@@ -1,6 +1,6 @@
 version: 2.1
 jobs:
-  build:
+  bygg:
     docker:
     - image: circleci/openjdk:11
     steps:
@@ -22,9 +22,15 @@ jobs:
         name: Bygger Docker image
         command: docker build -t "navikt/sykefravarsstatistikk-api:$CIRCLE_SHA1" .
     - run:
-        context: NAIS deployment
         name: Pusher Docker image
         command: |
-          echo $DOCKER_PASS | docker login --username $DOCKER_USER --password-stdin
-          docker push "navikt/kontakt-oss-api:$CIRCLE_SHA1"
+          echo $DOCKER_PASSWORD | docker login --username $DOCKER_LOGIN --password-stdin
+          docker push "navikt/sykefravarsstatistikk-api:$CIRCLE_SHA1"
           echo "Docker image: $CIRCLE_SHA1"
+
+workflows:
+  version: 2.1
+  bygg_og_deploy:
+    jobs:
+      - bygg:
+          context: NAIS deployment
