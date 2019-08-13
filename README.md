@@ -11,3 +11,5 @@ Kjør container
 
 Åpnes i browser: [http://localhost:8080/sykefravarsstatistikk-api/internal/healthcheck](http://localhost:8080/sykefravarsstatistikk-api/internal/healthcheck)
 
+### Notater
+Applikasjonen er ikke enablet til vault enda (vi tar det når det blir behov for noen secrets)

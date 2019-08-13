@@ -9,8 +9,6 @@ spec:
   image: navikt/sykefravarsstatistikk-api:{{version}}
   team: teamtag
   port: 8080
-  vault:
-    enabled: true
   ingresses:
     - https://arbeidsgiver.nais.preprod.local/sykefravarsstatistikk-api/
   liveness:
