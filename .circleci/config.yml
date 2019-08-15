@@ -36,6 +36,14 @@ jobs:
           cluster: "dev-fss"
           nais-yaml: "dev-nais.yaml"
 
+  deploy-til-prod:
+    docker:
+      - image: 'navikt/deployment-cli:v0.1.6'
+    steps:
+      - deploy:
+          cluster: "prod-fss"
+          nais-yaml: "prod-nais.yaml"
+
 
 commands:
   deploy:
@@ -64,4 +72,18 @@ workflows:
             branches:
               only:
                 - master
-
+      - godkjenn-til-prod:
+          type: approval
+          requires:
+            - bygg
+          filters:
+            branches:
+              only:
+                - master
+      - deploy-til-prod:
+          requires:
+            - godkjenn-til-prod
+          filters:
+            branches:
+              only:
+                - master
