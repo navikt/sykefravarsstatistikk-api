@@ -1,5 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api;
 
+import no.nav.tag.sykefravarsstatistikk.api.controller.SykefravarsstatistikkController;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,14 +11,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class SmokeTest {
+public class ApplicationTest {
 
 
     @Autowired
     private SykefravarsstatistikkController controller;
 
     @Test
-    public void contexLoads() throws Exception {
+    public void contexLoads() {
         assertThat(controller).isNotNull();
     }
 
