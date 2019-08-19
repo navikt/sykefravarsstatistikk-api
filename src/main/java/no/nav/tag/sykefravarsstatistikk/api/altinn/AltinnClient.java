@@ -55,8 +55,7 @@ public class AltinnClient {
                     uri,
                     HttpMethod.GET,
                     getHeaderEntity(),
-                    new ParameterizedTypeReference<List<Organisasjon>>() {
-                    }
+                    new ParameterizedTypeReference<List<Organisasjon>>() {}
             ).getBody());
 
             if (respons.isPresent()) {
