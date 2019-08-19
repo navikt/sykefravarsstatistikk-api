@@ -15,3 +15,35 @@ spring:
     path: /h2
   flyway:
     locations: classpath:/db/migration,/db/testdata
+
+---
+mock:
+  port: 8081
+
+spring:
+  profiles: local
+
+altinn:
+  url: "http://localhost:${mock.port}/altinn"
+  apikey: "test"
+  apigw.apikey: "test"
+
+---
+
+spring:
+  profiles: dev
+
+altinn:
+  url: "https://api-gw-q1.adeo.no/ekstern/altinn/api/serviceowner/"
+  apikey: ${ALTINN_HEADER}
+  apigw.apikey: ${APIGW_HEADER}
+
+---
+
+spring:
+  profiles: prod
+
+altinn:
+  url: "https://api-gw.adeo.no/ekstern/altinn/api/serviceowner/"
+  apikey: ${ALTINN_HEADER}
+  apigw.apikey: ${APIGW_HEADER}
