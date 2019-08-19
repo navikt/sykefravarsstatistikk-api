@@ -24,7 +24,7 @@ spring:
   profiles: local
 
 altinn:
-  url: "http://localhost:${mock.port}/altinn"
+  url: "http://localhost:${mock.port}/altinn/"
   apikey: "test"
   apigw.apikey: "test"
 

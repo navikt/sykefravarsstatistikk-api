@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "TROMVIK OG SPARBU REVISJON",
+    "Type": "Business",
+    "OrganizationNumber": "910989626",
+    "ParentOrganizationNumber": "910167200",
+    "OrganizationForm": "BEDR",
+    "Status": "Active"
+  },
+  {
+    "Name": "Tore sitt testselskap",
+    "Type": "Enterprise",
+    "OrganizationNumber": "910820834",
+    "OrganizationForm": "AS",
+    "Status": "Active"
+  }
+]
