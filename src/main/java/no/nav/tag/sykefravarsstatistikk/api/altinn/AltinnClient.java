@@ -13,6 +13,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -50,16 +51,23 @@ public class AltinnClient {
                 .toUri();
 
         try {
-            return restTemplate.exchange(
+            Optional<List<Organisasjon>> respons = Optional.ofNullable(restTemplate.exchange(
                     uri,
                     HttpMethod.GET,
                     getHeaderEntity(),
-                    new ParameterizedTypeReference<List<Organisasjon>>() {}
-            )
-                    .getBody()
-                    .stream()
-                    .map(Organisasjon::getOrganizationNumber)
-                    .collect(Collectors.toList());
+                    new ParameterizedTypeReference<List<Organisasjon>>() {
+                    }
+            ).getBody());
+
+            if (respons.isPresent()) {
+                return respons.get()
+                        .stream()
+                        .map(Organisasjon::getOrganizationNumber)
+                        .collect(Collectors.toList());
+            } else {
+                throw new AltinnException("Feil ved kall til Altinn. Response body er null.");
+            }
+
         } catch (RestClientException e) {
             log.error("Feil ved kall til Altinn", e);
             throw new AltinnException("Feil ved kall til Altinn", e);
