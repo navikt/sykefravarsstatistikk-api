@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.security.oidc.api.Protected;
 import no.nav.tag.sykefravarsstatistikk.api.domain.stats.LandStatistikk;
 import no.nav.tag.sykefravarsstatistikk.api.repository.LandStatistikkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
 
+@Protected
 @RestController
 @Slf4j
 public class SykefravarsstatistikkController {
