@@ -2,8 +2,10 @@ package no.nav.tag.sykefravarsstatistikk.api.controller;
 
 import no.nav.tag.sykefravarsstatistikk.api.domain.stats.LandStatistikk;
 import no.nav.tag.sykefravarsstatistikk.api.repository.LandStatistikkRepository;
+import no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll.TestController;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -29,6 +31,9 @@ public class SykefravarsstatistikkControllerTest {
     @MockBean
     private LandStatistikkRepository repository;
 
+    // TODO Fjern
+    @MockBean
+    private TestController testController;
 
     @Test
     public void returnerer_list_av_landStatistikk() throws Exception {
