@@ -24,7 +24,7 @@ public class MockServer {
             @Value("${mock.port}") Integer port,
             @Value("${altinn.url}") String altinnUrl
     ) {
-        log.info("Starter mock-server");
+        log.info("Starter mock-server på port " + port);
 
         this.server = new WireMockServer(port);
 
