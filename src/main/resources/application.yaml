@@ -34,7 +34,7 @@ spring:
   profiles: dev
 
 altinn:
-  url: "https://api-gw-q1.adeo.no/ekstern/altinn/api/serviceowner/"
+  url: "https://api-gw-q1.adeo.no/"
   apikey: ${ALTINN_APIKEY}
   apigw.apikey: ${ALTINN_APIGW_APIKEY}
 
@@ -44,6 +44,6 @@ spring:
   profiles: prod
 
 altinn:
-  url: "https://api-gw.adeo.no/ekstern/altinn/api/serviceowner/"
+  url: "https://api-gw.adeo.no/"
   apikey: ${ALTINN_APIKEY}
   apigw.apikey: ${ALTINN_APIGW_APIKEY}
