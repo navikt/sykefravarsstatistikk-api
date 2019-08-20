@@ -35,8 +35,8 @@ spring:
 
 altinn:
   url: "https://api-gw-q1.adeo.no/ekstern/altinn/api/serviceowner/"
-  apikey: ${ALTINN_HEADER}
-  apigw.apikey: ${APIGW_HEADER}
+  apikey: ${ALTINN_APIKEY}
+  apigw.apikey: ${ALTINN_APIGW_APIKEY}
 
 ---
 
@@ -45,5 +45,5 @@ spring:
 
 altinn:
   url: "https://api-gw.adeo.no/ekstern/altinn/api/serviceowner/"
-  apikey: ${ALTINN_HEADER}
-  apigw.apikey: ${APIGW_HEADER}
+  apikey: ${ALTINN_APIKEY}
+  apigw.apikey: ${ALTINN_APIGW_APIKEY}
