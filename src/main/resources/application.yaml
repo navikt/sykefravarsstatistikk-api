@@ -28,6 +28,13 @@ altinn:
   apikey: "test"
   apigw.apikey: "test"
 
+no.nav.security.oidc:
+  issuers: iss-localhost
+  issuer:
+    iss-localhost:
+      discoveryurl: http://metadata
+      accepted_audience: aud-localhost
+
 ---
 
 spring:
