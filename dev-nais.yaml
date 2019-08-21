@@ -23,3 +23,5 @@ spec:
   prometheus:
     enabled: true
     path: /sykefravarsstatistikk-api/internal/actuator/prometheus
+  vault:
+    enabled: true
