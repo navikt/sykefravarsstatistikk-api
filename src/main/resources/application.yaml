@@ -3,15 +3,47 @@ server.servlet.context-path: /sykefravarsstatistikk-api
 management.endpoints.web:
   exposure.include: info, health, metrics, prometheus
   base-path: /internal/actuator
-
   flyway:
     locations: classpath:/db/migration
 
 spring:
   profiles:
     active: local
+
+---
+
+spring:
+  profiles: local
   h2.console:
     enabled: true
     path: /h2
   flyway:
     locations: classpath:/db/migration,/db/testdata
+
+mock:
+  port: 8081
+
+altinn:
+  url: "http://localhost:${mock.port}/altinn/"
+  apikey: "test"
+  apigw.apikey: "test"
+
+---
+
+spring:
+  profiles: dev
+
+altinn:
+  url: "https://api-gw-q1.adeo.no/"
+  apikey: ${ALTINN_APIKEY}
+  apigw.apikey: ${ALTINN_APIGW_APIKEY}
+
+---
+
+spring:
+  profiles: prod
+
+altinn:
+  url: "https://api-gw.adeo.no/"
+  apikey: ${ALTINN_APIKEY}
+  apigw.apikey: ${ALTINN_APIGW_APIKEY}
