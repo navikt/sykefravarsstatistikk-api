@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.altinn;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.tag.sykefravarsstatistikk.api.domain.Fnr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -40,11 +41,11 @@ public class AltinnClient {
         this.altinnHeader = altinnApikey;
     }
 
-    public List<String> hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(String fnr) {
+    public List<Organisasjon> hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(Fnr fnr) {
         URI uri = UriComponentsBuilder.fromUriString(altinnUrl)
                 .pathSegment("ekstern", "altinn", "api", "serviceowner", "reportees")
                 .queryParam("ForceEIAuthentication")
-                .queryParam("subject", fnr)
+                .queryParam("subject", fnr.getVerdi())
                 .queryParam("serviceCode", ENKELTTJENESTE_TJENESTEKODE_IAWEB)
                 .queryParam("serviceEdition", ENKELTTJENESTE_TJENESTEKODE_VERSJON)
                 .build()
@@ -59,10 +60,7 @@ public class AltinnClient {
             ).getBody());
 
             if (respons.isPresent()) {
-                return respons.get()
-                        .stream()
-                        .map(Organisasjon::getOrganizationNumber)
-                        .collect(Collectors.toList());
+                return respons.get().stream().collect(Collectors.toList());
             } else {
                 throw new AltinnException("Feil ved kall til Altinn. Response body er null.");
             }
@@ -72,6 +70,7 @@ public class AltinnClient {
             throw new AltinnException("Feil ved kall til Altinn", e);
         }
     }
+
 
     private HttpEntity<Object> getHeaderEntity() {
         HttpHeaders headers = new HttpHeaders();

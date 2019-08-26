@@ -29,9 +29,12 @@ altinn:
   apigw.apikey: "test"
 
 no.nav.security.oidc:
-  issuers: iss-localhost
+  issuers: iss-localhost, selvbetjening
   issuer:
     iss-localhost:
+      discoveryurl: http://metadata
+      accepted_audience: aud-localhost
+    selvbetjening:
       discoveryurl: http://metadata
       accepted_audience: aud-localhost
 
