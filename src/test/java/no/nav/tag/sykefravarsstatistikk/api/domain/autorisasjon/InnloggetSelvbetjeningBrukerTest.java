@@ -39,7 +39,4 @@ public class InnloggetSelvbetjeningBrukerTest {
         bruker.sjekkTilgang(new Orgnr("987654321"));
     }
 
-
-
-
 }
