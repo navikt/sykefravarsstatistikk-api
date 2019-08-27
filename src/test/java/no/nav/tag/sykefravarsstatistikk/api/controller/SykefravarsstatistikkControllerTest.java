@@ -3,7 +3,8 @@ package no.nav.tag.sykefravarsstatistikk.api.controller;
 import no.nav.security.oidc.test.support.JwtTokenGenerator;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnException;
-import no.nav.tag.sykefravarsstatistikk.api.domain.Orgnr;
+import no.nav.tag.sykefravarsstatistikk.api.domain.Fnr;
+import no.nav.tag.sykefravarsstatistikk.api.domain.autorisasjon.InnloggetSelvbetjeningBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domain.stats.LandStatistikk;
 import no.nav.tag.sykefravarsstatistikk.api.repository.LandStatistikkRepository;
 import no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
@@ -84,12 +85,32 @@ public class SykefravarsstatistikkControllerTest {
     @Test
     public void handterer_AltinnException() throws Exception {
         doThrow(new AltinnException("Sthg bad happened :("))
-                .when(tilgangskontrollService).sjekkTilgang(new Orgnr("123456789"));
+                .when(tilgangskontrollService).hentInnloggetBruker();
 
         this.mockMvc.perform(get("/statistikk/bedrift/123456789").header(AUTHORIZATION, "Bearer " + jwt))
                 .andDo(print())
                 .andExpect(status().is5xxServerError())
                 .andExpect(content().json("{\"message\":\"Internal error\"}"));
     }
+
+    @Test
+    public void handterer_TilgangskontrollException() throws Exception {
+        InnloggetSelvbetjeningBruker brukerUtenTilgangTilOrg =
+                new InnloggetSelvbetjeningBruker(
+                        new Fnr("12345678901")
+                );
+        when(tilgangskontrollService.hentInnloggetBruker()).thenReturn(brukerUtenTilgangTilOrg);
+
+        this.mockMvc.perform(
+                get(
+                        "/statistikk/bedrift/123456789")
+                        .header(AUTHORIZATION, "Bearer " + jwt)
+                )
+                .andDo(print())
+                .andExpect(status().isForbidden())
+                .andExpect(content().json("{\"message\":\"You don't have access to this ressource\"}"));
+    }
+
+
 
 }

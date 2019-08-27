@@ -2,7 +2,6 @@ package no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnClient;
-import no.nav.tag.sykefravarsstatistikk.api.domain.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domain.autorisasjon.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domain.autorisasjon.InnloggetSelvbetjeningBruker;
 import no.nav.tag.sykefravarsstatistikk.api.utils.TokenUtils;
@@ -20,12 +19,7 @@ public class TilgangskontrollService {
         this.tokenUtils = tokenUtils;
     }
 
-    public void sjekkTilgang(Orgnr orgnr) {
-        hentInnloggetBruker().sjekkTilgang(orgnr);
-    }
-
-
-    private InnloggetBruker hentInnloggetBruker() {
+    public InnloggetBruker hentInnloggetBruker() {
         if (tokenUtils.erInnloggetSelvbetjeningBruker()) {
             InnloggetSelvbetjeningBruker innloggetSelvbetjeningBruker = tokenUtils.hentInnloggetSelvbetjeningBruker();
             innloggetSelvbetjeningBruker.setOrganisasjoner(

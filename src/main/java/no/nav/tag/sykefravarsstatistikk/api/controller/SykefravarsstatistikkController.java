@@ -61,7 +61,7 @@ public class SykefravarsstatistikkController {
 
     @GetMapping(value = "/statistikk/bedrift/{orgnr}")
     public String statistikkForBedrift(@PathVariable String orgnr) {
-        tilgangskontrollService.sjekkTilgang(new Orgnr(orgnr));
+        tilgangskontrollService.hentInnloggetBruker().sjekkTilgang(new Orgnr(orgnr));
         return "OK";
     }
 

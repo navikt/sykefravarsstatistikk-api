@@ -10,7 +10,7 @@ public abstract class InnloggetBruker<T extends Identifikator> {
     private final T identifikator;
 
 
-    public abstract boolean harTilgang(Orgnr orgnr);
+    protected abstract boolean harTilgang(Orgnr orgnr);
 
     public void sjekkTilgang(Orgnr orgnr) {
         if (!harTilgang(orgnr)) {
