@@ -41,6 +41,21 @@ no.nav.security.oidc:
 ---
 
 spring:
+  profiles: mvc-test
+
+no.nav.security.oidc:
+  issuers: iss-localhost, selvbetjening
+  issuer:
+    iss-localhost:
+      discoveryurl: http://metadata
+      accepted_audience: aud-localhost
+    selvbetjening:
+      discoveryurl: http://metadata
+      accepted_audience: aud-localhost
+
+---
+
+spring:
   profiles: dev
 
 altinn:

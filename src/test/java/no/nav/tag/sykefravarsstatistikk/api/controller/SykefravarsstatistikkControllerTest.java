@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.controller;
 
 import no.nav.security.oidc.test.support.JwtTokenGenerator;
+import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnException;
 import no.nav.tag.sykefravarsstatistikk.api.domain.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domain.stats.LandStatistikk;
@@ -9,7 +10,6 @@ import no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollSer
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,7 +21,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -31,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@ActiveProfiles("local")
+@ActiveProfiles("mvc-test")
 @AutoConfigureMockMvc
 @SpringBootTest
 public class SykefravarsstatistikkControllerTest {
@@ -44,6 +43,9 @@ public class SykefravarsstatistikkControllerTest {
 
     @MockBean
     private TilgangskontrollService tilgangskontrollService;
+
+    @MockBean
+    private AltinnClient altinnClient;
 
     private String jwt;
     private static String DUMMY_FNR = "01029900001";

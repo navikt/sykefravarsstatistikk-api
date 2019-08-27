@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -26,22 +25,27 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
     @ExceptionHandler(value = {TilgangskontrollException.class})
     @ResponseBody
-    @ResponseStatus(HttpStatus.FORBIDDEN)
     protected ResponseEntity<Object> handleTilgangskontrollException(RuntimeException e, WebRequest webRequest) {
         return getResponseEntity(e, "You don't have access to this ressource", HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(value = {OIDCUnauthorizedException.class, AccessDeniedException.class})
     @ResponseBody
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     protected ResponseEntity<Object> handleUnauthorizedException(RuntimeException e, WebRequest webRequest) {
         return getResponseEntity(e, "You are not authorized to access this ressource", HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(value = {AltinnException.class})
     @ResponseBody
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     protected ResponseEntity<Object> handleAltinnException(RuntimeException e, WebRequest webRequest) {
+        logger.warn("Feil ved Altinn integrasjon", e);
+        return getResponseEntity(e, "Internal error", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(value = {Exception.class})
+    @ResponseBody
+    protected ResponseEntity<Object> handleGenerellException(RuntimeException e, WebRequest webRequest) {
+        logger.error("Uhåndtert feil", e);
         return getResponseEntity(e, "Internal error", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
