@@ -21,6 +21,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <oidc-support.version>0.2.18</oidc-support.version>
         <java.version>11</java.version>
     </properties>
 
@@ -38,6 +39,13 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -113,6 +121,18 @@
             <groupId>com.github.tomakehurst</groupId>
             <artifactId>wiremock</artifactId>
             <version>2.24.1</version>
+        </dependency>
+
+        <!-- OIDC Support -->
+        <dependency>
+            <groupId>no.nav.security</groupId>
+            <artifactId>oidc-spring-support</artifactId>
+            <version>${oidc-support.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.security</groupId>
+            <artifactId>oidc-test-support</artifactId>
+            <version>${oidc-support.version}</version>
         </dependency>
 
     </dependencies>

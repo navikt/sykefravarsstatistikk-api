@@ -31,6 +31,31 @@ altinn:
     code: 3403
     edition: 1
 
+no.nav.security.oidc:
+  issuers: iss-localhost, selvbetjening
+  issuer:
+    iss-localhost:
+      discoveryurl: http://metadata
+      accepted_audience: aud-localhost
+    selvbetjening:
+      discoveryurl: http://metadata
+      accepted_audience: aud-localhost
+
+---
+
+spring:
+  profiles: mvc-test
+
+no.nav.security.oidc:
+  issuers: iss-localhost, selvbetjening
+  issuer:
+    iss-localhost:
+      discoveryurl: http://metadata
+      accepted_audience: aud-localhost
+    selvbetjening:
+      discoveryurl: http://metadata
+      accepted_audience: aud-localhost
+
 ---
 
 spring:

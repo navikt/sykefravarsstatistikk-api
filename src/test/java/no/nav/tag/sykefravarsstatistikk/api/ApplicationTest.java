@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@TestPropertySource(properties = {"mock.port=8082"})
+@TestPropertySource(properties = {"mock.port=8082", "spring.h2.console.enabled=false"})
 public class ApplicationTest {
 
     @Autowired

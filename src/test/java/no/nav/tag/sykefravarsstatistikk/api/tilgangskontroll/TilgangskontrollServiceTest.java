@@ -1,54 +1,48 @@
 package no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll;
 
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnClient;
+import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnException;
+import no.nav.tag.sykefravarsstatistikk.api.domain.Fnr;
+import no.nav.tag.sykefravarsstatistikk.api.domain.autorisasjon.InnloggetSelvbetjeningBruker;
+import no.nav.tag.sykefravarsstatistikk.api.utils.TokenUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.Collections;
-
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TilgangskontrollServiceTest {
+    public static final String FNR = "01082248486";
+
     @Mock
     private AltinnClient altinnClient;
-
+    @Mock
     private TilgangskontrollService tilgangskontroll;
+    @Mock
+    private TokenUtils tokenUtils;
+
+    private Fnr fnr;
+
 
     @Before
     public void setUp() {
-        tilgangskontroll = new TilgangskontrollService(altinnClient);
+        tilgangskontroll = new TilgangskontrollService(altinnClient, tokenUtils);
+        fnr = new Fnr(FNR);
     }
 
-    @Test
-    public void sjekkTilgang__skal_gi_OK_hvis_bruker_har_tilgang_til_orgnr() {
-        String fnr = "1353423534582";
-        String orgnr = "6487452783576";
-        when(altinnClient.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(fnr)).thenReturn(Collections.singletonList(
-                orgnr
-        ));
 
-        tilgangskontroll.sjekkTilgang(fnr, orgnr);
+
+    @Test(expected = AltinnException.class)
+    public void hentInnloggetBruker__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
+        when(altinnClient.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(fnr)).thenThrow(new AltinnException(""));
+        when(tokenUtils.erInnloggetSelvbetjeningBruker()).thenReturn(true);
+        when(tokenUtils.hentInnloggetSelvbetjeningBruker()).thenReturn(new InnloggetSelvbetjeningBruker(fnr));
+
+        tilgangskontroll.hentInnloggetBruker();
     }
 
-    @Test(expected = TilgangskontrollException.class)
-    public void sjekkTilgang__skal_feile_hvis_bruker_ikke_har_tilgang_til_orgnr() {
-        String fnr = "1353423534582";
-        when(altinnClient.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(fnr)).thenReturn(Collections.singletonList(
-                "11111"
-        ));
 
-        tilgangskontroll.sjekkTilgang(fnr, "22222");
-    }
-
-    @Test(expected = TilgangskontrollException.class)
-    public void sjekkTilgang__skal_feile_med_riktig_exception_hvis_altinn_gir_null() {
-        String fnr = "1353423534582";
-        when(altinnClient.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(fnr)).thenReturn(null);
-
-        tilgangskontroll.sjekkTilgang(fnr, "6487452783576");
-    }
 }
