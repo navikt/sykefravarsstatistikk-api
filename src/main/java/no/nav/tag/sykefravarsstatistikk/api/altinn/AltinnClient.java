@@ -26,19 +26,23 @@ public class AltinnClient {
     private final String altinnAPIGWApikey;
     private final String altinnHeader;
 
-    private final static String ENKELTTJENESTE_TJENESTEKODE_IAWEB = "3403";
-    private final static String ENKELTTJENESTE_TJENESTEKODE_VERSJON = "2";
+    private final String iawebServiceCode;
+    private final String iawebServiceEdition;
 
     public AltinnClient(
             RestTemplate restTemplate,
             @Value("${altinn.url}") String altinnUrl,
             @Value("${altinn.apigw.apikey}") String altinnAPIGWApikey,
-            @Value("${altinn.apikey}") String altinnApikey
+            @Value("${altinn.apikey}") String altinnApikey,
+            @Value("${altinn.iaweb.service.code}") String iawebServiceCode,
+            @Value("${altinn.iaweb.service.edition}") String iawebServiceEdition
     ) {
         this.restTemplate = restTemplate;
         this.altinnUrl = altinnUrl;
         this.altinnAPIGWApikey = altinnAPIGWApikey;
         this.altinnHeader = altinnApikey;
+        this.iawebServiceCode = iawebServiceCode;
+        this.iawebServiceEdition = iawebServiceEdition;
     }
 
     public List<Organisasjon> hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(Fnr fnr) {
@@ -50,7 +54,6 @@ public class AltinnClient {
                 .queryParam("serviceEdition", ENKELTTJENESTE_TJENESTEKODE_VERSJON)
                 .build()
                 .toUri();
-
         try {
             Optional<List<Organisasjon>> respons = Optional.ofNullable(restTemplate.exchange(
                     uri,
