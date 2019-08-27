@@ -56,6 +56,15 @@ no.nav.security.oidc:
       discoveryurl: http://metadata
       accepted_audience: aud-localhost
 
+altinn:
+  url: "http://localhost:1331/altinn/"
+  apikey: "test"
+  apigw.apikey: "test"
+  iaweb.service:
+    code: 3403
+    edition: 1
+
+
 ---
 
 spring:

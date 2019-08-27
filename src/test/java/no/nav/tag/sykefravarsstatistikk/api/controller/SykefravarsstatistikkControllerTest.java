@@ -45,9 +45,6 @@ public class SykefravarsstatistikkControllerTest {
     @MockBean
     private TilgangskontrollService tilgangskontrollService;
 
-    @MockBean
-    private AltinnClient altinnClient;
-
     private String jwt;
     private static String DUMMY_FNR = "01029900001";
 
