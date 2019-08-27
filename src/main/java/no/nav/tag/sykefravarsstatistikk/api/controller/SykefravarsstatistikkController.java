@@ -61,13 +61,8 @@ public class SykefravarsstatistikkController {
 
     @GetMapping(value = "/statistikk/bedrift/{orgnr}")
     public String statistikkForBedrift(@PathVariable String orgnr) {
-        try {
-            tilgangskontrollService.sjekkTilgang(new Orgnr(orgnr));
-            return "OK";
-        } catch (Exception e) {
-            log.warn(String.format("Feil ved uthenting av statistikk for bedrift %s", orgnr), e);
-            return null;
-        }
+        tilgangskontrollService.sjekkTilgang(new Orgnr(orgnr));
+        return "OK";
     }
 
 }
