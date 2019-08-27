@@ -50,8 +50,8 @@ public class AltinnClient {
                 .pathSegment("ekstern", "altinn", "api", "serviceowner", "reportees")
                 .queryParam("ForceEIAuthentication")
                 .queryParam("subject", fnr.getVerdi())
-                .queryParam("serviceCode", ENKELTTJENESTE_TJENESTEKODE_IAWEB)
-                .queryParam("serviceEdition", ENKELTTJENESTE_TJENESTEKODE_VERSJON)
+                .queryParam("serviceCode", iawebServiceCode)
+                .queryParam("serviceEdition", iawebServiceEdition)
                 .build()
                 .toUri();
         try {
