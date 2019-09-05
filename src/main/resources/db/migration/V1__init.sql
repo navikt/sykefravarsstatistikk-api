@@ -33,7 +33,7 @@ create table VIRKSOMHET (
 
 
 -- Statistikk tabeller
-create table LAND_STATISTIKK_SYKEFRAVAR (
+create table SYKEFRAVAR_STATISTIK_LAND (
   id serial primary key,
   opprettet timestamp not null default current_timestamp,
   arstall smallint not null,
@@ -42,7 +42,7 @@ create table LAND_STATISTIKK_SYKEFRAVAR (
   mulige_dagsverk numeric(17,6) not null
 );
 
-create table SEKTOR_STATISTIKK_SYKEFRAVAR (
+create table SYKEFRAVAR_STATISTIK_SEKTOR (
   id serial primary key,
   opprettet timestamp not null default current_timestamp,
   arstall smallint not null,
@@ -52,7 +52,7 @@ create table SEKTOR_STATISTIKK_SYKEFRAVAR (
   mulige_dagsverk numeric(17,6) not null
 );
 
-create table NARING_STATISTIKK_SYKEFRAVAR (
+create table SYKEFRAVAR_STATISTIK_NARING (
   id serial primary key,
   opprettet timestamp not null default current_timestamp,
   arstall smallint not null,
@@ -64,7 +64,7 @@ create table NARING_STATISTIKK_SYKEFRAVAR (
   foreign key (naring_kode) references NARING(kode)
 );
 
-create table VIRKSOMHET_STATISTIKK_SYKEFRAVAR (
+create table SYKEFRAVAR_STATISTIK_VIRKSOMHET (
   id serial primary key,
   opprettet timestamp not null default current_timestamp,
   arstall smallint not null,
