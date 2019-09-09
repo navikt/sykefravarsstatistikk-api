@@ -16,7 +16,6 @@ public class LandStatistikk {
     private final BigDecimal tapteDagsverk;
     private final BigDecimal muligeDagsverk;
 
-
     public BigDecimal beregnSykkefravarProsent() {
         return (tapteDagsverk.multiply(new BigDecimal(100)).divide(muligeDagsverk, 1, RoundingMode.HALF_UP));
     }

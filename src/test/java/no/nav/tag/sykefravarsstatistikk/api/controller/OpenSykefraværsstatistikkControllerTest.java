@@ -34,8 +34,6 @@ public class OpenSykefraværsstatistikkControllerTest {
     @MockBean
     private SykefraværprosentService service;
 
-
-
     @Test
     public void sykefravarprosent_krever_ikke_autentisering() throws Exception {
         LandStatistikk landStatistikk = LandStatistikk.builder()
@@ -46,7 +44,7 @@ public class OpenSykefraværsstatistikkControllerTest {
                 .build();
 
         Sykefraværprosent sfProsent = Sykefraværprosent.builder()
-                .landStatistikk(landStatistikk)
+                .land(landStatistikk.beregnSykkefravarProsent())
                 .build();
 
         when(service.hentSykefraværProsent()).thenReturn(sfProsent);

@@ -24,7 +24,7 @@ public class SykefravarprosentRepository {
                 .addValue("kvartal", kvartal);
 
         LandStatistikk landStatistikk = namedParameterJdbcTemplate.queryForObject(
-                "SELECT * FROM SYKEFRAVAR_STATISTIK_LAND where arstall = :arstall and kvartal = :kvartal",
+                "SELECT * FROM SYKEFRAVAR_STATISTIKK_LAND where arstall = :arstall and kvartal = :kvartal",
                 namedParameters,
                 new LandStatistikkRowMapper());
         return landStatistikk;

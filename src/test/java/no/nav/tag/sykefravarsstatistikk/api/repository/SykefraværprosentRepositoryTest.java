@@ -50,7 +50,7 @@ public class SykefraværprosentRepositoryTest {
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void hentLandStatistikk_returnerer_____() {
+    public void hentLandStatistikk_returnerer_exception_dersom_ingen_data_er_funnet() {
         repository.hentLandStatistikk(2008, 2);
         fail("Repository skal returnere EmptyResultDataAccessException");
     }

@@ -2,7 +2,6 @@ package no.nav.tag.sykefravarsstatistikk.api.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.security.oidc.api.Unprotected;
-import no.nav.tag.sykefravarsstatistikk.api.controller.json.SykefraværprosentJson;
 import no.nav.tag.sykefravarsstatistikk.api.sykefravarprosent.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.sykefravarprosent.SykefraværprosentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +23,8 @@ public class OpenSykefraværsstatistikkController {
 
 
     @GetMapping(value = "/sykefravarprosent")
-    public SykefraværprosentJson sykefraværprosent() {
-        return new SykefraværprosentJson(service.hentSykefraværProsent());
+    public Sykefraværprosent sykefraværprosent() {
+        return service.hentSykefraværProsent();
     }
 
 }

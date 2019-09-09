@@ -34,6 +34,8 @@ public class SykefraværprosentService {
             logger.info(msg);
             throw new ResourceNotFoundException(msg);
         }
-        return new Sykefraværprosent(landStatistikk);
+        return Sykefraværprosent.builder()
+                .land(landStatistikk.beregnSykkefravarProsent())
+                .build();
     }
 }

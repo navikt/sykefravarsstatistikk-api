@@ -2,7 +2,7 @@
 create table SEKTOR (
   id serial primary key,
   kode smallint not null,
-  navn varchar(255) not null,
+  navn varchar(255) not null
 );
 
 create table NARINGSGRUPPE (
@@ -33,7 +33,7 @@ create table VIRKSOMHET (
 
 
 -- Statistikk tabeller
-create table SYKEFRAVAR_STATISTIK_LAND (
+create table SYKEFRAVAR_STATISTIKK_LAND (
   id serial primary key,
   opprettet timestamp not null default current_timestamp,
   arstall smallint not null,
@@ -42,7 +42,7 @@ create table SYKEFRAVAR_STATISTIK_LAND (
   mulige_dagsverk numeric(17,6) not null
 );
 
-create table SYKEFRAVAR_STATISTIK_SEKTOR (
+create table SYKEFRAVAR_STATISTIKK_SEKTOR (
   id serial primary key,
   opprettet timestamp not null default current_timestamp,
   arstall smallint not null,
@@ -52,7 +52,7 @@ create table SYKEFRAVAR_STATISTIK_SEKTOR (
   mulige_dagsverk numeric(17,6) not null
 );
 
-create table SYKEFRAVAR_STATISTIK_NARING (
+create table SYKEFRAVAR_STATISTIKK_NARING (
   id serial primary key,
   opprettet timestamp not null default current_timestamp,
   arstall smallint not null,
@@ -64,7 +64,7 @@ create table SYKEFRAVAR_STATISTIK_NARING (
   foreign key (naring_kode) references NARING(kode)
 );
 
-create table SYKEFRAVAR_STATISTIK_VIRKSOMHET (
+create table SYKEFRAVAR_STATISTIKK_VIRKSOMHET (
   id serial primary key,
   opprettet timestamp not null default current_timestamp,
   arstall smallint not null,
