@@ -9,9 +9,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 		"springfox.documentation.swagger.web.ApiResourceController",
 		"org.springframework"
 })
-public class SykefravarsstatistikkApplication {
+public class SykefraværsstatistikkApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SykefravarsstatistikkApplication.class, args);
+		SpringApplication.run(SykefraværsstatistikkApplication.class, args);
 	}
 }
