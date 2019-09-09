@@ -7,7 +7,7 @@ import no.nav.tag.sykefravarsstatistikk.api.domain.stats.LandStatistikk;
 
 @Data
 @Builder
-public class Sykefravarprosent {
+public class Sykefraværprosent {
 
     private final LandStatistikk landStatistikk;
 }

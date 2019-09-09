@@ -18,7 +18,7 @@ import java.util.Collection;
 @Protected
 @RestController
 @Slf4j
-public class SykefravarsstatistikkController {
+public class SykefraværsstatistikkController {
 
     private final LandStatistikkRepository repository;
     private final TilgangskontrollService tilgangskontrollService;
@@ -26,7 +26,7 @@ public class SykefravarsstatistikkController {
 
 
     @Autowired
-    public SykefravarsstatistikkController(LandStatistikkRepository repository, TilgangskontrollService tilgangskontrollService){
+    public SykefraværsstatistikkController(LandStatistikkRepository repository, TilgangskontrollService tilgangskontrollService){
         this.repository = repository;
         this.tilgangskontrollService = tilgangskontrollService;
     }

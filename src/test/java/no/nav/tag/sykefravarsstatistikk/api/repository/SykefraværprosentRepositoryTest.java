@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @TestPropertySource(properties = {"mock.enabled=false"})
-public class SykefravarprosentRepositoryTest {
+public class SykefraværprosentRepositoryTest {
 
 
     public static final BigDecimal DELTA_ERROR = new BigDecimal(0.0000001);

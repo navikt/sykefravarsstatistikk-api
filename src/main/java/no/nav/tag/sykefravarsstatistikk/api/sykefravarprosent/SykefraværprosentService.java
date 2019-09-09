@@ -9,7 +9,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SykefravarprosentService {
+public class SykefraværprosentService {
 
     private final SykefravarprosentRepository sykefravarprosentRepository;
 
@@ -18,11 +18,11 @@ public class SykefravarprosentService {
 
     private static Logger logger = LoggerFactory.getLogger(SykefravarprosentRepository.class);
 
-    public SykefravarprosentService(SykefravarprosentRepository sykefravarprosentRepository) {
+    public SykefraværprosentService(SykefravarprosentRepository sykefravarprosentRepository) {
         this.sykefravarprosentRepository = sykefravarprosentRepository;
     }
 
-    public Sykefravarprosent hentSykefravarProsent() {
+    public Sykefraværprosent hentSykefraværProsent() {
         LandStatistikk landStatistikk;
 
         try {
@@ -34,6 +34,6 @@ public class SykefravarprosentService {
             logger.info(msg);
             throw new ResourceNotFoundException(msg);
         }
-        return new Sykefravarprosent(landStatistikk);
+        return new Sykefraværprosent(landStatistikk);
     }
 }

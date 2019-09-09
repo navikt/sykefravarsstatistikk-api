@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("mvc-test")
 @AutoConfigureMockMvc
 @SpringBootTest
-public class SykefravarsstatistikkControllerTest {
+public class SykefraværsstatistikkControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

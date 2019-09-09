@@ -2,8 +2,8 @@ package no.nav.tag.sykefravarsstatistikk.api.controller;
 
 import no.nav.tag.sykefravarsstatistikk.api.domain.stats.LandStatistikk;
 import no.nav.tag.sykefravarsstatistikk.api.repository.ResourceNotFoundException;
-import no.nav.tag.sykefravarsstatistikk.api.sykefravarprosent.Sykefravarprosent;
-import no.nav.tag.sykefravarsstatistikk.api.sykefravarprosent.SykefravarprosentService;
+import no.nav.tag.sykefravarsstatistikk.api.sykefravarprosent.Sykefraværprosent;
+import no.nav.tag.sykefravarsstatistikk.api.sykefravarprosent.SykefraværprosentService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +26,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("mvc-test")
 @AutoConfigureMockMvc
 @SpringBootTest
-public class OpenSykefravarsstatistikkControllerTest {
+public class OpenSykefraværsstatistikkControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private SykefravarprosentService service;
+    private SykefraværprosentService service;
 
 
 
@@ -45,28 +45,23 @@ public class OpenSykefravarsstatistikkControllerTest {
                 .tapteDagsverk(new BigDecimal(56.699))
                 .build();
 
-        Sykefravarprosent sfProsent = Sykefravarprosent.builder()
+        Sykefraværprosent sfProsent = Sykefraværprosent.builder()
                 .landStatistikk(landStatistikk)
                 .build();
 
-        when(service.hentSykefravarProsent()).thenReturn(sfProsent);
+        when(service.hentSykefraværProsent()).thenReturn(sfProsent);
 
         this.mockMvc.perform(
                 get("/sykefravarprosent"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"landStatistikk\":" +
-                        "{\"arstall\":2019," +
-                        "\"kvartal\":1," +
-                        "\"mulige_dagsverk\":1000.55," +
-                        "\"tapte_dagsverk\":56.699," +
-                        "\"sykefravar_prosent\":5.7}}")
+                .andExpect(content().json("{\"land\":5.7}")
                 );
     }
 
     @Test
     public void sykefravarprosent_returnerer_404_dersom_ingen_stat_er_funnet() throws Exception {
-        when(service.hentSykefravarProsent()).thenThrow(new ResourceNotFoundException("Har ikke funnet noe"));
+        when(service.hentSykefraværProsent()).thenThrow(new ResourceNotFoundException("Har ikke funnet noe"));
 
         this.mockMvc.perform(
                 get("/sykefravarprosent"))
