@@ -28,7 +28,7 @@ public class DatabaseConfig {
 
     @Bean
     public DataSource userDataSource() {
-        return dataSource("user");
+        return dataSource("admin");
     }
 
     @SneakyThrows
