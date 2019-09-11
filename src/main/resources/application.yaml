@@ -64,7 +64,6 @@ altinn:
     code: 3403
     edition: 1
 
-
 ---
 
 spring:
@@ -77,6 +76,10 @@ altinn:
   iaweb.service:
     code: 3403
     edition: 1
+
+database.navn: sykefravarstatistikk
+vault.mount-path: postgresql/preprod-fss
+
 ---
 
 spring:
@@ -89,3 +92,6 @@ altinn:
   iaweb.service:
     code: 3403
     edition: 2
+
+database.navn: sykefravarstatistikk
+vault.mount-path: postgresql/prod-fss
