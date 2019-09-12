@@ -1,19 +1,16 @@
 -- Dimensjon tabeller
 create table SEKTOR (
-  id serial primary key,
-  kode smallint not null,
+  kode smallint primary key,
   navn varchar(255) not null
 );
 
 create table NARINGSGRUPPE (
-  id serial primary key,
-  kode smallint not null,
+  kode smallint primary key,
   navn varchar(255) not null
 );
 
 create table NARING (
-  id serial primary key,
-  kode smallint not null,
+  kode smallint primary key,
   naringsgruppe_kode smallint not null,
   navn varchar(255) not null,
 
@@ -21,8 +18,7 @@ create table NARING (
 );
 
 create table VIRKSOMHET (
-  id serial primary key,
-  orgnr varchar(20) not null,
+  orgnr varchar(20) primary key,
   sektor_kode smallint not null,
   naring_kode smallint not null,
   offnavn varchar(255) not null,
