@@ -32,15 +32,56 @@ public class SykefraværprosentRepository {
         return landStatistikk;
     }
 
-    public Sykefraværprosent hentSykefraværprosentLand(int arstall, int kvartal) {
+
+    // TODO Generaliser disse metodene?
+    public Sykefraværprosent hentSykefraværprosentLand(int årstall, int kvartal) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
-                .addValue("arstall", arstall)
+                .addValue("arstall", årstall)
                 .addValue("kvartal", kvartal);
 
         return namedParameterJdbcTemplate.queryForObject(
                 "SELECT * FROM SYKEFRAVAR_STATISTIKK_LAND where arstall = :arstall and kvartal = :kvartal",
                 namedParameters,
-                (rs, rowNum) -> mapTilSykefraværprosent("Label for land", rs, rowNum)
+                (rs, rowNum) -> mapTilSykefraværprosent("Norge", rs, rowNum)
+        );
+    }
+
+    public Sykefraværprosent hentSykefraværprosentSektor(int årstall, int kvartal, String sektor) {
+        SqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("arstall", årstall)
+                .addValue("kvartal", kvartal)
+                .addValue("sektor", sektor);
+
+        return namedParameterJdbcTemplate.queryForObject(
+                "SELECT * FROM SYKEFRAVAR_STATISTIKK_SEKTOR WHERE arstall = :arstall AND kvartal = :kvartal AND sektor_kode = :sektor",
+                namedParameters,
+                (rs, rowNum) -> mapTilSykefraværprosent("Offentlig næringsvirksomhet", rs, rowNum)
+        );
+    }
+
+    public Sykefraværprosent hentSykefraværprosentNæring(int årstall, int kvartal, String næring) {
+        SqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("arstall", årstall)
+                .addValue("kvartal", kvartal)
+                .addValue("naring", næring);
+
+        return namedParameterJdbcTemplate.queryForObject(
+                "SELECT * FROM SYKEFRAVAR_STATISTIKK_NARING WHERE arstall = :arstall AND kvartal = :kvartal AND naring_kode = :naring",
+                namedParameters,
+                (rs, rowNum) -> mapTilSykefraværprosent("Tjenester tilknyttet informasjonsteknologi", rs, rowNum)
+        );
+    }
+
+    public Sykefraværprosent hentSykefraværprosentVirksomhet(int årstall, int kvartal, String orgnr) {
+        SqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("arstall", årstall)
+                .addValue("kvartal", kvartal)
+                .addValue("orgnr", orgnr);
+
+        return namedParameterJdbcTemplate.queryForObject(
+                "SELECT * FROM SYKEFRAVAR_STATISTIKK_VIRKSOMHET WHERE arstall = :arstall AND kvartal = :kvartal AND orgnr = :orgnr",
+                namedParameters,
+                (rs, rowNum) -> mapTilSykefraværprosent("Fisk og Fulg AS", rs, rowNum)
         );
     }
 

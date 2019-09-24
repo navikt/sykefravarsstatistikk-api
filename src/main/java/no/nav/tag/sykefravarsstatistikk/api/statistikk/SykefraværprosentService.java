@@ -3,7 +3,6 @@ package no.nav.tag.sykefravarsstatistikk.api.statistikk;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.LandStatistikk;
 import no.nav.tag.sykefravarsstatistikk.api.ResourceNotFoundException;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.Sammenligning;
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.Sykefraværprosent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -24,18 +23,17 @@ public class SykefraværprosentService {
     }
 
     public Sammenligning hentSammenligning() {
-        Sykefraværprosent landProsent = sykefravarprosentRepository.hentSykefraværprosentLand(ARSTALL, KVARTAL);
-
         return new Sammenligning(
                 KVARTAL,
                 ARSTALL,
-                sykefravarprosentRepository.hentSykefraværprosentLand(ARSTALL, KVARTAL),
-                sykefravarprosentRepository.hentSykefraværprosentLand(ARSTALL, KVARTAL),
-                sykefravarprosentRepository.hentSykefraværprosentLand(ARSTALL, KVARTAL),
+                sykefravarprosentRepository.hentSykefraværprosentVirksomhet(ARSTALL, KVARTAL, "910969439"),
+                sykefravarprosentRepository.hentSykefraværprosentSektor(ARSTALL, KVARTAL, "0"),
+                sykefravarprosentRepository.hentSykefraværprosentNæring(ARSTALL, KVARTAL, "10"),
                 sykefravarprosentRepository.hentSykefraværprosentLand(ARSTALL, KVARTAL)
         );
     }
 
+    @Deprecated
     public Sykefraværprosent2 hentSykefraværProsent() {
         LandStatistikk landStatistikk;
 
