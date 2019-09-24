@@ -1,8 +1,7 @@
-package no.nav.tag.sykefravarsstatistikk.api.sykefravarprosent;
+package no.nav.tag.sykefravarsstatistikk.api.statistikk;
 
-import no.nav.tag.sykefravarsstatistikk.api.domain.stats.LandStatistikk;
-import no.nav.tag.sykefravarsstatistikk.api.repository.ResourceNotFoundException;
-import no.nav.tag.sykefravarsstatistikk.api.repository.SykefravarprosentRepository;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.LandStatistikk;
+import no.nav.tag.sykefravarsstatistikk.api.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;

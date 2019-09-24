@@ -1,6 +1,6 @@
-package no.nav.tag.sykefravarsstatistikk.api.repository;
+package no.nav.tag.sykefravarsstatistikk.api.statistikk;
 
-import no.nav.tag.sykefravarsstatistikk.api.domain.stats.LandStatistikk;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.LandStatistikk;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;

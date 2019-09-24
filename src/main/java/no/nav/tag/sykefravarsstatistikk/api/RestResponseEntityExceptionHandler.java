@@ -2,7 +2,6 @@ package no.nav.tag.sykefravarsstatistikk.api;
 
 import no.nav.security.spring.oidc.validation.interceptor.OIDCUnauthorizedException;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnException;
-import no.nav.tag.sykefravarsstatistikk.api.repository.ResourceNotFoundException;
 import no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

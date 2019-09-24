@@ -1,4 +1,4 @@
-package no.nav.tag.sykefravarsstatistikk.api.domain.stats;
+package no.nav.tag.sykefravarsstatistikk.api.domene.statistikk;
 
 import lombok.*;
 

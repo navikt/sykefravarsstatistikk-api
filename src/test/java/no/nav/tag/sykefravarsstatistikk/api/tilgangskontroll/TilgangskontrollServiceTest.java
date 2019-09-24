@@ -2,9 +2,8 @@ package no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll;
 
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnException;
-import no.nav.tag.sykefravarsstatistikk.api.domain.Fnr;
-import no.nav.tag.sykefravarsstatistikk.api.domain.autorisasjon.InnloggetSelvbetjeningBruker;
-import no.nav.tag.sykefravarsstatistikk.api.utils.TokenUtils;
+import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
+import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetSelvbetjeningBruker;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

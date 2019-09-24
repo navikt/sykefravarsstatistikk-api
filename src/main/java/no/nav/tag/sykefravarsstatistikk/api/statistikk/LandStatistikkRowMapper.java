@@ -1,6 +1,6 @@
-package no.nav.tag.sykefravarsstatistikk.api.repository;
+package no.nav.tag.sykefravarsstatistikk.api.statistikk;
 
-import no.nav.tag.sykefravarsstatistikk.api.domain.stats.LandStatistikk;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.LandStatistikk;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;

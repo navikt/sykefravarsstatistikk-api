@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.repository;
 
-import no.nav.tag.sykefravarsstatistikk.api.domain.stats.LandStatistikk;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.LandStatistikk;
+import no.nav.tag.sykefravarsstatistikk.api.statistikk.SykefravarprosentRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

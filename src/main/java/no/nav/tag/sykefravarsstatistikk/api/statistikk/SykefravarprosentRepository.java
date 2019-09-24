@@ -1,7 +1,7 @@
-package no.nav.tag.sykefravarsstatistikk.api.repository;
+package no.nav.tag.sykefravarsstatistikk.api.statistikk;
 
 import lombok.SneakyThrows;
-import no.nav.tag.sykefravarsstatistikk.api.domain.stats.LandStatistikk;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.LandStatistikk;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;

@@ -1,8 +1,8 @@
 package no.nav.tag.sykefravarsstatistikk.api;
 
 import no.nav.tag.sykefravarsstatistikk.api.altinn.Organisasjon;
-import no.nav.tag.sykefravarsstatistikk.api.domain.Fnr;
-import no.nav.tag.sykefravarsstatistikk.api.domain.autorisasjon.InnloggetSelvbetjeningBruker;
+import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
+import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetSelvbetjeningBruker;
 
 public class TestUtils {
 

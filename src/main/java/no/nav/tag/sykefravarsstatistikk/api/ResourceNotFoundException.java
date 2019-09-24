@@ -1,4 +1,4 @@
-package no.nav.tag.sykefravarsstatistikk.api.repository;
+package no.nav.tag.sykefravarsstatistikk.api;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

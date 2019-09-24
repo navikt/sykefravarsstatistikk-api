@@ -1,6 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api;
 
-import no.nav.tag.sykefravarsstatistikk.api.controller.OpenSykefraværsstatistikkController;
+import no.nav.tag.sykefravarsstatistikk.api.statistikk.OpenSykefraværsstatistikkController;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

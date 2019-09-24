@@ -1,9 +1,9 @@
 package no.nav.tag.sykefravarsstatistikk.api.controller;
 
-import no.nav.tag.sykefravarsstatistikk.api.domain.stats.LandStatistikk;
-import no.nav.tag.sykefravarsstatistikk.api.repository.ResourceNotFoundException;
-import no.nav.tag.sykefravarsstatistikk.api.sykefravarprosent.Sykefraværprosent;
-import no.nav.tag.sykefravarsstatistikk.api.sykefravarprosent.SykefraværprosentService;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.LandStatistikk;
+import no.nav.tag.sykefravarsstatistikk.api.ResourceNotFoundException;
+import no.nav.tag.sykefravarsstatistikk.api.statistikk.Sykefraværprosent;
+import no.nav.tag.sykefravarsstatistikk.api.statistikk.SykefraværprosentService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

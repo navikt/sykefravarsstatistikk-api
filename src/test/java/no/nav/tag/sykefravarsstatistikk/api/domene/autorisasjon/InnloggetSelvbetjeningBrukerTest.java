@@ -1,8 +1,9 @@
-package no.nav.tag.sykefravarsstatistikk.api.domain.autorisasjon;
+package no.nav.tag.sykefravarsstatistikk.api.domene.autorisasjon;
 
 import no.nav.tag.sykefravarsstatistikk.api.TestUtils;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.Organisasjon;
-import no.nav.tag.sykefravarsstatistikk.api.domain.Orgnr;
+import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetSelvbetjeningBruker;
+import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
 import org.junit.Test;
 

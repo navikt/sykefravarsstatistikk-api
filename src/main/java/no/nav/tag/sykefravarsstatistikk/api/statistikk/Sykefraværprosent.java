@@ -1,9 +1,8 @@
-package no.nav.tag.sykefravarsstatistikk.api.sykefravarprosent;
+package no.nav.tag.sykefravarsstatistikk.api.statistikk;
 
 
 import lombok.Builder;
 import lombok.Data;
-import no.nav.tag.sykefravarsstatistikk.api.domain.stats.LandStatistikk;
 
 import java.math.BigDecimal;
 

@@ -1,13 +1,9 @@
-package no.nav.tag.sykefravarsstatistikk.api.utils;
+package no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
-import no.nav.tag.sykefravarsstatistikk.api.domain.Fnr;
-import no.nav.tag.sykefravarsstatistikk.api.domain.autorisasjon.InnloggetBruker;
-import no.nav.tag.sykefravarsstatistikk.api.domain.autorisasjon.InnloggetNavAnsatt;
-import no.nav.tag.sykefravarsstatistikk.api.domain.autorisasjon.InnloggetSelvbetjeningBruker;
-import no.nav.tag.sykefravarsstatistikk.api.domain.autorisasjon.NavIdent;
-import no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
+import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
+import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetSelvbetjeningBruker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,22 +23,12 @@ public class TokenUtils {
     }
 
 
-    public InnloggetBruker hentInnloggetBruker() {
-        if (erInnloggetNavAnsatt()) {
-            return hentInnloggetNavAnsatt();
-        } else if (erInnloggetSelvbetjeningBruker()) {
+    public InnloggetSelvbetjeningBruker hentInnloggetBruker() {
+        if (erInnloggetSelvbetjeningBruker()) {
             return hentInnloggetSelvbetjeningBruker();
         } else {
             throw new TilgangskontrollException("Bruker er ikke innlogget.");
         }
-    }
-
-
-    public boolean erInnloggetNavAnsatt() {
-        return hentClaimSet(ISSUER_ISSO)
-                .map(jwtClaimsSet -> (String) jwtClaimsSet.getClaims().get("NAVident"))
-                .map(navIdentString -> NavIdent.erGyldigNavIdent(navIdentString))
-                .orElse(false);
     }
 
     public boolean erInnloggetSelvbetjeningBruker() {
@@ -57,13 +43,6 @@ public class TokenUtils {
                 .orElseThrow(() -> new TilgangskontrollException("Finner ikke fodselsnummer til bruker."));
         return new InnloggetSelvbetjeningBruker(new Fnr(fnr));
     }
-
-    public InnloggetNavAnsatt hentInnloggetNavAnsatt() {
-        String navIdent = hentClaim(ISSUER_ISSO, "NAVident")
-                .orElseThrow(() -> new TilgangskontrollException("Innlogget bruker er ikke veileder."));
-        return new InnloggetNavAnsatt(new NavIdent(navIdent));
-    }
-
 
     private Optional<String> hentClaim(String issuer, String claim) {
         Optional<JWTClaimsSet> claimSet = hentClaimSet(issuer);

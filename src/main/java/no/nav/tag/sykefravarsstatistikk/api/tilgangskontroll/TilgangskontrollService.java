@@ -2,9 +2,7 @@ package no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnClient;
-import no.nav.tag.sykefravarsstatistikk.api.domain.autorisasjon.InnloggetBruker;
-import no.nav.tag.sykefravarsstatistikk.api.domain.autorisasjon.InnloggetSelvbetjeningBruker;
-import no.nav.tag.sykefravarsstatistikk.api.utils.TokenUtils;
+import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetSelvbetjeningBruker;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -19,17 +17,17 @@ public class TilgangskontrollService {
         this.tokenUtils = tokenUtils;
     }
 
-    public InnloggetBruker hentInnloggetBruker() {
+    public InnloggetSelvbetjeningBruker hentInnloggetBruker() {
         if (tokenUtils.erInnloggetSelvbetjeningBruker()) {
             InnloggetSelvbetjeningBruker innloggetSelvbetjeningBruker = tokenUtils.hentInnloggetSelvbetjeningBruker();
             innloggetSelvbetjeningBruker.setOrganisasjoner(
                     altinnClient.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
-                            innloggetSelvbetjeningBruker.getIdentifikator()
+                            innloggetSelvbetjeningBruker.getFnr()
                     )
             );
             return innloggetSelvbetjeningBruker;
         } else {
-            return tokenUtils.hentInnloggetNavAnsatt();
+            throw new TilgangskontrollException("Innlogget bruker er ikke selvbetjeningsbruker");
         }
     }
 
