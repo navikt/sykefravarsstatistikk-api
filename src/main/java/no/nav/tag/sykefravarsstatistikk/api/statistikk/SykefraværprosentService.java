@@ -2,6 +2,8 @@ package no.nav.tag.sykefravarsstatistikk.api.statistikk;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.LandStatistikk;
 import no.nav.tag.sykefravarsstatistikk.api.ResourceNotFoundException;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.Sammenligning;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.Sykefraværprosent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -10,18 +12,31 @@ import org.springframework.stereotype.Component;
 @Component
 public class SykefraværprosentService {
 
-    private final SykefravarprosentRepository sykefravarprosentRepository;
+    private final SykefraværprosentRepository sykefravarprosentRepository;
 
     private static int ARSTALL = 2019;
     private static int KVARTAL = 1;
 
-    private static Logger logger = LoggerFactory.getLogger(SykefravarprosentRepository.class);
+    private static Logger logger = LoggerFactory.getLogger(SykefraværprosentRepository.class);
 
-    public SykefraværprosentService(SykefravarprosentRepository sykefravarprosentRepository) {
+    public SykefraværprosentService(SykefraværprosentRepository sykefravarprosentRepository) {
         this.sykefravarprosentRepository = sykefravarprosentRepository;
     }
 
-    public Sykefraværprosent hentSykefraværProsent() {
+    public Sammenligning hentSammenligning() {
+        Sykefraværprosent landProsent = sykefravarprosentRepository.hentSykefraværprosentLand(ARSTALL, KVARTAL);
+
+        return new Sammenligning(
+                KVARTAL,
+                ARSTALL,
+                sykefravarprosentRepository.hentSykefraværprosentLand(ARSTALL, KVARTAL),
+                sykefravarprosentRepository.hentSykefraværprosentLand(ARSTALL, KVARTAL),
+                sykefravarprosentRepository.hentSykefraværprosentLand(ARSTALL, KVARTAL),
+                sykefravarprosentRepository.hentSykefraværprosentLand(ARSTALL, KVARTAL)
+        );
+    }
+
+    public Sykefraværprosent2 hentSykefraværProsent() {
         LandStatistikk landStatistikk;
 
         try {
@@ -33,7 +48,7 @@ public class SykefraværprosentService {
             logger.info(msg);
             throw new ResourceNotFoundException(msg);
         }
-        return Sykefraværprosent.builder()
+        return Sykefraværprosent2.builder()
                 .land(landStatistikk.beregnSykkefravarProsent())
                 .build();
     }

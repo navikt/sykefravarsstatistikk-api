@@ -5,6 +5,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+@Deprecated
 @EqualsAndHashCode
 @AllArgsConstructor
 @Getter

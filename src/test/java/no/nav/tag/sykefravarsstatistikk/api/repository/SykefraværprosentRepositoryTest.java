@@ -1,7 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.repository;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.LandStatistikk;
-import no.nav.tag.sykefravarsstatistikk.api.statistikk.SykefravarprosentRepository;
+import no.nav.tag.sykefravarsstatistikk.api.statistikk.SykefraværprosentRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class SykefraværprosentRepositoryTest {
     public static final BigDecimal DELTA_ERROR = new BigDecimal(0.0000001);
 
     @Autowired
-    SykefravarprosentRepository repository;
+    SykefraværprosentRepository repository;
 
 
     @Test

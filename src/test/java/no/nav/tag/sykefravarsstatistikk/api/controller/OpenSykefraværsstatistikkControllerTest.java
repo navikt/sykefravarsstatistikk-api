@@ -2,7 +2,7 @@ package no.nav.tag.sykefravarsstatistikk.api.controller;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.LandStatistikk;
 import no.nav.tag.sykefravarsstatistikk.api.ResourceNotFoundException;
-import no.nav.tag.sykefravarsstatistikk.api.statistikk.Sykefraværprosent;
+import no.nav.tag.sykefravarsstatistikk.api.statistikk.Sykefraværprosent2;
 import no.nav.tag.sykefravarsstatistikk.api.statistikk.SykefraværprosentService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,7 +43,7 @@ public class OpenSykefraværsstatistikkControllerTest {
                 .tapteDagsverk(new BigDecimal(56.699))
                 .build();
 
-        Sykefraværprosent sfProsent = Sykefraværprosent.builder()
+        Sykefraværprosent2 sfProsent = Sykefraværprosent2.builder()
                 .land(landStatistikk.beregnSykkefravarProsent())
                 .build();
 

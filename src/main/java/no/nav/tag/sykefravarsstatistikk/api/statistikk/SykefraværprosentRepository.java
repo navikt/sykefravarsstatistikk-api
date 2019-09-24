@@ -2,20 +2,22 @@ package no.nav.tag.sykefravarsstatistikk.api.statistikk;
 
 import lombok.SneakyThrows;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.LandStatistikk;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.Sykefraværprosent;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 @Component
-public class SykefravarprosentRepository {
+public class SykefraværprosentRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-
-    public SykefravarprosentRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public SykefraværprosentRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
-
 
     @SneakyThrows
     public LandStatistikk hentLandStatistikk(int arstall, int kvartal) {
@@ -28,5 +30,25 @@ public class SykefravarprosentRepository {
                 namedParameters,
                 new LandStatistikkRowMapper());
         return landStatistikk;
+    }
+
+    public Sykefraværprosent hentSykefraværprosentLand(int arstall, int kvartal) {
+        SqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("arstall", arstall)
+                .addValue("kvartal", kvartal);
+
+        return namedParameterJdbcTemplate.queryForObject(
+                "SELECT * FROM SYKEFRAVAR_STATISTIKK_LAND where arstall = :arstall and kvartal = :kvartal",
+                namedParameters,
+                (rs, rowNum) -> mapTilSykefraværprosent("Label for land", rs, rowNum)
+        );
+    }
+
+    private Sykefraværprosent mapTilSykefraværprosent(String label, ResultSet rs, int rowNum) throws SQLException {
+        return new Sykefraværprosent(
+                label,
+                rs.getBigDecimal("tapte_dagsverk"),
+                rs.getBigDecimal("mulige_dagsverk")
+        );
     }
 }
