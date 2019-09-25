@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TilgangskontrollServiceTest {
-    public static final String FNR = "01082248486";
+    private static final String FNR = "01082248486";
 
     @Mock
     private AltinnClient altinnClient;
@@ -31,8 +31,6 @@ public class TilgangskontrollServiceTest {
         tilgangskontroll = new TilgangskontrollService(altinnClient, tokenUtils);
         fnr = new Fnr(FNR);
     }
-
-
 
     @Test(expected = AltinnException.class)
     public void hentInnloggetBruker__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
