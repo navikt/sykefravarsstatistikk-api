@@ -1,4 +1,4 @@
-package no.nav.tag.sykefravarsstatistikk.api.domene.statistikk;
+package no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -3,7 +3,7 @@ package no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnException;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
-import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetSelvbetjeningBruker;
+import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +21,7 @@ public class TilgangskontrollServiceTest {
     @Mock
     private TilgangskontrollService tilgangskontroll;
     @Mock
-    private TokenUtils tokenUtils;
+    private TilgangskontrollUtils tokenUtils;
 
     private Fnr fnr;
 
@@ -38,7 +38,7 @@ public class TilgangskontrollServiceTest {
     public void hentInnloggetBruker__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
         when(altinnClient.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(fnr)).thenThrow(new AltinnException(""));
         when(tokenUtils.erInnloggetSelvbetjeningBruker()).thenReturn(true);
-        when(tokenUtils.hentInnloggetSelvbetjeningBruker()).thenReturn(new InnloggetSelvbetjeningBruker(fnr));
+        when(tokenUtils.hentInnloggetSelvbetjeningBruker()).thenReturn(new InnloggetBruker(fnr));
 
         tilgangskontroll.hentInnloggetBruker();
     }

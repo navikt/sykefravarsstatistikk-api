@@ -1,18 +1,12 @@
-package no.nav.tag.sykefravarsstatistikk.api.statistikk;
+package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.LandStatistikk;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
-
-import static org.hamcrest.number.BigDecimalCloseTo.closeTo;
-import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -23,9 +17,9 @@ public class SykefraværprosentRepositoryTest {
     public static final BigDecimal DELTA_ERROR = new BigDecimal(0.0000001);
 
     @Autowired
-    SykefraværprosentRepository repository;
+    SammenligningRepository repository;
 
-
+/*
     @Test
     public void hentLandStatistikk_returnerer_LandStatistikk_basert_på_ARSTALL_og_KVARTAL() {
         LandStatistikk landStatistikk = repository.hentLandStatistikk(2019, 1);
@@ -54,5 +48,7 @@ public class SykefraværprosentRepositoryTest {
         repository.hentLandStatistikk(2008, 2);
         fail("Repository skal returnere EmptyResultDataAccessException");
     }
+
+ */
 
 }

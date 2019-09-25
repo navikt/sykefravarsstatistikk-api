@@ -3,14 +3,14 @@ package no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll;
 import com.nimbusds.jwt.JWTClaimsSet;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
-import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetSelvbetjeningBruker;
+import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
-public class TokenUtils {
+public class TilgangskontrollUtils {
     
     final static String ISSUER_ISSO = "isso";
     final static String ISSUER_SELVBETJENING = "selvbetjening";
@@ -18,12 +18,12 @@ public class TokenUtils {
     private final OIDCRequestContextHolder contextHolder;
 
     @Autowired
-    public TokenUtils(OIDCRequestContextHolder contextHolder) {
+    public TilgangskontrollUtils(OIDCRequestContextHolder contextHolder) {
         this.contextHolder = contextHolder;
     }
 
 
-    public InnloggetSelvbetjeningBruker hentInnloggetBruker() {
+    public InnloggetBruker hentInnloggetBruker() {
         if (erInnloggetSelvbetjeningBruker()) {
             return hentInnloggetSelvbetjeningBruker();
         } else {
@@ -38,10 +38,10 @@ public class TokenUtils {
     }
 
 
-    public InnloggetSelvbetjeningBruker hentInnloggetSelvbetjeningBruker() {
+    public InnloggetBruker hentInnloggetSelvbetjeningBruker() {
         String fnr = hentClaim(ISSUER_SELVBETJENING, "sub")
                 .orElseThrow(() -> new TilgangskontrollException("Finner ikke fodselsnummer til bruker."));
-        return new InnloggetSelvbetjeningBruker(new Fnr(fnr));
+        return new InnloggetBruker(new Fnr(fnr));
     }
 
     private Optional<String> hentClaim(String issuer, String claim) {

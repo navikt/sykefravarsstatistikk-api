@@ -10,11 +10,11 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Data
-public class InnloggetSelvbetjeningBruker {
+public class InnloggetBruker {
     private List<Organisasjon> organisasjoner;
     private Fnr fnr;
 
-    public InnloggetSelvbetjeningBruker(Fnr fnr) {
+    public InnloggetBruker(Fnr fnr) {
         this.fnr = fnr;
         organisasjoner = new ArrayList<>();
     }

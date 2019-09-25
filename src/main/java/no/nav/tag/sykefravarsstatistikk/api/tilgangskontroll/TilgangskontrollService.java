@@ -2,7 +2,7 @@ package no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnClient;
-import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetSelvbetjeningBruker;
+import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -10,16 +10,16 @@ import org.springframework.stereotype.Component;
 public class TilgangskontrollService {
 
     private final AltinnClient altinnClient;
-    private final TokenUtils tokenUtils;
+    private final TilgangskontrollUtils tokenUtils;
 
-    public TilgangskontrollService(AltinnClient altinnClient, TokenUtils tokenUtils) {
+    public TilgangskontrollService(AltinnClient altinnClient, TilgangskontrollUtils tokenUtils) {
         this.altinnClient = altinnClient;
         this.tokenUtils = tokenUtils;
     }
 
-    public InnloggetSelvbetjeningBruker hentInnloggetBruker() {
+    public InnloggetBruker hentInnloggetBruker() {
         if (tokenUtils.erInnloggetSelvbetjeningBruker()) {
-            InnloggetSelvbetjeningBruker innloggetSelvbetjeningBruker = tokenUtils.hentInnloggetSelvbetjeningBruker();
+            InnloggetBruker innloggetSelvbetjeningBruker = tokenUtils.hentInnloggetSelvbetjeningBruker();
             innloggetSelvbetjeningBruker.setOrganisasjoner(
                     altinnClient.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
                             innloggetSelvbetjeningBruker.getFnr()

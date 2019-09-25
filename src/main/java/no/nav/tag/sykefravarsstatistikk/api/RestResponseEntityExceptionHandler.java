@@ -49,13 +49,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return getResponseEntity(e, "Internal error", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(value = {ResourceNotFoundException.class})
-    @ResponseBody
-    protected ResponseEntity<Object> handleResourceNotFoundException(RuntimeException e, WebRequest webRequest) {
-        return getResponseEntity(e, "The resource is not found", HttpStatus.NOT_FOUND);
-    }
-
-
     private ResponseEntity<Object> getResponseEntity(RuntimeException e, String melding, HttpStatus status) {
         HashMap<String, String> body = new HashMap<>(1);
         body.put("message", melding);

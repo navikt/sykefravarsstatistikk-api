@@ -1,4 +1,4 @@
-package no.nav.tag.sykefravarsstatistikk.api;
+package no.nav.tag.sykefravarsstatistikk.api.config;
 
 import no.nav.security.oidc.test.support.spring.TokenGeneratorConfiguration;
 import org.springframework.context.annotation.Configuration;

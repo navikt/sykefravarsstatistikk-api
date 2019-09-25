@@ -2,13 +2,13 @@ package no.nav.tag.sykefravarsstatistikk.api;
 
 import no.nav.tag.sykefravarsstatistikk.api.altinn.Organisasjon;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
-import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetSelvbetjeningBruker;
+import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 
 public class TestUtils {
 
 
-    public static InnloggetSelvbetjeningBruker getInnloggetSelvbetjeningBruker(String fnr) {
-        return new InnloggetSelvbetjeningBruker(new Fnr(fnr));
+    public static InnloggetBruker getInnloggetSelvbetjeningBruker(String fnr) {
+        return new InnloggetBruker(new Fnr(fnr));
     }
 
     public static Organisasjon getOrganisasjon(String organizationNumber) {

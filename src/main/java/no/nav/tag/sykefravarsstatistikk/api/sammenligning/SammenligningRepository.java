@@ -1,7 +1,6 @@
-package no.nav.tag.sykefravarsstatistikk.api.statistikk;
+package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.LandStatistikk;
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.Sykefraværprosent;
+import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -11,24 +10,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Component
-public class SykefraværprosentRepository {
+public class SammenligningRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public SykefraværprosentRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public SammenligningRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-    }
-
-    @Deprecated
-    public LandStatistikk hentLandStatistikk(int arstall, int kvartal) {
-        SqlParameterSource namedParameters = new MapSqlParameterSource()
-                .addValue("arstall", arstall)
-                .addValue("kvartal", kvartal);
-
-        LandStatistikk landStatistikk = namedParameterJdbcTemplate.queryForObject(
-                "SELECT * FROM SYKEFRAVAR_STATISTIKK_LAND where arstall = :arstall and kvartal = :kvartal",
-                namedParameters,
-                new LandStatistikkRowMapper());
-        return landStatistikk;
     }
 
     public Sykefraværprosent hentSykefraværprosentVirksomhet(int årstall, int kvartal, String orgnr) {
@@ -40,7 +26,7 @@ public class SykefraværprosentRepository {
         return namedParameterJdbcTemplate.queryForObject(
                 "SELECT * FROM SYKEFRAVAR_STATISTIKK_VIRKSOMHET WHERE arstall = :arstall AND kvartal = :kvartal AND orgnr = :orgnr",
                 namedParameters,
-                (rs, rowNum) -> mapTilSykefraværprosent("Fisk og Fulg AS", rs, rowNum)
+                (rs, rowNum) -> mapTilSykefraværprosent("Fisk og Fulg AS", rs)
         );
     }
 
@@ -53,7 +39,7 @@ public class SykefraværprosentRepository {
         return namedParameterJdbcTemplate.queryForObject(
                 "SELECT * FROM SYKEFRAVAR_STATISTIKK_NARING WHERE arstall = :arstall AND kvartal = :kvartal AND naring_kode = :naring",
                 namedParameters,
-                (rs, rowNum) -> mapTilSykefraværprosent("Tjenester tilknyttet informasjonsteknologi", rs, rowNum)
+                (rs, rowNum) -> mapTilSykefraværprosent("Tjenester tilknyttet informasjonsteknologi", rs)
         );
     }
 
@@ -66,7 +52,7 @@ public class SykefraværprosentRepository {
         return namedParameterJdbcTemplate.queryForObject(
                 "SELECT * FROM SYKEFRAVAR_STATISTIKK_SEKTOR WHERE arstall = :arstall AND kvartal = :kvartal AND sektor_kode = :sektor",
                 namedParameters,
-                (rs, rowNum) -> mapTilSykefraværprosent("Offentlig næringsvirksomhet", rs, rowNum)
+                (rs, rowNum) -> mapTilSykefraværprosent("Offentlig næringsvirksomhet", rs)
         );
     }
 
@@ -78,11 +64,11 @@ public class SykefraværprosentRepository {
         return namedParameterJdbcTemplate.queryForObject(
                 "SELECT * FROM SYKEFRAVAR_STATISTIKK_LAND where arstall = :arstall and kvartal = :kvartal",
                 namedParameters,
-                (rs, rowNum) -> mapTilSykefraværprosent("Norge", rs, rowNum)
+                (rs, rowNum) -> mapTilSykefraværprosent("Norge", rs)
         );
     }
 
-    private Sykefraværprosent mapTilSykefraværprosent(String label, ResultSet rs, int rowNum) throws SQLException {
+    private Sykefraværprosent mapTilSykefraværprosent(String label, ResultSet rs) throws SQLException {
         return new Sykefraværprosent(
                 label,
                 rs.getBigDecimal("tapte_dagsverk"),
