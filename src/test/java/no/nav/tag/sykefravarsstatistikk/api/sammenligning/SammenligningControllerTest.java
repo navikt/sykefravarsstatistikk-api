@@ -1,4 +1,4 @@
-package no.nav.tag.sykefravarsstatistikk.api.controller;
+package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
 import no.nav.tag.sykefravarsstatistikk.api.sammenligning.SammenligningService;
 import org.junit.runner.RunWith;
@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @ActiveProfiles("mvc-test")
 @AutoConfigureMockMvc
 @SpringBootTest
-public class OpenSykefraværsstatistikkControllerTest {
+public class SammenligningControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

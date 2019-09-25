@@ -13,15 +13,21 @@ import java.sql.SQLException;
 public class SammenligningRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+    public static final String ÅRSTALL = "arstall";
+    public static final String KVARTAL = "kvartal";
+    public static final String ORGNR = "orgnr";
+    public static final String NÆRING = "naring";
+    public static final String SEKTOR = "sektor";
+
     public SammenligningRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
     public Sykefraværprosent hentSykefraværprosentVirksomhet(int årstall, int kvartal, String orgnr) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
-                .addValue("arstall", årstall)
-                .addValue("kvartal", kvartal)
-                .addValue("orgnr", orgnr);
+                .addValue(ÅRSTALL, årstall)
+                .addValue(KVARTAL, kvartal)
+                .addValue(ORGNR, orgnr);
 
         return namedParameterJdbcTemplate.queryForObject(
                 "SELECT * FROM SYKEFRAVAR_STATISTIKK_VIRKSOMHET WHERE arstall = :arstall AND kvartal = :kvartal AND orgnr = :orgnr",
@@ -32,9 +38,9 @@ public class SammenligningRepository {
 
     public Sykefraværprosent hentSykefraværprosentNæring(int årstall, int kvartal, String næring) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
-                .addValue("arstall", årstall)
-                .addValue("kvartal", kvartal)
-                .addValue("naring", næring);
+                .addValue(ÅRSTALL, årstall)
+                .addValue(KVARTAL, kvartal)
+                .addValue(NÆRING, næring);
 
         return namedParameterJdbcTemplate.queryForObject(
                 "SELECT * FROM SYKEFRAVAR_STATISTIKK_NARING WHERE arstall = :arstall AND kvartal = :kvartal AND naring_kode = :naring",
@@ -45,9 +51,9 @@ public class SammenligningRepository {
 
     public Sykefraværprosent hentSykefraværprosentSektor(int årstall, int kvartal, String sektor) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
-                .addValue("arstall", årstall)
-                .addValue("kvartal", kvartal)
-                .addValue("sektor", sektor);
+                .addValue(ÅRSTALL, årstall)
+                .addValue(KVARTAL, kvartal)
+                .addValue(SEKTOR, sektor);
 
         return namedParameterJdbcTemplate.queryForObject(
                 "SELECT * FROM SYKEFRAVAR_STATISTIKK_SEKTOR WHERE arstall = :arstall AND kvartal = :kvartal AND sektor_kode = :sektor",
@@ -58,8 +64,8 @@ public class SammenligningRepository {
 
     public Sykefraværprosent hentSykefraværprosentLand(int årstall, int kvartal) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
-                .addValue("arstall", årstall)
-                .addValue("kvartal", kvartal);
+                .addValue(ÅRSTALL, årstall)
+                .addValue(KVARTAL, kvartal);
 
         return namedParameterJdbcTemplate.queryForObject(
                 "SELECT * FROM SYKEFRAVAR_STATISTIKK_LAND where arstall = :arstall and kvartal = :kvartal",
