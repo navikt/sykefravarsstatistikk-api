@@ -1,4 +1,4 @@
-package no.nav.tag.sykefravarsstatistikk.api.domene.autorisasjon;
+package no.nav.tag.sykefravarsstatistikk.api.domene;
 
 import no.nav.tag.sykefravarsstatistikk.api.TestUtils;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.Organisasjon;

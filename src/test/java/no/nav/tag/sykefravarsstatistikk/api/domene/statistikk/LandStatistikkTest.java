@@ -1,6 +1,5 @@
-package no.nav.tag.sykefravarsstatistikk.api.domene.stats;
+package no.nav.tag.sykefravarsstatistikk.api.domene.statistikk;
 
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.LandStatistikk;
 import org.junit.Test;
 
 import java.math.BigDecimal;
