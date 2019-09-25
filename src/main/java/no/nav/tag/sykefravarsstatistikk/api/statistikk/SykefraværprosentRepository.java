@@ -1,6 +1,5 @@
 package no.nav.tag.sykefravarsstatistikk.api.statistikk;
 
-import lombok.SneakyThrows;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.LandStatistikk;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.Sykefraværprosent;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -19,7 +18,7 @@ public class SykefraværprosentRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-    @SneakyThrows
+    @Deprecated
     public LandStatistikk hentLandStatistikk(int arstall, int kvartal) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("arstall", arstall)
@@ -32,30 +31,16 @@ public class SykefraværprosentRepository {
         return landStatistikk;
     }
 
-
-    // TODO Generaliser disse metodene?
-    public Sykefraværprosent hentSykefraværprosentLand(int årstall, int kvartal) {
-        SqlParameterSource namedParameters = new MapSqlParameterSource()
-                .addValue("arstall", årstall)
-                .addValue("kvartal", kvartal);
-
-        return namedParameterJdbcTemplate.queryForObject(
-                "SELECT * FROM SYKEFRAVAR_STATISTIKK_LAND where arstall = :arstall and kvartal = :kvartal",
-                namedParameters,
-                (rs, rowNum) -> mapTilSykefraværprosent("Norge", rs, rowNum)
-        );
-    }
-
-    public Sykefraværprosent hentSykefraværprosentSektor(int årstall, int kvartal, String sektor) {
+    public Sykefraværprosent hentSykefraværprosentVirksomhet(int årstall, int kvartal, String orgnr) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("arstall", årstall)
                 .addValue("kvartal", kvartal)
-                .addValue("sektor", sektor);
+                .addValue("orgnr", orgnr);
 
         return namedParameterJdbcTemplate.queryForObject(
-                "SELECT * FROM SYKEFRAVAR_STATISTIKK_SEKTOR WHERE arstall = :arstall AND kvartal = :kvartal AND sektor_kode = :sektor",
+                "SELECT * FROM SYKEFRAVAR_STATISTIKK_VIRKSOMHET WHERE arstall = :arstall AND kvartal = :kvartal AND orgnr = :orgnr",
                 namedParameters,
-                (rs, rowNum) -> mapTilSykefraværprosent("Offentlig næringsvirksomhet", rs, rowNum)
+                (rs, rowNum) -> mapTilSykefraværprosent("Fisk og Fulg AS", rs, rowNum)
         );
     }
 
@@ -72,16 +57,28 @@ public class SykefraværprosentRepository {
         );
     }
 
-    public Sykefraværprosent hentSykefraværprosentVirksomhet(int årstall, int kvartal, String orgnr) {
+    public Sykefraværprosent hentSykefraværprosentSektor(int årstall, int kvartal, String sektor) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("arstall", årstall)
                 .addValue("kvartal", kvartal)
-                .addValue("orgnr", orgnr);
+                .addValue("sektor", sektor);
 
         return namedParameterJdbcTemplate.queryForObject(
-                "SELECT * FROM SYKEFRAVAR_STATISTIKK_VIRKSOMHET WHERE arstall = :arstall AND kvartal = :kvartal AND orgnr = :orgnr",
+                "SELECT * FROM SYKEFRAVAR_STATISTIKK_SEKTOR WHERE arstall = :arstall AND kvartal = :kvartal AND sektor_kode = :sektor",
                 namedParameters,
-                (rs, rowNum) -> mapTilSykefraværprosent("Fisk og Fulg AS", rs, rowNum)
+                (rs, rowNum) -> mapTilSykefraværprosent("Offentlig næringsvirksomhet", rs, rowNum)
+        );
+    }
+
+    public Sykefraværprosent hentSykefraværprosentLand(int årstall, int kvartal) {
+        SqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("arstall", årstall)
+                .addValue("kvartal", kvartal);
+
+        return namedParameterJdbcTemplate.queryForObject(
+                "SELECT * FROM SYKEFRAVAR_STATISTIKK_LAND where arstall = :arstall and kvartal = :kvartal",
+                namedParameters,
+                (rs, rowNum) -> mapTilSykefraværprosent("Norge", rs, rowNum)
         );
     }
 
