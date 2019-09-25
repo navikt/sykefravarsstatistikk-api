@@ -13,8 +13,6 @@ public class SammenligningService {
     private static int ARSTALL = 2019;
     private static int KVARTAL = 1;
 
-    private static Logger logger = LoggerFactory.getLogger(SammenligningRepository.class);
-
     public SammenligningService(SammenligningRepository sykefravarprosentRepository) {
         this.sykefravarprosentRepository = sykefravarprosentRepository;
     }

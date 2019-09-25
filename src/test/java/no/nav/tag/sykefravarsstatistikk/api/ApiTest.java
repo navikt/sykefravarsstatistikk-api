@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties = {"mock.port=8082"})
+@TestPropertySource(properties = {"mock.port=8083"})
 public class ApiTest {
 
     @LocalServerPort
