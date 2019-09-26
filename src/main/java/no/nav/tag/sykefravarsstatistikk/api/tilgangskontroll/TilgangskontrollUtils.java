@@ -1,20 +1,16 @@
-package no.nav.tag.sykefravarsstatistikk.api.utils;
+package no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
-import no.nav.tag.sykefravarsstatistikk.api.domain.Fnr;
-import no.nav.tag.sykefravarsstatistikk.api.domain.autorisasjon.InnloggetBruker;
-import no.nav.tag.sykefravarsstatistikk.api.domain.autorisasjon.InnloggetNavAnsatt;
-import no.nav.tag.sykefravarsstatistikk.api.domain.autorisasjon.InnloggetSelvbetjeningBruker;
-import no.nav.tag.sykefravarsstatistikk.api.domain.autorisasjon.NavIdent;
-import no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
+import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
+import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
-public class TokenUtils {
+public class TilgangskontrollUtils {
     
     final static String ISSUER_ISSO = "isso";
     final static String ISSUER_SELVBETJENING = "selvbetjening";
@@ -22,27 +18,17 @@ public class TokenUtils {
     private final OIDCRequestContextHolder contextHolder;
 
     @Autowired
-    public TokenUtils(OIDCRequestContextHolder contextHolder) {
+    public TilgangskontrollUtils(OIDCRequestContextHolder contextHolder) {
         this.contextHolder = contextHolder;
     }
 
 
     public InnloggetBruker hentInnloggetBruker() {
-        if (erInnloggetNavAnsatt()) {
-            return hentInnloggetNavAnsatt();
-        } else if (erInnloggetSelvbetjeningBruker()) {
+        if (erInnloggetSelvbetjeningBruker()) {
             return hentInnloggetSelvbetjeningBruker();
         } else {
             throw new TilgangskontrollException("Bruker er ikke innlogget.");
         }
-    }
-
-
-    public boolean erInnloggetNavAnsatt() {
-        return hentClaimSet(ISSUER_ISSO)
-                .map(jwtClaimsSet -> (String) jwtClaimsSet.getClaims().get("NAVident"))
-                .map(navIdentString -> NavIdent.erGyldigNavIdent(navIdentString))
-                .orElse(false);
     }
 
     public boolean erInnloggetSelvbetjeningBruker() {
@@ -52,18 +38,11 @@ public class TokenUtils {
     }
 
 
-    public InnloggetSelvbetjeningBruker hentInnloggetSelvbetjeningBruker() {
+    public InnloggetBruker hentInnloggetSelvbetjeningBruker() {
         String fnr = hentClaim(ISSUER_SELVBETJENING, "sub")
                 .orElseThrow(() -> new TilgangskontrollException("Finner ikke fodselsnummer til bruker."));
-        return new InnloggetSelvbetjeningBruker(new Fnr(fnr));
+        return new InnloggetBruker(new Fnr(fnr));
     }
-
-    public InnloggetNavAnsatt hentInnloggetNavAnsatt() {
-        String navIdent = hentClaim(ISSUER_ISSO, "NAVident")
-                .orElseThrow(() -> new TilgangskontrollException("Innlogget bruker er ikke veileder."));
-        return new InnloggetNavAnsatt(new NavIdent(navIdent));
-    }
-
 
     private Optional<String> hentClaim(String issuer, String claim) {
         Optional<JWTClaimsSet> claimSet = hentClaimSet(issuer);

@@ -1,7 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.altinn;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.tag.sykefravarsstatistikk.api.domain.Fnr;
+import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;

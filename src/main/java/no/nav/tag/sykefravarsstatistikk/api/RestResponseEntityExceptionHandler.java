@@ -2,7 +2,6 @@ package no.nav.tag.sykefravarsstatistikk.api;
 
 import no.nav.security.spring.oidc.validation.interceptor.OIDCUnauthorizedException;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnException;
-import no.nav.tag.sykefravarsstatistikk.api.repository.ResourceNotFoundException;
 import no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,13 +48,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         logger.error("Uhåndtert feil", e);
         return getResponseEntity(e, "Internal error", HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    @ExceptionHandler(value = {ResourceNotFoundException.class})
-    @ResponseBody
-    protected ResponseEntity<Object> handleResourceNotFoundException(RuntimeException e, WebRequest webRequest) {
-        return getResponseEntity(e, "The resource is not found", HttpStatus.NOT_FOUND);
-    }
-
 
     private ResponseEntity<Object> getResponseEntity(RuntimeException e, String melding, HttpStatus status) {
         HashMap<String, String> body = new HashMap<>(1);

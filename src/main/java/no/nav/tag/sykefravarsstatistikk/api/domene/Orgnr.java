@@ -1,13 +1,12 @@
-package no.nav.tag.sykefravarsstatistikk.api.domain;
+package no.nav.tag.sykefravarsstatistikk.api.domene;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Value;
 
 @Value
-public class Orgnr implements Identifikator {
+public class Orgnr {
     private final String verdi;
 
-    @Override
     @JsonValue
     public String asString() {
         return verdi;
