@@ -781,4 +781,4 @@ insert into SYKEFRAVAR_STATISTIKK_NARING (arstall, kvartal, naring_kode, tapte_d
 insert into SYKEFRAVAR_STATISTIKK_NARING (arstall, kvartal, naring_kode, tapte_dagsverk, mulige_dagsverk) values (2019, 1, '96', 75108.132, 1018124.400456);
 insert into SYKEFRAVAR_STATISTIKK_NARING (arstall, kvartal, naring_kode, tapte_dagsverk, mulige_dagsverk) values (2019, 1, '97', 507.298016, 7907.540904);
 insert into SYKEFRAVAR_STATISTIKK_NARING (arstall, kvartal, naring_kode, tapte_dagsverk, mulige_dagsverk) values (2019, 1, '99', 659.243275, 14855.8921);
-commit''
+commit

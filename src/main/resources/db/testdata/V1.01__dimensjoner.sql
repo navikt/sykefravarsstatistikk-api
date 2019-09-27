@@ -27,15 +27,15 @@ insert into NARINGSGRUPPE (kode, navn) values('86', 'Helse- og sosialtjenester')
 insert into NARINGSGRUPPE (kode, navn) values('90', 'Private tjenester ellers');
 
 
-insert into NARING (kode, naringsgruppe_kode, navn) values ('0', '0','Ukjent næringskode');
-insert into NARING (kode, naringsgruppe_kode, navn) values ('1', '1','Jordbruk og tjenester tilknyttet jordbruk, jakt og viltstell');
-insert into NARING (kode, naringsgruppe_kode, navn) values ('2', '1','Skogbruk og tjenester tilknyttet skogbruk');
-insert into NARING (kode, naringsgruppe_kode, navn) values ('3', '1','Fiske, fangst og akvakultur');
-insert into NARING (kode, naringsgruppe_kode, navn) values ('5', '5','Bryting av steinkull og brunkull');
-insert into NARING (kode, naringsgruppe_kode, navn) values ('6', '5','Utvinning av råolje og naturgass');
-insert into NARING (kode, naringsgruppe_kode, navn) values ('7', '5','Bryting av metallholdig malm');
-insert into NARING (kode, naringsgruppe_kode, navn) values ('8', '5','Bryting og bergverksdrift ellers');
-insert into NARING (kode, naringsgruppe_kode, navn) values ('9', '5','Tjenester tilknyttet bergverksdrift og utvinning');
+insert into NARING (kode, naringsgruppe_kode, navn) values ('00', '0','Ukjent næringskode');
+insert into NARING (kode, naringsgruppe_kode, navn) values ('01', '1','Jordbruk og tjenester tilknyttet jordbruk, jakt og viltstell');
+insert into NARING (kode, naringsgruppe_kode, navn) values ('02', '1','Skogbruk og tjenester tilknyttet skogbruk');
+insert into NARING (kode, naringsgruppe_kode, navn) values ('03', '1','Fiske, fangst og akvakultur');
+insert into NARING (kode, naringsgruppe_kode, navn) values ('05', '5','Bryting av steinkull og brunkull');
+insert into NARING (kode, naringsgruppe_kode, navn) values ('06', '5','Utvinning av råolje og naturgass');
+insert into NARING (kode, naringsgruppe_kode, navn) values ('07', '5','Bryting av metallholdig malm');
+insert into NARING (kode, naringsgruppe_kode, navn) values ('08', '5','Bryting og bergverksdrift ellers');
+insert into NARING (kode, naringsgruppe_kode, navn) values ('09', '5','Tjenester tilknyttet bergverksdrift og utvinning');
 insert into NARING (kode, naringsgruppe_kode, navn) values ('10', '10', 'Produksjon av nærings- og nytelsesmidler');
 insert into NARING (kode, naringsgruppe_kode, navn) values ('11', '10', 'Produksjon av drikkevarer');
 insert into NARING (kode, naringsgruppe_kode, navn) values ('12', '10', 'Produksjon av tobakksvarer');

@@ -78,4 +78,4 @@ insert into SYKEFRAVAR_STATISTIKK_SEKTOR (arstall, kvartal, sektor_kode, tapte_d
 insert into SYKEFRAVAR_STATISTIKK_SEKTOR (arstall, kvartal, sektor_kode, tapte_dagsverk, mulige_dagsverk) values (2019, 1, '1', 890575.02502, 17196245.218916);
 insert into SYKEFRAVAR_STATISTIKK_SEKTOR (arstall, kvartal, sektor_kode, tapte_dagsverk, mulige_dagsverk) values (2019, 1, '2', 2147460.077814, 28324114.198077);
 insert into SYKEFRAVAR_STATISTIKK_SEKTOR (arstall, kvartal, sektor_kode, tapte_dagsverk, mulige_dagsverk) values (2019, 1, '3', 4564901.697031, 93387300.640596);
-commit'''
+commit
