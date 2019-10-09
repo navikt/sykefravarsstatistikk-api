@@ -10,13 +10,13 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 @Component
 public class Sporbarhetslogg {
 
     private static final Logger SPORBARHETSLOGGER = LoggerFactory.getLogger("sporbarhetslogger");
 
     public void loggHendelse(
+            String callId,
             InnloggetBruker innloggetBruker,
             Orgnr orgnr,
             boolean harTilgang,
@@ -28,6 +28,7 @@ public class Sporbarhetslogg {
         String severity = harTilgang ? "INFO" : "WARN";
 
         List<String> statements = new ArrayList<>();
+        statements.add("callId: " + callId);
         statements.add("fnr: " + innloggetBruker.getFnr().getVerdi());
         statements.add("Method: " + requestMethod);
         statements.add("Endpoint: " + requestUrl);
@@ -50,6 +51,5 @@ public class Sporbarhetslogg {
         } else {
             SPORBARHETSLOGGER.warn(loggmelding);
         }
-        log.info(loggmelding);
     }
 }

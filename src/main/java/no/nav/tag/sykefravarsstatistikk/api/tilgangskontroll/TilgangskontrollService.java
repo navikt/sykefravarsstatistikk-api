@@ -4,10 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+
+import static no.nav.tag.sykefravarsstatistikk.api.sammenligning.SammenligningController.CORRELATION_ID;
 
 @Slf4j
 @Component
@@ -52,8 +55,10 @@ public class TilgangskontrollService {
     public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, HttpServletRequest request) {
         InnloggetBruker bruker = hentInnloggetBruker();
         boolean harTilgang = bruker.harTilgang(orgnr);
+        String callId = MDC.get(CORRELATION_ID);
 
         sporbarhetslogg.loggHendelse(
+                callId,
                 bruker,
                 orgnr,
                 harTilgang,
