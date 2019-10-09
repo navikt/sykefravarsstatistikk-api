@@ -14,7 +14,7 @@ import java.util.List;
 @Component
 public class Sporbarhetslogg {
 
-    private static final Logger SPORBARHETSLOGGER = LoggerFactory.getLogger("auditLogger");
+    private static final Logger SPORBARHETSLOGGER = LoggerFactory.getLogger("sporbarhetslogger");
 
     public void loggHendelse(
             InnloggetBruker innloggetBruker,
@@ -28,7 +28,7 @@ public class Sporbarhetslogg {
         String severity = harTilgang ? "INFO" : "WARN";
 
         List<String> statements = new ArrayList<>();
-        statements.add("fnr: " + innloggetBruker.getFnr());
+        statements.add("fnr: " + innloggetBruker.getFnr().getVerdi());
         statements.add("Method: " + requestMethod);
         statements.add("Endpoint: " + requestUrl);
         statements.add("orgnr: " + orgnr.getVerdi());
