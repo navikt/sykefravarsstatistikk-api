@@ -3,6 +3,8 @@ package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.security.oidc.api.Unprotected;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
