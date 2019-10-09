@@ -3,7 +3,11 @@ package no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
+import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
 @Component
@@ -11,10 +15,24 @@ public class TilgangskontrollService {
 
     private final AltinnClient altinnClient;
     private final TilgangskontrollUtils tokenUtils;
+    private final Sporbarhetslogg sporbarhetslogg;
 
-    public TilgangskontrollService(AltinnClient altinnClient, TilgangskontrollUtils tokenUtils) {
+    private final String iawebServiceCode;
+    private final String iawebServiceEdition;
+
+    public TilgangskontrollService(
+            AltinnClient altinnClient,
+            TilgangskontrollUtils tokenUtils,
+            Sporbarhetslogg sporbarhetslogg,
+            @Value("${altinn.iaweb.service.code}") String iawebServiceCode,
+            @Value("${altinn.iaweb.service.edition}") String iawebServiceEdition
+    ) {
         this.altinnClient = altinnClient;
         this.tokenUtils = tokenUtils;
+        this.sporbarhetslogg = sporbarhetslogg;
+
+        this.iawebServiceCode = iawebServiceCode;
+        this.iawebServiceEdition = iawebServiceEdition;
     }
 
     public InnloggetBruker hentInnloggetBruker() {
@@ -29,6 +47,21 @@ public class TilgangskontrollService {
         } else {
             throw new TilgangskontrollException("Innlogget bruker er ikke selvbetjeningsbruker");
         }
+    }
+
+    public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, HttpServletRequest request) {
+        InnloggetBruker bruker = hentInnloggetBruker();
+        boolean harTilgang = bruker.harTilgang(orgnr);
+
+        sporbarhetslogg.loggHendelse(
+                bruker,
+                orgnr,
+                harTilgang,
+                request.getMethod(),
+                "" + request.getRequestURL(),
+                iawebServiceCode,
+                iawebServiceEdition
+        );
     }
 
 }

@@ -2,14 +2,19 @@ package no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll;
 
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnException;
+import no.nav.tag.sykefravarsstatistikk.api.altinn.Organisasjon;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
+import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Arrays;
+
+import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.getInnloggetSelvbetjeningBruker;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -22,13 +27,15 @@ public class TilgangskontrollServiceTest {
     private TilgangskontrollService tilgangskontroll;
     @Mock
     private TilgangskontrollUtils tokenUtils;
+    @Mock
+    private Sporbarhetslogg sporbarhetslogg;
 
     private Fnr fnr;
 
 
     @Before
     public void setUp() {
-        tilgangskontroll = new TilgangskontrollService(altinnClient, tokenUtils);
+        tilgangskontroll = new TilgangskontrollService(altinnClient, tokenUtils, sporbarhetslogg, "", "");
         fnr = new Fnr(FNR);
     }
 
@@ -40,6 +47,5 @@ public class TilgangskontrollServiceTest {
 
         tilgangskontroll.hentInnloggetBruker();
     }
-
 
 }
