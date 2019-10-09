@@ -52,6 +52,7 @@ public class TilgangskontrollService {
         }
     }
 
+    // TODO test dette
     public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, HttpServletRequest request) {
         InnloggetBruker bruker = hentInnloggetBruker();
         boolean harTilgang = bruker.harTilgang(orgnr);
@@ -67,6 +68,10 @@ public class TilgangskontrollService {
                 iawebServiceCode,
                 iawebServiceEdition
         );
+
+        if (!harTilgang) {
+            throw new TilgangskontrollException("Har ikke tilgang til statistikk for denne bedriften.");
+        }
     }
 
 }

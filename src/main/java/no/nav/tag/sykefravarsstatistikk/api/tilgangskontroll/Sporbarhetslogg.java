@@ -1,6 +1,5 @@
 package no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll;
 
-import lombok.extern.slf4j.Slf4j;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import org.slf4j.Logger;
@@ -10,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO test
 @Component
 public class Sporbarhetslogg {
 
