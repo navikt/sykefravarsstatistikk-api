@@ -8,8 +8,6 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-
 import static no.nav.tag.sykefravarsstatistikk.api.sammenligning.SammenligningController.CORRELATION_ID;
 
 @Slf4j
@@ -53,7 +51,7 @@ public class TilgangskontrollService {
     }
 
     // TODO test dette
-    public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, HttpServletRequest request) {
+    public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, String httpMetode, String requestUrl) {
         InnloggetBruker bruker = hentInnloggetBruker();
         boolean harTilgang = bruker.harTilgang(orgnr);
         String callId = MDC.get(CORRELATION_ID);
@@ -63,8 +61,8 @@ public class TilgangskontrollService {
                 bruker,
                 orgnr,
                 harTilgang,
-                request.getMethod(),
-                "" + request.getRequestURL(),
+                httpMetode,
+                requestUrl,
                 iawebServiceCode,
                 iawebServiceEdition
         );

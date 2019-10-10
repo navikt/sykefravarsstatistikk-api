@@ -37,15 +37,24 @@ public class SammenligningController {
     ) {
         Sammenligning sammenligning;
 
+        // TODO Best practice er å bruke MDC i en interceptor.
         try {
             MDC.put(CORRELATION_ID, UUID.randomUUID().toString());
-            tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(new Orgnr(orgnr), request);
+            utførTilgangskontroll(orgnr, request);
             sammenligning = service.hentSammenligning();
         } finally {
             MDC.remove(CORRELATION_ID);
         }
 
         return sammenligning;
+    }
+
+    private void utførTilgangskontroll(String orgnr, HttpServletRequest request) {
+        tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
+                new Orgnr(orgnr),
+                request.getMethod(),
+                "" + request.getRequestURL()
+        );
     }
 
 }
