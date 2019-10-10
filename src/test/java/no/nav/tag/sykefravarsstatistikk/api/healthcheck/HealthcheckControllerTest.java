@@ -17,16 +17,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@ActiveProfiles("mvc-test")
 @AutoConfigureMockMvc
 @SpringBootTest
 public class HealthcheckControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @MockBean
-    private AltinnClient altinnClient;
 
 
     @Test
