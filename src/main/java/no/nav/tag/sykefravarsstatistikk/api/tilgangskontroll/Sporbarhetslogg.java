@@ -4,10 +4,13 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static no.nav.tag.sykefravarsstatistikk.api.CorrelationIdFilter.CORRELATION_ID_MDC_NAME;
 
 @Component
 public class Sporbarhetslogg {
@@ -15,7 +18,6 @@ public class Sporbarhetslogg {
     private static final Logger SPORBARHETSLOGGER = LoggerFactory.getLogger("sporbarhetslogger");
 
     public void loggHendelse(
-            String callId,
             InnloggetBruker innloggetBruker,
             Orgnr orgnr,
             boolean harTilgang,
@@ -27,7 +29,7 @@ public class Sporbarhetslogg {
         String severity = harTilgang ? "INFO" : "WARN";
 
         List<String> statements = new ArrayList<>();
-        statements.add("callId: " + callId);
+        statements.add("callId: " + MDC.get(CORRELATION_ID_MDC_NAME));
         statements.add("fnr: " + innloggetBruker.getFnr().getVerdi());
         statements.add("Method: " + requestMethod);
         statements.add("Endpoint: " + requestUrl);

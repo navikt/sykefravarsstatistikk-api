@@ -1,8 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
