@@ -15,20 +15,18 @@
             </layout>
 
             <syslogConfig class="org.productivity.java.syslog4j.impl.net.tcp.TCPNetSyslogConfig">
-                <!-- remote system to log to -->
                 <host>audit.nais</host>
-                <!-- remote port to log to -->
                 <port>6514</port>
-                <!-- IMPORTANT: Set to your application name. -->
                 <ident>sykefravarsstatistikk-api</ident>
-                <!-- max log message length in bytes -->
                 <maxMessageLength>128000</maxMessageLength>
             </syslogConfig>
         </appender>
 
+        <!-- TODO kan fjerne?
         <appender name="stdout_json" class="ch.qos.logback.core.ConsoleAppender">
             <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
         </appender>
+        -->
 
         <logger level="INFO" name="sporbarhetslogger" additivity="false">
             <appender-ref ref="sporbarhetslogger" />
