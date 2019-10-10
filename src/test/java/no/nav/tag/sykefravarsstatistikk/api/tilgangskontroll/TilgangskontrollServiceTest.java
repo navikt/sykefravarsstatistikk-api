@@ -2,7 +2,6 @@ package no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll;
 
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnException;
-import no.nav.tag.sykefravarsstatistikk.api.altinn.Organisasjon;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
@@ -13,14 +12,12 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.MDC;
 
-import javax.servlet.http.HttpServletRequest;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static no.nav.tag.sykefravarsstatistikk.api.CorrelationIdFilter.CORRELATION_ID_MDC_NAME;
 import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.getInnloggetBruker;
 import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.getOrganisasjon;
-import static no.nav.tag.sykefravarsstatistikk.api.sammenligning.SammenligningController.CORRELATION_ID;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -89,12 +86,11 @@ public class TilgangskontrollServiceTest {
         String httpMetode = "GET";
         String requestUrl = "http://localhost:8080/endepunkt";
         String correlationId = "flfkjdhzdnjb";
-        MDC.put(CORRELATION_ID, correlationId);
+        MDC.put(CORRELATION_ID_MDC_NAME, correlationId);
 
         tilgangskontroll.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(orgnr, httpMetode, requestUrl);
 
         verify(sporbarhetslogg).loggHendelse(
-                correlationId,
                 bruker,
                 orgnr,
                 true,
@@ -105,7 +101,7 @@ public class TilgangskontrollServiceTest {
 
         );
 
-        MDC.remove(CORRELATION_ID);
+        MDC.remove(CORRELATION_ID_MDC_NAME);
     }
 
     private void værInnloggetSom(InnloggetBruker bruker) {

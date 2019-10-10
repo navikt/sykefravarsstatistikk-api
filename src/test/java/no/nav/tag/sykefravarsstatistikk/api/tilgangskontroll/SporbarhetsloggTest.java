@@ -11,7 +11,6 @@ public class SporbarhetsloggTest {
     public void loggHendelse__skal_ikke_feile_ved_nullfelter() {
         Sporbarhetslogg sporbarhetslogg = new Sporbarhetslogg();
         sporbarhetslogg.loggHendelse(
-                null,
                 getInnloggetBruker(),
                 new Orgnr(null),
                 false,
