@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 @Component
 public class CorrelationIdFilter extends OncePerRequestFilter {
     public static final String CORRELATION_ID_MDC_NAME = "correlationId";
@@ -21,7 +23,7 @@ public class CorrelationIdFilter extends OncePerRequestFilter {
         try {
             String correlationIdHeader = request.getHeader(CORRELATION_ID_HEADER_NAME);
 
-            if (correlationIdHeader == null || "".equals(correlationIdHeader)) {
+            if (isBlank(correlationIdHeader)) {
                 MDC.put(CORRELATION_ID_MDC_NAME, UUID.randomUUID().toString());
             } else {
                 MDC.put(CORRELATION_ID_MDC_NAME, correlationIdHeader);

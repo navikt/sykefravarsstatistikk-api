@@ -37,12 +37,12 @@ public class Sporbarhetslogg {
         statements.add("harTilgang: " + harTilgang);
 
         if (!harTilgang) {
-            statements.add(
-                    "Begrunnelse: Bruker har ikke rettigheten i Altinn spesifisert av service code "
-                            + altinnServiceCode
-                            + " og service edition "
-                            + altinnServiceEdition
+            String begrunnelse = String.format(
+                    "Bruker har ikke rettigheten i Altinn spesifisert av service code %s og service edition %s",
+                    altinnServiceCode,
+                    altinnServiceEdition
             );
+            statements.add("Begrunnelse: " + begrunnelse);
         }
 
         String loggmelding = severity + " " + String.join("; ", statements);
