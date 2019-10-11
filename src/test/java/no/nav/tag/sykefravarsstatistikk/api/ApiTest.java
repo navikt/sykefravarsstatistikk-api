@@ -3,7 +3,6 @@ package no.nav.tag.sykefravarsstatistikk.api;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.security.oidc.test.support.JwtTokenGenerator;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
