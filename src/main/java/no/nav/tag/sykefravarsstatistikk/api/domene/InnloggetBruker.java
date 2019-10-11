@@ -25,7 +25,7 @@ public class InnloggetBruker {
         }
     }
 
-    protected boolean harTilgang(Orgnr orgnr) {
+    public boolean harTilgang(Orgnr orgnr) {
         Optional<Organisasjon> organisasjon = organisasjoner
                 .stream()
                 .filter(Objects::nonNull)
