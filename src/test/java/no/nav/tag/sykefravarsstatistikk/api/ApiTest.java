@@ -2,6 +2,7 @@ package no.nav.tag.sykefravarsstatistikk.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +28,7 @@ public class ApiTest {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
+    @Ignore
     @Test
     public void sammenligning__skal_returnere_riktig_objekt() throws Exception {
         HttpResponse<String> response = newBuilder().build().send(
