@@ -47,7 +47,6 @@ public class TilgangskontrollService {
         }
     }
 
-    // TODO test dette
     public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, String httpMetode, String requestUrl) {
         InnloggetBruker bruker = hentInnloggetBruker();
         boolean harTilgang = bruker.harTilgang(orgnr);
