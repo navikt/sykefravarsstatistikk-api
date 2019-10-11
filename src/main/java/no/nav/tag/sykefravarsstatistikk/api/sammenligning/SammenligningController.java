@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.security.oidc.api.Protected;
 import no.nav.security.oidc.api.Unprotected;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
-@Unprotected
+@Protected
 @RestController
 @Slf4j
 public class SammenligningController {
