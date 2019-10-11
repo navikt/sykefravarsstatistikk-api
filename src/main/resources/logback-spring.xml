@@ -1,15 +1,10 @@
 <configuration scan="true">
     <springProfile name="dev,prod">
-        <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <appender name="consoleJsonAppender" class="ch.qos.logback.core.ConsoleAppender">
             <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
         </appender>
-        <logger name="jsonLogger" additivity="false" level="DEBUG">
-            <appender-ref ref="consoleAppender"/>
-        </logger>
 
-        <!-- Audit logging -->
-
-        <appender name="sporbarhetslogger" class="com.papertrailapp.logback.Syslog4jAppender">
+        <appender name="sporbarhetsloggAppender" class="com.papertrailapp.logback.Syslog4jAppender">
             <layout class="ch.qos.logback.classic.PatternLayout">
                 <pattern>%m%n%xEx</pattern>
             </layout>
@@ -22,17 +17,12 @@
             </syslogConfig>
         </appender>
 
-        <!-- TODO kan fjerne?
-        <appender name="stdout_json" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
-        </appender>
-        -->
-
         <logger level="INFO" name="sporbarhetslogger" additivity="false">
-            <appender-ref ref="sporbarhetslogger" />
+            <appender-ref ref="sporbarhetsloggAppender" />
         </logger>
+
         <root level="INFO">
-            <appender-ref ref="consoleAppender"/>
+            <appender-ref ref="consoleJsonAppender"/>
         </root>
     </springProfile>
     <springProfile name="local">
