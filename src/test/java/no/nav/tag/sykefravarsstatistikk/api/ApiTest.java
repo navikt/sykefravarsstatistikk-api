@@ -28,6 +28,7 @@ public class ApiTest {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
+    // TODO Får å kjøre denne testen må vi få TokenGeneratorController til å fungere
     @Ignore
     @Test
     public void sammenligning__skal_returnere_riktig_objekt() throws Exception {
