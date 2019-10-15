@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.klassifikasjoner;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.klassifikasjoner.Sektor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -14,7 +15,9 @@ public class KlassifikasjonerRepository {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public KlassifikasjonerRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public KlassifikasjonerRepository(
+            @Qualifier("applikasjonJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
+    ) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 

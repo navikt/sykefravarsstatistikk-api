@@ -15,8 +15,9 @@ import javax.sql.DataSource;
 
 @Configuration
 @Profile({"dev", "prod"})
-public class DatabaseConfig {
+public class ApplikasjonDBConfig {
 
+    // URL hentes i Vault
     @Value("${spring.datasource.url}")
     private String databaseUrl;
 
@@ -25,6 +26,7 @@ public class DatabaseConfig {
 
     @Value("${vault.mount-path}")
     private String mountPath;
+
 
     @Bean
     public DataSource userDataSource() {

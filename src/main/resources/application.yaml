@@ -17,8 +17,6 @@ spring:
   h2.console:
     enabled: true
     path: /h2
-  flyway:
-    locations: classpath:/db/migration,/db/testdata
 
 mock:
   port: 8081
@@ -40,6 +38,20 @@ no.nav.security.oidc:
     selvbetjening:
       discoveryurl: http://metadata
       accepted_audience: aud-localhost
+
+applikasjon.datasource:
+  type: org.apache.commons.dbcp2.BasicDataSource
+  url: jdbc:h2:mem:test
+  username: SA
+  password:
+  driver-class-name: org.h2.Driver
+
+datavarehus.datasource:
+  type: org.apache.commons.dbcp2.BasicDataSource
+  url: jdbc:h2:mem:test
+  username: SA
+  password:
+  driver-class-name: org.h2.Driver
 
 ---
 
@@ -79,6 +91,12 @@ altinn:
 
 database.navn: sykefravarsstatistikk
 vault.mount-path: postgresql/preprod-fss
+
+datavarehus.datasource:
+  url: jdbc:oracle:thin:@dm07-scan.adeo.no:1521/dwhq0
+  username: ${DVH_BRUKERNAVN}}
+  password: ${DVH_PASSORD}
+  driver-class-name: oracle.jdbc.driver.OracleDriver
 
 ---
 
