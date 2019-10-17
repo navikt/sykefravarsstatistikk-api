@@ -115,7 +115,8 @@ altinn:
 database.navn: sykefravarsstatistikk
 vault.mount-path: postgresql/preprod-fss
 
-datavarehus.datasource:
+applikasjon.datasource:
+  type: org.apache.commons.dbcp2.BasicDataSource
   url: jdbc:oracle:thin:@dm07-scan.adeo.no:1521/dwhq0
   username: ${DVH_BRUKERNAVN}}
   password: ${DVH_PASSORD}
