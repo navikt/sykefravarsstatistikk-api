@@ -56,6 +56,29 @@ datavarehus.datasource:
 ---
 
 spring:
+  profiles: db-test
+
+  flyway:
+    locations: classpath:/db/migration,classpath:/db/test-datavarehus
+
+applikasjon.datasource:
+  type: org.apache.commons.dbcp2.BasicDataSource
+  url: jdbc:h2:mem:test
+  username: SA
+  password:
+  driver-class-name: org.h2.Driver
+
+datavarehus.datasource:
+  type: org.apache.commons.dbcp2.BasicDataSource
+  url: jdbc:h2:mem:test
+  username: SA
+  password:
+  driver-class-name: org.h2.Driver
+
+
+---
+
+spring:
   profiles: mvc-test
 
 no.nav.security.oidc:

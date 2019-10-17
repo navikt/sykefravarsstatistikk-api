@@ -39,7 +39,7 @@ public class ApplikasjonDBConfigLocal {
     public FlywayMigrationStrategy flywayMigrationStrategy() {
         return flyway -> Flyway.configure()
                 .dataSource(springDataSource())
-                .locations("/db/migration","/db/testdata")
+                .locations("/db/migration", "/db/test-lokaldb-data", "/db/test-datavarehus")
                 .load()
                 .migrate();
     }

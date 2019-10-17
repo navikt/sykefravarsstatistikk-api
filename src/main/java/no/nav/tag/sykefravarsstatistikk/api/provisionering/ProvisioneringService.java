@@ -1,10 +1,13 @@
 package no.nav.tag.sykefravarsstatistikk.api.provisionering;
 
+import lombok.extern.slf4j.Slf4j;
+import no.nav.tag.sykefravarsstatistikk.api.domene.Tuple;
 import no.nav.tag.sykefravarsstatistikk.api.domene.klassifikasjoner.Sektor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Slf4j
 @Component
 public class ProvisioneringService {
 
@@ -19,8 +22,22 @@ public class ProvisioneringService {
         this.provisioneringRepository = provisioneringRepository;
     }
 
-    public void populerSektorer(int årstall, int kvartal) {
-        List<Sektor> sektorer = datavarehusRepository.hentAlleSektorer(årstall, kvartal);
-        provisioneringRepository.oppdaterSektorer(sektorer);
+    public void populerSektorer() {
+        List<Sektor> sektorer = datavarehusRepository.hentAlleSektorer();
+        Tuple<Integer, Integer> antallOpprettetogOppdatert =
+                provisioneringRepository.opprettEllerOppdaterSektorer(sektorer);
+        log.info(
+                String.format(
+                        "Import av sektorer er ferdig. Antall opprettet: %d, antall oppdatert: %d",
+                        antallOpprettetogOppdatert.x,
+                        antallOpprettetogOppdatert.y
+                )
+        );
+    }
+
+
+    // TODO: DELETE ME --> bare til versifisering
+    public List<Sektor> hentSektorer() {
+        return datavarehusRepository.hentAlleSektorer();
     }
 }

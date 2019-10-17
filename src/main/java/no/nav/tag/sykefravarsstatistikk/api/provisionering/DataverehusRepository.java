@@ -7,10 +7,10 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
-import static no.nav.tag.sykefravarsstatistikk.api.sammenligning.SammenligningRepository.KVARTAL;
-import static no.nav.tag.sykefravarsstatistikk.api.sammenligning.SammenligningRepository.ÅRSTALL;
 
 @Component
 public class DataverehusRepository {
@@ -25,14 +25,22 @@ public class DataverehusRepository {
     }
 
 
-    public List<Sektor> hentAlleSektorer(int årstall, int kvartal) {
-        SqlParameterSource namedParameters = new MapSqlParameterSource()
-                .addValue(ÅRSTALL, årstall)
-                .addValue(KVARTAL, kvartal);
+    public List<Sektor> hentAlleSektorer() {
+        SqlParameterSource namedParameters = new MapSqlParameterSource();
 
-        return namedParameterJdbcTemplate.queryForList(
-                "select * from dt_p.V_DIM_IA_SEKTOR WHERE arstall = :arstall AND kvartal = :kvartal",
+        return namedParameterJdbcTemplate.query(
+                "select SEKTORKODE, SEKTORNAVN from dt_p.V_DIM_IA_SEKTOR",
                 namedParameters,
-                Sektor.class);
+                (resultSet, rowNum) -> mapTilSektor(resultSet)
+        );
     }
+
+
+    private Sektor mapTilSektor(ResultSet rs) throws SQLException {
+        return new Sektor (
+                rs.getString("SEKTORKODE"),
+                rs.getString("SEKTORNAVN")
+        );
+    }
+
 }

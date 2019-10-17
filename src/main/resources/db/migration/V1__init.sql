@@ -1,4 +1,10 @@
 -- Dimensjon tabeller
+
+create table SEKTOR__TEST (
+                        kode varchar primary key,
+                        navn varchar(255) not null
+);
+
 create table SEKTOR (
   kode varchar primary key,
   navn varchar(255) not null

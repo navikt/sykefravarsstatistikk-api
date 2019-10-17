@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.klassifikasjoner;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.klassifikasjoner.Sektor;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,10 +14,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.assertEquals;
 
-@ActiveProfiles("test")
+@ActiveProfiles("db-test")
 @RunWith(SpringRunner.class)
 @DataJdbcTest
-public class DimensjonJDBCRepositoryTest {
+public class KlassifikasjonerRepositoryJdbcTest {
 
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -26,7 +27,12 @@ public class DimensjonJDBCRepositoryTest {
     @Before
     public void setUp() {
         repository = new KlassifikasjonerRepository(namedParameterJdbcTemplate);
-        initTestDB(namedParameterJdbcTemplate);
+        cleanUpTestDb(namedParameterJdbcTemplate);
+    }
+
+    @After
+    public void tearDown() {
+        cleanUpTestDb(namedParameterJdbcTemplate);
     }
 
 
@@ -41,7 +47,7 @@ public class DimensjonJDBCRepositoryTest {
     }
 
 
-    private static void initTestDB(NamedParameterJdbcTemplate jdbcTemplate) {
+    private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
         jdbcTemplate.update("delete from sektor", new MapSqlParameterSource());
     }
 
