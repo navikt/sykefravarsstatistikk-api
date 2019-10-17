@@ -5,11 +5,13 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.SneakyThrows;
 import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil;
 import org.flywaydb.core.Flyway;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;
 
@@ -28,10 +30,16 @@ public class ApplikasjonDBConfig {
     private String mountPath;
 
 
-    @Bean
+    @Bean(name = "applikasjonDS")
     public DataSource userDataSource() {
         return dataSource("admin");
     }
+
+    @Bean(name = "applikasjonJdbcTemplate")
+    public NamedParameterJdbcTemplate springJdbcTemplate(@Qualifier("applikasjonDS") DataSource dataSource) {
+        return new NamedParameterJdbcTemplate(dataSource);
+    }
+
 
     @SneakyThrows
     private HikariDataSource dataSource(String user) {
