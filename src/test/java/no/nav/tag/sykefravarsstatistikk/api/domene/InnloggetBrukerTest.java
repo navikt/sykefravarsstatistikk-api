@@ -9,7 +9,7 @@ import java.util.List;
 
 import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.getInnloggetBruker;
 
-public class InnloggetSelvbetjeningBrukerTest {
+public class InnloggetBrukerTest {
 
     @Test
     public void sjekkTilgang__kaster_ingen_Exception_hvis_bruker_har_tilgang_til_orgnr() {
@@ -34,6 +34,20 @@ public class InnloggetSelvbetjeningBrukerTest {
 
         Organisasjon organisasjon = TestUtils.getOrganisasjon("123456789");
         bruker.setOrganisasjoner(List.of(organisasjon));
+
+        bruker.sjekkTilgang(new Orgnr("987654321"));
+    }
+
+    @Test
+    public void sjekkTilgang__skal_ikke_feile_selv_om_listen_med_organisasjoner_har_null() {
+        InnloggetBruker bruker = getInnloggetBruker("12345678901");
+
+        List<Organisasjon> organisasjoner = List.of(
+                TestUtils.getOrganisasjon(null),
+                TestUtils.getOrganisasjon("987654321")
+        );
+
+        bruker.setOrganisasjoner(organisasjoner);
 
         bruker.sjekkTilgang(new Orgnr("987654321"));
     }
