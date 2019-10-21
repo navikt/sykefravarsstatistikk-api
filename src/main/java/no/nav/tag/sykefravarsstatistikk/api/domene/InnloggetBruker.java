@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Data
 public class InnloggetBruker {
@@ -26,14 +27,12 @@ public class InnloggetBruker {
     }
 
     public boolean harTilgang(Orgnr orgnr) {
-        Optional<Organisasjon> organisasjon = organisasjoner
+        List<String> orgnumreBrukerHarTilgangTil = organisasjoner
                 .stream()
                 .filter(Objects::nonNull)
-                .filter(
-                        o -> o.getOrganizationNumber().equals(orgnr.getVerdi())
-                )
-                .findFirst();
+                .map(org -> org.getOrganizationNumber())
+                .collect(Collectors.toList());
 
-        return organisasjon.isPresent();
+        return orgnumreBrukerHarTilgangTil.contains(orgnr.getVerdi());
     }
 }
