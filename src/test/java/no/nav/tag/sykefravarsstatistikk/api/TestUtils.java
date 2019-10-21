@@ -4,11 +4,21 @@ import no.nav.tag.sykefravarsstatistikk.api.altinn.Organisasjon;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 
+import java.util.Arrays;
+
 public class TestUtils {
 
+    public static InnloggetBruker getInnloggetBruker() {
+        return getInnloggetBruker(getFnr().getVerdi());
+    }
 
-    public static InnloggetBruker getInnloggetSelvbetjeningBruker(String fnr) {
-        return new InnloggetBruker(new Fnr(fnr));
+    public static InnloggetBruker getInnloggetBruker(String fnr) {
+        InnloggetBruker bruker = new InnloggetBruker(new Fnr(fnr));
+        bruker.setOrganisasjoner(Arrays.asList(
+                getOrganisasjon("999999999"),
+                getOrganisasjon("111111111")
+        ));
+        return bruker;
     }
 
     public static Organisasjon getOrganisasjon(String organizationNumber) {
@@ -17,4 +27,7 @@ public class TestUtils {
         return organisasjon;
     }
 
+    public static Fnr getFnr() {
+        return new Fnr("26070248114");
+    }
 }
