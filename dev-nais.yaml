@@ -6,7 +6,7 @@ metadata:
   labels:
     team: teamtag
 spec:
-  image: navikt/sykefravarsstatistikk-api:{{version}}
+  image: navikt/sykefravarsstatistikk-api:5683d28ccf2198a22130af317087c5a5cc231e7b
   team: teamtag
   port: 8080
   ingresses:
@@ -23,5 +23,6 @@ spec:
   prometheus:
     enabled: true
     path: /sykefravarsstatistikk-api/internal/actuator/prometheus
+  webproxy: true
   vault:
     enabled: true
