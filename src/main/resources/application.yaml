@@ -40,14 +40,12 @@ no.nav.security.oidc:
       accepted_audience: aud-localhost
 
 applikasjon.datasource:
-  type: org.apache.commons.dbcp2.BasicDataSource
   url: jdbc:h2:mem:test
   username: SA
   password:
   driver-class-name: org.h2.Driver
 
 datavarehus.datasource:
-  type: org.apache.commons.dbcp2.BasicDataSource
   url: jdbc:h2:mem:test
   username: SA
   password:
@@ -62,14 +60,12 @@ spring:
     locations: classpath:/db/migration,classpath:/db/test-datavarehus
 
 applikasjon.datasource:
-  type: org.apache.commons.dbcp2.BasicDataSource
   url: jdbc:h2:mem:test
   username: SA
   password:
   driver-class-name: org.h2.Driver
 
 datavarehus.datasource:
-  type: org.apache.commons.dbcp2.BasicDataSource
   url: jdbc:h2:mem:test
   username: SA
   password:
@@ -115,8 +111,7 @@ altinn:
 database.navn: sykefravarsstatistikk
 vault.mount-path: postgresql/preprod-fss
 
-applikasjon.datasource:
-  type: org.apache.commons.dbcp2.BasicDataSource
+datavarehus.datasource:
   url: jdbc:oracle:thin:@dm07-scan.adeo.no:1521/dwhq0
   username: ${DVH_BRUKERNAVN}}
   password: ${DVH_PASSORD}
