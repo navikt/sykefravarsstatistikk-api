@@ -1,5 +1,4 @@
 -- Dimensjon tabeller
-
 create table SEKTOR (
   kode varchar primary key,
   navn varchar(255) not null

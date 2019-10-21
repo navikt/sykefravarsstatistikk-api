@@ -52,7 +52,6 @@ public class DataverehusRepositoryJdbcTest {
 
 
     private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
-        jdbcTemplate.update("delete from SEKTOR__TEST", new MapSqlParameterSource());
         jdbcTemplate.update("delete from dt_p.V_DIM_IA_SEKTOR", new MapSqlParameterSource());
     }
 
