@@ -3,7 +3,6 @@ package no.nav.tag.sykefravarsstatistikk.api.config;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -34,10 +33,6 @@ public class DatavarehusDBConfig {
 
     @Bean(name = "datavarehusDS")
     public DataSource datavarehusDataSource() {
-        // TODO: DELETE ME!
-        startsWithOrBlank("property1", username);
-        startsWithOrBlank("property2", password);
-
         Properties properties = new Properties();
         properties.put("dataSource.oracle.jdbc.fanEnabled", false);
         HikariConfig config = new HikariConfig(properties);
@@ -55,12 +50,4 @@ public class DatavarehusDBConfig {
         return new NamedParameterJdbcTemplate(dataSource);
     }
 
-
-    private void startsWithOrBlank(String name, String value) {
-        if (StringUtils.isBlank(value)) {
-            log.info(String.format("%s is blank", name));
-        } else {
-            log.info(String.format("%s is %d chars long and starts w/: %s", name, value.length(), value.substring(0, 1)));
-        }
-    }
 }
