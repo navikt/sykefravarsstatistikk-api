@@ -1,31 +1,33 @@
-package no.nav.tag.sykefravarsstatistikk.api.provisionering;
+package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Tuple;
-import no.nav.tag.sykefravarsstatistikk.api.domene.klassifikasjoner.Sektor;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
+import no.nav.tag.sykefravarsstatistikk.api.provisjonering.DataverehusRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Slf4j
 @Component
-public class ProvisioneringService {
+public class VirksomhetsklassifikasjonerSynkroniseringService {
 
     private final DataverehusRepository datavarehusRepository;
-    private final ProvisioneringRepository provisioneringRepository;
+    private final VirksomhetsklassifikasjonerSynkroniseringRepository
+            virksomhetsklassifikasjonerSynkroniseringRepository;
 
-    public ProvisioneringService(
+    public VirksomhetsklassifikasjonerSynkroniseringService(
             DataverehusRepository datavarehusRepository,
-            ProvisioneringRepository provisioneringRepository
+            VirksomhetsklassifikasjonerSynkroniseringRepository virksomhetsklassifikasjonerSynkroniseringRepository
     ) {
         this.datavarehusRepository = datavarehusRepository;
-        this.provisioneringRepository = provisioneringRepository;
+        this.virksomhetsklassifikasjonerSynkroniseringRepository = virksomhetsklassifikasjonerSynkroniseringRepository;
     }
 
     public void populerSektorer() {
         List<Sektor> sektorer = datavarehusRepository.hentAlleSektorer();
         Tuple<Integer, Integer> antallOpprettetogOppdatert =
-                provisioneringRepository.opprettEllerOppdaterSektorer(sektorer);
+                virksomhetsklassifikasjonerSynkroniseringRepository.opprettEllerOppdaterSektorer(sektorer);
         log.info(
                 String.format(
                         "Import av sektorer er ferdig. Antall opprettet: %d, antall oppdatert: %d",

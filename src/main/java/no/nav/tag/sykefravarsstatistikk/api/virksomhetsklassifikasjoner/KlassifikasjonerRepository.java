@@ -1,6 +1,6 @@
-package no.nav.tag.sykefravarsstatistikk.api.klassifikasjoner;
+package no.nav.tag.sykefravarsstatistikk.api.virksomhetsklassifikasjoner;
 
-import no.nav.tag.sykefravarsstatistikk.api.domene.klassifikasjoner.Sektor;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;

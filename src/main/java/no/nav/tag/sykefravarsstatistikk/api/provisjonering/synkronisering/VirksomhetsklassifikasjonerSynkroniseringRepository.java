@@ -1,7 +1,7 @@
-package no.nav.tag.sykefravarsstatistikk.api.provisionering;
+package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.Tuple;
-import no.nav.tag.sykefravarsstatistikk.api.domene.klassifikasjoner.Sektor;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -16,11 +16,11 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
-public class ProvisioneringRepository {
+public class VirksomhetsklassifikasjonerSynkroniseringRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
 
-    public ProvisioneringRepository(
+    public VirksomhetsklassifikasjonerSynkroniseringRepository(
             @Qualifier("applikasjonJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
     ) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;

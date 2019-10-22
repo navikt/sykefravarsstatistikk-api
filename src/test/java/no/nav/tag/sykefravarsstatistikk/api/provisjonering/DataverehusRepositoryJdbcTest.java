@@ -1,6 +1,6 @@
-package no.nav.tag.sykefravarsstatistikk.api.provisionering;
+package no.nav.tag.sykefravarsstatistikk.api.provisjonering;
 
-import no.nav.tag.sykefravarsstatistikk.api.domene.klassifikasjoner.Sektor;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,8 +1,8 @@
-package no.nav.tag.sykefravarsstatistikk.api.provisionering;
+package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.security.oidc.api.Unprotected;
-import no.nav.tag.sykefravarsstatistikk.api.domene.klassifikasjoner.Sektor;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,12 +15,12 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping(value = "provisionering")
-public class ProvisioneringController {
+public class VirksomhetsklassifikasjonerSynkroniseringController {
 
-    private final ProvisioneringService service;
+    private final VirksomhetsklassifikasjonerSynkroniseringService service;
 
     @Autowired
-    public ProvisioneringController(ProvisioneringService service){
+    public VirksomhetsklassifikasjonerSynkroniseringController(VirksomhetsklassifikasjonerSynkroniseringService service){
         this.service = service;
     }
 

@@ -1,4 +1,4 @@
-package no.nav.tag.sykefravarsstatistikk.api.domene.klassifikasjoner;
+package no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
