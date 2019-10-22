@@ -121,7 +121,7 @@ datavarehus.datasource:
   url: jdbc:oracle:thin:@dm07-scan.adeo.no:1521/dwhq0
   username: ${DVH_BRUKERNAVN}}
   password: ${DVH_PASSORD}
-  driver-class-name: oracle.jdbc.driver.OracleDriver
+  driver-class-name: oracle.jdbc.OracleDriver
 
 ---
 
