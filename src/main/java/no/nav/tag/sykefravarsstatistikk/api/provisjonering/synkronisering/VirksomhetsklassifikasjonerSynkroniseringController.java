@@ -1,7 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.security.oidc.api.Unprotected;
+import no.nav.security.oidc.api.Protected;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Unprotected
+@Protected
 @RestController
 @Slf4j
-@RequestMapping(value = "provisionering")
+@RequestMapping(value = "provisjonering/synkronisering")
 public class VirksomhetsklassifikasjonerSynkroniseringController {
 
     private final VirksomhetsklassifikasjonerSynkroniseringService service;

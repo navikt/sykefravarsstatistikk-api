@@ -1,6 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering;
 
-import no.nav.tag.sykefravarsstatistikk.api.domene.Tuple;
+import no.nav.tag.sykefravarsstatistikk.api.domene.OpprettEllerOppdaterResultat;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -13,10 +13,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class VirksomhetsklassifikasjonerSynkroniseringRepository {
+    public static final String KODE = "kode";
+    public static final String NAVN = "navn";
+
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
 
@@ -27,32 +29,41 @@ public class VirksomhetsklassifikasjonerSynkroniseringRepository {
     }
 
 
-    public Tuple<Integer, Integer> opprettEllerOppdaterSektorer(List<Sektor> sektorerIDatavarehus) {
-        final AtomicInteger antallOppdaterteSektorer  = new AtomicInteger(0);
-        final AtomicInteger antallOpprettetSektorer = new AtomicInteger(0);
+    public OpprettEllerOppdaterResultat opprettEllerOppdaterSektorer(List<Sektor> sektorerIDatavarehus) {
+        final OpprettEllerOppdaterResultat sluttResultat = new OpprettEllerOppdaterResultat();
 
         sektorerIDatavarehus.stream().forEach(
-                sektorIDatavarehus ->
-                        hentSektor(sektorIDatavarehus.getKode())
-                                .ifPresentOrElse(
-                                        eksisterendeSektor -> {
-                                            if (!eksisterendeSektor.equals(sektorIDatavarehus)) {
-                                                update(eksisterendeSektor, sektorIDatavarehus);
-                                                antallOppdaterteSektorer.getAndIncrement();
-                                            }
-                                        },
-                                        () -> {
-                                            antallOpprettetSektorer.getAndIncrement();
-                                            create(sektorIDatavarehus);
-                                        }
-                                )
-        );
-        return new Tuple<>(antallOpprettetSektorer.get(), antallOppdaterteSektorer.get());
+                sektor -> {
+                    OpprettEllerOppdaterResultat result = opprettEllerOppdaterSektor(sektor);
+                    sluttResultat.add(result);
+                });
+
+        return sluttResultat;
+    }
+
+
+    private OpprettEllerOppdaterResultat opprettEllerOppdaterSektor(Sektor sektor) {
+        final OpprettEllerOppdaterResultat resultat = new OpprettEllerOppdaterResultat();
+
+        hentSektor(sektor.getKode())
+            .ifPresentOrElse(
+                eksisterendeSektor -> {
+                  if (!eksisterendeSektor.equals(sektor)) {
+                    update(eksisterendeSektor, sektor);
+                    resultat.setAntallRadOppdatert(1);
+                  }
+                },
+                () -> {
+                  create(sektor);
+                  resultat.setAntallRadOpprettet(1);
+                });
+
+        return resultat;
     }
 
     private Optional<Sektor> hentSektor(String kode) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
-                .addValue("kode", kode);
+                .addValue(KODE, kode);
 
         try {
             Sektor sektor = namedParameterJdbcTemplate.queryForObject(
@@ -68,8 +79,8 @@ public class VirksomhetsklassifikasjonerSynkroniseringRepository {
 
     private int create(Sektor sektor) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
-                .addValue("kode", sektor.getKode())
-                .addValue("navn", sektor.getNavn());
+                .addValue(KODE, sektor.getKode())
+                .addValue(NAVN, sektor.getNavn());
 
         return namedParameterJdbcTemplate.update(
                 "insert into SEKTOR (kode, navn)  values (:kode, :navn)",
@@ -78,8 +89,8 @@ public class VirksomhetsklassifikasjonerSynkroniseringRepository {
 
     private int update(Sektor eksisterendeSektor, Sektor sektor) {
                 SqlParameterSource namedParameters = new MapSqlParameterSource()
-                        .addValue("kode", eksisterendeSektor.getKode())
-                        .addValue("navn", sektor.getNavn());
+                        .addValue(KODE, eksisterendeSektor.getKode())
+                        .addValue(NAVN, sektor.getNavn());
 
         return namedParameterJdbcTemplate.update(
                 "update SEKTOR set navn = :navn where kode = :kode",
@@ -88,8 +99,8 @@ public class VirksomhetsklassifikasjonerSynkroniseringRepository {
 
     private Sektor mapTilSektor(ResultSet rs) throws SQLException {
         return new Sektor (
-                rs.getString("kode"),
-                rs.getString("navn")
+                rs.getString(KODE),
+                rs.getString(NAVN)
         );
     }
 

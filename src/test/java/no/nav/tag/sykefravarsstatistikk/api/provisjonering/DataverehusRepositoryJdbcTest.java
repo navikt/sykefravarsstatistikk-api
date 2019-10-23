@@ -48,6 +48,7 @@ public class DataverehusRepositoryJdbcTest {
 
         assertTrue(sektorer.size() == 2);
         assertTrue(sektorer.contains(new Sektor("0", "Ukjent")));
+        assertTrue(sektorer.contains(new Sektor("9", "Fylkeskommunal forvaltning")));
     }
 
 

@@ -1,7 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.tag.sykefravarsstatistikk.api.domene.Tuple;
+import no.nav.tag.sykefravarsstatistikk.api.domene.OpprettEllerOppdaterResultat;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.DataverehusRepository;
 import org.springframework.stereotype.Component;
@@ -26,13 +26,13 @@ public class VirksomhetsklassifikasjonerSynkroniseringService {
 
     public void populerSektorer() {
         List<Sektor> sektorer = datavarehusRepository.hentAlleSektorer();
-        Tuple<Integer, Integer> antallOpprettetogOppdatert =
+        OpprettEllerOppdaterResultat resultat =
                 virksomhetsklassifikasjonerSynkroniseringRepository.opprettEllerOppdaterSektorer(sektorer);
         log.info(
                 String.format(
                         "Import av sektorer er ferdig. Antall opprettet: %d, antall oppdatert: %d",
-                        antallOpprettetogOppdatert.x,
-                        antallOpprettetogOppdatert.y
+                        resultat.getAntallRadOpprettet(),
+                        resultat.getAntallRadOppdatert()
                 )
         );
     }

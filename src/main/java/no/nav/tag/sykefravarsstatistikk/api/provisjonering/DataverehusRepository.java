@@ -16,7 +16,11 @@ import java.util.List;
 public class DataverehusRepository {
 
 
+    public static final String SEKTORKODE = "SEKTORKODE";
+    public static final String SEKTORNAVN = "SEKTORNAVN";
+
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
 
     public DataverehusRepository(
             @Qualifier("datavarehusJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
@@ -38,8 +42,8 @@ public class DataverehusRepository {
 
     private Sektor mapTilSektor(ResultSet rs) throws SQLException {
         return new Sektor (
-                rs.getString("SEKTORKODE"),
-                rs.getString("SEKTORNAVN")
+                rs.getString(SEKTORKODE),
+                rs.getString(SEKTORNAVN)
         );
     }
 
