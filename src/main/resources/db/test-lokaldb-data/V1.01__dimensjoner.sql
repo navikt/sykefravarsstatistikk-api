@@ -1,6 +1,6 @@
 -- Dimensjoner
 
-insert into SEKTOR (kode, navn) values('0', 'Ukjent');
+insert into SEKTOR (kode, navn) values('0', 'Ukjent sektor');
 insert into SEKTOR (kode, navn) values('1', 'Statlig forvaltning');
 insert into SEKTOR (kode, navn) values('2', 'Kommunal forvaltning');
 insert into SEKTOR (kode, navn) values('3', 'Privat og offentlig næringsvirksomhet');

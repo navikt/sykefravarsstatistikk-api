@@ -17,8 +17,6 @@ spring:
   h2.console:
     enabled: true
     path: /h2
-  flyway:
-    locations: classpath:/db/migration,/db/testdata
 
 mock:
   port: 8081
@@ -40,6 +38,39 @@ no.nav.security.oidc:
     selvbetjening:
       discoveryurl: http://metadata
       accepted_audience: aud-localhost
+
+applikasjon.datasource:
+  url: jdbc:h2:mem:test
+  username: SA
+  password:
+  driver-class-name: org.h2.Driver
+
+datavarehus.datasource:
+  url: jdbc:h2:mem:test
+  username: SA
+  password:
+  driver-class-name: org.h2.Driver
+
+---
+
+spring:
+  profiles: db-test
+
+  flyway:
+    locations: classpath:/db/migration,classpath:/db/test-datavarehus
+
+applikasjon.datasource:
+  url: jdbc:h2:mem:test
+  username: SA
+  password:
+  driver-class-name: org.h2.Driver
+
+datavarehus.datasource:
+  url: jdbc:h2:mem:test
+  username: SA
+  password:
+  driver-class-name: org.h2.Driver
+
 
 ---
 
@@ -85,6 +116,12 @@ no.nav.security.oidc:
   issuer.selvbetjening:
     discoveryurl: https://login.microsoftonline.com/NAVtestB2C.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1A_idporten_ver1
     accepted_audience: 0090b6e1-ffcc-4c37-bc21-049f7d1f0fe5
+
+datavarehus.datasource:
+  url: jdbc:oracle:thin:@dm07-scan.adeo.no:1521/dwhq0
+  username: ${DVH_BRUKERNAVN}
+  password: ${DVH_PASSORD}
+  driver-class-name: oracle.jdbc.OracleDriver
 
 ---
 

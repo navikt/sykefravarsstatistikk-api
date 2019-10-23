@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -19,7 +20,10 @@ public class SammenligningRepository {
     public static final String NÆRING = "naring";
     public static final String SEKTOR = "sektor";
 
-    public SammenligningRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public SammenligningRepository(
+            @Qualifier("sykefravarsstatistikkJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
+    )
+    {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
