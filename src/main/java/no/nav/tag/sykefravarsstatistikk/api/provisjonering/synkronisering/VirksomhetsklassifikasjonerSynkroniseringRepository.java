@@ -3,6 +3,7 @@ package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering;
 import no.nav.tag.sykefravarsstatistikk.api.domene.OpprettEllerOppdaterResultat;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Profile;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -14,6 +15,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+@Profile({"local", "dev"})
 @Component
 public class VirksomhetsklassifikasjonerSynkroniseringRepository {
     public static final String KODE = "kode";

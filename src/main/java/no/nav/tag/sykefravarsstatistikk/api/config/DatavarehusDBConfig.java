@@ -15,7 +15,7 @@ import java.util.Properties;
 
 @Slf4j
 @Configuration
-@Profile({"local", "dev", "prod"})
+@Profile({"local", "dev"})
 public class DatavarehusDBConfig {
 
     @Value("${datavarehus.datasource.url}")

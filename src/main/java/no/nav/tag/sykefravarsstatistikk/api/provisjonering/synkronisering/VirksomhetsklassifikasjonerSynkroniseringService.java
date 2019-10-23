@@ -4,10 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.tag.sykefravarsstatistikk.api.domene.OpprettEllerOppdaterResultat;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.DataverehusRepository;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Profile({"local", "dev"})
 @Slf4j
 @Component
 public class VirksomhetsklassifikasjonerSynkroniseringService {

@@ -2,6 +2,7 @@ package no.nav.tag.sykefravarsstatistikk.api.provisjonering;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -12,6 +13,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 
+@Profile({"local", "dev"})
 @Component
 public class DataverehusRepository {
 
