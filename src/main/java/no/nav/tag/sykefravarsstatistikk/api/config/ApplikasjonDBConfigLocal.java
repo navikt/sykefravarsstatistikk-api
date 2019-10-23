@@ -30,8 +30,8 @@ public class ApplikasjonDBConfigLocal {
     private String driverClassName;
 
 
-    @Bean(name = "applikasjonDS")
-    public DataSource springDataSource() {
+    @Bean(name = "sykefravarsstatistikkDataSource")
+    public DataSource sykefravarsstatistikkDataSource() {
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(databaseUrl);
         config.setUsername(username);
@@ -42,15 +42,18 @@ public class ApplikasjonDBConfigLocal {
         return new HikariDataSource(config);
     }
 
-    @Bean(name = "applikasjonJdbcTemplate")
-    public NamedParameterJdbcTemplate springJdbcTemplate(@Qualifier("applikasjonDS") DataSource dataSource) {
+    @Bean(name = "sykefravarsstatistikkJdbcTemplate")
+    public NamedParameterJdbcTemplate sykefravarsstatistikkJdbcTemplate(
+            @Qualifier("sykefravarsstatistikkDataSource") DataSource dataSource
+    )
+    {
         return new NamedParameterJdbcTemplate(dataSource);
     }
 
     @Bean
     public FlywayMigrationStrategy flywayMigrationStrategy() {
         return flyway -> Flyway.configure()
-                .dataSource(springDataSource())
+                .dataSource(sykefravarsstatistikkDataSource())
                 .locations("/db/migration", "/db/test-lokaldb-data", "/db/test-datavarehus")
                 .load()
                 .migrate();

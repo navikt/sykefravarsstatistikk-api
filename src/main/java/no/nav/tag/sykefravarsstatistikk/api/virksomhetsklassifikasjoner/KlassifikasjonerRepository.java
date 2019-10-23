@@ -16,8 +16,9 @@ public class KlassifikasjonerRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     public KlassifikasjonerRepository(
-            @Qualifier("applikasjonJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
-    ) {
+            @Qualifier("sykefravarsstatistikkJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
+    )
+    {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 

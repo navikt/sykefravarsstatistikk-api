@@ -25,8 +25,9 @@ public class VirksomhetsklassifikasjonerSynkroniseringRepository {
 
 
     public VirksomhetsklassifikasjonerSynkroniseringRepository(
-            @Qualifier("applikasjonJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
-    ) {
+            @Qualifier("sykefravarsstatistikkJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
+    )
+    {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 

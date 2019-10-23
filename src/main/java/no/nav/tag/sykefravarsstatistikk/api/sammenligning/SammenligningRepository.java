@@ -21,8 +21,9 @@ public class SammenligningRepository {
     public static final String SEKTOR = "sektor";
 
     public SammenligningRepository(
-            @Qualifier("applikasjonJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
-    ) {
+            @Qualifier("sykefravarsstatistikkJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
+    )
+    {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 

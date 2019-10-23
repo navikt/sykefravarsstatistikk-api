@@ -30,13 +30,16 @@ public class ApplikasjonDBConfig {
     private String mountPath;
 
 
-    @Bean(name = "applikasjonDS")
+    @Bean(name = "sykefravarsstatistikkDataSource")
     public DataSource userDataSource() {
         return dataSource("admin");
     }
 
-    @Bean(name = "applikasjonJdbcTemplate")
-    public NamedParameterJdbcTemplate springJdbcTemplate(@Qualifier("applikasjonDS") DataSource dataSource) {
+    @Bean(name = "sykefravarsstatistikkJdbcTemplate")
+    public NamedParameterJdbcTemplate sykefravarsstatistikkJdbcTemplate(
+            @Qualifier("sykefravarsstatistikkDataSource") DataSource dataSource
+    )
+    {
         return new NamedParameterJdbcTemplate(dataSource);
     }
 
