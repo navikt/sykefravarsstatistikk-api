@@ -1,9 +1,23 @@
 -- Tabeller fra datavarehus
 create schema dt_p;
 
-create table dt_p.V_DIM_IA_SEKTOR (
- SEKTORKODE CHAR(1),
- SEKTORNAVN VARCHAR(60)
+create table dt_p.V_DIM_IA_SEKTOR
+(
+    SEKTORKODE CHAR(1),
+    SEKTORNAVN VARCHAR(60)
 );
 
+create table dt_p.V_DIM_IA_FGRP_NARING_SN2007
+(
+    NARGRPKODE CHAR(2) NOT NULL,
+    NARGRPNAVN VARCHAR(60) NOT NULL,
+    PRIMARY KEY (NARGRPKODE)
+);
 
+create table dt_p.V_DIM_IA_NARING_SN2007
+(
+    NARINGKODE CHAR(2) NOT NULL,
+    NARGRPKODE CHAR(2) NOT NULL,
+    NARINGNAVN VARCHAR(100) NOT NULL,
+    CONSTRAINT r1_naring_sn2007_pk PRIMARY KEY (NARINGKODE)
+)

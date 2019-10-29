@@ -1,5 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.provisjonering;
 
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppe;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
@@ -18,6 +20,10 @@ import java.util.List;
 public class DataverehusRepository {
 
 
+    public static final String NARGRPKODE = "NARGRPKODE";
+    public static final String NARGRPNAVN = "NARGRPNAVN";
+    public static final String NARINGKODE = "NARINGKODE";
+    public static final String NARINGNAVN = "NARINGNAVN";
     public static final String SEKTORKODE = "SEKTORKODE";
     public static final String SEKTORNAVN = "SEKTORNAVN";
 
@@ -41,6 +47,41 @@ public class DataverehusRepository {
         );
     }
 
+    public List<Næringsgruppe> hentAlleNæringsgrupper() {
+        SqlParameterSource namedParameters = new MapSqlParameterSource();
+
+        return namedParameterJdbcTemplate.query(
+                "select NARGRPKODE, NARGRPNAVN from dt_p.V_DIM_IA_FGRP_NARING_SN2007",
+                namedParameters,
+                (resultSet, rowNum) -> mapTilNæringsgrupper(resultSet)
+        );
+    }
+
+    public List<Næring> hentAlleNæringer() {
+        SqlParameterSource namedParameters = new MapSqlParameterSource();
+
+        return namedParameterJdbcTemplate.query(
+                "select NARINGKODE, NARGRPKODE, NARINGNAVN from dt_p.V_DIM_IA_NARING_SN2007",
+                namedParameters,
+                (resultSet, rowNum) -> mapTilNæring(resultSet)
+        );
+    }
+
+
+    private Næringsgruppe mapTilNæringsgrupper(ResultSet rs) throws SQLException {
+        return new Næringsgruppe(
+                rs.getString(NARGRPKODE),
+                rs.getString(NARGRPNAVN)
+        );
+    }
+
+    private Næring mapTilNæring(ResultSet rs) throws SQLException {
+        return new Næring(
+                rs.getString(NARGRPKODE),
+                rs.getString(NARINGKODE),
+                rs.getString(NARINGNAVN)
+        );
+    }
 
     private Sektor mapTilSektor(ResultSet rs) throws SQLException {
         return new Sektor (

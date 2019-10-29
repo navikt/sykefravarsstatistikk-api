@@ -37,4 +37,10 @@ public class VirksomhetsklassifikasjonerSynkroniseringController {
         return "OK";
     }
 
+    @PostMapping(value = "/naringskoder")
+    public String populerNæringskoder() {
+        service.populerNæringskoder();
+        return "OK";
+    }
+
 }

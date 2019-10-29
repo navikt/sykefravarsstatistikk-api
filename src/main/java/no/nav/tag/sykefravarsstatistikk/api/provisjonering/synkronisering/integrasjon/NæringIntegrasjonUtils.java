@@ -1,0 +1,89 @@
+package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon;
+
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Optional;
+
+public class NæringIntegrasjonUtils {
+
+    public static final String KODE = "kode";
+    public static final String NARINGSGRUPPE_KODE = "naringsgruppe_kode";
+    public static final String NAVN = "navn";
+
+
+    public static FetchVirksomhetsklassifikasjonFunction getHentNæringFunction(
+            NamedParameterJdbcTemplate namedParameterJdbcTemplate
+    ) {
+        FetchVirksomhetsklassifikasjonFunction<Næring> function =
+                (Næring næring) -> {
+                    SqlParameterSource namedParameters =
+                            new MapSqlParameterSource().addValue(KODE, næring.getKode());
+
+                    try {
+                        Næring hentetNæring =
+                                namedParameterJdbcTemplate.queryForObject(
+                                        "select naringsgruppe_kode, kode, navn from naring where kode = :kode",
+                                        namedParameters,
+                                        (resultSet, rowNum) -> mapTilNæring(resultSet));
+                        return Optional.of(hentetNæring);
+                    } catch (EmptyResultDataAccessException erdae) {
+                        return Optional.empty();
+                    }
+                };
+        return function;
+    }
+
+    public static CreateVirksomhetsklassifikasjonFunction getCreateNæringFunction(
+            NamedParameterJdbcTemplate namedParameterJdbcTemplate
+    ) {
+        CreateVirksomhetsklassifikasjonFunction<Næring> function =
+                (Næring næring) -> {
+                    SqlParameterSource namedParameters =
+                            new MapSqlParameterSource()
+                                    .addValue(KODE, næring.getKode())
+                                    .addValue(NARINGSGRUPPE_KODE, næring.getNæringsgruppeKode())
+                                    .addValue(NAVN, næring.getNavn());
+
+                    return namedParameterJdbcTemplate.update(
+                            "insert into naring (kode, naringsgruppe_kode, navn)  " +
+                                    "values (:kode, :naringsgruppe_kode, :navn)",
+                            namedParameters
+                    );
+                };
+
+        return function;
+    }
+
+    public static UpdateVirksomhetsklassifikasjonFunction getUpdateNæringFunction(
+            NamedParameterJdbcTemplate namedParameterJdbcTemplate
+    ) {
+        UpdateVirksomhetsklassifikasjonFunction<Næring> updateVirksomhetsklassifikasjonFunction =
+                (Næring eksisterendeNæring, Næring næring) -> {
+                    SqlParameterSource namedParameters =
+                            new MapSqlParameterSource()
+                                    .addValue(KODE, eksisterendeNæring.getKode())
+                                    .addValue(NARINGSGRUPPE_KODE, eksisterendeNæring.getNæringsgruppeKode())
+                                    .addValue(NAVN, næring.getNavn());
+
+                    return namedParameterJdbcTemplate.update(
+                            "update naring set navn = :navn, naringsgruppe_kode = :naringsgruppe_kode " +
+                                    "where kode = :kode",
+                            namedParameters
+                    );
+                };
+
+        return updateVirksomhetsklassifikasjonFunction;
+    }
+
+
+    private static Næring mapTilNæring(ResultSet rs) throws SQLException {
+        return new Næring(rs.getString(NARINGSGRUPPE_KODE), rs.getString(KODE), rs.getString(NAVN));
+    }
+}
+

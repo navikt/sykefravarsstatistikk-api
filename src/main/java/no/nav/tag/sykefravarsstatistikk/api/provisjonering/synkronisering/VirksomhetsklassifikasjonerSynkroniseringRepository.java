@@ -1,12 +1,11 @@
 package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.OpprettEllerOppdaterResultat;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppe;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Virksomhetsklassifikasjon;
-import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.CreateVirksomhetsklassifikasjonFunction;
-import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.FetchVirksomhetsklassifikasjonFunction;
-import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.SektorIntegrasjonUtils;
-import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.UpdateVirksomhetsklassifikasjonFunction;
+import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -45,12 +44,51 @@ public class VirksomhetsklassifikasjonerSynkroniseringRepository {
     return sluttResultat;
   }
 
+  public OpprettEllerOppdaterResultat opprettEllerOppdaterNæringsgrupper(
+      List<Næringsgruppe> næringsgrupper) {
+    final OpprettEllerOppdaterResultat sluttResultat = new OpprettEllerOppdaterResultat();
+
+    næringsgrupper.stream()
+        .forEach(
+            næringsgruppe -> {
+              OpprettEllerOppdaterResultat result =
+                  opprettEllerOppdater(
+                      næringsgruppe,
+                      NæringsgruppeIntegrasjonUtils.getHentNæringsgruppeFunction(
+                          namedParameterJdbcTemplate),
+                      NæringsgruppeIntegrasjonUtils.getCreateNæringsgruppeFunction(
+                          namedParameterJdbcTemplate),
+                      NæringsgruppeIntegrasjonUtils.getUpdateNæringsgruppeFunction(
+                          namedParameterJdbcTemplate));
+              sluttResultat.add(result);
+            });
+
+    return sluttResultat;
+  }
+
+  public OpprettEllerOppdaterResultat opprettEllerOppdaterNæringer(List<Næring> næringer) {
+    final OpprettEllerOppdaterResultat sluttResultat = new OpprettEllerOppdaterResultat();
+
+    næringer.stream()
+        .forEach(
+            næring -> {
+              OpprettEllerOppdaterResultat result =
+                  opprettEllerOppdater(
+                      næring,
+                      NæringIntegrasjonUtils.getHentNæringFunction(namedParameterJdbcTemplate),
+                      NæringIntegrasjonUtils.getCreateNæringFunction(namedParameterJdbcTemplate),
+                      NæringIntegrasjonUtils.getUpdateNæringFunction(namedParameterJdbcTemplate));
+              sluttResultat.add(result);
+            });
+
+    return sluttResultat;
+  }
+
   private OpprettEllerOppdaterResultat opprettEllerOppdater(
       Virksomhetsklassifikasjon virksomhetsklassifikasjon,
       FetchVirksomhetsklassifikasjonFunction fetchFunction,
       CreateVirksomhetsklassifikasjonFunction createFunction,
-      UpdateVirksomhetsklassifikasjonFunction updateFunction)
-  {
+      UpdateVirksomhetsklassifikasjonFunction updateFunction) {
     final OpprettEllerOppdaterResultat resultat = new OpprettEllerOppdaterResultat();
 
     fetchFunction
@@ -58,8 +96,7 @@ public class VirksomhetsklassifikasjonerSynkroniseringRepository {
         .ifPresentOrElse(
             eksisterende -> {
               if (!eksisterende.equals(virksomhetsklassifikasjon)) {
-                updateFunction.apply(
-                    eksisterende, virksomhetsklassifikasjon);
+                updateFunction.apply(eksisterende, virksomhetsklassifikasjon);
                 resultat.setAntallRadOppdatert(1);
               }
             },
@@ -70,6 +107,4 @@ public class VirksomhetsklassifikasjonerSynkroniseringRepository {
 
     return resultat;
   }
-
-
 }
