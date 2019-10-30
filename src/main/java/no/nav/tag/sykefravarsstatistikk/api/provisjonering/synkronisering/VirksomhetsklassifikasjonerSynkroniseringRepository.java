@@ -48,20 +48,19 @@ public class VirksomhetsklassifikasjonerSynkroniseringRepository {
       List<Næringsgruppe> næringsgrupper) {
     final OpprettEllerOppdaterResultat sluttResultat = new OpprettEllerOppdaterResultat();
 
-    næringsgrupper.stream()
-        .forEach(
-            næringsgruppe -> {
-              OpprettEllerOppdaterResultat result =
-                  opprettEllerOppdater(
-                      næringsgruppe,
-                      NæringsgruppeIntegrasjonUtils.getHentNæringsgruppeFunction(
-                          namedParameterJdbcTemplate),
-                      NæringsgruppeIntegrasjonUtils.getCreateNæringsgruppeFunction(
-                          namedParameterJdbcTemplate),
-                      NæringsgruppeIntegrasjonUtils.getUpdateNæringsgruppeFunction(
-                          namedParameterJdbcTemplate));
-              sluttResultat.add(result);
-            });
+    næringsgrupper.forEach(
+        næringsgruppe -> {
+          OpprettEllerOppdaterResultat result =
+              opprettEllerOppdater(
+                  næringsgruppe,
+                  NæringsgruppeIntegrasjonUtils.getHentNæringsgruppeFunction(
+                      namedParameterJdbcTemplate),
+                  NæringsgruppeIntegrasjonUtils.getCreateNæringsgruppeFunction(
+                      namedParameterJdbcTemplate),
+                  NæringsgruppeIntegrasjonUtils.getUpdateNæringsgruppeFunction(
+                      namedParameterJdbcTemplate));
+          sluttResultat.add(result);
+        });
 
     return sluttResultat;
   }
