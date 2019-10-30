@@ -1,11 +1,14 @@
 package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.OpprettEllerOppdaterResultat;
-import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppe;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppe;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Virksomhetsklassifikasjon;
-import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.*;
+import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.utils.NæringIntegrasjonUtils;
+import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.utils.NæringsgruppeIntegrasjonUtils;
+import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.utils.SektorIntegrasjonUtils;
+import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.utils.VirksomhetsklassifikasjonIntegrasjonUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -25,82 +28,52 @@ public class VirksomhetsklassifikasjonerSynkroniseringRepository {
     this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
   }
 
-  public OpprettEllerOppdaterResultat opprettEllerOppdaterSektorer(
-      List<Sektor> sektorerIDatavarehus) {
-    final OpprettEllerOppdaterResultat sluttResultat = new OpprettEllerOppdaterResultat();
-
-    sektorerIDatavarehus.stream()
-        .forEach(
-            sektor -> {
-              OpprettEllerOppdaterResultat result =
-                  opprettEllerOppdater(
-                      sektor,
-                      SektorIntegrasjonUtils.getHentSektorFunction(namedParameterJdbcTemplate),
-                      SektorIntegrasjonUtils.getCreateSektorFunction(namedParameterJdbcTemplate),
-                      SektorIntegrasjonUtils.getUpdateSektorFunction(namedParameterJdbcTemplate));
-              sluttResultat.add(result);
-            });
-
-    return sluttResultat;
+  public OpprettEllerOppdaterResultat opprettEllerOppdaterSektorer(List<Sektor> sektorerIDatavarehus) {
+      return opprettEllerOppdater(sektorerIDatavarehus, new SektorIntegrasjonUtils(namedParameterJdbcTemplate));
   }
 
-  public OpprettEllerOppdaterResultat opprettEllerOppdaterNæringsgrupper(
-      List<Næringsgruppe> næringsgrupper) {
+  public OpprettEllerOppdaterResultat opprettEllerOppdaterNæringsgrupper(List<Næringsgruppe> næringsgrupper) {
+      return opprettEllerOppdater(næringsgrupper, new NæringsgruppeIntegrasjonUtils(namedParameterJdbcTemplate));
+  }
+
+  public OpprettEllerOppdaterResultat opprettEllerOppdaterNæringer(List<Næring> næringer) {
+    return opprettEllerOppdater(næringer, new NæringIntegrasjonUtils(namedParameterJdbcTemplate));
+  }
+
+
+  private OpprettEllerOppdaterResultat opprettEllerOppdater(
+      List<? extends Virksomhetsklassifikasjon> virksomhetsklassifikasjoner,
+      VirksomhetsklassifikasjonIntegrasjonUtils integrasjonUtils) {
+
     final OpprettEllerOppdaterResultat sluttResultat = new OpprettEllerOppdaterResultat();
 
-    næringsgrupper.forEach(
-        næringsgruppe -> {
+    virksomhetsklassifikasjoner.forEach(
+        virksomhetsklassifikasjon -> {
           OpprettEllerOppdaterResultat result =
               opprettEllerOppdater(
-                  næringsgruppe,
-                  NæringsgruppeIntegrasjonUtils.getHentNæringsgruppeFunction(
-                      namedParameterJdbcTemplate),
-                  NæringsgruppeIntegrasjonUtils.getCreateNæringsgruppeFunction(
-                      namedParameterJdbcTemplate),
-                  NæringsgruppeIntegrasjonUtils.getUpdateNæringsgruppeFunction(
-                      namedParameterJdbcTemplate));
+                  virksomhetsklassifikasjon, integrasjonUtils);
           sluttResultat.add(result);
         });
 
     return sluttResultat;
   }
 
-  public OpprettEllerOppdaterResultat opprettEllerOppdaterNæringer(List<Næring> næringer) {
-    final OpprettEllerOppdaterResultat sluttResultat = new OpprettEllerOppdaterResultat();
-
-    næringer.stream()
-        .forEach(
-            næring -> {
-              OpprettEllerOppdaterResultat result =
-                  opprettEllerOppdater(
-                      næring,
-                      NæringIntegrasjonUtils.getHentNæringFunction(namedParameterJdbcTemplate),
-                      NæringIntegrasjonUtils.getCreateNæringFunction(namedParameterJdbcTemplate),
-                      NæringIntegrasjonUtils.getUpdateNæringFunction(namedParameterJdbcTemplate));
-              sluttResultat.add(result);
-            });
-
-    return sluttResultat;
-  }
-
-  private OpprettEllerOppdaterResultat opprettEllerOppdater(
+    private OpprettEllerOppdaterResultat opprettEllerOppdater(
       Virksomhetsklassifikasjon virksomhetsklassifikasjon,
-      FetchVirksomhetsklassifikasjonFunction fetchFunction,
-      CreateVirksomhetsklassifikasjonFunction createFunction,
-      UpdateVirksomhetsklassifikasjonFunction updateFunction) {
+      VirksomhetsklassifikasjonIntegrasjonUtils integrasjonUtils) {
     final OpprettEllerOppdaterResultat resultat = new OpprettEllerOppdaterResultat();
 
-    fetchFunction
+    integrasjonUtils.getFetchFunction()
         .apply(virksomhetsklassifikasjon)
         .ifPresentOrElse(
             eksisterende -> {
               if (!eksisterende.equals(virksomhetsklassifikasjon)) {
-                updateFunction.apply(eksisterende, virksomhetsklassifikasjon);
+                integrasjonUtils.getUpdateFunction().apply(eksisterende, virksomhetsklassifikasjon);
                 resultat.setAntallRadOppdatert(1);
               }
             },
             () -> {
-              createFunction.apply(virksomhetsklassifikasjon);
+              integrasjonUtils.getCreateFunction().apply(virksomhetsklassifikasjon);
               resultat.setAntallRadOpprettet(1);
             });
 

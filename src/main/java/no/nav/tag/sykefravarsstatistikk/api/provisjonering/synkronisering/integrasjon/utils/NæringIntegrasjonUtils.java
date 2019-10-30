@@ -1,6 +1,9 @@
-package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon;
+package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.utils;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
+import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.CreateVirksomhetsklassifikasjonFunction;
+import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.FetchVirksomhetsklassifikasjonFunction;
+import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.UpdateVirksomhetsklassifikasjonFunction;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -10,16 +13,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
-public class NæringIntegrasjonUtils {
+public class NæringIntegrasjonUtils extends VirksomhetsklassifikasjonIntegrasjon
+    implements VirksomhetsklassifikasjonIntegrasjonUtils {
 
     public static final String KODE = "kode";
     public static final String NARINGSGRUPPE_KODE = "naringsgruppe_kode";
     public static final String NAVN = "navn";
 
 
-    public static FetchVirksomhetsklassifikasjonFunction getHentNæringFunction(
-            NamedParameterJdbcTemplate namedParameterJdbcTemplate
-    ) {
+    public NæringIntegrasjonUtils(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        super(namedParameterJdbcTemplate);
+    }
+
+    @Override
+    public FetchVirksomhetsklassifikasjonFunction getFetchFunction() {
         FetchVirksomhetsklassifikasjonFunction<Næring> function =
                 (Næring næring) -> {
                     SqlParameterSource namedParameters =
@@ -39,9 +46,8 @@ public class NæringIntegrasjonUtils {
         return function;
     }
 
-    public static CreateVirksomhetsklassifikasjonFunction getCreateNæringFunction(
-            NamedParameterJdbcTemplate namedParameterJdbcTemplate
-    ) {
+    @Override
+    public CreateVirksomhetsklassifikasjonFunction getCreateFunction() {
         CreateVirksomhetsklassifikasjonFunction<Næring> function =
                 (Næring næring) -> {
                     SqlParameterSource namedParameters =
@@ -60,9 +66,8 @@ public class NæringIntegrasjonUtils {
         return function;
     }
 
-    public static UpdateVirksomhetsklassifikasjonFunction getUpdateNæringFunction(
-            NamedParameterJdbcTemplate namedParameterJdbcTemplate
-    ) {
+    @Override
+    public UpdateVirksomhetsklassifikasjonFunction getUpdateFunction() {
         UpdateVirksomhetsklassifikasjonFunction<Næring> updateVirksomhetsklassifikasjonFunction =
                 (Næring eksisterendeNæring, Næring næring) -> {
                     SqlParameterSource namedParameters =

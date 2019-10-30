@@ -1,6 +1,9 @@
-package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon;
+package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.utils;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
+import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.CreateVirksomhetsklassifikasjonFunction;
+import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.FetchVirksomhetsklassifikasjonFunction;
+import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.UpdateVirksomhetsklassifikasjonFunction;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -10,15 +13,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
-public class SektorIntegrasjonUtils {
+public class SektorIntegrasjonUtils extends VirksomhetsklassifikasjonIntegrasjon
+    implements VirksomhetsklassifikasjonIntegrasjonUtils {
 
     public static final String KODE = "kode";
     public static final String NAVN = "navn";
 
+    public SektorIntegrasjonUtils(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        super(namedParameterJdbcTemplate);
+    }
 
-    public static FetchVirksomhetsklassifikasjonFunction getHentSektorFunction(
-            NamedParameterJdbcTemplate namedParameterJdbcTemplate
-    ) {
+
+    @Override
+    public FetchVirksomhetsklassifikasjonFunction getFetchFunction() {
         FetchVirksomhetsklassifikasjonFunction<Sektor> function =
                 (Sektor sektor) -> {
                     SqlParameterSource namedParameters =
@@ -38,9 +45,8 @@ public class SektorIntegrasjonUtils {
         return function;
     }
 
-    public static CreateVirksomhetsklassifikasjonFunction getCreateSektorFunction(
-            NamedParameterJdbcTemplate namedParameterJdbcTemplate
-    ) {
+    @Override
+    public CreateVirksomhetsklassifikasjonFunction getCreateFunction() {
         CreateVirksomhetsklassifikasjonFunction<Sektor> function =
                 (Sektor sektor) -> {
                     SqlParameterSource namedParameters =
@@ -55,9 +61,7 @@ public class SektorIntegrasjonUtils {
         return function;
     }
 
-    public static UpdateVirksomhetsklassifikasjonFunction getUpdateSektorFunction(
-            NamedParameterJdbcTemplate namedParameterJdbcTemplate
-    ) {
+    public UpdateVirksomhetsklassifikasjonFunction getUpdateFunction() {
         UpdateVirksomhetsklassifikasjonFunction<Sektor> updateVirksomhetsklassifikasjonFunction =
                 (Sektor eksisterendeSektor, Sektor sektor) -> {
                     SqlParameterSource namedParameters =
