@@ -5,7 +5,8 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Sektor implements Virksomhetsklassifikasjon {
+public class Næringsgruppe implements Virksomhetsklassifikasjon {
     private String kode;
     private String navn;
+
 }
