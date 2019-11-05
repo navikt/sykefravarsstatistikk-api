@@ -30,7 +30,7 @@ altinn:
     edition: 1
 
 enhetsregisteret:
-  url: "https://data.brreg.no/enhetsregisteret/api/" # TODO "http://localhost:${mock.port}/enhetsregisteret/"
+  url: "http://localhost:${mock.port}/enhetsregisteret/"
 
 no.nav.security.oidc:
   issuers: iss-localhost, selvbetjening

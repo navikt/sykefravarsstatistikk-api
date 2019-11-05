@@ -58,6 +58,7 @@ public class EnhetsregisteretClient {
     private Enhet mapTilEnhet(String jsonResponseFraEnhetsregisteret) {
         try {
             JsonNode enhetJson = objectMapper.readTree(jsonResponseFraEnhetsregisteret);
+            // TODO Avklar: Vi ignorerer sekundære næringskoder
             JsonNode næringskodeJson = enhetJson.get("naeringskode1");
             JsonNode sektorJson = enhetJson.get("institusjonellSektorkode");
 

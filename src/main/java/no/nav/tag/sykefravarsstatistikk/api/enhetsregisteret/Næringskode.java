@@ -7,7 +7,7 @@ import lombok.Value;
 @Value
 public class Næringskode {
     private final String kode;
-    private final String beskrivelse;
+    private final String beskrivelse; // TODO Denne trengs kanskje ikke? Kan bare hente koden og slå opp i egen base
 
     @JsonCreator
     public Næringskode(
