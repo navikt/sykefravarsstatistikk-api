@@ -25,6 +25,14 @@ public class EnhetsregisteretClient {
         this.enhetsregisteretUrl = enhetsregisteretUrl;
     }
 
+    /* TODO Er det riktig å splitte mellom underenhet og (juridisk) enhet i domenet vårt? Burde vi heller rendyrke en generell "organisasjon"?
+     * Alle (under)enheter har jo indirekte en sektor og næring, og vårt domene trenger ikke nødvendigvis gjenspeile strukturen på returobjektet fra brreg.
+     * Det kommer kanskje an på dvh-datagrunnlaget - finner vi noe data som helst på juridisk enhet?
+     * Hvis ikke må det spesialhåndteres ved å feks summere opp på underenheter, og da er det kanskje best å ha splitten som en del av domenet.
+     *
+     * En annen diskusjon er orgledd.
+     */
+
     public Enhet hentInformasjonOmEnhet(Orgnr orgnrTilEnhet) {
         String url = enhetsregisteretUrl + "enheter/" + orgnrTilEnhet.getVerdi();
 
