@@ -15,7 +15,6 @@ public class Næringskode {
             @JsonProperty("beskrivelse") String beskrivelse
     ) {
         this.beskrivelse = beskrivelse;
-
         String næringskodeUtenPunktum = kode.replace(".", "");
 
         if (erGyldigNæringskode(næringskodeUtenPunktum)) {
