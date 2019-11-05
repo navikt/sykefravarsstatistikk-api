@@ -5,8 +5,9 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 
 // TODO Rename. Kanskje Organisasjon?
 @Data
-public class Enhet {
+public class Underenhet {
     private final Orgnr orgnr;
+    private final Orgnr overordnetEnhetOrgnr;
     private final String navn;
     private final Næringskode næringskode;
     private final InstitusjonellSektorkode institusjonellSektorkode;
