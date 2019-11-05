@@ -1,18 +1,17 @@
 package no.nav.tag.sykefravarsstatistikk.api.domene;
 
 import lombok.Data;
-import no.nav.tag.sykefravarsstatistikk.api.altinn.Organisasjon;
+import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnOrganisasjon;
 import no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Data
 public class InnloggetBruker {
-    private List<Organisasjon> organisasjoner;
+    private List<AltinnOrganisasjon> organisasjoner;
     private Fnr fnr;
 
     public InnloggetBruker(Fnr fnr) {
