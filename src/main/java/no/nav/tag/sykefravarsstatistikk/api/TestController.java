@@ -2,6 +2,7 @@ package no.nav.tag.sykefravarsstatistikk.api;
 
 import no.nav.security.oidc.api.Unprotected;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +19,7 @@ public class TestController {
     }
 
     @GetMapping(value = "/test/{orgnr}")
-    public String test(
+    public Enhet test(
             @PathVariable("orgnr") String orgnr
     ) {
         return enhetsregisteretClient.hentEnhetsinformasjon(new Orgnr(orgnr));
