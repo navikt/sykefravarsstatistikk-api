@@ -3,6 +3,7 @@ package no.nav.tag.sykefravarsstatistikk.api;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnOrganisasjon;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
+import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 
 import java.util.Arrays;
 
@@ -29,5 +30,9 @@ public class TestUtils {
 
     public static Fnr getFnr() {
         return new Fnr("26070248114");
+    }
+
+    public static Orgnr getOrgnr() {
+        return new Orgnr("971800534");
     }
 }

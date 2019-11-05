@@ -40,24 +40,26 @@ public class EnhetsregisteretClient {
         try {
             JsonNode enhetJson = objectMapper.readTree(jsonResponseFraEnhetsregisteret);
             JsonNode næringskodeJson = enhetJson.get("naeringskode1");
-            JsonNode sektorJson = enhetJson.get("institusjonellSektorkode");
+            // JsonNode sektorJson = enhetJson.get("institusjonellSektorkode");
 
-            Orgnr orgnr = new Orgnr(enhetJson.get("organisasjonsnummer").asText());
-            Orgnr overordnetEnhetOrgnr = new Orgnr(enhetJson.get("overordnetEnhet").asText());
-            String navn = enhetJson.get("navn").asText();
+            Orgnr orgnr = new Orgnr(enhetJson.get("organisasjonsnummer").textValue());
+            Orgnr overordnetEnhetOrgnr = new Orgnr(enhetJson.get("overordnetEnhet").textValue());
+            String navn = enhetJson.get("navn").textValue();
             Næringskode næringskode = new Næringskode(
-                    næringskodeJson.get("kode").asText(),
-                    næringskodeJson.get("beskrivelse").asText()
+                    næringskodeJson.get("kode").textValue(),
+                    næringskodeJson.get("beskrivelse").textValue()
             );
+            /*
             InstitusjonellSektorkode sektor = new InstitusjonellSektorkode(
-                    sektorJson.get("kode").asText(),
-                    sektorJson.get("beskrivelse").asText()
+                    sektorJson.get("kode").textValue(),
+                    sektorJson.get("beskrivelse").textValue()
             );
+             */
 
-            return new Underenhet(orgnr, overordnetEnhetOrgnr, navn, næringskode, sektor);
+            return new Underenhet(orgnr, overordnetEnhetOrgnr, navn, næringskode);
 
         } catch (IOException | NullPointerException e) {
-            throw new EnhetsregisteretException("Feil ved kall til Enhetsregisteret. Kunne ikke parse respons.");
+            throw new EnhetsregisteretException("Feil ved kall til Enhetsregisteret. Kunne ikke parse respons.", e);
         }
     }
 }
