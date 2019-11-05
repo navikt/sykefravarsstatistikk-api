@@ -25,8 +25,19 @@ public class EnhetsregisteretClient {
         this.enhetsregisteretUrl = enhetsregisteretUrl;
     }
 
+    public Enhet hentInformasjonOmEnhet(Orgnr orgnrTilEnhet) {
+        String url = enhetsregisteretUrl + "enheter/" + orgnrTilEnhet.getVerdi();
+
+        try {
+            String respons = restTemplate.getForObject(url, String.class);
+            return mapTilEnhet(respons);
+        } catch (RestClientException e) {
+            throw new EnhetsregisteretException("Feil ved kall til Enhetsregisteret", e);
+        }
+    }
+
     public Underenhet hentInformasjonOmUnderenhet(Orgnr orgnrTilUnderenhet) {
-        String url = enhetsregisteretUrl + "enheter/" + orgnrTilUnderenhet.getVerdi();
+        String url = enhetsregisteretUrl + "underenheter/" + orgnrTilUnderenhet.getVerdi();
 
         try {
             String respons = restTemplate.getForObject(url, String.class);
@@ -36,27 +47,35 @@ public class EnhetsregisteretClient {
         }
     }
 
+    private Enhet mapTilEnhet(String jsonResponseFraEnhetsregisteret) {
+        try {
+            JsonNode enhetJson = objectMapper.readTree(jsonResponseFraEnhetsregisteret);
+            JsonNode næringskodeJson = enhetJson.get("naeringskode1");
+            JsonNode sektorJson = enhetJson.get("institusjonellSektorkode");
+
+            return new Enhet(
+                    new Orgnr(enhetJson.get("organisasjonsnummer").textValue()),
+                    enhetJson.get("navn").textValue(),
+                    objectMapper.treeToValue(næringskodeJson, Næringskode.class),
+                    objectMapper.treeToValue(sektorJson, InstitusjonellSektorkode.class)
+            );
+
+        } catch (IOException | NullPointerException e) {
+            throw new EnhetsregisteretException("Feil ved kall til Enhetsregisteret. Kunne ikke parse respons.", e);
+        }
+    }
+
     private Underenhet mapTilUnderenhet(String jsonResponseFraEnhetsregisteret) {
         try {
             JsonNode enhetJson = objectMapper.readTree(jsonResponseFraEnhetsregisteret);
             JsonNode næringskodeJson = enhetJson.get("naeringskode1");
-            // JsonNode sektorJson = enhetJson.get("institusjonellSektorkode");
 
-            Orgnr orgnr = new Orgnr(enhetJson.get("organisasjonsnummer").textValue());
-            Orgnr overordnetEnhetOrgnr = new Orgnr(enhetJson.get("overordnetEnhet").textValue());
-            String navn = enhetJson.get("navn").textValue();
-            Næringskode næringskode = new Næringskode(
-                    næringskodeJson.get("kode").textValue(),
-                    næringskodeJson.get("beskrivelse").textValue()
+            return new Underenhet(
+                    new Orgnr(enhetJson.get("organisasjonsnummer").textValue()),
+                    new Orgnr(enhetJson.get("overordnetEnhet").textValue()),
+                    enhetJson.get("navn").textValue(),
+                    objectMapper.treeToValue(næringskodeJson, Næringskode.class)
             );
-            /*
-            InstitusjonellSektorkode sektor = new InstitusjonellSektorkode(
-                    sektorJson.get("kode").textValue(),
-                    sektorJson.get("beskrivelse").textValue()
-            );
-             */
-
-            return new Underenhet(orgnr, overordnetEnhetOrgnr, navn, næringskode);
 
         } catch (IOException | NullPointerException e) {
             throw new EnhetsregisteretException("Feil ved kall til Enhetsregisteret. Kunne ikke parse respons.", e);

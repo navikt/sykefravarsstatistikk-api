@@ -33,7 +33,29 @@ public class EnhetsregisteretClientTest {
     }
 
     @Test
-    public void hentEnhetsinformasjon__skal_hente_riktige_felter() {
+    public void hentInformasjonOmEnhet__skal_hente_riktige_felter() {
+        mockRespons(gyldigEnhetRespons());
+        Enhet enhet = enhetsregisteretClient.hentInformasjonOmEnhet(getOrgnr());
+
+        assertThat(enhet.getOrgnr().getVerdi()).isEqualTo("999263550");
+        assertThat(enhet.getNavn()).isEqualTo("NAV ARBEID OG YTELSER");
+        assertThat(enhet.getNæringskode().getKode()).isEqualTo("84300");
+        assertThat(enhet.getNæringskode().getBeskrivelse()).isEqualTo("Trygdeordninger underlagt offentlig forvaltning");
+        assertThat(enhet.getInstitusjonellSektorkode().getKode()).isEqualTo("6100");
+        assertThat(enhet.getInstitusjonellSektorkode().getBeskrivelse()).isEqualTo("Statsforvaltningen");
+    }
+
+    @Test(expected = EnhetsregisteretException.class)
+    public void hentInformasjonOmEnhet__skal_feile_hvis_et_felt_mangler() {
+        ObjectNode responsMedManglendeFelt = gyldigEnhetRespons();
+        responsMedManglendeFelt.remove("institusjonellSektorkode");
+        mockRespons(responsMedManglendeFelt);
+
+        enhetsregisteretClient.hentInformasjonOmUnderenhet(getOrgnr());
+    }
+
+    @Test
+    public void hentInformasjonOmUnderenhet__skal_hente_riktige_felter() {
         mockRespons(gyldigUnderenhetRespons());
         Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr("971800534"));
 
@@ -45,32 +67,17 @@ public class EnhetsregisteretClientTest {
     }
 
     @Test(expected = EnhetsregisteretException.class)
-    public void hentEnhetsinformasjon__skal_feile_hvis_navn_mangler() {
-        mockRespons(gyldigUnderenhetResponsUtenFelt("navn"));
-        enhetsregisteretClient.hentInformasjonOmUnderenhet(getOrgnr());
-    }
+    public void hentInformasjonOmUnderenhet__skal_feile_hvis_et_felt_mangler() {
+        ObjectNode responsMedManglendeFelt = gyldigUnderenhetRespons();
+        responsMedManglendeFelt.remove("navn");
+        mockRespons(responsMedManglendeFelt);
 
-    @Test(expected = EnhetsregisteretException.class)
-    public void hentEnhetsinformasjon__skal_feile_hvis_orgnr_mangler() {
-        mockRespons(gyldigUnderenhetResponsUtenFelt("organisasjonsnummer"));
-        enhetsregisteretClient.hentInformasjonOmUnderenhet(getOrgnr());
-    }
-
-    @Test(expected = EnhetsregisteretException.class)
-    public void hentEnhetsinformasjon__skal_feile_hvis_overordnet_næringskode_mangler() {
-        mockRespons(gyldigUnderenhetResponsUtenFelt("naeringskode1"));
         enhetsregisteretClient.hentInformasjonOmUnderenhet(getOrgnr());
     }
 
     @SneakyThrows
     private void mockRespons(JsonNode node) {
         when(restTemplate.getForObject(anyString(), any())).thenReturn(objectMapper.writeValueAsString(node));
-    }
-
-    private ObjectNode gyldigUnderenhetResponsUtenFelt(String felt) {
-        ObjectNode node = gyldigUnderenhetRespons();
-        node.remove(felt);
-        return node;
     }
 
     @SneakyThrows
@@ -83,6 +90,23 @@ public class EnhetsregisteretClientTest {
                 "    \"kode\": \"84.300\"\n" +
                 "  },\n" +
                 "  \"overordnetEnhet\": \"999263550\"\n" +
+                "}";
+        return (ObjectNode) objectMapper.readTree(str);
+    }
+
+    @SneakyThrows
+    private ObjectNode gyldigEnhetRespons() {
+        String str = "{\n" +
+                "  \"organisasjonsnummer\": \"999263550\",\n" +
+                "  \"navn\": \"NAV ARBEID OG YTELSER\",\n" +
+                "  \"naeringskode1\": {\n" +
+                "    \"beskrivelse\": \"Trygdeordninger underlagt offentlig forvaltning\",\n" +
+                "    \"kode\": \"84.300\"\n" +
+                "  },\n" +
+                "  \"institusjonellSektorkode\": {\n" +
+                "    \"kode\": \"6100\",\n" +
+                "    \"beskrivelse\": \"Statsforvaltningen\"\n" +
+                "  }\n" +
                 "}";
         return (ObjectNode) objectMapper.readTree(str);
     }

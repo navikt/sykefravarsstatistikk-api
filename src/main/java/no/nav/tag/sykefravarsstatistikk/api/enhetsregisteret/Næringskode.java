@@ -1,5 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
 
 @Value
@@ -7,7 +9,11 @@ public class Næringskode {
     private final String kode;
     private final String beskrivelse;
 
-    public Næringskode(String kode, String beskrivelse) {
+    @JsonCreator
+    public Næringskode(
+            @JsonProperty("kode") String kode,
+            @JsonProperty("beskrivelse") String beskrivelse
+    ) {
         this.beskrivelse = beskrivelse;
 
         String næringskodeUtenPunktum = kode.replace(".", "");
