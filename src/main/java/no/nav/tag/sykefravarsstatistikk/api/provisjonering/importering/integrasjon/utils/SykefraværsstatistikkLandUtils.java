@@ -42,7 +42,7 @@ public class SykefraværsstatistikkLandUtils extends SykefraværsstatistikkInteg
         (SykefraværsstatistikkLand sykefraværsstatistikkLand) -> {
           SqlParameterSource namedParameters =
               new MapSqlParameterSource()
-                  .addValue(ARSTALL, sykefraværsstatistikkLand.getÅr())
+                  .addValue(ARSTALL, sykefraværsstatistikkLand.getÅrstall())
                   .addValue(KVARTAL, sykefraværsstatistikkLand.getKvartal())
                   .addValue(TAPTE_DAGSVERK, sykefraværsstatistikkLand.getTapteDagsverk())
                   .addValue(MULIGE_DAGSVERK, sykefraværsstatistikkLand.getMuligeDagsverk());

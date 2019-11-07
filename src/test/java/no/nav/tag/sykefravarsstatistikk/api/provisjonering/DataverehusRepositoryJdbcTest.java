@@ -187,7 +187,7 @@ public class DataverehusRepositoryJdbcTest {
 
     private void assertEqualsSykefraværsstatistikkLand(
             SykefraværsstatistikkLand expected, SykefraværsstatistikkLand actual) {
-        assertEquals(expected.getÅr(), actual.getÅr());
+        assertEquals(expected.getÅrstall(), actual.getÅrstall());
         assertEquals(expected.getKvartal(), actual.getKvartal());
         assertThat(expected.getTapteDagsverk(), Matchers.comparesEqualTo(actual.getTapteDagsverk()));
         assertThat(expected.getMuligeDagsverk(), Matchers.comparesEqualTo(actual.getMuligeDagsverk()));

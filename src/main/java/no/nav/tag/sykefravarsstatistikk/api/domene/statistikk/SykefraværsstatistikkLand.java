@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 public class SykefraværsstatistikkLand implements Sykefraværsstatistikk {
-    private int år;
+    private int årstall;
     private int kvartal;
 
     private BigDecimal tapteDagsverk;
