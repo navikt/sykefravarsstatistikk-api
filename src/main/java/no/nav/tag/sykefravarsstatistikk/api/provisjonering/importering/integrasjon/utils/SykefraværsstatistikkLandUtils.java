@@ -11,10 +11,6 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 public class SykefraværsstatistikkLandUtils extends SykefraværsstatistikkIntegrasjon
     implements SykefraværsstatistikkIntegrasjonUtils {
 
-  public static final String ARSTALL = "ARSTALL";
-  public static final String KVARTAL = "KVARTAL";
-  public static final String TAPTE_DAGSVERK = "TAPTE_DAGSVERK";
-  public static final String MULIGE_DAGSVERK = "MULIGE_DAGSVERK";
 
   public SykefraværsstatistikkLandUtils(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
     super(namedParameterJdbcTemplate);
@@ -32,7 +28,7 @@ public class SykefraværsstatistikkLandUtils extends SykefraværsstatistikkInteg
           int antallSlettet =
               namedParameterJdbcTemplate.update(
                   String.format(
-                      "delete from SYKEFRAVAR_STATISTIKK_LAND where arstall = :%s and kvartal = :%s",
+                      "delete from sykefravar_statistikk_land where arstall = :%s and kvartal = :%s",
                       ARSTALL, KVARTAL),
                   namedParameters);
           return antallSlettet;
@@ -53,8 +49,8 @@ public class SykefraværsstatistikkLandUtils extends SykefraværsstatistikkInteg
 
           return namedParameterJdbcTemplate.update(
               String.format(
-                  "insert into SYKEFRAVAR_STATISTIKK_LAND (arstall, kvartal, tapte_dagsverk, mulige_dagsverk)  "
-                      + "values (:ARSTALL, :KVARTAL, :TAPTE_DAGSVERK, :MULIGE_DAGSVERK)",
+                  "insert into sykefravar_statistikk_land (arstall, kvartal, tapte_dagsverk, mulige_dagsverk)  "
+                      + "values (:arstall, :kvartal, :tapte_dagsverk, :mulige_dagsverk)",
                   ARSTALL,
                   KVARTAL,
                   TAPTE_DAGSVERK,

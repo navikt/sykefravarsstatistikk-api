@@ -1,19 +1,19 @@
 -- Aggregates statistikk tabeller fra datavarehus
 
 -- Land
-INSERT INTO dt_p.V_AGG_IA_SYKEFRAVAR_LAND
+insert into dt_p.v_agg_ia_sykefravar_land
  (
-  ARSTALL, KVARTAL,
-  NARING, NARINGNAVN,
-  ALDER, KJONN,
-  FYLKBO, FYLKNAVN,
-  VARIGHET, SEKTOR, SEKTORNAVN,
-  TAPTEDV, MULIGEDV, ANTPERS,
-  IA1_TAPTEDV, IA1_MULIGEDV, IA1_ANTPERS,
-  IA2_TAPTEDV, IA2_MULIGEDV, IA2_ANTPERS,
-  IA3_TAPTEDV, IA3_MULIGEDV, IA3_ANTPERS
+  arstall, kvartal,
+  naring, naringnavn,
+  alder, kjonn,
+  fylkbo, fylknavn,
+  varighet, sektor, sektornavn,
+  taptedv, muligedv, antpers,
+  ia1_taptedv, ia1_muligedv, ia1_antpers,
+  ia2_taptedv, ia2_muligedv, ia2_antpers,
+  ia3_taptedv, ia3_muligedv, ia3_antpers
  )
- VALUES
+ values
  (
   '2019','1',
   '41', 'Bygge- og anleggsvirksomhet',
@@ -25,19 +25,19 @@ INSERT INTO dt_p.V_AGG_IA_SYKEFRAVAR_LAND
   0, 0, 0,
   0, 0, 0
  );
-INSERT INTO dt_p.V_AGG_IA_SYKEFRAVAR_LAND
+insert into dt_p.v_agg_ia_sykefravar_land
 (
-    ARSTALL, KVARTAL,
-    NARING, NARINGNAVN,
-    ALDER, KJONN,
-    FYLKBO, FYLKNAVN,
-    VARIGHET, SEKTOR, SEKTORNAVN,
-    TAPTEDV, MULIGEDV, ANTPERS,
-    IA1_TAPTEDV, IA1_MULIGEDV, IA1_ANTPERS,
-    IA2_TAPTEDV, IA2_MULIGEDV, IA2_ANTPERS,
-    IA3_TAPTEDV, IA3_MULIGEDV, IA3_ANTPERS
+    arstall, kvartal,
+    naring, naringnavn,
+    alder, kjonn,
+    fylkbo, fylknavn,
+    varighet, sektor, sektornavn,
+    taptedv, muligedv, antpers,
+    ia1_taptedv, ia1_muligedv, ia1_antpers,
+    ia2_taptedv, ia2_muligedv, ia2_antpers,
+    ia3_taptedv, ia3_muligedv, ia3_antpers
 )
-VALUES
+values
 (
     '2019','1',
     '41', 'Bygge- og anleggsvirksomhet',
@@ -49,19 +49,19 @@ VALUES
     0, 0, 0,
     0, 0, 0
 );
-INSERT INTO dt_p.V_AGG_IA_SYKEFRAVAR_LAND
+insert into dt_p.v_agg_ia_sykefravar_land
 (
-    ARSTALL, KVARTAL,
-    NARING, NARINGNAVN,
-    ALDER, KJONN,
-    FYLKBO, FYLKNAVN,
-    VARIGHET, SEKTOR, SEKTORNAVN,
-    TAPTEDV, MULIGEDV, ANTPERS,
-    IA1_TAPTEDV, IA1_MULIGEDV, IA1_ANTPERS,
-    IA2_TAPTEDV, IA2_MULIGEDV, IA2_ANTPERS,
-    IA3_TAPTEDV, IA3_MULIGEDV, IA3_ANTPERS
+    arstall, kvartal,
+    naring, naringnavn,
+    alder, kjonn,
+    fylkbo, fylknavn,
+    varighet, sektor, sektornavn,
+    taptedv, muligedv, antpers,
+    ia1_taptedv, ia1_muligedv, ia1_antpers,
+    ia2_taptedv, ia2_muligedv, ia2_antpers,
+    ia3_taptedv, ia3_muligedv, ia3_antpers
 )
-VALUES
+values
 (
     '2019','1',
     '41', 'Bygge- og anleggsvirksomhet',
@@ -73,19 +73,19 @@ VALUES
     0, 0, 0,
     0, 0, 0
 );
-INSERT INTO dt_p.V_AGG_IA_SYKEFRAVAR_LAND
+insert into dt_p.v_agg_ia_sykefravar_land
 (
-    ARSTALL, KVARTAL,
-    NARING, NARINGNAVN,
-    ALDER, KJONN,
-    FYLKBO, FYLKNAVN,
-    VARIGHET, SEKTOR, SEKTORNAVN,
-    TAPTEDV, MULIGEDV, ANTPERS,
-    IA1_TAPTEDV, IA1_MULIGEDV, IA1_ANTPERS,
-    IA2_TAPTEDV, IA2_MULIGEDV, IA2_ANTPERS,
-    IA3_TAPTEDV, IA3_MULIGEDV, IA3_ANTPERS
+    arstall, kvartal,
+    naring, naringnavn,
+    alder, kjonn,
+    fylkbo, fylknavn,
+    varighet, sektor, sektornavn,
+    taptedv, muligedv, antpers,
+    ia1_taptedv, ia1_muligedv, ia1_antpers,
+    ia2_taptedv, ia2_muligedv, ia2_antpers,
+    ia3_taptedv, ia3_muligedv, ia3_antpers
 )
-VALUES
+values
 (
     '2019','1',
     '41', 'Bygge- og anleggsvirksomhet',

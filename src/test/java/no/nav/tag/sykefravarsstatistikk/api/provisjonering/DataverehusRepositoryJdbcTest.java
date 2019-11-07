@@ -44,8 +44,7 @@ public class DataverehusRepositoryJdbcTest {
     }
 
     @Test
-    public void
-    hentSykefraværsstatistikkLand_lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
+    public void hentSykefraværsstatistikkLand_lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
         insertSFStatLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 5, 100);
         insertSFStatLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 10, 100);
         insertSFStatLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 10);
@@ -57,6 +56,16 @@ public class DataverehusRepositoryJdbcTest {
         assertEqualsSykefraværsstatistikkLand(
                 new SykefraværsstatistikkLand(2018, 4, new BigDecimal(15), new BigDecimal(200)),
                 sykefraværsstatistikkLand.get(0));
+    }
+
+    @Test
+    public void hentSykefraværsstatistikkLand_returnerer_en_tom_liste_dersom_ingen_data_finnes_i_DVH() {
+        insertSFStatLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 10);
+
+        List<SykefraværsstatistikkLand> sykefraværsstatistikkLand =
+                repository.hentSykefraværsstatistikkLand(new ÅrstallOgKvartal(2018, 4));
+
+        assertTrue(sykefraværsstatistikkLand.isEmpty());
     }
 
     @Test
@@ -95,21 +104,23 @@ public class DataverehusRepositoryJdbcTest {
     }
 
     private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
-        jdbcTemplate.update("delete from dt_p.V_DIM_IA_NARING_SN2007", new MapSqlParameterSource());
+        jdbcTemplate.update("DELETE FROM dt_p.v_dim_ia_naring_sn2007", new MapSqlParameterSource());
         jdbcTemplate.update(
-                "delete from dt_p.V_DIM_IA_FGRP_NARING_SN2007", new MapSqlParameterSource());
-        jdbcTemplate.update("delete from dt_p.V_DIM_IA_SEKTOR", new MapSqlParameterSource());
-        jdbcTemplate.update("delete from dt_p.V_AGG_IA_SYKEFRAVAR_LAND", new MapSqlParameterSource());
+                "DELETE FROM dt_p.v_dim_ia_fgrp_naring_sn2007", new MapSqlParameterSource());
+        jdbcTemplate.update("DELETE FROM dt_p.v_dim_ia_sektor", new MapSqlParameterSource());
+        jdbcTemplate.update("DELETE FROM dt_p.v_agg_ia_sykefravar_land", new MapSqlParameterSource());
     }
 
     private static void insertSektorInDvhTabell(
             NamedParameterJdbcTemplate jdbcTemplate, String kode, String navn) {
         MapSqlParameterSource params =
-                new MapSqlParameterSource().addValue("sektorkode", kode).addValue("sektornavn", navn);
+                new MapSqlParameterSource()
+                        .addValue("sektorkode", kode)
+                        .addValue("sektornavn", navn);
 
         jdbcTemplate.update(
-                "insert into dt_p.V_DIM_IA_SEKTOR (SEKTORKODE, SEKTORNAVN) "
-                        + "values (:sektorkode, :sektornavn)",
+                "INSERT INTO dt_p.v_dim_ia_sektor (sektorkode, sektornavn) "
+                        + "VALUES (:sektorkode, :sektornavn)",
                 params);
     }
 
@@ -117,12 +128,12 @@ public class DataverehusRepositoryJdbcTest {
             NamedParameterJdbcTemplate jdbcTemplate, String næringsgruppekode, String næringsgruppenavn) {
         MapSqlParameterSource naringsgruppeParams =
                 new MapSqlParameterSource()
-                        .addValue("NARGRPKODE", næringsgruppekode)
-                        .addValue("NARGRPNAVN", næringsgruppenavn);
+                        .addValue("nargrpkode", næringsgruppekode)
+                        .addValue("nargrpnavn", næringsgruppenavn);
 
         jdbcTemplate.update(
-                "insert into dt_p.V_DIM_IA_FGRP_NARING_SN2007 (NARGRPKODE, NARGRPNAVN) "
-                        + "values (:NARGRPKODE, :NARGRPNAVN)",
+                "INSERT INTO dt_p.v_dim_ia_fgrp_naring_sn2007 (nargrpkode, nargrpnavn) "
+                        + "VALUES (:nargrpkode, :nargrpnavn)",
                 naringsgruppeParams);
     }
 
@@ -133,13 +144,13 @@ public class DataverehusRepositoryJdbcTest {
             String næringnavn) {
         MapSqlParameterSource naringParams =
                 new MapSqlParameterSource()
-                        .addValue("NARINGKODE", næringkode)
-                        .addValue("NARGRPKODE", næringsgruppekode)
-                        .addValue("NARINGNAVN", næringnavn);
+                        .addValue("naringkode", næringkode)
+                        .addValue("nargrpkode", næringsgruppekode)
+                        .addValue("naringnavn", næringnavn);
 
         jdbcTemplate.update(
-                "insert into dt_p.V_DIM_IA_NARING_SN2007 (NARINGKODE, NARGRPKODE, NARINGNAVN) "
-                        + "values (:NARINGKODE, :NARGRPKODE, :NARINGNAVN)",
+                "INSERT INTO dt_p.v_dim_ia_naring_sn2007 (naringkode, nargrpkode, naringnavn) "
+                        + "VALUES (:naringkode, :nargrpkode, :naringnavn)",
                 naringParams);
     }
 
@@ -157,14 +168,14 @@ public class DataverehusRepositoryJdbcTest {
                         .addValue("muligedv", muligedagsverk);
 
         jdbcTemplate.update(
-                "insert into dt_p.V_AGG_IA_SYKEFRAVAR_LAND ("
-                        + "ARSTALL, KVARTAL, "
-                        + "NARING, NARINGNAVN, "
-                        + "ALDER, KJONN, "
-                        + "FYLKBO, FYLKNAVN, "
-                        + "VARIGHET, SEKTOR, SEKTORNAVN, "
-                        + "TAPTEDV, MULIGEDV) "
-                        + "values ("
+                "INSERT INTO dt_p.V_AGG_IA_SYKEFRAVAR_LAND ("
+                        + "arstall, kvartal, "
+                        + "naring, naringnavn, "
+                        + "alder, kjonn, "
+                        + "fylkbo, fylknavn, "
+                        + "varighet, sektor, sektornavn, "
+                        + "taptedv, muligedv) "
+                        + "VALUES ("
                         + ":arstall, :kvartal, "
                         + "'41', 'Bygge- og anleggsvirksomhet', "
                         + "'D', 'M', "
