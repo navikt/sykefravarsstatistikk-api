@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.provisjonering;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkLand;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkSektor;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppe;
@@ -28,6 +29,8 @@ public class DataverehusRepository {
 
     public static final String ARSTALL = "arstall";
     public static final String KVARTAL = "kvartal";
+    public static final String SEKTOR = "sektor";
+    public static final String SUM_ANTALL_PERSONER = "sum_antall_personer";
     public static final String SUM_TAPTE_DAGSVERK = "sum_tapte_dagsverk";
     public static final String SUM_MULIGE_DAGSVERK = "sum_mulige_dagsverk";
 
@@ -51,16 +54,46 @@ public class DataverehusRepository {
                         .addValue(KVARTAL, årstallOgKvartal.getKvartal());
 
         return namedParameterJdbcTemplate.query(
-                "select arstall, kvartal, sum(taptedv) as sum_tapte_dagsverk, sum(muligedv) as sum_mulige_dagsverk, " +
-                        " sum(antpers) as sum_antall_personer from dt_p.v_agg_ia_sykefravar_land "
-                        + "where kjonn != 'X' and naring != 'X' "
-                        + "and arstall = :arstall and kvartal = :kvartal "
-                        + "group by arstall, kvartal order by arstall, kvartal;",
+                "select arstall, kvartal, " +
+                        "sum(antpers) as sum_antall_personer, " +
+                        "sum(taptedv) as sum_tapte_dagsverk, " +
+                        "sum(muligedv) as sum_mulige_dagsverk " +
+                        "from dt_p.v_agg_ia_sykefravar_land " +
+                        "where kjonn != 'X' and naring != 'X' " +
+                        "and arstall = :arstall and kvartal = :kvartal " +
+                        "group by arstall, kvartal order by arstall, kvartal;",
                 namedParameters,
                 (resultSet, rowNum) ->
                         new SykefraværsstatistikkLand(
                                 resultSet.getInt(ARSTALL),
                                 resultSet.getInt(KVARTAL),
+                                resultSet.getInt(SUM_ANTALL_PERSONER),
+                                resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
+                                resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
+    }
+
+    public List<SykefraværsstatistikkSektor> hentSykefraværsstatistikkSektor(ÅrstallOgKvartal årstallOgKvartal) {
+        SqlParameterSource namedParameters =
+                new MapSqlParameterSource()
+                        .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+                        .addValue(KVARTAL, årstallOgKvartal.getKvartal());
+
+        return namedParameterJdbcTemplate.query(
+                "select arstall, kvartal, sektor, " +
+                        "sum(antpers) as sum_antall_personer, " +
+                        "sum(taptedv) as sum_tapte_dagsverk, " +
+                        "sum(muligedv) as sum_mulige_dagsverk " +
+                        "from dt_p.v_agg_ia_sykefravar_land " +
+                        "where kjonn != 'X' and naring != 'X' " +
+                        "and arstall = :arstall and kvartal = :kvartal " +
+                        "group by arstall, kvartal, sektor order by arstall, kvartal, sektor;",
+                namedParameters,
+                (resultSet, rowNum) ->
+                        new SykefraværsstatistikkSektor(
+                                resultSet.getInt(ARSTALL),
+                                resultSet.getInt(KVARTAL),
+                                resultSet.getInt(SUM_ANTALL_PERSONER),
+                                resultSet.getString(SEKTOR),
                                 resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
                                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
     }

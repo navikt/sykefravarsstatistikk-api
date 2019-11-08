@@ -3,6 +3,7 @@ package no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.tag.sykefravarsstatistikk.api.domene.SlettOgOpprettResultat;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkLand;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkSektor;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.DataverehusRepository;
 import org.springframework.context.annotation.Profile;
@@ -25,10 +26,12 @@ public class StatistikkImportService {
     this.statistikkImportRepository = statistikkImportRepository;
   }
 
-  // TODO: DELETE ME --> bare til versifisering
   public List<SykefraværsstatistikkLand> hentSykefraværsstatistikkLand(int årstall, int kvartal) {
-    return datavarehusRepository.hentSykefraværsstatistikkLand(
-        new ÅrstallOgKvartal(årstall, kvartal));
+    return datavarehusRepository.hentSykefraværsstatistikkLand(new ÅrstallOgKvartal(årstall, kvartal));
+  }
+
+  public List<SykefraværsstatistikkSektor> hentSykefraværsstatistikkSektor(int årstall, int kvartal) {
+    return datavarehusRepository.hentSykefraværsstatistikkSektor(new ÅrstallOgKvartal(årstall, kvartal));
   }
 
   public void importSykefraværsstatistikkLand(int årstall, int kvartal) {
