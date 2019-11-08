@@ -9,4 +9,5 @@ public class Underenhet {
     private final Orgnr overordnetEnhetOrgnr;
     private final String navn;
     private final Næringskode5Siffer næringskode;
+    private final int antallAnsatte;
 }

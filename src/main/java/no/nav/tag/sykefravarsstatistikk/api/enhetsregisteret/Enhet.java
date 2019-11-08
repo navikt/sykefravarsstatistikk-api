@@ -9,4 +9,5 @@ public class Enhet {
     private final String navn;
     private final Næringskode5Siffer næringskode;
     private final InstitusjonellSektorkode institusjonellSektorkode;
+    private final int antallAnsatte;
 }

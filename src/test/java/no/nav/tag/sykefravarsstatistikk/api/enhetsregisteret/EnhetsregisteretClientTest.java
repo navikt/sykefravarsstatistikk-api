@@ -43,6 +43,7 @@ public class EnhetsregisteretClientTest {
         assertThat(enhet.getNæringskode().getBeskrivelse()).isEqualTo("Trygdeordninger underlagt offentlig forvaltning");
         assertThat(enhet.getInstitusjonellSektorkode().getKode()).isEqualTo("6100");
         assertThat(enhet.getInstitusjonellSektorkode().getBeskrivelse()).isEqualTo("Statsforvaltningen");
+        assertThat(enhet.getAntallAnsatte()).isEqualTo(40);
     }
 
     @Test(expected = EnhetsregisteretException.class)
@@ -64,6 +65,7 @@ public class EnhetsregisteretClientTest {
         assertThat(underenhet.getNavn()).isEqualTo("NAV ARBEID OG YTELSER AVD OSLO");
         assertThat(underenhet.getNæringskode().getKode()).isEqualTo("84300");
         assertThat(underenhet.getNæringskode().getBeskrivelse()).isEqualTo("Trygdeordninger underlagt offentlig forvaltning");
+        assertThat(underenhet.getAntallAnsatte()).isEqualTo(40);
     }
 
     @Test(expected = EnhetsregisteretException.class)
@@ -89,6 +91,7 @@ public class EnhetsregisteretClientTest {
                 "    \"beskrivelse\": \"Trygdeordninger underlagt offentlig forvaltning\",\n" +
                 "    \"kode\": \"84.300\"\n" +
                 "  },\n" +
+                "  \"antallAnsatte\": 40,\n" +
                 "  \"overordnetEnhet\": \"999263550\"\n" +
                 "}";
         return (ObjectNode) objectMapper.readTree(str);
@@ -106,7 +109,8 @@ public class EnhetsregisteretClientTest {
                 "  \"institusjonellSektorkode\": {\n" +
                 "    \"kode\": \"6100\",\n" +
                 "    \"beskrivelse\": \"Statsforvaltningen\"\n" +
-                "  }\n" +
+                "  },\n" +
+                "  \"antallAnsatte\": 40\n" +
                 "}";
         return (ObjectNode) objectMapper.readTree(str);
     }

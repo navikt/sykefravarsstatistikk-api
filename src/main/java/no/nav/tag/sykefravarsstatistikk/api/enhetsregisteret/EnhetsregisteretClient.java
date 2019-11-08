@@ -66,7 +66,8 @@ public class EnhetsregisteretClient {
                     new Orgnr(enhetJson.get("organisasjonsnummer").textValue()),
                     enhetJson.get("navn").textValue(),
                     objectMapper.treeToValue(næringskodeJson, Næringskode5Siffer.class),
-                    objectMapper.treeToValue(sektorJson, InstitusjonellSektorkode.class)
+                    objectMapper.treeToValue(sektorJson, InstitusjonellSektorkode.class),
+                    enhetJson.get("antallAnsatte").intValue()
             );
 
         } catch (IOException | NullPointerException e) {
@@ -83,7 +84,8 @@ public class EnhetsregisteretClient {
                     new Orgnr(enhetJson.get("organisasjonsnummer").textValue()),
                     new Orgnr(enhetJson.get("overordnetEnhet").textValue()),
                     enhetJson.get("navn").textValue(),
-                    objectMapper.treeToValue(næringskodeJson, Næringskode5Siffer.class)
+                    objectMapper.treeToValue(næringskodeJson, Næringskode5Siffer.class),
+                    enhetJson.get("antallAnsatte").intValue()
             );
 
         } catch (IOException | NullPointerException e) {
