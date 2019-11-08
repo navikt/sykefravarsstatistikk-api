@@ -33,7 +33,7 @@ public class ApiTest {
     public void sammenligning__skal_returnere_riktig_objekt() throws Exception {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/910820834/sammenligning"))
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/910969439/sammenligning"))
                         .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
                         .GET()
                         .build(),
