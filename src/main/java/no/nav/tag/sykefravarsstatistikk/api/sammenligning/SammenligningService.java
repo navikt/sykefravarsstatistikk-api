@@ -32,7 +32,7 @@ public class SammenligningService {
 
         // TODO Disse må diskuteres. Sektor fra brreg samsvarer ikke med dvh-sektor. Må også finne ut av hvor mange siffer vi skal ha.
         String sektor = enhet.getInstitusjonellSektorkode().getKode();
-        String næring2siffer = underenhet.getNæringskode().getKode().substring(0, 2);
+        String næring2siffer = underenhet.getNæringskode().hentNæringskode2Siffer();
 
         return new Sammenligning(
                 KVARTAL,

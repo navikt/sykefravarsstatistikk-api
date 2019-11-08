@@ -7,6 +7,6 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 public class Enhet {
     private final Orgnr orgnr;
     private final String navn;
-    private final Næringskode næringskode;
+    private final Næringskode5Siffer næringskode;
     private final InstitusjonellSektorkode institusjonellSektorkode;
 }

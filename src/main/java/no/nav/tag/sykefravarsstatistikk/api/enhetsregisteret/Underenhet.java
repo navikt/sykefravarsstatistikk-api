@@ -8,5 +8,5 @@ public class Underenhet {
     private final Orgnr orgnr;
     private final Orgnr overordnetEnhetOrgnr;
     private final String navn;
-    private final Næringskode næringskode;
+    private final Næringskode5Siffer næringskode;
 }
