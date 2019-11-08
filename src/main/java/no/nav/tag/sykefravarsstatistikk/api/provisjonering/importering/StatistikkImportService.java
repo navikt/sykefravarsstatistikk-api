@@ -1,7 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.tag.sykefravarsstatistikk.api.domene.SlettOgOpprettResultat;
+import no.nav.tag.sykefravarsstatistikk.api.common.SlettOgOpprettResultat;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkLand;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.DataverehusRepository;
@@ -31,7 +31,7 @@ public class StatistikkImportService {
         new ÅrstallOgKvartal(årstall, kvartal));
   }
 
-  public void importSykefraværsstatistikkLand(int årstall, int kvartal) {
+  public SlettOgOpprettResultat importSykefraværsstatistikkLand(int årstall, int kvartal) {
     List<SykefraværsstatistikkLand> sykefraværsstatistikkLand =
         datavarehusRepository.hentSykefraværsstatistikkLand(new ÅrstallOgKvartal(årstall, kvartal));
 
@@ -41,7 +41,7 @@ public class StatistikkImportService {
               "Import av sykefraværsstatistikk (land) for årstall '%d' og kvartal '%d 'er ferdig. "
                   + "Ingenting å importere.",
               årstall, kvartal));
-      return;
+      return new SlettOgOpprettResultat(0, 0);
     }
 
     SlettOgOpprettResultat resultat =
@@ -52,5 +52,6 @@ public class StatistikkImportService {
             "Import av sykefraværsstatistikk (land) for årstall '%d' og kvartal '%d 'er ferdig. "
                 + "Antall opprettet: %d, antall slettet: %d",
             årstall, kvartal, resultat.getAntallRadOpprettet(), resultat.getAntallRadSlettet()));
+    return resultat;
   }
 }
