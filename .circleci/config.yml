@@ -72,6 +72,21 @@ workflows:
             branches:
               only:
                 - master
+      - godkjenn-til-dev:
+          type: approval
+          requires:
+            - bygg
+          filters:
+            branches:
+              only:
+                - TAG-933-brreg
+      - deploy-til-dev:
+          requires:
+            - godkjenn-til-dev
+          filters:
+            branches:
+              only:
+                - TAG-933-brreg
       - godkjenn-til-prod:
           type: approval
           requires:
