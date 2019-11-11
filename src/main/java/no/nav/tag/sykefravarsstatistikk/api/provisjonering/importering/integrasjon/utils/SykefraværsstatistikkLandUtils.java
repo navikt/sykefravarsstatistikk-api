@@ -44,15 +44,18 @@ public class SykefraværsstatistikkLandUtils extends SykefraværsstatistikkInteg
               new MapSqlParameterSource()
                   .addValue(ARSTALL, sykefraværsstatistikkLand.getÅrstall())
                   .addValue(KVARTAL, sykefraværsstatistikkLand.getKvartal())
+                  .addValue(ANTALL_PERSONER, sykefraværsstatistikkLand.getAntallPersoner())
                   .addValue(TAPTE_DAGSVERK, sykefraværsstatistikkLand.getTapteDagsverk())
                   .addValue(MULIGE_DAGSVERK, sykefraværsstatistikkLand.getMuligeDagsverk());
 
           return namedParameterJdbcTemplate.update(
               String.format(
-                  "insert into sykefravar_statistikk_land (arstall, kvartal, tapte_dagsverk, mulige_dagsverk)  "
-                      + "values (:arstall, :kvartal, :tapte_dagsverk, :mulige_dagsverk)",
+                  "insert into sykefravar_statistikk_land " +
+                          "(arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk)  " +
+                          "values (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
                   ARSTALL,
                   KVARTAL,
+                  ANTALL_PERSONER,
                   TAPTE_DAGSVERK,
                   MULIGE_DAGSVERK),
               namedParameters);
