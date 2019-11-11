@@ -127,7 +127,7 @@ no.nav.security.oidc:
     accepted_audience: 0090b6e1-ffcc-4c37-bc21-049f7d1f0fe5
 
 datavarehus.datasource:
-  url: jdbc:oracle:thin:@dm07-scan.adeo.no:1521/dwhq0
+  url: ${DVH_DATASOURCE_URL}
   username: ${DVH_BRUKERNAVN}
   password: ${DVH_PASSORD}
   driver-class-name: oracle.jdbc.OracleDriver

@@ -4,14 +4,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 
 @Component
-public class EnhetsregisteretClient {
+public class    EnhetsregisteretClient {
     private final RestTemplate restTemplate;
     private final String enhetsregisteretUrl;
 
@@ -90,6 +95,20 @@ public class EnhetsregisteretClient {
 
         } catch (IOException | NullPointerException e) {
             throw new EnhetsregisteretException("Feil ved kall til Enhetsregisteret. Kunne ikke parse respons.", e);
+        }
+    }
+
+    public HttpStatus healthcheck() {
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    enhetsregisteretUrl,
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    String.class
+            );
+            return response.getStatusCode();
+        } catch (RestClientResponseException e) {
+            return HttpStatus.valueOf(e.getRawStatusCode());
         }
     }
 }
