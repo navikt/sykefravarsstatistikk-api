@@ -28,18 +28,14 @@ public class SammenligningService {
             Orgnr orgnr
     ) {
         Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
-        Enhet enhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
-
-        // TODO Disse må diskuteres. Sektor fra brreg samsvarer ikke med dvh-sektor. Må også finne ut av hvor mange siffer vi skal ha.
-        String sektor = enhet.getInstitusjonellSektorkode().getKode();
         String næring2siffer = underenhet.getNæringskode().hentNæringskode2Siffer();
 
         return new Sammenligning(
                 KVARTAL,
                 ARSTALL,
                 sykefravarprosentRepository.hentSykefraværprosentVirksomhet(ARSTALL, KVARTAL, orgnr.getVerdi()),
-                sykefravarprosentRepository.hentSykefraværprosentSektor(ARSTALL, KVARTAL, sektor),
                 sykefravarprosentRepository.hentSykefraværprosentNæring(ARSTALL, KVARTAL, næring2siffer),
+                null,
                 sykefravarprosentRepository.hentSykefraværprosentLand(ARSTALL, KVARTAL)
         );
     }

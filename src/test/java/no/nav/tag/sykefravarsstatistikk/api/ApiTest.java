@@ -48,13 +48,10 @@ public class ApiTest {
                 "\"prosent\":12.8" +
                 "}," +
                 "\"næring\":{" +
-                "\"label\":\"Offentlig næringsvirksomhet\"," +
-                "\"prosent\":3.0" +
-                "}," +
-                "\"sektor\":{" +
                 "\"label\":\"Tjenester tilknyttet informasjonsteknologi\"," +
                 "\"prosent\":5.6" +
                 "}," +
+                "\"sektor\":null," +
                 "\"land\":{" +
                 "\"label\":\"Norge\"," +
                 "\"prosent\":5.5" +
