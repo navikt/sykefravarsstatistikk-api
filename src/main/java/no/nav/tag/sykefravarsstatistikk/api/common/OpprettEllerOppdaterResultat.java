@@ -1,4 +1,4 @@
-package no.nav.tag.sykefravarsstatistikk.api.domene;
+package no.nav.tag.sykefravarsstatistikk.api.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -16,8 +16,6 @@ import java.util.Optional;
 public class SektorIntegrasjonUtils extends VirksomhetsklassifikasjonIntegrasjon
     implements VirksomhetsklassifikasjonIntegrasjonUtils {
 
-    public static final String KODE = "kode";
-    public static final String NAVN = "navn";
 
     public SektorIntegrasjonUtils(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         super(namedParameterJdbcTemplate);

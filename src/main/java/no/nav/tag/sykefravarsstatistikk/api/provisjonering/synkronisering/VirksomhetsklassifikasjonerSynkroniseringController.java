@@ -2,6 +2,7 @@ package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.security.oidc.api.Protected;
+import no.nav.tag.sykefravarsstatistikk.api.common.OpprettEllerOppdaterResultat;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -32,15 +33,13 @@ public class VirksomhetsklassifikasjonerSynkroniseringController {
     }
 
     @PostMapping(value = "/sektorer")
-    public String populerSektorer() {
-        service.populerSektorer();
-        return "OK";
+    public OpprettEllerOppdaterResultat populerSektorer() {
+        return service.populerSektorer();
     }
 
     @PostMapping(value = "/naringskoder")
-    public String populerNæringskoder() {
-        service.populerNæringskoder();
-        return "OK";
+    public OpprettEllerOppdaterResultat populerNæringskoder() {
+        return service.populerNæringskoder();
     }
 
 }
