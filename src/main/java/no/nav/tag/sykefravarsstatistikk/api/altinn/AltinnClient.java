@@ -47,7 +47,7 @@ public class AltinnClient {
 
     public List<AltinnOrganisasjon> hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(Fnr fnr) {
         URI uri = UriComponentsBuilder.fromUriString(altinnUrl)
-                .pathSegment("serviceowner", "reportees")
+                .pathSegment("ekstern", "altinn", "api", "serviceowner", "reportees")
                 .queryParam("ForceEIAuthentication")
                 .queryParam("subject", fnr.getVerdi())
                 .queryParam("serviceCode", iawebServiceCode)
