@@ -6,7 +6,6 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppe;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +21,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @ActiveProfiles("db-test")
 @RunWith(SpringRunner.class)
@@ -48,37 +50,43 @@ public class DataverehusRepositoryJdbcTest {
 
     @Test
     public void hentSykefraværsstatistikkSektor_lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
-        insertSFStatLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 1, 5, 100);
-        insertSFStatLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, 10, 100);
-        insertSFStatLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 1,5, 100);
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, 10, 100);
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
 
         List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor =
                 repository.hentSykefraværsstatistikkSektor(new ÅrstallOgKvartal(2018, 4));
 
         assertTrue(sykefraværsstatistikkSektor.size() == 1);
-        SykefraværsstatistikkSektor sfSektorExpected = new SykefraværsstatistikkSektor(2018, 4, 4, "1", new BigDecimal(15), new BigDecimal(200));
+        SykefraværsstatistikkSektor sykefraværsstatistikkSektorExpected = new SykefraværsstatistikkSektor(2018, 4, 4, "1", new BigDecimal(15), new BigDecimal(200));
         SykefraværsstatistikkSektor sykefraværsstatistikkSektorActual = sykefraværsstatistikkSektor.get(0);
-        assertTrue(new ReflectionEquals(sfSektorExpected).matches(sykefraværsstatistikkSektorActual));
+        assertTrue(new ReflectionEquals(sykefraværsstatistikkSektorExpected).matches(sykefraværsstatistikkSektorActual));
     }
 
     @Test
     public void hentSykefraværsstatistikkLand_lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
-        insertSFStatLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 1, 5, 100);
-        insertSFStatLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, 10, 100);
-        insertSFStatLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, 5, 100);
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, 10, 100);
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
 
         List<SykefraværsstatistikkLand> sykefraværsstatistikkLand =
                 repository.hentSykefraværsstatistikkLand(new ÅrstallOgKvartal(2018, 4));
 
-        assertTrue(sykefraværsstatistikkLand.size() == 1);
-        assertEqualsSykefraværsstatistikkLand(
-                new SykefraværsstatistikkLand(2018, 4, 4, new BigDecimal(15), new BigDecimal(200)),
+        assertThat(sykefraværsstatistikkLand, hasSize(1));
+        assertEquals(
+                new SykefraværsstatistikkLand(
+                        2018,
+                        4,
+                        10,
+                        new BigDecimal(15).setScale(6),
+                        new BigDecimal(200).setScale(6)
+                ),
                 sykefraværsstatistikkLand.get(0));
     }
 
     @Test
     public void hentSykefraværsstatistikkLand_returnerer_en_tom_liste_dersom_ingen_data_finnes_i_DVH() {
-        insertSFStatLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
 
         List<SykefraværsstatistikkLand> sykefraværsstatistikkLand =
                 repository.hentSykefraværsstatistikkLand(new ÅrstallOgKvartal(2018, 4));
@@ -172,7 +180,7 @@ public class DataverehusRepositoryJdbcTest {
                 naringParams);
     }
 
-    private static void insertSFStatLandInDvhTabell(
+    private static void insertSykefraværsstatistikkLandInDvhTabell(
             NamedParameterJdbcTemplate jdbcTemplate,
             int årstall,
             int kvartal,
@@ -204,14 +212,4 @@ public class DataverehusRepositoryJdbcTest {
                         + ":taptedv, :muligedv, :antpers)",
                 params);
     }
-
-    private void assertEqualsSykefraværsstatistikkLand(
-            SykefraværsstatistikkLand expected, SykefraværsstatistikkLand actual) {
-        assertEquals(expected.getÅrstall(), actual.getÅrstall());
-        assertEquals(expected.getKvartal(), actual.getKvartal());
-        assertEquals(expected.getAntallPersoner(), actual.getAntallPersoner());
-        assertThat(expected.getTapteDagsverk(), Matchers.comparesEqualTo(actual.getTapteDagsverk()));
-        assertThat(expected.getMuligeDagsverk(), Matchers.comparesEqualTo(actual.getMuligeDagsverk()));
-    }
-
 }

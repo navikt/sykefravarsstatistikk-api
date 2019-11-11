@@ -1,6 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering;
 
-import no.nav.tag.sykefravarsstatistikk.api.domene.OpprettEllerOppdaterResultat;
+import no.nav.tag.sykefravarsstatistikk.api.common.OpprettEllerOppdaterResultat;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppe;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;

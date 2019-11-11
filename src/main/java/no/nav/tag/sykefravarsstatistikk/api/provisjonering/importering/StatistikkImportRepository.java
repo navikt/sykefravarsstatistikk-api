@@ -1,6 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering;
 
-import no.nav.tag.sykefravarsstatistikk.api.domene.SlettOgOpprettResultat;
+import no.nav.tag.sykefravarsstatistikk.api.common.SlettOgOpprettResultat;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkLand;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.Sykefraværsstatistikk;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
