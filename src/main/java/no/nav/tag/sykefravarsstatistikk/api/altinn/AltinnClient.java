@@ -45,7 +45,7 @@ public class AltinnClient {
         this.iawebServiceEdition = iawebServiceEdition;
     }
 
-    public List<Organisasjon> hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(Fnr fnr) {
+    public List<AltinnOrganisasjon> hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(Fnr fnr) {
         URI uri = UriComponentsBuilder.fromUriString(altinnUrl)
                 .pathSegment("ekstern", "altinn", "api", "serviceowner", "reportees")
                 .queryParam("ForceEIAuthentication")
@@ -55,11 +55,11 @@ public class AltinnClient {
                 .build()
                 .toUri();
         try {
-            Optional<List<Organisasjon>> respons = Optional.ofNullable(restTemplate.exchange(
+            Optional<List<AltinnOrganisasjon>> respons = Optional.ofNullable(restTemplate.exchange(
                     uri,
                     HttpMethod.GET,
                     getHeaderEntity(),
-                    new ParameterizedTypeReference<List<Organisasjon>>() {}
+                    new ParameterizedTypeReference<List<AltinnOrganisasjon>>() {}
             ).getBody());
 
             if (respons.isPresent()) {

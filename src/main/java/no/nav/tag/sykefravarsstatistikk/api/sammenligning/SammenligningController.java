@@ -28,18 +28,17 @@ public class SammenligningController {
 
     @GetMapping(value = "/{orgnr}/sammenligning")
     public Sammenligning sammenligning(
-            @PathVariable("orgnr") String orgnr,
+            @PathVariable("orgnr") String orgnrStr,
             HttpServletRequest request
     ) {
-        Sammenligning sammenligning;
+        Orgnr orgnr = new Orgnr(orgnrStr);
         utførTilgangskontroll(orgnr, request);
-        sammenligning = service.hentSammenligning();
-        return sammenligning;
+        return service.hentSammenligningForUnderenhet(orgnr);
     }
 
-    private void utførTilgangskontroll(String orgnr, HttpServletRequest request) {
+    private void utførTilgangskontroll(Orgnr orgnr, HttpServletRequest request) {
         tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
-                new Orgnr(orgnr),
+                orgnr,
                 request.getMethod(),
                 "" + request.getRequestURL()
         );

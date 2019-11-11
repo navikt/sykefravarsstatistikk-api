@@ -10,8 +10,15 @@
   {
     "Name": "Tore sitt testselskap",
     "Type": "Enterprise",
-    "OrganizationNumber": "910820834",
+    "OrganizationNumber": "910969439",
     "OrganizationForm": "AS",
+    "Status": "Active"
+  },
+  {
+    "Name": "NAV ARBEID OG YTELSER AVD OSLO",
+    "Type": "Business",
+    "OrganizationNumber": "894834412",
+    "OrganizationForm": "BEDR",
     "Status": "Active"
   }
 ]

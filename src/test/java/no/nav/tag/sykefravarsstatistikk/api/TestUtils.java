@@ -1,8 +1,9 @@
 package no.nav.tag.sykefravarsstatistikk.api;
 
-import no.nav.tag.sykefravarsstatistikk.api.altinn.Organisasjon;
+import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnOrganisasjon;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
+import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 
 import java.util.Arrays;
 
@@ -21,13 +22,17 @@ public class TestUtils {
         return bruker;
     }
 
-    public static Organisasjon getOrganisasjon(String organizationNumber) {
-        Organisasjon organisasjon = new Organisasjon();
+    public static AltinnOrganisasjon getOrganisasjon(String organizationNumber) {
+        AltinnOrganisasjon organisasjon = new AltinnOrganisasjon();
         organisasjon.setOrganizationNumber(organizationNumber);
         return organisasjon;
     }
 
     public static Fnr getFnr() {
         return new Fnr("26070248114");
+    }
+
+    public static Orgnr getOrgnr() {
+        return new Orgnr("971800534");
     }
 }
