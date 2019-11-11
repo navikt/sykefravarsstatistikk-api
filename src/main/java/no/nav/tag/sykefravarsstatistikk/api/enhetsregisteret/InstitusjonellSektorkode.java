@@ -1,7 +1,5 @@
 package no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret;
 
-//TODO Dette må forenes med vårt eksisterende sektor-objekt
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
