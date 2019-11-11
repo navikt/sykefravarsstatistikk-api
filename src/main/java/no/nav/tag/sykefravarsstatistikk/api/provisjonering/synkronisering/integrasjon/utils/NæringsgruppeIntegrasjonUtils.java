@@ -16,9 +16,6 @@ import java.util.Optional;
 public class NæringsgruppeIntegrasjonUtils extends VirksomhetsklassifikasjonIntegrasjon
     implements VirksomhetsklassifikasjonIntegrasjonUtils {
 
-    public static final String KODE = "kode";
-    public static final String NAVN = "navn";
-
 
     public NæringsgruppeIntegrasjonUtils(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         super(namedParameterJdbcTemplate);

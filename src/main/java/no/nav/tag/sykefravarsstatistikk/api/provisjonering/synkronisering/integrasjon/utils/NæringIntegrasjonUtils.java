@@ -16,10 +16,6 @@ import java.util.Optional;
 public class NæringIntegrasjonUtils extends VirksomhetsklassifikasjonIntegrasjon
     implements VirksomhetsklassifikasjonIntegrasjonUtils {
 
-    public static final String KODE = "kode";
-    public static final String NARINGSGRUPPE_KODE = "naringsgruppe_kode";
-    public static final String NAVN = "navn";
-
 
     public NæringIntegrasjonUtils(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         super(namedParameterJdbcTemplate);

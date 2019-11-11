@@ -1,7 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.tag.sykefravarsstatistikk.api.domene.OpprettEllerOppdaterResultat;
+import no.nav.tag.sykefravarsstatistikk.api.common.OpprettEllerOppdaterResultat;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppe;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
@@ -28,7 +28,7 @@ public class VirksomhetsklassifikasjonerSynkroniseringService {
         this.virksomhetsklassifikasjonerSynkroniseringRepository = virksomhetsklassifikasjonerSynkroniseringRepository;
     }
 
-    public void populerSektorer() {
+    public OpprettEllerOppdaterResultat populerSektorer() {
         List<Sektor> sektorer = datavarehusRepository.hentAlleSektorer();
         OpprettEllerOppdaterResultat resultat =
                 virksomhetsklassifikasjonerSynkroniseringRepository.opprettEllerOppdaterSektorer(sektorer);
@@ -39,11 +39,12 @@ public class VirksomhetsklassifikasjonerSynkroniseringService {
                         resultat.getAntallRadOppdatert()
                 )
         );
+        return resultat;
     }
 
-    public void populerNæringskoder() {
+    public OpprettEllerOppdaterResultat populerNæringskoder() {
         populerNæringsgrupper();
-        populerNæringer();
+        return populerNæringer();
     }
 
     // TODO: DELETE ME --> bare til versifisering
@@ -52,7 +53,7 @@ public class VirksomhetsklassifikasjonerSynkroniseringService {
     }
 
 
-    private void populerNæringsgrupper() {
+    private OpprettEllerOppdaterResultat populerNæringsgrupper() {
 
         List<Næringsgruppe> næringsgrupper = datavarehusRepository.hentAlleNæringsgrupper();
         OpprettEllerOppdaterResultat resultat =
@@ -64,9 +65,10 @@ public class VirksomhetsklassifikasjonerSynkroniseringService {
                         resultat.getAntallRadOppdatert()
                 )
         );
+        return resultat;
     }
 
-    private void populerNæringer() {
+    private OpprettEllerOppdaterResultat populerNæringer() {
 
         List<Næring> næringer = datavarehusRepository.hentAlleNæringer();
         OpprettEllerOppdaterResultat resultat =
@@ -78,6 +80,7 @@ public class VirksomhetsklassifikasjonerSynkroniseringService {
                         resultat.getAntallRadOppdatert()
                 )
         );
+        return resultat;
     }
 
 

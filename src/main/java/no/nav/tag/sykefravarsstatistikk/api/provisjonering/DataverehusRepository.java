@@ -1,5 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.provisjonering;
 
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkLand;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppe;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
@@ -12,67 +14,91 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-
 @Profile({"local", "dev"})
 @Component
 public class DataverehusRepository {
 
+    public static final String NARGRPKODE = "nargrpkode";
+    public static final String NARGRPNAVN = "nargrpnavn";
+    public static final String NARINGKODE = "naringkode";
+    public static final String NARINGNAVN = "naringnavn";
+    public static final String SEKTORKODE = "sektorkode";
+    public static final String SEKTORNAVN = "sektornavn";
 
-    public static final String NARGRPKODE = "NARGRPKODE";
-    public static final String NARGRPNAVN = "NARGRPNAVN";
-    public static final String NARINGKODE = "NARINGKODE";
-    public static final String NARINGNAVN = "NARINGNAVN";
-    public static final String SEKTORKODE = "SEKTORKODE";
-    public static final String SEKTORNAVN = "SEKTORNAVN";
+
+    public static final String ARSTALL = "arstall";
+    public static final String KVARTAL = "kvartal";
+    public static final String SUM_TAPTE_DAGSVERK = "sum_tapte_dagsverk";
+    public static final String SUM_MULIGE_DAGSVERK = "sum_mulige_dagsverk";
+
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-
     public DataverehusRepository(
-            @Qualifier("datavarehusJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
-    ) {
+            @Qualifier("datavarehusJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
+
+  /*
+   Statistikk
+  */
+
+    public List<SykefraværsstatistikkLand> hentSykefraværsstatistikkLand(ÅrstallOgKvartal årstallOgKvartal) {
+        SqlParameterSource namedParameters =
+                new MapSqlParameterSource()
+                        .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+                        .addValue(KVARTAL, årstallOgKvartal.getKvartal());
+
+        return namedParameterJdbcTemplate.query(
+                "select arstall, kvartal, sum(taptedv) as sum_tapte_dagsverk, sum(muligedv) as sum_mulige_dagsverk, " +
+                        " sum(antpers) as sum_antall_personer from dt_p.v_agg_ia_sykefravar_land "
+                        + "where kjonn != 'X' and naring != 'X' "
+                        + "and arstall = :arstall and kvartal = :kvartal "
+                        + "group by arstall, kvartal order by arstall, kvartal;",
+                namedParameters,
+                (resultSet, rowNum) ->
+                        new SykefraværsstatistikkLand(
+                                resultSet.getInt(ARSTALL),
+                                resultSet.getInt(KVARTAL),
+                                resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
+                                resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
+    }
+
+    /*
+     Dimensjoner
+    */
 
     public List<Sektor> hentAlleSektorer() {
         SqlParameterSource namedParameters = new MapSqlParameterSource();
 
         return namedParameterJdbcTemplate.query(
-            "select SEKTORKODE, SEKTORNAVN from dt_p.V_DIM_IA_SEKTOR",
-            namedParameters,
-            (resultSet, rowNum) -> new Sektor(
-                    resultSet.getString(SEKTORKODE),
-                    resultSet.getString(SEKTORNAVN)
-            )
-        );
+                "select sektorkode, sektornavn from dt_p.v_dim_ia_sektor",
+                namedParameters,
+                (resultSet, rowNum) ->
+                        new Sektor(resultSet.getString(SEKTORKODE), resultSet.getString(SEKTORNAVN)));
     }
 
     public List<Næringsgruppe> hentAlleNæringsgrupper() {
         SqlParameterSource namedParameters = new MapSqlParameterSource();
 
         return namedParameterJdbcTemplate.query(
-                "select NARGRPKODE, NARGRPNAVN from dt_p.V_DIM_IA_FGRP_NARING_SN2007",
+                "select nargrpkode, nargrpnavn from dt_p.v_dim_ia_fgrp_naring_sn2007",
                 namedParameters,
-                (resultSet, rowNum) -> new Næringsgruppe(
-                        resultSet.getString(NARGRPKODE),
-                        resultSet.getString(NARGRPNAVN)
-                )
-        );
+                (resultSet, rowNum) ->
+                        new Næringsgruppe(resultSet.getString(NARGRPKODE), resultSet.getString(NARGRPNAVN)));
     }
 
     public List<Næring> hentAlleNæringer() {
         SqlParameterSource namedParameters = new MapSqlParameterSource();
 
         return namedParameterJdbcTemplate.query(
-                "select NARINGKODE, NARGRPKODE, NARINGNAVN from dt_p.V_DIM_IA_NARING_SN2007",
+                "select naringkode, nargrpkode, naringnavn from dt_p.v_dim_ia_naring_sn2007",
                 namedParameters,
-                (resultSet, rowNum) -> new Næring(
-                        resultSet.getString(NARGRPKODE),
-                        resultSet.getString(NARINGKODE),
-                        resultSet.getString(NARINGNAVN)
-                )
-        );
+                (resultSet, rowNum) ->
+                        new Næring(
+                                resultSet.getString(NARGRPKODE),
+                                resultSet.getString(NARINGKODE),
+                                resultSet.getString(NARINGNAVN)));
     }
-
 }
