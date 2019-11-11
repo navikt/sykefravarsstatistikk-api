@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 // TODO DELETE ME
-@Profile("local")
+@Profile({"local", "dev"})
 @Unprotected
 @RestController
 public class TestController {
