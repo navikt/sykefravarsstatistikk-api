@@ -137,6 +137,9 @@ datavarehus.datasource:
 spring:
   profiles: prod
 
+enhetsregisteret:
+  url: "https://data.brreg.no/enhetsregisteret/api/"
+
 altinn:
   url: "https://api-gw.adeo.no/"
   apikey: ${ALTINN_APIKEY}
