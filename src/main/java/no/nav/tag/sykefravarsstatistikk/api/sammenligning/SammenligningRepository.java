@@ -1,7 +1,10 @@
 package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -27,29 +30,30 @@ public class SammenligningRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-    public Sykefraværprosent hentSykefraværprosentVirksomhet(int årstall, int kvartal, String orgnr) {
+    public Sykefraværprosent hentSykefraværprosentVirksomhet(int årstall, int kvartal, Underenhet underenhet) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue(ÅRSTALL, årstall)
                 .addValue(KVARTAL, kvartal)
-                .addValue(ORGNR, orgnr);
+                .addValue(ORGNR, underenhet.getOrgnr().getVerdi());
 
-        return namedParameterJdbcTemplate.queryForObject(
+        return queryForSykefraværsprosentOgHåndterHvisIngenResultat(
                 "SELECT * FROM SYKEFRAVAR_STATISTIKK_VIRKSOMHET WHERE arstall = :arstall AND kvartal = :kvartal AND orgnr = :orgnr",
                 namedParameters,
-                (rs, rowNum) -> mapTilSykefraværprosent("Fisk og Fulg AS", rs)
+                underenhet.getNavn()
         );
     }
 
-    public Sykefraværprosent hentSykefraværprosentNæring(int årstall, int kvartal, String næring) {
+    public Sykefraværprosent hentSykefraværprosentNæring(int årstall, int kvartal, Næringskode5Siffer næringskode5Siffer) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue(ÅRSTALL, årstall)
                 .addValue(KVARTAL, kvartal)
-                .addValue(NÆRING, næring);
+                .addValue(NÆRING, næringskode5Siffer.hentNæringskode2Siffer());
 
-        return namedParameterJdbcTemplate.queryForObject(
+
+        return queryForSykefraværsprosentOgHåndterHvisIngenResultat(
                 "SELECT * FROM SYKEFRAVAR_STATISTIKK_NARING WHERE arstall = :arstall AND kvartal = :kvartal AND naring_kode = :naring",
                 namedParameters,
-                (rs, rowNum) -> mapTilSykefraværprosent("Tjenester tilknyttet informasjonsteknologi", rs)
+                næringskode5Siffer.getBeskrivelse()
         );
     }
 
@@ -59,10 +63,10 @@ public class SammenligningRepository {
                 .addValue(KVARTAL, kvartal)
                 .addValue(SEKTOR, sektor);
 
-        return namedParameterJdbcTemplate.queryForObject(
+        return queryForSykefraværsprosentOgHåndterHvisIngenResultat(
                 "SELECT * FROM SYKEFRAVAR_STATISTIKK_SEKTOR WHERE arstall = :arstall AND kvartal = :kvartal AND sektor_kode = :sektor",
                 namedParameters,
-                (rs, rowNum) -> mapTilSykefraværprosent("Offentlig næringsvirksomhet", rs)
+                "Offentlig næringsvirksomhet"
         );
     }
 
@@ -71,11 +75,27 @@ public class SammenligningRepository {
                 .addValue(ÅRSTALL, årstall)
                 .addValue(KVARTAL, kvartal);
 
-        return namedParameterJdbcTemplate.queryForObject(
+        return queryForSykefraværsprosentOgHåndterHvisIngenResultat(
                 "SELECT * FROM SYKEFRAVAR_STATISTIKK_LAND where arstall = :arstall and kvartal = :kvartal",
                 namedParameters,
-                (rs, rowNum) -> mapTilSykefraværprosent("Norge", rs)
+                "Norge"
         );
+    }
+
+    private Sykefraværprosent queryForSykefraværsprosentOgHåndterHvisIngenResultat(
+            String sql,
+            SqlParameterSource namedParameters,
+            String sykefraværsprosentLabel
+    ) {
+        try {
+            return namedParameterJdbcTemplate.queryForObject(
+                    sql,
+                    namedParameters,
+                    (rs, rowNum) -> mapTilSykefraværprosent(sykefraværsprosentLabel, rs)
+            );
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     private Sykefraværprosent mapTilSykefraværprosent(String label, ResultSet rs) throws SQLException {

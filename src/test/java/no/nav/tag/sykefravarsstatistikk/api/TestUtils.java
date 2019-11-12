@@ -4,6 +4,8 @@ import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnOrganisasjon;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 
 import java.util.Arrays;
 
@@ -34,5 +36,28 @@ public class TestUtils {
 
     public static Orgnr getOrgnr() {
         return new Orgnr("971800534");
+    }
+
+
+    public static Underenhet enUnderenhet() {
+        return enUnderenhetBuilder().orgnr(getOrgnr()).build();
+    }
+
+    public static Underenhet enUnderenhet(String orgnr) {
+        return enUnderenhetBuilder().orgnr(new Orgnr(orgnr)).build();
+    }
+
+    public static Underenhet.UnderenhetBuilder enUnderenhetBuilder() {
+        return Underenhet.builder()
+                .orgnr(getOrgnr())
+                .overordnetEnhetOrgnr(new Orgnr("053497180"))
+                .navn("Underenhet AS")
+                .næringskode(enNæringskode5Siffer())
+                .antallAnsatte(40);
+
+    }
+
+    public static Næringskode5Siffer enNæringskode5Siffer() {
+        return new Næringskode5Siffer("12345", "Spesiell næring");
     }
 }

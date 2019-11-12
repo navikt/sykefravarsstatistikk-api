@@ -18,5 +18,4 @@ public class SykefraværprosentTest {
         Sykefraværprosent sykefraværprosent = new Sykefraværprosent("", new BigDecimal(455), new BigDecimal(10000));
         assertThat(sykefraværprosent.getProsent()).isEqualTo(new BigDecimal("4.6"));
     }
-
 }

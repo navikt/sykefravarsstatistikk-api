@@ -33,7 +33,7 @@ public class ApiTest {
     public void sammenligning__skal_returnere_riktig_objekt() throws Exception {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/910969439/sammenligning"))
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/894834412/sammenligning"))
                         .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
                         .GET()
                         .build(),
@@ -41,21 +41,21 @@ public class ApiTest {
         );
 
         JsonNode ønsketResponseJson = objectMapper.readTree("{" +
-                "\"årstall\":2019," +
-                "\"kvartal\":1," +
-                "\"virksomhet\":{" +
-                "\"label\":\"Fisk og Fulg AS\"," +
-                "\"prosent\":12.8" +
-                "}," +
-                "\"næring\":{" +
-                "\"label\":\"Tjenester tilknyttet informasjonsteknologi\"," +
-                "\"prosent\":5.6" +
-                "}," +
-                "\"sektor\":null," +
-                "\"land\":{" +
-                "\"label\":\"Norge\"," +
-                "\"prosent\":5.5" +
-                "}" +
+                "  \"kvartal\": 1," +
+                "  \"årstall\": 2019," +
+                "  \"virksomhet\": {" +
+                "    \"label\": \"NAV ARBEID OG YTELSER AVD OSLO\"," +
+                "    \"prosent\": 12.8" +
+                "  }," +
+                "  \"næring\": {" +
+                "    \"label\": \"Trygdeordninger underlagt offentlig forvaltning\"," +
+                "    \"prosent\": 5.6" +
+                "  }," +
+                "  \"sektor\": null," +
+                "  \"land\": {" +
+                "    \"label\": \"Norge\"," +
+                "    \"prosent\": 5.5" +
+                "  }" +
                 "}"
         );
 
