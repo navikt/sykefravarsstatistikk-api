@@ -10,7 +10,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -95,7 +94,7 @@ public class SammenligningRepository {
                     (rs, rowNum) -> mapTilSykefraværprosent(sykefraværsprosentLabel, rs)
             );
         } catch (EmptyResultDataAccessException e) {
-            return new Sykefraværprosent(sykefraværsprosentLabel, new BigDecimal(0), new BigDecimal(0));
+            return null;
         }
     }
 

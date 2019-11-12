@@ -1,7 +1,5 @@
 package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
-import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
-import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,9 +13,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
-import java.math.BigDecimal;
-
-import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.*;
+import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.enNæringskode5Siffer;
+import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.enUnderenhet;
 import static no.nav.tag.sykefravarsstatistikk.api.sammenligning.SammenligningRepository.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -61,13 +58,11 @@ public class SykefraværprosentRepositoryTest {
     }
 
     @Test
-    public void hentSykefraværprosentLand_skal_returnere_tomt_sykefravær_hvis_database_ikke_inneholder_rader() {
+    public void hentSykefraværprosentLand_skal_returnere_null_hvis_database_ikke_inneholder_rader() {
         when(jdbcTemplate.queryForObject(anyString(), any(SqlParameterSource.class), any(RowMapper.class)))
                 .thenThrow(new EmptyResultDataAccessException(0));
 
-        Sykefraværprosent resultat = repository.hentSykefraværprosentLand(2019, 1);
-
-        assertThat(resultat.getProsent()).isEqualTo(new BigDecimal(0));
+        assertThat(repository.hentSykefraværprosentLand(2019, 1)).isNull();
     }
 
     @Test
@@ -93,9 +88,7 @@ public class SykefraværprosentRepositoryTest {
         when(jdbcTemplate.queryForObject(anyString(), any(SqlParameterSource.class), any(RowMapper.class)))
                 .thenThrow(new EmptyResultDataAccessException(0));
 
-        Sykefraværprosent resultat = repository.hentSykefraværprosentSektor(2019, 1, "sektor");
-
-        assertThat(resultat.getProsent()).isEqualTo(new BigDecimal(0));
+        assertThat(repository.hentSykefraværprosentSektor(2019, 1, "sektor")).isNull();
     }
 
     @Test
@@ -121,9 +114,7 @@ public class SykefraværprosentRepositoryTest {
         when(jdbcTemplate.queryForObject(anyString(), any(SqlParameterSource.class), any(RowMapper.class)))
                 .thenThrow(new EmptyResultDataAccessException(0));
 
-        Sykefraværprosent resultat = repository.hentSykefraværprosentNæring(2019, 1, enNæringskode5Siffer());
-
-        assertThat(resultat.getProsent()).isEqualTo(new BigDecimal(0));
+        assertThat(repository.hentSykefraværprosentNæring(2019, 1, enNæringskode5Siffer())).isNull();
     }
 
     @Test
@@ -153,9 +144,7 @@ public class SykefraværprosentRepositoryTest {
         when(jdbcTemplate.queryForObject(anyString(), any(SqlParameterSource.class), any(RowMapper.class)))
                 .thenThrow(new EmptyResultDataAccessException(0));
 
-        Sykefraværprosent resultat = repository.hentSykefraværprosentVirksomhet(2019, 1, enUnderenhet());
-
-        assertThat(resultat.getProsent()).isEqualTo(new BigDecimal(0));
+        assertThat(repository.hentSykefraværprosentVirksomhet(2019, 1, enUnderenhet())).isNull();
     }
 
     private void captureArgumenterTilJdbcTemplate() {
