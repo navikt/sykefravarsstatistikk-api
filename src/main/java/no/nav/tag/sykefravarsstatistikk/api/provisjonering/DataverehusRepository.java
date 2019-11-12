@@ -61,7 +61,7 @@ public class DataverehusRepository {
                         "from dt_p.v_agg_ia_sykefravar_land " +
                         "where kjonn != 'X' and naring != 'X' " +
                         "and arstall = :arstall and kvartal = :kvartal " +
-                        "group by arstall, kvartal order by arstall, kvartal;",
+                        "group by arstall, kvartal order by arstall, kvartal",
                 namedParameters,
                 (resultSet, rowNum) ->
                         new SykefraværsstatistikkLand(
@@ -86,7 +86,7 @@ public class DataverehusRepository {
                         "from dt_p.v_agg_ia_sykefravar_land " +
                         "where kjonn != 'X' and naring != 'X' " +
                         "and arstall = :arstall and kvartal = :kvartal " +
-                        "group by arstall, kvartal, sektor order by arstall, kvartal, sektor;",
+                        "group by arstall, kvartal, sektor order by arstall, kvartal, sektor",
                 namedParameters,
                 (resultSet, rowNum) ->
                         new SykefraværsstatistikkSektor(
