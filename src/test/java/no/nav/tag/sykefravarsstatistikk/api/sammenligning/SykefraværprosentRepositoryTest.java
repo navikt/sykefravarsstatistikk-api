@@ -1,5 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
+import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +13,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
+import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.enUnderenhet;
+import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.enUnderenhetBuilder;
 import static no.nav.tag.sykefravarsstatistikk.api.sammenligning.SammenligningRepository.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -71,7 +75,7 @@ public class SykefraværprosentRepositoryTest {
 
     @Test
     public void hentSykefraværprosentNæring_skal_sende_med_og_bruke_riktige_parametre() {
-        repository.hentSykefraværprosentNæring(2017, 3, "5123");
+        repository.hentSykefraværprosentNæring(2017, 3, new Næringskode5Siffer("51253", ""));
         captureArgumenterTilJdbcTemplate();
 
         SqlParameterSource parametre = parameterArgumentCaptor.getValue();
@@ -79,7 +83,7 @@ public class SykefraværprosentRepositoryTest {
 
         assertThat(parametre.getValue(ÅRSTALL)).isEqualTo(2017);
         assertThat(parametre.getValue(KVARTAL)).isEqualTo(3);
-        assertThat(parametre.getValue(NÆRING)).isEqualTo("5123");
+        assertThat(parametre.getValue(NÆRING)).isEqualTo("51");
         assertThat(parametre.getParameterNames().length).isEqualTo(3);
 
         assertThat(sql).contains(":" + ÅRSTALL);
@@ -89,7 +93,11 @@ public class SykefraværprosentRepositoryTest {
 
     @Test
     public void hentSykefraværprosentVirksomhet_skal_sende_med_og_bruke_riktige_parametre() {
-        repository.hentSykefraværprosentVirksomhet(2013, 4, "123456789");
+        repository.hentSykefraværprosentVirksomhet(
+                2013,
+                4,
+                enUnderenhet("123456789")
+        );
         captureArgumenterTilJdbcTemplate();
 
         SqlParameterSource parametre = parameterArgumentCaptor.getValue();
