@@ -17,12 +17,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 @SpringBootTest
-@TestPropertySource(properties = {"mock.port=8083"})
+@TestPropertySource(properties = {"mock.port=8084"})
 public class HealthcheckControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
 
     @Test
     public void returnerer_OK() throws Exception {
