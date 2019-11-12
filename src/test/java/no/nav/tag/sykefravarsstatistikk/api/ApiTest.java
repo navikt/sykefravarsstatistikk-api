@@ -29,11 +29,13 @@ public class ApiTest {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
+    private final static String ORGNR_UNDERENHET = "894834412";
+
     @Test
     public void sammenligning__skal_returnere_riktig_objekt() throws Exception {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/894834412/sammenligning"))
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET + "/sammenligning"))
                         .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
                         .GET()
                         .build(),
