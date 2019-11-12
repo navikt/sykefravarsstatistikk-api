@@ -3,11 +3,13 @@ package no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering;
 import no.nav.tag.sykefravarsstatistikk.api.common.SlettOgOpprettResultat;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkLand;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.Sykefraværsstatistikk;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkSektor;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.CreateSykefraværsstatistikkFunction;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.DeleteSykefraværsstatistikkFunction;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.SykefraværsstatistikkLandUtils;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.SykefraværsstatistikkIntegrasjonUtils;
+import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.SykefraværsstatistikkSektorUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -29,8 +31,10 @@ public class StatistikkImportRepository {
   }
 
 
-    public SlettOgOpprettResultat importSykefraværsstatistikkLand(
-          List<SykefraværsstatistikkLand> landStatistikk, ÅrstallOgKvartal årstallOgKvartal) {
+  public SlettOgOpprettResultat importSykefraværsstatistikkLand(
+          List<SykefraværsstatistikkLand> landStatistikk,
+          ÅrstallOgKvartal årstallOgKvartal
+  ) {
 
     SykefraværsstatistikkLandUtils sykefraværsstatistikkLandUtils =
         new SykefraværsstatistikkLandUtils(namedParameterJdbcTemplate);
@@ -38,7 +42,19 @@ public class StatistikkImportRepository {
     return importStats(landStatistikk, årstallOgKvartal, sykefraværsstatistikkLandUtils);
   }
 
-  public SlettOgOpprettResultat importStats(
+  public SlettOgOpprettResultat importSykefraværsstatistikkSektor(
+          List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor,
+          ÅrstallOgKvartal årstallOgKvartal
+  ) {
+
+    SykefraværsstatistikkSektorUtils sykefraværsstatistikkSektorUtils =
+            new SykefraværsstatistikkSektorUtils(namedParameterJdbcTemplate);
+
+    return importStats(sykefraværsstatistikkSektor, årstallOgKvartal, sykefraværsstatistikkSektorUtils);
+  }
+
+
+  private SlettOgOpprettResultat importStats(
       List<? extends Sykefraværsstatistikk> stats,
       ÅrstallOgKvartal årstallOgKvartal,
       SykefraværsstatistikkIntegrasjonUtils sykefraværsstatistikkIntegrasjonUtils) {

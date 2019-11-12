@@ -57,4 +57,28 @@ public class StatistikkImportService {
             årstall, kvartal, resultat.getAntallRadOpprettet(), resultat.getAntallRadSlettet()));
     return resultat;
   }
+
+  public SlettOgOpprettResultat importSykefraværsstatistikkSektor(int årstall, int kvartal) {
+    List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor =
+            datavarehusRepository.hentSykefraværsstatistikkSektor(new ÅrstallOgKvartal(årstall, kvartal));
+
+    if (sykefraværsstatistikkSektor.isEmpty()) {
+      log.info(
+              String.format(
+                      "Import av sykefraværsstatistikk (sektor) for årstall '%d' og kvartal '%d 'er ferdig. "
+                              + "Ingenting å importere.",
+                      årstall, kvartal));
+      return new SlettOgOpprettResultat(0, 0);
+    }
+
+    SlettOgOpprettResultat resultat =
+            statistikkImportRepository.importSykefraværsstatistikkSektor(
+                    sykefraværsstatistikkSektor, new ÅrstallOgKvartal(årstall, kvartal));
+    log.info(
+            String.format(
+                    "Import av sykefraværsstatistikk (land) for årstall '%d' og kvartal '%d 'er ferdig. "
+                            + "Antall opprettet: %d, antall slettet: %d",
+                    årstall, kvartal, resultat.getAntallRadOpprettet(), resultat.getAntallRadSlettet()));
+    return resultat;
+  }
 }

@@ -40,4 +40,9 @@ public class StatistikkImportController {
         return service.importSykefraværsstatistikkLand(årstall, kvartal);
     }
 
+    @PostMapping(value = "/sektor/{årstall}/{kvartal}")
+    public SlettOgOpprettResultat importSykefraværsstatistikkSektor(@PathVariable int årstall, @PathVariable int kvartal) {
+        return service.importSykefraværsstatistikkSektor(årstall, kvartal);
+    }
+
 }
