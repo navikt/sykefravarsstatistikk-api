@@ -29,6 +29,9 @@ altinn:
     code: 3403
     edition: 1
 
+enhetsregisteret:
+  url: "http://localhost:${mock.port}/enhetsregisteret/"
+
 no.nav.security.oidc:
   issuers: iss-localhost, selvbetjening
   issuer:
@@ -87,6 +90,9 @@ no.nav.security.oidc:
       discoveryurl: http://metadata
       accepted_audience: aud-localhost
 
+enhetsregisteret:
+  url: "http://localhost:1331/enhetsregisteret/"
+
 altinn:
   url: "http://localhost:1331/altinn/"
   apikey: "test"
@@ -99,6 +105,9 @@ altinn:
 
 spring:
   profiles: dev
+
+enhetsregisteret:
+  url: "https://data.brreg.no/enhetsregisteret/api/"
 
 altinn:
   url: "https://api-gw-q1.adeo.no/"
@@ -118,7 +127,7 @@ no.nav.security.oidc:
     accepted_audience: 0090b6e1-ffcc-4c37-bc21-049f7d1f0fe5
 
 datavarehus.datasource:
-  url: jdbc:oracle:thin:@dm07-scan.adeo.no:1521/dwhq0
+  url: ${DVH_DATASOURCE_URL}
   username: ${DVH_BRUKERNAVN}
   password: ${DVH_PASSORD}
   driver-class-name: oracle.jdbc.OracleDriver
@@ -127,6 +136,9 @@ datavarehus.datasource:
 
 spring:
   profiles: prod
+
+enhetsregisteret:
+  url: "https://data.brreg.no/enhetsregisteret/api/"
 
 altinn:
   url: "https://api-gw.adeo.no/"

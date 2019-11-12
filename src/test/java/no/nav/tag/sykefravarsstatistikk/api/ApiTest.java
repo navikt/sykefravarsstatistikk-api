@@ -33,7 +33,7 @@ public class ApiTest {
     public void sammenligning__skal_returnere_riktig_objekt() throws Exception {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/910820834/sammenligning"))
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/910969439/sammenligning"))
                         .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
                         .GET()
                         .build(),
@@ -48,13 +48,10 @@ public class ApiTest {
                 "\"prosent\":12.8" +
                 "}," +
                 "\"næring\":{" +
-                "\"label\":\"Offentlig næringsvirksomhet\"," +
-                "\"prosent\":3.0" +
-                "}," +
-                "\"sektor\":{" +
                 "\"label\":\"Tjenester tilknyttet informasjonsteknologi\"," +
                 "\"prosent\":5.6" +
                 "}," +
+                "\"sektor\":null," +
                 "\"land\":{" +
                 "\"label\":\"Norge\"," +
                 "\"prosent\":5.5" +

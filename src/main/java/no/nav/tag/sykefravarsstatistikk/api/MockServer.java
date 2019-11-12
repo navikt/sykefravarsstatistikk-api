@@ -2,6 +2,7 @@ package no.nav.tag.sykefravarsstatistikk.api;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
 import io.micrometer.core.instrument.util.IOUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -22,15 +23,24 @@ public class MockServer {
 
     public MockServer(
             @Value("${mock.port}") Integer port,
-            @Value("${altinn.url}") String altinnUrl
+            @Value("${altinn.url}") String altinnUrl,
+            @Value("${enhetsregisteret.url}") String enhetsregisteretUrl
     ) {
         log.info("Starter mock-server på port " + port);
 
         this.server = new WireMockServer(port);
 
         mockKallFraFil(altinnUrl + "ekstern/altinn/api/serviceowner/reportees", "altinnReportees.json");
+        mockKallFraEnhetsregisteret(enhetsregisteretUrl);
 
         server.start();
+    }
+
+    @SneakyThrows
+    private void mockKallFraEnhetsregisteret(String enhetsregisteretUrl) {
+        String path = new URL(enhetsregisteretUrl).getPath();
+        mockKall(WireMock.urlPathMatching(path + "underenheter/[0-9]{9}"), lesFilSomString("enhetsregisteretUnderenhet.json"));
+        mockKall(WireMock.urlPathMatching(path + "enheter/[0-9]{9}"), lesFilSomString("enhetsregisteretEnhet.json"));
     }
 
     private void mockKallFraFil(String url, String filnavn) {
@@ -40,8 +50,13 @@ public class MockServer {
     @SneakyThrows
     private void mockKall(String url, String body) {
         String path = new URL(url).getPath();
+        mockKall(WireMock.urlPathEqualTo(path), body);
+    }
+
+    @SneakyThrows
+    private void mockKall(UrlPathPattern urlPathPattern, String body) {
         server.stubFor(
-                WireMock.get(WireMock.urlPathEqualTo(path)).willReturn(WireMock.aResponse()
+                WireMock.get(urlPathPattern).willReturn(WireMock.aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withStatus(HttpStatus.OK.value())
                         .withBody(body)

@@ -1,0 +1,64 @@
+{
+  "organisasjonsnummer": "999263550",
+  "navn": "NAV ARBEID OG YTELSER",
+  "organisasjonsform": {
+    "kode": "ORGL",
+    "beskrivelse": "Organisasjonsledd",
+    "_links": {
+      "self": {
+        "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/ORGL"
+      }
+    }
+  },
+  "hjemmeside": "www.nav.no",
+  "postadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "0130",
+    "poststed": "OSLO",
+    "adresse": [
+      "Postboks 6944 St Olavs Plass"
+    ],
+    "kommune": "OSLO",
+    "kommunenummer": "0301"
+  },
+  "registreringsdatoEnhetsregisteret": "2012-12-12",
+  "registrertIMvaregisteret": false,
+  "naeringskode1": {
+    "beskrivelse": "Trygdeordninger underlagt offentlig forvaltning",
+    "kode": "84.300"
+  },
+  "antallAnsatte": 1621,
+  "overordnetEnhet": "991012206",
+  "forretningsadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "0164",
+    "poststed": "OSLO",
+    "adresse": [
+      "C. J. Hambros Plass 2A"
+    ],
+    "kommune": "OSLO",
+    "kommunenummer": "0301"
+  },
+  "stiftelsesdato": "2012-06-18",
+  "institusjonellSektorkode": {
+    "kode": "0",
+    "beskrivelse": "Statsforvaltningen"
+  },
+  "registrertIForetaksregisteret": false,
+  "registrertIStiftelsesregisteret": false,
+  "registrertIFrivillighetsregisteret": false,
+  "konkurs": false,
+  "underAvvikling": false,
+  "underTvangsavviklingEllerTvangsopplosning": false,
+  "maalform": "Bokmål",
+  "_links": {
+    "self": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/999263550"
+    },
+    "overordnetEnhet": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/991012206"
+    }
+  }
+}

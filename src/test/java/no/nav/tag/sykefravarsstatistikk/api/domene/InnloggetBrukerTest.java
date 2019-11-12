@@ -1,7 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.domene;
 
 import no.nav.tag.sykefravarsstatistikk.api.TestUtils;
-import no.nav.tag.sykefravarsstatistikk.api.altinn.Organisasjon;
+import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnOrganisasjon;
 import no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
 import org.junit.Test;
 
@@ -15,7 +15,7 @@ public class InnloggetBrukerTest {
     public void sjekkTilgang__kaster_ingen_Exception_hvis_bruker_har_tilgang_til_orgnr() {
         InnloggetBruker bruker = getInnloggetBruker("12345678901");
 
-        Organisasjon organisasjon = TestUtils.getOrganisasjon("123456789");
+        AltinnOrganisasjon organisasjon = TestUtils.getOrganisasjon("123456789");
         bruker.setOrganisasjoner(List.of(organisasjon));
 
         bruker.sjekkTilgang(new Orgnr(organisasjon.getOrganizationNumber()));
@@ -32,7 +32,7 @@ public class InnloggetBrukerTest {
     public void sjekkTilgang__skal_feile_hvis_bruker_ikke_har_tilgang_til_orgnr() {
         InnloggetBruker bruker = getInnloggetBruker("12345678901");
 
-        Organisasjon organisasjon = TestUtils.getOrganisasjon("123456789");
+        AltinnOrganisasjon organisasjon = TestUtils.getOrganisasjon("123456789");
         bruker.setOrganisasjoner(List.of(organisasjon));
 
         bruker.sjekkTilgang(new Orgnr("987654321"));
@@ -42,7 +42,7 @@ public class InnloggetBrukerTest {
     public void sjekkTilgang__skal_ikke_feile_selv_om_listen_med_organisasjoner_har_null() {
         InnloggetBruker bruker = getInnloggetBruker("12345678901");
 
-        List<Organisasjon> organisasjoner = List.of(
+        List<AltinnOrganisasjon> organisasjoner = List.of(
                 TestUtils.getOrganisasjon(null),
                 TestUtils.getOrganisasjon("987654321")
         );
