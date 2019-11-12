@@ -19,4 +19,10 @@ public class SykefraværprosentTest {
         assertThat(sykefraværprosent.getProsent()).isEqualTo(new BigDecimal("4.6"));
     }
 
+    @Test
+    public void sykefraværprosent__skal_gi_0_i_prosent_hvis_mulige_dagsverk_er_0() {
+        Sykefraværprosent sykefraværprosent = new Sykefraværprosent("", new BigDecimal(0), new BigDecimal(0));
+        assertThat(sykefraværprosent.getProsent()).isEqualTo(new BigDecimal(0));
+    }
+
 }

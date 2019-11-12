@@ -12,8 +12,12 @@ public class Sykefraværprosent {
 
     public Sykefraværprosent(String label, BigDecimal tapteDagsverk, BigDecimal muligeDagsverk) {
         this.label = label;
-        this.prosent = tapteDagsverk
-                .multiply(new BigDecimal(100))
-                .divide(muligeDagsverk, 1, RoundingMode.HALF_UP);
+        if (new BigDecimal(0).equals(muligeDagsverk)) {
+            this.prosent = new BigDecimal(0);
+        } else {
+            this.prosent = tapteDagsverk
+                    .multiply(new BigDecimal(100))
+                    .divide(muligeDagsverk, 1, RoundingMode.HALF_UP);
+        }
     }
 }

@@ -38,6 +38,11 @@ public class TestUtils {
         return new Orgnr("971800534");
     }
 
+
+    public static Underenhet enUnderenhet() {
+        return enUnderenhetBuilder().orgnr(getOrgnr()).build();
+    }
+
     public static Underenhet enUnderenhet(String orgnr) {
         return enUnderenhetBuilder().orgnr(new Orgnr(orgnr)).build();
     }
