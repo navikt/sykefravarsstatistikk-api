@@ -2,10 +2,7 @@ package no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.tag.sykefravarsstatistikk.api.common.SlettOgOpprettResultat;
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkLand;
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkNæring;
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkSektor;
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.*;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.DataverehusRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -39,6 +36,11 @@ public class StatistikkImportService {
   public List<SykefraværsstatistikkNæring> hentSykefraværsstatistikkNæring(ÅrstallOgKvartal årstallOgKvartal) {
     return datavarehusRepository.hentSykefraværsstatistikkNæring(årstallOgKvartal);
   }
+
+  public List<SykefraværsstatistikkVirksomhet> hentSykefraværsstatistikkVirksomhet(ÅrstallOgKvartal årstallOgKvartal) {
+    return datavarehusRepository.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal);
+  }
+
 
   public SlettOgOpprettResultat importSykefraværsstatistikkLand(ÅrstallOgKvartal årstallOgKvartal) {
     List<SykefraværsstatistikkLand> sykefraværsstatistikkLand =
@@ -95,6 +97,24 @@ public class StatistikkImportService {
     return resultat;
   }
 
+  public SlettOgOpprettResultat importSykefraværsstatistikkVirksomhet(ÅrstallOgKvartal årstallOgKvartal) {
+    List<SykefraværsstatistikkVirksomhet> sykefraværsstatistikkVirksomhet =
+            datavarehusRepository.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal);
+
+    SlettOgOpprettResultat resultat = SlettOgOpprettResultat.init();
+
+    if (!sykefraværsstatistikkVirksomhet.isEmpty()) {
+      resultat.add(
+              statistikkImportRepository.importSykefraværsstatistikkVirksomhet(
+                      sykefraværsstatistikkVirksomhet,
+                      årstallOgKvartal
+              )
+      );
+    }
+    loggResultat(årstallOgKvartal, resultat, "virksomhet");
+
+    return resultat;
+  }
 
   private static void loggResultat(ÅrstallOgKvartal årstallOgKvartal, SlettOgOpprettResultat resultat, String type) {
     String melding = resultat.getAntallRadOpprettet() == 0 && resultat.getAntallRadSlettet() == 0 ?
@@ -116,4 +136,5 @@ public class StatistikkImportService {
             )
     );
   }
+
 }
