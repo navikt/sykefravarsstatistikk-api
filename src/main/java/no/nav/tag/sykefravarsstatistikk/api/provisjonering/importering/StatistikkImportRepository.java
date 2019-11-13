@@ -37,7 +37,7 @@ public class StatistikkImportRepository {
     SykefraværsstatistikkLandUtils sykefraværsstatistikkLandUtils =
         new SykefraværsstatistikkLandUtils(namedParameterJdbcTemplate);
 
-    return importStats(landStatistikk, årstallOgKvartal, sykefraværsstatistikkLandUtils);
+    return importStatistikk(landStatistikk, årstallOgKvartal, sykefraværsstatistikkLandUtils);
   }
 
   public SlettOgOpprettResultat importSykefraværsstatistikkSektor(
@@ -48,7 +48,7 @@ public class StatistikkImportRepository {
     SykefraværsstatistikkSektorUtils sykefraværsstatistikkSektorUtils =
             new SykefraværsstatistikkSektorUtils(namedParameterJdbcTemplate);
 
-    return importStats(sykefraværsstatistikkSektor, årstallOgKvartal, sykefraværsstatistikkSektorUtils);
+    return importStatistikk(sykefraværsstatistikkSektor, årstallOgKvartal, sykefraværsstatistikkSektorUtils);
   }
 
   public SlettOgOpprettResultat importSykefraværsstatistikkNæring(
@@ -58,17 +58,17 @@ public class StatistikkImportRepository {
     SykefraværsstatistikkNæringUtils sykefraværsstatistikkNæringUtils =
             new SykefraværsstatistikkNæringUtils(namedParameterJdbcTemplate);
 
-    return importStats(sykefraværsstatistikkNæring, årstallOgKvartal, sykefraværsstatistikkNæringUtils);
+    return importStatistikk(sykefraværsstatistikkNæring, årstallOgKvartal, sykefraværsstatistikkNæringUtils);
   }
 
 
-  private SlettOgOpprettResultat importStats(
-      List<? extends Sykefraværsstatistikk> stats,
+  private SlettOgOpprettResultat importStatistikk(
+      List<? extends Sykefraværsstatistikk> sykefraværsstatistikk,
       ÅrstallOgKvartal årstallOgKvartal,
       SykefraværsstatistikkIntegrasjonUtils sykefraværsstatistikkIntegrasjonUtils) {
 
     int antallSletet = slett(årstallOgKvartal, sykefraværsstatistikkIntegrasjonUtils.getDeleteFunction());
-    int antallOprettet = opprett(stats, sykefraværsstatistikkIntegrasjonUtils.getCreateFunction());
+    int antallOprettet = opprett(sykefraværsstatistikk, sykefraværsstatistikkIntegrasjonUtils.getCreateFunction());
 
     return new SlettOgOpprettResultat(antallSletet, antallOprettet);
   }

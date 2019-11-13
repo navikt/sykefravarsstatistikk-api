@@ -27,6 +27,7 @@ public class StatistikkImportService {
     this.statistikkImportRepository = statistikkImportRepository;
   }
 
+  // TODO: DELETE ME --> bare til versifisering
   public List<SykefraværsstatistikkLand> hentSykefraværsstatistikkLand(ÅrstallOgKvartal årstallOgKvartal) {
     return datavarehusRepository.hentSykefraværsstatistikkLand(årstallOgKvartal);
   }
@@ -97,13 +98,13 @@ public class StatistikkImportService {
 
   private static void loggResultat(ÅrstallOgKvartal årstallOgKvartal, SlettOgOpprettResultat resultat, String type) {
     String melding = resultat.getAntallRadOpprettet() == 0 && resultat.getAntallRadSlettet() == 0 ?
+            "Ingenting å importere"
+            :
             String.format(
                     "Antall opprettet: %d, antall slettet: %d",
                     resultat.getAntallRadOpprettet(),
                     resultat.getAntallRadSlettet()
-            )
-            :
-            "Ingenting å importere";
+            );
 
     log.info(
             String.format(
