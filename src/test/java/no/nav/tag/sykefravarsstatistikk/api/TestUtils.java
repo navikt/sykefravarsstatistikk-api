@@ -4,9 +4,11 @@ import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnOrganisasjon;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
+import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 public class TestUtils {
@@ -58,6 +60,14 @@ public class TestUtils {
     }
 
     public static Næringskode5Siffer enNæringskode5Siffer() {
-        return new Næringskode5Siffer("12345", "Spesiell næring");
+        return enNæringskode5Siffer("12345");
+    }
+
+    public static Næringskode5Siffer enNæringskode5Siffer(String kode) {
+        return new Næringskode5Siffer(kode, "Spesiell næring");
+    }
+
+    public static Sykefraværprosent enSykefraværprosent(String label, int tapteDagsverk, int muligeDagsverk) {
+        return new Sykefraværprosent(label, new BigDecimal(tapteDagsverk), new BigDecimal(muligeDagsverk));
     }
 }
