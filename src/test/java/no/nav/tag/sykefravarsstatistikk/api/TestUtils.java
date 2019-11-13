@@ -4,7 +4,11 @@ import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnOrganisasjon;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
+import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 public class TestUtils {
@@ -34,5 +38,36 @@ public class TestUtils {
 
     public static Orgnr getOrgnr() {
         return new Orgnr("971800534");
+    }
+
+
+    public static Underenhet enUnderenhet() {
+        return enUnderenhetBuilder().orgnr(getOrgnr()).build();
+    }
+
+    public static Underenhet enUnderenhet(String orgnr) {
+        return enUnderenhetBuilder().orgnr(new Orgnr(orgnr)).build();
+    }
+
+    public static Underenhet.UnderenhetBuilder enUnderenhetBuilder() {
+        return Underenhet.builder()
+                .orgnr(getOrgnr())
+                .overordnetEnhetOrgnr(new Orgnr("053497180"))
+                .navn("Underenhet AS")
+                .næringskode(enNæringskode5Siffer())
+                .antallAnsatte(40);
+
+    }
+
+    public static Næringskode5Siffer enNæringskode5Siffer() {
+        return enNæringskode5Siffer("12345");
+    }
+
+    public static Næringskode5Siffer enNæringskode5Siffer(String kode) {
+        return new Næringskode5Siffer(kode, "Spesiell næring");
+    }
+
+    public static Sykefraværprosent enSykefraværprosent(String label, int tapteDagsverk, int muligeDagsverk) {
+        return new Sykefraværprosent(label, new BigDecimal(tapteDagsverk), new BigDecimal(muligeDagsverk));
     }
 }

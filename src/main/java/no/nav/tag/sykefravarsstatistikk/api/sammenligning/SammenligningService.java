@@ -28,13 +28,12 @@ public class SammenligningService {
             Orgnr orgnr
     ) {
         Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
-        String næring2siffer = underenhet.getNæringskode().hentNæringskode2Siffer();
 
         return new Sammenligning(
                 KVARTAL,
                 ARSTALL,
-                sykefravarprosentRepository.hentSykefraværprosentVirksomhet(ARSTALL, KVARTAL, orgnr.getVerdi()),
-                sykefravarprosentRepository.hentSykefraværprosentNæring(ARSTALL, KVARTAL, næring2siffer),
+                sykefravarprosentRepository.hentSykefraværprosentVirksomhet(ARSTALL, KVARTAL, underenhet),
+                sykefravarprosentRepository.hentSykefraværprosentNæring(ARSTALL, KVARTAL, underenhet.getNæringskode()),
                 null,
                 sykefravarprosentRepository.hentSykefraværprosentLand(ARSTALL, KVARTAL)
         );
