@@ -1,14 +1,12 @@
 package no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering;
 
 import no.nav.tag.sykefravarsstatistikk.api.common.SlettOgOpprettResultat;
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkLand;
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.Sykefraværsstatistikk;
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkSektor;
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.*;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.CreateSykefraværsstatistikkFunction;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.DeleteSykefraværsstatistikkFunction;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.SykefraværsstatistikkLandUtils;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.SykefraværsstatistikkIntegrasjonUtils;
+import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.SykefraværsstatistikkNæringUtils;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.SykefraværsstatistikkSektorUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
@@ -51,6 +49,16 @@ public class StatistikkImportRepository {
             new SykefraværsstatistikkSektorUtils(namedParameterJdbcTemplate);
 
     return importStats(sykefraværsstatistikkSektor, årstallOgKvartal, sykefraværsstatistikkSektorUtils);
+  }
+
+  public SlettOgOpprettResultat importSykefraværsstatistikkNæring(
+          List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring,
+          ÅrstallOgKvartal årstallOgKvartal
+  ) {
+    SykefraværsstatistikkNæringUtils sykefraværsstatistikkNæringUtils =
+            new SykefraværsstatistikkNæringUtils(namedParameterJdbcTemplate);
+
+    return importStats(sykefraværsstatistikkNæring, årstallOgKvartal, sykefraværsstatistikkNæringUtils);
   }
 
 

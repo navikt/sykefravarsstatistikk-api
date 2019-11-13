@@ -53,8 +53,8 @@ public class SykefraværsstatistikkSektorUtilsJdbcTest {
                 new SykefraværsstatistikkSektor(
                         2019,
                         1,
-                        14,
                         "3",
+                        14,
                         new BigDecimal(55.123),
                         new BigDecimal(856.891)
                 )

@@ -58,7 +58,7 @@ public class DataverehusRepositoryJdbcTest {
                 repository.hentSykefraværsstatistikkSektor(new ÅrstallOgKvartal(2018, 4));
 
         assertTrue(sykefraværsstatistikkSektor.size() == 1);
-        SykefraværsstatistikkSektor sykefraværsstatistikkSektorExpected = new SykefraværsstatistikkSektor(2018, 4, 4, "1", new BigDecimal(15), new BigDecimal(200));
+        SykefraværsstatistikkSektor sykefraværsstatistikkSektorExpected = new SykefraværsstatistikkSektor(2018, 4, "1", 4, new BigDecimal(15), new BigDecimal(200));
         SykefraværsstatistikkSektor sykefraværsstatistikkSektorActual = sykefraværsstatistikkSektor.get(0);
         assertTrue(new ReflectionEquals(sykefraværsstatistikkSektorExpected).matches(sykefraværsstatistikkSektorActual));
     }
