@@ -6,12 +6,14 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
+@Profile({"dev", "local"})
 @Protected
 @RestController
 @Slf4j
