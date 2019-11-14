@@ -30,7 +30,6 @@ public class ApiTest {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private final static String ORGNR_UNDERENHET = "822565212";
-    // private final static String ORGNR_UNDERENHET = "894834412";
 
     @Test
     public void sammenligning__skal_returnere_riktig_objekt() throws Exception {
