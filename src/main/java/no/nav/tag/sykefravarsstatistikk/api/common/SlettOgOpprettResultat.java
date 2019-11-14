@@ -17,7 +17,7 @@ public class SlettOgOpprettResultat {
         antallRadSlettet = antallRadSlettet + resultat.getAntallRadSlettet();
     }
 
-    public static SlettOgOpprettResultat init() {
+    public static SlettOgOpprettResultat tomtResultat() {
         return new SlettOgOpprettResultat(0, 0);
     }
 }

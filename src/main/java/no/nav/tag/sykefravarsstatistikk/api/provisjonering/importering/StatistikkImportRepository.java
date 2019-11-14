@@ -69,10 +69,15 @@ public class StatistikkImportRepository {
   }
 
 
-  private SlettOgOpprettResultat importStatistikk(
-      List<? extends Sykefraværsstatistikk> sykefraværsstatistikk,
-      ÅrstallOgKvartal årstallOgKvartal,
-      SykefraværsstatistikkIntegrasjonUtils sykefraværsstatistikkIntegrasjonUtils) {
+  SlettOgOpprettResultat importStatistikk(
+          List<? extends Sykefraværsstatistikk> sykefraværsstatistikk,
+          ÅrstallOgKvartal årstallOgKvartal,
+          SykefraværsstatistikkIntegrasjonUtils sykefraværsstatistikkIntegrasjonUtils
+  ) {
+
+    if (sykefraværsstatistikk.isEmpty()) {
+      return SlettOgOpprettResultat.tomtResultat();
+    }
 
     int antallSletet = slett(årstallOgKvartal, sykefraværsstatistikkIntegrasjonUtils.getDeleteFunction());
     int antallOprettet = opprett(sykefraværsstatistikk, sykefraværsstatistikkIntegrasjonUtils.getCreateFunction());

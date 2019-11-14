@@ -24,6 +24,7 @@ public class StatistikkImportController {
         this.service = service;
     }
 
+    // TODO: DELETE ME! fjerne disse GET endepunkter som brukes til verifisering i dev miljø
     @GetMapping(value = "/verif/datavarehus/sykefravar/land/{årstall}/{kvartal}")
     public List<SykefraværsstatistikkLand> hentSykefraværsstatistikkLand(@PathVariable int årstall, @PathVariable int kvartal) {
         return service.hentSykefraværsstatistikkLand(new ÅrstallOgKvartal(årstall, kvartal));

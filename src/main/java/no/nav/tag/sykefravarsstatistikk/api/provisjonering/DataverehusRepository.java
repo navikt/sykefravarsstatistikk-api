@@ -22,7 +22,6 @@ public class DataverehusRepository {
     public static final String NARINGKODE = "naringkode";
     public static final String NARINGNAVN = "naringnavn";
     public static final String SEKTORKODE = "sektorkode";
-    public static final String NÆRINGKODE = "næringkode";
     public static final String SEKTORNAVN = "sektornavn";
 
 
@@ -62,7 +61,7 @@ public class DataverehusRepository {
                         "from dt_p.v_agg_ia_sykefravar_land " +
                         "where kjonn != 'X' and naring != 'X' " +
                         "and arstall = :arstall and kvartal = :kvartal " +
-                        "group by arstall, kvartal order by arstall, kvartal",
+                        "group by arstall, kvartal",
                 namedParameters,
                 (resultSet, rowNum) ->
                         new SykefraværsstatistikkLand(
@@ -87,7 +86,7 @@ public class DataverehusRepository {
                         "from dt_p.v_agg_ia_sykefravar_land " +
                         "where kjonn != 'X' and naring != 'X' " +
                         "and arstall = :arstall and kvartal = :kvartal " +
-                        "group by arstall, kvartal, sektor order by arstall, kvartal, sektor",
+                        "group by arstall, kvartal, sektor",
                 namedParameters,
                 (resultSet, rowNum) ->
                         new SykefraværsstatistikkSektor(
@@ -113,7 +112,7 @@ public class DataverehusRepository {
                         "from dt_p.v_agg_ia_sykefravar_naring " +
                         "where kjonn != 'X' and naring != 'X' " +
                         "and arstall = :arstall and kvartal = :kvartal " +
-                        "group by arstall, kvartal, naring order by arstall, kvartal, naring",
+                        "group by arstall, kvartal, naring",
                 namedParameters,
                 (resultSet, rowNum) ->
                         new SykefraværsstatistikkNæring(
@@ -124,7 +123,6 @@ public class DataverehusRepository {
                                 resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
                                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
     }
-
 
     public List<SykefraværsstatistikkVirksomhet> hentSykefraværsstatistikkVirksomhet(ÅrstallOgKvartal årstallOgKvartal) {
         SqlParameterSource namedParameters =
@@ -189,5 +187,4 @@ public class DataverehusRepository {
                                 resultSet.getString(NARINGKODE),
                                 resultSet.getString(NARINGNAVN)));
     }
-
 }
