@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.provisjonering;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkLand;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkSektor;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppe;
@@ -9,6 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -45,11 +47,27 @@ public class DataverehusRepositoryJdbcTest {
         cleanUpTestDb(namedParameterJdbcTemplate);
     }
 
+
+    @Test
+    public void hentSykefraværsstatistikkSektor_lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 1,5, 100);
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, 10, 100);
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
+
+        List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor =
+                repository.hentSykefraværsstatistikkSektor(new ÅrstallOgKvartal(2018, 4));
+
+        assertTrue(sykefraværsstatistikkSektor.size() == 1);
+        SykefraværsstatistikkSektor sykefraværsstatistikkSektorExpected = new SykefraværsstatistikkSektor(2018, 4, "1", 4, new BigDecimal(15), new BigDecimal(200));
+        SykefraværsstatistikkSektor sykefraværsstatistikkSektorActual = sykefraværsstatistikkSektor.get(0);
+        assertTrue(new ReflectionEquals(sykefraværsstatistikkSektorExpected).matches(sykefraværsstatistikkSektorActual));
+    }
+
     @Test
     public void hentSykefraværsstatistikkLand_lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 5, 100);
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 10, 100);
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 10);
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, 5, 100);
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, 10, 100);
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
 
         List<SykefraværsstatistikkLand> sykefraværsstatistikkLand =
                 repository.hentSykefraværsstatistikkLand(new ÅrstallOgKvartal(2018, 4));
@@ -59,6 +77,7 @@ public class DataverehusRepositoryJdbcTest {
                 new SykefraværsstatistikkLand(
                         2018,
                         4,
+                        10,
                         new BigDecimal(15).setScale(6),
                         new BigDecimal(200).setScale(6)
                 ),
@@ -67,7 +86,7 @@ public class DataverehusRepositoryJdbcTest {
 
     @Test
     public void hentSykefraværsstatistikkLand_returnerer_en_tom_liste_dersom_ingen_data_finnes_i_DVH() {
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 10);
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
 
         List<SykefraværsstatistikkLand> sykefraværsstatistikkLand =
                 repository.hentSykefraværsstatistikkLand(new ÅrstallOgKvartal(2018, 4));
@@ -165,12 +184,14 @@ public class DataverehusRepositoryJdbcTest {
             NamedParameterJdbcTemplate jdbcTemplate,
             int årstall,
             int kvartal,
+            int antallPersoner,
             long taptedagsverk,
             long muligedagsverk) {
         MapSqlParameterSource params =
                 new MapSqlParameterSource()
                         .addValue("arstall", årstall)
                         .addValue("kvartal", kvartal)
+                        .addValue("antpers", antallPersoner)
                         .addValue("taptedv", taptedagsverk)
                         .addValue("muligedv", muligedagsverk);
 
@@ -181,14 +202,14 @@ public class DataverehusRepositoryJdbcTest {
                         + "alder, kjonn, "
                         + "fylkbo, fylknavn, "
                         + "varighet, sektor, sektornavn, "
-                        + "taptedv, muligedv) "
+                        + "taptedv, muligedv, antpers) "
                         + "VALUES ("
                         + ":arstall, :kvartal, "
                         + "'41', 'Bygge- og anleggsvirksomhet', "
                         + "'D', 'M', "
                         + "'06', 'Buskerud', "
                         + "'B', '1', 'Statlig forvaltning', "
-                        + ":taptedv, :muligedv)",
+                        + ":taptedv, :muligedv, :antpers)",
                 params);
     }
 }

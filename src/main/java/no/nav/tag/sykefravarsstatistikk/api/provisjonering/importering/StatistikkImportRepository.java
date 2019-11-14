@@ -1,13 +1,13 @@
 package no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering;
 
 import no.nav.tag.sykefravarsstatistikk.api.common.SlettOgOpprettResultat;
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkLand;
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.Sykefraværsstatistikk;
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.*;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.CreateSykefraværsstatistikkFunction;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.DeleteSykefraværsstatistikkFunction;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.SykefraværsstatistikkLandUtils;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.SykefraværsstatistikkIntegrasjonUtils;
+import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.SykefraværsstatistikkNæringUtils;
+import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.SykefraværsstatistikkSektorUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -29,22 +29,51 @@ public class StatistikkImportRepository {
   }
 
 
-    public SlettOgOpprettResultat importSykefraværsstatistikkLand(
-          List<SykefraværsstatistikkLand> landStatistikk, ÅrstallOgKvartal årstallOgKvartal) {
+  public SlettOgOpprettResultat importSykefraværsstatistikkLand(
+          List<SykefraværsstatistikkLand> landStatistikk,
+          ÅrstallOgKvartal årstallOgKvartal
+  ) {
 
     SykefraværsstatistikkLandUtils sykefraværsstatistikkLandUtils =
         new SykefraværsstatistikkLandUtils(namedParameterJdbcTemplate);
 
-    return importStats(landStatistikk, årstallOgKvartal, sykefraværsstatistikkLandUtils);
+    return importStatistikk(landStatistikk, årstallOgKvartal, sykefraværsstatistikkLandUtils);
   }
 
-  public SlettOgOpprettResultat importStats(
-      List<? extends Sykefraværsstatistikk> stats,
-      ÅrstallOgKvartal årstallOgKvartal,
-      SykefraværsstatistikkIntegrasjonUtils sykefraværsstatistikkIntegrasjonUtils) {
+  public SlettOgOpprettResultat importSykefraværsstatistikkSektor(
+          List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor,
+          ÅrstallOgKvartal årstallOgKvartal
+  ) {
+
+    SykefraværsstatistikkSektorUtils sykefraværsstatistikkSektorUtils =
+            new SykefraværsstatistikkSektorUtils(namedParameterJdbcTemplate);
+
+    return importStatistikk(sykefraværsstatistikkSektor, årstallOgKvartal, sykefraværsstatistikkSektorUtils);
+  }
+
+  public SlettOgOpprettResultat importSykefraværsstatistikkNæring(
+          List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring,
+          ÅrstallOgKvartal årstallOgKvartal
+  ) {
+    SykefraværsstatistikkNæringUtils sykefraværsstatistikkNæringUtils =
+            new SykefraværsstatistikkNæringUtils(namedParameterJdbcTemplate);
+
+    return importStatistikk(sykefraværsstatistikkNæring, årstallOgKvartal, sykefraværsstatistikkNæringUtils);
+  }
+
+
+  SlettOgOpprettResultat importStatistikk(
+          List<? extends Sykefraværsstatistikk> sykefraværsstatistikk,
+          ÅrstallOgKvartal årstallOgKvartal,
+          SykefraværsstatistikkIntegrasjonUtils sykefraværsstatistikkIntegrasjonUtils
+  ) {
+
+    if (sykefraværsstatistikk.isEmpty()) {
+      return SlettOgOpprettResultat.tomtResultat();
+    }
 
     int antallSletet = slett(årstallOgKvartal, sykefraværsstatistikkIntegrasjonUtils.getDeleteFunction());
-    int antallOprettet = opprett(stats, sykefraværsstatistikkIntegrasjonUtils.getCreateFunction());
+    int antallOprettet = opprett(sykefraværsstatistikk, sykefraværsstatistikkIntegrasjonUtils.getCreateFunction());
 
     return new SlettOgOpprettResultat(antallSletet, antallOprettet);
   }

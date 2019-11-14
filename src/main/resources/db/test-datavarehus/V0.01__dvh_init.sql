@@ -1,20 +1,20 @@
 -- Tabeller fra datavarehus
 create schema dt_p;
 
-create table dt_p.V_DIM_IA_SEKTOR
+create table dt_p.v_dim_ia_sektor
 (
     sektorkode char(1),
     sektornavn varchar(60)
 );
 
-create table dt_p.V_DIM_IA_FGRP_NARING_SN2007
+create table dt_p.v_dim_ia_fgrp_naring_sn2007
 (
     nargrpkode char(2) not null,
     nargrpnavn varchar(60) not null,
     primary key (nargrpkode)
 );
 
-create table dt_p.V_DIM_IA_NARING_SN2007
+create table dt_p.v_dim_ia_naring_sn2007
 (
     naringkode char(2) not null,
     nargrpkode char(2) not null,
@@ -22,7 +22,7 @@ create table dt_p.V_DIM_IA_NARING_SN2007
     constraint r1_naring_sn2007_pk primary key (naringkode)
 );
 
-create table dt_p.V_AGG_IA_SYKEFRAVAR_LAND
+create table dt_p.v_agg_ia_sykefravar_land
 (
      arstall char(4) not null,
      kvartal char(1) not null,
@@ -47,4 +47,16 @@ create table dt_p.V_AGG_IA_SYKEFRAVAR_LAND
      ia3_taptedv decimal(14,6),
      ia3_muligedv decimal(15,6),
      ia3_antpers decimal(7,0)
-)
+);
+
+create table dt_p.v_agg_ia_sykefravar_naring
+(
+    arstall char(4) not null,
+    kvartal char(1) not null,
+    naring char(2) not null,
+    alder char(1) not null,
+    kjonn char(1) not null,
+    taptedv decimal(14,6),
+    muligedv decimal(15,6),
+    antpers decimal(7,0)
+);
