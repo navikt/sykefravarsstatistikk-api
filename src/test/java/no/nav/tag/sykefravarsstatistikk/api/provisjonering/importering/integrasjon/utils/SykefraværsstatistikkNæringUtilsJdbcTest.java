@@ -48,7 +48,7 @@ public class SykefraværsstatistikkNæringUtilsJdbcTest {
 
 
     @Test
-    public void skal_lagre_data_i_lokale_sykefraværstatistikk_tabellen(){
+    public void createFunction_apply__skal_lagre_data_i_lokale_sykefraværstatistikk_tabellen(){
         CreateSykefraværsstatistikkFunction createFunction = utils.getCreateFunction();
         createFunction.apply(
                 new SykefraværsstatistikkNæring(
@@ -67,7 +67,7 @@ public class SykefraværsstatistikkNæringUtilsJdbcTest {
     }
 
     @Test
-    public void skal_slette_data_i_lokale_sykefraværstatistikk_tabellen(){
+    public void createFunction_delete__skal_slette_data_i_lokale_sykefraværstatistikk_tabellen(){
         lagreSykefraværprosentNæring(namedParameterJdbcTemplate, "01", 2018, 3);
         lagreSykefraværprosentNæring(namedParameterJdbcTemplate, "02", 2018, 3);
         lagreSykefraværprosentNæring(namedParameterJdbcTemplate, "01", 2018, 4);

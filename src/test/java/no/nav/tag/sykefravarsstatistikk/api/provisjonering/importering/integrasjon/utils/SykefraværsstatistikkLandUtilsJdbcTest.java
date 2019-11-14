@@ -47,7 +47,7 @@ public class SykefraværsstatistikkLandUtilsJdbcTest {
 
 
     @Test
-    public void skal_lagre_data_i_lokale_sykefraværstatistikk_tabellen(){
+    public void createFunction_apply__skal_lagre_data_i_lokale_sykefraværstatistikk_tabellen(){
         CreateSykefraværsstatistikkFunction createFunction = utils.getCreateFunction();
         createFunction.apply(new SykefraværsstatistikkLand(2019, 1, 14, new BigDecimal(55.123), new BigDecimal(856.891)));
 
@@ -57,7 +57,7 @@ public class SykefraværsstatistikkLandUtilsJdbcTest {
     }
 
     @Test
-    public void skal_slette_data_i_lokale_sykefraværstatistikk_tabellen(){
+    public void deleteFunction_apply__skal_slette_data_i_lokale_sykefraværstatistikk_tabellen(){
         lagreSykefraværprosentLand(namedParameterJdbcTemplate, 2018, 3);
         lagreSykefraværprosentLand(namedParameterJdbcTemplate, 2018, 4);
         lagreSykefraværprosentLand(namedParameterJdbcTemplate, 2019, 1);
