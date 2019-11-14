@@ -43,16 +43,11 @@ public class StatistikkImportService {
   public SlettOgOpprettResultat importSykefraværsstatistikkLand(ÅrstallOgKvartal årstallOgKvartal) {
     List<SykefraværsstatistikkLand> sykefraværsstatistikkLand =
         datavarehusRepository.hentSykefraværsstatistikkLand(årstallOgKvartal);
-    SlettOgOpprettResultat resultat = SlettOgOpprettResultat.init();
 
-    if (!sykefraværsstatistikkLand.isEmpty()) {
-      resultat.add(
-              statistikkImportRepository.importSykefraværsstatistikkLand(
-                      sykefraværsstatistikkLand,
-                      årstallOgKvartal
-              )
-      );
-    }
+    SlettOgOpprettResultat resultat = statistikkImportRepository.importSykefraværsstatistikkLand(
+            sykefraværsstatistikkLand,
+            årstallOgKvartal
+    );
     loggResultat(årstallOgKvartal, resultat, "land");
 
     return resultat;
@@ -61,16 +56,11 @@ public class StatistikkImportService {
   public SlettOgOpprettResultat importSykefraværsstatistikkSektor(ÅrstallOgKvartal årstallOgKvartal) {
     List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor =
             datavarehusRepository.hentSykefraværsstatistikkSektor(årstallOgKvartal);
-    SlettOgOpprettResultat resultat = SlettOgOpprettResultat.init();
 
-    if (!sykefraværsstatistikkSektor.isEmpty()) {
-      resultat.add(
-              statistikkImportRepository.importSykefraværsstatistikkSektor(
-                      sykefraværsstatistikkSektor,
-                      årstallOgKvartal
-              )
-      );
-    }
+    SlettOgOpprettResultat resultat = statistikkImportRepository.importSykefraværsstatistikkSektor(
+            sykefraværsstatistikkSektor,
+            årstallOgKvartal
+    );
     loggResultat(årstallOgKvartal, resultat, "sektor");
 
     return resultat;
@@ -80,16 +70,10 @@ public class StatistikkImportService {
     List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring =
             datavarehusRepository.hentSykefraværsstatistikkNæring(årstallOgKvartal);
 
-    SlettOgOpprettResultat resultat = SlettOgOpprettResultat.init();
-
-    if (!sykefraværsstatistikkNæring.isEmpty()) {
-      resultat.add(
-              statistikkImportRepository.importSykefraværsstatistikkNæring(
-                      sykefraværsstatistikkNæring,
-                      årstallOgKvartal
-              )
-      );
-    }
+    SlettOgOpprettResultat resultat = statistikkImportRepository.importSykefraværsstatistikkNæring(
+            sykefraværsstatistikkNæring,
+            årstallOgKvartal
+    );
     loggResultat(årstallOgKvartal, resultat, "næring");
 
     return resultat;
