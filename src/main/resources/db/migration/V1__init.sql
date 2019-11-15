@@ -24,6 +24,7 @@ create table sykefravar_statistikk_land (
   opprettet timestamp not null default current_timestamp,
   arstall smallint not null,
   kvartal smallint not null,
+  antall_personer numeric(17,0) not null default 0,
   tapte_dagsverk numeric(17,6) not null,
   mulige_dagsverk numeric(17,6) not null
 );
@@ -33,6 +34,7 @@ create table sykefravar_statistikk_sektor (
   opprettet timestamp not null default current_timestamp,
   arstall smallint not null,
   kvartal smallint not null,
+  antall_personer numeric(17,0) not null default 0,
   sektor_kode varchar not null,
   tapte_dagsverk numeric(17,6) not null,
   mulige_dagsverk numeric(17,6) not null
@@ -43,6 +45,7 @@ create table sykefravar_statistikk_naring (
   opprettet timestamp not null default current_timestamp,
   arstall smallint not null,
   kvartal smallint not null,
+  antall_personer numeric(17,0) not null default 0,
   naring_kode varchar not null,
   tapte_dagsverk numeric(17,6) not null,
   mulige_dagsverk numeric(17,6) not null,
@@ -55,6 +58,7 @@ create table sykefravar_statistikk_virksomhet (
   opprettet timestamp not null default current_timestamp,
   arstall smallint not null,
   kvartal smallint not null,
+  antall_personer numeric(17,0) not null default 0,
   orgnr varchar(20) not null,
   tapte_dagsverk numeric(17,6) not null,
   mulige_dagsverk numeric(17,6) not null
