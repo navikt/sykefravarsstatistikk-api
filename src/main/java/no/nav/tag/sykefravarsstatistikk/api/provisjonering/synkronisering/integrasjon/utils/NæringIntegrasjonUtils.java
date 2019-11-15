@@ -31,7 +31,7 @@ public class NæringIntegrasjonUtils extends VirksomhetsklassifikasjonIntegrasjo
                     try {
                         Næring hentetNæring =
                                 namedParameterJdbcTemplate.queryForObject(
-                                        "select naringsgruppe_kode, kode, navn from naring where kode = :kode",
+                                        "select kode, navn from naring where kode = :kode",
                                         namedParameters,
                                         (resultSet, rowNum) -> mapTilNæring(resultSet));
                         return Optional.of(hentetNæring);
@@ -49,11 +49,10 @@ public class NæringIntegrasjonUtils extends VirksomhetsklassifikasjonIntegrasjo
                     SqlParameterSource namedParameters =
                             new MapSqlParameterSource()
                                     .addValue(KODE, næring.getKode())
-                                    .addValue(NARINGSGRUPPE_KODE, næring.getNæringsgruppeKode())
                                     .addValue(NAVN, næring.getNavn());
 
                     return namedParameterJdbcTemplate.update(
-                            "insert into naring (kode, naringsgruppe_kode, navn)  " +
+                            "insert into naring (kode, navn)  " +
                                     "values (:kode, :naringsgruppe_kode, :navn)",
                             namedParameters
                     );
@@ -69,11 +68,10 @@ public class NæringIntegrasjonUtils extends VirksomhetsklassifikasjonIntegrasjo
                     SqlParameterSource namedParameters =
                             new MapSqlParameterSource()
                                     .addValue(KODE, eksisterendeNæring.getKode())
-                                    .addValue(NARINGSGRUPPE_KODE, eksisterendeNæring.getNæringsgruppeKode())
                                     .addValue(NAVN, næring.getNavn());
 
                     return namedParameterJdbcTemplate.update(
-                            "update naring set navn = :navn, naringsgruppe_kode = :naringsgruppe_kode " +
+                            "update naring set navn = :navn " +
                                     "where kode = :kode",
                             namedParameters
                     );
@@ -84,7 +82,7 @@ public class NæringIntegrasjonUtils extends VirksomhetsklassifikasjonIntegrasjo
 
 
     private static Næring mapTilNæring(ResultSet rs) throws SQLException {
-        return new Næring(rs.getString(NARINGSGRUPPE_KODE), rs.getString(KODE), rs.getString(NAVN));
+        return new Næring(rs.getString(KODE), rs.getString(NAVN));
     }
 }
 

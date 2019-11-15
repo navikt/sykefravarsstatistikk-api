@@ -2,11 +2,9 @@ package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering;
 
 import no.nav.tag.sykefravarsstatistikk.api.common.OpprettEllerOppdaterResultat;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
-import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppe;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Virksomhetsklassifikasjon;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.utils.NæringIntegrasjonUtils;
-import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.utils.NæringsgruppeIntegrasjonUtils;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.utils.SektorIntegrasjonUtils;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.utils.VirksomhetsklassifikasjonIntegrasjonUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,10 +28,6 @@ public class VirksomhetsklassifikasjonerSynkroniseringRepository {
 
   public OpprettEllerOppdaterResultat opprettEllerOppdaterSektorer(List<Sektor> sektorerIDatavarehus) {
       return opprettEllerOppdater(sektorerIDatavarehus, new SektorIntegrasjonUtils(namedParameterJdbcTemplate));
-  }
-
-  public OpprettEllerOppdaterResultat opprettEllerOppdaterNæringsgrupper(List<Næringsgruppe> næringsgrupper) {
-      return opprettEllerOppdater(næringsgrupper, new NæringsgruppeIntegrasjonUtils(namedParameterJdbcTemplate));
   }
 
   public OpprettEllerOppdaterResultat opprettEllerOppdaterNæringer(List<Næring> næringer) {

@@ -2,7 +2,6 @@ package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.tag.sykefravarsstatistikk.api.common.OpprettEllerOppdaterResultat;
-import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppe;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.DataverehusRepository;
@@ -43,7 +42,6 @@ public class VirksomhetsklassifikasjonerSynkroniseringService {
     }
 
     public OpprettEllerOppdaterResultat populerNæringskoder() {
-        populerNæringsgrupper();
         return populerNæringer();
     }
 
@@ -53,20 +51,6 @@ public class VirksomhetsklassifikasjonerSynkroniseringService {
     }
 
 
-    private OpprettEllerOppdaterResultat populerNæringsgrupper() {
-
-        List<Næringsgruppe> næringsgrupper = datavarehusRepository.hentAlleNæringsgrupper();
-        OpprettEllerOppdaterResultat resultat =
-                virksomhetsklassifikasjonerSynkroniseringRepository.opprettEllerOppdaterNæringsgrupper(næringsgrupper);
-        log.info(
-                String.format(
-                        "Import av næringsgrupper er ferdig. Antall opprettet: %d, antall oppdatert: %d",
-                        resultat.getAntallRadOpprettet(),
-                        resultat.getAntallRadOppdatert()
-                )
-        );
-        return resultat;
-    }
 
     private OpprettEllerOppdaterResultat populerNæringer() {
 

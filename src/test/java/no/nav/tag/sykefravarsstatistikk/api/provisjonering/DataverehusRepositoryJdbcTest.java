@@ -134,31 +134,18 @@ public class DataverehusRepositoryJdbcTest {
 
     @Test
     public void hentNæring_returnerer_eksisterende_Næring() {
-        insertNæringsgruppeInDvhTabell(namedParameterJdbcTemplate, "B", "Jordbruk, skogbruk og fiske");
-        insertNæringInDvhTabell(namedParameterJdbcTemplate, "14", "B", "Jordbruk, skogbruk og fiske");
-        insertNæringInDvhTabell(namedParameterJdbcTemplate, "15", "B", "Turisme");
+        insertNæringInDvhTabell(namedParameterJdbcTemplate, "02", "01", "Skogbruk og tjenester tilknyttet skogbruk");
+        insertNæringInDvhTabell(namedParameterJdbcTemplate, "11", "10", "Produksjon av drikkevarer");
 
         List<Næring> næringer = repository.hentAlleNæringer();
 
-        assertTrue(næringer.contains(new Næring("B", "14", "Jordbruk, skogbruk og fiske")));
-        assertTrue(næringer.contains(new Næring("B", "15", "Turisme")));
-    }
-
-    @Test
-    public void hentNæringsgruppe_returnerer_eksisterende_Næringsgruppe() {
-        insertNæringsgruppeInDvhTabell(namedParameterJdbcTemplate, "B", "Jordbruk, skogbruk og fiske");
-        insertNæringsgruppeInDvhTabell(namedParameterJdbcTemplate, "C", "Industri");
-
-        List<Næringsgruppe> næringsgrupper = repository.hentAlleNæringsgrupper();
-
-        assertTrue(næringsgrupper.contains(new Næringsgruppe("C", "Industri")));
-        assertTrue(næringsgrupper.contains(new Næringsgruppe("B", "Jordbruk, skogbruk og fiske")));
+        assertTrue(næringer.contains(new Næring("02", "Skogbruk og tjenester tilknyttet skogbruk")));
+        assertTrue(næringer.contains(new Næring("11", "Produksjon av drikkevarer")));
     }
 
 
     private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
         delete(jdbcTemplate, "dt_p.v_dim_ia_naring_sn2007");
-        delete(jdbcTemplate, "dt_p.v_dim_ia_fgrp_naring_sn2007");
         delete(jdbcTemplate, "dt_p.v_dim_ia_sektor");
         delete(jdbcTemplate, "dt_p.v_agg_ia_sykefravar_land");
         delete(jdbcTemplate, "dt_p.v_agg_ia_sykefravar");
@@ -179,19 +166,6 @@ public class DataverehusRepositoryJdbcTest {
                 "insert into dt_p.v_dim_ia_sektor (sektorkode, sektornavn) "
                         + "values (:sektorkode, :sektornavn)",
                 params);
-    }
-
-    private static void insertNæringsgruppeInDvhTabell(
-            NamedParameterJdbcTemplate jdbcTemplate, String næringsgruppekode, String næringsgruppenavn) {
-        MapSqlParameterSource naringsgruppeParams =
-                new MapSqlParameterSource()
-                        .addValue("nargrpkode", næringsgruppekode)
-                        .addValue("nargrpnavn", næringsgruppenavn);
-
-        jdbcTemplate.update(
-                "insert into dt_p.v_dim_ia_fgrp_naring_sn2007 (nargrpkode, nargrpnavn) "
-                        + "values (:nargrpkode, :nargrpnavn)",
-                naringsgruppeParams);
     }
 
     private static void insertNæringInDvhTabell(

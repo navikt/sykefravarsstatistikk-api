@@ -118,7 +118,6 @@ public class SykefraværsstatistikkNæringUtilsJdbcTest {
     private static void cleanUpLokalTestDb(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         delete(namedParameterJdbcTemplate, "sykefravar_statistikk_naring");
         delete(namedParameterJdbcTemplate, "naring");
-        delete(namedParameterJdbcTemplate, "naringsgruppe");
     }
 
     private static void delete(NamedParameterJdbcTemplate namedParameterJdbcTemplate, String tabell) {
@@ -129,38 +128,20 @@ public class SykefraværsstatistikkNæringUtilsJdbcTest {
     }
 
     private static void opprettDimensjoner(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-        opprettNæringsgruppe(namedParameterJdbcTemplate, "1", "Jordbruk, skogbruk og fiske");
-        opprettNæring(namedParameterJdbcTemplate, "01", "1", "Jordbruk");
-        opprettNæring(namedParameterJdbcTemplate, "02", "1", "Skogbruk");
-        opprettNæring(namedParameterJdbcTemplate, "03", "1", "Akvalultur");
-    }
-
-    private static void opprettNæringsgruppe(
-            NamedParameterJdbcTemplate namedParameterJdbcTemplate,
-            String næringsgruppekode,
-            String næringsgruppenavn) {
-        namedParameterJdbcTemplate.update(
-                String.format(
-                        "insert into naringsgruppe (kode, navn) " +
-                                "values('%s', '%s')",
-                        næringsgruppekode,
-                        næringsgruppenavn
-                ),
-                new MapSqlParameterSource()
-        );
+        opprettNæring(namedParameterJdbcTemplate, "01", "Jordbruk");
+        opprettNæring(namedParameterJdbcTemplate, "02", "Skogbruk");
+        opprettNæring(namedParameterJdbcTemplate, "03", "Akvalultur");
     }
 
     private static void opprettNæring(
             NamedParameterJdbcTemplate namedParameterJdbcTemplate,
             String næringkode,
-            String næringsgruppekode,
             String næringnavn) {
         namedParameterJdbcTemplate.update(
                 String.format(
-                        "insert into naring (kode, naringsgruppe_kode, navn) " +
-                                "values('%s', '%s', '%s')",
+                        "insert into naring (kode, navn) " +
+                                "values('%s', '%s')",
                         næringkode,
-                        næringsgruppekode,
                         næringnavn
                 ),
                 new MapSqlParameterSource()

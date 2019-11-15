@@ -17,7 +17,6 @@ import java.util.List;
 @Component
 public class DataverehusRepository {
 
-    public static final String NARGRPKODE = "nargrpkode";
     public static final String NARGRPNAVN = "nargrpnavn";
     public static final String NARINGKODE = "naringkode";
     public static final String NARINGNAVN = "naringnavn";
@@ -165,25 +164,14 @@ public class DataverehusRepository {
                         new Sektor(resultSet.getString(SEKTORKODE), resultSet.getString(SEKTORNAVN)));
     }
 
-    public List<Næringsgruppe> hentAlleNæringsgrupper() {
-        SqlParameterSource namedParameters = new MapSqlParameterSource();
-
-        return namedParameterJdbcTemplate.query(
-                "select nargrpkode, nargrpnavn from dt_p.v_dim_ia_fgrp_naring_sn2007",
-                namedParameters,
-                (resultSet, rowNum) ->
-                        new Næringsgruppe(resultSet.getString(NARGRPKODE), resultSet.getString(NARGRPNAVN)));
-    }
-
     public List<Næring> hentAlleNæringer() {
         SqlParameterSource namedParameters = new MapSqlParameterSource();
 
         return namedParameterJdbcTemplate.query(
-                "select naringkode, nargrpkode, naringnavn from dt_p.v_dim_ia_naring_sn2007",
+                "select naringkode, naringnavn from dt_p.v_dim_ia_naring_sn2007",
                 namedParameters,
                 (resultSet, rowNum) ->
                         new Næring(
-                                resultSet.getString(NARGRPKODE),
                                 resultSet.getString(NARINGKODE),
                                 resultSet.getString(NARINGNAVN)));
     }

@@ -4,17 +4,9 @@ create table sektor (
   navn varchar(255) not null
 );
 
-create table naringsgruppe (
-  kode varchar primary key,
-  navn varchar(255) not null
-);
-
 create table naring (
   kode varchar primary key,
-  naringsgruppe_kode varchar not null,
   navn varchar(255) not null,
-
-  foreign key (naringsgruppe_kode) references naringsgruppe(kode)
 );
 
 

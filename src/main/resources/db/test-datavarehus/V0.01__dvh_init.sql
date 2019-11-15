@@ -7,13 +7,6 @@ create table dt_p.v_dim_ia_sektor
     sektornavn varchar(60)
 );
 
-create table dt_p.v_dim_ia_fgrp_naring_sn2007
-(
-    nargrpkode char(2) not null,
-    nargrpnavn varchar(60) not null,
-    primary key (nargrpkode)
-);
-
 create table dt_p.v_dim_ia_naring_sn2007
 (
     naringkode char(2) not null,
