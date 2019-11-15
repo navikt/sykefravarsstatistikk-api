@@ -60,7 +60,7 @@ public class EnhetsregisteretClientTest {
         mockRespons(gyldigUnderenhetRespons());
         Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr("971800534"));
 
-        assertThat(underenhet.getOrgnr().getVerdi()).isEqualTo("894834412");
+        assertThat(underenhet.getOrgnr().getVerdi()).isEqualTo("822565212");
         assertThat(underenhet.getOverordnetEnhetOrgnr().getVerdi()).isEqualTo("999263550");
         assertThat(underenhet.getNavn()).isEqualTo("NAV ARBEID OG YTELSER AVD OSLO");
         assertThat(underenhet.getNæringskode().getKode()).isEqualTo("84300");
@@ -85,7 +85,7 @@ public class EnhetsregisteretClientTest {
     @SneakyThrows
     private ObjectNode gyldigUnderenhetRespons() {
         String str = "{\n" +
-                "  \"organisasjonsnummer\": \"894834412\",\n" +
+                "  \"organisasjonsnummer\": \"822565212\",\n" +
                 "  \"navn\": \"NAV ARBEID OG YTELSER AVD OSLO\",\n" +
                 "  \"naeringskode1\": {\n" +
                 "    \"beskrivelse\": \"Trygdeordninger underlagt offentlig forvaltning\",\n" +
