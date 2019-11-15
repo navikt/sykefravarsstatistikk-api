@@ -53,7 +53,7 @@ public class NæringIntegrasjonUtils extends VirksomhetsklassifikasjonIntegrasjo
 
                     return namedParameterJdbcTemplate.update(
                             "insert into naring (kode, navn)  " +
-                                    "values (:kode, :naringsgruppe_kode, :navn)",
+                                    "values (:kode, :navn)",
                             namedParameters
                     );
                 };
