@@ -7,13 +7,6 @@ create table dt_p.v_dim_ia_sektor
     sektornavn varchar(60)
 );
 
-create table dt_p.v_dim_ia_fgrp_naring_sn2007
-(
-    nargrpkode char(2) not null,
-    nargrpnavn varchar(60) not null,
-    primary key (nargrpkode)
-);
-
 create table dt_p.v_dim_ia_naring_sn2007
 (
     naringkode char(2) not null,
@@ -56,6 +49,25 @@ create table dt_p.v_agg_ia_sykefravar_naring
     naring char(2) not null,
     alder char(1) not null,
     kjonn char(1) not null,
+    taptedv decimal(14,6),
+    muligedv decimal(15,6),
+    antpers decimal(7,0)
+);
+
+create table dt_p.v_agg_ia_sykefravar
+(
+    arstall char(4) not null,
+    kvartal char(1) not null,
+    orgnr char(9) not null,
+    naring char(2) not null,
+    alder char(1) not null,
+    kjonn char(1) not null,
+    fylkbo varchar(2) not null,
+    sftype char(1) not null,
+    varighet char(1) not null,
+    sektor char(1) not null,
+    storrelse char(1) not null,
+    fylkarb varchar(2) not null,
     taptedv decimal(14,6),
     muligedv decimal(15,6),
     antpers decimal(7,0)

@@ -7,10 +7,6 @@ insert into dt_p.v_dim_ia_sektor (sektorkode,sektornavn) values ('2','Kommunal f
 insert into dt_p.v_dim_ia_sektor (sektorkode,sektornavn) values ('3','Privat og offentlig næringsvirksomhet');
 insert into dt_p.v_dim_ia_sektor (sektorkode,sektornavn) values ('9','Fylkeskommunal forvaltning');
 
--- Gruppert næring
-insert into dt_p.v_dim_ia_fgrp_naring_sn2007 (nargrpkode,nargrpnavn) values ('C','Industri og bergverksdrift');
-insert into dt_p.v_dim_ia_fgrp_naring_sn2007 (nargrpkode,nargrpnavn) values ('B','Film');
-
 -- Næring
 insert into dt_p.v_dim_ia_naring_sn2007 (naringkode,nargrpkode,naringnavn)
  values ('11','C','Utvinning av råolje og naturgass. Tjenester tilknyttet olje- og gassutvinning');

@@ -4,10 +4,7 @@ import no.nav.tag.sykefravarsstatistikk.api.common.SlettOgOpprettResultat;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.*;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.CreateSykefraværsstatistikkFunction;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.DeleteSykefraværsstatistikkFunction;
-import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.SykefraværsstatistikkLandUtils;
-import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.SykefraværsstatistikkIntegrasjonUtils;
-import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.SykefraværsstatistikkNæringUtils;
-import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.SykefraværsstatistikkSektorUtils;
+import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -59,6 +56,16 @@ public class StatistikkImportRepository {
             new SykefraværsstatistikkNæringUtils(namedParameterJdbcTemplate);
 
     return importStatistikk(sykefraværsstatistikkNæring, årstallOgKvartal, sykefraværsstatistikkNæringUtils);
+  }
+
+  public SlettOgOpprettResultat importSykefraværsstatistikkVirksomhet(
+          List<SykefraværsstatistikkVirksomhet> sykefraværsstatistikkVirksomhet,
+          ÅrstallOgKvartal årstallOgKvartal
+  ) {
+    SykefraværsstatistikkVirksomhetUtils sykefraværsstatistikkVirksomhetUtils =
+            new SykefraværsstatistikkVirksomhetUtils(namedParameterJdbcTemplate);
+
+    return importStatistikk(sykefraværsstatistikkVirksomhet, årstallOgKvartal, sykefraværsstatistikkVirksomhetUtils);
   }
 
 

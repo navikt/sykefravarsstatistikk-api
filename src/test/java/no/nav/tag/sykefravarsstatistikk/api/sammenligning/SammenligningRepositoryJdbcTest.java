@@ -41,9 +41,9 @@ public class SammenligningRepositoryJdbcTest {
     @Test
     public void hentSykefraværprosentLand__skal_returnere_riktig_sykefravær() {
         jdbcTemplate.update(
-                "insert into SYKEFRAVAR_STATISTIKK_LAND (arstall, kvartal, tapte_dagsverk, mulige_dagsverk) "
-                        + "VALUES (:arstall, :kvartal, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(2019, 2, 4, 100)
+                "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(2019, 2, 10, 4, 100)
         );
 
         Sykefraværprosent resultat = repository.hentSykefraværprosentLand(2019, 2);
@@ -58,9 +58,10 @@ public class SammenligningRepositoryJdbcTest {
     @Test
     public void hentSykefraværprosentSektor__skal_returnere_riktig_sykefravær() {
         jdbcTemplate.update(
-                "insert into SYKEFRAVAR_STATISTIKK_SEKTOR (arstall, kvartal, tapte_dagsverk, mulige_dagsverk, sektor_kode) "
-                        + "VALUES (:arstall, :kvartal, :tapte_dagsverk, :mulige_dagsverk, :sektor_kode)",
-                parametre(2018, 1, 8, 23).addValue("sektor_kode", "1")
+                "insert into sykefravar_statistikk_sektor " +
+                        "(sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES ( :sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(2018, 1, 1,8, 23).addValue("sektor_kode", "1")
         );
 
         Sykefraværprosent resultat = repository.hentSykefraværprosentSektor(2018, 1, "1");
@@ -78,9 +79,10 @@ public class SammenligningRepositoryJdbcTest {
 
         insertNæringskode(næringskode);
         jdbcTemplate.update(
-                "insert into SYKEFRAVAR_STATISTIKK_NARING (arstall, kvartal, tapte_dagsverk, mulige_dagsverk, naring_kode) "
-                        + "VALUES (:arstall, :kvartal, :tapte_dagsverk, :mulige_dagsverk, :naring_kode)",
-                parametre(2017, 3, 56, 2051)
+                "insert into sykefravar_statistikk_naring " +
+                        "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(2017, 3, 10,56, 2051)
                         .addValue("naring_kode", næringskode.hentNæringskode2Siffer())
         );
 
@@ -97,13 +99,11 @@ public class SammenligningRepositoryJdbcTest {
     @Test
     public void hentSykefraværprosentVirksomhet__skal_returnere_riktig_sykefravær() {
         Underenhet virksomhet = enUnderenhet();
-
-        insertVirksomhet(virksomhet);
-
         jdbcTemplate.update(
-                "insert into SYKEFRAVAR_STATISTIKK_VIRKSOMHET (arstall, kvartal, tapte_dagsverk, mulige_dagsverk, orgnr) "
-                        + "VALUES (:arstall, :kvartal, :tapte_dagsverk, :mulige_dagsverk, :orgnr)",
-                parametre(2016, 4, 31, 6234)
+                "insert into sykefravar_statistikk_virksomhet " +
+                        "(orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(2016, 4, 10, 31, 6234)
                         .addValue("orgnr", virksomhet.getOrgnr().getVerdi())
         );
 
@@ -117,53 +117,29 @@ public class SammenligningRepositoryJdbcTest {
         assertThat(repository.hentSykefraværprosentVirksomhet(2020, 1, enUnderenhet())).isNull();
     }
 
-    private void insertVirksomhet(Underenhet virksomhet) {
-        insertNæringskode(virksomhet.getNæringskode());
-
-        jdbcTemplate.update(
-                "insert into SEKTOR (kode, navn) VALUES ('0000', 'Sektorkode')",
-                new MapSqlParameterSource()
-        );
-
-        jdbcTemplate.update(
-                "insert into VIRKSOMHET (orgnr, sektor_kode, naring_kode, offnavn) " +
-                        "VALUES (:orgnr, '0000', :naring_kode, :offnavn)",
-                new MapSqlParameterSource()
-                        .addValue("orgnr", virksomhet.getOrgnr().getVerdi())
-                        .addValue("naring_kode", virksomhet.getNæringskode().hentNæringskode2Siffer())
-                        .addValue("offnavn", virksomhet.getNavn())
-        );
-    }
-
     private void insertNæringskode(Næringskode5Siffer næringskode) {
         jdbcTemplate.update(
-                "insert into NARINGSGRUPPE (kode, navn) VALUES ('0000', 'Næringsgruppenavn')",
-                new MapSqlParameterSource()
-        );
-
-        jdbcTemplate.update(
-                "insert into NARING (kode, naringsgruppe_kode, navn) VALUES (:kode, '0000', :navn)",
+                "insert into naring (kode, navn) VALUES (:kode, :navn)",
                 new MapSqlParameterSource()
                         .addValue("kode", næringskode.hentNæringskode2Siffer())
                         .addValue("navn", næringskode.getBeskrivelse())
         );
     }
 
-    private MapSqlParameterSource parametre(int årstall, int kvartal, int tapteDagsverk, int muligeDagsverk) {
+    private MapSqlParameterSource parametre(int årstall, int kvartal, int antallPersoner, int tapteDagsverk, int muligeDagsverk) {
         return new MapSqlParameterSource()
                 .addValue("arstall", årstall)
                 .addValue("kvartal", kvartal)
+                .addValue("antall_personer", antallPersoner)
                 .addValue("tapte_dagsverk", tapteDagsverk)
                 .addValue("mulige_dagsverk", muligeDagsverk);
     }
 
     private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
-        jdbcTemplate.update("DELETE FROM SYKEFRAVAR_STATISTIKK_VIRKSOMHET", new MapSqlParameterSource());
-        jdbcTemplate.update("DELETE FROM SYKEFRAVAR_STATISTIKK_NARING", new MapSqlParameterSource());
-        jdbcTemplate.update("DELETE FROM SYKEFRAVAR_STATISTIKK_SEKTOR", new MapSqlParameterSource());
-        jdbcTemplate.update("DELETE FROM SYKEFRAVAR_STATISTIKK_LAND", new MapSqlParameterSource());
-        jdbcTemplate.update("DELETE FROM VIRKSOMHET", new MapSqlParameterSource());
-        jdbcTemplate.update("DELETE FROM NARING", new MapSqlParameterSource());
-        jdbcTemplate.update("DELETE FROM NARINGSGRUPPE", new MapSqlParameterSource());
+        jdbcTemplate.update("delete from sykefravar_statistikk_virksomhet", new MapSqlParameterSource());
+        jdbcTemplate.update("delete from sykefravar_statistikk_naring", new MapSqlParameterSource());
+        jdbcTemplate.update("delete from sykefravar_statistikk_sektor", new MapSqlParameterSource());
+        jdbcTemplate.update("delete from sykefravar_statistikk_land", new MapSqlParameterSource());
+        jdbcTemplate.update("delete from naring", new MapSqlParameterSource());
     }
 }

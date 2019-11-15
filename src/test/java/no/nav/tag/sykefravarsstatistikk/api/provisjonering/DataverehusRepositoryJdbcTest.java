@@ -2,9 +2,9 @@ package no.nav.tag.sykefravarsstatistikk.api.provisjonering;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkLand;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkSektor;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkVirksomhet;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
-import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppe;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.junit.After;
 import org.junit.Before;
@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -31,6 +32,8 @@ import static org.junit.Assert.assertTrue;
 @DataJdbcTest
 public class DataverehusRepositoryJdbcTest {
 
+    public static final String ORGNR_VIRKSOMHET_1 = "987654321";
+    public static final String ORGNR_VIRKSOMHET_2 = "999999999";
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
@@ -49,7 +52,7 @@ public class DataverehusRepositoryJdbcTest {
 
 
     @Test
-    public void hentSykefraværsstatistikkSektor_lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
+    public void hentSykefraværsstatistikkSektor__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 1,5, 100);
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, 10, 100);
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
@@ -64,7 +67,7 @@ public class DataverehusRepositoryJdbcTest {
     }
 
     @Test
-    public void hentSykefraværsstatistikkLand_lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
+    public void hentSykefraværsstatistikkLand__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, 5, 100);
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, 10, 100);
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
@@ -85,7 +88,29 @@ public class DataverehusRepositoryJdbcTest {
     }
 
     @Test
-    public void hentSykefraværsstatistikkLand_returnerer_en_tom_liste_dersom_ingen_data_finnes_i_DVH() {
+    public void hentSykefraværsstatistikkVirksomhet__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
+        insertSykefraværsstatistikkInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, ORGNR_VIRKSOMHET_1, "K", 5, 100);
+        insertSykefraværsstatistikkInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, ORGNR_VIRKSOMHET_1, "M", 8, 88);
+        insertSykefraværsstatistikkInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, ORGNR_VIRKSOMHET_2, "K", 3, 75);
+        insertSykefraværsstatistikkInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 5, ORGNR_VIRKSOMHET_1, "M", 5, 101);
+
+        List<SykefraværsstatistikkVirksomhet> sykefraværsstatistikkVirksomhet =
+                repository.hentSykefraværsstatistikkVirksomhet(new ÅrstallOgKvartal(2018, 4));
+
+        assertThat(sykefraværsstatistikkVirksomhet, hasSize(2));
+        SykefraværsstatistikkVirksomhet expected = new SykefraværsstatistikkVirksomhet(
+                2018,
+                4,
+                ORGNR_VIRKSOMHET_1,
+                7,
+                new BigDecimal(13).setScale(6),
+                new BigDecimal(188).setScale(6)
+        );
+        assertThat(sykefraværsstatistikkVirksomhet.get(0), equalTo(expected));
+    }
+
+    @Test
+    public void hentSykefraværsstatistikkLand__returnerer_en_tom_liste_dersom_ingen_data_finnes_i_DVH() {
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
 
         List<SykefraværsstatistikkLand> sykefraværsstatistikkLand =
@@ -95,7 +120,7 @@ public class DataverehusRepositoryJdbcTest {
     }
 
     @Test
-    public void hentSektor_returnerer_eksisterende_Sektor() {
+    public void hentAlleSektorer__returnerer_eksisterende_Sektor() {
         insertSektorInDvhTabell(namedParameterJdbcTemplate, "9", "Fylkeskommunal forvaltning");
         insertSektorInDvhTabell(namedParameterJdbcTemplate, "0", "Ukjent");
 
@@ -107,34 +132,26 @@ public class DataverehusRepositoryJdbcTest {
     }
 
     @Test
-    public void hentNæring_returnerer_eksisterende_Næring() {
-        insertNæringsgruppeInDvhTabell(namedParameterJdbcTemplate, "B", "Jordbruk, skogbruk og fiske");
-        insertNæringInDvhTabell(namedParameterJdbcTemplate, "14", "B", "Jordbruk, skogbruk og fiske");
-        insertNæringInDvhTabell(namedParameterJdbcTemplate, "15", "B", "Turisme");
+    public void hentAlleNæringer__returnerer_eksisterende_Næring() {
+        insertNæringInDvhTabell(namedParameterJdbcTemplate, "02", "01", "Skogbruk og tjenester tilknyttet skogbruk");
+        insertNæringInDvhTabell(namedParameterJdbcTemplate, "11", "10", "Produksjon av drikkevarer");
 
         List<Næring> næringer = repository.hentAlleNæringer();
 
-        assertTrue(næringer.contains(new Næring("B", "14", "Jordbruk, skogbruk og fiske")));
-        assertTrue(næringer.contains(new Næring("B", "15", "Turisme")));
+        assertTrue(næringer.contains(new Næring("02", "Skogbruk og tjenester tilknyttet skogbruk")));
+        assertTrue(næringer.contains(new Næring("11", "Produksjon av drikkevarer")));
     }
 
-    @Test
-    public void hentNæringsgruppe_returnerer_eksisterende_Næringsgruppe() {
-        insertNæringsgruppeInDvhTabell(namedParameterJdbcTemplate, "B", "Jordbruk, skogbruk og fiske");
-        insertNæringsgruppeInDvhTabell(namedParameterJdbcTemplate, "C", "Industri");
-
-        List<Næringsgruppe> næringsgrupper = repository.hentAlleNæringsgrupper();
-
-        assertTrue(næringsgrupper.contains(new Næringsgruppe("C", "Industri")));
-        assertTrue(næringsgrupper.contains(new Næringsgruppe("B", "Jordbruk, skogbruk og fiske")));
-    }
 
     private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
-        jdbcTemplate.update("DELETE FROM dt_p.v_dim_ia_naring_sn2007", new MapSqlParameterSource());
-        jdbcTemplate.update(
-                "DELETE FROM dt_p.v_dim_ia_fgrp_naring_sn2007", new MapSqlParameterSource());
-        jdbcTemplate.update("DELETE FROM dt_p.v_dim_ia_sektor", new MapSqlParameterSource());
-        jdbcTemplate.update("DELETE FROM dt_p.v_agg_ia_sykefravar_land", new MapSqlParameterSource());
+        delete(jdbcTemplate, "dt_p.v_dim_ia_naring_sn2007");
+        delete(jdbcTemplate, "dt_p.v_dim_ia_sektor");
+        delete(jdbcTemplate, "dt_p.v_agg_ia_sykefravar_land");
+        delete(jdbcTemplate, "dt_p.v_agg_ia_sykefravar");
+    }
+
+    private static int delete(NamedParameterJdbcTemplate jdbcTemplate, String tabell) {
+        return jdbcTemplate.update(String.format("delete from %s", tabell), new MapSqlParameterSource());
     }
 
     private static void insertSektorInDvhTabell(
@@ -145,22 +162,9 @@ public class DataverehusRepositoryJdbcTest {
                         .addValue("sektornavn", navn);
 
         jdbcTemplate.update(
-                "INSERT INTO dt_p.v_dim_ia_sektor (sektorkode, sektornavn) "
-                        + "VALUES (:sektorkode, :sektornavn)",
+                "insert into dt_p.v_dim_ia_sektor (sektorkode, sektornavn) "
+                        + "values (:sektorkode, :sektornavn)",
                 params);
-    }
-
-    private static void insertNæringsgruppeInDvhTabell(
-            NamedParameterJdbcTemplate jdbcTemplate, String næringsgruppekode, String næringsgruppenavn) {
-        MapSqlParameterSource naringsgruppeParams =
-                new MapSqlParameterSource()
-                        .addValue("nargrpkode", næringsgruppekode)
-                        .addValue("nargrpnavn", næringsgruppenavn);
-
-        jdbcTemplate.update(
-                "INSERT INTO dt_p.v_dim_ia_fgrp_naring_sn2007 (nargrpkode, nargrpnavn) "
-                        + "VALUES (:nargrpkode, :nargrpnavn)",
-                naringsgruppeParams);
     }
 
     private static void insertNæringInDvhTabell(
@@ -175,8 +179,8 @@ public class DataverehusRepositoryJdbcTest {
                         .addValue("naringnavn", næringnavn);
 
         jdbcTemplate.update(
-                "INSERT INTO dt_p.v_dim_ia_naring_sn2007 (naringkode, nargrpkode, naringnavn) "
-                        + "VALUES (:naringkode, :nargrpkode, :naringnavn)",
+                "insert into dt_p.v_dim_ia_naring_sn2007 (naringkode, nargrpkode, naringnavn) "
+                        + "values (:naringkode, :nargrpkode, :naringnavn)",
                 naringParams);
     }
 
@@ -196,14 +200,14 @@ public class DataverehusRepositoryJdbcTest {
                         .addValue("muligedv", muligedagsverk);
 
         jdbcTemplate.update(
-                "INSERT INTO dt_p.V_AGG_IA_SYKEFRAVAR_LAND ("
+                "insert into dt_p.V_AGG_IA_SYKEFRAVAR_LAND ("
                         + "arstall, kvartal, "
                         + "naring, naringnavn, "
                         + "alder, kjonn, "
                         + "fylkbo, fylknavn, "
                         + "varighet, sektor, sektornavn, "
                         + "taptedv, muligedv, antpers) "
-                        + "VALUES ("
+                        + "values ("
                         + ":arstall, :kvartal, "
                         + "'41', 'Bygge- og anleggsvirksomhet', "
                         + "'D', 'M', "
@@ -212,4 +216,40 @@ public class DataverehusRepositoryJdbcTest {
                         + ":taptedv, :muligedv, :antpers)",
                 params);
     }
+
+    private static void insertSykefraværsstatistikkInDvhTabell(
+            NamedParameterJdbcTemplate jdbcTemplate,
+            int årstall,
+            int kvartal,
+            int antallPersoner,
+            String orgnr,
+            String kjonn,
+            long taptedagsverk,
+            long muligedagsverk) {
+        MapSqlParameterSource params =
+                new MapSqlParameterSource()
+                        .addValue("arstall", årstall)
+                        .addValue("kvartal", kvartal)
+                        .addValue("antpers", antallPersoner)
+                        .addValue("orgnr", orgnr)
+                        .addValue("kjonn", kjonn)
+                        .addValue("taptedv", taptedagsverk)
+                        .addValue("muligedv", muligedagsverk);
+
+        jdbcTemplate.update(
+                "insert into dt_p.v_agg_ia_sykefravar ("
+                        + "arstall, kvartal, "
+                        + "orgnr, naring, sektor, storrelse, fylkarb, "
+                        + "alder, kjonn,  fylkbo, "
+                        + "sftype, varighet, "
+                        + "taptedv, muligedv, antpers) "
+                        + "values ("
+                        + ":arstall, :kvartal, "
+                        + ":orgnr, '62', '3', 'G', '03', "
+                        + "'B', :kjonn, '02', "
+                        + "'L', 'A', "
+                        + ":taptedv, :muligedv, :antpers)",
+                params);
+    }
+
 }

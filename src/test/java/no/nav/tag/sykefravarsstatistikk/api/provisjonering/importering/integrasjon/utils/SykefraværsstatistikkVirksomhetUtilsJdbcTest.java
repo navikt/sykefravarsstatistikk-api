@@ -1,7 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkNæring;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkVirksomhet;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.CreateSykefraværsstatistikkFunction;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.DeleteSykefraværsstatistikkFunction;
@@ -24,21 +24,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("db-test")
 @RunWith(SpringRunner.class)
 @DataJdbcTest
-public class SykefraværsstatistikkNæringUtilsJdbcTest {
+public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
 
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    private SykefraværsstatistikkNæringUtils utils;
+    private SykefraværsstatistikkVirksomhetUtils utils;
 
     private static final String LABEL = "TEST";
 
 
     @Before
     public void setUp() {
-        utils = new SykefraværsstatistikkNæringUtils(namedParameterJdbcTemplate);
+        utils = new SykefraværsstatistikkVirksomhetUtils(namedParameterJdbcTemplate);
         cleanUpLokalTestDb(namedParameterJdbcTemplate);
-        opprettDimensjoner(namedParameterJdbcTemplate);
     }
 
     @After
@@ -51,42 +50,39 @@ public class SykefraværsstatistikkNæringUtilsJdbcTest {
     public void createFunction_apply__skal_lagre_data_i_lokale_sykefraværstatistikk_tabellen(){
         CreateSykefraværsstatistikkFunction createFunction = utils.getCreateFunction();
         createFunction.apply(
-                new SykefraværsstatistikkNæring(
+                new SykefraværsstatistikkVirksomhet(
                         2019,
                         1,
-                        "03",
+                        "987654321",
                         14,
                         new BigDecimal(55.123),
                         new BigDecimal(856.891)
                 )
         );
 
-        List<Sykefraværprosent> list = hentSykefraværprosentNæring(namedParameterJdbcTemplate);
+        List<Sykefraværprosent> list = hentSykefraværprosentVirksomhet(namedParameterJdbcTemplate);
         assertThat(list.size()).isEqualTo(1);
         assertThat(list.get(0)).isEqualTo((new Sykefraværprosent(LABEL, new BigDecimal(55.123), new BigDecimal(856.891))));
     }
 
     @Test
     public void createFunction_delete__skal_slette_data_i_lokale_sykefraværstatistikk_tabellen(){
-        lagreSykefraværprosentNæring(namedParameterJdbcTemplate, "01", 2018, 3);
-        lagreSykefraværprosentNæring(namedParameterJdbcTemplate, "02", 2018, 3);
-        lagreSykefraværprosentNæring(namedParameterJdbcTemplate, "01", 2018, 4);
-        lagreSykefraværprosentNæring(namedParameterJdbcTemplate, "02", 2018, 4);
-        lagreSykefraværprosentNæring(namedParameterJdbcTemplate, "01", 2019, 1);
-        lagreSykefraværprosentNæring(namedParameterJdbcTemplate, "02", 2019, 1);
+        lagreSykefraværprosentVirksomhet(namedParameterJdbcTemplate, "987654321", 2018, 3);
+        lagreSykefraværprosentVirksomhet(namedParameterJdbcTemplate, "987654321", 2018, 4);
+        lagreSykefraværprosentVirksomhet(namedParameterJdbcTemplate, "987654321", 2019, 1);
 
         DeleteSykefraværsstatistikkFunction deleteFunction = utils.getDeleteFunction();
         deleteFunction.apply(new ÅrstallOgKvartal(2018, 4));
 
-        List<Sykefraværprosent> list = hentSykefraværprosentNæring(namedParameterJdbcTemplate);
-        assertThat(list.size()).isEqualTo(4);
+        List<Sykefraværprosent> list = hentSykefraværprosentVirksomhet(namedParameterJdbcTemplate);
+        assertThat(list.size()).isEqualTo(2);
     }
 
 
-    private static List<Sykefraværprosent> hentSykefraværprosentNæring(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    private static List<Sykefraværprosent> hentSykefraværprosentVirksomhet(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
 
         return namedParameterJdbcTemplate.query(
-                "select * from sykefravar_statistikk_naring",
+                "select * from sykefravar_statistikk_virksomhet",
                 new MapSqlParameterSource(),
                 (rs, rowNum) -> new Sykefraværprosent(
                         LABEL,
@@ -96,54 +92,32 @@ public class SykefraværsstatistikkNæringUtilsJdbcTest {
         );
     }
 
-    private static void lagreSykefraværprosentNæring(
+    private static void lagreSykefraværprosentVirksomhet(
             NamedParameterJdbcTemplate namedParameterJdbcTemplate,
-            String næringkode,
+            String orgnr,
             int årstall,
             int kvartal
     ) {
         namedParameterJdbcTemplate.update(
                 String.format(
-                        "insert into sykefravar_statistikk_naring " +
-                                "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk) " +
+                        "insert into sykefravar_statistikk_virksomhet " +
+                                "(arstall, kvartal, orgnr, antall_personer, tapte_dagsverk, mulige_dagsverk) " +
                                 "values (%d, %d, '%s', 15, 30, 300)",
                         årstall,
                         kvartal,
-                        næringkode
+                        orgnr
                 ),
                 new MapSqlParameterSource()
         );
     }
 
     private static void cleanUpLokalTestDb(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-        delete(namedParameterJdbcTemplate, "sykefravar_statistikk_naring");
-        delete(namedParameterJdbcTemplate, "naring");
+        delete(namedParameterJdbcTemplate, "sykefravar_statistikk_virksomhet");
     }
 
     private static void delete(NamedParameterJdbcTemplate namedParameterJdbcTemplate, String tabell) {
         namedParameterJdbcTemplate.update(
                 String.format("delete from %s", tabell),
-                new MapSqlParameterSource()
-        );
-    }
-
-    private static void opprettDimensjoner(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-        opprettNæring(namedParameterJdbcTemplate, "01", "Jordbruk");
-        opprettNæring(namedParameterJdbcTemplate, "02", "Skogbruk");
-        opprettNæring(namedParameterJdbcTemplate, "03", "Akvalultur");
-    }
-
-    private static void opprettNæring(
-            NamedParameterJdbcTemplate namedParameterJdbcTemplate,
-            String næringkode,
-            String næringnavn) {
-        namedParameterJdbcTemplate.update(
-                String.format(
-                        "insert into naring (kode, navn) " +
-                                "values('%s', '%s')",
-                        næringkode,
-                        næringnavn
-                ),
                 new MapSqlParameterSource()
         );
     }

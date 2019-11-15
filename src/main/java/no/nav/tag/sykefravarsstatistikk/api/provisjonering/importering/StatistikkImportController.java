@@ -3,10 +3,7 @@ package no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.security.oidc.api.Protected;
 import no.nav.tag.sykefravarsstatistikk.api.common.SlettOgOpprettResultat;
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkLand;
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkNæring;
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkSektor;
-import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +24,7 @@ public class StatistikkImportController {
         this.service = service;
     }
 
+    // TODO: DELETE ME! fjerne disse GET endepunkter som brukes til verifisering i dev miljø
     @GetMapping(value = "/verif/datavarehus/sykefravar/land/{årstall}/{kvartal}")
     public List<SykefraværsstatistikkLand> hentSykefraværsstatistikkLand(@PathVariable int årstall, @PathVariable int kvartal) {
         return service.hentSykefraværsstatistikkLand(new ÅrstallOgKvartal(årstall, kvartal));
@@ -42,6 +40,11 @@ public class StatistikkImportController {
         return service.hentSykefraværsstatistikkNæring(new ÅrstallOgKvartal(årstall, kvartal));
     }
 
+    @GetMapping(value = "/verif/datavarehus/sykefravar/virksomhet/{årstall}/{kvartal}")
+    public List<SykefraværsstatistikkVirksomhet> hentSykefraværsstatistikkVirksomhet(@PathVariable int årstall, @PathVariable int kvartal) {
+        return service.hentSykefraværsstatistikkVirksomhet(new ÅrstallOgKvartal(årstall, kvartal));
+    }
+
     @PostMapping(value = "/land/{årstall}/{kvartal}")
     public SlettOgOpprettResultat importSykefraværsstatistikkLand(@PathVariable int årstall, @PathVariable int kvartal) {
         return service.importSykefraværsstatistikkLand(new ÅrstallOgKvartal(årstall, kvartal));
@@ -55,6 +58,11 @@ public class StatistikkImportController {
     @PostMapping(value = "/naring/{årstall}/{kvartal}")
     public SlettOgOpprettResultat importSykefraværsstatistikkNæring(@PathVariable int årstall, @PathVariable int kvartal) {
         return service.importSykefraværsstatistikkNæring(new ÅrstallOgKvartal(årstall, kvartal));
+    }
+
+    @PostMapping(value = "/virksomhet/{årstall}/{kvartal}")
+    public SlettOgOpprettResultat importSykefraværsstatistikkVirksomhet(@PathVariable int årstall, @PathVariable int kvartal) {
+        return service.importSykefraværsstatistikkVirksomhet(new ÅrstallOgKvartal(årstall, kvartal));
     }
 
 }

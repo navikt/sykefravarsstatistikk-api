@@ -32,7 +32,7 @@ public class StatistikkImportRepositoryTest {
     }
 
     @Test
-    public void importStatistikk_skal_ikke_slette_eksisterende_statistikk_når_det_ikke_er_noe_data_å_importere() {
+    public void importStatistikk__skal_ikke_slette_eksisterende_statistikk_når_det_ikke_er_noe_data_å_importere() {
 
         SlettOgOpprettResultat resultat = statistikkImportRepository.importStatistikk(
                 Collections.emptyList(),
