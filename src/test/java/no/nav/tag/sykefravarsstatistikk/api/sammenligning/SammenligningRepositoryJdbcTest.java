@@ -97,9 +97,6 @@ public class SammenligningRepositoryJdbcTest {
     @Test
     public void hentSykefraværprosentVirksomhet__skal_returnere_riktig_sykefravær() {
         Underenhet virksomhet = enUnderenhet();
-
-        insertVirksomhet(virksomhet);
-
         jdbcTemplate.update(
                 "insert into SYKEFRAVAR_STATISTIKK_VIRKSOMHET (arstall, kvartal, tapte_dagsverk, mulige_dagsverk, orgnr) "
                         + "VALUES (:arstall, :kvartal, :tapte_dagsverk, :mulige_dagsverk, :orgnr)",
@@ -115,24 +112,6 @@ public class SammenligningRepositoryJdbcTest {
     @Test
     public void hentSykefraværprosentVirksomhet__skal_returnere_null_hvis_database_ikke_har_data() {
         assertThat(repository.hentSykefraværprosentVirksomhet(2020, 1, enUnderenhet())).isNull();
-    }
-
-    private void insertVirksomhet(Underenhet virksomhet) {
-        insertNæringskode(virksomhet.getNæringskode());
-
-        jdbcTemplate.update(
-                "insert into SEKTOR (kode, navn) VALUES ('0000', 'Sektorkode')",
-                new MapSqlParameterSource()
-        );
-
-        jdbcTemplate.update(
-                "insert into VIRKSOMHET (orgnr, sektor_kode, naring_kode, offnavn) " +
-                        "VALUES (:orgnr, '0000', :naring_kode, :offnavn)",
-                new MapSqlParameterSource()
-                        .addValue("orgnr", virksomhet.getOrgnr().getVerdi())
-                        .addValue("naring_kode", virksomhet.getNæringskode().hentNæringskode2Siffer())
-                        .addValue("offnavn", virksomhet.getNavn())
-        );
     }
 
     private void insertNæringskode(Næringskode5Siffer næringskode) {
@@ -162,7 +141,6 @@ public class SammenligningRepositoryJdbcTest {
         jdbcTemplate.update("DELETE FROM SYKEFRAVAR_STATISTIKK_NARING", new MapSqlParameterSource());
         jdbcTemplate.update("DELETE FROM SYKEFRAVAR_STATISTIKK_SEKTOR", new MapSqlParameterSource());
         jdbcTemplate.update("DELETE FROM SYKEFRAVAR_STATISTIKK_LAND", new MapSqlParameterSource());
-        jdbcTemplate.update("DELETE FROM VIRKSOMHET", new MapSqlParameterSource());
         jdbcTemplate.update("DELETE FROM NARING", new MapSqlParameterSource());
         jdbcTemplate.update("DELETE FROM NARINGSGRUPPE", new MapSqlParameterSource());
     }

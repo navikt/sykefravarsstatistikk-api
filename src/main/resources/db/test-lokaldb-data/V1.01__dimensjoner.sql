@@ -116,6 +116,4 @@ insert into naring (kode, naringsgruppe_kode, navn) values ('96', '90', 'Annen p
 insert into naring (kode, naringsgruppe_kode, navn) values ('97', '90', 'Lønnet arbeid i private husholdninger');
 insert into naring (kode, naringsgruppe_kode, navn) values ('99', '90', 'Internasjonale organisasjoner og organer');
 
-insert into virksomhet (orgnr, sektor_kode, naring_kode, offnavn) values ('910969439', '2', '87', 'EYDEHAVN OG ATRÅ REVISJON');
-
 commit

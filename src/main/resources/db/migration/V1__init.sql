@@ -17,16 +17,6 @@ create table naring (
   foreign key (naringsgruppe_kode) references naringsgruppe(kode)
 );
 
-create table virksomhet (
-  orgnr varchar(20) primary key,
-  sektor_kode varchar not null,
-  naring_kode varchar not null,
-  offnavn varchar(255) not null,
-
-  foreign key (sektor_kode) references sektor(kode),
-  foreign key (naring_kode) references naring(kode)
-);
-
 
 -- Statistikk tabeller
 create table sykefravar_statistikk_land (
