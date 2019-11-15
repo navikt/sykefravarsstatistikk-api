@@ -39,6 +39,7 @@ public class StatistikkImportRepositoryTest {
     public void importStatistikk__skal_ikke_slette_eksisterende_statistikk_når_det_ikke_er_noe_data_å_importere() {
 
         SlettOgOpprettResultat resultat = statistikkImportRepository.importStatistikk(
+                "Test stats",
                 Collections.emptyList(),
                 new ÅrstallOgKvartal(2019, 3),
                 getIntegrasjonUtils()

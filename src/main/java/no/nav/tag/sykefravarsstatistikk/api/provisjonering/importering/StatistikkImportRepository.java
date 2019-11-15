@@ -38,7 +38,12 @@ public class StatistikkImportRepository {
     SykefraværsstatistikkLandUtils sykefraværsstatistikkLandUtils =
         new SykefraværsstatistikkLandUtils(namedParameterJdbcTemplate);
 
-    return importStatistikk(landStatistikk, årstallOgKvartal, sykefraværsstatistikkLandUtils);
+    return importStatistikk(
+            "land",
+            landStatistikk,
+            årstallOgKvartal,
+            sykefraværsstatistikkLandUtils
+    );
   }
 
   public SlettOgOpprettResultat importSykefraværsstatistikkSektor(
@@ -49,7 +54,12 @@ public class StatistikkImportRepository {
     SykefraværsstatistikkSektorUtils sykefraværsstatistikkSektorUtils =
             new SykefraværsstatistikkSektorUtils(namedParameterJdbcTemplate);
 
-    return importStatistikk(sykefraværsstatistikkSektor, årstallOgKvartal, sykefraværsstatistikkSektorUtils);
+    return importStatistikk(
+            "sektor",
+            sykefraværsstatistikkSektor,
+            årstallOgKvartal,
+            sykefraværsstatistikkSektorUtils
+    );
   }
 
   public SlettOgOpprettResultat importSykefraværsstatistikkNæring(
@@ -59,7 +69,12 @@ public class StatistikkImportRepository {
     SykefraværsstatistikkNæringUtils sykefraværsstatistikkNæringUtils =
             new SykefraværsstatistikkNæringUtils(namedParameterJdbcTemplate);
 
-    return importStatistikk(sykefraværsstatistikkNæring, årstallOgKvartal, sykefraværsstatistikkNæringUtils);
+    return importStatistikk(
+            "næring",
+            sykefraværsstatistikkNæring,
+            årstallOgKvartal,
+            sykefraværsstatistikkNæringUtils
+    );
   }
 
   public SlettOgOpprettResultat importSykefraværsstatistikkVirksomhet(
@@ -69,20 +84,43 @@ public class StatistikkImportRepository {
     SykefraværsstatistikkVirksomhetUtils sykefraværsstatistikkVirksomhetUtils =
             new SykefraværsstatistikkVirksomhetUtils(namedParameterJdbcTemplate);
 
-    return importStatistikk(sykefraværsstatistikkVirksomhet, årstallOgKvartal, sykefraværsstatistikkVirksomhetUtils);
+    return importStatistikk(
+            "virksomhet",
+            sykefraværsstatistikkVirksomhet,
+            årstallOgKvartal,
+            sykefraværsstatistikkVirksomhetUtils
+    );
   }
 
 
   SlettOgOpprettResultat importStatistikk(
+          String statistikktype,
           List<? extends Sykefraværsstatistikk> sykefraværsstatistikk,
           ÅrstallOgKvartal årstallOgKvartal,
           SykefraværsstatistikkIntegrasjonUtils sykefraværsstatistikkIntegrasjonUtils
   ) {
 
     if (sykefraværsstatistikk.isEmpty()) {
+      log.info(
+              String.format("Ingen sykefraværsstatistikk (%s) til import for årstall '%d' og kvartal '%d'. ",
+                      statistikktype,
+                      årstallOgKvartal.getÅrstall(),
+                      årstallOgKvartal.getKvartal()
+              )
+      );
       return SlettOgOpprettResultat.tomtResultat();
     }
 
+    log.info(
+            String.format(
+                    "Starter import av sykefraværsstatistikk (%s) for årstall '%d' og kvartal '%d'. " +
+                            "Skal importere %d rader",
+                    statistikktype,
+                    årstallOgKvartal.getÅrstall(),
+                    årstallOgKvartal.getKvartal(),
+                    sykefraværsstatistikk.size()
+            )
+    );
     int antallSletet = slett(årstallOgKvartal, sykefraværsstatistikkIntegrasjonUtils.getDeleteFunction());
     int antallOprettet = batchOpprett(
             sykefraværsstatistikk,
@@ -104,12 +142,6 @@ public class StatistikkImportRepository {
           CreateSykefraværsstatistikkFunction createFunction,
           int insertBatchStørrelse
   ) {
-    log.info(
-            String.format(
-                    "Starter import av sykefraværsstatistikk. Skal importere %d rader",
-                    sykefraværsstatistikk.size()
-            )
-    );
     List<? extends List<? extends Sykefraværsstatistikk>> subsets =
             Lists.partition(sykefraværsstatistikk, insertBatchStørrelse);
     AtomicInteger antallOpprettet = new AtomicInteger();
