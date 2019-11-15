@@ -41,9 +41,9 @@ public class SammenligningRepositoryJdbcTest {
     @Test
     public void hentSykefraværprosentLand__skal_returnere_riktig_sykefravær() {
         jdbcTemplate.update(
-                "insert into sykefravar_statistikk_land (arstall, kvartal, tapte_dagsverk, mulige_dagsverk) "
-                        + "VALUES (:arstall, :kvartal, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(2019, 2, 4, 100)
+                "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(2019, 2, 10, 4, 100)
         );
 
         Sykefraværprosent resultat = repository.hentSykefraværprosentLand(2019, 2);
@@ -58,9 +58,10 @@ public class SammenligningRepositoryJdbcTest {
     @Test
     public void hentSykefraværprosentSektor__skal_returnere_riktig_sykefravær() {
         jdbcTemplate.update(
-                "insert into sykefravar_statistikk_sektor (arstall, kvartal, tapte_dagsverk, mulige_dagsverk, sektor_kode) "
-                        + "VALUES (:arstall, :kvartal, :tapte_dagsverk, :mulige_dagsverk, :sektor_kode)",
-                parametre(2018, 1, 8, 23).addValue("sektor_kode", "1")
+                "insert into sykefravar_statistikk_sektor " +
+                        "(sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES ( :sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(2018, 1, 1,8, 23).addValue("sektor_kode", "1")
         );
 
         Sykefraværprosent resultat = repository.hentSykefraværprosentSektor(2018, 1, "1");
@@ -78,9 +79,10 @@ public class SammenligningRepositoryJdbcTest {
 
         insertNæringskode(næringskode);
         jdbcTemplate.update(
-                "insert into sykefravar_statistikk_naring (arstall, kvartal, tapte_dagsverk, mulige_dagsverk, naring_kode) "
-                        + "VALUES (:arstall, :kvartal, :tapte_dagsverk, :mulige_dagsverk, :naring_kode)",
-                parametre(2017, 3, 56, 2051)
+                "insert into sykefravar_statistikk_naring " +
+                        "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(2017, 3, 10,56, 2051)
                         .addValue("naring_kode", næringskode.hentNæringskode2Siffer())
         );
 
@@ -98,9 +100,10 @@ public class SammenligningRepositoryJdbcTest {
     public void hentSykefraværprosentVirksomhet__skal_returnere_riktig_sykefravær() {
         Underenhet virksomhet = enUnderenhet();
         jdbcTemplate.update(
-                "insert into sykefravar_statistikk_virksomhet (arstall, kvartal, tapte_dagsverk, mulige_dagsverk, orgnr) "
-                        + "VALUES (:arstall, :kvartal, :tapte_dagsverk, :mulige_dagsverk, :orgnr)",
-                parametre(2016, 4, 31, 6234)
+                "insert into sykefravar_statistikk_virksomhet " +
+                        "(orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(2016, 4, 10, 31, 6234)
                         .addValue("orgnr", virksomhet.getOrgnr().getVerdi())
         );
 
@@ -123,10 +126,11 @@ public class SammenligningRepositoryJdbcTest {
         );
     }
 
-    private MapSqlParameterSource parametre(int årstall, int kvartal, int tapteDagsverk, int muligeDagsverk) {
+    private MapSqlParameterSource parametre(int årstall, int kvartal, int antallPersoner, int tapteDagsverk, int muligeDagsverk) {
         return new MapSqlParameterSource()
                 .addValue("arstall", årstall)
                 .addValue("kvartal", kvartal)
+                .addValue("antall_personer", antallPersoner)
                 .addValue("tapte_dagsverk", tapteDagsverk)
                 .addValue("mulige_dagsverk", muligeDagsverk);
     }
