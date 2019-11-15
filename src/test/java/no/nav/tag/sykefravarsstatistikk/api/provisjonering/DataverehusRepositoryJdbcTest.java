@@ -5,7 +5,6 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.Sykefraværsstatis
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkVirksomhet;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
-import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppe;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.junit.After;
 import org.junit.Before;
@@ -53,7 +52,7 @@ public class DataverehusRepositoryJdbcTest {
 
 
     @Test
-    public void hentSykefraværsstatistikkSektor_lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
+    public void hentSykefraværsstatistikkSektor__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 1,5, 100);
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, 10, 100);
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
@@ -68,7 +67,7 @@ public class DataverehusRepositoryJdbcTest {
     }
 
     @Test
-    public void hentSykefraværsstatistikkLand_lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
+    public void hentSykefraværsstatistikkLand__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, 5, 100);
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, 10, 100);
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
@@ -89,7 +88,7 @@ public class DataverehusRepositoryJdbcTest {
     }
 
     @Test
-    public void hentSykefraværsstatistikkVirksomhet_lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
+    public void hentSykefraværsstatistikkVirksomhet__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
         insertSykefraværsstatistikkInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, ORGNR_VIRKSOMHET_1, "K", 5, 100);
         insertSykefraværsstatistikkInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, ORGNR_VIRKSOMHET_1, "M", 8, 88);
         insertSykefraværsstatistikkInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, ORGNR_VIRKSOMHET_2, "K", 3, 75);
@@ -111,7 +110,7 @@ public class DataverehusRepositoryJdbcTest {
     }
 
     @Test
-    public void hentSykefraværsstatistikkLand_returnerer_en_tom_liste_dersom_ingen_data_finnes_i_DVH() {
+    public void hentSykefraværsstatistikkLand__returnerer_en_tom_liste_dersom_ingen_data_finnes_i_DVH() {
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
 
         List<SykefraværsstatistikkLand> sykefraværsstatistikkLand =
@@ -121,7 +120,7 @@ public class DataverehusRepositoryJdbcTest {
     }
 
     @Test
-    public void hentSektor_returnerer_eksisterende_Sektor() {
+    public void hentAlleSektorer__returnerer_eksisterende_Sektor() {
         insertSektorInDvhTabell(namedParameterJdbcTemplate, "9", "Fylkeskommunal forvaltning");
         insertSektorInDvhTabell(namedParameterJdbcTemplate, "0", "Ukjent");
 
@@ -133,7 +132,7 @@ public class DataverehusRepositoryJdbcTest {
     }
 
     @Test
-    public void hentNæring_returnerer_eksisterende_Næring() {
+    public void hentAlleNæringer__returnerer_eksisterende_Næring() {
         insertNæringInDvhTabell(namedParameterJdbcTemplate, "02", "01", "Skogbruk og tjenester tilknyttet skogbruk");
         insertNæringInDvhTabell(namedParameterJdbcTemplate, "11", "10", "Produksjon av drikkevarer");
 
