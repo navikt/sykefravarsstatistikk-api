@@ -136,6 +136,7 @@ public class DataverehusRepository {
                         "sum(muligedv) as sum_mulige_dagsverk " +
                         "from dt_p.v_agg_ia_sykefravar " +
                         "where kjonn != 'X' and naring != 'X' " +
+                        "and orgnr > '980000000' and orgnr <= '999999999' " +
                         "and arstall = :arstall and kvartal = :kvartal " +
                         "group by arstall, kvartal, orgnr",
                 namedParameters,
