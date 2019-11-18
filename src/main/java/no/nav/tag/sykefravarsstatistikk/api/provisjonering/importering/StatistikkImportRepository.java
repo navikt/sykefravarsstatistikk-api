@@ -131,10 +131,10 @@ public class StatistikkImportRepository {
   }
 
 
-  private int slett(ÅrstallOgKvartal årstallOgKvartal, DeleteSykefraværsstatistikkFunction deleteFunction) {
-      int antallSlettet = deleteFunction.apply(årstallOgKvartal);
-      return antallSlettet;
-  }
+    private int slett(ÅrstallOgKvartal årstallOgKvartal, DeleteSykefraværsstatistikkFunction deleteFunction) {
+        int antallSlettet = deleteFunction.apply(årstallOgKvartal);
+        return antallSlettet;
+    }
 
     int batchOpprett(
             List<? extends Sykefraværsstatistikk> sykefraværsstatistikk,
@@ -144,20 +144,17 @@ public class StatistikkImportRepository {
 
         List<? extends List<? extends Sykefraværsstatistikk>> subsets =
                 Lists.partition(sykefraværsstatistikk, insertBatchStørrelse);
+
         AtomicInteger antallOpprettet = new AtomicInteger();
 
-      /*
-        subsets.forEach( subset -> {
-              int opprettet = utils.getBatchCreateFunction(subset).apply();
-              int opprettetHittilNå = antallOpprettet.addAndGet(opprettet);
+        subsets.forEach(subset -> {
+                    int opprettet = utils.getBatchCreateFunction(subset).apply();
+                    int opprettetHittilNå = antallOpprettet.addAndGet(opprettet);
 
-              log.info(String.format("Opprettet %d rader", opprettetHittilNå));
-              subset.clear();
-            }
-        );*/
+                    log.info(String.format("Opprettet %d rader", opprettetHittilNå));
+                }
+        );
 
-        int opprettet = utils.getBatchCreateFunction(sykefraværsstatistikk).apply();
-        antallOpprettet.addAndGet(opprettet);
         return antallOpprettet.get();
     }
 
