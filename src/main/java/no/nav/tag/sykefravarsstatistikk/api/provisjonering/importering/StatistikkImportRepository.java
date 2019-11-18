@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class StatistikkImportRepository {
 
-  public static final int INSERT_BATCH_STØRRELSE = 1000;
+  public static final int INSERT_BATCH_STØRRELSE = 10000;
   private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
   public StatistikkImportRepository(
