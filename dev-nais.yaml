@@ -6,17 +6,17 @@ metadata:
   labels:
     team: teamtag
 spec:
-  image: navikt/sykefravarsstatistikk-api:{{version}}
+  image: navikt/sykefravarsstatistikk-api:91789aa73e0cc2bc6ade62a38048bac97eb21ac3
   team: teamtag
   port: 8080
   ingresses:
     - https://arbeidsgiver.nais.preprod.local/sykefravarsstatistikk-api/
   liveness:
     path: /sykefravarsstatistikk-api/internal/healthcheck
-    initialDelay: 20
+    initialDelay: 30
   readiness:
     path: /sykefravarsstatistikk-api/internal/healthcheck
-    initialDelay: 20
+    initialDelay: 30
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: dev

@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.tag.sykefravarsstatistikk.api.common.SlettOgOpprettResultat;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.*;
-import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.CreateSykefraværsstatistikkFunction;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.DeleteSykefraværsstatistikkFunction;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.*;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -124,7 +123,7 @@ public class StatistikkImportRepository {
     int antallSletet = slett(årstallOgKvartal, sykefraværsstatistikkIntegrasjonUtils.getDeleteFunction());
     int antallOprettet = batchOpprett(
             sykefraværsstatistikk,
-            sykefraværsstatistikkIntegrasjonUtils.getCreateFunction(),
+            sykefraværsstatistikkIntegrasjonUtils,
             INSERT_BATCH_STØRRELSE
     );
 
@@ -139,34 +138,21 @@ public class StatistikkImportRepository {
 
   int batchOpprett(
           List<? extends Sykefraværsstatistikk> sykefraværsstatistikk,
-          CreateSykefraværsstatistikkFunction createFunction,
+          SykefraværsstatistikkIntegrasjonUtils utils,
           int insertBatchStørrelse
   ) {
     List<? extends List<? extends Sykefraværsstatistikk>> subsets =
             Lists.partition(sykefraværsstatistikk, insertBatchStørrelse);
     AtomicInteger antallOpprettet = new AtomicInteger();
 
-    subsets.forEach(s -> {
-              int opprettet = opprett(s, createFunction);
+    subsets.forEach( subset -> {
+              int opprettet = utils.getBatchCreateFunction(subset).apply();
               int opprettetHittilNå = antallOpprettet.addAndGet(opprettet);
 
               log.info(String.format("Opprettet %d rader", opprettetHittilNå));
             }
     );
 
-    return antallOpprettet.get();
-  }
-
-  private int opprett(
-          List<? extends Sykefraværsstatistikk> sykefraværsstatistikk,
-          CreateSykefraværsstatistikkFunction createFunction) {
-
-    AtomicInteger antallOpprettet = new AtomicInteger();
-    sykefraværsstatistikk.forEach(
-        stat -> {
-          createFunction.apply(stat);
-          antallOpprettet.getAndIncrement();
-        });
     return antallOpprettet.get();
   }
 

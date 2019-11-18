@@ -1,9 +1,10 @@
 package no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering;
 
 import no.nav.tag.sykefravarsstatistikk.api.common.SlettOgOpprettResultat;
+import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.Sykefraværsstatistikk;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkVirksomhet;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
-import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.CreateSykefraværsstatistikkFunction;
+import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.BatchCreateSykefraværsstatistikkFunction;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.DeleteSykefraværsstatistikkFunction;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.SykefraværsstatistikkIntegrasjonUtils;
 import org.junit.Before;
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -50,38 +52,38 @@ public class StatistikkImportRepositoryTest {
 
     @Test
     public void batchOpprett__deler_import_i_små_batch() {
-        List<SykefraværsstatistikkVirksomhet> list = getSykefraværsstatistikkVirksomhetList();
+        List<SykefraværsstatistikkVirksomhet> list = getSykefraværsstatistikkVirksomhetList(5);
 
         int resultat = statistikkImportRepository.batchOpprett(
                 list,
-                o -> 0,
+                dummyUtils(),
                 2
         );
 
-        assertEquals(resultat, 5);
+        assertEquals(5, resultat);
     }
 
     @Test
     public void batchOpprett__ikke_deler_dersom_batch_størrelse_er_større_enn_listen() {
-        List<SykefraværsstatistikkVirksomhet> list = getSykefraværsstatistikkVirksomhetList();
+        List<SykefraværsstatistikkVirksomhet> list = getSykefraværsstatistikkVirksomhetList(5);
 
         int resultat = statistikkImportRepository.batchOpprett(
                 list,
-                o -> 0,
+                dummyUtils(),
                 1000
         );
 
-        assertEquals(resultat, 5);
+        assertEquals(5, resultat);
     }
 
 
-    private static List<SykefraværsstatistikkVirksomhet> getSykefraværsstatistikkVirksomhetList() {
+    private static List<SykefraværsstatistikkVirksomhet> getSykefraværsstatistikkVirksomhetList(int antallStatistikk) {
         List<SykefraværsstatistikkVirksomhet> list = new ArrayList<>();
-        list.add(sykefraværsstatistikkVirksomhet(2018, 1));
-        list.add(sykefraværsstatistikkVirksomhet(2018, 2));
-        list.add(sykefraværsstatistikkVirksomhet(2018, 3));
-        list.add(sykefraværsstatistikkVirksomhet(2018, 4));
-        list.add(sykefraværsstatistikkVirksomhet(2019, 1));
+
+        IntStream.range(0, antallStatistikk).forEach(
+                i -> list.add(sykefraværsstatistikkVirksomhet((2000 + i), 1))
+        );
+
         return list;
     }
 
@@ -107,12 +109,27 @@ public class StatistikkImportRepositoryTest {
             }
 
             @Override
-            public CreateSykefraværsstatistikkFunction getCreateFunction() {
-                return o -> {
-                    fail("Skal ikke bruke create funksjon");
-                    return 0;
-                };
+            public BatchCreateSykefraværsstatistikkFunction getBatchCreateFunction(List<? extends Sykefraværsstatistikk> list) {
+                return null;
             }
         };
     }
+
+    private static SykefraværsstatistikkIntegrasjonUtils dummyUtils() {
+        return new SykefraværsstatistikkIntegrasjonUtils() {
+            @Override
+            public DeleteSykefraværsstatistikkFunction getDeleteFunction() {
+                return null;
+            }
+
+            @Override
+            public BatchCreateSykefraværsstatistikkFunction getBatchCreateFunction(
+                    List<? extends Sykefraværsstatistikk> list
+            ) {
+                return () -> list.size();
+            }
+        };
+    }
+
+
 }

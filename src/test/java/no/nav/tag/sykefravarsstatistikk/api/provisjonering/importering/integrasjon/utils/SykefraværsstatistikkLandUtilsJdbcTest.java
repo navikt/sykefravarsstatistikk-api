@@ -3,7 +3,6 @@ package no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integras
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkLand;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
-import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.CreateSykefraværsstatistikkFunction;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.DeleteSykefraværsstatistikkFunction;
 import org.junit.After;
 import org.junit.Before;
@@ -17,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,13 +47,29 @@ public class SykefraværsstatistikkLandUtilsJdbcTest {
 
 
     @Test
-    public void createFunction_apply__skal_lagre_data_i_lokale_sykefraværstatistikk_tabellen(){
-        CreateSykefraværsstatistikkFunction createFunction = utils.getCreateFunction();
-        createFunction.apply(new SykefraværsstatistikkLand(2019, 1, 14, new BigDecimal(55.123), new BigDecimal(856.891)));
+    public void createFunction_apply__skal_lagre_data_i_lokale_sykefraværstatistikk_tabellen() {
+        List<SykefraværsstatistikkLand> list = new ArrayList<>();
+        list.add(
+                new SykefraværsstatistikkLand(
+                        2019,
+                        1,
+                        14,
+                        new BigDecimal(55.123),
+                        new BigDecimal(856.891)
+                )
+        );
 
-        List<Sykefraværprosent> list = hentSykefraværprosentLand(namedParameterJdbcTemplate);
-        assertThat(list.size()).isEqualTo(1);
-        assertThat(list.get(0)).isEqualTo((new Sykefraværprosent(LABEL, new BigDecimal(55.123), new BigDecimal(856.891))));
+        utils.getBatchCreateFunction(list).apply();
+
+        List<Sykefraværprosent> resultList = hentSykefraværprosentLand(namedParameterJdbcTemplate);
+        assertThat(resultList.size()).isEqualTo(1);
+        assertThat(resultList.get(0)).isEqualTo((
+                        new Sykefraværprosent(LABEL,
+                                new BigDecimal(55.123),
+                                new BigDecimal(856.891)
+                        )
+                )
+        );
     }
 
     @Test
