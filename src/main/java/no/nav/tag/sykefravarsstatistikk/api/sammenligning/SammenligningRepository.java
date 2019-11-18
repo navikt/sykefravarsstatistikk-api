@@ -102,7 +102,8 @@ public class SammenligningRepository {
         return new Sykefraværprosent(
                 label,
                 rs.getBigDecimal("tapte_dagsverk"),
-                rs.getBigDecimal("mulige_dagsverk")
+                rs.getBigDecimal("mulige_dagsverk"),
+                rs.getInt("antall_personer")
         );
     }
 }

@@ -68,6 +68,6 @@ public class TestUtils {
     }
 
     public static Sykefraværprosent enSykefraværprosent(String label, int tapteDagsverk, int muligeDagsverk) {
-        return new Sykefraværprosent(label, new BigDecimal(tapteDagsverk), new BigDecimal(muligeDagsverk));
+        return new Sykefraværprosent(label, new BigDecimal(tapteDagsverk), new BigDecimal(muligeDagsverk), 40);
     }
 }

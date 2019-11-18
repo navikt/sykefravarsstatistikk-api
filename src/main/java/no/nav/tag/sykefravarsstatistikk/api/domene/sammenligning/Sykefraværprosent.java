@@ -9,11 +9,19 @@ import java.math.RoundingMode;
 public class Sykefraværprosent {
     private final String label;
     private final BigDecimal prosent;
+    private final boolean erMaskert;
 
-    public Sykefraværprosent(String label, BigDecimal tapteDagsverk, BigDecimal muligeDagsverk) {
+    public Sykefraværprosent(String label, BigDecimal tapteDagsverk, BigDecimal muligeDagsverk, int antallPersoner) {
         this.label = label;
-        this.prosent = tapteDagsverk
-                .multiply(new BigDecimal(100))
-                .divide(muligeDagsverk, 1, RoundingMode.HALF_UP);
+
+        if (antallPersoner > 4) {
+            erMaskert = false;
+            this.prosent = tapteDagsverk
+                    .multiply(new BigDecimal(100))
+                    .divide(muligeDagsverk, 1, RoundingMode.HALF_UP);
+        } else {
+            erMaskert = true;
+            prosent = null;
+        }
     }
 }
