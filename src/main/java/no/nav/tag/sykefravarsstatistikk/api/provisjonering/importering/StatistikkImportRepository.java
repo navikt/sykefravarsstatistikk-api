@@ -136,24 +136,29 @@ public class StatistikkImportRepository {
       return antallSlettet;
   }
 
-  int batchOpprett(
-          List<? extends Sykefraværsstatistikk> sykefraværsstatistikk,
-          SykefraværsstatistikkIntegrasjonUtils utils,
-          int insertBatchStørrelse
-  ) {
-    List<? extends List<? extends Sykefraværsstatistikk>> subsets =
-            Lists.partition(sykefraværsstatistikk, insertBatchStørrelse);
-    AtomicInteger antallOpprettet = new AtomicInteger();
+    int batchOpprett(
+            List<? extends Sykefraværsstatistikk> sykefraværsstatistikk,
+            SykefraværsstatistikkIntegrasjonUtils utils,
+            int insertBatchStørrelse
+    ) {
 
-    subsets.forEach( subset -> {
+        List<? extends List<? extends Sykefraværsstatistikk>> subsets =
+                Lists.partition(sykefraværsstatistikk, insertBatchStørrelse);
+        AtomicInteger antallOpprettet = new AtomicInteger();
+
+      /*
+        subsets.forEach( subset -> {
               int opprettet = utils.getBatchCreateFunction(subset).apply();
               int opprettetHittilNå = antallOpprettet.addAndGet(opprettet);
 
               log.info(String.format("Opprettet %d rader", opprettetHittilNå));
+              subset.clear();
             }
-    );
+        );*/
 
-    return antallOpprettet.get();
-  }
+        int opprettet = utils.getBatchCreateFunction(sykefraværsstatistikk).apply();
+        antallOpprettet.addAndGet(opprettet);
+        return antallOpprettet.get();
+    }
 
 }

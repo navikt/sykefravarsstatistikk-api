@@ -78,6 +78,20 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
     }
 
 
+    @Test
+    public void createFunction_delete__skal_slette_data_i_lokale_sykefraværstatistikk_tabellen(){
+        lagreSykefraværprosentVirksomhet(namedParameterJdbcTemplate, "987654321", 2018, 3);
+        lagreSykefraværprosentVirksomhet(namedParameterJdbcTemplate, "987654321", 2018, 4);
+        lagreSykefraværprosentVirksomhet(namedParameterJdbcTemplate, "987654321", 2019, 1);
+
+        DeleteSykefraværsstatistikkFunction deleteFunction = utils.getDeleteFunction();
+        deleteFunction.apply(new ÅrstallOgKvartal(2018, 4));
+
+        List<Sykefraværprosent> list = hentSykefraværprosentVirksomhet(namedParameterJdbcTemplate);
+        assertThat(list.size()).isEqualTo(2);
+    }
+
+
     private List<SykefraværsstatistikkVirksomhet> createStatistikk(int antall) {
         List<SykefraværsstatistikkVirksomhet> list = new ArrayList<>();
 
@@ -94,20 +108,6 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
         );
         return list;
     }
-
-    @Test
-    public void createFunction_delete__skal_slette_data_i_lokale_sykefraværstatistikk_tabellen(){
-        lagreSykefraværprosentVirksomhet(namedParameterJdbcTemplate, "987654321", 2018, 3);
-        lagreSykefraværprosentVirksomhet(namedParameterJdbcTemplate, "987654321", 2018, 4);
-        lagreSykefraværprosentVirksomhet(namedParameterJdbcTemplate, "987654321", 2019, 1);
-
-        DeleteSykefraværsstatistikkFunction deleteFunction = utils.getDeleteFunction();
-        deleteFunction.apply(new ÅrstallOgKvartal(2018, 4));
-
-        List<Sykefraværprosent> list = hentSykefraværprosentVirksomhet(namedParameterJdbcTemplate);
-        assertThat(list.size()).isEqualTo(2);
-    }
-
 
     private static List<Sykefraværprosent> hentSykefraværprosentVirksomhet(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
 
