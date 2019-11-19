@@ -6,7 +6,7 @@ metadata:
   labels:
     team: teamtag
 spec:
-  image: navikt/sykefravarsstatistikk-api:{{version}}
+  image: navikt/sykefravarsstatistikk-api:1b79c287a0673e2980146a1ffc657cbbe1f65102
   team: teamtag
   port: 8080
   ingresses:
@@ -28,6 +28,6 @@ spec:
     enabled: true
   resources:
     limits:
-      memory: 1024
+      memory: 1024Mi
     requests:
-      memory: 512
+      memory: 512Mi
