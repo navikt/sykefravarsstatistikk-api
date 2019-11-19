@@ -69,9 +69,13 @@ public class SykefraværsstatistikkSektorUtilsJdbcTest {
                 new Sykefraværprosent(
                         LABEL,
                         new BigDecimal(55.123),
-                        new BigDecimal(856.891)
+                        new BigDecimal(856.891),
+                        14
                 )
         );
+
+        assertThat(resultList.size()).isEqualTo(1);
+        assertThat(resultList.get(0)).isEqualTo((new Sykefraværprosent(LABEL, new BigDecimal(55.123), new BigDecimal(856.891), 14)));
     }
 
     @Test
@@ -99,7 +103,8 @@ public class SykefraværsstatistikkSektorUtilsJdbcTest {
                 (rs, rowNum) -> new Sykefraværprosent(
                         LABEL,
                         rs.getBigDecimal("tapte_dagsverk"),
-                        rs.getBigDecimal("mulige_dagsverk")
+                        rs.getBigDecimal("mulige_dagsverk"),
+                        rs.getInt("antall_personer")
                 )
         );
     }

@@ -61,7 +61,7 @@ public class SammenligningRepositoryJdbcTest {
                 "insert into sykefravar_statistikk_sektor " +
                         "(sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES ( :sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(2018, 1, 1,8, 23).addValue("sektor_kode", "1")
+                parametre(2018, 1, 5,8, 23).addValue("sektor_kode", "1")
         );
 
         Sykefraværprosent resultat = repository.hentSykefraværprosentSektor(2018, 1, "1");

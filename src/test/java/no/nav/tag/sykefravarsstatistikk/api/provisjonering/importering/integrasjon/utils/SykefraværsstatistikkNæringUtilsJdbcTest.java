@@ -69,7 +69,8 @@ public class SykefraværsstatistikkNæringUtilsJdbcTest {
                 new Sykefraværprosent(
                         LABEL,
                         new BigDecimal(55.123),
-                        new BigDecimal(856.891)
+                        new BigDecimal(856.891),
+                        14
                 )
         );
     }
@@ -99,7 +100,8 @@ public class SykefraværsstatistikkNæringUtilsJdbcTest {
                 (rs, rowNum) -> new Sykefraværprosent(
                         LABEL,
                         rs.getBigDecimal("tapte_dagsverk"),
-                        rs.getBigDecimal("mulige_dagsverk")
+                        rs.getBigDecimal("mulige_dagsverk"),
+                        rs.getInt("antall_personer")
                 )
         );
     }
