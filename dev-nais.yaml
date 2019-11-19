@@ -6,7 +6,7 @@ metadata:
   labels:
     team: teamtag
 spec:
-  image: navikt/sykefravarsstatistikk-api:1b79c287a0673e2980146a1ffc657cbbe1f65102
+  image: navikt/sykefravarsstatistikk-api:{{version}}
   team: teamtag
   port: 8080
   ingresses:
