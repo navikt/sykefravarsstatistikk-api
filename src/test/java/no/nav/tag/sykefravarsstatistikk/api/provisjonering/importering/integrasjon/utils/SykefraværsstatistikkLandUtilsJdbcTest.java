@@ -53,7 +53,7 @@ public class SykefraværsstatistikkLandUtilsJdbcTest {
 
         List<Sykefraværprosent> list = hentSykefraværprosentLand(namedParameterJdbcTemplate);
         assertThat(list.size()).isEqualTo(1);
-        assertThat(list.get(0)).isEqualTo((new Sykefraværprosent(LABEL, new BigDecimal(55.123), new BigDecimal(856.891))));
+        assertThat(list.get(0)).isEqualTo((new Sykefraværprosent(LABEL, new BigDecimal(55.123), new BigDecimal(856.891), 14)));
     }
 
     @Test
@@ -78,7 +78,8 @@ public class SykefraværsstatistikkLandUtilsJdbcTest {
                 (rs, rowNum) -> new Sykefraværprosent(
                         LABEL,
                         rs.getBigDecimal("tapte_dagsverk"),
-                        rs.getBigDecimal("mulige_dagsverk")
+                        rs.getBigDecimal("mulige_dagsverk"),
+                        rs.getInt("antall_personer")
                 )
         );
     }

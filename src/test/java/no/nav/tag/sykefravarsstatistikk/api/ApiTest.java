@@ -47,16 +47,19 @@ public class ApiTest {
                 "  \"årstall\": 2019," +
                 "  \"virksomhet\": {" +
                 "    \"label\": \"NAV ARBEID OG YTELSER AVD OSLO\"," +
-                "    \"prosent\": 12.8" +
+                "    \"prosent\": 12.8," +
+                "    \"erMaskert\": false" +
                 "  }," +
                 "  \"næring\": {" +
                 "    \"label\": \"Trygdeordninger underlagt offentlig forvaltning\"," +
-                "    \"prosent\": 5.6" +
+                "    \"prosent\": 5.6," +
+                "    \"erMaskert\": false" +
                 "  }," +
                 "  \"sektor\": null," +
                 "  \"land\": {" +
                 "    \"label\": \"Norge\"," +
-                "    \"prosent\": 5.5" +
+                "    \"prosent\": 5.5," +
+                "    \"erMaskert\": false" +
                 "  }" +
                 "}"
         );
