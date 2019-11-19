@@ -7,6 +7,8 @@ import java.math.RoundingMode;
 
 @Value
 public class Sykefraværprosent {
+    private static final int MINIMUM_ANTALL_PERSONER_SOM_SKAL_TIL_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER = 5;
+
     private final String label;
     private final BigDecimal prosent;
     private final boolean erMaskert;
@@ -14,7 +16,7 @@ public class Sykefraværprosent {
     public Sykefraværprosent(String label, BigDecimal tapteDagsverk, BigDecimal muligeDagsverk, int antallPersoner) {
         this.label = label;
 
-        if (antallPersoner > 4) {
+        if (antallPersoner >= MINIMUM_ANTALL_PERSONER_SOM_SKAL_TIL_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER) {
             erMaskert = false;
             this.prosent = tapteDagsverk
                     .multiply(new BigDecimal(100))
