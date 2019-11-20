@@ -25,7 +25,7 @@ public class MockServer {
     private final WireMockServer server;
 
     public MockServer(
-            @Value("${mock.port}") Integer port,
+            @Value("${wiremock.mock.port}") Integer port,
             @Value("${altinn.url}") String altinnUrl,
             @Value("${enhetsregisteret.url}") String enhetsregisteretUrl,
             Environment environment

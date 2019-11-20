@@ -18,11 +18,11 @@ spring:
     enabled: true
     path: /h2
 
-mock:
+wiremock.mock:
   port: 8081
 
 altinn:
-  url: "http://localhost:${mock.port}/altinn/"
+  url: "http://localhost:${wiremock.mock.port}/altinn/"
   apikey: "test"
   apigw.apikey: "test"
   iaweb.service:
@@ -30,7 +30,7 @@ altinn:
     edition: 1
 
 enhetsregisteret:
-  url: "http://localhost:${mock.port}/enhetsregisteret/"
+  url: "http://localhost:${wiremock.mock.port}/enhetsregisteret/"
 
 no.nav.security.oidc:
   issuers: iss-localhost, selvbetjening
@@ -106,11 +106,11 @@ altinn:
 spring:
   profiles: dev
 
-mock:
+wiremock.mock:
   port: 8081
 
 enhetsregisteret:
-  url: "http://localhost:${mock.port}/enhetsregisteret/"
+  url: "http://localhost:${wiremock.mock.port}/enhetsregisteret/"
 
 altinn:
   url: "https://api-gw-q1.adeo.no/"
