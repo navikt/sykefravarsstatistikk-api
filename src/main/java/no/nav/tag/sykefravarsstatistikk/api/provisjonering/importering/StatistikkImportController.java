@@ -24,26 +24,6 @@ public class StatistikkImportController {
         this.service = service;
     }
 
-    // TODO: DELETE ME! fjerne disse GET endepunkter som brukes til verifisering i dev miljø
-    @GetMapping(value = "/verif/datavarehus/sykefravar/land/{årstall}/{kvartal}")
-    public List<SykefraværsstatistikkLand> hentSykefraværsstatistikkLand(@PathVariable int årstall, @PathVariable int kvartal) {
-        return service.hentSykefraværsstatistikkLand(new ÅrstallOgKvartal(årstall, kvartal));
-    }
-
-    @GetMapping(value = "/verif/datavarehus/sykefravar/sektor/{årstall}/{kvartal}")
-    public List<SykefraværsstatistikkSektor> hentSykefraværsstatistikkSektor(@PathVariable int årstall, @PathVariable int kvartal) {
-        return service.hentSykefraværsstatistikkSektor(new ÅrstallOgKvartal(årstall, kvartal));
-    }
-
-    @GetMapping(value = "/verif/datavarehus/sykefravar/naring/{årstall}/{kvartal}")
-    public List<SykefraværsstatistikkNæring> hentSykefraværsstatistikkNæring(@PathVariable int årstall, @PathVariable int kvartal) {
-        return service.hentSykefraværsstatistikkNæring(new ÅrstallOgKvartal(årstall, kvartal));
-    }
-
-    @GetMapping(value = "/verif/datavarehus/sykefravar/virksomhet/{årstall}/{kvartal}")
-    public List<SykefraværsstatistikkVirksomhet> hentSykefraværsstatistikkVirksomhet(@PathVariable int årstall, @PathVariable int kvartal) {
-        return service.hentSykefraværsstatistikkVirksomhet(new ÅrstallOgKvartal(årstall, kvartal));
-    }
 
     @PostMapping(value = "/land/{årstall}/{kvartal}")
     public SlettOgOpprettResultat importSykefraværsstatistikkLand(@PathVariable int årstall, @PathVariable int kvartal) {

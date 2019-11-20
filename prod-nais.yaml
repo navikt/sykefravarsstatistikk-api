@@ -13,10 +13,10 @@ spec:
     - https://arbeidsgiver.nais.adeo.no/sykefravarsstatistikk-api/
   liveness:
     path: /sykefravarsstatistikk-api/internal/healthcheck
-    initialDelay: 20
+    initialDelay: 30
   readiness:
     path: /sykefravarsstatistikk-api/internal/healthcheck
-    initialDelay: 20
+    initialDelay: 30
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: prod
@@ -26,3 +26,8 @@ spec:
   webproxy: true
   vault:
     enabled: true
+  resources:
+    limits:
+      memory: 1024Mi
+    requests:
+      memory: 512Mi

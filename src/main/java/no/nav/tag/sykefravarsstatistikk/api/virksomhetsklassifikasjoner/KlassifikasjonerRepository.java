@@ -1,5 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api.virksomhetsklassifikasjoner;
 
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -33,6 +34,22 @@ public class KlassifikasjonerRepository {
                 (rs, rowNum) -> mapTilSektor(rs)
         );
     }
+
+    public Næring hentNæring(String kode) {
+        SqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("kode", kode);
+
+        return namedParameterJdbcTemplate.queryForObject(
+                "SELECT * FROM naring WHERE kode = :kode",
+                namedParameters,
+                (rs, rowNum) -> new Næring(
+                        rs.getString("kode"),
+                        rs.getString("navn")
+                )
+
+        );
+    }
+
 
     protected Sektor mapTilSektor(ResultSet rs) throws SQLException {
         return new Sektor(

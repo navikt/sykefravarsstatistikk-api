@@ -42,17 +42,6 @@ public class VirksomhetsklassifikasjonerSynkroniseringService {
     }
 
     public OpprettEllerOppdaterResultat populerNæringskoder() {
-        return populerNæringer();
-    }
-
-    // TODO: DELETE ME --> bare til versifisering
-    public List<Sektor> hentSektorer() {
-        return datavarehusRepository.hentAlleSektorer();
-    }
-
-
-
-    private OpprettEllerOppdaterResultat populerNæringer() {
 
         List<Næring> næringer = datavarehusRepository.hentAlleNæringer();
         OpprettEllerOppdaterResultat resultat =
@@ -66,6 +55,5 @@ public class VirksomhetsklassifikasjonerSynkroniseringService {
         );
         return resultat;
     }
-
 
 }
