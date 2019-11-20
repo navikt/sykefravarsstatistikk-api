@@ -1,6 +1,6 @@
 {
   "organisasjonsnummer": "910562452",
-  "navn": "NAV ARBEID OG YTELSER AVD OSLO",
+  "navn": "(devmock) NAV ARBEID OG YTELSER AVD OSLO",
   "organisasjonsform": {
     "kode": "BEDR",
     "beskrivelse": "Bedrift",
@@ -28,7 +28,7 @@
     "kode": "10.300"
   },
   "antallAnsatte": 143,
-  "overordnetEnhet": "999263550",
+  "overordnetEnhet": "910562223",
   "oppstartsdato": "2010-01-01",
   "datoEierskifte": "2013-01-01",
   "beliggenhetsadresse": {
