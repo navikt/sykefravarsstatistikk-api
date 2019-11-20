@@ -6,31 +6,40 @@ import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
 import io.micrometer.core.instrument.util.IOUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
+import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Slf4j
 @Component
-@Profile("local")
+@Profile({"local", "dev"})
 public class MockServer {
     private final WireMockServer server;
 
     public MockServer(
             @Value("${mock.port}") Integer port,
             @Value("${altinn.url}") String altinnUrl,
-            @Value("${enhetsregisteret.url}") String enhetsregisteretUrl
+            @Value("${enhetsregisteret.url}") String enhetsregisteretUrl,
+            Environment environment
     ) {
         log.info("Starter mock-server på port " + port);
 
         this.server = new WireMockServer(port);
 
-        mockKallFraFil(altinnUrl + "ekstern/altinn/api/serviceowner/reportees", "altinnReportees.json");
+        if (Arrays.asList(environment.getActiveProfiles()).contains("local")) {
+            log.info("Mocker kall fra Altinn");
+            mockKallFraFil(altinnUrl + "ekstern/altinn/api/serviceowner/reportees", "altinnReportees.json");
+        }
+
+        log.info("Mocker kall fra Enhetsregisteret");
         mockKallFraEnhetsregisteret(enhetsregisteretUrl);
 
         server.start();
@@ -40,7 +49,9 @@ public class MockServer {
     private void mockKallFraEnhetsregisteret(String enhetsregisteretUrl) {
         String path = new URL(enhetsregisteretUrl).getPath();
         mockKall(WireMock.urlPathMatching(path + "underenheter/[0-9]{9}"), lesFilSomString("enhetsregisteretUnderenhet.json"));
+        mockKall(WireMock.urlPathMatching(path + "underenheter/910562452"), lesFilSomString("dev_enhetsregisteretUnderenhet.json"));
         mockKall(WireMock.urlPathMatching(path + "enheter/[0-9]{9}"), lesFilSomString("enhetsregisteretEnhet.json"));
+        mockKall(WireMock.urlPathMatching(path + "enheter/910562223"), lesFilSomString("dev_enhetsregisteretEnhet.json"));
     }
 
     private void mockKallFraFil(String url, String filnavn) {
