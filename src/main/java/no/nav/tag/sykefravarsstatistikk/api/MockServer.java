@@ -6,12 +6,15 @@ import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
 import io.micrometer.core.instrument.util.IOUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
+import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -25,13 +28,13 @@ public class MockServer {
             @Value("${mock.port}") Integer port,
             @Value("${altinn.url}") String altinnUrl,
             @Value("${enhetsregisteret.url}") String enhetsregisteretUrl,
-            @Value("${spring.profiles.active}") String springProfileActive
+            Environment environment
     ) {
         log.info("Starter mock-server på port " + port);
 
         this.server = new WireMockServer(port);
 
-        if ("local".equals(springProfileActive)) {
+        if (Arrays.asList(environment.getActiveProfiles()).contains("local")) {
             System.out.println("Mocker kall fra Altinn");
             mockKallFraFil(altinnUrl + "ekstern/altinn/api/serviceowner/reportees", "altinnReportees.json");
         }
