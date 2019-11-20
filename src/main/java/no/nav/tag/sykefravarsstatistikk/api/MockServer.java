@@ -35,11 +35,11 @@ public class MockServer {
         this.server = new WireMockServer(port);
 
         if (Arrays.asList(environment.getActiveProfiles()).contains("local")) {
-            System.out.println("Mocker kall fra Altinn");
+            log.info("Mocker kall fra Altinn");
             mockKallFraFil(altinnUrl + "ekstern/altinn/api/serviceowner/reportees", "altinnReportees.json");
         }
 
-        System.out.println("Mocker kall fra Enhetsregisteret");
+        log.info("Mocker kall fra Enhetsregisteret");
         mockKallFraEnhetsregisteret(enhetsregisteretUrl);
 
         server.start();
