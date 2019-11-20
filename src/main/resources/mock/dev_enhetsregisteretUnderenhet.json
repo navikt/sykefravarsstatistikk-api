@@ -1,6 +1,6 @@
 {
   "organisasjonsnummer": "910562452",
-  "navn": "(devmock) NAV ARBEID OG YTELSER AVD OSLO",
+  "navn": "(devmock) Orkanger og Bremnes barnehage",
   "organisasjonsform": {
     "kode": "BEDR",
     "beskrivelse": "Bedrift",
@@ -24,8 +24,8 @@
   "registreringsdatoEnhetsregisteret": "2009-11-30",
   "registrertIMvaregisteret": false,
   "naeringskode1": {
-    "beskrivelse": "Trygdeordninger underlagt offentlig forvaltning",
-    "kode": "10.300"
+    "beskrivelse": "Barnehager",
+    "kode": "88.911"
   },
   "antallAnsatte": 143,
   "overordnetEnhet": "910562223",
