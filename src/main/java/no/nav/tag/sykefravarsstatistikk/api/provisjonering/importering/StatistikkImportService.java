@@ -24,22 +24,6 @@ public class StatistikkImportService {
         this.statistikkImportRepository = statistikkImportRepository;
     }
 
-    // TODO: DELETE ME --> bare til versifisering
-    public List<SykefraværsstatistikkLand> hentSykefraværsstatistikkLand(ÅrstallOgKvartal årstallOgKvartal) {
-        return datavarehusRepository.hentSykefraværsstatistikkLand(årstallOgKvartal);
-    }
-
-    public List<SykefraværsstatistikkSektor> hentSykefraværsstatistikkSektor(ÅrstallOgKvartal årstallOgKvartal) {
-        return datavarehusRepository.hentSykefraværsstatistikkSektor(årstallOgKvartal);
-    }
-
-    public List<SykefraværsstatistikkNæring> hentSykefraværsstatistikkNæring(ÅrstallOgKvartal årstallOgKvartal) {
-        return datavarehusRepository.hentSykefraværsstatistikkNæring(årstallOgKvartal);
-    }
-
-    public List<SykefraværsstatistikkVirksomhet> hentSykefraværsstatistikkVirksomhet(ÅrstallOgKvartal årstallOgKvartal) {
-        return datavarehusRepository.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal);
-    }
 
     public SlettOgOpprettResultat importSykefraværsstatistikkLand(ÅrstallOgKvartal årstallOgKvartal) {
         List<SykefraværsstatistikkLand> sykefraværsstatistikkLand =
