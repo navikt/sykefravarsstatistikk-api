@@ -26,3 +26,8 @@ spec:
   webproxy: true
   vault:
     enabled: true
+  resources:
+    limits:
+      memory: 1024Mi
+    requests:
+      memory: 512Mi
