@@ -106,8 +106,11 @@ altinn:
 spring:
   profiles: dev
 
+mock:
+  port: 8081
+
 enhetsregisteret:
-  url: "https://data.brreg.no/enhetsregisteret/api/"
+  url: "http://localhost:${mock.port}/enhetsregisteret/"
 
 altinn:
   url: "https://api-gw-q1.adeo.no/"

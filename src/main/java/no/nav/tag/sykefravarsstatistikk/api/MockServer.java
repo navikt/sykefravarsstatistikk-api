@@ -17,20 +17,26 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Slf4j
 @Component
-@Profile("local")
+@Profile({"local", "dev"})
 public class MockServer {
     private final WireMockServer server;
 
     public MockServer(
             @Value("${mock.port}") Integer port,
             @Value("${altinn.url}") String altinnUrl,
-            @Value("${enhetsregisteret.url}") String enhetsregisteretUrl
+            @Value("${enhetsregisteret.url}") String enhetsregisteretUrl,
+            @Value("${spring.profiles.active}") String springProfileActive
     ) {
         log.info("Starter mock-server på port " + port);
 
         this.server = new WireMockServer(port);
 
-        mockKallFraFil(altinnUrl + "ekstern/altinn/api/serviceowner/reportees", "altinnReportees.json");
+        if ("local".equals(springProfileActive)) {
+            System.out.println("Mocker kall fra Altinn");
+            mockKallFraFil(altinnUrl + "ekstern/altinn/api/serviceowner/reportees", "altinnReportees.json");
+        }
+
+        System.out.println("Mocker kall fra Enhetsregisteret");
         mockKallFraEnhetsregisteret(enhetsregisteretUrl);
 
         server.start();
