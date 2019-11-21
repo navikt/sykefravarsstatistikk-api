@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.junit.After;
@@ -63,14 +64,14 @@ public class SammenligningRepositoryJdbcTest {
                         + "VALUES ( :sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
                 parametre(2018, 1, 5,8, 23).addValue("sektor_kode", "1")
         );
-
-        Sykefraværprosent resultat = repository.hentSykefraværprosentSektor(2018, 1, "1");
-        assertThat(resultat).isEqualTo(enSykefraværprosent("Offentlig næringsvirksomhet", 8, 23));
+        Sektor sektor = new Sektor("1", "Offentlig næringsvirksomhet");
+        Sykefraværprosent resultat = repository.hentSykefraværprosentSektor(2018, 1, sektor);
+        assertThat(resultat).isEqualTo(enSykefraværprosent(sektor.getNavn(), 8, 23));
     }
 
     @Test
     public void hentSykefraværprosentSektor__skal_returnere_null_hvis_database_ikke_har_data() {
-        assertThat(repository.hentSykefraværprosentSektor(2020, 1, "0")).isNull();
+        assertThat(repository.hentSykefraværprosentSektor(2020, 1, enSektor())).isNull();
     }
 
     @Test

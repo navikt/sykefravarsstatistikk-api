@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -57,16 +58,16 @@ public class SammenligningRepository {
         );
     }
 
-    public Sykefraværprosent hentSykefraværprosentSektor(int årstall, int kvartal, String sektor) {
+    public Sykefraværprosent hentSykefraværprosentSektor(int årstall, int kvartal, Sektor sektor) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue(ÅRSTALL, årstall)
                 .addValue(KVARTAL, kvartal)
-                .addValue(SEKTOR, sektor);
+                .addValue(SEKTOR, sektor.getKode());
 
         return queryForSykefraværsprosentOgHåndterHvisIngenResultat(
                 "SELECT * FROM SYKEFRAVAR_STATISTIKK_SEKTOR WHERE arstall = :arstall AND kvartal = :kvartal AND sektor_kode = :sektor",
                 namedParameters,
-                "Offentlig næringsvirksomhet"
+                sektor.getNavn()
         );
     }
 

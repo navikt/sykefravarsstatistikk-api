@@ -5,6 +5,7 @@ import no.nav.security.oidc.api.Protected;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import no.nav.tag.sykefravarsstatistikk.api.sammenligning.SammenligningRepository;
@@ -72,7 +73,7 @@ public class SammenligningVerifikasjonController {
             @PathVariable int årstall,
             @PathVariable int kvartal
     ) {
-        return sykefravarprosentRepository.hentSykefraværprosentSektor(årstall, kvartal, sektor);
+        return sykefravarprosentRepository.hentSykefraværprosentSektor(årstall, kvartal, new Sektor(sektor, "tom label"));
     }
 
     @GetMapping(value = "/sykefravarsprosent/land/{årstall}/{kvartal}")

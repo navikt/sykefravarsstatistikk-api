@@ -55,7 +55,11 @@ public class ApiTest {
                 "    \"prosent\": 5.6," +
                 "    \"erMaskert\": false" +
                 "  }," +
-                "  \"sektor\": null," +
+                "  \"sektor\": {" +
+                "    \"label\": \"Statlig forvaltning\"," +
+                "    \"prosent\": 5.2," +
+                "    \"erMaskert\": false" +
+                "  }," +
                 "  \"land\": {" +
                 "    \"label\": \"Norge\"," +
                 "    \"prosent\": 5.5," +
