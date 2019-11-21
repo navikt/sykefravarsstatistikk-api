@@ -51,7 +51,7 @@ public class ApiTest {
                 "    \"erMaskert\": false" +
                 "  }," +
                 "  \"næring\": {" +
-                "    \"label\": \"Trygdeordninger underlagt offentlig forvaltning\"," +
+                "    \"label\": \"Produksjon av nærings- og nytelsesmidler\"," +
                 "    \"prosent\": 5.6," +
                 "    \"erMaskert\": false" +
                 "  }," +
