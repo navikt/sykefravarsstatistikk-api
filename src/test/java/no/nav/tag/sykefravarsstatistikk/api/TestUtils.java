@@ -5,6 +5,7 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 
@@ -69,5 +70,9 @@ public class TestUtils {
 
     public static Sykefraværprosent enSykefraværprosent(String label, int tapteDagsverk, int muligeDagsverk) {
         return new Sykefraværprosent(label, new BigDecimal(tapteDagsverk), new BigDecimal(muligeDagsverk), 40);
+    }
+
+    public static Sektor enSektor() {
+        return new Sektor("1", "Statlig forvaltning");
     }
 }
