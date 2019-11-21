@@ -64,7 +64,7 @@ public class SammenligningRepositoryJdbcTest {
                         + "VALUES ( :sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
                 parametre(2018, 1, 5,8, 23).addValue("sektor_kode", "1")
         );
-        Sektor sektor = new Sektor("1", "Offentlig næringsvirksomhet");
+        Sektor sektor = enSektor();
         Sykefraværprosent resultat = repository.hentSykefraværprosentSektor(2018, 1, sektor);
         assertThat(resultat).isEqualTo(enSykefraværprosent(sektor.getNavn(), 8, 23));
     }
