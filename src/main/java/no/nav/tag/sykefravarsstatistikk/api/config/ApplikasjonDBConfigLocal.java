@@ -33,6 +33,7 @@ public class ApplikasjonDBConfigLocal {
     @Bean(name = "sykefravarsstatistikkDataSource")
     public DataSource sykefravarsstatistikkDataSource() {
         HikariConfig config = new HikariConfig();
+        config.setPoolName("Sykefraværsstatistikk-connection-pool-local");
         config.setJdbcUrl(databaseUrl);
         config.setUsername(username);
         config.setPassword(password);

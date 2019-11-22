@@ -36,6 +36,7 @@ public class DatavarehusDBConfig {
         Properties properties = new Properties();
         properties.put("dataSource.oracle.jdbc.fanEnabled", false);
         HikariConfig config = new HikariConfig(properties);
+        config.setPoolName("Datavarehus-connection-pool");
         config.setJdbcUrl(databaseUrl);
         config.setUsername(username);
         config.setPassword(password);

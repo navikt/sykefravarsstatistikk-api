@@ -47,6 +47,7 @@ public class ApplikasjonDBConfig {
     @SneakyThrows
     private HikariDataSource dataSource(String user) {
         HikariConfig config = new HikariConfig();
+        config.setPoolName("Sykefraværsstatistikk-connection-pool");
         config.setJdbcUrl(databaseUrl);
         config.setMaximumPoolSize(2);
         config.setMinimumIdle(1);
