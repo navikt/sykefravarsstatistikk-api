@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
@@ -76,25 +77,25 @@ public class SammenligningRepositoryJdbcTest {
 
     @Test
     public void hentSykefraværprosentNæring__skal_returnere_riktig_sykefravær() {
-        Næringskode5Siffer næringskode = new Næringskode5Siffer("74123", "Spesiell næring");
+        Næring næring = new Næring("74123", "Spesiell næring");
 
-        insertNæringskode(næringskode);
+        insertNæringskode(næring);
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_naring " +
                         "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
                 parametre(2017, 3, 10,56, 2051)
-                        .addValue("naring_kode", næringskode.hentNæringskode2Siffer())
+                        .addValue("naring_kode", næring.getKode())
         );
 
-        Sykefraværprosent resultat = repository.hentSykefraværprosentNæring(2017, 3, næringskode);
+        Sykefraværprosent resultat = repository.hentSykefraværprosentNæring(2017, 3, næring);
 
-        assertThat(resultat).isEqualTo(enSykefraværprosent(næringskode.getBeskrivelse(), 56, 2051));
+        assertThat(resultat).isEqualTo(enSykefraværprosent(næring.getNavn(), 56, 2051));
     }
 
     @Test
     public void hentSykefraværprosentNæring__skal_returnere_null_hvis_database_ikke_har_data() {
-        assertThat(repository.hentSykefraværprosentNæring(2020, 1, enNæringskode5Siffer())).isNull();
+        assertThat(repository.hentSykefraværprosentNæring(2020, 1, enNæring())).isNull();
     }
 
     @Test
@@ -118,12 +119,12 @@ public class SammenligningRepositoryJdbcTest {
         assertThat(repository.hentSykefraværprosentVirksomhet(2020, 1, enUnderenhet())).isNull();
     }
 
-    private void insertNæringskode(Næringskode5Siffer næringskode) {
+    private void insertNæringskode(Næring næring) {
         jdbcTemplate.update(
                 "insert into naring (kode, navn) VALUES (:kode, :navn)",
                 new MapSqlParameterSource()
-                        .addValue("kode", næringskode.hentNæringskode2Siffer())
-                        .addValue("navn", næringskode.getBeskrivelse())
+                        .addValue("kode", næring.getKode())
+                        .addValue("navn", næring.getNavn())
         );
     }
 

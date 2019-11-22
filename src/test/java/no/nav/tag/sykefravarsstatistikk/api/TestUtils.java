@@ -5,6 +5,7 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
@@ -58,6 +59,14 @@ public class TestUtils {
                 .næringskode(enNæringskode5Siffer())
                 .antallAnsatte(40);
 
+    }
+
+    public static Næring enNæring() {
+        return enNæring("12");
+    }
+
+    public static Næring enNæring(String kode) {
+        return new Næring(kode, "en næring");
     }
 
     public static Næringskode5Siffer enNæringskode5Siffer() {

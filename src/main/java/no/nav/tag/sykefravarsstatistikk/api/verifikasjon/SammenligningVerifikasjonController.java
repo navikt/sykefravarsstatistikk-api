@@ -60,10 +60,7 @@ public class SammenligningVerifikasjonController {
         return sykefravarprosentRepository.hentSykefraværprosentNæring(
                 årstall,
                 kvartal,
-                new Næringskode5Siffer(
-                        String.format("%s.000", næringskode2Siffer),
-                        næring.getNavn()
-                )
+                næring
         );
     }
 

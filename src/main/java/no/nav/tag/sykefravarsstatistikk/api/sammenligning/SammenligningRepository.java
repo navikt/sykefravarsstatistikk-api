@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
@@ -44,17 +45,17 @@ public class SammenligningRepository {
         );
     }
 
-    public Sykefraværprosent hentSykefraværprosentNæring(int årstall, int kvartal, Næringskode5Siffer næringskode5Siffer) {
+    public Sykefraværprosent hentSykefraværprosentNæring(int årstall, int kvartal, Næring næring) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue(ÅRSTALL, årstall)
                 .addValue(KVARTAL, kvartal)
-                .addValue(NÆRING, næringskode5Siffer.hentNæringskode2Siffer());
+                .addValue(NÆRING, næring.getKode());
 
 
         return queryForSykefraværsprosentOgHåndterHvisIngenResultat(
                 "SELECT * FROM SYKEFRAVAR_STATISTIKK_NARING WHERE arstall = :arstall AND kvartal = :kvartal AND naring_kode = :naring",
                 namedParameters,
-                næringskode5Siffer.getBeskrivelse()
+                næring.getNavn()
         );
     }
 
