@@ -8,13 +8,11 @@ import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integr
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.utils.SektorIntegrasjonUtils;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.utils.VirksomhetsklassifikasjonIntegrasjonUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Profile({"local", "dev"})
 @Component
 public class VirksomhetsklassifikasjonerSynkroniseringRepository {
 

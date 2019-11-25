@@ -7,14 +7,12 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.*;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.DeleteSykefraværsstatistikkFunction;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.*;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@Profile({"local", "dev"})
 @Slf4j
 @Component
 public class StatistikkImportRepository {

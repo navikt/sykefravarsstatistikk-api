@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
-@Profile({"dev", "local"})
 @Protected
 @RestController
 @Slf4j
