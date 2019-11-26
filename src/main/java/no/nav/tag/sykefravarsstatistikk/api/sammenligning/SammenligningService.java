@@ -20,7 +20,7 @@ public class SammenligningService {
     private final KlassifikasjonerRepository klassifikasjonerRepository;
 
     private static int ARSTALL = 2019;
-    private static int KVARTAL = 1;
+    private static int KVARTAL = 2;
 
     public SammenligningService(
             SammenligningRepository sykefravarprosentRepository,

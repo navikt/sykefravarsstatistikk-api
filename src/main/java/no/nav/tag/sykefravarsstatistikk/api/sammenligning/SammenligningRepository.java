@@ -3,7 +3,6 @@ package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -17,6 +16,7 @@ import java.sql.SQLException;
 
 @Component
 public class SammenligningRepository {
+    public static final String NORGE = "Norge";
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     public static final String ÅRSTALL = "arstall";
@@ -80,7 +80,7 @@ public class SammenligningRepository {
         return queryForSykefraværsprosentOgHåndterHvisIngenResultat(
                 "SELECT * FROM SYKEFRAVAR_STATISTIKK_LAND where arstall = :arstall and kvartal = :kvartal",
                 namedParameters,
-                "Norge"
+                NORGE
         );
     }
 
@@ -96,7 +96,7 @@ public class SammenligningRepository {
                     (rs, rowNum) -> mapTilSykefraværprosent(sykefraværsprosentLabel, rs)
             );
         } catch (EmptyResultDataAccessException e) {
-            return null;
+            return Sykefraværprosent.tomSykefraværprosent(sykefraværsprosentLabel);
         }
     }
 
