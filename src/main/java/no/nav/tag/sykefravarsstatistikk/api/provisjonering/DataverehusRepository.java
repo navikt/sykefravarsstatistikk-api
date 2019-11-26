@@ -2,10 +2,8 @@ package no.nav.tag.sykefravarsstatistikk.api.provisjonering;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.*;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
-import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppe;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -13,11 +11,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Profile({"local", "dev"})
 @Component
 public class DataverehusRepository {
 
-    public static final String NARGRPNAVN = "nargrpnavn";
     public static final String NARINGKODE = "naringkode";
     public static final String NARINGNAVN = "naringnavn";
     public static final String SEKTORKODE = "sektorkode";

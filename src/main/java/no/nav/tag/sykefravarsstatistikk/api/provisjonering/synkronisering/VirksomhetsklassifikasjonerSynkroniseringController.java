@@ -4,12 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.security.oidc.api.Protected;
 import no.nav.tag.sykefravarsstatistikk.api.common.OpprettEllerOppdaterResultat;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Profile({"local", "dev"})
 @Protected
 @RestController
 @Slf4j
