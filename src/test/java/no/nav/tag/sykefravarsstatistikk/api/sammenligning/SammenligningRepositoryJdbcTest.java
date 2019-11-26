@@ -17,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.*;
+import static no.nav.tag.sykefravarsstatistikk.api.sammenligning.SammenligningRepository.NORGE;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 @ActiveProfiles("db-test")
@@ -54,7 +55,8 @@ public class SammenligningRepositoryJdbcTest {
 
     @Test
     public void hentSykefraværprosentLand__skal_returnere_null_hvis_database_ikke_har_data() {
-        assertThat(repository.hentSykefraværprosentLand(2020, 1)).isNull();
+        assertThat(repository.hentSykefraværprosentLand(2020, 1))
+                .isEqualTo(Sykefraværprosent.tomSykefraværprosent(NORGE));
     }
 
     @Test
@@ -72,7 +74,8 @@ public class SammenligningRepositoryJdbcTest {
 
     @Test
     public void hentSykefraværprosentSektor__skal_returnere_null_hvis_database_ikke_har_data() {
-        assertThat(repository.hentSykefraværprosentSektor(2020, 1, enSektor())).isNull();
+        assertThat(repository.hentSykefraværprosentSektor(2020, 1, enSektor()))
+                .isEqualTo(Sykefraværprosent.tomSykefraværprosent(enSektor().getNavn()));
     }
 
     @Test
@@ -95,7 +98,8 @@ public class SammenligningRepositoryJdbcTest {
 
     @Test
     public void hentSykefraværprosentNæring__skal_returnere_null_hvis_database_ikke_har_data() {
-        assertThat(repository.hentSykefraværprosentNæring(2020, 1, enNæring())).isNull();
+        assertThat(repository.hentSykefraværprosentNæring(2020, 1, enNæring()))
+                .isEqualTo(Sykefraværprosent.tomSykefraværprosent(enNæring().getNavn()));
     }
 
     @Test
@@ -116,7 +120,8 @@ public class SammenligningRepositoryJdbcTest {
 
     @Test
     public void hentSykefraværprosentVirksomhet__skal_returnere_null_hvis_database_ikke_har_data() {
-        assertThat(repository.hentSykefraværprosentVirksomhet(2020, 1, enUnderenhet())).isNull();
+        assertThat(repository.hentSykefraværprosentVirksomhet(2020, 1, enUnderenhet()))
+                .isEqualTo(Sykefraværprosent.tomSykefraværprosent(enUnderenhet().getNavn()));
     }
 
     private void insertNæringskode(Næring næring) {

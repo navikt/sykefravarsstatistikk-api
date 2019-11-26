@@ -26,4 +26,16 @@ public class Sykefraværprosent {
             prosent = null;
         }
     }
+
+
+    private Sykefraværprosent(String label) {
+        this.label = label;
+        this.erMaskert = false;
+        this.prosent = null;
+    }
+
+
+    public static Sykefraværprosent tomSykefraværprosent(String sykefravaærprosentLabel) {
+        return new Sykefraværprosent(sykefravaærprosentLabel);
+    }
 }
