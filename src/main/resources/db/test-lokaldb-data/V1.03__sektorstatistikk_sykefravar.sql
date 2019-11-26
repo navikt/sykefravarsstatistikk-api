@@ -78,4 +78,8 @@ insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_
 insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values ('1', 2019, 1, 10, 890575.02502, 17196245.218916);
 insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values ('2', 2019, 1, 10, 2147460.077814, 28324114.198077);
 insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values ('3', 2019, 1, 10, 4564901.697031, 93387300.640596);
+insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values ('0', 2019, 2, 10, 2162.354254, 71250.686366);
+insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values ('1', 2019, 2, 10, 890575.02502, 17196245.218916);
+insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values ('2', 2019, 2, 10, 2147460.077814, 28324114.198077);
+insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values ('3', 2019, 2, 10, 4564901.697031, 93387300.640596);
 commit

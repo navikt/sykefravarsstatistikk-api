@@ -43,16 +43,16 @@ public class ApiTest {
         );
 
         JsonNode ønsketResponseJson = objectMapper.readTree("{" +
-                "  \"kvartal\": 1," +
+                "  \"kvartal\": 2," +
                 "  \"årstall\": 2019," +
                 "  \"virksomhet\": {" +
                 "    \"label\": \"NAV ARBEID OG YTELSER AVD OSLO\"," +
-                "    \"prosent\": 12.8," +
+                "    \"prosent\": 12.0," +
                 "    \"erMaskert\": false" +
                 "  }," +
                 "  \"næring\": {" +
                 "    \"label\": \"Produksjon av nærings- og nytelsesmidler\"," +
-                "    \"prosent\": 5.6," +
+                "    \"prosent\": 5.1," +
                 "    \"erMaskert\": false" +
                 "  }," +
                 "  \"sektor\": {" +
@@ -62,7 +62,7 @@ public class ApiTest {
                 "  }," +
                 "  \"land\": {" +
                 "    \"label\": \"Norge\"," +
-                "    \"prosent\": 5.5," +
+                "    \"prosent\": 4.5," +
                 "    \"erMaskert\": false" +
                 "  }" +
                 "}"
