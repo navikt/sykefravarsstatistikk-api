@@ -17,8 +17,9 @@ public class TestController {
         this.meterRegistry = meterRegistry;
 
         DistributionSummary histogram = DistributionSummary
-                .builder("tall.histogram")
+                .builder("nytt.histogram")
                 .sla(10, 20, 30, 40, 50, 100, 500, 1000)
+                .publishPercentileHistogram()
                 .register(meterRegistry);
 
         test(0);
@@ -44,6 +45,6 @@ public class TestController {
     }
 
     private void histogram(int tall) {
-        meterRegistry.summary("tall.histogram").record(tall);
+        meterRegistry.summary("nytt.histogram").record(tall);
     }
 }
