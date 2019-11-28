@@ -17,12 +17,11 @@ public class TestController {
         this.meterRegistry = meterRegistry;
 
         DistributionSummary histogram = DistributionSummary
-                .builder("tall-histogram")
-                .publishPercentiles(0.25, 0.5, 0.75)
-                .publishPercentileHistogram()
-                .minimumExpectedValue(1L)
+                .builder("tall.histogram")
+                .sla(10, 20, 30, 40, 50, 100, 500, 1000)
                 .register(meterRegistry);
 
+        test(0);
     }
 
     @GetMapping(value = "/test/{tall}")
@@ -35,6 +34,7 @@ public class TestController {
         histogram(18);
         histogram(50);
         histogram(60);
+
         histogram(125);
         histogram(234);
         histogram(734);
@@ -44,6 +44,6 @@ public class TestController {
     }
 
     private void histogram(int tall) {
-        meterRegistry.summary("tall-histogram").record(tall);
+        meterRegistry.summary("tall.histogram").record(tall);
     }
 }
