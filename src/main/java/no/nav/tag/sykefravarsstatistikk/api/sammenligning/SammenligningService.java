@@ -9,6 +9,7 @@ import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretCli
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import no.nav.tag.sykefravarsstatistikk.api.virksomhetsklassifikasjoner.KlassifikasjonerRepository;
 import no.nav.tag.sykefravarsstatistikk.api.virksomhetsklassifikasjoner.SektorMappingService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,8 +20,10 @@ public class SammenligningService {
     private final SektorMappingService sektorMappingService;
     private final KlassifikasjonerRepository klassifikasjonerRepository;
 
-    private static int ARSTALL = 2019;
-    private static int KVARTAL = 2;
+    @Value("${statistikk.import.siste.arstall}")
+    private int ARSTALL;
+    @Value("${statistikk.import.siste.kvartal}")
+    private int KVARTAL;
 
     public SammenligningService(
             SammenligningRepository sykefravarprosentRepository,
