@@ -7,9 +7,11 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.S
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
+import no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk.SammenligningEvent;
 import no.nav.tag.sykefravarsstatistikk.api.virksomhetsklassifikasjoner.KlassifikasjonerRepository;
 import no.nav.tag.sykefravarsstatistikk.api.virksomhetsklassifikasjoner.SektorMappingService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,6 +21,7 @@ public class SammenligningService {
     private final EnhetsregisteretClient enhetsregisteretClient;
     private final SektorMappingService sektorMappingService;
     private final KlassifikasjonerRepository klassifikasjonerRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Value("${statistikk.import.siste.arstall}")
     private int ARSTALL;
@@ -29,12 +32,13 @@ public class SammenligningService {
             SammenligningRepository sykefravarprosentRepository,
             EnhetsregisteretClient enhetsregisteretClient,
             SektorMappingService sektorMappingService,
-            KlassifikasjonerRepository klassifikasjonerRepository
-    ) {
+            KlassifikasjonerRepository klassifikasjonerRepository,
+            ApplicationEventPublisher eventPublisher) {
         this.sykefravarprosentRepository = sykefravarprosentRepository;
         this.enhetsregisteretClient = enhetsregisteretClient;
         this.sektorMappingService = sektorMappingService;
         this.klassifikasjonerRepository = klassifikasjonerRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     public Sammenligning hentSammenligningForUnderenhet(
@@ -44,8 +48,7 @@ public class SammenligningService {
         Enhet enhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
         Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(enhet.getInstitusjonellSektorkode());
         Næring næring = klassifikasjonerRepository.hentNæring(underenhet.getNæringskode().hentNæringskode2Siffer());
-
-        return new Sammenligning(
+        Sammenligning sammenligning = new Sammenligning(
                 KVARTAL,
                 ARSTALL,
                 sykefravarprosentRepository.hentSykefraværprosentVirksomhet(ARSTALL, KVARTAL, underenhet),
@@ -53,5 +56,15 @@ public class SammenligningService {
                 sykefravarprosentRepository.hentSykefraværprosentSektor(ARSTALL, KVARTAL, ssbSektor),
                 sykefravarprosentRepository.hentSykefraværprosentLand(ARSTALL, KVARTAL)
         );
+
+        eventPublisher.publishEvent(new SammenligningEvent(
+                underenhet,
+                enhet,
+                ssbSektor,
+                næring,
+                sammenligning
+        ));
+
+        return sammenligning;
     }
 }
