@@ -5,6 +5,7 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -18,14 +19,23 @@ import static no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefrav
 public class BesøksstatistikkRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    private static final String SYKEFRAVÆRSPROSENT = "sykefravarsprosent";
-    private static final String ANTALL_ANSATTE = "antall_ansatte";
-    private static final String ORGNR = "orgnr";
-    private static final String NÆRING_KODE = "naring_kode";
-    private static final String SEKTOR_KODE = "sektor_kode";
-    private static final String ÅRSTALL = "arstall";
-    private static final String KVARTAL = "kvartal";
-    private static final String COOKIE = "cookie";
+    private final static String ÅRSTALL = "arstall";
+    private final static String KVARTAL = "kvartal";
+    private final static String SYKEFRAVÆRSPROSENT = "sykefravarsprosent";
+    private final static String SYKEFRAVÆRSPROSENT_ER_MASKERT = "sykefravarsprosent_er_maskert";
+    private final static String NÆRING_2SIFFER_SYKEFRAVÆRSPROSENT = "naring_2siffer_sykefravarsprosent";
+    private final static String SSB_SEKTOR_SYKEFRAVÆRSPROSENT = "ssb_sektor_sykefravarsprosent";
+    private final static String ORGNR = "orgnr";
+    private final static String ORGANISASJON_NAVN = "organisasjon_navn";
+    private final static String ANTALL_ANSATTE = "antall_ansatte";
+    private final static String NÆRING_5SIFFER_KODE = "naring_5siffer_kode";
+    private final static String NÆRING_5SIFFER_BESKRIVELSE = "naring_5siffer_beskrivelse";
+    private final static String NÆRING_2SIFFER_BESKRIVELSE = "naring_2siffer_beskrivelse";
+    private final static String INSTITUSJONELL_SEKTOR_KODE = "institusjonell_sektor_kode";
+    private final static String INSTITUSJONELL_SEKTOR_BESKRIVELSE = "institusjonell_sektor_beskrivelse";
+    private final static String SSB_SEKTOR_KODE = "ssb_sektor_kode";
+    private final static String SSB_SEKTOR_BESKRIVELSE = "ssb_sektor_beskrivelse";
+    private final static String COOKIE = "cookie";
 
     private static final String ANTALL_SMÅ_VIRKSOMHETER = "antall_smaa_virksomheter";
 
@@ -40,23 +50,35 @@ public class BesøksstatistikkRepository {
             Underenhet underenhet,
             Enhet enhet,
             Sektor ssbSektor,
-            Næring næring,
+            Næringskode5Siffer næring5siffer,
+            Næring næring2siffer,
             Sammenligning sammenligning
     ) {
+       
+        
         if (underenhet.getAntallAnsatte() >= MINIMUM_ANTALL_PERSONER_SOM_SKAL_TIL_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER) {
             namedParameterJdbcTemplate.update(
                     "insert into besoksstatistikk_virksomhet " +
-                            "(sykefravarsprosent, antall_ansatte, orgnr, naring_kode, sektor_kode, arstall, kvartal, cookie) " +
-                            "values (:sykefravarsprosent, :antall_ansatte, :orgnr, :naring_kode, :sektor_kode, :arstall, :kvartal, :cookie)",
+                            "(arstall, kvartal, sykefravarsprosent, sykefravarsprosent_er_maskert, naring_2siffer_sykefravarsprosent, ssb_sektor_sykefravarsprosent, orgnr, organisasjon_navn, antall_ansatte, naring_5siffer_kode, naring_5siffer_beskrivelse, naring_2siffer_beskrivelse, institusjonell_sektor_kode, institusjonell_sektor_beskrivelse, ssb_sektor_kode, ssb_sektor_beskrivelse, cookie) " +
+                            "values (:arstall, :kvartal, :sykefravarsprosent_er_maskert, :sykefravarsprosent, :naring_2siffer_sykefravarsprosent, :ssb_sektor_sykefravarsprosent, :orgnr, :organisasjon_navn, :antall_ansatte, :naring_5siffer_kode, :naring_5siffer_beskrivelse, :naring_2siffer_beskrivelse, :institusjonell_sektor_kode, :institusjonell_sektor_beskrivelse, :ssb_sektor_kode, :ssb_sektor_beskrivelse, :cookie)",
                     new MapSqlParameterSource()
-                            .addValue(SYKEFRAVÆRSPROSENT, sammenligning.getVirksomhet().getProsent())
-                            .addValue(ANTALL_ANSATTE, underenhet.getAntallAnsatte())
-                            .addValue(ORGNR, underenhet.getOrgnr().getVerdi())
-                            .addValue(NÆRING_KODE, underenhet.getNæringskode().getKode())
-                            .addValue(SEKTOR_KODE, enhet.getInstitusjonellSektorkode().getKode())
                             .addValue(ÅRSTALL, sammenligning.getÅrstall())
                             .addValue(KVARTAL, sammenligning.getKvartal())
-                            .addValue(COOKIE, "cookie")
+                            .addValue(SYKEFRAVÆRSPROSENT, sammenligning.getVirksomhet().getProsent())
+                            .addValue(SYKEFRAVÆRSPROSENT_ER_MASKERT, sammenligning.getVirksomhet().isErMaskert())
+                            .addValue(NÆRING_2SIFFER_SYKEFRAVÆRSPROSENT, sammenligning.getNæring().getProsent())
+                            .addValue(SSB_SEKTOR_SYKEFRAVÆRSPROSENT, sammenligning.getSektor().getProsent())
+                            .addValue(ORGNR, enhet.getOrgnr())
+                            .addValue(ORGANISASJON_NAVN, enhet.getNavn())
+                            .addValue(ANTALL_ANSATTE, enhet.getAntallAnsatte())
+                            .addValue(NÆRING_5SIFFER_KODE, næring5siffer.getKode())
+                            .addValue(NÆRING_5SIFFER_BESKRIVELSE, næring5siffer.getBeskrivelse())
+                            .addValue(NÆRING_2SIFFER_BESKRIVELSE, næring2siffer.getNavn())
+                            .addValue(INSTITUSJONELL_SEKTOR_KODE, enhet.getInstitusjonellSektorkode().getKode())
+                            .addValue(INSTITUSJONELL_SEKTOR_BESKRIVELSE, enhet.getInstitusjonellSektorkode().getBeskrivelse())
+                            .addValue(SSB_SEKTOR_KODE, ssbSektor.getKode())
+                            .addValue(SSB_SEKTOR_BESKRIVELSE, ssbSektor.getNavn())
+                            .addValue(COOKIE, sammenligning.getÅrstall())
             );
         } else {
             namedParameterJdbcTemplate.update(

@@ -20,7 +20,8 @@ public class BesøksstatistikkEventListener {
                 sammenligningEvent.getUnderenhet(),
                 sammenligningEvent.getEnhet(),
                 sammenligningEvent.getSsbSektor(),
-                sammenligningEvent.getNæring(),
+                sammenligningEvent.getNæring5siffer(),
+                sammenligningEvent.getNæring2siffer(),
                 sammenligningEvent.getSammenligning()
         );
     }

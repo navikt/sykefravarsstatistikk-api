@@ -6,6 +6,7 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.N
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretClient;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk.SammenligningEvent;
 import no.nav.tag.sykefravarsstatistikk.api.virksomhetsklassifikasjoner.KlassifikasjonerRepository;
@@ -47,7 +48,8 @@ public class SammenligningService {
         Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
         Enhet enhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
         Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(enhet.getInstitusjonellSektorkode());
-        Næring næring = klassifikasjonerRepository.hentNæring(underenhet.getNæringskode().hentNæringskode2Siffer());
+        Næringskode5Siffer næring5siffer = underenhet.getNæringskode();
+        Næring næring = klassifikasjonerRepository.hentNæring(næring5siffer.hentNæringskode2Siffer());
         Sammenligning sammenligning = new Sammenligning(
                 KVARTAL,
                 ARSTALL,
@@ -61,6 +63,7 @@ public class SammenligningService {
                 underenhet,
                 enhet,
                 ssbSektor,
+                næring5siffer,
                 næring,
                 sammenligning
         ));
