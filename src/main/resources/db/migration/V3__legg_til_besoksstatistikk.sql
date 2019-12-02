@@ -14,5 +14,6 @@ create table besoksstatistikk_virksomhet (
 create table besoksstatistikk_smaa_virksomheter (
  id serial primary key,
  antall_smaa_virksomheter smallint not null,
+ cookie varchar,
  opprettet timestamp default current_timestamp
 );
