@@ -3,10 +3,10 @@ create table besoksstatistikk_virksomhet (
 
  arstall smallint not null,
  kvartal smallint not null,
- sykefravarsprosent numeric(17,0),
- sykefravarsprosent_er_maskert boolean,
- naring_2siffer_sykefravarsprosent numeric(17,0) not null,
- ssb_sektor_sykefravarsprosent numeric(17,0) not null,
+ sykefravarsprosent numeric(17,6),
+ sykefravarsprosent_antall_personer smallint,
+ naring_2siffer_sykefravarsprosent numeric(17,6) not null,
+ ssb_sektor_sykefravarsprosent numeric(17,6) not null,
 
  orgnr varchar(20) not null,
  organisasjon_navn varchar not null,

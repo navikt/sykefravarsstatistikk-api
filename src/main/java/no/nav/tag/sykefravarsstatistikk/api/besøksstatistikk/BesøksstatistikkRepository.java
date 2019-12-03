@@ -23,6 +23,7 @@ public class BesøksstatistikkRepository {
     private final static String KVARTAL = "kvartal";
     private final static String SYKEFRAVÆRSPROSENT = "sykefravarsprosent";
     private final static String SYKEFRAVÆRSPROSENT_ER_MASKERT = "sykefravarsprosent_er_maskert";
+    private final static String SYKEFRAVÆRSPROSENT_ANTALL_PERSONER = "sykefravarsprosent_antall_personer";
     private final static String NÆRING_2SIFFER_SYKEFRAVÆRSPROSENT = "naring_2siffer_sykefravarsprosent";
     private final static String SSB_SEKTOR_SYKEFRAVÆRSPROSENT = "ssb_sektor_sykefravarsprosent";
     private final static String ORGNR = "orgnr";
@@ -37,14 +38,11 @@ public class BesøksstatistikkRepository {
     private final static String SSB_SEKTOR_BESKRIVELSE = "ssb_sektor_beskrivelse";
     private final static String COOKIE = "cookie";
 
-    private static final String ANTALL_SMÅ_VIRKSOMHETER = "antall_smaa_virksomheter";
-
     public BesøksstatistikkRepository(
             @Qualifier("sykefravarsstatistikkJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
     ) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
-
 
     public void loggBesøk(
             Underenhet underenhet,
@@ -54,21 +52,21 @@ public class BesøksstatistikkRepository {
             Næring næring2siffer,
             Sammenligning sammenligning
     ) {
-       
-        
-        if (underenhet.getAntallAnsatte() >= MINIMUM_ANTALL_PERSONER_SOM_SKAL_TIL_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER) {
+
+
+        if (kanLagreBesøksdata(underenhet, sammenligning)) {
             namedParameterJdbcTemplate.update(
                     "insert into besoksstatistikk_virksomhet " +
-                            "(arstall, kvartal, sykefravarsprosent, sykefravarsprosent_er_maskert, naring_2siffer_sykefravarsprosent, ssb_sektor_sykefravarsprosent, orgnr, organisasjon_navn, antall_ansatte, naring_5siffer_kode, naring_5siffer_beskrivelse, naring_2siffer_beskrivelse, institusjonell_sektor_kode, institusjonell_sektor_beskrivelse, ssb_sektor_kode, ssb_sektor_beskrivelse, cookie) " +
-                            "values (:arstall, :kvartal, :sykefravarsprosent_er_maskert, :sykefravarsprosent, :naring_2siffer_sykefravarsprosent, :ssb_sektor_sykefravarsprosent, :orgnr, :organisasjon_navn, :antall_ansatte, :naring_5siffer_kode, :naring_5siffer_beskrivelse, :naring_2siffer_beskrivelse, :institusjonell_sektor_kode, :institusjonell_sektor_beskrivelse, :ssb_sektor_kode, :ssb_sektor_beskrivelse, :cookie)",
+                            "(arstall, kvartal, sykefravarsprosent, sykefravarsprosent_antall_personer, naring_2siffer_sykefravarsprosent, ssb_sektor_sykefravarsprosent, orgnr, organisasjon_navn, antall_ansatte, naring_5siffer_kode, naring_5siffer_beskrivelse, naring_2siffer_beskrivelse, institusjonell_sektor_kode, institusjonell_sektor_beskrivelse, ssb_sektor_kode, ssb_sektor_beskrivelse, cookie) " +
+                            "values (:arstall, :kvartal, :sykefravarsprosent, :sykefravarsprosent_antall_personer, :naring_2siffer_sykefravarsprosent, :ssb_sektor_sykefravarsprosent, :orgnr, :organisasjon_navn, :antall_ansatte, :naring_5siffer_kode, :naring_5siffer_beskrivelse, :naring_2siffer_beskrivelse, :institusjonell_sektor_kode, :institusjonell_sektor_beskrivelse, :ssb_sektor_kode, :ssb_sektor_beskrivelse, :cookie)",
                     new MapSqlParameterSource()
                             .addValue(ÅRSTALL, sammenligning.getÅrstall())
                             .addValue(KVARTAL, sammenligning.getKvartal())
                             .addValue(SYKEFRAVÆRSPROSENT, sammenligning.getVirksomhet().getProsent())
-                            .addValue(SYKEFRAVÆRSPROSENT_ER_MASKERT, sammenligning.getVirksomhet().isErMaskert())
+                            .addValue(SYKEFRAVÆRSPROSENT_ANTALL_PERSONER, sammenligning.getVirksomhet().getAntallPersoner())
                             .addValue(NÆRING_2SIFFER_SYKEFRAVÆRSPROSENT, sammenligning.getNæring().getProsent())
                             .addValue(SSB_SEKTOR_SYKEFRAVÆRSPROSENT, sammenligning.getSektor().getProsent())
-                            .addValue(ORGNR, enhet.getOrgnr())
+                            .addValue(ORGNR, enhet.getOrgnr().getVerdi())
                             .addValue(ORGANISASJON_NAVN, enhet.getNavn())
                             .addValue(ANTALL_ANSATTE, enhet.getAntallAnsatte())
                             .addValue(NÆRING_5SIFFER_KODE, næring5siffer.getKode())
@@ -89,5 +87,10 @@ public class BesøksstatistikkRepository {
         }
 
         log.info("done");
+    }
+
+    private boolean kanLagreBesøksdata(Underenhet underenhet, Sammenligning sammenligning) {
+        return !sammenligning.getVirksomhet().isErMaskert()
+                && underenhet.getAntallAnsatte() >= MINIMUM_ANTALL_PERSONER_SOM_SKAL_TIL_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
     }
 }
