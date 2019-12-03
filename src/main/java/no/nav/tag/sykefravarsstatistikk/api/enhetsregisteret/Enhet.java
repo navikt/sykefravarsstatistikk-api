@@ -1,9 +1,11 @@
 package no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret;
 
+import lombok.Builder;
 import lombok.Data;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 
 @Data
+@Builder
 public class Enhet {
     private final Orgnr orgnr;
     private final String navn;

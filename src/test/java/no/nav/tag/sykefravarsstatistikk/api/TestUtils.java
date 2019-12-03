@@ -4,9 +4,12 @@ import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnOrganisasjon;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
+import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.InstitusjonellSektorkode;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 
@@ -34,6 +37,17 @@ public class TestUtils {
         return organisasjon;
     }
 
+    public static Sammenligning enSammenligning() {
+        return new Sammenligning(
+                2,
+                2019,
+                enSykefraværprosent("Virksomhet AS", 100, 6000),
+                enSykefraværprosent("Næring", 1100, 60000),
+                enSykefraværprosent("Sektor", 11100, 600000),
+                enSykefraværprosent("Land", 111100, 6000000)
+        );
+    }
+
     public static Fnr getFnr() {
         return new Fnr("26070248114");
     }
@@ -42,6 +56,15 @@ public class TestUtils {
         return new Orgnr("971800534");
     }
 
+    public static Enhet enEnhet() {
+        return Enhet.builder()
+                .orgnr(getOrgnr())
+                .antallAnsatte(10)
+                .navn("Enhet AS")
+                .institusjonellSektorkode(new InstitusjonellSektorkode("1234", "sektor!"))
+                .næringskode(enNæringskode5Siffer())
+                .build();
+    }
 
     public static Underenhet enUnderenhet() {
         return enUnderenhetBuilder().orgnr(getOrgnr()).build();
@@ -79,6 +102,10 @@ public class TestUtils {
 
     public static Sykefraværprosent enSykefraværprosent(String label, int tapteDagsverk, int muligeDagsverk) {
         return new Sykefraværprosent(label, new BigDecimal(tapteDagsverk), new BigDecimal(muligeDagsverk), 40);
+    }
+
+    public static Sykefraværprosent enSykefraværprosent(int antallAnsatte) {
+        return  new Sykefraværprosent("Hei AS", new BigDecimal(5), new BigDecimal(100), antallAnsatte);
     }
 
     public static Sektor enSektor() {
