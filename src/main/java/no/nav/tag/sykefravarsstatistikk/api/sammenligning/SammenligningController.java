@@ -42,7 +42,7 @@ public class SammenligningController {
         Orgnr orgnr = new Orgnr(orgnrStr);
         utførTilgangskontroll(orgnr, request);
         String statistikkId = settPåCookieOgReturnerStatistikkId(request, response);
-        return service.hentSammenligningForUnderenhet(orgnr);
+        return service.hentSammenligningForUnderenhet(orgnr, statistikkId);
     }
 
     private void utførTilgangskontroll(Orgnr orgnr, HttpServletRequest request) {

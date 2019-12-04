@@ -43,7 +43,8 @@ public class SammenligningService {
     }
 
     public Sammenligning hentSammenligningForUnderenhet(
-            Orgnr orgnr
+            Orgnr orgnr,
+            String statistikkId
     ) {
         Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
         Enhet enhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
@@ -65,7 +66,8 @@ public class SammenligningService {
                 ssbSektor,
                 næring5siffer,
                 næring,
-                sammenligning
+                sammenligning,
+                statistikkId
         ));
 
         return sammenligning;

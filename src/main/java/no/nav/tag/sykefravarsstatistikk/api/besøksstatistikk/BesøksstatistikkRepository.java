@@ -40,13 +40,30 @@ public class BesøksstatistikkRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
+    public boolean sessionIdEksisterer(String sessionId) {
+        if (sessionIdEksistererITabell("besoksstatistikk_virksomhet", sessionId)) {
+            return true;
+        }
+
+        return sessionIdEksistererITabell("besoksstatistikk_smaa_virksomheter", sessionId);
+    }
+
+    private boolean sessionIdEksistererITabell(String tabell, String sessionId) {
+        // TODO Hvor no-no er dette?
+        return namedParameterJdbcTemplate.queryForObject(
+                "select count(*) from " + tabell + " where cookie=(:cookie)",
+                new MapSqlParameterSource().addValue(COOKIE, sessionId),
+                Integer.class
+        ) > 0;
+    }
+
     public void lagreBesøkFraStorVirksomhet(
             Enhet enhet,
             Sektor ssbSektor,
             Næringskode5Siffer næring5siffer,
             Næring næring2siffer,
             Sammenligning sammenligning,
-            String cookie
+            String sessionId
     ) {
 
         namedParameterJdbcTemplate.update(
@@ -70,15 +87,15 @@ public class BesøksstatistikkRepository {
                         .addValue(INSTITUSJONELL_SEKTOR_BESKRIVELSE, enhet.getInstitusjonellSektorkode().getBeskrivelse())
                         .addValue(SSB_SEKTOR_KODE, ssbSektor.getKode())
                         .addValue(SSB_SEKTOR_BESKRIVELSE, ssbSektor.getNavn())
-                        .addValue(COOKIE, cookie)
+                        .addValue(COOKIE, sessionId)
         );
     }
 
-    public void lagreBesøkFraLitenVirksomhet(String cookie) {
+    public void lagreBesøkFraLitenVirksomhet(String sessionId) {
         namedParameterJdbcTemplate.update(
                 "insert into besoksstatistikk_smaa_virksomheter (antall_smaa_virksomheter, cookie) values (1, :cookie)",
                 new MapSqlParameterSource()
-                        .addValue(COOKIE, cookie)
+                        .addValue(COOKIE, sessionId)
         );
     }
 

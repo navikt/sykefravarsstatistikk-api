@@ -36,7 +36,8 @@ public class BesøksstatistikkEventListenerTest {
                         enSektor(),
                         enNæringskode5Siffer(),
                         enNæring(),
-                        sammenligning
+                        sammenligning,
+                        ""
                 )
         );
 
@@ -55,7 +56,8 @@ public class BesøksstatistikkEventListenerTest {
                         enSektor(),
                         enNæringskode5Siffer(),
                         enNæring(),
-                        sammenligning
+                        sammenligning,
+                        ""
                 )
         );
 
@@ -74,7 +76,8 @@ public class BesøksstatistikkEventListenerTest {
                         enSektor(),
                         enNæringskode5Siffer(),
                         enNæring(),
-                        sammenligning
+                        sammenligning,
+                        ""
                 )
         );
 

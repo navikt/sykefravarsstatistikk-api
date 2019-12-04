@@ -18,4 +18,5 @@ public class SammenligningEvent {
     private final Næringskode5Siffer næring5siffer;
     private final Næring næring2siffer;
     private final Sammenligning sammenligning;
+    private final String statistikkId;
 }

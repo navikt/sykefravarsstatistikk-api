@@ -27,10 +27,10 @@ public class BesøksstatistikkEventListener {
                     sammenligningEvent.getNæring5siffer(),
                     sammenligningEvent.getNæring2siffer(),
                     sammenligningEvent.getSammenligning(),
-                    "cookie"
+                    sammenligningEvent.getStatistikkId()
             );
         } else {
-            besøksstatistikkRepository.lagreBesøkFraLitenVirksomhet("cookie");
+            besøksstatistikkRepository.lagreBesøkFraLitenVirksomhet(sammenligningEvent.getStatistikkId());
         }
     }
 
