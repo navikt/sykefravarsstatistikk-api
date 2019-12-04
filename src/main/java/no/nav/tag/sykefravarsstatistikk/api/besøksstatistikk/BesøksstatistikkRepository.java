@@ -32,7 +32,7 @@ public class BesøksstatistikkRepository {
     private final static String INSTITUSJONELL_SEKTOR_BESKRIVELSE = "institusjonell_sektor_beskrivelse";
     private final static String SSB_SEKTOR_KODE = "ssb_sektor_kode";
     private final static String SSB_SEKTOR_BESKRIVELSE = "ssb_sektor_beskrivelse";
-    private final static String COOKIE = "cookie";
+    private final static String SESSION_ID = "session_id";
 
     public BesøksstatistikkRepository(
             @Qualifier("sykefravarsstatistikkJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
@@ -51,8 +51,8 @@ public class BesøksstatistikkRepository {
     private boolean sessionIdEksistererITabell(String tabell, String sessionId) {
         // TODO Hvor no-no er dette?
         return namedParameterJdbcTemplate.queryForObject(
-                "select count(*) from " + tabell + " where cookie=(:cookie)",
-                new MapSqlParameterSource().addValue(COOKIE, sessionId),
+                "select count(*) from " + tabell + " where session_id=(:session_id)",
+                new MapSqlParameterSource().addValue(SESSION_ID, sessionId),
                 Integer.class
         ) > 0;
     }
@@ -68,8 +68,8 @@ public class BesøksstatistikkRepository {
 
         namedParameterJdbcTemplate.update(
                 "insert into besoksstatistikk_virksomhet " +
-                        "(arstall, kvartal, sykefravarsprosent, sykefravarsprosent_antall_personer, naring_2siffer_sykefravarsprosent, ssb_sektor_sykefravarsprosent, orgnr, organisasjon_navn, antall_ansatte, naring_5siffer_kode, naring_5siffer_beskrivelse, naring_2siffer_beskrivelse, institusjonell_sektor_kode, institusjonell_sektor_beskrivelse, ssb_sektor_kode, ssb_sektor_beskrivelse, cookie) " +
-                        "values (:arstall, :kvartal, :sykefravarsprosent, :sykefravarsprosent_antall_personer, :naring_2siffer_sykefravarsprosent, :ssb_sektor_sykefravarsprosent, :orgnr, :organisasjon_navn, :antall_ansatte, :naring_5siffer_kode, :naring_5siffer_beskrivelse, :naring_2siffer_beskrivelse, :institusjonell_sektor_kode, :institusjonell_sektor_beskrivelse, :ssb_sektor_kode, :ssb_sektor_beskrivelse, :cookie)",
+                        "(arstall, kvartal, sykefravarsprosent, sykefravarsprosent_antall_personer, naring_2siffer_sykefravarsprosent, ssb_sektor_sykefravarsprosent, orgnr, organisasjon_navn, antall_ansatte, naring_5siffer_kode, naring_5siffer_beskrivelse, naring_2siffer_beskrivelse, institusjonell_sektor_kode, institusjonell_sektor_beskrivelse, ssb_sektor_kode, ssb_sektor_beskrivelse, session_id) " +
+                        "values (:arstall, :kvartal, :sykefravarsprosent, :sykefravarsprosent_antall_personer, :naring_2siffer_sykefravarsprosent, :ssb_sektor_sykefravarsprosent, :orgnr, :organisasjon_navn, :antall_ansatte, :naring_5siffer_kode, :naring_5siffer_beskrivelse, :naring_2siffer_beskrivelse, :institusjonell_sektor_kode, :institusjonell_sektor_beskrivelse, :ssb_sektor_kode, :ssb_sektor_beskrivelse, :session_id)",
                 new MapSqlParameterSource()
                         .addValue(ÅRSTALL, sammenligning.getÅrstall())
                         .addValue(KVARTAL, sammenligning.getKvartal())
@@ -87,15 +87,14 @@ public class BesøksstatistikkRepository {
                         .addValue(INSTITUSJONELL_SEKTOR_BESKRIVELSE, enhet.getInstitusjonellSektorkode().getBeskrivelse())
                         .addValue(SSB_SEKTOR_KODE, ssbSektor.getKode())
                         .addValue(SSB_SEKTOR_BESKRIVELSE, ssbSektor.getNavn())
-                        .addValue(COOKIE, sessionId)
+                        .addValue(SESSION_ID, sessionId)
         );
     }
 
     public void lagreBesøkFraLitenVirksomhet(String sessionId) {
         namedParameterJdbcTemplate.update(
-                "insert into besoksstatistikk_smaa_virksomheter (antall_smaa_virksomheter, cookie) values (1, :cookie)",
-                new MapSqlParameterSource()
-                        .addValue(COOKIE, sessionId)
+                "insert into besoksstatistikk_smaa_virksomheter (session_id) values (:session_id)",
+                new MapSqlParameterSource().addValue(SESSION_ID, sessionId)
         );
     }
 
