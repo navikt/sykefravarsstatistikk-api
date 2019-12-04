@@ -1,5 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
+import no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk.SammenligningEvent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
@@ -8,7 +9,6 @@ import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
-import no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk.SammenligningEvent;
 import no.nav.tag.sykefravarsstatistikk.api.virksomhetsklassifikasjoner.KlassifikasjonerRepository;
 import no.nav.tag.sykefravarsstatistikk.api.virksomhetsklassifikasjoner.SektorMappingService;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +44,7 @@ public class SammenligningService {
 
     public Sammenligning hentSammenligningForUnderenhet(
             Orgnr orgnr,
-            String statistikkId
+            String sessionId
     ) {
         Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
         Enhet enhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
@@ -67,7 +67,7 @@ public class SammenligningService {
                 næring5siffer,
                 næring,
                 sammenligning,
-                statistikkId
+                sessionId
         ));
 
         return sammenligning;

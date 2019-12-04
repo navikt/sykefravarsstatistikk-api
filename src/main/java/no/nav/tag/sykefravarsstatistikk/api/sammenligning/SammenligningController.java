@@ -40,8 +40,8 @@ public class SammenligningController {
         Orgnr orgnr = new Orgnr(orgnrStr);
         utførTilgangskontroll(orgnr, request);
         // TODO Burde det gjøres mer feilhåndtering her, slik at feil i cookies ikke feiler kallet?
-        String statistikkId = hentCookieEllerGenererNy(request, response, STATISTIKK_ID_COOKIE_NAME);
-        return service.hentSammenligningForUnderenhet(orgnr, statistikkId);
+        String sessionId = hentCookieEllerGenererNy(request, response, STATISTIKK_ID_COOKIE_NAME);
+        return service.hentSammenligningForUnderenhet(orgnr, sessionId);
     }
 
     private void utførTilgangskontroll(Orgnr orgnr, HttpServletRequest request) {

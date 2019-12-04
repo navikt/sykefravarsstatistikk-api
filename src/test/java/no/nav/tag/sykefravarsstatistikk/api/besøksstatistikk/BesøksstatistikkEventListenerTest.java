@@ -10,8 +10,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BesøksstatistikkEventListenerTest {
@@ -29,17 +28,13 @@ public class BesøksstatistikkEventListenerTest {
     public void onSammenligningUtsendt__skal_lagre_mye_info_for_store_virksomheter() {
         Sammenligning sammenligning = enSammenligning();
         sammenligning.setVirksomhet(enSykefraværprosent(5));
-        eventListener.onSammenligningUtsendt(
-                new SammenligningEvent(
-                        Underenhet.builder().antallAnsatte(5).build(),
-                        enEnhet(),
-                        enSektor(),
-                        enNæringskode5Siffer(),
-                        enNæring(),
-                        sammenligning,
-                        ""
-                )
-        );
+
+        SammenligningEvent event = enSammenligningEventBuilder()
+                .underenhet(Underenhet.builder().antallAnsatte(5).build())
+                .sammenligning(sammenligning)
+                .build();
+
+        eventListener.onSammenligningUtsendt(event);
 
         verify(repository, times(1)).lagreBesøkFraStorVirksomhet(any(), any(), any(), any(), any(), any());
         verify(repository, times(0)).lagreBesøkFraLitenVirksomhet(any());
@@ -49,17 +44,13 @@ public class BesøksstatistikkEventListenerTest {
     public void onSammenligningUtsendt__skal_ikke_lagre_info_på_virksomheter_med_få_ansatte_fra_enhetsregisteret() {
         Sammenligning sammenligning = enSammenligning();
         sammenligning.setVirksomhet(enSykefraværprosent(4));
-        eventListener.onSammenligningUtsendt(
-                new SammenligningEvent(
-                        Underenhet.builder().antallAnsatte(1000).build(),
-                        enEnhet(),
-                        enSektor(),
-                        enNæringskode5Siffer(),
-                        enNæring(),
-                        sammenligning,
-                        ""
-                )
-        );
+
+        SammenligningEvent event = enSammenligningEventBuilder()
+                .underenhet(Underenhet.builder().antallAnsatte(1000).build())
+                .sammenligning(sammenligning)
+                .build();
+
+        eventListener.onSammenligningUtsendt(event);
 
         verify(repository, times(0)).lagreBesøkFraStorVirksomhet(any(), any(), any(), any(), any(), any());
         verify(repository, times(1)).lagreBesøkFraLitenVirksomhet(any());
@@ -69,19 +60,28 @@ public class BesøksstatistikkEventListenerTest {
     public void onSammenligningUtsendt__skal_ikke_lagre_info_på_virksomheter_med_få_personer_i_datagrunnlaget() {
         Sammenligning sammenligning = enSammenligning();
         sammenligning.setVirksomhet(enSykefraværprosent(4000));
-        eventListener.onSammenligningUtsendt(
-                new SammenligningEvent(
-                        Underenhet.builder().antallAnsatte(4).build(),
-                        enEnhet(),
-                        enSektor(),
-                        enNæringskode5Siffer(),
-                        enNæring(),
-                        sammenligning,
-                        ""
-                )
-        );
+        SammenligningEvent event = enSammenligningEventBuilder()
+                .underenhet(Underenhet.builder().antallAnsatte(4).build())
+                .build();
+
+        eventListener.onSammenligningUtsendt(event);
 
         verify(repository, times(0)).lagreBesøkFraStorVirksomhet(any(), any(), any(), any(), any(), any());
         verify(repository, times(1)).lagreBesøkFraLitenVirksomhet(any());
+    }
+
+    @Test
+    public void onSammenligningUtsendt__skal_ikke_lagre_data_hvis_sessionId_allerede_eksisterer() {
+        String sessionId = "sessionId";
+        when(repository.sessionIdEksisterer(sessionId)).thenReturn(true);
+
+        SammenligningEvent event = enSammenligningEventBuilder()
+                .sessionId(sessionId)
+                .build();
+
+        eventListener.onSammenligningUtsendt(event);
+
+        verify(repository, times(0)).lagreBesøkFraStorVirksomhet(any(), any(), any(), any(), any(), any());
+        verify(repository, times(0)).lagreBesøkFraLitenVirksomhet(any());
     }
 }

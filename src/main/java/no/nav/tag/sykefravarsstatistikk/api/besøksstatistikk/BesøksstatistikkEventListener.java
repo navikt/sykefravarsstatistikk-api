@@ -1,8 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
-import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -20,23 +18,30 @@ public class BesøksstatistikkEventListener {
 
     @EventListener
     public void onSammenligningUtsendt(SammenligningEvent sammenligningEvent) {
-        if (kanLagreBesøksdata(sammenligningEvent.getUnderenhet(), sammenligningEvent.getSammenligning())) {
+        if (sessionHarAlleredeBlittRegistrert(sammenligningEvent)) {
+            return;
+        }
+
+        if (kanLagreBesøksdata(sammenligningEvent)) {
             besøksstatistikkRepository.lagreBesøkFraStorVirksomhet(
                     sammenligningEvent.getEnhet(),
                     sammenligningEvent.getSsbSektor(),
                     sammenligningEvent.getNæring5siffer(),
                     sammenligningEvent.getNæring2siffer(),
                     sammenligningEvent.getSammenligning(),
-                    sammenligningEvent.getStatistikkId()
+                    sammenligningEvent.getSessionId()
             );
         } else {
-            besøksstatistikkRepository.lagreBesøkFraLitenVirksomhet(sammenligningEvent.getStatistikkId());
+            besøksstatistikkRepository.lagreBesøkFraLitenVirksomhet(sammenligningEvent.getSessionId());
         }
     }
 
+    private boolean sessionHarAlleredeBlittRegistrert(SammenligningEvent event) {
+        return besøksstatistikkRepository.sessionIdEksisterer(event.getSessionId());
+    }
 
-    private boolean kanLagreBesøksdata(Underenhet underenhet, Sammenligning sammenligning) {
-        return !sammenligning.getVirksomhet().isErMaskert()
-                && underenhet.getAntallAnsatte() >= MINIMUM_ANTALL_PERSONER_SOM_SKAL_TIL_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
+    private boolean kanLagreBesøksdata(SammenligningEvent event) {
+        return !event.getSammenligning().getVirksomhet().isErMaskert()
+                && event.getUnderenhet().getAntallAnsatte() >= MINIMUM_ANTALL_PERSONER_SOM_SKAL_TIL_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
     }
 }

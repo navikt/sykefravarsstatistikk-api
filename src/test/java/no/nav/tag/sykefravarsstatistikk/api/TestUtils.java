@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api;
 
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnOrganisasjon;
+import no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk.SammenligningEvent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
@@ -35,6 +36,17 @@ public class TestUtils {
         AltinnOrganisasjon organisasjon = new AltinnOrganisasjon();
         organisasjon.setOrganizationNumber(organizationNumber);
         return organisasjon;
+    }
+
+    public static SammenligningEvent.SammenligningEventBuilder enSammenligningEventBuilder() {
+        return SammenligningEvent.builder()
+                .underenhet(enUnderenhet())
+                .enhet(enEnhet())
+                .ssbSektor(enSektor())
+                .næring5siffer(enNæringskode5Siffer())
+                .næring2siffer(enNæring())
+                .sammenligning(enSammenligning())
+                .sessionId("sessionId");
     }
 
     public static Sammenligning enSammenligning() {
@@ -105,7 +117,7 @@ public class TestUtils {
     }
 
     public static Sykefraværprosent enSykefraværprosent(int antallAnsatte) {
-        return  new Sykefraværprosent("Hei AS", new BigDecimal(5), new BigDecimal(100), antallAnsatte);
+        return new Sykefraværprosent("Hei AS", new BigDecimal(5), new BigDecimal(100), antallAnsatte);
     }
 
     public static Sektor enSektor() {
