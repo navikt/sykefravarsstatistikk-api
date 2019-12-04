@@ -10,12 +10,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
+
+import static no.nav.tag.sykefravarsstatistikk.api.sammenligning.CookieUtils.hentCookieEllerGenererNy;
 
 @Protected
 @RestController
@@ -41,7 +39,8 @@ public class SammenligningController {
     ) {
         Orgnr orgnr = new Orgnr(orgnrStr);
         utførTilgangskontroll(orgnr, request);
-        String statistikkId = settPåCookieOgReturnerStatistikkId(request, response);
+        // TODO Burde det gjøres mer feilhåndtering her, slik at feil i cookies ikke feiler kallet?
+        String statistikkId = hentCookieEllerGenererNy(request, response, STATISTIKK_ID_COOKIE_NAME);
         return service.hentSammenligningForUnderenhet(orgnr, statistikkId);
     }
 
@@ -51,28 +50,6 @@ public class SammenligningController {
                 request.getMethod(),
                 "" + request.getRequestURL()
         );
-    }
-
-    private String settPåCookieOgReturnerStatistikkId(HttpServletRequest request, HttpServletResponse response) {
-        Optional<Cookie> cookie = getStatistikkIdCookie(request);
-
-        if (cookie.isPresent()) {
-            return cookie.get().getValue();
-        } else {
-            return setStatistikkIdCookie(response);
-        }
-    }
-
-    private Optional<Cookie> getStatistikkIdCookie(HttpServletRequest request) {
-        return Arrays.stream(request.getCookies())
-                .filter(cookie -> STATISTIKK_ID_COOKIE_NAME.equals(cookie.getName()))
-                .findAny();
-    }
-
-    private String setStatistikkIdCookie(HttpServletResponse response) {
-        String statistikkId = UUID.randomUUID().toString();
-        response.addCookie(new Cookie(STATISTIKK_ID_COOKIE_NAME, statistikkId));
-        return statistikkId;
     }
 
 }

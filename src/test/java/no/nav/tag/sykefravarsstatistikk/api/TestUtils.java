@@ -41,10 +41,10 @@ public class TestUtils {
         return new Sammenligning(
                 2,
                 2019,
-                enSykefraværprosent("Virksomhet AS", 100, 6000),
-                enSykefraværprosent("Næring", 1100, 60000),
-                enSykefraværprosent("Sektor", 11100, 600000),
-                enSykefraværprosent("Land", 111100, 6000000)
+                enSykefraværprosent("Virksomhet AS", 100, 6000, 100),
+                enSykefraværprosent("Næring", 1100, 60000, 1000),
+                enSykefraværprosent("Sektor", 11100, 600000, 10000),
+                enSykefraværprosent("Land", 111100, 6000000, 100000)
         );
     }
 
@@ -100,8 +100,8 @@ public class TestUtils {
         return new Næringskode5Siffer(kode, "Spesiell næring");
     }
 
-    public static Sykefraværprosent enSykefraværprosent(String label, int tapteDagsverk, int muligeDagsverk) {
-        return new Sykefraværprosent(label, new BigDecimal(tapteDagsverk), new BigDecimal(muligeDagsverk), 40);
+    public static Sykefraværprosent enSykefraværprosent(String label, int tapteDagsverk, int muligeDagsverk, int antallPersoner) {
+        return new Sykefraværprosent(label, new BigDecimal(tapteDagsverk), new BigDecimal(muligeDagsverk), antallPersoner);
     }
 
     public static Sykefraværprosent enSykefraværprosent(int antallAnsatte) {
