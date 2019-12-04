@@ -1,3 +1,0 @@
-alter table besoksstatistikk_smaa_virksomheter drop column antall_smaa_virksomheter;
-alter table besoksstatistikk_smaa_virksomheter rename column cookie to session_id;
-alter table besoksstatistikk_virksomhet rename column cookie to session_id;
