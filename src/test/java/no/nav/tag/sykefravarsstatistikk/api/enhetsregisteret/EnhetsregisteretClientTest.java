@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.client.RestTemplate;
 
-import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.getOrgnr;
+import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.etOrgnr;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -35,7 +35,7 @@ public class EnhetsregisteretClientTest {
     @Test
     public void hentInformasjonOmEnhet__skal_hente_riktige_felter() {
         mockRespons(gyldigEnhetRespons());
-        Enhet enhet = enhetsregisteretClient.hentInformasjonOmEnhet(getOrgnr());
+        Enhet enhet = enhetsregisteretClient.hentInformasjonOmEnhet(etOrgnr());
 
         assertThat(enhet.getOrgnr().getVerdi()).isEqualTo("999263550");
         assertThat(enhet.getNavn()).isEqualTo("NAV ARBEID OG YTELSER");
@@ -52,7 +52,7 @@ public class EnhetsregisteretClientTest {
         responsMedManglendeFelt.remove("institusjonellSektorkode");
         mockRespons(responsMedManglendeFelt);
 
-        enhetsregisteretClient.hentInformasjonOmUnderenhet(getOrgnr());
+        enhetsregisteretClient.hentInformasjonOmUnderenhet(etOrgnr());
     }
 
     @Test
@@ -74,7 +74,7 @@ public class EnhetsregisteretClientTest {
         responsMedManglendeFelt.remove("navn");
         mockRespons(responsMedManglendeFelt);
 
-        enhetsregisteretClient.hentInformasjonOmUnderenhet(getOrgnr());
+        enhetsregisteretClient.hentInformasjonOmUnderenhet(etOrgnr());
     }
 
     @SneakyThrows

@@ -50,7 +50,7 @@ public class SammenligningRepositoryJdbcTest {
         );
 
         Sykefraværprosent resultat = repository.hentSykefraværprosentLand(2019, 2);
-        assertThat(resultat).isEqualTo(enSykefraværprosent("Norge", 4, 100));
+        assertThat(resultat).isEqualTo(enSykefraværprosent("Norge", 4, 100, 10));
     }
 
     @Test
@@ -69,7 +69,7 @@ public class SammenligningRepositoryJdbcTest {
         );
         Sektor sektor = enSektor();
         Sykefraværprosent resultat = repository.hentSykefraværprosentSektor(2018, 1, sektor);
-        assertThat(resultat).isEqualTo(enSykefraværprosent(sektor.getNavn(), 8, 23));
+        assertThat(resultat).isEqualTo(enSykefraværprosent(sektor.getNavn(), 8, 23, 5));
     }
 
     @Test
@@ -93,7 +93,7 @@ public class SammenligningRepositoryJdbcTest {
 
         Sykefraværprosent resultat = repository.hentSykefraværprosentNæring(2017, 3, næring);
 
-        assertThat(resultat).isEqualTo(enSykefraværprosent(næring.getNavn(), 56, 2051));
+        assertThat(resultat).isEqualTo(enSykefraværprosent(næring.getNavn(), 56, 2051, 10));
     }
 
     @Test
@@ -115,7 +115,7 @@ public class SammenligningRepositoryJdbcTest {
 
         Sykefraværprosent resultat = repository.hentSykefraværprosentVirksomhet(2016, 4, virksomhet);
 
-        assertThat(resultat).isEqualTo(enSykefraværprosent(virksomhet.getNavn(), 31, 6234));
+        assertThat(resultat).isEqualTo(enSykefraværprosent(virksomhet.getNavn(), 31, 6234, 10));
     }
 
     @Test
