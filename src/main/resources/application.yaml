@@ -164,7 +164,7 @@ no.nav.security.oidc:
     accepted_audience: 45104d6a-f5bc-4e8c-b352-4bbfc9381f25
 
 statistikk.import.siste.arstall: 2019
-statistikk.import.siste.kvartal: 2
+statistikk.import.siste.kvartal: 3
 
 database.navn: sykefravarsstatistikk
 vault.mount-path: postgresql/prod-fss
