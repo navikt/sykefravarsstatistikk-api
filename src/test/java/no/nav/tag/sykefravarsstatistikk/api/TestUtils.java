@@ -64,13 +64,13 @@ public class TestUtils {
         return new Fnr("26070248114");
     }
 
-    public static Orgnr getOrgnr() {
+    public static Orgnr etOrgnr() {
         return new Orgnr("971800534");
     }
 
     public static Enhet enEnhet() {
         return Enhet.builder()
-                .orgnr(getOrgnr())
+                .orgnr(etOrgnr())
                 .antallAnsatte(10)
                 .navn("Enhet AS")
                 .institusjonellSektorkode(new InstitusjonellSektorkode("1234", "sektor!"))
@@ -79,7 +79,7 @@ public class TestUtils {
     }
 
     public static Underenhet enUnderenhet() {
-        return enUnderenhetBuilder().orgnr(getOrgnr()).build();
+        return enUnderenhetBuilder().orgnr(etOrgnr()).build();
     }
 
     public static Underenhet enUnderenhet(String orgnr) {
@@ -88,7 +88,7 @@ public class TestUtils {
 
     public static Underenhet.UnderenhetBuilder enUnderenhetBuilder() {
         return Underenhet.builder()
-                .orgnr(getOrgnr())
+                .orgnr(etOrgnr())
                 .overordnetEnhetOrgnr(new Orgnr("053497180"))
                 .navn("Underenhet AS")
                 .næringskode(enNæringskode5Siffer())

@@ -1,5 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk;
 
+import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.junit.Before;
@@ -36,7 +37,7 @@ public class BesøksstatistikkEventListenerTest {
 
         eventListener.onSammenligningUtsendt(event);
 
-        verify(repository, times(1)).lagreBesøkFraStorVirksomhet(any(), any(), any(), any(), any(), any());
+        verify(repository, times(1)).lagreBesøkFraStorVirksomhet(any(), any(), any(), any(), any(), any(), any());
         verify(repository, times(0)).lagreBesøkFraLitenVirksomhet(any());
     }
 
@@ -52,7 +53,7 @@ public class BesøksstatistikkEventListenerTest {
 
         eventListener.onSammenligningUtsendt(event);
 
-        verify(repository, times(0)).lagreBesøkFraStorVirksomhet(any(), any(), any(), any(), any(), any());
+        verify(repository, times(0)).lagreBesøkFraStorVirksomhet(any(), any(), any(), any(), any(), any(), any());
         verify(repository, times(1)).lagreBesøkFraLitenVirksomhet(any());
     }
 
@@ -66,14 +67,14 @@ public class BesøksstatistikkEventListenerTest {
 
         eventListener.onSammenligningUtsendt(event);
 
-        verify(repository, times(0)).lagreBesøkFraStorVirksomhet(any(), any(), any(), any(), any(), any());
+        verify(repository, times(0)).lagreBesøkFraStorVirksomhet(any(), any(), any(), any(), any(), any(), any());
         verify(repository, times(1)).lagreBesøkFraLitenVirksomhet(any());
     }
 
     @Test
-    public void onSammenligningUtsendt__skal_ikke_lagre_data_hvis_sessionId_allerede_eksisterer() {
+    public void onSammenligningUtsendt__skal_ikke_lagre_data_hvis_session_allerede_er_registrert() {
         String sessionId = "sessionId";
-        when(repository.sessionIdEksisterer(sessionId)).thenReturn(true);
+        when(repository.sessionHarBlittRegistrert(eq(sessionId), any(Orgnr.class))).thenReturn(true);
 
         SammenligningEvent event = enSammenligningEventBuilder()
                 .sessionId(sessionId)
@@ -81,7 +82,7 @@ public class BesøksstatistikkEventListenerTest {
 
         eventListener.onSammenligningUtsendt(event);
 
-        verify(repository, times(0)).lagreBesøkFraStorVirksomhet(any(), any(), any(), any(), any(), any());
+        verify(repository, times(0)).lagreBesøkFraStorVirksomhet(any(), any(), any(), any(), any(), any(), any());
         verify(repository, times(0)).lagreBesøkFraLitenVirksomhet(any());
     }
 }

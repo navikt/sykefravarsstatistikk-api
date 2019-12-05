@@ -23,7 +23,7 @@ public class SammenligningController {
     private final SammenligningService service;
     private final TilgangskontrollService tilgangskontrollService;
 
-    private final static String STATISTIKK_ID_COOKIE_NAME = "statistikk-id";
+    private final static String SESSION_ID_COOKIE_NAME = "sykefravarsstatistikk-session";
 
     @Autowired
     public SammenligningController(SammenligningService service, TilgangskontrollService tilgangskontrollService) {
@@ -39,8 +39,7 @@ public class SammenligningController {
     ) {
         Orgnr orgnr = new Orgnr(orgnrStr);
         utførTilgangskontroll(orgnr, request);
-        // TODO Burde det gjøres mer feilhåndtering her, slik at feil i cookies ikke feiler kallet?
-        String sessionId = hentCookieEllerGenererNy(request, response, STATISTIKK_ID_COOKIE_NAME);
+        String sessionId = hentCookieEllerGenererNy(request, response, SESSION_ID_COOKIE_NAME);
         return service.hentSammenligningForUnderenhet(orgnr, sessionId);
     }
 

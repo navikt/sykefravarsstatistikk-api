@@ -1,11 +1,13 @@
 package no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -40,25 +42,35 @@ public class BesøksstatistikkRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-    public boolean sessionIdEksisterer(String sessionId) {
-        if (sessionIdEksistererITabell("besoksstatistikk_virksomhet", sessionId)) {
+    public boolean sessionHarBlittRegistrert(String sessionId, Orgnr orgnr) {
+        if (kombinasjonEksistererITabellForStoreVirksomheter(sessionId, orgnr)) {
             return true;
         }
-
-        return sessionIdEksistererITabell("besoksstatistikk_smaa_virksomheter", sessionId);
+        return sessionIdEksisterITabellForSmåVirksomheter(sessionId);
     }
 
-    private boolean sessionIdEksistererITabell(String tabell, String sessionId) {
-        // TODO Hvor no-no er dette?
+    private boolean kombinasjonEksistererITabellForStoreVirksomheter(String sessionId, Orgnr orgnr) {
         return namedParameterJdbcTemplate.queryForObject(
-                "select count(*) from " + tabell + " where session_id=(:session_id)",
-                new MapSqlParameterSource().addValue(SESSION_ID, sessionId),
+                "select count(*) from besoksstatistikk_virksomhet where session_id=(:session_id) and orgnr=(:orgnr)",
+                new MapSqlParameterSource()
+                        .addValue(SESSION_ID, sessionId)
+                        .addValue(ORGNR, orgnr.getVerdi()),
+                Integer.class
+        ) > 0;
+    }
+
+    private boolean sessionIdEksisterITabellForSmåVirksomheter(String sessionId) {
+        return namedParameterJdbcTemplate.queryForObject(
+                "select count(*) from besoksstatistikk_smaa_virksomheter where session_id=(:session_id)",
+                new MapSqlParameterSource()
+                        .addValue(SESSION_ID, sessionId),
                 Integer.class
         ) > 0;
     }
 
     public void lagreBesøkFraStorVirksomhet(
             Enhet enhet,
+            Underenhet underenhet,
             Sektor ssbSektor,
             Næringskode5Siffer næring5siffer,
             Næring næring2siffer,
@@ -77,7 +89,7 @@ public class BesøksstatistikkRepository {
                         .addValue(SYKEFRAVÆRSPROSENT_ANTALL_PERSONER, sammenligning.getVirksomhet().getAntallPersoner())
                         .addValue(NÆRING_2SIFFER_SYKEFRAVÆRSPROSENT, sammenligning.getNæring().getProsent())
                         .addValue(SSB_SEKTOR_SYKEFRAVÆRSPROSENT, sammenligning.getSektor().getProsent())
-                        .addValue(ORGNR, enhet.getOrgnr().getVerdi())
+                        .addValue(ORGNR, underenhet.getOrgnr().getVerdi())
                         .addValue(ORGANISASJON_NAVN, enhet.getNavn())
                         .addValue(ANTALL_ANSATTE, enhet.getAntallAnsatte())
                         .addValue(NÆRING_5SIFFER_KODE, næring5siffer.getKode())
@@ -91,7 +103,9 @@ public class BesøksstatistikkRepository {
         );
     }
 
-    public void lagreBesøkFraLitenVirksomhet(String sessionId) {
+    public void lagreBesøkFraLitenVirksomhet(
+            String sessionId
+    ) {
         namedParameterJdbcTemplate.update(
                 "insert into besoksstatistikk_smaa_virksomheter (session_id) values (:session_id)",
                 new MapSqlParameterSource().addValue(SESSION_ID, sessionId)

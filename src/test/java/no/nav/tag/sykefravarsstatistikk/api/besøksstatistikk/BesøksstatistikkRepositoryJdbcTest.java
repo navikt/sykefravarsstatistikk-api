@@ -1,5 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk;
 
+import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,21 +38,37 @@ public class BesøksstatistikkRepositoryJdbcTest {
 
     @Test
     public void sessionIdEksisterer__skal_gi_false_hvis_sessionId_ikke_eksisterer() {
-        assertThat(repository.sessionIdEksisterer("sessionId som ikke finnes i db")).isFalse();
+        assertThat(repository.sessionHarBlittRegistrert("sessionId som ikke finnes i db", etOrgnr())).isFalse();
     }
 
     @Test
-    public void sessionIdEksisterer__skal_gi_true_hvis_en_stor_virksomhet_har_lik_sessionId() {
+    public void sessionIdEksisterer__skal_gi_true_hvis_en_stor_virksomhet_har_lik_sessionId_og_orgnr() {
         String sessionId = "sessionId til stor virksomhet";
         repository.lagreBesøkFraStorVirksomhet(
                 enEnhet(),
+                enUnderenhet("1235"),
                 enSektor(),
                 enNæringskode5Siffer(),
                 enNæring(),
                 enSammenligning(),
                 sessionId
         );
-        assertThat(repository.sessionIdEksisterer(sessionId)).isTrue();
+        assertThat(repository.sessionHarBlittRegistrert(sessionId, new Orgnr("1235"))).isTrue();
+    }
+
+    @Test
+    public void sessionIdEksisterer__skal_gi_false_hvis_en_stor_virksomhet_har_lik_sessionId_men_forskjellig_orgnr() {
+        String sessionId = "sessionId til stor virksomhet";
+        repository.lagreBesøkFraStorVirksomhet(
+                enEnhet(),
+                enUnderenhet("1111"),
+                enSektor(),
+                enNæringskode5Siffer(),
+                enNæring(),
+                enSammenligning(),
+                sessionId
+        );
+        assertThat(repository.sessionHarBlittRegistrert(sessionId, new Orgnr("9999"))).isFalse();
     }
 
     @Test
@@ -60,7 +77,7 @@ public class BesøksstatistikkRepositoryJdbcTest {
         repository.lagreBesøkFraLitenVirksomhet(
                 sessionId
         );
-        assertThat(repository.sessionIdEksisterer(sessionId)).isTrue();
+        assertThat(repository.sessionHarBlittRegistrert(sessionId, etOrgnr())).isTrue();
     }
 
 

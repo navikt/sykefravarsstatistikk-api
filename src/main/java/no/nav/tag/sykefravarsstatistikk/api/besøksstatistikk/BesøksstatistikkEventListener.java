@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -18,13 +19,17 @@ public class BesøksstatistikkEventListener {
 
     @EventListener
     public void onSammenligningUtsendt(SammenligningEvent sammenligningEvent) {
-        if (sessionHarAlleredeBlittRegistrert(sammenligningEvent)) {
+        String sessionId = sammenligningEvent.getSessionId();
+        Underenhet underenhet = sammenligningEvent.getUnderenhet();
+
+        if (besøksstatistikkRepository.sessionHarBlittRegistrert(sessionId, underenhet.getOrgnr())) {
             return;
         }
 
         if (kanLagreBesøksdata(sammenligningEvent)) {
             besøksstatistikkRepository.lagreBesøkFraStorVirksomhet(
                     sammenligningEvent.getEnhet(),
+                    underenhet,
                     sammenligningEvent.getSsbSektor(),
                     sammenligningEvent.getNæring5siffer(),
                     sammenligningEvent.getNæring2siffer(),
@@ -34,10 +39,6 @@ public class BesøksstatistikkEventListener {
         } else {
             besøksstatistikkRepository.lagreBesøkFraLitenVirksomhet(sammenligningEvent.getSessionId());
         }
-    }
-
-    private boolean sessionHarAlleredeBlittRegistrert(SammenligningEvent event) {
-        return besøksstatistikkRepository.sessionIdEksisterer(event.getSessionId());
     }
 
     private boolean kanLagreBesøksdata(SammenligningEvent event) {
