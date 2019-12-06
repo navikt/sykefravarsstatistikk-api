@@ -47,7 +47,7 @@ public class BesøksstatistikkEventListenerTest {
         sammenligning.setVirksomhet(enSykefraværprosent(4));
 
         SammenligningEvent event = enSammenligningEventBuilder()
-                .underenhet(Underenhet.builder().antallAnsatte(1000).build())
+                .underenhet(enUnderenhetBuilder().antallAnsatte(1000).build())
                 .sammenligning(sammenligning)
                 .build();
 
@@ -62,7 +62,7 @@ public class BesøksstatistikkEventListenerTest {
         Sammenligning sammenligning = enSammenligning();
         sammenligning.setVirksomhet(enSykefraværprosent(4000));
         SammenligningEvent event = enSammenligningEventBuilder()
-                .underenhet(Underenhet.builder().antallAnsatte(4).build())
+                .underenhet(enUnderenhetBuilder().antallAnsatte(4).build())
                 .build();
 
         eventListener.onSammenligningUtsendt(event);
