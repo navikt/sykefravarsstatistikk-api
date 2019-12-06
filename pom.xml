@@ -150,6 +150,12 @@
             <version>${oidc-support.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>no.nav.common</groupId>
+            <artifactId>metrics</artifactId>
+            <version>1.2019.07.25-08.54-f2bfe18c24bc</version>
+        </dependency>
+
     </dependencies>
 
 

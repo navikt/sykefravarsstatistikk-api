@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.metrics.MetricsFactory;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,10 @@ public class BesøksstatistikkEventListener {
     public void onSammenligningUtsendt(SammenligningEvent sammenligningEvent) {
         String sessionId = sammenligningEvent.getSessionId();
         Underenhet underenhet = sammenligningEvent.getUnderenhet();
+
+        MetricsFactory.createEvent("sykefravarsstatistikk.testevent")
+                .addTagToReport("sessionId", sessionId)
+                .report();
 
         if (besøksstatistikkRepository.sessionHarBlittRegistrert(sessionId, underenhet.getOrgnr())) {
             return;
