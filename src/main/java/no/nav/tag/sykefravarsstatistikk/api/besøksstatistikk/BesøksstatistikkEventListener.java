@@ -53,11 +53,6 @@ public class BesøksstatistikkEventListener {
             MetricsFactory.createEvent("sykefravarsstatistikk.stor-bedrift.besok")
                     .addTagToReport("arstall", String.valueOf(sammenligning.getÅrstall()))
                     .addTagToReport("kvartal", String.valueOf(sammenligning.getKvartal()))
-                    .addTagToReport("sykefravarsprosent", String.valueOf(virksomhet.getProsent()))
-                    .addTagToReport("sykefravarsprosent_antall_personer", String.valueOf(virksomhet.getAntallPersoner()))
-                    .addTagToReport("naring_2siffer_sykefravarsprosent", String.valueOf(sammenligning.getNæring().getProsent()))
-                    .addTagToReport("ssb_sektor_sykefravarsprosent", String.valueOf(sammenligning.getSektor().getProsent()))
-                    .addTagToReport("antall_ansatte", String.valueOf(sammenligningEvent.getUnderenhet().getAntallAnsatte()))
                     .addTagToReport("naring_5siffer_kode", underenhet.getNæringskode().getKode())
                     .addTagToReport("naring_5siffer_beskrivelse", underenhet.getNæringskode().getBeskrivelse())
                     .addTagToReport("naring_2siffer_beskrivelse", næring2siffer.getNavn())
@@ -65,6 +60,13 @@ public class BesøksstatistikkEventListener {
                     .addTagToReport("institusjonell_sektor_beskrivelse", enhet.getInstitusjonellSektorkode().getBeskrivelse())
                     .addTagToReport("ssb_sektor_kode", ssbSektor.getKode())
                     .addTagToReport("ssb_sektor_beskrivelse", ssbSektor.getNavn())
+                    .addTagToReport("sykefravarsprosent_antall_personer", String.valueOf(virksomhet.getAntallPersoner()))
+                    .addTagToReport("naring_2siffer_sykefravarsprosent", String.valueOf(sammenligning.getNæring().getProsent()))
+                    .addTagToReport("ssb_sektor_sykefravarsprosent", String.valueOf(sammenligning.getSektor().getProsent()))
+
+                    .addFieldToReport("sykefravarsprosent", virksomhet.getProsent())
+                    .addFieldToReport("antall_ansatte", underenhet.getAntallAnsatte())
+
                     .report();
 
         } else {
