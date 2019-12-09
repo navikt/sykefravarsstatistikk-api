@@ -97,7 +97,7 @@ public class BesøksstatistikkEventListener {
                 .addTagToReport("ssb_sektor_sykefravarsprosent", String.valueOf(sammenligning.getSektor().getProsent()))
                 .addTagToReport("sykefravarsprosent_over_naring_snitt", virksomhetErOverSnittetINæringen ? "true" : "false")
 
-                .addFieldToReport("sykefravarsprosent", prosentVirksomhet.isPresent() ? prosentVirksomhet.get().floatValue() : null)
+                .addFieldToReport("virksomhet_sykefravarsprosent", prosentVirksomhet.isPresent() ? prosentVirksomhet.get().floatValue() : null)
                 .addFieldToReport("antall_ansatte", underenhet.getAntallAnsatte())
 
                 .report();
