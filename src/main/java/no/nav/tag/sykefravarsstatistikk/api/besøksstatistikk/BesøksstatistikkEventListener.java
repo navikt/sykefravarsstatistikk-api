@@ -72,14 +72,14 @@ public class BesøksstatistikkEventListener {
         Underenhet underenhet = sammenligningEvent.getUnderenhet();
 
         Optional<BigDecimal> prosentVirksomhet = Optional.ofNullable(sammenligning.getVirksomhet().getProsent());
-        Optional<BigDecimal> prosentNæring = Optional.ofNullable(sammenligning.getNæring().getProsent());
+        BigDecimal prosentNæring = sammenligning.getNæring().getProsent();
 
         boolean virksomhetErOverSnittetINæringen;
 
-        if (prosentVirksomhet.isEmpty() || prosentNæring.isEmpty()) {
+        if (prosentVirksomhet.isEmpty()) {
             virksomhetErOverSnittetINæringen = false;
         } else {
-            virksomhetErOverSnittetINæringen = prosentVirksomhet.get().compareTo(prosentNæring.get()) > 0;
+            virksomhetErOverSnittetINæringen = prosentVirksomhet.get().compareTo(prosentNæring) > 0;
         }
 
         MetricsFactory.createEvent("sykefravarsstatistikk.stor-bedrift.besok")
