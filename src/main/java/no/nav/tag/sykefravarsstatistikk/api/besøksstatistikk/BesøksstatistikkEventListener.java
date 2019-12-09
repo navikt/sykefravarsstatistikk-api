@@ -11,6 +11,8 @@ import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 import static no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent.MINIMUM_ANTALL_PERSONER_SOM_SKAL_TIL_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
 
 @Slf4j
@@ -50,6 +52,11 @@ public class BesøksstatistikkEventListener {
                     sammenligningEvent.getSessionId()
             );
 
+            BigDecimal prosentVirksomhet = sammenligning.getVirksomhet().getProsent();
+            BigDecimal prosentNæring = sammenligning.getNæring().getProsent();
+
+            boolean virksomhetErOverSnittetINæringen = prosentVirksomhet.compareTo(prosentNæring) > 0;
+
             MetricsFactory.createEvent("sykefravarsstatistikk.stor-bedrift.besok")
                     .addTagToReport("arstall", String.valueOf(sammenligning.getÅrstall()))
                     .addTagToReport("kvartal", String.valueOf(sammenligning.getKvartal()))
@@ -61,10 +68,11 @@ public class BesøksstatistikkEventListener {
                     .addTagToReport("ssb_sektor_kode", ssbSektor.getKode())
                     .addTagToReport("ssb_sektor_beskrivelse", ssbSektor.getNavn())
                     .addTagToReport("sykefravarsprosent_antall_personer", String.valueOf(virksomhet.getAntallPersoner()))
-                    .addTagToReport("naring_2siffer_sykefravarsprosent", String.valueOf(sammenligning.getNæring().getProsent()))
+                    .addTagToReport("naring_2siffer_sykefravarsprosent", String.valueOf(prosentNæring))
                     .addTagToReport("ssb_sektor_sykefravarsprosent", String.valueOf(sammenligning.getSektor().getProsent()))
+                    .addTagToReport("sykefravarprosent_over_naring_snitt", virksomhetErOverSnittetINæringen ? "true" : "false")
 
-                    .addFieldToReport("sykefravarsprosent", virksomhet.getProsent())
+                    .addFieldToReport("sykefravarsprosent", prosentVirksomhet)
                     .addFieldToReport("antall_ansatte", underenhet.getAntallAnsatte())
 
                     .report();
