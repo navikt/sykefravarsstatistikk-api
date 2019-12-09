@@ -70,10 +70,10 @@ public class BesøksstatistikkEventListener {
         Sektor ssbSektor = sammenligningEvent.getSsbSektor();
         Underenhet underenhet = sammenligningEvent.getUnderenhet();
 
-        BigDecimal prosentVirksomhet = sammenligning.getVirksomhet().getProsent();
-        BigDecimal prosentNæring = sammenligning.getNæring().getProsent();
+        float prosentVirksomhet = sammenligning.getVirksomhet().getProsent().floatValue();
+        float prosentNæring = sammenligning.getNæring().getProsent().floatValue();
 
-        boolean virksomhetErOverSnittetINæringen = prosentVirksomhet.compareTo(prosentNæring) > 0;
+        boolean virksomhetErOverSnittetINæringen = prosentVirksomhet > prosentNæring;
 
         MetricsFactory.createEvent("sykefravarsstatistikk.stor-bedrift.besok")
                 .addTagToReport("arstall", String.valueOf(sammenligning.getÅrstall()))
@@ -87,7 +87,7 @@ public class BesøksstatistikkEventListener {
                 .addTagToReport("ssb_sektor_beskrivelse", ssbSektor.getNavn())
                 .addTagToReport("sykefravarsprosent_antall_personer", String.valueOf(sammenligning.getVirksomhet().getAntallPersoner()))
                 .addTagToReport("naring_2siffer_sykefravarsprosent", String.valueOf(prosentNæring))
-                .addTagToReport("ssb_sektor_sykefravarsprosent", String.valueOf(sammenligning.getSektor().getProsent()))
+                .addTagToReport("ssb_sektor_sykefravarsprosent", String.valueOf(sammenligning.getSektor().getProsent().floatValue()))
                 .addTagToReport("sykefravarsprosent_over_naring_snitt", virksomhetErOverSnittetINæringen ? "true" : "false")
 
                 .addFieldToReport("sykefravarsprosent", prosentVirksomhet)
