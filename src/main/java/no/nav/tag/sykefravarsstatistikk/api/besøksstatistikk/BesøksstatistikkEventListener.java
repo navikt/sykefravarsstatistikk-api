@@ -13,6 +13,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent.MINIMUM_ANTALL_PERSONER_SOM_SKAL_TIL_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
 
@@ -70,10 +71,16 @@ public class BesøksstatistikkEventListener {
         Sektor ssbSektor = sammenligningEvent.getSsbSektor();
         Underenhet underenhet = sammenligningEvent.getUnderenhet();
 
-        float prosentVirksomhet = sammenligning.getVirksomhet().getProsent().floatValue();
-        float prosentNæring = sammenligning.getNæring().getProsent().floatValue();
+        Optional<BigDecimal> prosentVirksomhet = Optional.ofNullable(sammenligning.getVirksomhet().getProsent());
+        Optional<BigDecimal> prosentNæring = Optional.ofNullable(sammenligning.getNæring().getProsent());
 
-        boolean virksomhetErOverSnittetINæringen = prosentVirksomhet > prosentNæring;
+        boolean virksomhetErOverSnittetINæringen;
+
+        if (prosentVirksomhet.isEmpty() || prosentNæring.isEmpty()) {
+            virksomhetErOverSnittetINæringen = false;
+        } else {
+            virksomhetErOverSnittetINæringen = prosentVirksomhet.get().compareTo(prosentNæring.get()) > 0;
+        }
 
         MetricsFactory.createEvent("sykefravarsstatistikk.stor-bedrift.besok")
                 .addTagToReport("arstall", String.valueOf(sammenligning.getÅrstall()))
@@ -87,10 +94,10 @@ public class BesøksstatistikkEventListener {
                 .addTagToReport("ssb_sektor_beskrivelse", ssbSektor.getNavn())
                 .addTagToReport("sykefravarsprosent_antall_personer", String.valueOf(sammenligning.getVirksomhet().getAntallPersoner()))
                 .addTagToReport("naring_2siffer_sykefravarsprosent", String.valueOf(prosentNæring))
-                .addTagToReport("ssb_sektor_sykefravarsprosent", String.valueOf(sammenligning.getSektor().getProsent().floatValue()))
+                .addTagToReport("ssb_sektor_sykefravarsprosent", String.valueOf(sammenligning.getSektor().getProsent()))
                 .addTagToReport("sykefravarsprosent_over_naring_snitt", virksomhetErOverSnittetINæringen ? "true" : "false")
 
-                .addFieldToReport("sykefravarsprosent", prosentVirksomhet)
+                .addFieldToReport("sykefravarsprosent", prosentVirksomhet.isPresent() ? prosentVirksomhet.get().floatValue() : null)
                 .addFieldToReport("antall_ansatte", underenhet.getAntallAnsatte())
 
                 .report();
