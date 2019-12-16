@@ -10,6 +10,7 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.S
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -27,6 +28,7 @@ public class BesøksstatistikkEventListener {
         this.besøksstatistikkRepository = besøksstatistikkRepository;
     }
 
+    @Async
     @EventListener
     public void onSammenligningUtsendt(SammenligningEvent sammenligningEvent) {
         String sessionId = sammenligningEvent.getSessionId();
