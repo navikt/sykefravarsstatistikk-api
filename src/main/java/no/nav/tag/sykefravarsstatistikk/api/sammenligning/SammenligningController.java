@@ -39,7 +39,7 @@ public class SammenligningController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        Timer timer = MetricsFactory.createTimer("sykefravarsstatistikk.sammenligning");
+        Timer timer = MetricsFactory.createTimer("sykefravarsstatistikk.sammenligning").start();
 
         Orgnr orgnr = new Orgnr(orgnrStr);
         utførTilgangskontroll(orgnr, request);
