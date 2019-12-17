@@ -77,21 +77,9 @@ public class EnhetsregisteretClientTest {
         enhetsregisteretClient.hentInformasjonOmUnderenhet(etOrgnr());
     }
 
-    @Test
-    public void testTest() {
-        mockRespons(test());
-        enhetsregisteretClient.hentInformasjonOmUnderenhet(etOrgnr());
-    }
-
     @SneakyThrows
     private void mockRespons(JsonNode node) {
         when(restTemplate.getForObject(anyString(), any())).thenReturn(objectMapper.writeValueAsString(node));
-    }
-
-    @SneakyThrows
-    private ObjectNode test() {
-        String str = "{\"organisasjonsnummer\":\"924109920\",\"navn\":\"SOLBERGVEIEN 36\",\"organisasjonsform\":{\"kode\":\"AAFY\",\"beskrivelse\":\"Virksomhet til ikke-næringsdrivende person\",\"_links\":{\"self\":{\"href\":\"https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/AAFY\"}}},\"registreringsdatoEnhetsregisteret\":\"2019-12-12\",\"registrertIMvaregisteret\":false,\"antallAnsatte\":0,\"overordnetEnhet\":\"922653240\",\"beliggenhetsadresse\":{\"land\":\"Norge\",\"landkode\":\"NO\",\"postnummer\":\"1337\",\"poststed\":\"SANDVIKA\",\"adresse\":[\"Solbergveien 36B\"],\"kommune\":\"BÆRUM\",\"kommunenummer\":\"0219\"},\"_links\":{\"self\":{\"href\":\"https://data.brreg.no/enhetsregisteret/api/underenheter/924109920\"},\"overordnetEnhet\":{\"href\":\"https://data.brreg.no/enhetsregisteret/api/enheter/922653240\"}}}";
-        return (ObjectNode) objectMapper.readTree(str);
     }
 
     @SneakyThrows
