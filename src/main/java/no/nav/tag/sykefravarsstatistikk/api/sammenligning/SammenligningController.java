@@ -1,6 +1,8 @@
 package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.metrics.MetricsFactory;
+import no.nav.metrics.Timer;
 import no.nav.security.oidc.api.Protected;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
@@ -37,10 +39,16 @@ public class SammenligningController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
+        Timer timer = MetricsFactory.createTimer("sykefravarsstatistikk.sammenligning");
+
         Orgnr orgnr = new Orgnr(orgnrStr);
         utførTilgangskontroll(orgnr, request);
         String sessionId = hentCookieEllerGenererNy(request, response, SESSION_ID_COOKIE_NAME);
-        return service.hentSammenligningForUnderenhet(orgnr, sessionId);
+        Sammenligning sammenligning = service.hentSammenligningForUnderenhet(orgnr, sessionId);
+
+        timer.stop().report();
+
+        return sammenligning;
     }
 
     private void utførTilgangskontroll(Orgnr orgnr, HttpServletRequest request) {
