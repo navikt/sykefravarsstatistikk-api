@@ -1,13 +1,13 @@
 package no.nav.tag.sykefravarsstatistikk.api.metrikker;
 
 import no.nav.metrics.MetricsFactory;
-import no.nav.security.oidc.api.Unprotected;
+import no.nav.security.oidc.api.Protected;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Unprotected
+@Protected
 @RestController
 public class MetrikkController {
 
