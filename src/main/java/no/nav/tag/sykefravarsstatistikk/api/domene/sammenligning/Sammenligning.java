@@ -10,6 +10,7 @@ public class Sammenligning {
     private int årstall;
     private Sykefraværprosent virksomhet;
     private Sykefraværprosent næring;
+    private Sykefraværprosent bransje;
     private Sykefraværprosent sektor;
     private Sykefraværprosent land;
 }

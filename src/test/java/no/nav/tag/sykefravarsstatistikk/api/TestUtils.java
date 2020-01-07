@@ -5,6 +5,7 @@ import no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk.SammenligningEvent
 import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
+import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
@@ -55,6 +56,7 @@ public class TestUtils {
                 2019,
                 enSykefraværprosent("Virksomhet AS", 100, 6000, 100),
                 enSykefraværprosent("Næring", 1100, 60000, 1000),
+                null,
                 enSykefraværprosent("Sektor", 11100, 600000, 10000),
                 enSykefraværprosent("Land", 111100, 6000000, 100000)
         );
@@ -120,7 +122,15 @@ public class TestUtils {
         return new Sykefraværprosent("Hei AS", new BigDecimal(5), new BigDecimal(100), antallAnsatte);
     }
 
+    public static Sykefraværprosent enSykefraværprosent() {
+        return enSykefraværprosent(8);
+    }
+
     public static Sektor enSektor() {
         return new Sektor("1", "Statlig forvaltning");
+    }
+
+    public static Bransje enBransje() {
+        return new Bransje("bransje", Arrays.asList("123"));
     }
 }

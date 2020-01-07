@@ -1,5 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
+import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
@@ -82,6 +83,10 @@ public class SammenligningRepository {
                 namedParameters,
                 NORGE
         );
+    }
+
+    public Sykefraværprosent hentSykefraværprosentBransje(int årstall, int kvartal, Bransje bransje) {
+        return null;
     }
 
     private Sykefraværprosent queryForSykefraværsprosentOgHåndterHvisIngenResultat(
