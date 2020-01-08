@@ -39,6 +39,11 @@ public class StatistikkImportController {
         return service.importSykefraværsstatistikkNæring(new ÅrstallOgKvartal(årstall, kvartal));
     }
 
+    @PostMapping(value = "/naring5siffer/{årstall}/{kvartal}")
+    public SlettOgOpprettResultat importSykefraværsstatistikkNæring5siffer(@PathVariable int årstall, @PathVariable int kvartal) {
+        return service.importSykefraværsstatistikkNæring5siffer(new ÅrstallOgKvartal(årstall, kvartal));
+    }
+
     @PostMapping(value = "/virksomhet/{årstall}/{kvartal}")
     public SlettOgOpprettResultat importSykefraværsstatistikkVirksomhet(@PathVariable int årstall, @PathVariable int kvartal) {
         return service.importSykefraværsstatistikkVirksomhet(new ÅrstallOgKvartal(årstall, kvartal));
