@@ -2,6 +2,7 @@ package no.nav.tag.sykefravarsstatistikk.api.provisjonering.importering;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.security.oidc.api.Protected;
+import no.nav.security.oidc.api.Unprotected;
 import no.nav.tag.sykefravarsstatistikk.api.common.SlettOgOpprettResultat;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import org.springframework.beans.factory.annotation.Autowired;
