@@ -37,6 +37,8 @@ public class SammenligningServiceTest {
         when(enhetsregisteretClient.hentInformasjonOmUnderenhet(any())).thenReturn(enUnderenhet());
         when(enhetsregisteretClient.hentInformasjonOmEnhet(any())).thenReturn(enEnhet());
         when(sektorMappingService.mapTilSSBSektorKode(any())).thenReturn(enSektor());
+        when(sammenligningRepository.hentSykefraværprosentNæring(anyInt(), anyInt(), any())).thenReturn(enSykefraværprosent());
+        when(sammenligningRepository.hentSykefraværprosentBransje(anyInt(), anyInt(), any())).thenReturn(enSykefraværprosent());
 
         sammenligningService = new SammenligningService(
                 sammenligningRepository,
@@ -52,7 +54,6 @@ public class SammenligningServiceTest {
     public void hentSammenligningForUnderenhet__skal_hente_bransje_og_ikke_næring_hvis_virksomhet_er_med_i_bransjeprogrammet() {
         Sykefraværprosent sykefraværprosentBransje = enSykefraværprosent("hei", 10, 100, 6);
         when(bransjeprogrammet.finnBransje(any())).thenReturn(Optional.of(enBransje()));
-        when(sammenligningRepository.hentSykefraværprosentNæring(anyInt(), anyInt(), any())).thenReturn(enSykefraværprosent());
         when(sammenligningRepository.hentSykefraværprosentBransje(anyInt(), anyInt(), any())).thenReturn(sykefraværprosentBransje);
 
         Sammenligning sammenligning = sammenligningService.hentSammenligningForUnderenhet(etOrgnr(), "asdfa");
@@ -66,7 +67,6 @@ public class SammenligningServiceTest {
         Sykefraværprosent sykefraværprosentNæring = enSykefraværprosent("hei", 10, 100, 6);
         when(bransjeprogrammet.finnBransje(any())).thenReturn(Optional.empty());
         when(sammenligningRepository.hentSykefraværprosentNæring(anyInt(), anyInt(), any())).thenReturn(sykefraværprosentNæring);
-        when(sammenligningRepository.hentSykefraværprosentBransje(anyInt(), anyInt(), any())).thenReturn(enSykefraværprosent());
 
         Sammenligning sammenligning = sammenligningService.hentSammenligningForUnderenhet(etOrgnr(), "asdfa");
 

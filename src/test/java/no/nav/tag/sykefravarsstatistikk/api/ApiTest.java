@@ -55,6 +55,7 @@ public class ApiTest {
                 "    \"prosent\": 5.1," +
                 "    \"erMaskert\": false" +
                 "  }," +
+                "  \"bransje\":null," +
                 "  \"sektor\": {" +
                 "    \"label\": \"Statlig forvaltning\"," +
                 "    \"prosent\": 5.2," +

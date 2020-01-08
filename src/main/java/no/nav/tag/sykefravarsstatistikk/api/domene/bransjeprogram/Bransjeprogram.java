@@ -19,6 +19,10 @@ public class Bransjeprogram {
     private final static List<Bransje> bransjer = Arrays.asList(BARNEHAGER, NÆRINGSMIDDELINDUSTRI, SYKEHUS, SYKEHJEM, TRANSPORT);
 
     public Optional<Bransje> finnBransje(Underenhet underenhet) {
+        if (true) {
+            // TODO Primitiv toggle for å få ut migrering uten at denne funksjonaliteten blir deployet.
+            return Optional.empty();
+        }
         return bransjer.stream()
                 .filter(bransje -> bransje.inkludererVirksomhet(underenhet))
                 .findAny();
