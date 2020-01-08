@@ -41,7 +41,7 @@ insert into dt_p.agg_ia_sykefravar_naring_kode
  values
  (
   '2019','1',
-  '01110',
+  '01112',
   'A', 'K',
   567.735679, 2124.865386, 410
  );
@@ -56,7 +56,7 @@ insert into dt_p.agg_ia_sykefravar_naring_kode
  values
  (
   '2019','1',
-  '01110',
+  '01112',
   'F', 'K',
   824.019285, 195301.687778, 438
  );
