@@ -9,6 +9,7 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppering;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.InstitusjonellSektorkode;
@@ -31,6 +32,21 @@ public class TestUtils {
                 getOrganisasjon("111111111")
         ));
         return bruker;
+    }
+
+    public static Næringsgruppering enNæringsgruppering() {
+        return new Næringsgruppering(
+                "02123",
+                "Test5",
+                "0212",
+                "test4",
+                "021",
+                "test3",
+                "02",
+                "test2",
+                "02",
+                "test1"
+        );
     }
 
     public static AltinnOrganisasjon getOrganisasjon(String organizationNumber) {

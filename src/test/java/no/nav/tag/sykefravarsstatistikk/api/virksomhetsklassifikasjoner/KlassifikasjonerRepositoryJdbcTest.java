@@ -1,5 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api.virksomhetsklassifikasjoner;
 
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppering;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.junit.After;
 import org.junit.Before;
@@ -12,7 +13,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.assertEquals;
+import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.enNæringsgruppering;
+import static no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.NæringsgrupperingSynkroniseringRepository.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("db-test")
 @RunWith(SpringRunner.class)
@@ -42,13 +45,43 @@ public class KlassifikasjonerRepositoryJdbcTest {
 
         Sektor sektor = repository.hentSektor("9");
 
-        assertEquals("9", sektor.getKode());
-        assertEquals("Fylkeskommunal forvaltning", sektor.getNavn());
+        assertThat(sektor.getKode()).isEqualTo("9");
+        assertThat(sektor.getNavn()).isEqualTo("Fylkeskommunal forvaltning");
+    }
+
+    @Test
+    public void hentNæringsgruppering__returnerer_eksisterende_Næringsgruppering() {
+        Næringsgruppering næringsgruppering = enNæringsgruppering();
+        insertNæringsgruppering(namedParameterJdbcTemplate, næringsgruppering);
+
+        Næringsgruppering hentetNæringsgruppering = repository.hentNæringsgruppering(næringsgruppering.getKode5siffer());
+
+        assertThat(hentetNæringsgruppering).isEqualTo(næringsgruppering);
     }
 
 
     private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
         jdbcTemplate.update("delete from sektor", new MapSqlParameterSource());
+    }
+
+    private static void insertNæringsgruppering(NamedParameterJdbcTemplate jdbcTemplate, Næringsgruppering næringsgruppering) {
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue(KODE_5SIFFER, næringsgruppering.getKode5siffer())
+                .addValue(BESKRIVELSE_5SIFFER, næringsgruppering.getBeskrivelse5siffer())
+                .addValue(KODE_4SIFFER, næringsgruppering.getKode4siffer())
+                .addValue(BESKRIVELSE_4SIFFER, næringsgruppering.getBeskrivelse4siffer())
+                .addValue(KODE_3SIFFER, næringsgruppering.getKode3siffer())
+                .addValue(BESKRIVELSE_3SIFFER, næringsgruppering.getBeskrivelse3siffer())
+                .addValue(KODE_2SIFFER, næringsgruppering.getKode2siffer())
+                .addValue(BESKRIVELSE_2SIFFER, næringsgruppering.getBeskrivelse2siffer())
+                .addValue(KODE_HOVEDOMRADE, næringsgruppering.getKodeHovedområde())
+                .addValue(BESKRIVELSE_HOVEDOMRADE, næringsgruppering.getBeskrivelseHovedområde());
+
+        jdbcTemplate.update(
+                "insert into naringsgruppering (kode_5siffer, beskrivelse_5siffer, kode_4siffer, beskrivelse_4siffer, kode_3siffer, beskrivelse_3siffer, kode_2siffer, beskrivelse_2siffer, kode_hovedomrade, beskrivelse_hovedomrade)  " +
+                        "values (:kode_5siffer, :beskrivelse_5siffer, :kode_4siffer, :beskrivelse_4siffer, :kode_3siffer, :beskrivelse_3siffer, :kode_2siffer, :beskrivelse_2siffer, :kode_hovedomrade, :beskrivelse_hovedomrade)",
+                params
+        );
     }
 
     private static void insertSektor(NamedParameterJdbcTemplate jdbcTemplate, String kode, String navn) {

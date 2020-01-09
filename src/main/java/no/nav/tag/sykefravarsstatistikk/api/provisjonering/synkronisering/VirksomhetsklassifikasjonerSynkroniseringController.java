@@ -21,7 +21,6 @@ public class VirksomhetsklassifikasjonerSynkroniseringController {
         this.service = service;
     }
 
-
     @PostMapping(value = "/sektorer")
     public OpprettEllerOppdaterResultat populerSektorer() {
         return service.populerSektorer();

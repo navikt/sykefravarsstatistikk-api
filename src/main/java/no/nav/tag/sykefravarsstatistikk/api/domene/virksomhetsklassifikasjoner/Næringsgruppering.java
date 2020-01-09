@@ -1,5 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 /*
@@ -7,6 +8,7 @@ TODO Med importering av næringsgrupper vil importering av Næring-objektene væ
 Da kan vi fjerne Virksomhetsklassifikasjon-interfacet.
 Muligens kan vi fjerne hele Næring-klassen og bare bruke Næringsgruppering(?)
  */
+@EqualsAndHashCode
 @Value
 public class Næringsgruppering {
     private final String kode5siffer;
