@@ -34,19 +34,23 @@ public class TestUtils {
         return bruker;
     }
 
-    public static Næringsgruppering enNæringsgruppering() {
+    public static Næringsgruppering enNæringsgruppering(String kode5siffer) {
         return new Næringsgruppering(
-                "02123",
+                kode5siffer,
                 "Test5",
-                "0212",
+                kode5siffer.substring(0, 4),
                 "test4",
-                "021",
+                kode5siffer.substring(0, 3),
                 "test3",
-                "02",
+                kode5siffer.substring(0, 2),
                 "test2",
                 "02",
                 "test1"
         );
+    }
+
+    public static Næringsgruppering enNæringsgruppering() {
+        return enNæringsgruppering("02123");
     }
 
     public static AltinnOrganisasjon getOrganisasjon(String organizationNumber) {

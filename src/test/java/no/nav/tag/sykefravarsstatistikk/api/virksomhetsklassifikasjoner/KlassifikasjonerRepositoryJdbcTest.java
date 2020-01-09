@@ -13,6 +13,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
+
 import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.enNæringsgruppering;
 import static no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.NæringsgrupperingSynkroniseringRepository.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,6 +61,24 @@ public class KlassifikasjonerRepositoryJdbcTest {
         assertThat(hentetNæringsgruppering).isEqualTo(næringsgruppering);
     }
 
+    @Test
+    public void hentNæringsgrupperinger__skal_returnere_Næringsgrupperinger_som_starter_med_angitte_sifre() {
+        Næringsgruppering næringsgruppering1 = enNæringsgruppering("11111");
+        Næringsgruppering næringsgruppering2 = enNæringsgruppering("11222");
+        Næringsgruppering næringsgruppering3 = enNæringsgruppering("33333");
+        insertNæringsgruppering(namedParameterJdbcTemplate, næringsgruppering1);
+        insertNæringsgruppering(namedParameterJdbcTemplate, næringsgruppering2);
+        insertNæringsgruppering(namedParameterJdbcTemplate, næringsgruppering3);
+
+        List<Næringsgruppering> resultat = repository.hentNæringsgrupperingerTilhørendeNæringskode2siffer("11");
+
+        assertThat(resultat).containsExactly(næringsgruppering1, næringsgruppering2);
+    }
+
+    @Test
+    public void hentNæringsgrupperinger__skal_returnere_tom_liste_hvis_ingen_næringsgrupperinger_eksisterer() {
+        assertThat(repository.hentNæringsgrupperingerTilhørendeNæringskode2siffer("11")).isEmpty();
+    }
 
     private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
         jdbcTemplate.update("delete from sektor", new MapSqlParameterSource());
