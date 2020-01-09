@@ -5,6 +5,7 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.Sykefraværsstatis
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkVirksomhet;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppering;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.junit.After;
 import org.junit.Before;
@@ -21,6 +22,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static no.nav.tag.sykefravarsstatistikk.api.provisjonering.DataverehusRepository.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -141,6 +143,17 @@ public class DataverehusRepositoryJdbcTest {
         assertTrue(næringer.contains(new Næring("02", "Skogbruk og tjenester tilknyttet skogbruk")));
         assertTrue(næringer.contains(new Næring("11", "Produksjon av drikkevarer")));
     }
+    
+    @Test
+    public void hentAlleNæringsgrupperinger__returnerer_eksisterende_Næringsgrupperinger() {
+        insertNæringsgrupperingInDvhTabell(namedParameterJdbcTemplate, "02123", "Test5", "0212", "test4", "021", "test3", "02", "test2", "02", "test1");
+        insertNæringsgrupperingInDvhTabell(namedParameterJdbcTemplate, "54321", "hei1", "5432", "hei2", "543", "hei3", "54", "hei4", "66633", "hei5");
+
+        List<Næringsgruppering> næringsgrupperinger = repository.hentAlleNæringsgrupperinger();
+
+        assertTrue(næringsgrupperinger.contains(new Næringsgruppering("02123", "Test5", "0212", "test4", "021", "test3", "02", "test2", "02", "test1")));
+        assertTrue(næringsgrupperinger.contains(new Næringsgruppering("54321", "hei1", "5432", "hei2", "543", "hei3", "54", "hei4", "66633", "hei5")));
+    }
 
 
     private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
@@ -148,6 +161,7 @@ public class DataverehusRepositoryJdbcTest {
         delete(jdbcTemplate, "dt_p.v_dim_ia_sektor");
         delete(jdbcTemplate, "dt_p.v_agg_ia_sykefravar_land");
         delete(jdbcTemplate, "dt_p.v_agg_ia_sykefravar");
+        delete(jdbcTemplate, "dt_p.dim_ia_naring");
     }
 
     private static int delete(NamedParameterJdbcTemplate jdbcTemplate, String tabell) {
@@ -181,6 +195,38 @@ public class DataverehusRepositoryJdbcTest {
         jdbcTemplate.update(
                 "insert into dt_p.v_dim_ia_naring_sn2007 (naringkode, nargrpkode, naringnavn) "
                         + "values (:naringkode, :nargrpkode, :naringnavn)",
+                naringParams);
+    }
+    
+    private static void insertNæringsgrupperingInDvhTabell(
+            NamedParameterJdbcTemplate jdbcTemplate,
+            String næringkode,
+            String næringbeskrivelse,
+            String gruppe1kode,
+            String gruppe1beskrivelse,
+            String gruppe2kode,
+            String gruppe2beskrivelse,
+            String gruppe3kode,
+            String gruppe3beskrivelse,
+            String gruppe4kode,
+            String gruppe4beskrivelse
+    ) {
+        MapSqlParameterSource naringParams =
+                new MapSqlParameterSource()
+                        .addValue(NAERING_KODE, næringkode)
+                        .addValue(NAERING_BESKRIVELSE, næringbeskrivelse)
+                        .addValue(GRUPPE1_KODE, gruppe1kode)
+                        .addValue(GRUPPE1_BESKRIVELSE, gruppe1beskrivelse)
+                        .addValue(GRUPPE2_KODE, gruppe2kode)
+                        .addValue(GRUPPE2_BESKRIVELSE, gruppe2beskrivelse)
+                        .addValue(GRUPPE3_KODE, gruppe3kode)
+                        .addValue(GRUPPE3_BESKRIVELSE, gruppe3beskrivelse)
+                        .addValue(GRUPPE4_KODE, gruppe4kode)
+                        .addValue(GRUPPE4_BESKRIVELSE, gruppe4beskrivelse);
+
+        jdbcTemplate.update(
+                "insert into dt_p.dim_ia_naring (naering_kode, naering_besk_lang, gruppe1_kode, gruppe1_besk_lang, gruppe2_kode, gruppe2_besk_lang, gruppe3_kode, gruppe3_besk_lang, gruppe4_kode, gruppe4_besk_lang) "
+                        + "values (:naering_kode,  :naering_besk_lang,  :gruppe1_kode,  :gruppe1_besk_lang,  :gruppe2_kode,  :gruppe2_besk_lang,  :gruppe3_kode,  :gruppe3_besk_lang,  :gruppe4_kode,  :gruppe4_besk_lang)",
                 naringParams);
     }
 

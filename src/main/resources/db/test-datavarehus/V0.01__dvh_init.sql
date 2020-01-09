@@ -25,7 +25,7 @@ create table dt_p.dim_ia_naring
     gruppe2_besk_lang varchar,
     gruppe3_kode char(2),
     gruppe3_besk_lang varchar,
-    gruppe4_kode char(2),
+    gruppe4_kode char,
     gruppe4_besk_lang varchar
 );
 
