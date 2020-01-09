@@ -17,13 +17,15 @@ public class VirksomhetsklassifikasjonerSynkroniseringService {
     private final DataverehusRepository datavarehusRepository;
     private final VirksomhetsklassifikasjonerSynkroniseringRepository
             virksomhetsklassifikasjonerSynkroniseringRepository;
+    private final NæringsgrupperingSynkroniseringRepository næringsgrupperingSynkroniseringRepository;
 
     public VirksomhetsklassifikasjonerSynkroniseringService(
             DataverehusRepository datavarehusRepository,
-            VirksomhetsklassifikasjonerSynkroniseringRepository virksomhetsklassifikasjonerSynkroniseringRepository
-    ) {
+            VirksomhetsklassifikasjonerSynkroniseringRepository virksomhetsklassifikasjonerSynkroniseringRepository,
+            NæringsgrupperingSynkroniseringRepository næringsgrupperingSynkroniseringRepository) {
         this.datavarehusRepository = datavarehusRepository;
         this.virksomhetsklassifikasjonerSynkroniseringRepository = virksomhetsklassifikasjonerSynkroniseringRepository;
+        this.næringsgrupperingSynkroniseringRepository = næringsgrupperingSynkroniseringRepository;
     }
 
     public OpprettEllerOppdaterResultat populerSektorer() {
@@ -58,7 +60,7 @@ public class VirksomhetsklassifikasjonerSynkroniseringService {
     public OpprettEllerOppdaterResultat populerNæringsgrupperinger() {
         List<Næringsgruppering> næringsgrupperinger = datavarehusRepository.hentAlleNæringsgrupperinger();
         OpprettEllerOppdaterResultat resultat =
-                virksomhetsklassifikasjonerSynkroniseringRepository.opprettEllerOppdaterNæringsgrupperinger(næringsgrupperinger);
+                næringsgrupperingSynkroniseringRepository.opprettEllerOppdaterNæringsgrupperinger(næringsgrupperinger);
         log.info(
                 String.format(
                         "Import av fullstendige næringsgrupperinger er ferdig. Antall opprettet: %d, antall oppdatert: %d",
