@@ -15,6 +15,20 @@ create table dt_p.v_dim_ia_naring_sn2007
     constraint r1_naring_sn2007_pk primary key (naringkode)
 );
 
+create table dt_p.dim_ia_naring
+(
+    naering_kode char(5),
+    naering_besk_land varchar,
+    gruppe1_kode char(4),
+    gruppe1_besk_lang varchar,
+    gruppe2_kode char(3),
+    gruppe2_besk_lang varchar,
+    gruppe3_kode char(2),
+    gruppe3_besk_lang varchar,
+    gruppe4_kode char(2),
+    gruppe4_besk_lang varchar
+);
+
 create table dt_p.v_agg_ia_sykefravar_land
 (
      arstall char(4) not null,
