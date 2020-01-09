@@ -204,7 +204,7 @@ public class DataverehusRepository {
         SqlParameterSource namedParameters = new MapSqlParameterSource();
 
         return namedParameterJdbcTemplate.query(
-                "select naringkode, naringnavn from dt_p.dim_ia_naring",
+                "select naringkode, naringnavn from dt_p.v_dim_ia_naring_sn2007",
                 namedParameters,
                 (resultSet, rowNum) ->
                         new Næring(
