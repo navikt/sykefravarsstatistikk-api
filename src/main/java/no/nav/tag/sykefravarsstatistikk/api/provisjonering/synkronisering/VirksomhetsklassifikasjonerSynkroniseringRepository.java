@@ -2,6 +2,7 @@ package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering;
 
 import no.nav.tag.sykefravarsstatistikk.api.common.OpprettEllerOppdaterResultat;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppering;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Virksomhetsklassifikasjon;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integrasjon.utils.NæringIntegrasjonUtils;
@@ -71,4 +72,8 @@ public class VirksomhetsklassifikasjonerSynkroniseringRepository {
 
     return resultat;
   }
+
+    public OpprettEllerOppdaterResultat opprettEllerOppdaterNæringsgrupperinger(List<Næringsgruppering> næringsgrupperinger) {
+        return null;
+    }
 }

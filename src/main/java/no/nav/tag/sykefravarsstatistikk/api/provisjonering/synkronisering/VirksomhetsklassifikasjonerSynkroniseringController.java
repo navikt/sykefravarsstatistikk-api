@@ -32,4 +32,9 @@ public class VirksomhetsklassifikasjonerSynkroniseringController {
         return service.populerNæringskoder();
     }
 
+    @PostMapping(value = "/naringsgrupperinger")
+    public OpprettEllerOppdaterResultat populerNæringsgrupperinger() {
+        return service.populerNæringsgrupperinger();
+    }
+
 }

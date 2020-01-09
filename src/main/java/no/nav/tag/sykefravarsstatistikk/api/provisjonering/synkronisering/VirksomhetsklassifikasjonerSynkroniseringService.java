@@ -3,6 +3,7 @@ package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.tag.sykefravarsstatistikk.api.common.OpprettEllerOppdaterResultat;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppering;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.DataverehusRepository;
 import org.springframework.stereotype.Component;
@@ -46,7 +47,21 @@ public class VirksomhetsklassifikasjonerSynkroniseringService {
                 virksomhetsklassifikasjonerSynkroniseringRepository.opprettEllerOppdaterNæringer(næringer);
         log.info(
                 String.format(
-                        "Import av næringer er ferdig. Antall opprettet: %d, antall oppdatert: %d",
+                        "Import av næringer (med næringskode på 2 siffer) er ferdig. Antall opprettet: %d, antall oppdatert: %d",
+                        resultat.getAntallRadOpprettet(),
+                        resultat.getAntallRadOppdatert()
+                )
+        );
+        return resultat;
+    }
+
+    public OpprettEllerOppdaterResultat populerNæringsgrupperinger() {
+        List<Næringsgruppering> næringsgrupperinger = datavarehusRepository.hentAlleNæringsgrupperinger();
+        OpprettEllerOppdaterResultat resultat =
+                virksomhetsklassifikasjonerSynkroniseringRepository.opprettEllerOppdaterNæringsgrupperinger(næringsgrupperinger);
+        log.info(
+                String.format(
+                        "Import av fullstendige næringsgrupperinger er ferdig. Antall opprettet: %d, antall oppdatert: %d",
                         resultat.getAntallRadOpprettet(),
                         resultat.getAntallRadOppdatert()
                 )

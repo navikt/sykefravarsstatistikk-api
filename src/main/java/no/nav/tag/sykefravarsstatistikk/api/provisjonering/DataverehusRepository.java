@@ -2,6 +2,7 @@ package no.nav.tag.sykefravarsstatistikk.api.provisjonering;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.*;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppering;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -197,5 +198,9 @@ public class DataverehusRepository {
                         new Næring(
                                 resultSet.getString(NARINGKODE),
                                 resultSet.getString(NARINGNAVN)));
+    }
+
+    public List<Næringsgruppering> hentAlleNæringsgrupperinger() {
+        return null;
     }
 }
