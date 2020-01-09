@@ -28,7 +28,7 @@ public class SammenligningServiceTest {
     @Mock SektorMappingService sektorMappingService;
     @Mock KlassifikasjonerRepository klassifikasjonerRepository;
     @Mock ApplicationEventPublisher eventPublisher;
-    @Mock Bransjeprogram bransjeprogrammet;
+    @Mock Bransjeprogram bransjeprogram;
 
     private SammenligningService sammenligningService;
 
@@ -46,14 +46,14 @@ public class SammenligningServiceTest {
                 sektorMappingService,
                 klassifikasjonerRepository,
                 eventPublisher,
-                bransjeprogrammet
+                bransjeprogram
         );
     }
 
     @Test
     public void hentSammenligningForUnderenhet__skal_hente_bransje_og_ikke_næring_hvis_virksomhet_er_med_i_bransjeprogrammet() {
         Sykefraværprosent sykefraværprosentBransje = enSykefraværprosent("hei", 10, 100, 6);
-        when(bransjeprogrammet.finnBransje(any())).thenReturn(Optional.of(enBransje()));
+        when(bransjeprogram.finnBransje(any())).thenReturn(Optional.of(enBransje()));
         when(sammenligningRepository.hentSykefraværprosentBransje(anyInt(), anyInt(), any())).thenReturn(sykefraværprosentBransje);
 
         Sammenligning sammenligning = sammenligningService.hentSammenligningForUnderenhet(etOrgnr(), "asdfa");
@@ -65,7 +65,7 @@ public class SammenligningServiceTest {
     @Test
     public void hentSammenligningForUnderenhet__skal_hente_næring_og_ikke_bransje_hvis_virksomhet_er_med_i_bransjeprogrammet() {
         Sykefraværprosent sykefraværprosentNæring = enSykefraværprosent("hei", 10, 100, 6);
-        when(bransjeprogrammet.finnBransje(any())).thenReturn(Optional.empty());
+        when(bransjeprogram.finnBransje(any())).thenReturn(Optional.empty());
         when(sammenligningRepository.hentSykefraværprosentNæring(anyInt(), anyInt(), any())).thenReturn(sykefraværprosentNæring);
 
         Sammenligning sammenligning = sammenligningService.hentSammenligningForUnderenhet(etOrgnr(), "asdfa");

@@ -28,7 +28,7 @@ public class SammenligningService {
     private final SektorMappingService sektorMappingService;
     private final KlassifikasjonerRepository klassifikasjonerRepository;
     private final ApplicationEventPublisher eventPublisher;
-    private final Bransjeprogram bransjeprogrammet;
+    private final Bransjeprogram bransjeprogram;
 
     @Value("${statistikk.import.siste.arstall}")
     private int ARSTALL;
@@ -41,14 +41,14 @@ public class SammenligningService {
             SektorMappingService sektorMappingService,
             KlassifikasjonerRepository klassifikasjonerRepository,
             ApplicationEventPublisher eventPublisher,
-            Bransjeprogram bransjeprogrammet
+            Bransjeprogram bransjeprogram
     ) {
         this.sammenligningRepository = sammenligningRepository;
         this.enhetsregisteretClient = enhetsregisteretClient;
         this.sektorMappingService = sektorMappingService;
         this.klassifikasjonerRepository = klassifikasjonerRepository;
         this.eventPublisher = eventPublisher;
-        this.bransjeprogrammet = bransjeprogrammet;
+        this.bransjeprogram = bransjeprogram;
     }
 
     public Sammenligning hentSammenligningForUnderenhet(
@@ -63,7 +63,7 @@ public class SammenligningService {
 
         Sykefraværprosent sykefraværprosentNæring = null;
         Sykefraværprosent sykefraværprosentBransje = null;
-        Optional<Bransje> bransje = bransjeprogrammet.finnBransje(underenhet);
+        Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
 
         if (bransje.isPresent()) {
             sykefraværprosentBransje = sammenligningRepository.hentSykefraværprosentBransje(ARSTALL, KVARTAL, bransje.get());

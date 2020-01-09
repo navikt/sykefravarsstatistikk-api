@@ -145,8 +145,7 @@ public class DataverehusRepository {
                         "sum(taptedv) as sum_tapte_dagsverk, " +
                         "sum(muligedv) as sum_mulige_dagsverk " +
                         "from dt_p.agg_ia_sykefravar_naring_kode " +
-                        "where kjonn != 'X' and naering_kode != 'X' " +
-                        "and arstall = :arstall and kvartal = :kvartal " +
+                        "where arstall = :arstall and kvartal = :kvartal " +
                         "group by arstall, kvartal, naering_kode",
                 namedParameters,
                 (resultSet, rowNum) ->
