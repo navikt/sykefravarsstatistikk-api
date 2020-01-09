@@ -18,7 +18,7 @@ create table dt_p.v_dim_ia_naring_sn2007
 create table dt_p.dim_ia_naring
 (
     naering_kode char(5),
-    naering_besk_land varchar,
+    naering_besk_lang varchar,
     gruppe1_kode char(4),
     gruppe1_besk_lang varchar,
     gruppe2_kode char(3),

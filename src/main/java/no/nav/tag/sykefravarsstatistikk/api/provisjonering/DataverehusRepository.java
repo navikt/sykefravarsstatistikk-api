@@ -204,7 +204,7 @@ public class DataverehusRepository {
         SqlParameterSource namedParameters = new MapSqlParameterSource();
 
         return namedParameterJdbcTemplate.query(
-                "select naringkode, naringnavn from dt_p.v_dim_ia_naring_sn2007",
+                "select naringkode, naringnavn from dt_p.dim_ia_naring",
                 namedParameters,
                 (resultSet, rowNum) ->
                         new Næring(
@@ -216,7 +216,7 @@ public class DataverehusRepository {
         SqlParameterSource namedParameters = new MapSqlParameterSource();
 
         return namedParameterJdbcTemplate.query(
-                "select naering_kode, naering_besk_lang, gruppe1_kode, gruppe1_besk_lang, gruppe2_kode, gruppe2_besk_lang, gruppe3_kode, gruppe3_besk_lang, gruppe4_kode, gruppe4_besk_lang from dt_p.v_dim_ia_naring_sn2007",
+                "select naering_kode, naering_besk_lang, gruppe1_kode, gruppe1_besk_lang, gruppe2_kode, gruppe2_besk_lang, gruppe3_kode, gruppe3_besk_lang, gruppe4_kode, gruppe4_besk_lang from dt_p.dim_ia_naring",
                 namedParameters,
                 (resultSet, rowNum) ->
                         new Næringsgruppering(
