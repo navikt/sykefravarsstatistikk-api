@@ -32,6 +32,18 @@ public class DataverehusRepository {
     public static final String SUM_MULIGE_DAGSVERK = "sum_mulige_dagsverk";
 
 
+    public static final String NAERING_KODE = "naering_kode";
+    public static final String NAERING_BESKRIVELSE = "naering_besk_lang";
+    public static final String GRUPPE1_KODE = "gruppe1_kode";
+    public static final String GRUPPE1_BESKRIVELSE = "gruppe1_besk_lang";
+    public static final String GRUPPE2_KODE = "gruppe2_kode";
+    public static final String GRUPPE2_BESKRIVELSE = "gruppe2_besk_lang";
+    public static final String GRUPPE3_KODE = "gruppe3_kode";
+    public static final String GRUPPE3_BESKRIVELSE = "gruppe3_besk_lang";
+    public static final String GRUPPE4_KODE = "gruppe4_kode";
+    public static final String GRUPPE4_BESKRIVELSE = "gruppe4_besk_lang";
+
+
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     public DataverehusRepository(
@@ -201,6 +213,23 @@ public class DataverehusRepository {
     }
 
     public List<Næringsgruppering> hentAlleNæringsgrupperinger() {
-        return null;
+        SqlParameterSource namedParameters = new MapSqlParameterSource();
+
+        return namedParameterJdbcTemplate.query(
+                "select naering_kode, naering_besk_lang, gruppe1_kode, gruppe1_besk_lang, gruppe2_kode, gruppe2_besk_lang, gruppe3_kode, gruppe3_besk_lang, gruppe4_kode, gruppe4_besk_lang from dt_p.v_dim_ia_naring_sn2007",
+                namedParameters,
+                (resultSet, rowNum) ->
+                        new Næringsgruppering(
+                                resultSet.getString(NAERING_KODE),
+                                resultSet.getString(NAERING_BESKRIVELSE),
+                                resultSet.getString(GRUPPE1_KODE),
+                                resultSet.getString(GRUPPE1_BESKRIVELSE),
+                                resultSet.getString(GRUPPE2_KODE),
+                                resultSet.getString(GRUPPE2_BESKRIVELSE),
+                                resultSet.getString(GRUPPE3_KODE),
+                                resultSet.getString(GRUPPE3_BESKRIVELSE),
+                                resultSet.getString(GRUPPE4_KODE),
+                                resultSet.getString(GRUPPE4_BESKRIVELSE)
+                        ));
     }
 }
