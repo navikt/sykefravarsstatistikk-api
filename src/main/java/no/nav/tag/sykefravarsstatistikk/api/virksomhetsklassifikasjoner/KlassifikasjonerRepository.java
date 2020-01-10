@@ -51,7 +51,6 @@ public class KlassifikasjonerRepository {
                         rs.getString("kode"),
                         rs.getString("navn")
                 )
-
         );
     }
 

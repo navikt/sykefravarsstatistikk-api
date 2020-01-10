@@ -151,6 +151,6 @@ public class TestUtils {
     }
 
     public static Bransje enBransje() {
-        return new Bransje("bransje", Arrays.asList("123"));
+        return new Bransje("bransje", "12322");
     }
 }
