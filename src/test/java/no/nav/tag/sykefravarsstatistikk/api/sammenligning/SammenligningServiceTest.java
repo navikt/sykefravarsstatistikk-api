@@ -7,6 +7,7 @@ import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretCli
 import no.nav.tag.sykefravarsstatistikk.api.virksomhetsklassifikasjoner.KlassifikasjonerRepository;
 import no.nav.tag.sykefravarsstatistikk.api.virksomhetsklassifikasjoner.SektorMappingService;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -50,6 +51,7 @@ public class SammenligningServiceTest {
         );
     }
 
+    @Ignore // TODO Fjern "Ignore" når funksjonaliteten skal lanseres
     @Test
     public void hentSammenligningForUnderenhet__skal_hente_bransje_og_ikke_næring_hvis_virksomhet_er_med_i_bransjeprogrammet() {
         Sykefraværprosent sykefraværprosentBransje = enSykefraværprosent("hei", 10, 100, 6);
@@ -62,6 +64,7 @@ public class SammenligningServiceTest {
         assertThat(sammenligning.getBransje()).isEqualTo(sykefraværprosentBransje);
     }
 
+    @Ignore
     @Test
     public void hentSammenligningForUnderenhet__skal_hente_næring_og_ikke_bransje_hvis_virksomhet_er_med_i_bransjeprogrammet() {
         Sykefraværprosent sykefraværprosentNæring = enSykefraværprosent("hei", 10, 100, 6);
