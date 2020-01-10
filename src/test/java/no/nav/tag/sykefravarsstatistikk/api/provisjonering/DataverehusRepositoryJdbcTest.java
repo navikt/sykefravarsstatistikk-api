@@ -143,25 +143,12 @@ public class DataverehusRepositoryJdbcTest {
         assertTrue(næringer.contains(new Næring("02", "Skogbruk og tjenester tilknyttet skogbruk")));
         assertTrue(næringer.contains(new Næring("11", "Produksjon av drikkevarer")));
     }
-    
-    @Test
-    public void hentAlleNæringsgrupperinger__returnerer_eksisterende_Næringsgrupperinger() {
-        insertNæringsgrupperingInDvhTabell(namedParameterJdbcTemplate, "02123", "Test5", "0212", "test4", "021", "test3", "02", "test2", "02", "test1");
-        insertNæringsgrupperingInDvhTabell(namedParameterJdbcTemplate, "54321", "hei1", "5432", "hei2", "543", "hei3", "54", "hei4", "66633", "hei5");
-
-        List<Næringsgruppering> næringsgrupperinger = repository.hentAlleNæringsgrupperinger();
-
-        assertTrue(næringsgrupperinger.contains(new Næringsgruppering("02123", "Test5", "0212", "test4", "021", "test3", "02", "test2", "02", "test1")));
-        assertTrue(næringsgrupperinger.contains(new Næringsgruppering("54321", "hei1", "5432", "hei2", "543", "hei3", "54", "hei4", "66633", "hei5")));
-    }
-
 
     private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
         delete(jdbcTemplate, "dt_p.v_dim_ia_naring_sn2007");
         delete(jdbcTemplate, "dt_p.v_dim_ia_sektor");
         delete(jdbcTemplate, "dt_p.v_agg_ia_sykefravar_land");
         delete(jdbcTemplate, "dt_p.v_agg_ia_sykefravar");
-        delete(jdbcTemplate, "dt_p.dim_ia_naring");
     }
 
     private static int delete(NamedParameterJdbcTemplate jdbcTemplate, String tabell) {

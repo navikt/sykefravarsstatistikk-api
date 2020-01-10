@@ -3,7 +3,6 @@ package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.tag.sykefravarsstatistikk.api.common.OpprettEllerOppdaterResultat;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
-import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppering;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.provisjonering.DataverehusRepository;
 import org.springframework.stereotype.Component;
@@ -17,15 +16,13 @@ public class VirksomhetsklassifikasjonerSynkroniseringService {
     private final DataverehusRepository datavarehusRepository;
     private final VirksomhetsklassifikasjonerSynkroniseringRepository
             virksomhetsklassifikasjonerSynkroniseringRepository;
-    private final NæringsgrupperingSynkroniseringRepository næringsgrupperingSynkroniseringRepository;
 
     public VirksomhetsklassifikasjonerSynkroniseringService(
             DataverehusRepository datavarehusRepository,
-            VirksomhetsklassifikasjonerSynkroniseringRepository virksomhetsklassifikasjonerSynkroniseringRepository,
-            NæringsgrupperingSynkroniseringRepository næringsgrupperingSynkroniseringRepository) {
+            VirksomhetsklassifikasjonerSynkroniseringRepository virksomhetsklassifikasjonerSynkroniseringRepository
+    ) {
         this.datavarehusRepository = datavarehusRepository;
         this.virksomhetsklassifikasjonerSynkroniseringRepository = virksomhetsklassifikasjonerSynkroniseringRepository;
-        this.næringsgrupperingSynkroniseringRepository = næringsgrupperingSynkroniseringRepository;
     }
 
     public OpprettEllerOppdaterResultat populerSektorer() {
@@ -50,20 +47,6 @@ public class VirksomhetsklassifikasjonerSynkroniseringService {
         log.info(
                 String.format(
                         "Import av næringer (med næringskode på 2 siffer) er ferdig. Antall opprettet: %d, antall oppdatert: %d",
-                        resultat.getAntallRadOpprettet(),
-                        resultat.getAntallRadOppdatert()
-                )
-        );
-        return resultat;
-    }
-
-    public OpprettEllerOppdaterResultat populerNæringsgrupperinger() {
-        List<Næringsgruppering> næringsgrupperinger = datavarehusRepository.hentAlleNæringsgrupperinger();
-        OpprettEllerOppdaterResultat resultat =
-                næringsgrupperingSynkroniseringRepository.opprettEllerOppdaterNæringsgrupperinger(næringsgrupperinger);
-        log.info(
-                String.format(
-                        "Import av fullstendige næringsgrupperinger er ferdig. Antall opprettet: %d, antall oppdatert: %d",
                         resultat.getAntallRadOpprettet(),
                         resultat.getAntallRadOppdatert()
                 )
