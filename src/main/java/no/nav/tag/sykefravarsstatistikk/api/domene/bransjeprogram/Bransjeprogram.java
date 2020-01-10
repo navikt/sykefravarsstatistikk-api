@@ -11,10 +11,10 @@ import java.util.Optional;
 public class Bransjeprogram {
 
     private final static Bransje BARNEHAGER = new Bransje("Barnehager", "88911");
-    private final static Bransje NÆRINGSMIDDELINDUSTRI = new Bransje("Næringsmiddelsindustri", "10");
+    private final static Bransje NÆRINGSMIDDELINDUSTRI = new Bransje("Næringsmiddelsindustrien", "10");
     private final static Bransje SYKEHUS = new Bransje("Sykehus", "86101", "86102", "86104", "86105", "86106", "86107");
-    private final static Bransje SYKEHJEM = new Bransje("Næringsmiddelsindustri", "87101", "87102");
-    private final static Bransje TRANSPORT = new Bransje("Transport", "49100", "49311", "49391", "49392");
+    private final static Bransje SYKEHJEM = new Bransje("Sykehjem", "87101", "87102");
+    private final static Bransje TRANSPORT = new Bransje("Rutebuss og persontrafikk (transport)", "49100", "49311", "49391", "49392");
 
     private final static List<Bransje> bransjer = Arrays.asList(BARNEHAGER, NÆRINGSMIDDELINDUSTRI, SYKEHUS, SYKEHJEM, TRANSPORT);
 
