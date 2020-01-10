@@ -1,9 +1,11 @@
 package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
+import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -82,6 +84,29 @@ public class SammenligningRepository {
                 namedParameters,
                 NORGE
         );
+    }
+
+    public Sykefraværprosent hentSykefraværprosentBransje(int årstall, int kvartal, Bransje bransje) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue(ÅRSTALL, årstall)
+                .addValue(KVARTAL, kvartal)
+                .addValue(NÆRING, bransje.getKoderSomSpesifisererNæringer());
+
+        if (bransje.lengdePåNæringskoder() == 2) {
+            return queryForSykefraværsprosentOgHåndterHvisIngenResultat(
+                    "SELECT SUM(tapte_dagsverk) AS tapte_dagsverk, SUM(mulige_dagsverk) AS mulige_dagsverk, SUM(antall_personer) AS antall_personer FROM SYKEFRAVAR_STATISTIKK_NARING WHERE arstall = :arstall AND kvartal = :kvartal AND naring_kode IN (:naring)",
+                    namedParameters,
+                    bransje.getNavn()
+            );
+        } else if (bransje.lengdePåNæringskoder() == 5) {
+            return queryForSykefraværsprosentOgHåndterHvisIngenResultat(
+                    "SELECT SUM(tapte_dagsverk) AS tapte_dagsverk, SUM(mulige_dagsverk) AS mulige_dagsverk, SUM(antall_personer) AS antall_personer FROM SYKEFRAVAR_STATISTIKK_NARING5SIFFER WHERE arstall = :arstall AND kvartal = :kvartal AND naring_kode IN (:naring)",
+                    namedParameters,
+                    bransje.getNavn()
+            );
+        } else {
+            throw new IllegalArgumentException("Støtter kun bransjer som er spesifisert av enten 2 eller 5 sifre");
+        }
     }
 
     private Sykefraværprosent queryForSykefraværsprosentOgHåndterHvisIngenResultat(

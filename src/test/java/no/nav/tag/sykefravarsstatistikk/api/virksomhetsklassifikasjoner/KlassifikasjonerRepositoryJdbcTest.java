@@ -12,7 +12,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("db-test")
 @RunWith(SpringRunner.class)
@@ -42,10 +42,9 @@ public class KlassifikasjonerRepositoryJdbcTest {
 
         Sektor sektor = repository.hentSektor("9");
 
-        assertEquals("9", sektor.getKode());
-        assertEquals("Fylkeskommunal forvaltning", sektor.getNavn());
+        assertThat(sektor.getKode()).isEqualTo("9");
+        assertThat(sektor.getNavn()).isEqualTo("Fylkeskommunal forvaltning");
     }
-
 
     private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
         jdbcTemplate.update("delete from sektor", new MapSqlParameterSource());

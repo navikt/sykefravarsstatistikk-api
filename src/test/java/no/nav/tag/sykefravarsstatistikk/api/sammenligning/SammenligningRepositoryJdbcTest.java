@@ -1,9 +1,9 @@
 package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
+import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.junit.After;
 import org.junit.Before;
@@ -15,6 +15,8 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.Arrays;
 
 import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.*;
 import static no.nav.tag.sykefravarsstatistikk.api.sammenligning.SammenligningRepository.NORGE;
@@ -82,14 +84,7 @@ public class SammenligningRepositoryJdbcTest {
     public void hentSykefraværprosentNæring__skal_returnere_riktig_sykefravær() {
         Næring næring = new Næring("74123", "Spesiell næring");
 
-        insertNæringskode(næring);
-        jdbcTemplate.update(
-                "insert into sykefravar_statistikk_naring " +
-                        "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                        + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(2017, 3, 10,56, 2051)
-                        .addValue("naring_kode", næring.getKode())
-        );
+        insertStatistikkForNæring2siffer("74123", 2017, 3, 10,56, 2051);
 
         Sykefraværprosent resultat = repository.hentSykefraværprosentNæring(2017, 3, næring);
 
@@ -124,12 +119,45 @@ public class SammenligningRepositoryJdbcTest {
                 .isEqualTo(Sykefraværprosent.tomSykefraværprosent(enUnderenhet().getNavn()));
     }
 
-    private void insertNæringskode(Næring næring) {
+    @Test
+    public void hentSykefraværprosentBransje__skal_summere_opp_næringer_på_2siffernivå_hvis_bransjen_spesifiseres_av_2sifferkoder() {
+        Bransje bransje = new Bransje("bransje", "01", "02");
+        insertStatistikkForNæring2siffer("01", 2017, 3, 10,10, 1000);
+        insertStatistikkForNæring2siffer("02", 2017, 3, 20,30, 2000);
+
+        Sykefraværprosent resultat = repository.hentSykefraværprosentBransje(2017, 3, bransje);
+
+        assertThat(resultat).isEqualTo(enSykefraværprosent(bransje.getNavn(), 40, 3000, 30));
+    }
+
+    @Test
+    public void hentSykefraværprosentBransje__skal_summere_opp_næringer_på_5siffernivå_hvis_bransjen_spesifiseres_av_5sifferkoder() {
+        Bransje bransje = new Bransje("bransje", "11111", "22222");
+        insertStatistikkForNæring5siffer("11111", 2017, 3, 10,10, 1000);
+        insertStatistikkForNæring5siffer("22222", 2017, 3, 20,30, 2000);
+
+        Sykefraværprosent resultat = repository.hentSykefraværprosentBransje(2017, 3, bransje);
+
+        assertThat(resultat).isEqualTo(enSykefraværprosent(bransje.getNavn(), 40, 3000, 30));
+    }
+
+    private void insertStatistikkForNæring2siffer(String næringskode2siffer, int årstall, int kvartal, int antallPersoner, int tapteDagsverk, int muligeDagsverk) {
         jdbcTemplate.update(
-                "insert into naring (kode, navn) VALUES (:kode, :navn)",
-                new MapSqlParameterSource()
-                        .addValue("kode", næring.getKode())
-                        .addValue("navn", næring.getNavn())
+                "insert into sykefravar_statistikk_naring " +
+                        "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(årstall, kvartal, antallPersoner,tapteDagsverk, muligeDagsverk)
+                        .addValue("naring_kode", næringskode2siffer)
+        );
+    }
+
+    private void insertStatistikkForNæring5siffer(String næringskode5siffer, int årstall, int kvartal, int antallPersoner, int tapteDagsverk, int muligeDagsverk) {
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_naring5siffer " +
+                        "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(årstall, kvartal, antallPersoner,tapteDagsverk, muligeDagsverk)
+                        .addValue("naring_kode", næringskode5siffer)
         );
     }
 
@@ -145,6 +173,7 @@ public class SammenligningRepositoryJdbcTest {
     private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
         jdbcTemplate.update("delete from sykefravar_statistikk_virksomhet", new MapSqlParameterSource());
         jdbcTemplate.update("delete from sykefravar_statistikk_naring", new MapSqlParameterSource());
+        jdbcTemplate.update("delete from sykefravar_statistikk_naring5siffer", new MapSqlParameterSource());
         jdbcTemplate.update("delete from sykefravar_statistikk_sektor", new MapSqlParameterSource());
         jdbcTemplate.update("delete from sykefravar_statistikk_land", new MapSqlParameterSource());
         jdbcTemplate.update("delete from naring", new MapSqlParameterSource());

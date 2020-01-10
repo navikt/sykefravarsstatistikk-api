@@ -46,7 +46,7 @@ public class VirksomhetsklassifikasjonerSynkroniseringService {
                 virksomhetsklassifikasjonerSynkroniseringRepository.opprettEllerOppdaterNæringer(næringer);
         log.info(
                 String.format(
-                        "Import av næringer er ferdig. Antall opprettet: %d, antall oppdatert: %d",
+                        "Import av næringer (med næringskode på 2 siffer) er ferdig. Antall opprettet: %d, antall oppdatert: %d",
                         resultat.getAntallRadOpprettet(),
                         resultat.getAntallRadOppdatert()
                 )

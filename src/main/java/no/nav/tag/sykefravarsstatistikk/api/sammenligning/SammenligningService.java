@@ -2,7 +2,10 @@ package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
 import no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk.SammenligningEvent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
+import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
+import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjeprogram;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
+import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
@@ -15,14 +18,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class SammenligningService {
 
-    private final SammenligningRepository sykefravarprosentRepository;
+    private final SammenligningRepository sammenligningRepository;
     private final EnhetsregisteretClient enhetsregisteretClient;
     private final SektorMappingService sektorMappingService;
     private final KlassifikasjonerRepository klassifikasjonerRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final Bransjeprogram bransjeprogram;
 
     @Value("${statistikk.import.siste.arstall}")
     private int ARSTALL;
@@ -30,16 +36,19 @@ public class SammenligningService {
     private int KVARTAL;
 
     public SammenligningService(
-            SammenligningRepository sykefravarprosentRepository,
+            SammenligningRepository sammenligningRepository,
             EnhetsregisteretClient enhetsregisteretClient,
             SektorMappingService sektorMappingService,
             KlassifikasjonerRepository klassifikasjonerRepository,
-            ApplicationEventPublisher eventPublisher) {
-        this.sykefravarprosentRepository = sykefravarprosentRepository;
+            ApplicationEventPublisher eventPublisher,
+            Bransjeprogram bransjeprogram
+    ) {
+        this.sammenligningRepository = sammenligningRepository;
         this.enhetsregisteretClient = enhetsregisteretClient;
         this.sektorMappingService = sektorMappingService;
         this.klassifikasjonerRepository = klassifikasjonerRepository;
         this.eventPublisher = eventPublisher;
+        this.bransjeprogram = bransjeprogram;
     }
 
     public Sammenligning hentSammenligningForUnderenhet(
@@ -51,13 +60,26 @@ public class SammenligningService {
         Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(enhet.getInstitusjonellSektorkode());
         Næringskode5Siffer næring5siffer = underenhet.getNæringskode();
         Næring næring = klassifikasjonerRepository.hentNæring(næring5siffer.hentNæringskode2Siffer());
+        if (false) {
+            // TODO Primitiv toggle for å få ut migrering uten at denne funksjonaliteten blir deployet.
+            Sykefraværprosent sykefraværprosentNæring = null;
+            Sykefraværprosent sykefraværprosentBransje = null;
+            Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
+            if (bransje.isPresent()) {
+                sykefraværprosentBransje = sammenligningRepository.hentSykefraværprosentBransje(ARSTALL, KVARTAL, bransje.get());
+            } else {
+                sykefraværprosentNæring = sammenligningRepository.hentSykefraværprosentNæring(ARSTALL, KVARTAL, næring);
+            }
+        }
+
         Sammenligning sammenligning = new Sammenligning(
                 KVARTAL,
                 ARSTALL,
-                sykefravarprosentRepository.hentSykefraværprosentVirksomhet(ARSTALL, KVARTAL, underenhet),
-                sykefravarprosentRepository.hentSykefraværprosentNæring(ARSTALL, KVARTAL, næring),
-                sykefravarprosentRepository.hentSykefraværprosentSektor(ARSTALL, KVARTAL, ssbSektor),
-                sykefravarprosentRepository.hentSykefraværprosentLand(ARSTALL, KVARTAL)
+                sammenligningRepository.hentSykefraværprosentVirksomhet(ARSTALL, KVARTAL, underenhet),
+                sammenligningRepository.hentSykefraværprosentNæring(ARSTALL, KVARTAL, næring),
+                null,
+                sammenligningRepository.hentSykefraværprosentSektor(ARSTALL, KVARTAL, ssbSektor),
+                sammenligningRepository.hentSykefraværprosentLand(ARSTALL, KVARTAL)
         );
 
         eventPublisher.publishEvent(new SammenligningEvent(
