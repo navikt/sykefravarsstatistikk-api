@@ -60,23 +60,24 @@ public class SammenligningService {
         Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(enhet.getInstitusjonellSektorkode());
         Næringskode5Siffer næring5siffer = underenhet.getNæringskode();
         Næring næring = klassifikasjonerRepository.hentNæring(næring5siffer.hentNæringskode2Siffer());
-
-        Sykefraværprosent sykefraværprosentNæring = null;
-        Sykefraværprosent sykefraværprosentBransje = null;
-        Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
-
-        if (bransje.isPresent()) {
-            sykefraværprosentBransje = sammenligningRepository.hentSykefraværprosentBransje(ARSTALL, KVARTAL, bransje.get());
-        } else {
-            sykefraværprosentNæring = sammenligningRepository.hentSykefraværprosentNæring(ARSTALL, KVARTAL, næring);
+        if (false) {
+            // TODO Primitiv toggle for å få ut migrering uten at denne funksjonaliteten blir deployet.
+            Sykefraværprosent sykefraværprosentNæring = null;
+            Sykefraværprosent sykefraværprosentBransje = null;
+            Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
+            if (bransje.isPresent()) {
+                sykefraværprosentBransje = sammenligningRepository.hentSykefraværprosentBransje(ARSTALL, KVARTAL, bransje.get());
+            } else {
+                sykefraværprosentNæring = sammenligningRepository.hentSykefraværprosentNæring(ARSTALL, KVARTAL, næring);
+            }
         }
 
         Sammenligning sammenligning = new Sammenligning(
                 KVARTAL,
                 ARSTALL,
                 sammenligningRepository.hentSykefraværprosentVirksomhet(ARSTALL, KVARTAL, underenhet),
-                sykefraværprosentNæring,
-                sykefraværprosentBransje,
+                sammenligningRepository.hentSykefraværprosentNæring(ARSTALL, KVARTAL, næring),
+                null,
                 sammenligningRepository.hentSykefraværprosentSektor(ARSTALL, KVARTAL, ssbSektor),
                 sammenligningRepository.hentSykefraværprosentLand(ARSTALL, KVARTAL)
         );
