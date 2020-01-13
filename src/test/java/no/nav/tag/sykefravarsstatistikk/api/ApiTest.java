@@ -52,7 +52,7 @@ public class ApiTest {
                 "  }," +
                 "  \"næring\": null," +
                 "  \"bransje\": {" +
-                "    \"label\": \"Næringsmiddelsindustri\"," +
+                "    \"label\": \"Næringsmiddelsindustrien\"," +
                 "    \"prosent\": 5.1," +
                 "    \"erMaskert\": false" +
                 "  }," +

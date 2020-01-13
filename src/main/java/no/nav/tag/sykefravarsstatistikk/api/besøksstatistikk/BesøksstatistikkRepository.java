@@ -3,6 +3,7 @@ package no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
+import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
@@ -78,6 +79,8 @@ public class BesøksstatistikkRepository {
             String sessionId
     ) {
 
+        Sykefraværprosent prosentNæring = sammenligning.getNæring();
+
         namedParameterJdbcTemplate.update(
                 "insert into besoksstatistikk_virksomhet " +
                         "(arstall, kvartal, sykefravarsprosent, sykefravarsprosent_antall_personer, naring_2siffer_sykefravarsprosent, ssb_sektor_sykefravarsprosent, orgnr, organisasjon_navn, antall_ansatte, naring_5siffer_kode, naring_5siffer_beskrivelse, naring_2siffer_beskrivelse, institusjonell_sektor_kode, institusjonell_sektor_beskrivelse, ssb_sektor_kode, ssb_sektor_beskrivelse, session_id) " +
@@ -87,7 +90,7 @@ public class BesøksstatistikkRepository {
                         .addValue(KVARTAL, sammenligning.getKvartal())
                         .addValue(SYKEFRAVÆRSPROSENT, sammenligning.getVirksomhet().getProsent())
                         .addValue(SYKEFRAVÆRSPROSENT_ANTALL_PERSONER, sammenligning.getVirksomhet().getAntallPersoner())
-                        .addValue(NÆRING_2SIFFER_SYKEFRAVÆRSPROSENT, sammenligning.getNæring().getProsent())
+                        .addValue(NÆRING_2SIFFER_SYKEFRAVÆRSPROSENT, prosentNæring == null ? null : prosentNæring.getProsent())
                         .addValue(SSB_SEKTOR_SYKEFRAVÆRSPROSENT, sammenligning.getSektor().getProsent())
                         .addValue(ORGNR, underenhet.getOrgnr().getVerdi())
                         .addValue(ORGANISASJON_NAVN, underenhet.getNavn())
