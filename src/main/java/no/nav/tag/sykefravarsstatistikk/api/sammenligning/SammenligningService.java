@@ -86,7 +86,6 @@ public class SammenligningService {
                 ssbSektor,
                 næring5siffer,
                 næring,
-                bransje.orElse(null),
                 sammenligning,
                 sessionId
         ));
