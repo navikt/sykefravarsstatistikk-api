@@ -5,7 +5,6 @@ import no.nav.metrics.MetricsFactory;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
-import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
@@ -74,14 +73,15 @@ public class BesøksstatistikkEventListener {
         Underenhet underenhet = sammenligningEvent.getUnderenhet();
 
         Optional<BigDecimal> prosentVirksomhet = Optional.ofNullable(sammenligning.getVirksomhet().getProsent());
-        BigDecimal prosentNæring = sammenligning.getNæring().getProsent();
+
+        Optional<BigDecimal> sykefraværprosentNæring = Optional.ofNullable(sammenligning.getNæring()).map(Sykefraværprosent::getProsent);
 
         boolean virksomhetErOverSnittetINæringen;
 
-        if (prosentVirksomhet.isEmpty()) {
+        if (prosentVirksomhet.isEmpty() || sykefraværprosentNæring.isEmpty()) {
             virksomhetErOverSnittetINæringen = false;
         } else {
-            virksomhetErOverSnittetINæringen = prosentVirksomhet.get().compareTo(prosentNæring) > 0;
+            virksomhetErOverSnittetINæringen = prosentVirksomhet.get().compareTo(sykefraværprosentNæring.get()) > 0;
         }
 
         MetricsFactory.createEvent("sykefravarsstatistikk.stor-bedrift.besok")
@@ -95,7 +95,7 @@ public class BesøksstatistikkEventListener {
                 .addTagToReport("ssb_sektor_kode", ssbSektor.getKode())
                 .addTagToReport("ssb_sektor_beskrivelse", ssbSektor.getNavn())
                 .addTagToReport("sykefravarsprosent_antall_personer", String.valueOf(sammenligning.getVirksomhet().getAntallPersoner()))
-                .addTagToReport("naring_2siffer_sykefravarsprosent", String.valueOf(prosentNæring))
+                .addTagToReport("naring_2siffer_sykefravarsprosent", String.valueOf(sykefraværprosentNæring.orElse(null)))
                 .addTagToReport("ssb_sektor_sykefravarsprosent", String.valueOf(sammenligning.getSektor().getProsent()))
                 .addTagToReport("sykefravarsprosent_over_naring_snitt", virksomhetErOverSnittetINæringen ? "true" : "false")
 
