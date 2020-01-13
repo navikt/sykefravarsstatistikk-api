@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnRole;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
@@ -11,7 +12,11 @@ import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Slf4j
 @Component
@@ -112,4 +117,28 @@ public class BesøksstatistikkRepository {
         );
     }
 
+    public void lagreRollerTilBesøkende(
+            int år,
+            int ukenummer,
+            List<String> altinnRolleIds
+    ) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        namedParameterJdbcTemplate.update(
+                "insert into besoksstatistikk_unikt_besok (år, ukenummer) values (:ar, :ukenummer)",
+                new MapSqlParameterSource()
+                        .addValue("ar", år).addValue("ukenummer", ukenummer), keyHolder
+
+        );
+
+        altinnRolleIds.stream().forEach(
+                rolleId ->
+                        namedParameterJdbcTemplate.update(
+                                "insert into besoksstatistikk_altinn_roller (unikt_besok_id, altinn_rolle) " +
+                                        "values (:unikt_besok_id, :altinn_rolle)",
+                                new MapSqlParameterSource()
+                                        .addValue("unikt_besok_id", keyHolder.getKey())
+                                        .addValue("altinn_rolle", rolleId)
+                        )
+        );
+    }
 }

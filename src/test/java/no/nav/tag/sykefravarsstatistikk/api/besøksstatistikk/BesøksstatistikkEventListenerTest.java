@@ -1,8 +1,8 @@
 package no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk;
 
+import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
-import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,12 +17,14 @@ import static org.mockito.Mockito.*;
 public class BesøksstatistikkEventListenerTest {
     @Mock
     private BesøksstatistikkRepository repository;
+    @Mock
+    private AltinnClient altinnClient;
 
     private BesøksstatistikkEventListener eventListener;
 
     @Before
     public void setup() {
-        eventListener = new BesøksstatistikkEventListener(repository);
+        eventListener = new BesøksstatistikkEventListener(repository, altinnClient);
     }
 
     @Test
