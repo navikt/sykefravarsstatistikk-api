@@ -1,9 +1,11 @@
 package no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 @AllArgsConstructor
 public class Sammenligning {
     private int kvartal;

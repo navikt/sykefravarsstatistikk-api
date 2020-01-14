@@ -74,6 +74,19 @@ public class BesøksstatistikkRepositoryJdbcTest {
         assertThat(repository.sessionHarBlittRegistrert(sessionId, etOrgnr())).isTrue();
     }
 
+    @Test
+    public void lagreBesøkFraStorVirksomhet__skal_ikke_feile_hvis_næring_og_bransje_er_null() {
+        repository.lagreBesøkFraStorVirksomhet(
+                enSammenligningEventBuilder()
+                        .bransje(null)
+                        .sammenligning(enSammenligningBuilder()
+                                .næring(null)
+                                .bransje(null)
+                                .build())
+                        .build()
+        );
+    }
+
 
     private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
         delete(jdbcTemplate, "besoksstatistikk_virksomhet");
