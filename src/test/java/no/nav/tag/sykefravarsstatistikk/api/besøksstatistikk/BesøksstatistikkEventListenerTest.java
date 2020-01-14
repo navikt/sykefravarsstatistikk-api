@@ -85,4 +85,21 @@ public class BesøksstatistikkEventListenerTest {
         verify(repository, times(0)).lagreBesøkFraStorVirksomhet(any());
         verify(repository, times(0)).lagreBesøkFraLitenVirksomhet(any());
     }
+
+    @Test
+    public void onSammenligningUtsendt__skal_ikke_feile_hvis_næring_og_bransje_er_null_for_stor_virksomhet() {
+        Sammenligning sammenligning = enSammenligningBuilder()
+                .næring(null)
+                .bransje(null)
+                .virksomhet(enSykefraværprosent(5))
+                .build();
+
+        SammenligningEvent event = enSammenligningEventBuilder()
+                .bransje(null)
+                .underenhet(enUnderenhetBuilder().antallAnsatte(5).build())
+                .sammenligning(sammenligning)
+                .build();
+
+        eventListener.onSammenligningUtsendt(event);
+    }
 }
