@@ -57,15 +57,17 @@ public class BesøksstatistikkEventListener {
         Underenhet underenhet = sammenligningEvent.getUnderenhet();
 
         Optional<BigDecimal> prosentVirksomhet = Optional.ofNullable(sammenligning.getVirksomhet().getProsent());
-
         Optional<BigDecimal> sykefraværprosentNæring = Optional.ofNullable(sammenligning.getNæring()).map(Sykefraværprosent::getProsent);
+        Optional<BigDecimal> sykefraværprosentBransje = Optional.ofNullable(sammenligning.getBransje()).map(Sykefraværprosent::getProsent);
 
-        boolean virksomhetErOverSnittetINæringen;
+        boolean virksomhetErOverSnittetINæringenEllerBransjen = false;
 
-        if (prosentVirksomhet.isEmpty() || sykefraværprosentNæring.isEmpty()) {
-            virksomhetErOverSnittetINæringen = false;
-        } else {
-            virksomhetErOverSnittetINæringen = prosentVirksomhet.get().compareTo(sykefraværprosentNæring.get()) > 0;
+        if (prosentVirksomhet.isPresent()) {
+            if (sykefraværprosentNæring.isPresent()) {
+                virksomhetErOverSnittetINæringenEllerBransjen = prosentVirksomhet.get().compareTo(sykefraværprosentNæring.get()) > 0;
+            } else if (sykefraværprosentBransje.isPresent()) {
+                virksomhetErOverSnittetINæringenEllerBransjen = prosentVirksomhet.get().compareTo(sykefraværprosentBransje.get()) > 0;
+            }
         }
 
         MetricsFactory.createEvent("sykefravarsstatistikk.stor-bedrift.besok")
@@ -74,14 +76,16 @@ public class BesøksstatistikkEventListener {
                 .addTagToReport("naring_5siffer_kode", underenhet.getNæringskode().getKode())
                 .addTagToReport("naring_5siffer_beskrivelse", underenhet.getNæringskode().getBeskrivelse())
                 .addTagToReport("naring_2siffer_beskrivelse", sammenligningEvent.getNæring2siffer().getNavn())
+                .addTagToReport("bransje_navn", sammenligningEvent.getBransje().getNavn())
                 .addTagToReport("institusjonell_sektor_kode", enhet.getInstitusjonellSektorkode().getKode())
                 .addTagToReport("institusjonell_sektor_beskrivelse", enhet.getInstitusjonellSektorkode().getBeskrivelse())
                 .addTagToReport("ssb_sektor_kode", ssbSektor.getKode())
                 .addTagToReport("ssb_sektor_beskrivelse", ssbSektor.getNavn())
                 .addTagToReport("sykefravarsprosent_antall_personer", String.valueOf(sammenligning.getVirksomhet().getAntallPersoner()))
                 .addTagToReport("naring_2siffer_sykefravarsprosent", String.valueOf(sykefraværprosentNæring.orElse(null)))
+                .addTagToReport("bransje_sykefravarsprosent", String.valueOf(sykefraværprosentBransje.orElse(null)))
                 .addTagToReport("ssb_sektor_sykefravarsprosent", String.valueOf(sammenligning.getSektor().getProsent()))
-                .addTagToReport("sykefravarsprosent_over_naring_snitt", virksomhetErOverSnittetINæringen ? "true" : "false")
+                .addTagToReport("sykefravarsprosent_over_naring_snitt", virksomhetErOverSnittetINæringenEllerBransjen ? "true" : "false")
 
                 .addFieldToReport("virksomhet_sykefravarsprosent", prosentVirksomhet.isPresent() ? prosentVirksomhet.get().floatValue() : null)
                 .addFieldToReport("antall_ansatte", underenhet.getAntallAnsatte())
