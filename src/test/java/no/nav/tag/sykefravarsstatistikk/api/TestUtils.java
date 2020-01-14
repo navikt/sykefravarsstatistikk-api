@@ -71,15 +71,18 @@ public class TestUtils {
     }
 
     public static Sammenligning enSammenligning() {
-        return new Sammenligning(
-                2,
-                2019,
-                enSykefraværprosent("Virksomhet AS", 100, 6000, 100),
-                enSykefraværprosent("Næring", 1100, 60000, 1000),
-                null,
-                enSykefraværprosent("Sektor", 11100, 600000, 10000),
-                enSykefraværprosent("Land", 111100, 6000000, 100000)
-        );
+        return enSammenligningBuilder().build();
+    }
+
+    public static Sammenligning.SammenligningBuilder enSammenligningBuilder() {
+        return Sammenligning.builder()
+                .kvartal(2)
+                .årstall(2019)
+                .virksomhet(enSykefraværprosent("Virksomhet AS", 100, 6000, 100))
+                .næring(enSykefraværprosent("Næring", 1100, 60000, 1000))
+                .bransje(null)
+                .sektor(enSykefraværprosent("Sektor", 11100, 600000, 10000))
+                .land(enSykefraværprosent("Land", 111100, 6000000, 100000));
     }
 
     public static Fnr getFnr() {

@@ -88,8 +88,9 @@ public class SammenligningService {
                 ssbSektor,
                 næring5siffer,
                 næring,
-                sammenligning,
+                bransje.orElse(null),
                 innloggetSelvbetjeningBruker.getFnr(),
+                sammenligning,
                 sessionId
         ));
 

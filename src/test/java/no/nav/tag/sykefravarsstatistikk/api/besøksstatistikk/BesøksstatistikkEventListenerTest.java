@@ -39,7 +39,7 @@ public class BesøksstatistikkEventListenerTest {
 
         eventListener.onSammenligningUtsendt(event);
 
-        verify(repository, times(1)).lagreBesøkFraStorVirksomhet(any(), any(), any(), any(), any(), any(), any());
+        verify(repository, times(1)).lagreBesøkFraStorVirksomhet(any());
         verify(repository, times(0)).lagreBesøkFraLitenVirksomhet(any());
     }
 
@@ -55,7 +55,7 @@ public class BesøksstatistikkEventListenerTest {
 
         eventListener.onSammenligningUtsendt(event);
 
-        verify(repository, times(0)).lagreBesøkFraStorVirksomhet(any(), any(), any(), any(), any(), any(), any());
+        verify(repository, times(0)).lagreBesøkFraStorVirksomhet(any());
         verify(repository, times(1)).lagreBesøkFraLitenVirksomhet(any());
     }
 
@@ -69,7 +69,7 @@ public class BesøksstatistikkEventListenerTest {
 
         eventListener.onSammenligningUtsendt(event);
 
-        verify(repository, times(0)).lagreBesøkFraStorVirksomhet(any(), any(), any(), any(), any(), any(), any());
+        verify(repository, times(0)).lagreBesøkFraStorVirksomhet(any());
         verify(repository, times(1)).lagreBesøkFraLitenVirksomhet(any());
     }
 
@@ -84,7 +84,7 @@ public class BesøksstatistikkEventListenerTest {
 
         eventListener.onSammenligningUtsendt(event);
 
-        verify(repository, times(0)).lagreBesøkFraStorVirksomhet(any(), any(), any(), any(), any(), any(), any());
+        verify(repository, times(0)).lagreBesøkFraStorVirksomhet(any());
         verify(repository, times(0)).lagreBesøkFraLitenVirksomhet(any());
     }
 }

@@ -45,28 +45,22 @@ public class BesøksstatistikkRepositoryJdbcTest {
     public void sessionIdEksisterer__skal_gi_true_hvis_en_stor_virksomhet_har_lik_sessionId_og_orgnr() {
         String sessionId = "sessionId til stor virksomhet";
         repository.lagreBesøkFraStorVirksomhet(
-                enEnhet(),
-                enUnderenhet("1235"),
-                enSektor(),
-                enNæringskode5Siffer(),
-                enNæring(),
-                enSammenligning(),
-                sessionId
+                enSammenligningEventBuilder()
+                        .sessionId(sessionId)
+                        .underenhet(enUnderenhet("98765432"))
+                        .build()
         );
-        assertThat(repository.sessionHarBlittRegistrert(sessionId, new Orgnr("1235"))).isTrue();
+        assertThat(repository.sessionHarBlittRegistrert(sessionId, new Orgnr("98765432"))).isTrue();
     }
 
     @Test
     public void sessionIdEksisterer__skal_gi_false_hvis_en_stor_virksomhet_har_lik_sessionId_men_forskjellig_orgnr() {
         String sessionId = "sessionId til stor virksomhet";
         repository.lagreBesøkFraStorVirksomhet(
-                enEnhet(),
-                enUnderenhet("1111"),
-                enSektor(),
-                enNæringskode5Siffer(),
-                enNæring(),
-                enSammenligning(),
-                sessionId
+                enSammenligningEventBuilder()
+                        .sessionId(sessionId)
+                        .underenhet(enUnderenhet("1111"))
+                        .build()
         );
         assertThat(repository.sessionHarBlittRegistrert(sessionId, new Orgnr("9999"))).isFalse();
     }
@@ -78,6 +72,19 @@ public class BesøksstatistikkRepositoryJdbcTest {
                 sessionId
         );
         assertThat(repository.sessionHarBlittRegistrert(sessionId, etOrgnr())).isTrue();
+    }
+
+    @Test
+    public void lagreBesøkFraStorVirksomhet__skal_ikke_feile_hvis_næring_og_bransje_er_null() {
+        repository.lagreBesøkFraStorVirksomhet(
+                enSammenligningEventBuilder()
+                        .bransje(null)
+                        .sammenligning(enSammenligningBuilder()
+                                .næring(null)
+                                .bransje(null)
+                                .build())
+                        .build()
+        );
     }
 
 

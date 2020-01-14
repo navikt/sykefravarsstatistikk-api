@@ -3,6 +3,7 @@ package no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnRole;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
+import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
@@ -17,6 +18,9 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.util.Optional;
+
 import java.util.List;
 
 @Slf4j
@@ -29,6 +33,7 @@ public class BesøksstatistikkRepository {
     private final static String SYKEFRAVÆRSPROSENT = "sykefravarsprosent";
     private final static String SYKEFRAVÆRSPROSENT_ANTALL_PERSONER = "sykefravarsprosent_antall_personer";
     private final static String NÆRING_2SIFFER_SYKEFRAVÆRSPROSENT = "naring_2siffer_sykefravarsprosent";
+    private final static String BRANSJE_SYKEFRAVÆRSPROSENT = "bransje_sykefravarsprosent";
     private final static String SSB_SEKTOR_SYKEFRAVÆRSPROSENT = "ssb_sektor_sykefravarsprosent";
     private final static String ORGNR = "orgnr";
     private final static String ORGANISASJON_NAVN = "organisasjon_navn";
@@ -36,6 +41,7 @@ public class BesøksstatistikkRepository {
     private final static String NÆRING_5SIFFER_KODE = "naring_5siffer_kode";
     private final static String NÆRING_5SIFFER_BESKRIVELSE = "naring_5siffer_beskrivelse";
     private final static String NÆRING_2SIFFER_BESKRIVELSE = "naring_2siffer_beskrivelse";
+    private final static String BRANSJE_NAVN = "bransje_navn";
     private final static String INSTITUSJONELL_SEKTOR_KODE = "institusjonell_sektor_kode";
     private final static String INSTITUSJONELL_SEKTOR_BESKRIVELSE = "institusjonell_sektor_beskrivelse";
     private final static String SSB_SEKTOR_KODE = "ssb_sektor_kode";
@@ -74,17 +80,17 @@ public class BesøksstatistikkRepository {
         ) > 0;
     }
 
-    public void lagreBesøkFraStorVirksomhet(
-            Enhet enhet,
-            Underenhet underenhet,
-            Sektor ssbSektor,
-            Næringskode5Siffer næring5siffer,
-            Næring næring2siffer,
-            Sammenligning sammenligning,
-            String sessionId
-    ) {
+    public void lagreBesøkFraStorVirksomhet(SammenligningEvent sammenligningEvent) {
 
-        Sykefraværprosent prosentNæring = sammenligning.getNæring();
+        Sammenligning sammenligning = sammenligningEvent.getSammenligning();
+        Underenhet underenhet = sammenligningEvent.getUnderenhet();
+        Næringskode5Siffer næring5siffer = sammenligningEvent.getNæring5siffer();
+        Enhet enhet = sammenligningEvent.getEnhet();
+        Sektor ssbSektor = sammenligningEvent.getSsbSektor();
+
+        Optional<BigDecimal> prosentNæring = Optional.ofNullable(sammenligning.getNæring()).map(Sykefraværprosent::getProsent);
+        Optional<BigDecimal> prosentBransje = Optional.ofNullable(sammenligning.getBransje()).map(Sykefraværprosent::getProsent);
+        Optional<String> bransjenavn = Optional.ofNullable(sammenligningEvent.getBransje()).map(Bransje::getNavn);
 
         namedParameterJdbcTemplate.update(
                 "insert into besoksstatistikk_virksomhet " +
@@ -95,20 +101,23 @@ public class BesøksstatistikkRepository {
                         .addValue(KVARTAL, sammenligning.getKvartal())
                         .addValue(SYKEFRAVÆRSPROSENT, sammenligning.getVirksomhet().getProsent())
                         .addValue(SYKEFRAVÆRSPROSENT_ANTALL_PERSONER, sammenligning.getVirksomhet().getAntallPersoner())
-                        .addValue(NÆRING_2SIFFER_SYKEFRAVÆRSPROSENT, prosentNæring == null ? null : prosentNæring.getProsent())
+                        .addValue(NÆRING_2SIFFER_SYKEFRAVÆRSPROSENT, prosentNæring.orElse(null))
+                        .addValue(BRANSJE_SYKEFRAVÆRSPROSENT, prosentBransje.orElse(null))
                         .addValue(SSB_SEKTOR_SYKEFRAVÆRSPROSENT, sammenligning.getSektor().getProsent())
                         .addValue(ORGNR, underenhet.getOrgnr().getVerdi())
                         .addValue(ORGANISASJON_NAVN, underenhet.getNavn())
                         .addValue(ANTALL_ANSATTE, underenhet.getAntallAnsatte())
                         .addValue(NÆRING_5SIFFER_KODE, næring5siffer.getKode())
                         .addValue(NÆRING_5SIFFER_BESKRIVELSE, næring5siffer.getBeskrivelse())
-                        .addValue(NÆRING_2SIFFER_BESKRIVELSE, næring2siffer.getNavn())
+                        .addValue(NÆRING_2SIFFER_BESKRIVELSE, sammenligningEvent.getNæring2siffer().getNavn())
+                        .addValue(BRANSJE_NAVN, bransjenavn.orElse(null))
                         .addValue(INSTITUSJONELL_SEKTOR_KODE, enhet.getInstitusjonellSektorkode().getKode())
                         .addValue(INSTITUSJONELL_SEKTOR_BESKRIVELSE, enhet.getInstitusjonellSektorkode().getBeskrivelse())
                         .addValue(SSB_SEKTOR_KODE, ssbSektor.getKode())
                         .addValue(SSB_SEKTOR_BESKRIVELSE, ssbSektor.getNavn())
-                        .addValue(SESSION_ID, sessionId)
+                        .addValue(SESSION_ID, sammenligningEvent.getSessionId())
         );
+
     }
 
     public void lagreBesøkFraLitenVirksomhet(
