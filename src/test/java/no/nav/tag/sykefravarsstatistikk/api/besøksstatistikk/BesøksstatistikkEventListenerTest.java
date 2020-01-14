@@ -87,7 +87,7 @@ public class BesøksstatistikkEventListenerTest {
     }
 
     @Test
-    public void onSammenligningUtsendt__for_stor_virksomhet_skal_ikke_feile_hvis_næring_og_bransje_er_null() {
+    public void onSammenligningUtsendt__skal_ikke_feile_hvis_næring_og_bransje_er_null_for_stor_virksomhet() {
         Sammenligning sammenligning = enSammenligningBuilder()
                 .næring(null)
                 .bransje(null)
