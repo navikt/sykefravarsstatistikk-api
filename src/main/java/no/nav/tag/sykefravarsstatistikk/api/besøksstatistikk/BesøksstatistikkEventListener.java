@@ -38,28 +38,12 @@ public class BesøksstatistikkEventListener {
         }
 
         if (kanLagreBesøksdata(sammenligningEvent)) {
-            lagreBesøksdataForStorVirksomhetIDatabase(sammenligningEvent);
+            besøksstatistikkRepository.lagreBesøkFraStorVirksomhet(sammenligningEvent);
             sendEventForStorVirksomhetTilInfluxDB(sammenligningEvent);
         } else {
-            lagreBesøkForLitenVirksomhetIDatabase(sammenligningEvent);
+            besøksstatistikkRepository.lagreBesøkFraLitenVirksomhet(sammenligningEvent.getSessionId());
             sendEventForLitenVirksomhetTilInfluxDB();
         }
-    }
-
-    private void lagreBesøkForLitenVirksomhetIDatabase(SammenligningEvent sammenligningEvent) {
-        besøksstatistikkRepository.lagreBesøkFraLitenVirksomhet(sammenligningEvent.getSessionId());
-    }
-
-    private void lagreBesøksdataForStorVirksomhetIDatabase(SammenligningEvent sammenligningEvent) {
-        besøksstatistikkRepository.lagreBesøkFraStorVirksomhet(
-                sammenligningEvent.getEnhet(),
-                sammenligningEvent.getUnderenhet(),
-                sammenligningEvent.getSsbSektor(),
-                sammenligningEvent.getNæring5siffer(),
-                sammenligningEvent.getNæring2siffer(),
-                sammenligningEvent.getSammenligning(),
-                sammenligningEvent.getSessionId()
-        );
     }
 
     private void sendEventForLitenVirksomhetTilInfluxDB() {
