@@ -1,12 +1,10 @@
 package no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnRole;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
-import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
@@ -129,20 +127,20 @@ public class BesøksstatistikkRepository {
         );
     }
 
-    public void lagreRollerTilBesøkende(
+    public void lagreRollerKnyttetTilBesøket(
             int år,
-            int ukenummer,
-            List<String> altinnRolleIds
+            int uke,
+            List<String> altinnRolleIder
     ) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         namedParameterJdbcTemplate.update(
-                "insert into besoksstatistikk_unikt_besok (år, ukenummer) values (:ar, :ukenummer)",
+                "insert into besoksstatistikk_unikt_besok (ar, uke) values (:ar, :uke)",
                 new MapSqlParameterSource()
-                        .addValue("ar", år).addValue("ukenummer", ukenummer), keyHolder
+                        .addValue("ar", år).addValue("uke", uke), keyHolder
 
         );
 
-        altinnRolleIds.stream().forEach(
+        altinnRolleIder.stream().forEach(
                 rolleId ->
                         namedParameterJdbcTemplate.update(
                                 "insert into besoksstatistikk_altinn_roller (unikt_besok_id, altinn_rolle) " +

@@ -6,7 +6,7 @@ import lombok.Data;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class AltinnRole {
+public class AltinnRolle {
     @JsonProperty("RoleType")
     private String type;
     @JsonProperty("RoleDefinitionId")

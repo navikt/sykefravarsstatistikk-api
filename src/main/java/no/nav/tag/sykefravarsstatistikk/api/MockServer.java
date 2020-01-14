@@ -36,6 +36,10 @@ public class MockServer {
         if (Arrays.asList(environment.getActiveProfiles()).contains("local")) {
             log.info("Mocker kall fra Altinn");
             mockKallFraFil(altinnUrl + "ekstern/altinn/api/serviceowner/reportees", "altinnReportees.json");
+            mockKallFraFil(
+                    altinnUrl + "ekstern/altinn/api/serviceowner/authorization/roles",
+                    "altinnAuthorization-roles.json"
+            );
         }
 
         log.info("Mocker kall fra Enhetsregisteret");

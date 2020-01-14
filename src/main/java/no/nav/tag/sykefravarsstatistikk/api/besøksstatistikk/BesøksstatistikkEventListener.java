@@ -3,7 +3,7 @@ package no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.metrics.MetricsFactory;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnClient;
-import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnRole;
+import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnRolle;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
@@ -15,10 +15,13 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.time.temporal.IsoFields;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.time.ZonedDateTime.now;
 import static no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent.MINIMUM_ANTALL_PERSONER_SOM_SKAL_TIL_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
 
 @Slf4j
@@ -54,14 +57,15 @@ public class BesøksstatistikkEventListener {
     }
 
     private void lagreRollerIDatabase(SammenligningEvent sammenligningEvent) {
-        List<AltinnRole> altinnRoller = altinnClient.hentRollerBrukerHarIEnOrganisasjon(
+        List<AltinnRolle> altinnRoller = altinnClient.hentRollerBrukerHarIEnOrganisasjon(
                 sammenligningEvent.getFnr(),
                 sammenligningEvent.getUnderenhet().getOrgnr()
         );
 
-        besøksstatistikkRepository.lagreRollerTilBesøkende(
-                2020,
-                2,
+        ZonedDateTime now = now();
+        besøksstatistikkRepository.lagreRollerKnyttetTilBesøket(
+                now.getYear(),
+                now.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR),
                 altinnRoller
                         .stream()
                         .map( rolle -> rolle.getDefinitionId() )

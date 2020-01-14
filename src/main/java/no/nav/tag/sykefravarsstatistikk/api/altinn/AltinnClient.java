@@ -75,9 +75,9 @@ public class AltinnClient {
         }
     }
 
-    public List<AltinnRole> hentRollerBrukerHarIEnOrganisasjon(Fnr fnr, Orgnr orgnr) {
+    public List<AltinnRolle> hentRollerBrukerHarIEnOrganisasjon(Fnr fnr, Orgnr orgnr) {
         URI uri = UriComponentsBuilder.fromUriString(altinnUrl)
-                .pathSegment("ekstern", "altinn", "api", "serviceowner", "authorization")
+                .pathSegment("ekstern", "altinn", "api", "serviceowner", "authorization", "roles")
                 .queryParam("ForceEIAuthentication")
                 .queryParam("subject", fnr.getVerdi())
                 .queryParam("reportee", orgnr.getVerdi())
@@ -86,11 +86,11 @@ public class AltinnClient {
                 .build()
                 .toUri();
         try {
-            Optional<List<AltinnRole>> respons = Optional.ofNullable(restTemplate.exchange(
+            Optional<List<AltinnRolle>> respons = Optional.ofNullable(restTemplate.exchange(
                     uri,
                     HttpMethod.GET,
                     getHeaderEntity(),
-                    new ParameterizedTypeReference<List<AltinnRole>>() {}
+                    new ParameterizedTypeReference<List<AltinnRolle>>() {}
             ).getBody());
 
             if (respons.isPresent()) {
