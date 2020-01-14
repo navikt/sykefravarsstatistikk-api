@@ -18,8 +18,7 @@ public class KlassifikasjonerRepository {
 
     public KlassifikasjonerRepository(
             @Qualifier("sykefravarsstatistikkJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
-    )
-    {
+    ) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
@@ -46,10 +45,8 @@ public class KlassifikasjonerRepository {
                         rs.getString("kode"),
                         rs.getString("navn")
                 )
-
         );
     }
-
 
     protected Sektor mapTilSektor(ResultSet rs) throws SQLException {
         return new Sektor(

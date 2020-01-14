@@ -74,6 +74,21 @@ public class StatistikkImportRepository {
     );
   }
 
+    public SlettOgOpprettResultat importSykefraværsstatistikkNæring5siffer(
+            List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring,
+            ÅrstallOgKvartal årstallOgKvartal
+    ) {
+        SykefraværsstatistikkNæring5sifferUtils sykefraværsstatistikkNæring5sifferUtils =
+                new SykefraværsstatistikkNæring5sifferUtils(namedParameterJdbcTemplate);
+
+        return importStatistikk(
+                "næring5siffer",
+                sykefraværsstatistikkNæring,
+                årstallOgKvartal,
+                sykefraværsstatistikkNæring5sifferUtils
+        );
+    }
+
   public SlettOgOpprettResultat importSykefraværsstatistikkVirksomhet(
           List<SykefraværsstatistikkVirksomhet> sykefraværsstatistikkVirksomhet,
           ÅrstallOgKvartal årstallOgKvartal
@@ -155,5 +170,4 @@ public class StatistikkImportRepository {
 
         return antallOpprettet.get();
     }
-
 }

@@ -5,9 +5,11 @@ import no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk.SammenligningEvent
 import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
+import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppering;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.InstitusjonellSektorkode;
@@ -30,6 +32,25 @@ public class TestUtils {
                 getOrganisasjon("111111111")
         ));
         return bruker;
+    }
+
+    public static Næringsgruppering enNæringsgruppering(String kode5siffer) {
+        return new Næringsgruppering(
+                kode5siffer,
+                "Test5",
+                kode5siffer.substring(0, 4),
+                "test4",
+                kode5siffer.substring(0, 3),
+                "test3",
+                kode5siffer.substring(0, 2),
+                "test2",
+                "02",
+                "test1"
+        );
+    }
+
+    public static Næringsgruppering enNæringsgruppering() {
+        return enNæringsgruppering("02123");
     }
 
     public static AltinnOrganisasjon getOrganisasjon(String organizationNumber) {
@@ -55,6 +76,7 @@ public class TestUtils {
                 2019,
                 enSykefraværprosent("Virksomhet AS", 100, 6000, 100),
                 enSykefraværprosent("Næring", 1100, 60000, 1000),
+                null,
                 enSykefraværprosent("Sektor", 11100, 600000, 10000),
                 enSykefraværprosent("Land", 111100, 6000000, 100000)
         );
@@ -120,7 +142,15 @@ public class TestUtils {
         return new Sykefraværprosent("Hei AS", new BigDecimal(5), new BigDecimal(100), antallAnsatte);
     }
 
+    public static Sykefraværprosent enSykefraværprosent() {
+        return enSykefraværprosent(8);
+    }
+
     public static Sektor enSektor() {
         return new Sektor("1", "Statlig forvaltning");
+    }
+
+    public static Bransje enBransje() {
+        return new Bransje("bransje", "12322");
     }
 }

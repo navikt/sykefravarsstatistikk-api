@@ -50,8 +50,9 @@ public class ApiTest {
                 "    \"prosent\": 12.0," +
                 "    \"erMaskert\": false" +
                 "  }," +
-                "  \"næring\": {" +
-                "    \"label\": \"Produksjon av nærings- og nytelsesmidler\"," +
+                "  \"næring\": null," +
+                "  \"bransje\": {" +
+                "    \"label\": \"Næringsmiddelsindustrien\"," +
                 "    \"prosent\": 5.1," +
                 "    \"erMaskert\": false" +
                 "  }," +

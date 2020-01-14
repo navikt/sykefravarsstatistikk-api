@@ -62,6 +62,19 @@ public class StatistikkImportService {
         return resultat;
     }
 
+    public SlettOgOpprettResultat importSykefraværsstatistikkNæring5siffer(ÅrstallOgKvartal årstallOgKvartal) {
+        List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring =
+                datavarehusRepository.hentSykefraværsstatistikkNæring5siffer(årstallOgKvartal);
+
+        SlettOgOpprettResultat resultat = statistikkImportRepository.importSykefraværsstatistikkNæring5siffer(
+                sykefraværsstatistikkNæring,
+                årstallOgKvartal
+        );
+        loggResultat(årstallOgKvartal, resultat, "næring5siffer");
+
+        return resultat;
+    }
+
     public SlettOgOpprettResultat importSykefraværsstatistikkVirksomhet(ÅrstallOgKvartal årstallOgKvartal) {
         List<SykefraværsstatistikkVirksomhet> sykefraværsstatistikkVirksomhet =
                 datavarehusRepository.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal);

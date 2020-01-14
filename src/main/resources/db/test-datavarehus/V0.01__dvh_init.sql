@@ -72,3 +72,15 @@ create table dt_p.v_agg_ia_sykefravar
     muligedv decimal(15,6),
     antpers decimal(7,0)
 );
+
+create table dt_p.agg_ia_sykefravar_naring_kode
+(
+    arstall char(4) not null,
+    kvartal char(1) not null,
+    naering_kode char(5) not null,
+    alder char(1) not null,
+    kjonn char(1) not null,
+    taptedv decimal(14,6),
+    muligedv decimal(15,6),
+    antpers decimal(7,0)
+);
