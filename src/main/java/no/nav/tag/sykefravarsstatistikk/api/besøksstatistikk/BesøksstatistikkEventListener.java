@@ -3,6 +3,7 @@ package no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.metrics.MetricsFactory;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
+import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
@@ -56,6 +57,7 @@ public class BesøksstatistikkEventListener {
         Sektor ssbSektor = sammenligningEvent.getSsbSektor();
         Underenhet underenhet = sammenligningEvent.getUnderenhet();
 
+        Optional<String> bransjenavn = Optional.ofNullable(sammenligningEvent.getBransje()).map(Bransje::getNavn);
         Optional<BigDecimal> prosentVirksomhet = Optional.ofNullable(sammenligning.getVirksomhet().getProsent());
         Optional<BigDecimal> sykefraværprosentNæring = Optional.ofNullable(sammenligning.getNæring()).map(Sykefraværprosent::getProsent);
         Optional<BigDecimal> sykefraværprosentBransje = Optional.ofNullable(sammenligning.getBransje()).map(Sykefraværprosent::getProsent);
@@ -75,7 +77,7 @@ public class BesøksstatistikkEventListener {
                 .addTagToReport("kvartal", String.valueOf(sammenligning.getKvartal()))
                 .addTagToReport("naring_2siffer_kode", sammenligningEvent.getNæring2siffer().getKode())
                 .addTagToReport("naring_2siffer_beskrivelse", sammenligningEvent.getNæring2siffer().getNavn())
-                .addTagToReport("bransje_navn", sammenligningEvent.getBransje().getNavn())
+                .addTagToReport("bransje_navn", bransjenavn.orElse(null))
                 .addTagToReport("institusjonell_sektor_kode", enhet.getInstitusjonellSektorkode().getKode())
                 .addTagToReport("institusjonell_sektor_beskrivelse", enhet.getInstitusjonellSektorkode().getBeskrivelse())
                 .addTagToReport("ssb_sektor_kode", ssbSektor.getKode())
