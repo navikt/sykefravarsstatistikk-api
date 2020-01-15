@@ -57,7 +57,7 @@ public class BesøksstatistikkEventListener {
     }
 
     private void lagreRollerIDatabase(SammenligningEvent sammenligningEvent) {
-        List<AltinnRolle> altinnRoller = altinnClient.hentRollerBrukerHarIEnOrganisasjon(
+        List<AltinnRolle> altinnRoller = altinnClient.hentRoller(
                 sammenligningEvent.getFnr(),
                 sammenligningEvent.getUnderenhet().getOrgnr()
         );
@@ -66,11 +66,7 @@ public class BesøksstatistikkEventListener {
         besøksstatistikkRepository.lagreRollerKnyttetTilBesøket(
                 now.getYear(),
                 now.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR),
-                altinnRoller
-                        .stream()
-                        .map( rolle -> rolle.getDefinitionId() )
-                        .collect(Collectors.toList())
-        );
+                altinnRoller);
     }
 
     private void sendEventForLitenVirksomhetTilInfluxDB() {

@@ -64,7 +64,7 @@ public class AltinnClient {
             ).getBody());
 
             if (respons.isPresent()) {
-                return respons.get().stream().collect(Collectors.toList());
+                return respons.get();
             } else {
                 throw new AltinnException("Feil ved kall til Altinn. Response body er null.");
             }
@@ -75,14 +75,12 @@ public class AltinnClient {
         }
     }
 
-    public List<AltinnRolle> hentRollerBrukerHarIEnOrganisasjon(Fnr fnr, Orgnr orgnr) {
+    public List<AltinnRolle> hentRoller(Fnr fnr, Orgnr orgnr) {
         URI uri = UriComponentsBuilder.fromUriString(altinnUrl)
                 .pathSegment("ekstern", "altinn", "api", "serviceowner", "authorization", "roles")
                 .queryParam("ForceEIAuthentication")
                 .queryParam("subject", fnr.getVerdi())
                 .queryParam("reportee", orgnr.getVerdi())
-                .queryParam("serviceCode", iawebServiceCode)
-                .queryParam("serviceEdition", iawebServiceEdition)
                 .build()
                 .toUri();
         try {
@@ -94,7 +92,7 @@ public class AltinnClient {
             ).getBody());
 
             if (respons.isPresent()) {
-                return respons.get().stream().collect(Collectors.toList());
+                return respons.get();
             } else {
                 throw new AltinnException("Feil ved kall til Altinn. Response body er null.");
             }

@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnRolle;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
@@ -130,7 +131,7 @@ public class BesøksstatistikkRepository {
     public void lagreRollerKnyttetTilBesøket(
             int år,
             int uke,
-            List<String> altinnRolleIder
+            List<AltinnRolle> altinnRoller
     ) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         namedParameterJdbcTemplate.update(
@@ -140,14 +141,16 @@ public class BesøksstatistikkRepository {
 
         );
 
-        altinnRolleIder.stream().forEach(
-                rolleId ->
+        altinnRoller.stream().forEach(
+                rolle ->
                         namedParameterJdbcTemplate.update(
-                                "insert into besoksstatistikk_altinn_roller (unikt_besok_id, altinn_rolle) " +
-                                        "values (:unikt_besok_id, :altinn_rolle)",
+                                "insert into besoksstatistikk_altinn_roller " +
+                                        "(unikt_besok_id, rolle_definition_id, rolle_name) " +
+                                        "values (:unikt_besok_id, :rolle_definition_id, :rolle_name)",
                                 new MapSqlParameterSource()
                                         .addValue("unikt_besok_id", keyHolder.getKey())
-                                        .addValue("altinn_rolle", rolleId)
+                                        .addValue("rolle_definition_id", rolle.getDefinitionId())
+                                        .addValue("rolle_name", rolle.getName())
                         )
         );
     }

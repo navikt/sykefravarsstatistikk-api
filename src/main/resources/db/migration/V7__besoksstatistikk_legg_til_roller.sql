@@ -7,5 +7,6 @@ create table besoksstatistikk_unikt_besok (
 create table besoksstatistikk_altinn_roller (
  id serial primary key,
  unikt_besok_id number,
- altinn_rolle varchar
+ rolle_definition_id varchar,
+ rolle_name varchar
 );

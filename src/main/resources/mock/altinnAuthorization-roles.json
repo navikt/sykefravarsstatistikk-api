@@ -9,12 +9,6 @@
     "RoleType": "Altinn",
     "RoleDefinitionId": 24869,
     "RoleName": "Main Administrator",
-    "RoleDescription": ""
-  },
-  {
-    "RoleType": "Altinn",
-    "RoleDefinitionId": 24869,
-    "RoleName": "Main Administrator",
     "RoleDescription": "This role allows you to delegate all roles and rights for an actor, including those you do not have yourself. The Main administrator role can only be delegated by General manager, Chairman of the board, Soul proprietor and Managing shipowner."
   },
   {

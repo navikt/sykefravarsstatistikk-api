@@ -94,8 +94,15 @@ public class BesøksstatistikkRepositoryJdbcTest {
     }
 
     @Test
-    public void lagreRollerKnyttetTilBesøket__skal_alle_roller_knyttet_et_unkikt_besøk() {
-        repository.lagreRollerKnyttetTilBesøket(2019, 52, Arrays.asList("12345", "10", "129"));
+    public void lagreRollerKnyttetTilBesøket__skal_alle_roller_knyttet_et_unikt_besøk() {
+        repository.lagreRollerKnyttetTilBesøket(
+                2019,
+                52, Arrays.asList(
+                        altinnRolle("12345", "Regnskap"),
+                        altinnRolle("12", "Personalsjef"),
+                        altinnRolle("980", "Daglig leder")
+                )
+        );
 
         assertThat(antallRaderITabellen("besoksstatistikk_unikt_besok")).isEqualTo(1);
         assertThat(antallRaderITabellen("besoksstatistikk_altinn_roller")).isEqualTo(3);
@@ -130,4 +137,10 @@ public class BesøksstatistikkRepositoryJdbcTest {
         return antallRader == null? 0 : antallRader;
     }
 
+    private static AltinnRolle altinnRolle(String definitionId, String name) {
+        AltinnRolle altinnRolle = new AltinnRolle();
+        altinnRolle.setDefinitionId(definitionId);
+        altinnRolle.setName(name);
+        return altinnRolle;
+    }
 }
