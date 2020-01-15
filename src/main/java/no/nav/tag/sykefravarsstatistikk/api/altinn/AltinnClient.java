@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 @Slf4j
 @Component
 public class AltinnClient {
@@ -92,7 +94,9 @@ public class AltinnClient {
             ).getBody());
 
             if (respons.isPresent()) {
-                return respons.get();
+                List<AltinnRolle> altinnRoller = respons.get();
+                log.info(format("Hentet %d roller fra Altinn", altinnRoller.size()));
+                return altinnRoller;
             } else {
                 throw new AltinnException("Feil ved kall til Altinn. Response body er null.");
             }

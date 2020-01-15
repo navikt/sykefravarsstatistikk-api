@@ -137,10 +137,19 @@ public class BesøksstatistikkRepository {
         namedParameterJdbcTemplate.update(
                 "insert into besoksstatistikk_unikt_besok (ar, uke) values (:ar, :uke)",
                 new MapSqlParameterSource()
-                        .addValue("ar", år).addValue("uke", uke), keyHolder
-
+                        .addValue("ar", år)
+                        .addValue("uke", uke),
+                keyHolder,
+                new String[] { "id" }
         );
 
+        int uniktBesøkId = keyHolder.getKey().intValue();
+        log.info(
+                String.format("Lagret unikt besøk '%d' med '%d' roller",
+                        uniktBesøkId,
+                        altinnRoller.size()
+                )
+        );
         altinnRoller.stream().forEach(
                 rolle ->
                         namedParameterJdbcTemplate.update(
@@ -148,7 +157,7 @@ public class BesøksstatistikkRepository {
                                         "(unikt_besok_id, rolle_definition_id, rolle_name) " +
                                         "values (:unikt_besok_id, :rolle_definition_id, :rolle_name)",
                                 new MapSqlParameterSource()
-                                        .addValue("unikt_besok_id", keyHolder.getKey())
+                                        .addValue("unikt_besok_id", uniktBesøkId)
                                         .addValue("rolle_definition_id", rolle.getDefinitionId())
                                         .addValue("rolle_name", rolle.getName())
                         )
