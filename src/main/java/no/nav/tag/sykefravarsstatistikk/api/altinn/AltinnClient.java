@@ -85,7 +85,6 @@ public class AltinnClient {
                 .queryParam("reportee", orgnr.getVerdi())
                 .build()
                 .toUri();
-        log.info(format("[Templogg] henter roller med følgende URL til Altinn '%s'", uri.toString()));
         try {
             Optional<List<AltinnRolle>> respons = Optional.ofNullable(restTemplate.exchange(
                     uri,
