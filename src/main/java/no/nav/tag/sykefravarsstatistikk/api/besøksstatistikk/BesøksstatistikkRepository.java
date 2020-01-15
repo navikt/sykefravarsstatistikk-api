@@ -18,9 +18,8 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.Optional;
-
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -137,8 +136,10 @@ public class BesøksstatistikkRepository {
         namedParameterJdbcTemplate.update(
                 "insert into besoksstatistikk_unikt_besok (ar, uke) values (:ar, :uke)",
                 new MapSqlParameterSource()
-                        .addValue("ar", år).addValue("uke", uke), keyHolder
-
+                        .addValue("ar", år)
+                        .addValue("uke", uke),
+                keyHolder,
+                new String[] { "id" }
         );
 
         altinnRoller.stream().forEach(
@@ -148,7 +149,7 @@ public class BesøksstatistikkRepository {
                                         "(unikt_besok_id, rolle_definition_id, rolle_name) " +
                                         "values (:unikt_besok_id, :rolle_definition_id, :rolle_name)",
                                 new MapSqlParameterSource()
-                                        .addValue("unikt_besok_id", keyHolder.getKey())
+                                        .addValue("unikt_besok_id", keyHolder.getKey().intValue())
                                         .addValue("rolle_definition_id", rolle.getDefinitionId())
                                         .addValue("rolle_name", rolle.getName())
                         )
