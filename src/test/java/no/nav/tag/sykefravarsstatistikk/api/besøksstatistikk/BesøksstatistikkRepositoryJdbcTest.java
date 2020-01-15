@@ -1,6 +1,8 @@
 package no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk;
 
+import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnRolle;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
+import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +14,10 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Arrays;
+import java.util.Collections;
+
+import static java.lang.String.format;
 import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.*;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
@@ -87,14 +93,54 @@ public class BesøksstatistikkRepositoryJdbcTest {
         );
     }
 
+    @Test
+    public void lagreRollerKnyttetTilBesøket__skal_alle_roller_knyttet_et_unikt_besøk() {
+        repository.lagreRollerKnyttetTilBesøket(
+                2019,
+                52, Arrays.asList(
+                        altinnRolle("12345", "Regnskap"),
+                        altinnRolle("12", "Personalsjef"),
+                        altinnRolle("980", "Daglig leder")
+                )
+        );
+
+        assertThat(antallRaderITabellen("besoksstatistikk_unikt_besok")).isEqualTo(1);
+        assertThat(antallRaderITabellen("besoksstatistikk_altinn_roller")).isEqualTo(3);
+    }
+
+    @Test
+    public void lagreRollerKnyttetTilBesøket__skal_ikke_feile_dersom_besøkende_har_ingen_rolle() {
+        repository.lagreRollerKnyttetTilBesøket(2019, 52, Collections.emptyList());
+
+        assertThat(antallRaderITabellen("besoksstatistikk_unikt_besok")).isEqualTo(1);
+        assertThat(antallRaderITabellen("besoksstatistikk_altinn_roller")).isEqualTo(0);
+    }
+
 
     private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
         delete(jdbcTemplate, "besoksstatistikk_virksomhet");
         delete(jdbcTemplate, "besoksstatistikk_smaa_virksomheter");
+        delete(jdbcTemplate, "besoksstatistikk_altinn_roller");
+        delete(jdbcTemplate, "besoksstatistikk_unikt_besok");
     }
 
     private static int delete(NamedParameterJdbcTemplate jdbcTemplate, String tabell) {
-        return jdbcTemplate.update(String.format("delete from %s", tabell), new MapSqlParameterSource());
+        return jdbcTemplate.update(format("delete from %s", tabell), new MapSqlParameterSource());
     }
 
+    private int antallRaderITabellen(String tabbelnavn) {
+        Integer antallRader = namedParameterJdbcTemplate.queryForObject(
+                format("select count(*) from %s", tabbelnavn),
+                new MapSqlParameterSource(),
+                Integer.class
+        );
+        return antallRader == null? 0 : antallRader;
+    }
+
+    private static AltinnRolle altinnRolle(String definitionId, String name) {
+        AltinnRolle altinnRolle = new AltinnRolle();
+        altinnRolle.setDefinitionId(definitionId);
+        altinnRolle.setName(name);
+        return altinnRolle;
+    }
 }

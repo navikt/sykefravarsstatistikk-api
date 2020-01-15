@@ -1,11 +1,11 @@
 package no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnRolle;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
-import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
@@ -13,10 +13,14 @@ import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+
+import java.util.List;
 
 @Slf4j
 @Component
@@ -124,4 +128,30 @@ public class BesøksstatistikkRepository {
         );
     }
 
+    public void lagreRollerKnyttetTilBesøket(
+            int år,
+            int uke,
+            List<AltinnRolle> altinnRoller
+    ) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        namedParameterJdbcTemplate.update(
+                "insert into besoksstatistikk_unikt_besok (ar, uke) values (:ar, :uke)",
+                new MapSqlParameterSource()
+                        .addValue("ar", år).addValue("uke", uke), keyHolder
+
+        );
+
+        altinnRoller.stream().forEach(
+                rolle ->
+                        namedParameterJdbcTemplate.update(
+                                "insert into besoksstatistikk_altinn_roller " +
+                                        "(unikt_besok_id, rolle_definition_id, rolle_name) " +
+                                        "values (:unikt_besok_id, :rolle_definition_id, :rolle_name)",
+                                new MapSqlParameterSource()
+                                        .addValue("unikt_besok_id", keyHolder.getKey())
+                                        .addValue("rolle_definition_id", rolle.getDefinitionId())
+                                        .addValue("rolle_name", rolle.getName())
+                        )
+        );
+    }
 }

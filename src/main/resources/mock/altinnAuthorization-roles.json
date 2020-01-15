@@ -1,0 +1,21 @@
+[
+  {
+    "RoleType": "Altinn",
+    "RoleDefinitionId": 4,
+    "RoleName": "Access Manager",
+    "RoleDescription": "Administration of access"
+  },
+  {
+    "RoleType": "Altinn",
+    "RoleDefinitionId": 24869,
+    "RoleName": "Main Administrator",
+    "RoleDescription": "This role allows you to delegate all roles and rights for an actor, including those you do not have yourself. The Main administrator role can only be delegated by General manager, Chairman of the board, Soul proprietor and Managing shipowner."
+  },
+  {
+    "RoleId": 479098,
+    "RoleType": "External",
+    "RoleDefinitionId": 195,
+    "RoleName": "General manager",
+    "RoleDescription": "External role (from The Central Coordinating Register for Legal Entities)"
+  }
+]

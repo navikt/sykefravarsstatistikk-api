@@ -1,5 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
+import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjeprogram;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
@@ -57,7 +58,7 @@ public class SammenligningServiceTest {
         when(bransjeprogram.finnBransje(any())).thenReturn(Optional.of(enBransje()));
         when(sammenligningRepository.hentSykefraværprosentBransje(anyInt(), anyInt(), any())).thenReturn(sykefraværprosentBransje);
 
-        Sammenligning sammenligning = sammenligningService.hentSammenligningForUnderenhet(etOrgnr(), "asdfa");
+        Sammenligning sammenligning = sammenligningService.hentSammenligningForUnderenhet(etOrgnr(), new InnloggetBruker(getFnr()), "asdfa");
 
         assertThat(sammenligning.getNæring()).isNull();
         assertThat(sammenligning.getBransje()).isEqualTo(sykefraværprosentBransje);
@@ -69,7 +70,7 @@ public class SammenligningServiceTest {
         when(bransjeprogram.finnBransje(any())).thenReturn(Optional.empty());
         when(sammenligningRepository.hentSykefraværprosentNæring(anyInt(), anyInt(), any())).thenReturn(sykefraværprosentNæring);
 
-        Sammenligning sammenligning = sammenligningService.hentSammenligningForUnderenhet(etOrgnr(), "asdfa");
+        Sammenligning sammenligning = sammenligningService.hentSammenligningForUnderenhet(etOrgnr(), new InnloggetBruker(getFnr()), "asdfa");
 
         assertThat(sammenligning.getBransje()).isNull();
         assertThat(sammenligning.getNæring()).isEqualTo(sykefraværprosentNæring);

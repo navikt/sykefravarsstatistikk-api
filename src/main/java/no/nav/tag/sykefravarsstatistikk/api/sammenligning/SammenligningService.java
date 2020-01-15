@@ -1,6 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
 import no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk.SammenligningEvent;
+import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjeprogram;
@@ -53,6 +54,7 @@ public class SammenligningService {
 
     public Sammenligning hentSammenligningForUnderenhet(
             Orgnr orgnr,
+            InnloggetBruker innloggetSelvbetjeningBruker,
             String sessionId
     ) {
         Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
@@ -87,6 +89,7 @@ public class SammenligningService {
                 næring5siffer,
                 næring,
                 bransje.orElse(null),
+                innloggetSelvbetjeningBruker.getFnr(),
                 sammenligning,
                 sessionId
         ));
