@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 @Slf4j
 @Component
 public class AltinnClient {
@@ -83,6 +85,7 @@ public class AltinnClient {
                 .queryParam("reportee", orgnr.getVerdi())
                 .build()
                 .toUri();
+        log.info(format("[Templogg] henter roller med følgende URL til Altinn '%s'", uri.toString()));
         try {
             Optional<List<AltinnRolle>> respons = Optional.ofNullable(restTemplate.exchange(
                     uri,
@@ -93,7 +96,7 @@ public class AltinnClient {
 
             if (respons.isPresent()) {
                 List<AltinnRolle> altinnRoller = respons.get();
-                log.info(String.format("Hentet %d roller fra Altinn", altinnRoller.size()));
+                log.info(format("Hentet %d roller fra Altinn", altinnRoller.size()));
                 return altinnRoller;
             } else {
                 throw new AltinnException("Feil ved kall til Altinn. Response body er null.");
