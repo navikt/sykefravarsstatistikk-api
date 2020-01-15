@@ -18,8 +18,9 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
+
+import java.util.List;
 
 @Slf4j
 @Component
@@ -142,6 +143,13 @@ public class BesøksstatistikkRepository {
                 new String[] { "id" }
         );
 
+        int uniktBesøkId = keyHolder.getKey().intValue();
+        log.info(
+                String.format("Lagret unikt besøk '%d' med '%d' roller",
+                        uniktBesøkId,
+                        altinnRoller.size()
+                )
+        );
         altinnRoller.stream().forEach(
                 rolle ->
                         namedParameterJdbcTemplate.update(
@@ -149,7 +157,7 @@ public class BesøksstatistikkRepository {
                                         "(unikt_besok_id, rolle_definition_id, rolle_name) " +
                                         "values (:unikt_besok_id, :rolle_definition_id, :rolle_name)",
                                 new MapSqlParameterSource()
-                                        .addValue("unikt_besok_id", keyHolder.getKey().intValue())
+                                        .addValue("unikt_besok_id", uniktBesøkId)
                                         .addValue("rolle_definition_id", rolle.getDefinitionId())
                                         .addValue("rolle_name", rolle.getName())
                         )
