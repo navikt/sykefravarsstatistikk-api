@@ -2,6 +2,7 @@ package no.nav.tag.sykefravarsstatistikk.api.altinn;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Fnr;
+import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -63,13 +64,40 @@ public class AltinnClient {
             ).getBody());
 
             if (respons.isPresent()) {
-                return respons.get().stream().collect(Collectors.toList());
+                return respons.get();
             } else {
                 throw new AltinnException("Feil ved kall til Altinn. Response body er null.");
             }
 
         } catch (RestClientException e) {
             log.error("Feil ved kall til Altinn", e);
+            throw new AltinnException("Feil ved kall til Altinn", e);
+        }
+    }
+
+    public List<AltinnRolle> hentRoller(Fnr fnr, Orgnr orgnr) {
+        URI uri = UriComponentsBuilder.fromUriString(altinnUrl)
+                .pathSegment("ekstern", "altinn", "api", "serviceowner", "authorization", "roles")
+                .queryParam("ForceEIAuthentication")
+                .queryParam("subject", fnr.getVerdi())
+                .queryParam("reportee", orgnr.getVerdi())
+                .build()
+                .toUri();
+        try {
+            Optional<List<AltinnRolle>> respons = Optional.ofNullable(restTemplate.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    getHeaderEntity(),
+                    new ParameterizedTypeReference<List<AltinnRolle>>() {}
+            ).getBody());
+
+            if (respons.isPresent()) {
+                return respons.get();
+            } else {
+                throw new AltinnException("Feil ved kall til Altinn. Response body er null.");
+            }
+
+        } catch (RestClientException e) {
             throw new AltinnException("Feil ved kall til Altinn", e);
         }
     }

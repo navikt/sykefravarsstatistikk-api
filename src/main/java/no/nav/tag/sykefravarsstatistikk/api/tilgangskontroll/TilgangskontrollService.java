@@ -49,6 +49,10 @@ public class TilgangskontrollService {
 
     public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, String httpMetode, String requestUrl) {
         InnloggetBruker bruker = hentInnloggetBruker();
+        sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(orgnr, bruker, httpMetode, requestUrl);
+    }
+
+    public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, InnloggetBruker bruker, String httpMetode, String requestUrl) {
         boolean harTilgang = bruker.harTilgang(orgnr);
 
         sporbarhetslogg.loggHendelse(

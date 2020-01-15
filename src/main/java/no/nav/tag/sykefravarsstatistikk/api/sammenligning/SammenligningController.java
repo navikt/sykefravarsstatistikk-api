@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.metrics.MetricsFactory;
 import no.nav.metrics.Timer;
 import no.nav.security.oidc.api.Protected;
+import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
@@ -42,18 +43,24 @@ public class SammenligningController {
         Timer timer = MetricsFactory.createTimer("sykefravarsstatistikk.sammenligning").start();
 
         Orgnr orgnr = new Orgnr(orgnrStr);
-        utførTilgangskontroll(orgnr, request);
+        InnloggetBruker innloggetSelvbetjeningBruker = tilgangskontrollService.hentInnloggetBruker();
+        utførTilgangskontroll(orgnr, innloggetSelvbetjeningBruker, request);
         String sessionId = hentCookieEllerGenererNy(request, response, SESSION_ID_COOKIE_NAME);
-        Sammenligning sammenligning = service.hentSammenligningForUnderenhet(orgnr, sessionId);
+        Sammenligning sammenligning = service.hentSammenligningForUnderenhet(
+                orgnr,
+                innloggetSelvbetjeningBruker,
+                sessionId
+        );
 
         timer.stop().report();
 
         return sammenligning;
     }
 
-    private void utførTilgangskontroll(Orgnr orgnr, HttpServletRequest request) {
+    private void utførTilgangskontroll(Orgnr orgnr, InnloggetBruker bruker, HttpServletRequest request) {
         tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
                 orgnr,
+                bruker,
                 request.getMethod(),
                 "" + request.getRequestURL()
         );
