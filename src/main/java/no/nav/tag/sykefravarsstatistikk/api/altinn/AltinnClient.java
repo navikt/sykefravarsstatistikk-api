@@ -98,7 +98,6 @@ public class AltinnClient {
             }
 
         } catch (RestClientException e) {
-            log.error("Feil ved kall til Altinn", e);
             throw new AltinnException("Feil ved kall til Altinn", e);
         }
     }
