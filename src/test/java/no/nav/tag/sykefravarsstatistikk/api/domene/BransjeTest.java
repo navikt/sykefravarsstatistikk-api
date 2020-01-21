@@ -4,9 +4,7 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.junit.Test;
 
-import java.util.Arrays;
-
-import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.*;
+import static no.nav.tag.sykefravarsstatistikk.api.TestData.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class BransjeTest {

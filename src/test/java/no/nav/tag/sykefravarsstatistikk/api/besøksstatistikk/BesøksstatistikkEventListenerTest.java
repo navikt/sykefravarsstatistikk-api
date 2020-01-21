@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.*;
+import static no.nav.tag.sykefravarsstatistikk.api.TestData.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 

@@ -16,9 +16,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Arrays;
+import java.math.BigDecimal;
 
-import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.*;
+import static no.nav.tag.sykefravarsstatistikk.api.TestData.*;
+import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
+import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.insertStatistikkForVirksomhet;
 import static no.nav.tag.sykefravarsstatistikk.api.sammenligning.SammenligningRepository.NORGE;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
@@ -35,12 +37,12 @@ public class SammenligningRepositoryJdbcTest {
     @Before
     public void setUp() {
         repository = new SammenligningRepository(jdbcTemplate);
-        cleanUpTestDb(jdbcTemplate);
+        slettAllStatistikkFraDatabase(jdbcTemplate);
     }
 
     @After
     public void tearDown() {
-        cleanUpTestDb(jdbcTemplate);
+        slettAllStatistikkFraDatabase(jdbcTemplate);
     }
 
     @Test
@@ -100,12 +102,8 @@ public class SammenligningRepositoryJdbcTest {
     @Test
     public void hentSykefraværprosentVirksomhet__skal_returnere_riktig_sykefravær() {
         Underenhet virksomhet = enUnderenhet();
-        jdbcTemplate.update(
-                "insert into sykefravar_statistikk_virksomhet " +
-                        "(orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                        + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(2016, 4, 10, 31, 6234)
-                        .addValue("orgnr", virksomhet.getOrgnr().getVerdi())
+        insertStatistikkForVirksomhet(
+                jdbcTemplate, virksomhet.getOrgnr(), 2016, 4, 10, new BigDecimal(31), 6234
         );
 
         Sykefraværprosent resultat = repository.hentSykefraværprosentVirksomhet(2016, 4, virksomhet);
@@ -168,14 +166,5 @@ public class SammenligningRepositoryJdbcTest {
                 .addValue("antall_personer", antallPersoner)
                 .addValue("tapte_dagsverk", tapteDagsverk)
                 .addValue("mulige_dagsverk", muligeDagsverk);
-    }
-
-    private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
-        jdbcTemplate.update("delete from sykefravar_statistikk_virksomhet", new MapSqlParameterSource());
-        jdbcTemplate.update("delete from sykefravar_statistikk_naring", new MapSqlParameterSource());
-        jdbcTemplate.update("delete from sykefravar_statistikk_naring5siffer", new MapSqlParameterSource());
-        jdbcTemplate.update("delete from sykefravar_statistikk_sektor", new MapSqlParameterSource());
-        jdbcTemplate.update("delete from sykefravar_statistikk_land", new MapSqlParameterSource());
-        jdbcTemplate.update("delete from naring", new MapSqlParameterSource());
     }
 }

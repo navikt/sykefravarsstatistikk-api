@@ -3,7 +3,7 @@ package no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import org.junit.Test;
 
-import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.getInnloggetBruker;
+import static no.nav.tag.sykefravarsstatistikk.api.TestData.getInnloggetBruker;
 
 public class SporbarhetsloggTest {
 

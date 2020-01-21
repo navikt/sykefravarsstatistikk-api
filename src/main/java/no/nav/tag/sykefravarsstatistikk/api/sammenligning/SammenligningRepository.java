@@ -87,10 +87,10 @@ public class SammenligningRepository {
     }
 
     public Sykefraværprosent hentSykefraværprosentBransje(int årstall, int kvartal, Bransje bransje) {
-        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
-                .addValue(ÅRSTALL, årstall)
-                .addValue(KVARTAL, kvartal)
-                .addValue(NÆRING, bransje.getKoderSomSpesifisererNæringer());
+            MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                    .addValue(ÅRSTALL, årstall)
+                    .addValue(KVARTAL, kvartal)
+                    .addValue(NÆRING, bransje.getKoderSomSpesifisererNæringer());
 
         if (bransje.lengdePåNæringskoder() == 2) {
             return queryForSykefraværsprosentOgHåndterHvisIngenResultat(

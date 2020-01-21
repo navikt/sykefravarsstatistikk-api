@@ -2,7 +2,6 @@ package no.nav.tag.sykefravarsstatistikk.api.besøksstatistikk;
 
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnRolle;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
-import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +17,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static java.lang.String.format;
-import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.*;
+import static no.nav.tag.sykefravarsstatistikk.api.TestData.*;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 @ActiveProfiles("db-test")

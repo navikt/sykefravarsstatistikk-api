@@ -1,13 +1,13 @@
 package no.nav.tag.sykefravarsstatistikk.api.domene;
 
-import no.nav.tag.sykefravarsstatistikk.api.TestUtils;
+import no.nav.tag.sykefravarsstatistikk.api.TestData;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnOrganisasjon;
 import no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
 import org.junit.Test;
 
 import java.util.List;
 
-import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.getInnloggetBruker;
+import static no.nav.tag.sykefravarsstatistikk.api.TestData.getInnloggetBruker;
 
 public class InnloggetBrukerTest {
 
@@ -15,7 +15,7 @@ public class InnloggetBrukerTest {
     public void sjekkTilgang__kaster_ingen_Exception_hvis_bruker_har_tilgang_til_orgnr() {
         InnloggetBruker bruker = getInnloggetBruker("12345678901");
 
-        AltinnOrganisasjon organisasjon = TestUtils.getOrganisasjon("123456789");
+        AltinnOrganisasjon organisasjon = TestData.getOrganisasjon("123456789");
         bruker.setOrganisasjoner(List.of(organisasjon));
 
         bruker.sjekkTilgang(new Orgnr(organisasjon.getOrganizationNumber()));
@@ -32,7 +32,7 @@ public class InnloggetBrukerTest {
     public void sjekkTilgang__skal_feile_hvis_bruker_ikke_har_tilgang_til_orgnr() {
         InnloggetBruker bruker = getInnloggetBruker("12345678901");
 
-        AltinnOrganisasjon organisasjon = TestUtils.getOrganisasjon("123456789");
+        AltinnOrganisasjon organisasjon = TestData.getOrganisasjon("123456789");
         bruker.setOrganisasjoner(List.of(organisasjon));
 
         bruker.sjekkTilgang(new Orgnr("987654321"));
@@ -43,8 +43,8 @@ public class InnloggetBrukerTest {
         InnloggetBruker bruker = getInnloggetBruker("12345678901");
 
         List<AltinnOrganisasjon> organisasjoner = List.of(
-                TestUtils.getOrganisasjon(null),
-                TestUtils.getOrganisasjon("987654321")
+                TestData.getOrganisasjon(null),
+                TestData.getOrganisasjon("987654321")
         );
 
         bruker.setOrganisasjoner(organisasjoner);

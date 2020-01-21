@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.client.RestTemplate;
 
-import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.etOrgnr;
+import static no.nav.tag.sykefravarsstatistikk.api.TestData.etOrgnr;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;

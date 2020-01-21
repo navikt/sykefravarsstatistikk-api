@@ -3,8 +3,8 @@ package no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.junit.Test;
 
-import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.enNæringskode5Siffer;
-import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.enUnderenhetBuilder;
+import static no.nav.tag.sykefravarsstatistikk.api.TestData.enNæringskode5Siffer;
+import static no.nav.tag.sykefravarsstatistikk.api.TestData.enUnderenhetBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class BransjeTest {

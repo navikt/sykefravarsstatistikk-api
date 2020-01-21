@@ -8,7 +8,6 @@ import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretCli
 import no.nav.tag.sykefravarsstatistikk.api.virksomhetsklassifikasjoner.KlassifikasjonerRepository;
 import no.nav.tag.sykefravarsstatistikk.api.virksomhetsklassifikasjoner.SektorMappingService;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -17,7 +16,7 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.Optional;
 
-import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.*;
+import static no.nav.tag.sykefravarsstatistikk.api.TestData.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;

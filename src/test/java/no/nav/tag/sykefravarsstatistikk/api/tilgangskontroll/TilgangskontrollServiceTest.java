@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static no.nav.tag.sykefravarsstatistikk.api.CorrelationIdFilter.CORRELATION_ID_MDC_NAME;
-import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.getInnloggetBruker;
-import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.getOrganisasjon;
+import static no.nav.tag.sykefravarsstatistikk.api.TestData.getInnloggetBruker;
+import static no.nav.tag.sykefravarsstatistikk.api.TestData.getOrganisasjon;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
