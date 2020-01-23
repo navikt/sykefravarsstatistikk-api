@@ -17,8 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Arrays;
 import java.util.List;
 
-import static no.nav.tag.sykefravarsstatistikk.api.TestData.enUnderenhet;
-import static no.nav.tag.sykefravarsstatistikk.api.TestData.testTapteDagsverk;
+import static no.nav.tag.sykefravarsstatistikk.api.TestData.*;
 import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.insertStatistikkForVirksomhet;
 import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,8 +45,7 @@ public class TapteDagsverkForKostnadsberegningRepositoryTest {
 
     @Test
     public void hentTapteDagsverkFor4Kvartaler__skal_returnere_riktig_data_fra_database() {
-        Underenhet underenhet = enUnderenhet();
-        Orgnr orgnr = underenhet.getOrgnr();
+        Orgnr orgnr = etOrgnr();
 
         List<TapteDagsverk> tapteDagsverkListe = Arrays.asList(
                 testTapteDagsverk(1,  2019, 1),
@@ -64,7 +62,7 @@ public class TapteDagsverkForKostnadsberegningRepositoryTest {
                 new ÅrstallOgKvartal(2019, 3),
                 new ÅrstallOgKvartal(2018, 4)
                 ),
-                enUnderenhet());
+                orgnr);
 
         assertThat(resultat).isEqualTo(tapteDagsverkListe);
     }
@@ -77,7 +75,7 @@ public class TapteDagsverkForKostnadsberegningRepositoryTest {
                 new ÅrstallOgKvartal(2019, 3),
                 new ÅrstallOgKvartal(2018, 4)
                 ),
-                enUnderenhet());
+                etOrgnr());
         assertThat(resultat).isEmpty();
     }
 
@@ -88,14 +86,13 @@ public class TapteDagsverkForKostnadsberegningRepositoryTest {
                 new ÅrstallOgKvartal(2019, 2),
                 new ÅrstallOgKvartal(2019, 3)
                 ),
-                enUnderenhet());
+                etOrgnr());
     }
 
     @Test
     public void hentTapteDagsverkFor4Kvartaler__skal_bare_returnere_de_riktige_radene() {
         Orgnr feilOrgnr = new Orgnr("9999");
         Orgnr riktigOrgnr = new Orgnr("1234");
-        Underenhet riktigUnderenhet = enUnderenhet(riktigOrgnr.getVerdi());
 
         List<TapteDagsverk> riktigeTapteDagsverk = Arrays.asList(
                 testTapteDagsverk(1, 2019, 1),
@@ -124,7 +121,7 @@ public class TapteDagsverkForKostnadsberegningRepositoryTest {
                 new ÅrstallOgKvartal(2018, 3),
                 new ÅrstallOgKvartal(2018, 4)
                 ),
-                riktigUnderenhet);
+                riktigOrgnr);
         assertThat(resultat).isEqualTo(riktigeTapteDagsverk);
     }
 
@@ -147,7 +144,7 @@ public class TapteDagsverkForKostnadsberegningRepositoryTest {
                 new ÅrstallOgKvartal(2019, 3),
                 new ÅrstallOgKvartal(2018, 4)
                 ),
-                enUnderenhet());
+                etOrgnr());
 
         assertThat(resultat).isEqualTo(tapteDagsverkListe);
     }

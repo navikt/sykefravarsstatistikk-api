@@ -46,5 +46,13 @@
     "OrganizationNumber": "990229023",
     "OrganizationForm": "BEDR",
     "Status": "Active"
+  },
+  {
+    "Name": "NAV HAMAR 2",
+    "Type": "Business",
+    "ParentOrganizationNumber": "874652202",
+    "OrganizationNumber": "910969439",
+    "OrganizationForm": "BEDR",
+    "Status": "Active"
   }
 ]

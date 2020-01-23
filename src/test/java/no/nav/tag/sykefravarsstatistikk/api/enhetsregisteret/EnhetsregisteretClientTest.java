@@ -34,8 +34,8 @@ public class EnhetsregisteretClientTest {
 
     @Test
     public void hentInformasjonOmEnhet__skal_hente_riktige_felter() {
-        mockRespons(gyldigEnhetRespons());
-        Enhet enhet = enhetsregisteretClient.hentInformasjonOmEnhet(etOrgnr());
+        mockRespons(gyldigEnhetRespons("999263550"));
+        Enhet enhet = enhetsregisteretClient.hentInformasjonOmEnhet(new Orgnr("999263550"));
 
         assertThat(enhet.getOrgnr().getVerdi()).isEqualTo("999263550");
         assertThat(enhet.getNavn()).isEqualTo("NAV ARBEID OG YTELSER");
@@ -48,19 +48,26 @@ public class EnhetsregisteretClientTest {
 
     @Test(expected = EnhetsregisteretException.class)
     public void hentInformasjonOmEnhet__skal_feile_hvis_et_felt_mangler() {
-        ObjectNode responsMedManglendeFelt = gyldigEnhetRespons();
+        ObjectNode responsMedManglendeFelt = gyldigEnhetRespons("999263550");
         responsMedManglendeFelt.remove("institusjonellSektorkode");
         mockRespons(responsMedManglendeFelt);
 
-        enhetsregisteretClient.hentInformasjonOmUnderenhet(etOrgnr());
+        enhetsregisteretClient.hentInformasjonOmEnhet(etOrgnr());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void hentInformasjonOmEnhet__skal_feile_hvis_returnert_orgnr_ikke_matcher_med_medsendt_orgnr() {
+        ObjectNode responsMedFeilOrgnr = gyldigEnhetRespons("999263550");
+        mockRespons(responsMedFeilOrgnr);
+        enhetsregisteretClient.hentInformasjonOmEnhet(new Orgnr("777777777"));
     }
 
     @Test
     public void hentInformasjonOmUnderenhet__skal_hente_riktige_felter() {
-        mockRespons(gyldigUnderenhetRespons());
+        mockRespons(gyldigUnderenhetRespons("971800534"));
         Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr("971800534"));
 
-        assertThat(underenhet.getOrgnr().getVerdi()).isEqualTo("822565212");
+        assertThat(underenhet.getOrgnr().getVerdi()).isEqualTo("971800534");
         assertThat(underenhet.getOverordnetEnhetOrgnr().getVerdi()).isEqualTo("999263550");
         assertThat(underenhet.getNavn()).isEqualTo("NAV ARBEID OG YTELSER AVD OSLO");
         assertThat(underenhet.getNæringskode().getKode()).isEqualTo("84300");
@@ -70,11 +77,18 @@ public class EnhetsregisteretClientTest {
 
     @Test(expected = EnhetsregisteretException.class)
     public void hentInformasjonOmUnderenhet__skal_feile_hvis_et_felt_mangler() {
-        ObjectNode responsMedManglendeFelt = gyldigUnderenhetRespons();
+        ObjectNode responsMedManglendeFelt = gyldigUnderenhetRespons("822565212");
         responsMedManglendeFelt.remove("navn");
         mockRespons(responsMedManglendeFelt);
 
         enhetsregisteretClient.hentInformasjonOmUnderenhet(etOrgnr());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void hentInformasjonOmUnderenhet__skal_feile_hvis_returnert_orgnr_ikke_matcher_med_medsendt_orgnr() {
+        ObjectNode responsMedFeilOrgnr = gyldigUnderenhetRespons("822565212");
+        mockRespons(responsMedFeilOrgnr);
+        enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr("777777777"));
     }
 
     @SneakyThrows
@@ -83,9 +97,9 @@ public class EnhetsregisteretClientTest {
     }
 
     @SneakyThrows
-    private ObjectNode gyldigUnderenhetRespons() {
+    private ObjectNode gyldigUnderenhetRespons(String orgnr) {
         String str = "{\n" +
-                "  \"organisasjonsnummer\": \"822565212\",\n" +
+                "  \"organisasjonsnummer\": \"" + orgnr + "\",\n" +
                 "  \"navn\": \"NAV ARBEID OG YTELSER AVD OSLO\",\n" +
                 "  \"naeringskode1\": {\n" +
                 "    \"beskrivelse\": \"Trygdeordninger underlagt offentlig forvaltning\",\n" +
@@ -98,9 +112,9 @@ public class EnhetsregisteretClientTest {
     }
 
     @SneakyThrows
-    private ObjectNode gyldigEnhetRespons() {
+    private ObjectNode gyldigEnhetRespons(String orgnr) {
         String str = "{\n" +
-                "  \"organisasjonsnummer\": \"999263550\",\n" +
+                "  \"organisasjonsnummer\": \"" + orgnr + "\",\n" +
                 "  \"navn\": \"NAV ARBEID OG YTELSER\",\n" +
                 "  \"naeringskode1\": {\n" +
                 "    \"beskrivelse\": \"Trygdeordninger underlagt offentlig forvaltning\",\n" +

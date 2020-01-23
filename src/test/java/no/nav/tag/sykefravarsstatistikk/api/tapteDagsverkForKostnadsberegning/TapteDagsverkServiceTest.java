@@ -1,7 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.tapteDagsverkForKostnadsberegning;
 
+import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
-import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,8 +11,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Arrays;
 import java.util.List;
 
-import static no.nav.tag.sykefravarsstatistikk.api.TestData.enUnderenhet;
-import static org.mockito.ArgumentMatchers.*;
+import static no.nav.tag.sykefravarsstatistikk.api.TestData.etOrgnr;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -43,9 +44,9 @@ public class TapteDagsverkServiceTest {
 
     @Test
     public void hentTapteDagsverkFraDeSiste4Kvartalene__skal_sende_rikitg_underenhet() {
-        Underenhet underenhet = enUnderenhet();
-        tapteDagsverkService.hentTapteDagsverkFraDeSiste4Kvartalene(underenhet);
+        Orgnr orgnr = etOrgnr();
+        tapteDagsverkService.hentTapteDagsverkFraDeSiste4Kvartalene(orgnr);
 
-        verify(repository, times(1)).hentTapteDagsverkFor4Kvartaler(any(), eq(underenhet));
+        verify(repository, times(1)).hentTapteDagsverkFor4Kvartaler(any(), eq(orgnr));
     }
 }

@@ -16,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 
 @Component
-public class    EnhetsregisteretClient {
+public class EnhetsregisteretClient {
     private final RestTemplate restTemplate;
     private final String enhetsregisteretUrl;
 
@@ -25,7 +25,7 @@ public class    EnhetsregisteretClient {
     public EnhetsregisteretClient(
             RestTemplate restTemplate,
             @Value("${enhetsregisteret.url}") String enhetsregisteretUrl
-  ) {
+    ) {
         this.restTemplate = restTemplate;
         this.enhetsregisteretUrl = enhetsregisteretUrl;
     }
@@ -35,18 +35,21 @@ public class    EnhetsregisteretClient {
 
         try {
             String respons = restTemplate.getForObject(url, String.class);
-            return mapTilEnhet(respons);
+            Enhet enhet = mapTilEnhet(respons);
+            validerReturnertOrgnr(orgnrTilEnhet, enhet.getOrgnr());
+            return enhet;
         } catch (RestClientException e) {
             throw new EnhetsregisteretException("Feil ved kall til Enhetsregisteret", e);
         }
     }
 
     public Underenhet hentInformasjonOmUnderenhet(Orgnr orgnrTilUnderenhet) {
-        String url = enhetsregisteretUrl + "underenheter/" + orgnrTilUnderenhet.getVerdi();
-
         try {
+            String url = enhetsregisteretUrl + "underenheter/" + orgnrTilUnderenhet.getVerdi();
             String respons = restTemplate.getForObject(url, String.class);
-            return mapTilUnderenhet(respons);
+            Underenhet underenhet = mapTilUnderenhet(respons);
+            validerReturnertOrgnr(orgnrTilUnderenhet, underenhet.getOrgnr());
+            return underenhet;
         } catch (RestClientException e) {
             throw new EnhetsregisteretException("Feil ved kall til Enhetsregisteret", e);
         }
@@ -68,6 +71,17 @@ public class    EnhetsregisteretClient {
 
         } catch (IOException | NullPointerException e) {
             throw new EnhetsregisteretException("Feil ved kall til Enhetsregisteret. Kunne ikke parse respons.", e);
+        }
+    }
+
+    private void validerReturnertOrgnr(Orgnr opprinneligOrgnr, Orgnr returnertOrgnr) {
+        if (!opprinneligOrgnr.equals(returnertOrgnr)) {
+            throw new IllegalStateException(
+                    "Orgnr hentet fra Enhetsregisteret samsvarer ikke med det medsendte orgnr. Request: "
+                            + opprinneligOrgnr.getVerdi()
+                            + ", response: "
+                            + returnertOrgnr.getVerdi()
+            );
         }
     }
 

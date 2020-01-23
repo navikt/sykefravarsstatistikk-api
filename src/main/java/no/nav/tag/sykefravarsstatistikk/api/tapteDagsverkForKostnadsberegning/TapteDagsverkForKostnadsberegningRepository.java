@@ -1,7 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.tapteDagsverkForKostnadsberegning;
 
+import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
-import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -23,13 +23,13 @@ public class TapteDagsverkForKostnadsberegningRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-    public List<TapteDagsverk> hentTapteDagsverkFor4Kvartaler(List<ÅrstallOgKvartal> årstallOgKvartalListe, Underenhet underenhet) {
+    public List<TapteDagsverk> hentTapteDagsverkFor4Kvartaler(List<ÅrstallOgKvartal> årstallOgKvartalListe, Orgnr orgnr) {
         if (årstallOgKvartalListe.size() != 4) {
             throw new IllegalArgumentException("Kan bare sende inn 4 kvartaler");
         }
 
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
-                .addValue(ORGNR, underenhet.getOrgnr().getVerdi());
+                .addValue(ORGNR, orgnr.getVerdi());
 
         for (int i = 0; i < årstallOgKvartalListe.size(); i++) {
             namedParameters.addValue("kvartal" + (i + 1), årstallOgKvartalListe.get(i).getKvartal());

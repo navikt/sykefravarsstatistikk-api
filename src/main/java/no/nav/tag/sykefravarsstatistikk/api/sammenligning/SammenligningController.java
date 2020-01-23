@@ -20,7 +20,6 @@ import static no.nav.tag.sykefravarsstatistikk.api.sammenligning.CookieUtils.hen
 
 @Protected
 @RestController
-@Slf4j
 public class SammenligningController {
 
     private final SammenligningService service;

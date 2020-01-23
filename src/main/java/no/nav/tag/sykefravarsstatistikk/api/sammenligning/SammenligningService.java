@@ -58,6 +58,7 @@ public class SammenligningService {
             String sessionId
     ) {
         Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
+
         Enhet enhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
         Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(enhet.getInstitusjonellSektorkode());
         Næringskode5Siffer næring5siffer = underenhet.getNæringskode();

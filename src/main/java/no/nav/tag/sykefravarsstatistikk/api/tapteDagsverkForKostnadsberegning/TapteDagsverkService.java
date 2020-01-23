@@ -1,5 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api.tapteDagsverkForKostnadsberegning;
 
+import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,15 +18,15 @@ public class TapteDagsverkService {
 
     public TapteDagsverkService(
             @Value("${statistikk.import.siste.arstall}") int sisteÅrstall,
-            @Value("${statistikk.import.siste.arstall}") int sisteKvartal,
+            @Value("${statistikk.import.siste.kvartal}") int sisteKvartal,
             TapteDagsverkForKostnadsberegningRepository tapteDagsverkForKostnadsberegningRepository) {
         this.sisteÅrstall = sisteÅrstall;
         this.sisteKvartal = sisteKvartal;
         this.tapteDagsverkForKostnadsberegningRepository = tapteDagsverkForKostnadsberegningRepository;
     }
 
-    public List<TapteDagsverk> hentTapteDagsverkFraDeSiste4Kvartalene(Underenhet underenhet) {
-        return tapteDagsverkForKostnadsberegningRepository.hentTapteDagsverkFor4Kvartaler(hentDe4SisteTilgjengeligeKvartalene(), underenhet);
+    public List<TapteDagsverk> hentTapteDagsverkFraDeSiste4Kvartalene(Orgnr orgnr) {
+        return tapteDagsverkForKostnadsberegningRepository.hentTapteDagsverkFor4Kvartaler(hentDe4SisteTilgjengeligeKvartalene(), orgnr);
     }
 
     private List<ÅrstallOgKvartal> hentDe4SisteTilgjengeligeKvartalene() {
