@@ -7,7 +7,7 @@
 # Input / lesing av parametre
 read -p 'Årstall: ' aarstall
 read -p 'Kvartal: ' kvartal
-read -p 'Stat [tillatt: land, sektor, naring, virksomhet] -- "blank" betyr alle stat: ' stat
+read -p 'Stat [tillatt: land, sektor, naring, virksomhet] -- "blank" betyr alle statistikk: ' statistikk
 read -sp 'Auth bearer: ' bearer
 echo " "
 echo " "
@@ -23,14 +23,14 @@ import_stat() {
 # Main
 #-----
 echo "Import starter for årstall '$aarstall' og kvartal '$kvartal'"
-if [ -z "$stat" ]; then
-      echo "Importerer alle stats (input parm 'stat' er blank)"
+if [ -z "$statistikk" ]; then
+      echo "Importerer alle stats (input parameter 'statistikk' er blank)"
       import_stat land $aarstall $kvartal
       import_stat sektor $aarstall $kvartal
       import_stat naring $aarstall $kvartal
-      #import_stat virksomhet $aarstall $kvartal
+      import_stat virksomhet $aarstall $kvartal
 else
-      import_stat $stat $aarstall $kvartal
+      import_stat $statistikk $aarstall $kvartal
 fi
 echo " "
 echo " Import er ferdig"
