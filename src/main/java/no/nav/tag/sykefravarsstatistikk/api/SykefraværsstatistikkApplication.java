@@ -7,7 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @EnableOIDCTokenValidation(ignore = {
 		"springfox.documentation.swagger.web.ApiResourceController",
-		"org.springframework"
+		"org.springframework",
+		"com.coxautodev.graphql",
+		"com.oembedler.moon.graphiql"
 })
 public class SykefraværsstatistikkApplication {
 

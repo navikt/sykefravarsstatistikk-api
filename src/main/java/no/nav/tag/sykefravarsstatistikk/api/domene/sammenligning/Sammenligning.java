@@ -15,4 +15,12 @@ public class Sammenligning {
     private Sykefraværprosent bransje;
     private Sykefraværprosent sektor;
     private Sykefraværprosent land;
+
+    public int getArstall() {
+        return årstall;
+    }
+
+    public Sykefraværprosent getNaring() {
+        return næring;
+    }
 }

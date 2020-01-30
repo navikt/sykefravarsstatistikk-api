@@ -1,0 +1,21 @@
+type Sykefravarprosent {
+    label: String!
+    prosent: Float!
+    erMaskert: Boolean!
+}
+
+type Sammenligning {
+    kvartal: Int!
+    arstall: Int!
+    virksomhet: Sykefravarprosent
+    naring: Sykefravarprosent
+    bransje: Sykefravarprosent
+    sektor: Sykefravarprosent
+    land: Sykefravarprosent
+}
+
+# The Root Query for the application
+type Query {
+    sammenligning(orgnr: String): Sammenligning
+}
+

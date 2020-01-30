@@ -18,6 +18,20 @@ spring:
     enabled: true
     path: /h2
 
+graphql:
+  servlet:
+    mapping: /graphql
+    enabled: true
+
+graphiql:
+  enabled: true
+  mapping: /graphiql
+  endpoint:
+    graphql: /api/graphql
+  cdn:
+    enabled: true
+    version: 0.12.0
+
 wiremock.mock:
   port: 8081
 

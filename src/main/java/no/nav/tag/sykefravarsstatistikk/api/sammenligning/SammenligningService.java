@@ -97,4 +97,35 @@ public class SammenligningService {
 
         return sammenligning;
     }
+
+    public Sammenligning hentSammenligningForUnderenhet(Orgnr orgnr) {
+        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
+
+        Enhet enhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
+        Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(enhet.getInstitusjonellSektorkode());
+        Næringskode5Siffer næring5siffer = underenhet.getNæringskode();
+        Næring næring = klassifikasjonerRepository.hentNæring(næring5siffer.hentNæringskode2Siffer());
+
+        Sykefraværprosent sykefraværprosentNæring = null;
+        Sykefraværprosent sykefraværprosentBransje = null;
+        Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
+        if (bransje.isPresent()) {
+            sykefraværprosentBransje = sammenligningRepository.hentSykefraværprosentBransje(ARSTALL, KVARTAL, bransje.get());
+        } else {
+            sykefraværprosentNæring = sammenligningRepository.hentSykefraværprosentNæring(ARSTALL, KVARTAL, næring);
+        }
+
+        Sammenligning sammenligning = new Sammenligning(
+                KVARTAL,
+                ARSTALL,
+                sammenligningRepository.hentSykefraværprosentVirksomhet(ARSTALL, KVARTAL, underenhet),
+                sykefraværprosentNæring,
+                sykefraværprosentBransje,
+                sammenligningRepository.hentSykefraværprosentSektor(ARSTALL, KVARTAL, ssbSektor),
+                sammenligningRepository.hentSykefraværprosentLand(ARSTALL, KVARTAL)
+        );
+
+        return sammenligning;
+    }
+
 }
