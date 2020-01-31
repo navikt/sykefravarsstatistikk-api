@@ -38,10 +38,10 @@ public class TapteDagsverkForKostnadsberegningRepository {
 
         return namedParameterJdbcTemplate.query(
                 "SELECT tapte_dagsverk, kvartal, arstall FROM SYKEFRAVAR_STATISTIKK_VIRKSOMHET where orgnr=:orgnr and " +
-                        "(ARSTALL = :arstall1 and kvartal = :kvartal1) or " +
+                        "((ARSTALL = :arstall1 and kvartal = :kvartal1) or " +
                         "(ARSTALL = :arstall2 and kvartal = :kvartal2) or " +
                         "(ARSTALL = :arstall3 and kvartal = :kvartal3) or " +
-                        "(ARSTALL = :arstall4 and kvartal = :kvartal4)",
+                        "(ARSTALL = :arstall4 and kvartal = :kvartal4))",
                 namedParameters,
                 (rs, rowNum) -> mapTilTapteDagsverk(rs)
         );

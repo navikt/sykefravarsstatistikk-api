@@ -64,7 +64,8 @@ public class TapteDagsverkForKostnadsberegningRepositoryTest {
                 ),
                 orgnr);
 
-        assertThat(resultat).isEqualTo(tapteDagsverkListe);
+        assertThat(resultat).containsAll(tapteDagsverkListe);
+        assertThat(resultat.size()).isEqualTo(4);
     }
 
     @Test
@@ -122,7 +123,8 @@ public class TapteDagsverkForKostnadsberegningRepositoryTest {
                 new ÅrstallOgKvartal(2018, 4)
                 ),
                 riktigOrgnr);
-        assertThat(resultat).isEqualTo(riktigeTapteDagsverk);
+        assertThat(resultat).containsAll(riktigeTapteDagsverk);
+        assertThat(resultat.size()).isEqualTo(4);
     }
 
     @Test
@@ -146,7 +148,8 @@ public class TapteDagsverkForKostnadsberegningRepositoryTest {
                 ),
                 etOrgnr());
 
-        assertThat(resultat).isEqualTo(tapteDagsverkListe);
+        assertThat(resultat).containsAll(tapteDagsverkListe);
+        assertThat(resultat.size()).isEqualTo(3);
     }
 
     private void insertTapteDagsverk(Orgnr orgnr, TapteDagsverk tapteDagsverk) {
