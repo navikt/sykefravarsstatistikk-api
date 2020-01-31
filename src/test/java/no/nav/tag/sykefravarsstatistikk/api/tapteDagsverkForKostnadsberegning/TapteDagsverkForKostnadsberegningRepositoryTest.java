@@ -48,13 +48,14 @@ public class TapteDagsverkForKostnadsberegningRepositoryTest {
         Orgnr orgnr = etOrgnr();
 
         List<TapteDagsverk> tapteDagsverkListe = Arrays.asList(
-                testTapteDagsverk(1,  2019, 1),
+                testTapteDagsverk(1, 2019, 1),
                 testTapteDagsverk(10, 2019, 2),
                 testTapteDagsverk(100, 2019, 3),
-                testTapteDagsverk(1000,  2018, 4)
+                testTapteDagsverk(1000, 2018, 4)
         );
 
-        tapteDagsverkListe.forEach(tapteDagsverk -> insertTapteDagsverk(orgnr, tapteDagsverk));
+
+        insertTapteDagsverk(orgnr, tapteDagsverkListe);
 
         List<TapteDagsverk> resultat = repository.hentTapteDagsverkFor4Kvartaler(Arrays.asList(
                 new ÅrstallOgKvartal(2019, 1),
@@ -64,8 +65,7 @@ public class TapteDagsverkForKostnadsberegningRepositoryTest {
                 ),
                 orgnr);
 
-        assertThat(resultat).containsAll(tapteDagsverkListe);
-        assertThat(resultat.size()).isEqualTo(4);
+        assertThat(resultat).containsExactlyInAnyOrder(toArray(tapteDagsverkListe));
     }
 
     @Test
@@ -91,54 +91,17 @@ public class TapteDagsverkForKostnadsberegningRepositoryTest {
     }
 
     @Test
-    public void hentTapteDagsverkFor4Kvartaler__skal_bare_returnere_de_riktige_radene() {
-        Orgnr feilOrgnr = new Orgnr("9999");
-        Orgnr riktigOrgnr = new Orgnr("1234");
-
-        List<TapteDagsverk> riktigeTapteDagsverk = Arrays.asList(
-                testTapteDagsverk(1, 2019, 1),
-                testTapteDagsverk(10, 2019, 2),
-                testTapteDagsverk(1000, 2018, 3),
-                testTapteDagsverk(1000, 2018, 4)
-        );
-
-        List<TapteDagsverk> feilTapteDagsverk = Arrays.asList(
-                testTapteDagsverk(100, 2019, 3),
-                testTapteDagsverk(1000, 2019, 4),
-                testTapteDagsverk(10, 2019, 3),
-                testTapteDagsverk(100, 2018, 2)
-        );
-
-        riktigeTapteDagsverk.forEach(tapteDagsverk -> insertTapteDagsverk(riktigOrgnr, tapteDagsverk));
-
-        insertTapteDagsverk(feilOrgnr, feilTapteDagsverk.get(0));
-        insertTapteDagsverk(feilOrgnr, feilTapteDagsverk.get(1));
-        insertTapteDagsverk(riktigOrgnr, feilTapteDagsverk.get(2));
-        insertTapteDagsverk(riktigOrgnr, feilTapteDagsverk.get(3));
-
-        List<TapteDagsverk> resultat = repository.hentTapteDagsverkFor4Kvartaler(Arrays.asList(
-                new ÅrstallOgKvartal(2019, 1),
-                new ÅrstallOgKvartal(2019, 2),
-                new ÅrstallOgKvartal(2018, 3),
-                new ÅrstallOgKvartal(2018, 4)
-                ),
-                riktigOrgnr);
-        assertThat(resultat).containsAll(riktigeTapteDagsverk);
-        assertThat(resultat.size()).isEqualTo(4);
-    }
-
-    @Test
     public void hentTapteDagsverkFor4Kvartaler__skal_returnere_færre_enn_4_rader_hvis_alle_kvartalene_ikke_er_tilgjengelige() {
         Underenhet underenhet = enUnderenhet();
         Orgnr orgnr = underenhet.getOrgnr();
 
         List<TapteDagsverk> tapteDagsverkListe = Arrays.asList(
-                testTapteDagsverk(1,  2019, 1),
+                testTapteDagsverk(1, 2019, 1),
                 testTapteDagsverk(10, 2019, 2),
-                testTapteDagsverk(1000,  2018, 4)
+                testTapteDagsverk(1000, 2018, 4)
         );
 
-        tapteDagsverkListe.forEach(tapteDagsverk -> insertTapteDagsverk(orgnr, tapteDagsverk));
+        insertTapteDagsverk(orgnr, tapteDagsverkListe);
 
         List<TapteDagsverk> resultat = repository.hentTapteDagsverkFor4Kvartaler(Arrays.asList(
                 new ÅrstallOgKvartal(2019, 1),
@@ -148,8 +111,80 @@ public class TapteDagsverkForKostnadsberegningRepositoryTest {
                 ),
                 etOrgnr());
 
-        assertThat(resultat).containsAll(tapteDagsverkListe);
-        assertThat(resultat.size()).isEqualTo(3);
+        assertThat(resultat).containsExactlyInAnyOrder(toArray(tapteDagsverkListe));
+    }
+
+    @Test
+    public void hentTapteDagsverkFor4Kvartaler__skal_bare_returnere_tapte_dagsverk_for_eget_orgnr() {
+        Orgnr orgnr1 = new Orgnr("111111111");
+        Orgnr orgnr2 = new Orgnr("222222222");
+
+        List<TapteDagsverk> tapteDagsverkOrgnr1 = Arrays.asList(
+                testTapteDagsverk(1, 2018, 1),
+                testTapteDagsverk(1, 2018, 2),
+                testTapteDagsverk(1, 2018, 3),
+                testTapteDagsverk(1, 2018, 4)
+        );
+
+        List<TapteDagsverk> tapteDagsverkOrgnr2 = Arrays.asList(
+                testTapteDagsverk(2, 2018, 1),
+                testTapteDagsverk(2, 2018, 2),
+                testTapteDagsverk(2, 2018, 3),
+                testTapteDagsverk(2, 2018, 4)
+        );
+
+        insertTapteDagsverk(orgnr1, tapteDagsverkOrgnr1);
+        insertTapteDagsverk(orgnr2, tapteDagsverkOrgnr2);
+
+        List<TapteDagsverk> resultat = repository.hentTapteDagsverkFor4Kvartaler(Arrays.asList(
+                new ÅrstallOgKvartal(2018, 1),
+                new ÅrstallOgKvartal(2018, 2),
+                new ÅrstallOgKvartal(2018, 3),
+                new ÅrstallOgKvartal(2018, 4)
+                ),
+                orgnr1);
+
+        assertThat(resultat).containsExactlyInAnyOrder(toArray(tapteDagsverkOrgnr1));
+    }
+
+    @Test
+    public void hentTapteDagsverkFor4Kvartaler__skal_bare_returnere_tapte_dagsverk_for_innsendte_kvartaler() {
+        Orgnr orgnr = new Orgnr("111111111");
+
+        List<TapteDagsverk> riktigeTapteDagsverk = Arrays.asList(
+                testTapteDagsverk(100, 2018, 1),
+                testTapteDagsverk(100, 2018, 2),
+                testTapteDagsverk(100, 2018, 3),
+                testTapteDagsverk(100, 2018, 4)
+        );
+
+        List<TapteDagsverk> feilTapteDagsverk = Arrays.asList(
+                testTapteDagsverk(200, 2019, 1),
+                testTapteDagsverk(200, 2019, 2),
+                testTapteDagsverk(200, 2019, 3),
+                testTapteDagsverk(200, 2019, 4)
+        );
+
+        insertTapteDagsverk(orgnr, riktigeTapteDagsverk);
+        insertTapteDagsverk(orgnr, feilTapteDagsverk);
+
+        List<TapteDagsverk> resultat = repository.hentTapteDagsverkFor4Kvartaler(Arrays.asList(
+                new ÅrstallOgKvartal(2018, 1),
+                new ÅrstallOgKvartal(2018, 2),
+                new ÅrstallOgKvartal(2018, 3),
+                new ÅrstallOgKvartal(2018, 4)
+                ),
+                orgnr);
+
+        assertThat(resultat).containsExactlyInAnyOrder(toArray(riktigeTapteDagsverk));
+    }
+
+    private TapteDagsverk[] toArray(List<TapteDagsverk> tapteDagsverk) {
+        return tapteDagsverk.toArray(new TapteDagsverk[0]);
+    }
+
+    private void insertTapteDagsverk(Orgnr orgnr, List<TapteDagsverk> tapteDagsverkListe) {
+        tapteDagsverkListe.forEach(tapteDagsverk -> insertTapteDagsverk(orgnr, tapteDagsverk));
     }
 
     private void insertTapteDagsverk(Orgnr orgnr, TapteDagsverk tapteDagsverk) {
