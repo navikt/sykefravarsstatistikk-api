@@ -34,6 +34,29 @@ public class ApiTest {
     private final static String ORGNR_UNDERENHET_INGEN_TILGANG = "777777777";
 
     @Test
+    public void sykefraværprosenthistorikk_land___skal_returnere_riktig_objekt() throws Exception {
+        HttpResponse<String> response = newBuilder().build().send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/sykefravarprosenthistorikk/land"))
+                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .GET()
+                        .build(),
+                ofString()
+        );
+
+        String startPåResponse = "{" +
+                "\"label\":\"Norge\"," +
+                "\"kvartalsvisSykefraværProsent\":[" +
+                "{\"prosent\":5.4,\"erMaskert\":false,\"årstall\":2014,\"kvartal\":4}," +
+                "{\"prosent\":5.5,\"erMaskert\":false,\"årstall\":2014,\"kvartal\":3},";
+
+        JsonNode ønsketResponseJson = objectMapper.readTree("{\"prosent\":5.4,\"erMaskert\":false,\"årstall\":2014,\"kvartal\":4}");
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(objectMapper.readTree(response.body()).get("kvartalsvisSykefraværProsent").elements().next()).isEqualTo(ønsketResponseJson);
+        //assertThat(response.body().startsWith(startPåResponse)).isTrue();
+    }
+
+    @Test
     public void sammenligning__skal_returnere_riktig_objekt() throws Exception {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
@@ -74,6 +97,7 @@ public class ApiTest {
         assertThat(response.statusCode()).isEqualTo(200);
         assertThat(objectMapper.readTree(response.body())).isEqualTo(ønsketResponseJson);
     }
+
     @Test
     public void sammenligning__skal_utføre_tilgangskontroll() throws Exception {
         HttpResponse<String> response = newBuilder().build().send(
