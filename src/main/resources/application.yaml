@@ -22,6 +22,9 @@ graphql:
   servlet:
     mapping: /graphql
     enabled: true
+##    websocket:
+##      enabled: false
+
 
 graphiql:
   enabled: true

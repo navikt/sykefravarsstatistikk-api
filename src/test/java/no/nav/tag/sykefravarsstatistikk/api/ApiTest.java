@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static java.net.http.HttpClient.newBuilder;
@@ -124,6 +126,11 @@ public class ApiTest {
 
         assertThat(response.statusCode()).isEqualTo(200);
         assertThat(objectMapper.readTree(response.body())).isEqualTo(ønsketResponseJson);
+    }
+
+    @Test
+    public void test() {
+        assertThat(Arrays.asList("Denne", "kan", "brukes", "direkte med list")).containsExactlyInAnyOrderElementsOf(Arrays.asList("direkte med list", "kan", "Denne", "brukes"));
     }
 
     @Test

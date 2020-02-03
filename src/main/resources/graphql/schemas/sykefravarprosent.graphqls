@@ -14,8 +14,14 @@ type Sammenligning {
     land: Sykefravarprosent
 }
 
+type TapteDagsverk {
+    kvartal: Int!
+    arstall: Int!
+    tapteDagsverk: Float!
+}
+
 # The Root Query for the application
 type Query {
     sammenligning(orgnr: String): Sammenligning
+    tapteDagsverk(orgnr: String): [TapteDagsverk]!
 }
-
