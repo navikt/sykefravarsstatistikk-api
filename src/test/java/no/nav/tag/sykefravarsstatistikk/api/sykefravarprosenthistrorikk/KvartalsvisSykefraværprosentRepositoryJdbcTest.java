@@ -2,6 +2,7 @@ package no.nav.tag.sykefravarsstatistikk.api.sykefravarprosenthistrorikk;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,13 +58,51 @@ public class KvartalsvisSykefraværprosentRepositoryJdbcTest {
                 parametre(2018, 4, 10, 6, 100)
         );
 
-        List<KvartalsvisSykefraværprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand();
+        List<KvartalsvisSykefraværprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand("Norge");
         assertThat(resultat.size()).isEqualTo(3);
         assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefraværprosent(
                         new ÅrstallOgKvartal(2018, 4),
                         new Sykefraværprosent(
                                 "Norge",
                                 new BigDecimal(6),
+                                new BigDecimal(100),
+                                10
+                        )
+                )
+        );
+    }
+
+    @Test
+    public void hentSykefraværprosentSektor__skal_returnere_riktig_sykefravær() {
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre("1", 2019, 2, 10, 2, 100)
+        );
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre("1", 2019, 1, 10, 3, 100)
+        );
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre("1", 2018, 4, 10, 4, 100)
+        );
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre("2", 2018, 4, 10, 5, 100)
+        );
+
+        List<KvartalsvisSykefraværprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor
+                (new Sektor("1", "Statlig forvaltning"));
+        assertThat(resultat.size()).isEqualTo(3);
+        assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefraværprosent(
+                        new ÅrstallOgKvartal(2018, 4),
+                        new Sykefraværprosent(
+                                "Statlig forvaltning",
+                                new BigDecimal(4),
                                 new BigDecimal(100),
                                 10
                         )
@@ -83,7 +122,7 @@ public class KvartalsvisSykefraværprosentRepositoryJdbcTest {
                         + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
                 parametre(2019, 1, 10, 5, 100)
         );
-        List<KvartalsvisSykefraværprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand();
+        List<KvartalsvisSykefraværprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand("Norge");
         assertThat(resultat.size()).isEqualTo(2);
         KvartalsvisSykefraværprosent maskertKvartalsvisSykefraværprosent = resultat.get(0);
         assertThat(maskertKvartalsvisSykefraværprosent.isErMaskert()).isTrue();
@@ -96,6 +135,16 @@ public class KvartalsvisSykefraværprosentRepositoryJdbcTest {
 
     private MapSqlParameterSource parametre(int årstall, int kvartal, int antallPersoner, int tapteDagsverk, int muligeDagsverk) {
         return new MapSqlParameterSource()
+                .addValue("arstall", årstall)
+                .addValue("kvartal", kvartal)
+                .addValue("antall_personer", antallPersoner)
+                .addValue("tapte_dagsverk", tapteDagsverk)
+                .addValue("mulige_dagsverk", muligeDagsverk);
+    }
+
+    private MapSqlParameterSource parametre(String sektorKode, int årstall, int kvartal, int antallPersoner, int tapteDagsverk, int muligeDagsverk) {
+        return new MapSqlParameterSource()
+                .addValue("sektor_kode", sektorKode)
                 .addValue("arstall", årstall)
                 .addValue("kvartal", kvartal)
                 .addValue("antall_personer", antallPersoner)

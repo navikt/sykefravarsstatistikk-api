@@ -33,6 +33,7 @@ public class ApiTest {
     private final static String ORGNR_UNDERENHET = "910969439";
     private final static String ORGNR_UNDERENHET_INGEN_TILGANG = "777777777";
 
+
     @Test
     public void sykefraværprosenthistorikk_land___skal_returnere_riktig_objekt() throws Exception {
         HttpResponse<String> response = newBuilder().build().send(
@@ -44,17 +45,44 @@ public class ApiTest {
                 ofString()
         );
 
-        String startPåResponse = "{" +
-                "\"label\":\"Norge\"," +
-                "\"kvartalsvisSykefraværProsent\":[" +
-                "{\"prosent\":5.4,\"erMaskert\":false,\"årstall\":2014,\"kvartal\":4}," +
-                "{\"prosent\":5.5,\"erMaskert\":false,\"årstall\":2014,\"kvartal\":3},";
-
         JsonNode ønsketResponseJson = objectMapper.readTree("{\"prosent\":5.4,\"erMaskert\":false,\"årstall\":2014,\"kvartal\":4}");
         assertThat(response.statusCode()).isEqualTo(200);
         assertThat(objectMapper.readTree(response.body()).get("kvartalsvisSykefraværProsent").elements().next()).isEqualTo(ønsketResponseJson);
-        //assertThat(response.body().startsWith(startPåResponse)).isTrue();
     }
+
+    @Test
+    public void sykefraværprosenthistorikk_sektor___skal_returnere_riktig_objekt() throws Exception {
+        HttpResponse<String> response = newBuilder().build().send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET + "/sykefravarprosenthistorikk/sektor"))
+                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .GET()
+                        .build(),
+                ofString()
+        );
+
+        JsonNode ønsketResponseJson = objectMapper.readTree("{\"prosent\":5.0,\"erMaskert\":false,\"årstall\":2014,\"kvartal\":4}");
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(objectMapper.readTree(response.body()).get("label")).isEqualTo(objectMapper.readTree("\"Statlig forvaltning\""));
+        assertThat(objectMapper.readTree(response.body()).get("kvartalsvisSykefraværProsent").elements().next()).isEqualTo(ønsketResponseJson);
+    }
+
+    @Test
+    public void sykefraværprosenthistorikk_sektor__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
+        HttpResponse<String> response = newBuilder().build().send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/"
+                                + ORGNR_UNDERENHET_INGEN_TILGANG + "/sykefravarprosenthistorikk/sektor"))
+                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .GET()
+                        .build(),
+                ofString()
+        );
+        assertThat(response.statusCode()).isEqualTo(403);
+        assertThat(response.body()).isEqualTo("{\"message\":\"You don't have access to this ressource\"}");
+    }
+
+
 
     @Test
     public void sammenligning__skal_returnere_riktig_objekt() throws Exception {
