@@ -56,6 +56,22 @@ public class KvartalsvisSykefraværprosentRepository {
         }
     }
 
+    public List<KvartalsvisSykefraværprosent> hentKvartalsvisSykefraværprosentNæring(Næring næring) {
+        try {
+            return namedParameterJdbcTemplate.query(
+                    "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal " +
+                            "FROM sykefravar_statistikk_naring " +
+                            "where naring_kode = :naringKode " +
+                            "ORDER BY arstall, kvartal DESC ",
+                    new MapSqlParameterSource()
+                            .addValue("naringKode", næring.getKode()),
+                    (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs, næring.getNavn())
+            );
+        } catch (EmptyResultDataAccessException e) {
+            return Collections.emptyList();
+        }
+    }
+
 
     private KvartalsvisSykefraværprosent mapTilKvartalsvisSykefraværprosent(ResultSet rs, String label) throws SQLException {
         return new KvartalsvisSykefraværprosent(
@@ -71,7 +87,4 @@ public class KvartalsvisSykefraværprosentRepository {
                 ));
     }
 
-    public List<KvartalsvisSykefraværprosent> hentKvartalsvisSykefraværprosentNæring(Næring næring) {
-        return null;
-    }
 }

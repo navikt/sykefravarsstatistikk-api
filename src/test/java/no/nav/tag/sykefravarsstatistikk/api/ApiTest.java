@@ -76,10 +76,10 @@ public class ApiTest {
                         "{\"erMaskert\": false,\"kvartal\": 4,\"årstall\": 2014,\"prosent\": 5.0}"
                         )
                 );
-        assertThat(alleSykefraværprosentHistorikk.get(2).get("label")).isEqualTo(objectMapper.readTree("\"Statlig forvaltning\""));
+        assertThat(alleSykefraværprosentHistorikk.get(2).get("label")).isEqualTo(objectMapper.readTree("\"Produksjon av nærings- og nytelsesmidler\""));
         assertThat(alleSykefraværprosentHistorikk.get(2).get("kvartalsvisSykefraværProsent").get(0))
                 .isEqualTo(objectMapper.readTree(
-                        "{\"erMaskert\": false,\"kvartal\": 4,\"årstall\": 2014,\"prosent\": 5.0}"
+                        "{\"erMaskert\": false,\"kvartal\": 4,\"årstall\": 2017,\"prosent\": 5.4}"
                         )
                 );
 

@@ -2,6 +2,7 @@ package no.nav.tag.sykefravarsstatistikk.api.sykefravarprosenthistrorikk;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.junit.After;
 import org.junit.Before;
@@ -74,35 +75,69 @@ public class KvartalsvisSykefraværprosentRepositoryJdbcTest {
 
     @Test
     public void hentSykefraværprosentSektor__skal_returnere_riktig_sykefravær() {
+        Sektor statligForvaltning = new Sektor("1", "Statlig forvaltning");
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre("1", 2019, 2, 10, 2, 100)
+                parametre(statligForvaltning, 2019, 2, 10, 2, 100)
         );
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre("1", 2019, 1, 10, 3, 100)
+                parametre(statligForvaltning, 2019, 1, 10, 3, 100)
         );
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre("1", 2018, 4, 10, 4, 100)
+                parametre(statligForvaltning, 2018, 4, 10, 4, 100)
         );
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre("2", 2018, 4, 10, 5, 100)
+                parametre(new Sektor("2", "Kommunal forvaltning"), 2018, 4, 10, 5, 100)
         );
 
         List<KvartalsvisSykefraværprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor
-                (new Sektor("1", "Statlig forvaltning"));
+                (statligForvaltning);
         assertThat(resultat.size()).isEqualTo(3);
         assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefraværprosent(
                         new ÅrstallOgKvartal(2018, 4),
                         new Sykefraværprosent(
                                 "Statlig forvaltning",
                                 new BigDecimal(4),
+                                new BigDecimal(100),
+                                10
+                        )
+                )
+        );
+    }
+
+    @Test
+    public void hentSykefraværprosentNæring__skal_returnere_riktig_sykefravær() {
+        Næring produksjonAvKlær = new Næring("14", "Produksjon av klær");
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_naring (naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(produksjonAvKlær, 2019, 2, 10, 2, 100)
+        );
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_naring (naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(produksjonAvKlær, 2019, 1, 10, 3, 100)
+        );
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_naring (naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(new Næring("85", "Undervisning"), 2018, 4, 10, 5, 100)
+        );
+
+        List<KvartalsvisSykefraværprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentNæring(produksjonAvKlær);
+        assertThat(resultat.size()).isEqualTo(2);
+        assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefraværprosent(
+                        new ÅrstallOgKvartal(2019, 2),
+                        new Sykefraværprosent(
+                                produksjonAvKlær.getNavn(),
+                                new BigDecimal(2),
                                 new BigDecimal(100),
                                 10
                         )
@@ -142,9 +177,19 @@ public class KvartalsvisSykefraværprosentRepositoryJdbcTest {
                 .addValue("mulige_dagsverk", muligeDagsverk);
     }
 
-    private MapSqlParameterSource parametre(String sektorKode, int årstall, int kvartal, int antallPersoner, int tapteDagsverk, int muligeDagsverk) {
+    private MapSqlParameterSource parametre(Sektor sektor, int årstall, int kvartal, int antallPersoner, int tapteDagsverk, int muligeDagsverk) {
         return new MapSqlParameterSource()
-                .addValue("sektor_kode", sektorKode)
+                .addValue("sektor_kode", sektor.getKode())
+                .addValue("arstall", årstall)
+                .addValue("kvartal", kvartal)
+                .addValue("antall_personer", antallPersoner)
+                .addValue("tapte_dagsverk", tapteDagsverk)
+                .addValue("mulige_dagsverk", muligeDagsverk);
+    }
+
+    private MapSqlParameterSource parametre(Næring næring, int årstall, int kvartal, int antallPersoner, int tapteDagsverk, int muligeDagsverk) {
+        return new MapSqlParameterSource()
+                .addValue("naring_kode", næring.getKode())
                 .addValue("arstall", årstall)
                 .addValue("kvartal", kvartal)
                 .addValue("antall_personer", antallPersoner)
