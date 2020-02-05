@@ -8,6 +8,9 @@ import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import no.nav.tag.sykefravarsstatistikk.api.virksomhetsklassifikasjoner.SektorMappingService;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class SykefraværprosentHistorikkService {
     private final KvartalsvisSykefraværprosentRepository kvartalsvisSykefraværprosentRepository;
@@ -23,19 +26,35 @@ public class SykefraværprosentHistorikkService {
         this.sektorMappingService = sektorMappingService;
     }
 
-    public KvartalsvisSykefraværprosentHistorikk hentKvartalsvisSykefraværprosentHistorikkLand() {
+
+    public List<KvartalsvisSykefraværprosentHistorikk> hentKvartalsvisSykefraværprosentHistorikk(Orgnr orgnr) {
+        List<KvartalsvisSykefraværprosentHistorikk> kvartalsvisSykefraværprosentListe = new ArrayList<>();
+
+        kvartalsvisSykefraværprosentListe.add(hentKvartalsvisSykefraværprosentHistorikkLand());
+
+        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
+        Enhet enhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
+        Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(enhet.getInstitusjonellSektorkode());
+
+        kvartalsvisSykefraværprosentListe.add(hentKvartalsvisSykefraværprosentHistorikkSektor(ssbSektor));
+        return kvartalsvisSykefraværprosentListe;
+    }
+
+
+    protected KvartalsvisSykefraværprosentHistorikk hentKvartalsvisSykefraværprosentHistorikkLand() {
         KvartalsvisSykefraværprosentHistorikk kvartalsvisSykefraværprosentHistorikk = new KvartalsvisSykefraværprosentHistorikk();
+
+        kvartalsvisSykefraværprosentHistorikk.setSykefraværsstatistikkType(SykefraværsstatistikkType.LAND);
         kvartalsvisSykefraværprosentHistorikk.setLabel("Norge");
         kvartalsvisSykefraværprosentHistorikk.setKvartalsvisSykefraværProsent(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand("Norge"));
 
         return kvartalsvisSykefraværprosentHistorikk;
     }
 
-    public KvartalsvisSykefraværprosentHistorikk hentKvartalsvisSykefraværprosentHistorikkSektor(Orgnr orgnr) {
-        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
-        Enhet enhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
-        Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(enhet.getInstitusjonellSektorkode());
+    protected KvartalsvisSykefraværprosentHistorikk hentKvartalsvisSykefraværprosentHistorikkSektor(Sektor ssbSektor) {
+
         KvartalsvisSykefraværprosentHistorikk kvartalsvisSykefraværprosentHistorikk = new KvartalsvisSykefraværprosentHistorikk();
+        kvartalsvisSykefraværprosentHistorikk.setSykefraværsstatistikkType(SykefraværsstatistikkType.SEKTOR);
         kvartalsvisSykefraværprosentHistorikk.setLabel(ssbSektor.getNavn());
         kvartalsvisSykefraværprosentHistorikk.setKvartalsvisSykefraværProsent(
                 kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(ssbSektor));

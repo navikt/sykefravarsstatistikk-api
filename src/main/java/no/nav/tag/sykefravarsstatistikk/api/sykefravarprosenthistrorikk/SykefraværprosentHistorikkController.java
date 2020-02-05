@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @Protected
 @RestController
 public class SykefraværprosentHistorikkController {
@@ -20,13 +22,9 @@ public class SykefraværprosentHistorikkController {
         this.tilgangskontrollService = tilgangskontrollService;
     }
 
-    @GetMapping(value = "/sykefravarprosenthistorikk/land")
-    public KvartalsvisSykefraværprosentHistorikk hentStatistikkLand() {
-        return sykefraværprosentHistorikkService.hentKvartalsvisSykefraværprosentHistorikkLand();
-    }
+    @GetMapping(value = "/{orgnr}/sykefravarprosenthistorikk")
+    public List<KvartalsvisSykefraværprosentHistorikk> hentStatistikk(@PathVariable("orgnr") String orgnrStr) {
 
-    @GetMapping(value = "/{orgnr}/sykefravarprosenthistorikk/sektor")
-    public KvartalsvisSykefraværprosentHistorikk hentStatistikkSektor(@PathVariable("orgnr") String orgnrStr) {
         Orgnr orgnr = new Orgnr(orgnrStr);
         InnloggetBruker innloggetSelvbetjeningBruker = tilgangskontrollService.hentInnloggetBruker();
 
@@ -34,7 +32,8 @@ public class SykefraværprosentHistorikkController {
             throw new TilgangskontrollException("Har ikke tilgang til statistikk for denne bedriften.");
         }
 
-        return sykefraværprosentHistorikkService.hentKvartalsvisSykefraværprosentHistorikkSektor(orgnr);
+        return sykefraværprosentHistorikkService.hentKvartalsvisSykefraværprosentHistorikk(orgnr);
     }
+
 
 }

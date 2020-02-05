@@ -3,6 +3,7 @@ package no.nav.tag.sykefravarsstatistikk.api;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.security.oidc.test.support.JwtTokenGenerator;
+import no.nav.tag.sykefravarsstatistikk.api.sykefravarprosenthistrorikk.SykefraværsstatistikkType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +15,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static java.net.http.HttpClient.newBuilder;
@@ -35,36 +38,44 @@ public class ApiTest {
 
 
     @Test
-    public void sykefraværprosenthistorikk_land___skal_returnere_riktig_objekt() throws Exception {
-        HttpResponse<String> response = newBuilder().build().send(
-                HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/sykefravarprosenthistorikk/land"))
-                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
-                        .GET()
-                        .build(),
-                ofString()
-        );
-
-        JsonNode ønsketResponseJson = objectMapper.readTree("{\"prosent\":5.4,\"erMaskert\":false,\"årstall\":2014,\"kvartal\":4}");
-        assertThat(response.statusCode()).isEqualTo(200);
-        assertThat(objectMapper.readTree(response.body()).get("kvartalsvisSykefraværProsent").elements().next()).isEqualTo(ønsketResponseJson);
-    }
-
-    @Test
     public void sykefraværprosenthistorikk_sektor___skal_returnere_riktig_objekt() throws Exception {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET + "/sykefravarprosenthistorikk/sektor"))
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET + "/sykefravarprosenthistorikk"))
                         .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
                         .GET()
                         .build(),
                 ofString()
         );
 
-        JsonNode ønsketResponseJson = objectMapper.readTree("{\"prosent\":5.0,\"erMaskert\":false,\"årstall\":2014,\"kvartal\":4}");
         assertThat(response.statusCode()).isEqualTo(200);
-        assertThat(objectMapper.readTree(response.body()).get("label")).isEqualTo(objectMapper.readTree("\"Statlig forvaltning\""));
-        assertThat(objectMapper.readTree(response.body()).get("kvartalsvisSykefraværProsent").elements().next()).isEqualTo(ønsketResponseJson);
+        JsonNode alleSykefraværprosentHistorikk = objectMapper.readTree(response.body());
+
+        assertThat(
+                alleSykefraværprosentHistorikk.findValues("sykefraværsstatistikkType")
+                        .stream()
+                        .map(v -> v.textValue())
+                        .collect(Collectors.toList()))
+                .containsExactlyInAnyOrderElementsOf(
+                        Arrays.asList(
+                                SykefraværsstatistikkType.LAND.toString(),
+                                SykefraværsstatistikkType.SEKTOR.toString()
+                        )
+                );
+
+        assertThat(alleSykefraværprosentHistorikk.get(0).get("label")).isEqualTo(objectMapper.readTree("\"Norge\""));
+        assertThat(alleSykefraværprosentHistorikk.get(0).get("kvartalsvisSykefraværProsent").get(0))
+                .isEqualTo(objectMapper.readTree(
+                        "{\"erMaskert\": false,\"kvartal\": 4,\"årstall\": 2014,\"prosent\": 5.4}"
+                        )
+                );
+        assertThat(alleSykefraværprosentHistorikk.get(1).get("label")).isEqualTo(objectMapper.readTree("\"Statlig forvaltning\""));
+        assertThat(alleSykefraværprosentHistorikk.get(1).get("kvartalsvisSykefraværProsent").get(0))
+                .isEqualTo(objectMapper.readTree(
+                        "{\"erMaskert\": false,\"kvartal\": 4,\"årstall\": 2014,\"prosent\": 5.0}"
+                        )
+                );
+
     }
 
     @Test
@@ -72,7 +83,7 @@ public class ApiTest {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/"
-                                + ORGNR_UNDERENHET_INGEN_TILGANG + "/sykefravarprosenthistorikk/sektor"))
+                                + ORGNR_UNDERENHET_INGEN_TILGANG + "/sykefravarprosenthistorikk"))
                         .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
                         .GET()
                         .build(),
@@ -81,7 +92,6 @@ public class ApiTest {
         assertThat(response.statusCode()).isEqualTo(403);
         assertThat(response.body()).isEqualTo("{\"message\":\"You don't have access to this ressource\"}");
     }
-
 
 
     @Test
