@@ -1,6 +1,8 @@
 package no.nav.tag.sykefravarsstatistikk.api.sykefravarprosenthistrorikk;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
+import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
+import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjeprogram;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class SykefraværprosentHistorikkService {
@@ -20,17 +23,19 @@ public class SykefraværprosentHistorikkService {
     private final EnhetsregisteretClient enhetsregisteretClient;
     private final SektorMappingService sektorMappingService;
     private final KlassifikasjonerRepository klassifikasjonerRepository;
-
+    private final Bransjeprogram bransjeprogram;
 
     public SykefraværprosentHistorikkService(
             KvartalsvisSykefraværprosentRepository kvartalsvisSykefraværprosentRepository,
             EnhetsregisteretClient enhetsregisteretClient,
             SektorMappingService sektorMappingService,
-            KlassifikasjonerRepository klassifikasjonerRepository) {
+            KlassifikasjonerRepository klassifikasjonerRepository,
+            Bransjeprogram bransjeprogram) {
         this.kvartalsvisSykefraværprosentRepository = kvartalsvisSykefraværprosentRepository;
         this.enhetsregisteretClient = enhetsregisteretClient;
         this.sektorMappingService = sektorMappingService;
-        this.klassifikasjonerRepository=klassifikasjonerRepository;
+        this.klassifikasjonerRepository = klassifikasjonerRepository;
+        this.bransjeprogram = bransjeprogram;
     }
 
 
@@ -44,8 +49,27 @@ public class SykefraværprosentHistorikkService {
         Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(enhet.getInstitusjonellSektorkode());
 
         kvartalsvisSykefraværprosentListe.add(hentKvartalsvisSykefraværprosentHistorikkSektor(ssbSektor));
-        kvartalsvisSykefraværprosentListe.add(hentKvartalsvisSykefraværprosentHistorikkNæring(underenhet));
+
+        Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
+
+        if (bransje.isPresent() && bransje.get().lengdePåNæringskoder() == 5) {
+            kvartalsvisSykefraværprosentListe.add(hentKvartalsvisSykefraværprosentHistorikkBransje(bransje.get()));
+        } else {
+            kvartalsvisSykefraværprosentListe.add(hentKvartalsvisSykefraværprosentHistorikkNæring(underenhet));
+        }
+
         return kvartalsvisSykefraværprosentListe;
+    }
+
+    private KvartalsvisSykefraværprosentHistorikk hentKvartalsvisSykefraværprosentHistorikkBransje(Bransje bransje) {
+        KvartalsvisSykefraværprosentHistorikk kvartalsvisSykefraværprosentHistorikk = new KvartalsvisSykefraværprosentHistorikk();
+        kvartalsvisSykefraværprosentHistorikk.setSykefraværsstatistikkType(SykefraværsstatistikkType.BRANSJE);
+        kvartalsvisSykefraværprosentHistorikk.setLabel(bransje.getNavn());
+        kvartalsvisSykefraværprosentHistorikk.setKvartalsvisSykefraværProsent(
+                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentBransje(bransje));
+
+        return kvartalsvisSykefraværprosentHistorikk;
+
     }
 
 

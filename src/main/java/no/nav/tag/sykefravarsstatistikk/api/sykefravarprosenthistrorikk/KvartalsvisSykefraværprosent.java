@@ -1,18 +1,15 @@
 package no.nav.tag.sykefravarsstatistikk.api.sykefravarprosenthistrorikk;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Data;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.util.Comparator;
 
 @Data
-public class KvartalsvisSykefraværprosent {
+public class KvartalsvisSykefraværprosent implements Comparable<KvartalsvisSykefraværprosent>{
 
     @JsonIgnore
     private final ÅrstallOgKvartal årstallOgKvartal;
@@ -51,5 +48,13 @@ public class KvartalsvisSykefraværprosent {
     private KvartalsvisSykefraværprosent() {
         this.årstallOgKvartal = null;
         this.sykefraværprosent = null;
+    }
+
+
+    @Override
+    public int compareTo(KvartalsvisSykefraværprosent kvartalsvisSykefraværprosent) {
+        return Comparator
+                .comparing(KvartalsvisSykefraværprosent::getÅrstallOgKvartal)
+                .compare(this, kvartalsvisSykefraværprosent);
     }
 }

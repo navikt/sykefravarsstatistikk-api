@@ -1,5 +1,7 @@
 package no.nav.tag.sykefravarsstatistikk.api.sykefravarprosenthistrorikk;
 
+import no.nav.tag.sykefravarsstatistikk.api.TestUtils;
+import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
@@ -134,12 +136,58 @@ public class KvartalsvisSykefraværprosentRepositoryJdbcTest {
         List<KvartalsvisSykefraværprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentNæring(produksjonAvKlær);
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefraværprosent(
-                        new ÅrstallOgKvartal(2019, 2),
+                        new ÅrstallOgKvartal(2019, 1),
                         new Sykefraværprosent(
                                 produksjonAvKlær.getNavn(),
-                                new BigDecimal(2),
+                                new BigDecimal(3),
                                 new BigDecimal(100),
                                 10
+                        )
+                )
+        );
+    }
+
+    @Test
+    public void hentSykefraværprosentBransje__skal_returnere_riktig_sykefravær() {
+        Næring produksjonAvKlær = new Næring("14", "Produksjon av klær");
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_naring5siffer " +
+                        "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(new Næring("87101", "Somatiske spesialsykehjem"), 2019, 2, 10, 5, 100)
+        );
+
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_naring5siffer " +
+                        "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(new Næring("87101", "Somatiske spesialsykehjem"), 2019, 1, 10, 1, 100)
+        );
+
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_naring5siffer " +
+                        "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(new Næring("87102", "Somatiske sykehjem"), 2019, 1, 10, 7, 100)
+        );
+
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_naring5siffer " +
+                        "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(new Næring("87301", "Aldershjem"), 2018, 4, 10, 6, 100)
+        );
+
+        Bransje sykehjem = new Bransje("Sykehjem", "87101", "87102");
+        List<KvartalsvisSykefraværprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentBransje(sykehjem);
+        assertThat(resultat.size()).isEqualTo(2);
+        assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefraværprosent(
+                        new ÅrstallOgKvartal(2019, 1),
+                        new Sykefraværprosent(
+                                sykehjem.getNavn(),
+                                new BigDecimal(8),
+                                new BigDecimal(200),
+                                20
                         )
                 )
         );
@@ -157,14 +205,18 @@ public class KvartalsvisSykefraværprosentRepositoryJdbcTest {
                         + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
                 parametre(2019, 1, 10, 5, 100)
         );
+
         List<KvartalsvisSykefraværprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand("Norge");
+
         assertThat(resultat.size()).isEqualTo(2);
-        KvartalsvisSykefraværprosent maskertKvartalsvisSykefraværprosent = resultat.get(0);
-        assertThat(maskertKvartalsvisSykefraværprosent.isErMaskert()).isTrue();
-        assertThat(maskertKvartalsvisSykefraværprosent.getProsent()).isNull();
-        KvartalsvisSykefraværprosent ikkeMaskertKvartalsvisSykefraværprosent = resultat.get(1);
+
+        KvartalsvisSykefraværprosent ikkeMaskertKvartalsvisSykefraværprosent = resultat.get(0);
         assertThat(ikkeMaskertKvartalsvisSykefraværprosent.isErMaskert()).isFalse();
         assertThat(ikkeMaskertKvartalsvisSykefraværprosent.getProsent().setScale(2)).isEqualTo(new BigDecimal(5).setScale(2));
+
+        KvartalsvisSykefraværprosent maskertKvartalsvisSykefraværprosent = resultat.get(1);
+        assertThat(maskertKvartalsvisSykefraværprosent.isErMaskert()).isTrue();
+        assertThat(maskertKvartalsvisSykefraværprosent.getProsent()).isNull();
     }
 
 

@@ -67,19 +67,19 @@ public class ApiTest {
         assertThat(alleSykefraværprosentHistorikk.get(0).get("label")).isEqualTo(objectMapper.readTree("\"Norge\""));
         assertThat(alleSykefraværprosentHistorikk.get(0).get("kvartalsvisSykefraværProsent").get(0))
                 .isEqualTo(objectMapper.readTree(
-                        "{\"erMaskert\": false,\"kvartal\": 4,\"årstall\": 2014,\"prosent\": 5.4}"
+                        "{\"erMaskert\": false,\"kvartal\": 2,\"årstall\": 2014,\"prosent\": 5.2}"
                         )
                 );
         assertThat(alleSykefraværprosentHistorikk.get(1).get("label")).isEqualTo(objectMapper.readTree("\"Statlig forvaltning\""));
         assertThat(alleSykefraværprosentHistorikk.get(1).get("kvartalsvisSykefraværProsent").get(0))
                 .isEqualTo(objectMapper.readTree(
-                        "{\"erMaskert\": false,\"kvartal\": 4,\"årstall\": 2014,\"prosent\": 5.0}"
+                        "{\"erMaskert\": false,\"kvartal\": 2,\"årstall\": 2014,\"prosent\": 4.9}"
                         )
                 );
         assertThat(alleSykefraværprosentHistorikk.get(2).get("label")).isEqualTo(objectMapper.readTree("\"Produksjon av nærings- og nytelsesmidler\""));
         assertThat(alleSykefraværprosentHistorikk.get(2).get("kvartalsvisSykefraværProsent").get(0))
                 .isEqualTo(objectMapper.readTree(
-                        "{\"erMaskert\": false,\"kvartal\": 4,\"årstall\": 2017,\"prosent\": 5.4}"
+                        "{\"erMaskert\": false,\"kvartal\": 1,\"årstall\": 2017,\"prosent\": 5.6}"
                         )
                 );
 
