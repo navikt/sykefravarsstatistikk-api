@@ -57,7 +57,6 @@ public class SektorMappingService {
             case "2": return "Kommunal forvaltning";
             case "3": return "Privat og offentlig næringsvirksomhet";
             default: return "Ukjent";
-
         }
     }
 }
