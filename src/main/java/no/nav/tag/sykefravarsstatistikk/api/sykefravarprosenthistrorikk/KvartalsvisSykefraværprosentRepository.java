@@ -2,6 +2,7 @@ package no.nav.tag.sykefravarsstatistikk.api.sykefravarprosenthistrorikk;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
+import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -68,5 +69,9 @@ public class KvartalsvisSykefraværprosentRepository {
                         rs.getBigDecimal("mulige_dagsverk"),
                         rs.getInt("antall_personer")
                 ));
+    }
+
+    public List<KvartalsvisSykefraværprosent> hentKvartalsvisSykefraværprosentNæring(Næring næring) {
+        return null;
     }
 }

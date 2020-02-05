@@ -59,7 +59,8 @@ public class ApiTest {
                 .containsExactlyInAnyOrderElementsOf(
                         Arrays.asList(
                                 SykefraværsstatistikkType.LAND.toString(),
-                                SykefraværsstatistikkType.SEKTOR.toString()
+                                SykefraværsstatistikkType.SEKTOR.toString(),
+                                SykefraværsstatistikkType.NÆRING.toString()
                         )
                 );
 
@@ -71,6 +72,12 @@ public class ApiTest {
                 );
         assertThat(alleSykefraværprosentHistorikk.get(1).get("label")).isEqualTo(objectMapper.readTree("\"Statlig forvaltning\""));
         assertThat(alleSykefraværprosentHistorikk.get(1).get("kvartalsvisSykefraværProsent").get(0))
+                .isEqualTo(objectMapper.readTree(
+                        "{\"erMaskert\": false,\"kvartal\": 4,\"årstall\": 2014,\"prosent\": 5.0}"
+                        )
+                );
+        assertThat(alleSykefraværprosentHistorikk.get(2).get("label")).isEqualTo(objectMapper.readTree("\"Statlig forvaltning\""));
+        assertThat(alleSykefraværprosentHistorikk.get(2).get("kvartalsvisSykefraværProsent").get(0))
                 .isEqualTo(objectMapper.readTree(
                         "{\"erMaskert\": false,\"kvartal\": 4,\"årstall\": 2014,\"prosent\": 5.0}"
                         )
