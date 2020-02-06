@@ -60,7 +60,8 @@ public class ApiTest {
                         Arrays.asList(
                                 SykefraværsstatistikkType.LAND.toString(),
                                 SykefraværsstatistikkType.SEKTOR.toString(),
-                                SykefraværsstatistikkType.NÆRING.toString()
+                                SykefraværsstatistikkType.NÆRING.toString(),
+                                SykefraværsstatistikkType.VIRKSOMHET.toString()
                         )
                 );
 
@@ -80,6 +81,12 @@ public class ApiTest {
         assertThat(alleSykefraværprosentHistorikk.get(2).get("kvartalsvisSykefraværProsent").get(0))
                 .isEqualTo(objectMapper.readTree(
                         "{\"erMaskert\": false,\"kvartal\": 1,\"årstall\": 2017,\"prosent\": 5.6}"
+                        )
+                );
+        assertThat(alleSykefraværprosentHistorikk.get(3).get("label")).isEqualTo(objectMapper.readTree("\"NAV ARBEID OG YTELSER AVD OSLO\""));
+        assertThat(alleSykefraværprosentHistorikk.get(3).get("kvartalsvisSykefraværProsent").get(0))
+                .isEqualTo(objectMapper.readTree(
+                        "{\"erMaskert\": false,\"kvartal\": 2,\"årstall\": 2014,\"prosent\": 25.3}"
                         )
                 );
 

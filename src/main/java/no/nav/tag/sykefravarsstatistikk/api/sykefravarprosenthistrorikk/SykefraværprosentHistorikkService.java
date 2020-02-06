@@ -58,49 +58,66 @@ public class SykefraværprosentHistorikkService {
             kvartalsvisSykefraværprosentListe.add(hentKvartalsvisSykefraværprosentHistorikkNæring(underenhet));
         }
 
+        kvartalsvisSykefraværprosentListe.add(hentKvartalsvissSykefraværprosentHistorikkVirksomhet(underenhet));
+
         return kvartalsvisSykefraværprosentListe;
-    }
-
-    private KvartalsvisSykefraværprosentHistorikk hentKvartalsvisSykefraværprosentHistorikkBransje(Bransje bransje) {
-        KvartalsvisSykefraværprosentHistorikk kvartalsvisSykefraværprosentHistorikk = new KvartalsvisSykefraværprosentHistorikk();
-        kvartalsvisSykefraværprosentHistorikk.setSykefraværsstatistikkType(SykefraværsstatistikkType.BRANSJE);
-        kvartalsvisSykefraværprosentHistorikk.setLabel(bransje.getNavn());
-        kvartalsvisSykefraværprosentHistorikk.setKvartalsvisSykefraværProsent(
-                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentBransje(bransje));
-
-        return kvartalsvisSykefraværprosentHistorikk;
-
     }
 
 
     protected KvartalsvisSykefraværprosentHistorikk hentKvartalsvisSykefraværprosentHistorikkLand() {
-        KvartalsvisSykefraværprosentHistorikk kvartalsvisSykefraværprosentHistorikk = new KvartalsvisSykefraværprosentHistorikk();
-
-        kvartalsvisSykefraværprosentHistorikk.setSykefraværsstatistikkType(SykefraværsstatistikkType.LAND);
-        kvartalsvisSykefraværprosentHistorikk.setLabel("Norge");
-        kvartalsvisSykefraværprosentHistorikk.setKvartalsvisSykefraværProsent(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand("Norge"));
-
-        return kvartalsvisSykefraværprosentHistorikk;
+        return byggKvartalsvisSykefraværprosentHistorikk(
+                SykefraværsstatistikkType.LAND,
+                "Norge",
+                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand("Norge")
+        );
     }
 
     protected KvartalsvisSykefraværprosentHistorikk hentKvartalsvisSykefraværprosentHistorikkSektor(Sektor ssbSektor) {
-
-        KvartalsvisSykefraværprosentHistorikk kvartalsvisSykefraværprosentHistorikk = new KvartalsvisSykefraværprosentHistorikk();
-        kvartalsvisSykefraværprosentHistorikk.setSykefraværsstatistikkType(SykefraværsstatistikkType.SEKTOR);
-        kvartalsvisSykefraværprosentHistorikk.setLabel(ssbSektor.getNavn());
-        kvartalsvisSykefraværprosentHistorikk.setKvartalsvisSykefraværProsent(
-                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(ssbSektor));
-
-        return kvartalsvisSykefraværprosentHistorikk;
+        return byggKvartalsvisSykefraværprosentHistorikk(
+                SykefraværsstatistikkType.SEKTOR,
+                ssbSektor.getNavn(),
+                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(ssbSektor)
+        );
     }
 
-    protected KvartalsvisSykefraværprosentHistorikk hentKvartalsvisSykefraværprosentHistorikkNæring(Underenhet underenhet){
+    protected KvartalsvisSykefraværprosentHistorikk hentKvartalsvisSykefraværprosentHistorikkNæring(Underenhet underenhet) {
         Næringskode5Siffer næring5siffer = underenhet.getNæringskode();
         Næring næring = klassifikasjonerRepository.hentNæring(næring5siffer.hentNæringskode2Siffer());
-         KvartalsvisSykefraværprosentHistorikk kvartalsvisSykefraværprosentHistorikk= new KvartalsvisSykefraværprosentHistorikk();
-         kvartalsvisSykefraværprosentHistorikk.setSykefraværsstatistikkType(SykefraværsstatistikkType.NÆRING);
-         kvartalsvisSykefraværprosentHistorikk.setLabel(næring.getNavn());
-         kvartalsvisSykefraværprosentHistorikk.setKvartalsvisSykefraværProsent(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentNæring(næring));
+
+        return byggKvartalsvisSykefraværprosentHistorikk(
+                SykefraværsstatistikkType.NÆRING,
+                næring.getNavn(),
+                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentNæring(næring)
+        );
+    }
+
+    protected KvartalsvisSykefraværprosentHistorikk hentKvartalsvisSykefraværprosentHistorikkBransje(Bransje bransje) {
+        return byggKvartalsvisSykefraværprosentHistorikk(
+                SykefraværsstatistikkType.BRANSJE,
+                bransje.getNavn(),
+                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentBransje(bransje)
+        );
+    }
+
+    protected KvartalsvisSykefraværprosentHistorikk hentKvartalsvissSykefraværprosentHistorikkVirksomhet(Underenhet underenhet) {
+        return byggKvartalsvisSykefraværprosentHistorikk(
+                SykefraværsstatistikkType.VIRKSOMHET,
+                underenhet.getNavn(),
+                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(underenhet)
+        );
+    }
+
+
+    private static KvartalsvisSykefraværprosentHistorikk byggKvartalsvisSykefraværprosentHistorikk(
+            SykefraværsstatistikkType sykefraværsstatistikkType,
+            String label,
+            List<KvartalsvisSykefraværprosent> kvartalsvisSykefraværProsent
+    ) {
+        KvartalsvisSykefraværprosentHistorikk kvartalsvisSykefraværprosentHistorikk = new KvartalsvisSykefraværprosentHistorikk();
+        kvartalsvisSykefraværprosentHistorikk.setSykefraværsstatistikkType(sykefraværsstatistikkType);
+        kvartalsvisSykefraværprosentHistorikk.setLabel(label);
+        kvartalsvisSykefraværprosentHistorikk.setKvartalsvisSykefraværProsent(kvartalsvisSykefraværProsent);
+
         return kvartalsvisSykefraværprosentHistorikk;
     }
 }

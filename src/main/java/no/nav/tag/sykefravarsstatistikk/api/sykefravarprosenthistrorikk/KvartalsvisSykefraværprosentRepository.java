@@ -5,6 +5,7 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværpros
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -29,15 +30,13 @@ public class KvartalsvisSykefraværprosentRepository {
 
     public List<KvartalsvisSykefraværprosent> hentKvartalsvisSykefraværprosentLand(String label) {
         try {
-            List<KvartalsvisSykefraværprosent> resultat = namedParameterJdbcTemplate.query(
+            return namedParameterJdbcTemplate.query(
                     "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal " +
                             "FROM SYKEFRAVAR_STATISTIKK_LAND " +
-                            "ORDER BY arstall, kvartal DESC ",
+                            "ORDER BY arstall, kvartal ",
                     new HashMap<>(),
                     (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs, label)
             );
-            Collections.sort(resultat);
-            return resultat;
         } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();
         }
@@ -45,17 +44,15 @@ public class KvartalsvisSykefraværprosentRepository {
 
     public List<KvartalsvisSykefraværprosent> hentKvartalsvisSykefraværprosentSektor(Sektor sektor) {
         try {
-            List<KvartalsvisSykefraværprosent> resultat = namedParameterJdbcTemplate.query(
+            return namedParameterJdbcTemplate.query(
                     "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal " +
                             "FROM sykefravar_statistikk_sektor " +
                             "where sektor_kode = :sektorKode " +
-                            "ORDER BY arstall, kvartal DESC ",
+                            "ORDER BY arstall, kvartal ",
                     new MapSqlParameterSource()
                             .addValue("sektorKode", sektor.getKode()),
                     (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs, sektor.getNavn())
             );
-            Collections.sort(resultat);
-            return resultat;
         } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();
         }
@@ -63,17 +60,15 @@ public class KvartalsvisSykefraværprosentRepository {
 
     public List<KvartalsvisSykefraværprosent> hentKvartalsvisSykefraværprosentNæring(Næring næring) {
         try {
-            List<KvartalsvisSykefraværprosent> resultat = namedParameterJdbcTemplate.query(
+            return namedParameterJdbcTemplate.query(
                     "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal " +
                             "FROM sykefravar_statistikk_naring " +
                             "where naring_kode = :naringKode " +
-                            "ORDER BY arstall, kvartal DESC ",
+                            "ORDER BY arstall, kvartal ",
                     new MapSqlParameterSource()
                             .addValue("naringKode", næring.getKode()),
                     (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs, næring.getNavn())
             );
-            Collections.sort(resultat);
-            return resultat;
         } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();
         }
@@ -81,18 +76,32 @@ public class KvartalsvisSykefraværprosentRepository {
 
     public List<KvartalsvisSykefraværprosent> hentKvartalsvisSykefraværprosentBransje(Bransje bransje) {
         try {
-            List<KvartalsvisSykefraværprosent> resultat = namedParameterJdbcTemplate.query(
+            return namedParameterJdbcTemplate.query(
                     "SELECT sum(tapte_dagsverk) as tapte_dagsverk, sum(mulige_dagsverk) as mulige_dagsverk, sum(antall_personer) as antall_personer, arstall, kvartal " +
                             "FROM sykefravar_statistikk_naring5siffer " +
                             "where naring_kode in (:naringKoder) " +
                             "group by arstall, kvartal " +
-                            "ORDER BY (arstall, kvartal) DESC ",
+                            "ORDER BY arstall, kvartal ",
                     new MapSqlParameterSource()
                             .addValue("naringKoder", bransje.getKoderSomSpesifisererNæringer()),
                     (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs, bransje.getNavn())
             );
-            Collections.sort(resultat);
-            return resultat;
+        } catch (EmptyResultDataAccessException e) {
+            return Collections.emptyList();
+        }
+    }
+
+    public List<KvartalsvisSykefraværprosent> hentKvartalsvisSykefraværprosentVirksomhet(Underenhet underenhet) {
+        try {
+            return namedParameterJdbcTemplate.query(
+                    "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal " +
+                            "FROM sykefravar_statistikk_virksomhet " +
+                            "where orgnr = :orgnr " +
+                            "ORDER BY arstall, kvartal ",
+                    new MapSqlParameterSource()
+                            .addValue("orgnr", underenhet.getOrgnr().getVerdi()),
+                    (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs, underenhet.getNavn())
+            );
         } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();
         }

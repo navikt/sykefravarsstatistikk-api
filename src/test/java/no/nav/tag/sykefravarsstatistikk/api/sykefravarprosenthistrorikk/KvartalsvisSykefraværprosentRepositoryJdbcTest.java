@@ -1,11 +1,13 @@
 package no.nav.tag.sykefravarsstatistikk.api.sykefravarprosenthistrorikk;
 
-import no.nav.tag.sykefravarsstatistikk.api.TestUtils;
+import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,11 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -194,6 +198,43 @@ public class KvartalsvisSykefraværprosentRepositoryJdbcTest {
     }
 
     @Test
+    public void hentSykefraværprosentVirksomhet__skal_returnere_riktig_sykefravær() {
+        Underenhet barnehage = Underenhet.builder().orgnr(new Orgnr("999999999"))
+                .navn("test Barnehage")
+                .næringskode(new Næringskode5Siffer("88911", "Barnehage"))
+                .antallAnsatte(10)
+                .overordnetEnhetOrgnr(new Orgnr("1111111111")).build();
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(barnehage.getOrgnr(), 2019, 2, 10, 2, 100)
+        );
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(new Orgnr("987654321"), 2019, 1, 10, 3, 100)
+        );
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(barnehage.getOrgnr(), 2018, 4, 10, 5, 100)
+        );
+
+        List<KvartalsvisSykefraværprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(barnehage);
+        assertThat(resultat.size()).isEqualTo(2);
+        assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefraværprosent(
+                        new ÅrstallOgKvartal(2018, 4),
+                        new Sykefraværprosent(
+                                barnehage.getNavn(),
+                                new BigDecimal(5),
+                                new BigDecimal(100),
+                                10
+                        )
+                )
+        );
+    }
+
+    @Test
     public void hentSykefraværprosentLand__maskerer_sf_dersom_antall_ansatte_er_for_lav() {
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
@@ -230,22 +271,17 @@ public class KvartalsvisSykefraværprosentRepositoryJdbcTest {
     }
 
     private MapSqlParameterSource parametre(Sektor sektor, int årstall, int kvartal, int antallPersoner, int tapteDagsverk, int muligeDagsverk) {
-        return new MapSqlParameterSource()
-                .addValue("sektor_kode", sektor.getKode())
-                .addValue("arstall", årstall)
-                .addValue("kvartal", kvartal)
-                .addValue("antall_personer", antallPersoner)
-                .addValue("tapte_dagsverk", tapteDagsverk)
-                .addValue("mulige_dagsverk", muligeDagsverk);
+        return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
+                .addValue("sektor_kode", sektor.getKode());
     }
 
     private MapSqlParameterSource parametre(Næring næring, int årstall, int kvartal, int antallPersoner, int tapteDagsverk, int muligeDagsverk) {
-        return new MapSqlParameterSource()
-                .addValue("naring_kode", næring.getKode())
-                .addValue("arstall", årstall)
-                .addValue("kvartal", kvartal)
-                .addValue("antall_personer", antallPersoner)
-                .addValue("tapte_dagsverk", tapteDagsverk)
-                .addValue("mulige_dagsverk", muligeDagsverk);
+        return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
+                .addValue("naring_kode", næring.getKode());
+    }
+
+    private MapSqlParameterSource parametre(Orgnr orgnr, int årstall, int kvartal, int antallPersoner, int tapteDagsverk, int muligeDagsverk) {
+        return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
+                .addValue("orgnr", orgnr.getVerdi());
     }
 }
