@@ -7,8 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static no.nav.tag.sykefravarsstatistikk.api.CorrelationIdFilter.CORRELATION_ID_MDC_NAME;
 
@@ -26,26 +25,47 @@ public class Sporbarhetslogg {
             String altinnServiceCode,
             String altinnServiceEdition
     ) {
+
+        String version = "CEF:0";
+        String deviceVendor = "sykefravarsstatistikk-api";
+        String deviceProduct = "sporbarhetslogg";
+        String deviceVersion = "1.0";
+        String signatureID = "sykefravarsstatistikk-api:accessed";
+        String name = "sykefravarsstatistikk";
         String severity = harTilgang ? "INFO" : "WARN";
 
-        List<String> statements = new ArrayList<>();
-        statements.add("callId: " + MDC.get(CORRELATION_ID_MDC_NAME));
-        statements.add("fnr: " + innloggetBruker.getFnr().getVerdi());
-        statements.add("Method: " + requestMethod);
-        statements.add("Endpoint: " + requestUrl);
-        statements.add("orgnr: " + orgnr.getVerdi());
-        statements.add("harTilgang: " + harTilgang);
+        List<String> extensions = new ArrayList<>();
+        extensions.add("end=?" /*TODO set end*/);
+        extensions.add("suid=" + innloggetBruker.getFnr().getVerdi());
+        extensions.add("request=" + requestUrl);
+        extensions.add("requestMethod=" + requestMethod);
+        extensions.add("cs3=" + orgnr.getVerdi());
+        extensions.add("cs3Label=OrgNr");
+        extensions.add("flexString1=" + severity);
+        extensions.add("flexString1Label=Decision");
+        // TODO callId?
 
         if (!harTilgang) {
-            String begrunnelse = String.format(
-                    "Bruker har ikke rettigheten i Altinn spesifisert av service code %s og service edition %s",
-                    altinnServiceCode,
-                    altinnServiceEdition
-            );
-            statements.add("Begrunnelse: " + begrunnelse);
+            extensions.add("flexString2=Bruker har ikke rettighet i Altinn");
+            extensions.add("flexString2Label=Begrunnelse");
+            extensions.add("cn1=" + altinnServiceCode);
+            extensions.add("cn1Label=Service Code");
+            extensions.add("cn2=" + altinnServiceEdition);
+            extensions.add("cn2Label=Service Edition");
         }
 
-        String loggmelding = severity + " " + String.join("; ", statements);
+        String extension = String.join(" ", extensions);
+
+        String loggmelding = String.join("|", Arrays.asList(
+                version,
+                deviceVendor,
+                deviceProduct,
+                deviceVersion,
+                signatureID,
+                name,
+                severity,
+                extension
+        ));
 
         if (harTilgang) {
             SPORBARHETSLOGGER.info(loggmelding);
