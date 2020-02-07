@@ -25,6 +25,7 @@ public class Sporbarhetslogg {
             String altinnServiceCode,
             String altinnServiceEdition
     ) {
+        long unixEpochTimestamp = System.currentTimeMillis() / 1000L;
 
         String version = "CEF:0";
         String deviceVendor = "sykefravarsstatistikk-api";
@@ -35,7 +36,7 @@ public class Sporbarhetslogg {
         String severity = harTilgang ? "INFO" : "WARN";
 
         List<String> extensions = new ArrayList<>();
-        extensions.add("end=?" /*TODO set end*/);
+        extensions.add("end=" + unixEpochTimestamp);
         extensions.add("suid=" + innloggetBruker.getFnr().getVerdi());
         extensions.add("request=" + requestUrl);
         extensions.add("requestMethod=" + requestMethod);
@@ -43,7 +44,6 @@ public class Sporbarhetslogg {
         extensions.add("cs3Label=OrgNr");
         extensions.add("flexString1=" + severity);
         extensions.add("flexString1Label=Decision");
-        // TODO callId?
 
         if (!harTilgang) {
             extensions.add("flexString2=Bruker har ikke rettighet i Altinn");
@@ -53,6 +53,8 @@ public class Sporbarhetslogg {
             extensions.add("cn2=" + altinnServiceEdition);
             extensions.add("cn2Label=Service Edition");
         }
+
+        extensions.add("sproc=" +  MDC.get(CORRELATION_ID_MDC_NAME));
 
         String extension = String.join(" ", extensions);
 
