@@ -60,27 +60,38 @@ public class SykefraværprosentHistorikkService {
         Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(enhet.getInstitusjonellSektorkode());
         Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
 
+        boolean erIBransjeprogram =
+                bransje.isPresent()
+                        && bransje.get().lengdePåNæringskoder() == LENGDE_PÅ_NÆRINGSKODE_AV_BRANSJENIVÅ;
+
         List<KvartalsvisSykefraværprosentHistorikk> kvartalsvisSykefraværprosentListe =
                 Stream.of(
-                        feilHåndtertOgTidsbegrensetUthenting(
+                        uthentingMedFeilhåndteringOgTimeout(
                                 () ->
                                         hentKvartalsvisSykefraværprosentHistorikkLand(),
                                 SykefraværsstatistikkType.LAND,
                                 SYKEFRAVÆRPROSENT_LAND_LABEL),
-                        feilHåndtertOgTidsbegrensetUthenting(
+                        uthentingMedFeilhåndteringOgTimeout(
                                 () ->
                                         hentKvartalsvisSykefraværprosentHistorikkSektor(ssbSektor),
                                 SykefraværsstatistikkType.SEKTOR,
                                 ssbSektor.getNavn()),
-                        hentHistoriskkForNæringEllerBransje(underenhet, bransje),
-                        feilHåndtertOgTidsbegrensetUthenting(
+                        erIBransjeprogram ?
+                                uthentingMedFeilhåndteringOgTimeout(
+                                        () ->
+                                                hentKvartalsvisSykefraværprosentHistorikkBransje(bransje.get()),
+                                        SykefraværsstatistikkType.BRANSJE,
+                                        bransje.get().getNavn()
+                                )
+                                : uthentingAvSykefraværprosentHistorikkNæring(underenhet),
+                        uthentingMedFeilhåndteringOgTimeout(
                                 () ->
                                         hentKvartalsvissSykefraværprosentHistorikkVirksomhet(underenhet),
                                 SykefraværsstatistikkType.VIRKSOMHET,
                                 underenhet.getNavn())
                 )
-                .map(CompletableFuture::join)
-                .collect(Collectors.toList());
+                        .map(CompletableFuture::join)
+                        .collect(Collectors.toList());
 
         return kvartalsvisSykefraværprosentListe;
     }
@@ -128,65 +139,48 @@ public class SykefraværprosentHistorikkService {
         );
     }
 
-    private CompletableFuture<KvartalsvisSykefraværprosentHistorikk> hentHistoriskkForNæringEllerBransje(
-            Underenhet underenhet, Optional<Bransje> bransje
-    ) {
-        CompletableFuture<KvartalsvisSykefraværprosentHistorikk> hentNæringEllerBransjeFuture;
+    private CompletableFuture<KvartalsvisSykefraværprosentHistorikk> uthentingAvSykefraværprosentHistorikkNæring(Underenhet underenhet) {
+        Næringskode5Siffer næring5siffer = underenhet.getNæringskode();
+        return uthentingMedTimeout(
+                () -> klassifikasjonerRepository.hentNæring(næring5siffer.hentNæringskode2Siffer())
 
-        if (bransje.isPresent() && bransje.get().lengdePåNæringskoder() == LENGDE_PÅ_NÆRINGSKODE_AV_BRANSJENIVÅ) {
-            hentNæringEllerBransjeFuture =
-                    feilHåndtertOgTidsbegrensetUthenting(
-                            () ->
-                                    hentKvartalsvisSykefraværprosentHistorikkBransje(bransje.get()),
-                            SykefraværsstatistikkType.BRANSJE,
-                            bransje.get().getNavn()
-                    );
-        } else {
-            Næringskode5Siffer næring5siffer = underenhet.getNæringskode();
-            hentNæringEllerBransjeFuture =
-                    tidsbegrensetUthenting(
-                            () -> klassifikasjonerRepository.hentNæring(næring5siffer.hentNæringskode2Siffer())
-
-                    ).thenCompose(
-                            næring ->
-                                    feilHåndtertOgTidsbegrensetUthenting(
-                                            () -> hentKvartalsvisSykefraværprosentHistorikkNæring(næring),
-                                            SykefraværsstatistikkType.NÆRING,
-                                            næring.getNavn()
-                                    )
-                    ).handle(
-                            (result, throwable) -> {
-                                if (throwable == null) {
-                                    return result;
-                                } else {
-                                    log.warn(
-                                            format("Fikk '%s' ved uthenting av næring '%s'. " +
-                                                            "Returnerer en tom liste",
-                                                    throwable.getMessage(),
-                                                    næring5siffer.hentNæringskode2Siffer()
-                                            ),
-                                            throwable
-                                    );
-                                    return byggKvartalsvisSykefraværprosentHistorikk(
-                                            SykefraværsstatistikkType.NÆRING,
-                                            null,
-                                            Collections.EMPTY_LIST
-                                    );
-                                }
-                            }
-
-                    );
-        }
-        return hentNæringEllerBransjeFuture;
+        ).thenCompose(
+                næring ->
+                        uthentingMedFeilhåndteringOgTimeout(
+                                () -> hentKvartalsvisSykefraværprosentHistorikkNæring(næring),
+                                SykefraværsstatistikkType.NÆRING,
+                                næring.getNavn()
+                        )
+        ).handle(
+                (result, throwable) -> {
+                    if (throwable == null) {
+                        return result;
+                    } else {
+                        log.warn(
+                                format("Fikk '%s' ved uthenting av næring '%s'. " +
+                                                "Returnerer en tom liste",
+                                        throwable.getMessage(),
+                                        næring5siffer.hentNæringskode2Siffer()
+                                ),
+                                throwable
+                        );
+                        return byggKvartalsvisSykefraværprosentHistorikk(
+                                SykefraværsstatistikkType.NÆRING,
+                                null,
+                                Collections.EMPTY_LIST
+                        );
+                    }
+                }
+        );
     }
 
-    private static CompletableFuture<Næring> tidsbegrensetUthenting(Supplier<Næring> hentNæringSupplier) {
+    private static CompletableFuture<Næring> uthentingMedTimeout(Supplier<Næring> hentNæringSupplier) {
         return CompletableFuture
                 .supplyAsync(hentNæringSupplier)
                 .orTimeout(TIMEOUT_UTHENTING_FRA_DB_I_SEKUNDER, TimeUnit.SECONDS);
     }
 
-    private static CompletableFuture<KvartalsvisSykefraværprosentHistorikk> feilHåndtertOgTidsbegrensetUthenting(
+    private static CompletableFuture<KvartalsvisSykefraværprosentHistorikk> uthentingMedFeilhåndteringOgTimeout(
             Supplier<KvartalsvisSykefraværprosentHistorikk> kvartalsvisSykefraværprosentHistorikkSupplier,
             SykefraværsstatistikkType sykefraværsstatistikkType,
             String sykefraværprosentHistorikkLabel
