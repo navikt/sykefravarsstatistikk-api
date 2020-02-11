@@ -59,6 +59,8 @@ datavarehus.datasource:
 
 unleash.url: http://unleash.herokuapp.com/api/
 
+nais.cluster.name: local
+
 ---
 
 spring:
