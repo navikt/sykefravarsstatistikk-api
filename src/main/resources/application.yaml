@@ -57,6 +57,8 @@ datavarehus.datasource:
   password:
   driver-class-name: org.h2.Driver
 
+unleash.url: http://unleash.herokuapp.com/api/
+
 ---
 
 spring:
