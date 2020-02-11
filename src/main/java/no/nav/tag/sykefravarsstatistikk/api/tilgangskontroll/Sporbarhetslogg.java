@@ -25,8 +25,6 @@ public class Sporbarhetslogg {
             String altinnServiceCode,
             String altinnServiceEdition
     ) {
-        long unixEpochTimestamp = System.currentTimeMillis() / 1000L;
-
         String version = "CEF:0";
         String deviceVendor = "sykefravarsstatistikk-api";
         String deviceProduct = "sporbarhetslogg";
@@ -36,13 +34,14 @@ public class Sporbarhetslogg {
         String severity = harTilgang ? "INFO" : "WARN";
 
         List<String> extensions = new ArrayList<>();
-        extensions.add("end=" + unixEpochTimestamp);
+        extensions.add("end=" + System.currentTimeMillis());
         extensions.add("suid=" + innloggetBruker.getFnr().getVerdi());
         extensions.add("request=" + requestUrl);
         extensions.add("requestMethod=" + requestMethod);
         extensions.add("cs3=" + orgnr.getVerdi());
         extensions.add("cs3Label=OrgNr");
-        extensions.add("flexString1=" + severity);
+        String decision = harTilgang ? "Permit" : "Deny";
+        extensions.add("flexString1=" + decision);
         extensions.add("flexString1Label=Decision");
 
         if (!harTilgang) {
