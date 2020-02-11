@@ -1,5 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api.feratureToggles;
 
+import no.nav.security.oidc.api.Unprotected;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Unprotected
 @RestController
 public class FeatureToggleController {
     private final FeatureToggleService featureToggleService;
