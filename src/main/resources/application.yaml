@@ -57,6 +57,10 @@ datavarehus.datasource:
   password:
   driver-class-name: org.h2.Driver
 
+unleash.url: http://unleash.herokuapp.com/api/
+
+nais.cluster.name: local
+
 ---
 
 spring:
@@ -141,6 +145,8 @@ datavarehus.datasource:
   password: ${DVH_PASSORD}
   driver-class-name: oracle.jdbc.OracleDriver
 
+unleash.url: https://unleash.nais.adeo.no/api/
+
 ---
 
 spring:
@@ -174,3 +180,5 @@ datavarehus.datasource:
   username: ${DVH_BRUKERNAVN}
   password: ${DVH_PASSORD}
   driver-class-name: oracle.jdbc.OracleDriver
+
+unleash.url: https://unleash.nais.adeo.no/api/
