@@ -7,7 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static no.nav.tag.sykefravarsstatistikk.api.CorrelationIdFilter.CORRELATION_ID_MDC_NAME;
 
@@ -53,7 +55,7 @@ public class Sporbarhetslogg {
             extensions.add("cn2Label=Service Edition");
         }
 
-        extensions.add("sproc=" +  MDC.get(CORRELATION_ID_MDC_NAME));
+        extensions.add("sproc=" + MDC.get(CORRELATION_ID_MDC_NAME));
 
         String extension = String.join(" ", extensions);
 
