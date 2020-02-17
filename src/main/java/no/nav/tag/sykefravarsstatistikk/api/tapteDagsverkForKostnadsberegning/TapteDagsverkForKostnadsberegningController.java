@@ -24,7 +24,7 @@ public class TapteDagsverkForKostnadsberegningController {
     }
 
     @GetMapping(value = "/{orgnr}/tapteDagsverk")
-    public List<TapteDagsverk> tapteDagsverk(
+    public List<KvartalsvisTapteDagsverk> tapteDagsverk(
             @PathVariable("orgnr") String orgnrStr,
             HttpServletRequest request,
             HttpServletResponse response

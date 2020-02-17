@@ -7,6 +7,5 @@ import java.math.BigDecimal;
 @Value
 public class TapteDagsverk {
     private BigDecimal tapteDagsverk;
-    private int årstall;
-    private int kvartal;
+    private boolean erMaskert;
 }

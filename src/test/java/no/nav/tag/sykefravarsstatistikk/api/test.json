@@ -1,0 +1,385 @@
+[
+  {
+    "sykefraværsstatistikkType": "LAND",
+    "label": "Norge",
+    "kvartalsvisSykefraværProsent": [
+      {
+        "årstall": 2014,
+        "kvartal": 4,
+        "prosent": 5.4,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2015,
+        "kvartal": 1,
+        "prosent": 5.4,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2015,
+        "kvartal": 2,
+        "prosent": 4.9,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2015,
+        "kvartal": 3,
+        "prosent": 4.3,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2015,
+        "kvartal": 4,
+        "prosent": 5.1,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2016,
+        "kvartal": 1,
+        "prosent": 5.2,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2016,
+        "kvartal": 2,
+        "prosent": 4.9,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2016,
+        "kvartal": 3,
+        "prosent": 4.2,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2016,
+        "kvartal": 4,
+        "prosent": 5.1,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2017,
+        "kvartal": 1,
+        "prosent": 5.5,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2017,
+        "kvartal": 2,
+        "prosent": 4.9,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2017,
+        "kvartal": 3,
+        "prosent": 4.3,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2017,
+        "kvartal": 4,
+        "prosent": 5.2,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2018,
+        "kvartal": 1,
+        "prosent": 5.6,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2018,
+        "kvartal": 2,
+        "prosent": 4.8,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2018,
+        "kvartal": 3,
+        "prosent": 4.2,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2018,
+        "kvartal": 4,
+        "prosent": 5.1,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2019,
+        "kvartal": 1,
+        "prosent": 5.5,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2019,
+        "kvartal": 2,
+        "prosent": 4.9,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2019,
+        "kvartal": 3,
+        "prosent": 4.3,
+        "erMaskert": false
+      }
+    ]
+  },
+  {
+    "sykefraværsstatistikkType": "SEKTOR",
+    "label": "Privat og offentlig næringsvirksomhet",
+    "kvartalsvisSykefraværProsent": [
+      {
+        "årstall": 2014,
+        "kvartal": 4,
+        "prosent": 4.9,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2015,
+        "kvartal": 1,
+        "prosent": 4.8,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2015,
+        "kvartal": 2,
+        "prosent": 4.4,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2015,
+        "kvartal": 3,
+        "prosent": 4.0,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2015,
+        "kvartal": 4,
+        "prosent": 4.6,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2016,
+        "kvartal": 1,
+        "prosent": 4.7,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2016,
+        "kvartal": 2,
+        "prosent": 4.4,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2016,
+        "kvartal": 3,
+        "prosent": 4.0,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2016,
+        "kvartal": 4,
+        "prosent": 4.7,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2017,
+        "kvartal": 1,
+        "prosent": 4.9,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2017,
+        "kvartal": 2,
+        "prosent": 4.4,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2017,
+        "kvartal": 3,
+        "prosent": 4.0,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2017,
+        "kvartal": 4,
+        "prosent": 4.7,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2018,
+        "kvartal": 1,
+        "prosent": 5.0,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2018,
+        "kvartal": 2,
+        "prosent": 4.3,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2018,
+        "kvartal": 3,
+        "prosent": 3.9,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2018,
+        "kvartal": 4,
+        "prosent": 4.6,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2019,
+        "kvartal": 1,
+        "prosent": 4.9,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2019,
+        "kvartal": 2,
+        "prosent": 4.4,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2019,
+        "kvartal": 3,
+        "prosent": 4.0,
+        "erMaskert": false
+      }
+    ]
+  },
+  {
+    "sykefraværsstatistikkType": "NÆRING",
+    "label": "Arkitektvirksomhet og teknisk konsulentvirksomhet, og teknisk prøving og analyse",
+    "kvartalsvisSykefraværProsent": [
+      {
+        "årstall": 2014,
+        "kvartal": 4,
+        "prosent": 3.1,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2015,
+        "kvartal": 1,
+        "prosent": 2.9,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2015,
+        "kvartal": 2,
+        "prosent": 2.7,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2015,
+        "kvartal": 3,
+        "prosent": 2.5,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2015,
+        "kvartal": 4,
+        "prosent": 3.0,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2016,
+        "kvartal": 1,
+        "prosent": 3.1,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2016,
+        "kvartal": 2,
+        "prosent": 2.8,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2016,
+        "kvartal": 3,
+        "prosent": 2.6,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2016,
+        "kvartal": 4,
+        "prosent": 3.1,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2017,
+        "kvartal": 1,
+        "prosent": 3.2,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2017,
+        "kvartal": 2,
+        "prosent": 2.9,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2017,
+        "kvartal": 3,
+        "prosent": 2.6,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2017,
+        "kvartal": 4,
+        "prosent": 3.1,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2018,
+        "kvartal": 1,
+        "prosent": 3.3,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2018,
+        "kvartal": 2,
+        "prosent": 2.7,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2018,
+        "kvartal": 3,
+        "prosent": 2.5,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2018,
+        "kvartal": 4,
+        "prosent": 3.0,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2019,
+        "kvartal": 1,
+        "prosent": 3.1,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2019,
+        "kvartal": 2,
+        "prosent": 2.8,
+        "erMaskert": false
+      },
+      {
+        "årstall": 2019,
+        "kvartal": 3,
+        "prosent": 2.5,
+        "erMaskert": false
+      }
+    ]
+  },
+  {
+    "sykefraværsstatistikkType": "VIRKSOMHET",
+    "label": "MY LOGISTICS MALAZ ALKOJ",
+    "kvartalsvisSykefraværProsent": []
+  }
+]
