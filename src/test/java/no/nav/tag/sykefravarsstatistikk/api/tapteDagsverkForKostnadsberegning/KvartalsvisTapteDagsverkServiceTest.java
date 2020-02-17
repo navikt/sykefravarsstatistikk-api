@@ -82,4 +82,8 @@ public class KvartalsvisTapteDagsverkServiceTest {
 
               verify(repository, times(1)).hentTapteDagsverkFor4Kvartaler(any(), eq(orgnr));
     }
+    @Test
+    public  void oppsummerTapteDagsverk__skal_ikke_maskere_her(){
+
+    }
 }
