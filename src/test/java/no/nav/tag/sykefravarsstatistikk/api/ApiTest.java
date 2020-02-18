@@ -178,22 +178,26 @@ public class ApiTest {
                 "  {" +
                 "    \"tapteDagsverk\": 154.175982," +
                 "    \"årstall\": 2018," +
-                "    \"kvartal\": 3" +
+                "    \"kvartal\": 3," +
+                "    \"erMaskert\": false"+
                 "  }," +
                 "  {" +
                 "    \"tapteDagsverk\": 195.948185," +
                 "    \"årstall\": 2018," +
-                "    \"kvartal\": 4" +
+                "    \"kvartal\": 4," +
+                "    \"erMaskert\": false"+
                 "  }," +
                 "  {" +
                 "    \"tapteDagsverk\": 251.441100," +
                 "    \"årstall\": 2019," +
-                "    \"kvartal\": 1" +
+                "    \"kvartal\": 1," +
+                "    \"erMaskert\": false"+
                 "  }," +
                 "  {" +
                 "    \"tapteDagsverk\": 240.323100," +
                 "    \"årstall\": 2019," +
-                "    \"kvartal\": 2" +
+                "    \"kvartal\": 2," +
+                "    \"erMaskert\": false"+
                 "  }" +
                 "]"
         );
