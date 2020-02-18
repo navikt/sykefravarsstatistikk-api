@@ -23,6 +23,25 @@ public class TapteDagsverkForKostnadsberegningController {
         this.tilgangskontrollService = tilgangskontrollService;
     }
 
+    @GetMapping(value = "/{orgnr}/oppsummertTapteDagsverk")
+    public TapteDagsverk oppsummertTapteDagsverk(
+            @PathVariable("orgnr") String orgnrStr,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+
+        Orgnr orgnr = new Orgnr(orgnrStr);
+        InnloggetBruker innloggetBruker = tilgangskontrollService.hentInnloggetBruker();
+        tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
+                orgnr,
+                innloggetBruker,
+                request.getMethod(),
+                "" + request.getRequestURL()
+        );
+
+        return service.hentOppsummertTapteDagsverk(orgnr);
+    }
+
     @GetMapping(value = "/{orgnr}/tapteDagsverk")
     public List<KvartalsvisTapteDagsverk> tapteDagsverk(
             @PathVariable("orgnr") String orgnrStr,

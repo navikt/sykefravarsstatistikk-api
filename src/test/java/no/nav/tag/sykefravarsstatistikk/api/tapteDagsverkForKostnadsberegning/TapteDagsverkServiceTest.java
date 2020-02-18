@@ -13,13 +13,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import static no.nav.tag.sykefravarsstatistikk.api.TestData.etOrgnr;
+import static no.nav.tag.sykefravarsstatistikk.api.TestData.testTapteDagsverk;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class KvartalsvisTapteDagsverkServiceTest {
+public class TapteDagsverkServiceTest {
     @Mock
     TapteDagsverkForKostnadsberegningRepository repository;
     private TapteDagsverkService tapteDagsverkService;
@@ -80,10 +82,29 @@ public class KvartalsvisTapteDagsverkServiceTest {
         Orgnr orgnr = etOrgnr();
         tapteDagsverkService.hentOppsummertTapteDagsverk(orgnr);
 
-              verify(repository, times(1)).hentTapteDagsverkFor4Kvartaler(any(), eq(orgnr));
+        verify(repository, times(1)).hentTapteDagsverkFor4Kvartaler(any(), eq(orgnr));
     }
-    @Test
-    public  void oppsummerTapteDagsverk__skal_ikke_maskere_her(){
 
+    @Test
+    public void oppsummerTapteDagsverk__skal_ikke_maskere_her() {
+        List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverkListe = Arrays.asList(
+                testTapteDagsverk(1, 2019, 1, 10),
+                testTapteDagsverk(10, 2019, 2, 10),
+                testTapteDagsverk(100, 2019, 3, 10),
+                testTapteDagsverk(1000, 2018, 4, 10)
+        );
+        assertThat(tapteDagsverkService.oppsummerTapteDagsverk(kvartalsvisTapteDagsverkListe)).isEqualTo(new TapteDagsverk(new BigDecimal(1111).setScale(6), false));
+    }
+
+    @Test
+    public void oppsummerTapteDagsverk__skal_maskere_her() {
+        List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverkListe = Arrays.asList(
+                testTapteDagsverk(1, 2019, 1, 10),
+                testTapteDagsverk(10, 2019, 2, 3),
+                testTapteDagsverk(100, 2019, 3, 10),
+                testTapteDagsverk(1000, 2018, 4, 10)
+        );
+        assertThat(tapteDagsverkService.oppsummerTapteDagsverk(kvartalsvisTapteDagsverkListe)).isEqualTo(new TapteDagsverk(new BigDecimal(0), true));
     }
 }
+
