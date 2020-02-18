@@ -54,7 +54,7 @@ public class TapteDagsverkServiceTest {
     }
 
     @Test
-    public void oppsummerTapteDagsverk__skal_sende_riktige_årstall_og_kvartaler() {
+    public void summerTapteDagsverk__skal_sende_riktige_årstall_og_kvartaler() {
         List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverksListe = Arrays.asList(
                 new KvartalsvisTapteDagsverk(new BigDecimal(100), 2019, 3, 50),
                 new KvartalsvisTapteDagsverk(new BigDecimal(100), 2019, 2, 50),
@@ -67,44 +67,39 @@ public class TapteDagsverkServiceTest {
                 new ÅrstallOgKvartal(2019, 1),
                 new ÅrstallOgKvartal(2018, 4)
         );
-        tapteDagsverkService.hentOppsummertTapteDagsverk(null);
+        tapteDagsverkService.hentSummerTapteDagsverk(null);
 
         verify(repository, times(1)).hentTapteDagsverkFor4Kvartaler(eq(årstallOgKvartal), any());
-        //tapteDagsverkService.oppsummerTapteDagsverk()
-        //TapteDagsverk
-        //tapteDagsverkService.hentTapteDagsverkFraDeSiste4Kvartalene(null);
-
-        //verify(repository, times(1)).hentTapteDagsverkFor4Kvartaler(eq(årstallOgKvartal), any());
     }
 
     @Test
-    public void oppsummerTapteDagsverk__skal_sende_rikitg_underenhet() {
+    public void summerTapteDagsverk__skal_sende_rikitg_underenhet() {
         Orgnr orgnr = etOrgnr();
-        tapteDagsverkService.hentOppsummertTapteDagsverk(orgnr);
+        tapteDagsverkService.hentSummerTapteDagsverk(orgnr);
 
         verify(repository, times(1)).hentTapteDagsverkFor4Kvartaler(any(), eq(orgnr));
     }
 
     @Test
-    public void oppsummerTapteDagsverk__skal_ikke_maskere_her() {
+    public void summerTapteDagsverk__skal_ikke_maskere_når_antall_personer_er_5_eller_mer() {
         List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverkListe = Arrays.asList(
-                testTapteDagsverk(1, 2019, 1, 10),
-                testTapteDagsverk(10, 2019, 2, 10),
+                testTapteDagsverk(1, 2019, 1, 5),
+                testTapteDagsverk(10, 2019, 2, 6),
                 testTapteDagsverk(100, 2019, 3, 10),
-                testTapteDagsverk(1000, 2018, 4, 10)
+                testTapteDagsverk(1000, 2018, 4, 100)
         );
-        assertThat(tapteDagsverkService.oppsummerTapteDagsverk(kvartalsvisTapteDagsverkListe)).isEqualTo(new TapteDagsverk(new BigDecimal(1111).setScale(6), false));
+        assertThat(tapteDagsverkService.summTapteDagsverk(kvartalsvisTapteDagsverkListe)).isEqualTo(new TapteDagsverk(new BigDecimal(1111).setScale(6), false));
     }
 
     @Test
-    public void oppsummerTapteDagsverk__skal_maskere_her() {
+    public void summerTapteDagsverk__skal_maskere_når_en_antall__personer_er_færre_enn_5() {
         List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverkListe = Arrays.asList(
                 testTapteDagsverk(1, 2019, 1, 10),
-                testTapteDagsverk(10, 2019, 2, 3),
+                testTapteDagsverk(10, 2019, 2, 4),
                 testTapteDagsverk(100, 2019, 3, 10),
                 testTapteDagsverk(1000, 2018, 4, 10)
         );
-        assertThat(tapteDagsverkService.oppsummerTapteDagsverk(kvartalsvisTapteDagsverkListe)).isEqualTo(new TapteDagsverk(new BigDecimal(0), true));
+        assertThat(tapteDagsverkService.summTapteDagsverk(kvartalsvisTapteDagsverkListe)).isEqualTo(new TapteDagsverk(new BigDecimal(0), true));
     }
 }
 

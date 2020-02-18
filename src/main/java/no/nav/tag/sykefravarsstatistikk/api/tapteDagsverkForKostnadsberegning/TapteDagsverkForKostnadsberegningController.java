@@ -23,8 +23,8 @@ public class TapteDagsverkForKostnadsberegningController {
         this.tilgangskontrollService = tilgangskontrollService;
     }
 
-    @GetMapping(value = "/{orgnr}/oppsummertTapteDagsverk")
-    public TapteDagsverk oppsummertTapteDagsverk(
+    @GetMapping(value = "/{orgnr}/summerTapteDagsverk")
+    public TapteDagsverk summerTapteDagsverk(
             @PathVariable("orgnr") String orgnrStr,
             HttpServletRequest request,
             HttpServletResponse response
@@ -39,7 +39,7 @@ public class TapteDagsverkForKostnadsberegningController {
                 "" + request.getRequestURL()
         );
 
-        return service.hentOppsummertTapteDagsverk(orgnr);
+        return service.hentSummerTapteDagsverk(orgnr);
     }
 
     @GetMapping(value = "/{orgnr}/tapteDagsverk")

@@ -210,7 +210,7 @@ public class ApiTest {
     public void oppsummertTapteDgsverk__skal_returnere_riktig_object() throws IOException, InterruptedException {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET + "/oppsummertTapteDagsverk"))
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET + "/summerTapteDagsverk"))
                         .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
                         .GET()
                         .build(),
@@ -233,6 +233,19 @@ public class ApiTest {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET_INGEN_TILGANG + "/tapteDagsverk"))
+                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .GET()
+                        .build(),
+                ofString()
+        );
+        assertThat(response.statusCode()).isEqualTo(403);
+        assertThat(response.body()).isEqualTo("{\"message\":\"You don't have access to this ressource\"}");
+    }
+    @Test
+    public void summertapteDgsverk__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
+        HttpResponse<String> response = newBuilder().build().send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET_INGEN_TILGANG + "/summerTapteDagsverk"))
                         .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
                         .GET()
                         .build(),
