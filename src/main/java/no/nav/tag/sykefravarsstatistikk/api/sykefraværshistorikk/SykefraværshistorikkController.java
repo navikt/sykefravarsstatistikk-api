@@ -1,4 +1,4 @@
-package no.nav.tag.sykefravarsstatistikk.api.sykefravarprosenthistrorikk;
+package no.nav.tag.sykefravarsstatistikk.api.sykefraværshistorikk;
 
 import no.nav.security.oidc.api.Protected;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
@@ -13,17 +13,17 @@ import java.util.List;
 
 @Protected
 @RestController
-public class SykefraværprosentHistorikkController {
-    private final SykefraværprosentHistorikkService sykefraværprosentHistorikkService;
+public class SykefraværshistorikkController {
+    private final SykefraværshistorikkService sykefraværshistorikkService;
     private final TilgangskontrollService tilgangskontrollService;
 
-    public SykefraværprosentHistorikkController(SykefraværprosentHistorikkService sykefraværprosentHistorikkService, TilgangskontrollService tilgangskontrollService) {
-        this.sykefraværprosentHistorikkService = sykefraværprosentHistorikkService;
+    public SykefraværshistorikkController(SykefraværshistorikkService sykefraværshistorikkService, TilgangskontrollService tilgangskontrollService) {
+        this.sykefraværshistorikkService = sykefraværshistorikkService;
         this.tilgangskontrollService = tilgangskontrollService;
     }
 
-    @GetMapping(value = "/{orgnr}/sykefravarprosenthistorikk")
-    public List<KvartalsvisSykefraværprosentHistorikk> hentStatistikk(@PathVariable("orgnr") String orgnrStr) {
+    @GetMapping(value = "/{orgnr}/sykefravarshistorikk")
+    public List<Sykefraværshistorikk> hentSykefraværshistorikk(@PathVariable("orgnr") String orgnrStr) {
 
         Orgnr orgnr = new Orgnr(orgnrStr);
         InnloggetBruker innloggetSelvbetjeningBruker = tilgangskontrollService.hentInnloggetBruker();
@@ -32,7 +32,7 @@ public class SykefraværprosentHistorikkController {
             throw new TilgangskontrollException("Har ikke tilgang til statistikk for denne bedriften.");
         }
 
-        return sykefraværprosentHistorikkService.hentKvartalsvisSykefraværprosentHistorikk(orgnr);
+        return sykefraværshistorikkService.hentSykefraværshistorikk(orgnr);
     }
 
 

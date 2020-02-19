@@ -3,7 +3,7 @@ package no.nav.tag.sykefravarsstatistikk.api;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.security.oidc.test.support.JwtTokenGenerator;
-import no.nav.tag.sykefravarsstatistikk.api.sykefravarprosenthistrorikk.SykefraværsstatistikkType;
+import no.nav.tag.sykefravarsstatistikk.api.sykefraværshistorikk.SykefraværshistorikkType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,10 +38,10 @@ public class ApiTest {
 
 
     @Test
-    public void sykefraværprosenthistorikk_sektor___skal_returnere_riktig_objekt() throws Exception {
+    public void sykefraværshistorikk_sektor___skal_returnere_riktig_objekt() throws Exception {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET + "/sykefravarprosenthistorikk"))
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET + "/sykefravarshistorikk"))
                         .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
                         .GET()
                         .build(),
@@ -49,42 +49,42 @@ public class ApiTest {
         );
 
         assertThat(response.statusCode()).isEqualTo(200);
-        JsonNode alleSykefraværprosentHistorikk = objectMapper.readTree(response.body());
+        JsonNode alleSykefraværshistorikk = objectMapper.readTree(response.body());
 
         assertThat(
-                alleSykefraværprosentHistorikk.findValues("sykefraværsstatistikkType")
+                alleSykefraværshistorikk.findValues("type")
                         .stream()
                         .map(v -> v.textValue())
                         .collect(Collectors.toList()))
                 .containsExactlyInAnyOrderElementsOf(
                         Arrays.asList(
-                                SykefraværsstatistikkType.LAND.toString(),
-                                SykefraværsstatistikkType.SEKTOR.toString(),
-                                SykefraværsstatistikkType.NÆRING.toString(),
-                                SykefraværsstatistikkType.VIRKSOMHET.toString()
+                                SykefraværshistorikkType.LAND.toString(),
+                                SykefraværshistorikkType.SEKTOR.toString(),
+                                SykefraværshistorikkType.NÆRING.toString(),
+                                SykefraværshistorikkType.VIRKSOMHET.toString()
                         )
                 );
 
-        assertThat(alleSykefraværprosentHistorikk.get(0).get("label")).isEqualTo(objectMapper.readTree("\"Norge\""));
-        assertThat(alleSykefraværprosentHistorikk.get(0).get("kvartalsvisSykefraværProsent").get(0))
+        assertThat(alleSykefraværshistorikk.get(0).get("label")).isEqualTo(objectMapper.readTree("\"Norge\""));
+        assertThat(alleSykefraværshistorikk.get(0).get("kvartalsvisSykefraværsprosent").get(0))
                 .isEqualTo(objectMapper.readTree(
                         "{\"erMaskert\": false,\"kvartal\": 2,\"årstall\": 2014,\"prosent\": 5.2}"
                         )
                 );
-        assertThat(alleSykefraværprosentHistorikk.get(1).get("label")).isEqualTo(objectMapper.readTree("\"Statlig forvaltning\""));
-        assertThat(alleSykefraværprosentHistorikk.get(1).get("kvartalsvisSykefraværProsent").get(0))
+        assertThat(alleSykefraværshistorikk.get(1).get("label")).isEqualTo(objectMapper.readTree("\"Statlig forvaltning\""));
+        assertThat(alleSykefraværshistorikk.get(1).get("kvartalsvisSykefraværsprosent").get(0))
                 .isEqualTo(objectMapper.readTree(
                         "{\"erMaskert\": false,\"kvartal\": 2,\"årstall\": 2014,\"prosent\": 4.9}"
                         )
                 );
-        assertThat(alleSykefraværprosentHistorikk.get(2).get("label")).isEqualTo(objectMapper.readTree("\"Produksjon av nærings- og nytelsesmidler\""));
-        assertThat(alleSykefraværprosentHistorikk.get(2).get("kvartalsvisSykefraværProsent").get(0))
+        assertThat(alleSykefraværshistorikk.get(2).get("label")).isEqualTo(objectMapper.readTree("\"Produksjon av nærings- og nytelsesmidler\""));
+        assertThat(alleSykefraværshistorikk.get(2).get("kvartalsvisSykefraværsprosent").get(0))
                 .isEqualTo(objectMapper.readTree(
                         "{\"erMaskert\": false,\"kvartal\": 1,\"årstall\": 2017,\"prosent\": 5.6}"
                         )
                 );
-        assertThat(alleSykefraværprosentHistorikk.get(3).get("label")).isEqualTo(objectMapper.readTree("\"NAV ARBEID OG YTELSER AVD OSLO\""));
-        assertThat(alleSykefraværprosentHistorikk.get(3).get("kvartalsvisSykefraværProsent").get(0))
+        assertThat(alleSykefraværshistorikk.get(3).get("label")).isEqualTo(objectMapper.readTree("\"NAV ARBEID OG YTELSER AVD OSLO\""));
+        assertThat(alleSykefraværshistorikk.get(3).get("kvartalsvisSykefraværsprosent").get(0))
                 .isEqualTo(objectMapper.readTree(
                         "{\"erMaskert\": false,\"kvartal\": 2,\"årstall\": 2014,\"prosent\": 25.3}"
                         )
@@ -93,11 +93,11 @@ public class ApiTest {
     }
 
     @Test
-    public void sykefraværprosenthistorikk_sektor__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
+    public void sykefraværshistorikk_sektor__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/"
-                                + ORGNR_UNDERENHET_INGEN_TILGANG + "/sykefravarprosenthistorikk"))
+                                + ORGNR_UNDERENHET_INGEN_TILGANG + "/sykefravarshistorikk"))
                         .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
                         .GET()
                         .build(),
