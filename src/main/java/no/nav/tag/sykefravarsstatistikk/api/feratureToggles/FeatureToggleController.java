@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -29,7 +30,7 @@ public class FeatureToggleController {
     @GetMapping("/feature")
     public ResponseEntity<Map<String, Boolean>> feature(
             @RequestParam("feature") List<String> features,
-            @CookieValue(name = UNLEASH_SESSION_COOKIE_NAME, required = false) String unleashSession,
+            @ApiIgnore @CookieValue(name = UNLEASH_SESSION_COOKIE_NAME, required = false) String unleashSession,
             HttpServletResponse response
     ) {
         String sessionId = unleashSession;
