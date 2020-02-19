@@ -37,7 +37,8 @@ public class TapteDagsverkService {
 
     private TapteDagsverk summTapteDagsverk(List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverksListe) {
 
-        if (kvartalsvisTapteDagsverksListe.size() < 4 ||
+        if (kvartalsvisTapteDagsverksListe == null ||
+                kvartalsvisTapteDagsverksListe.size() != 4 ||
                 kvartalsvisTapteDagsverksListe.stream().anyMatch(kvartalsvisTapteDagsverk -> kvartalsvisTapteDagsverk.isErMaskert())) {
             return new TapteDagsverk(new BigDecimal(0), true);
         }
