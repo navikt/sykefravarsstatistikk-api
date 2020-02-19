@@ -8,19 +8,17 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
 import static no.nav.tag.sykefravarsstatistikk.api.TestData.etOrgnr;
-import static no.nav.tag.sykefravarsstatistikk.api.TestData.testTapteDagsverk;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class TapteDagsverkServiceTest {
+public class KvartalsvisTapteDagsverkServiceTest {
     @Mock
     TapteDagsverkForKostnadsberegningRepository repository;
     private TapteDagsverkService tapteDagsverkService;
@@ -53,52 +51,24 @@ public class TapteDagsverkServiceTest {
     }
 
     @Test
-    public void summerTapteDagsverk__skal_sende_riktige_årstall_og_kvartaler() {
-        List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverksListe = Arrays.asList(
-                new KvartalsvisTapteDagsverk(new BigDecimal(100), 2019, 3, 50),
-                new KvartalsvisTapteDagsverk(new BigDecimal(100), 2019, 2, 50),
-                new KvartalsvisTapteDagsverk(new BigDecimal(100), 2019, 1, 50),
-                new KvartalsvisTapteDagsverk(new BigDecimal(100), 2018, 4, 50)
-        );
+    public void oppsummerTapteDagsverk__skal_sende_riktige_årstall_og_kvartaler() {
         List<ÅrstallOgKvartal> årstallOgKvartal = Arrays.asList(
                 new ÅrstallOgKvartal(2019, 3),
                 new ÅrstallOgKvartal(2019, 2),
                 new ÅrstallOgKvartal(2019, 1),
                 new ÅrstallOgKvartal(2018, 4)
         );
+
         tapteDagsverkService.hentOgSummerTapteDagsverk(null);
+
         verify(repository, times(1)).hentTapteDagsverkFor4Kvartaler(eq(årstallOgKvartal), any());
     }
 
     @Test
-    public void summerTapteDagsverk__skal_sende_rikitg_underenhet() {
+    public void oppsummerTapteDagsverk__skal_sende_rikitg_underenhet() {
         Orgnr orgnr = etOrgnr();
         tapteDagsverkService.hentOgSummerTapteDagsverk(orgnr);
+
         verify(repository, times(1)).hentTapteDagsverkFor4Kvartaler(any(), eq(orgnr));
     }
-
-    @Test
-    public void summerTapteDagsverk__skal_ikke_maskere_når_antall_personer_er_5_eller_mer() {
-        List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverkListe = Arrays.asList(
-                testTapteDagsverk(1, 2019, 1, 5),
-                testTapteDagsverk(10, 2019, 2, 6),
-                testTapteDagsverk(100, 2019, 3, 10),
-                testTapteDagsverk(1000, 2018, 4, 100)
-        );
-        when(repository.hentTapteDagsverkFor4Kvartaler(anyList(), eq(etOrgnr()))).thenReturn(kvartalsvisTapteDagsverkListe);
-        assertThat(tapteDagsverkService.hentOgSummerTapteDagsverk(etOrgnr())).isEqualTo(new TapteDagsverk(new BigDecimal(1111).setScale(6), false));
-    }
-
-    @Test
-    public void summerTapteDagsverk__skal_maskere_når_en_antall__personer_er_færre_enn_5() {
-        List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverkListe = Arrays.asList(
-                testTapteDagsverk(1, 2019, 1, 10),
-                testTapteDagsverk(10, 2019, 2, 4),
-                testTapteDagsverk(100, 2019, 3, 10),
-                testTapteDagsverk(1000, 2018, 4, 10)
-        );
-        when(repository.hentTapteDagsverkFor4Kvartaler(anyList(), eq(etOrgnr()))).thenReturn(kvartalsvisTapteDagsverkListe);
-        assertThat(tapteDagsverkService.hentOgSummerTapteDagsverk(etOrgnr())).isEqualTo(new TapteDagsverk(new BigDecimal(0), true));
-    }
 }
-

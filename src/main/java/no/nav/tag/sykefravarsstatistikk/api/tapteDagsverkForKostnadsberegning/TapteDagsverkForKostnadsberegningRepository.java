@@ -23,7 +23,7 @@ public class TapteDagsverkForKostnadsberegningRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-    public List<TapteDagsverk> hentTapteDagsverkFor4Kvartaler(List<ÅrstallOgKvartal> årstallOgKvartalListe, Orgnr orgnr) {
+    public List<KvartalsvisTapteDagsverk> hentTapteDagsverkFor4Kvartaler(List<ÅrstallOgKvartal> årstallOgKvartalListe, Orgnr orgnr) {
         if (årstallOgKvartalListe.size() != 4) {
             throw new IllegalArgumentException("Kan bare sende inn 4 kvartaler");
         }
@@ -37,7 +37,7 @@ public class TapteDagsverkForKostnadsberegningRepository {
         }
 
         return namedParameterJdbcTemplate.query(
-                "SELECT tapte_dagsverk, kvartal, arstall FROM SYKEFRAVAR_STATISTIKK_VIRKSOMHET where orgnr=:orgnr and " +
+                "SELECT tapte_dagsverk, kvartal, arstall,antall_personer FROM SYKEFRAVAR_STATISTIKK_VIRKSOMHET where orgnr=:orgnr and " +
                         "((ARSTALL = :arstall1 and kvartal = :kvartal1) or " +
                         "(ARSTALL = :arstall2 and kvartal = :kvartal2) or " +
                         "(ARSTALL = :arstall3 and kvartal = :kvartal3) or " +
@@ -47,11 +47,12 @@ public class TapteDagsverkForKostnadsberegningRepository {
         );
     }
 
-    private TapteDagsverk mapTilTapteDagsverk(ResultSet rs) throws SQLException {
-        return new TapteDagsverk(
+    private KvartalsvisTapteDagsverk mapTilTapteDagsverk(ResultSet rs) throws SQLException {
+        return new KvartalsvisTapteDagsverk(
                 rs.getBigDecimal("tapte_dagsverk"),
                 rs.getInt("arstall"),
-                rs.getInt("kvartal")
+                rs.getInt("kvartal"),
+                rs.getInt("antall_personer")
         );
     }
 

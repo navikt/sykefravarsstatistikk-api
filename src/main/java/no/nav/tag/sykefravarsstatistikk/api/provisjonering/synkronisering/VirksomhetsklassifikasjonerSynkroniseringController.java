@@ -17,7 +17,7 @@ public class VirksomhetsklassifikasjonerSynkroniseringController {
     private final VirksomhetsklassifikasjonerSynkroniseringService service;
 
     @Autowired
-    public VirksomhetsklassifikasjonerSynkroniseringController(VirksomhetsklassifikasjonerSynkroniseringService service){
+    public VirksomhetsklassifikasjonerSynkroniseringController(VirksomhetsklassifikasjonerSynkroniseringService service) {
         this.service = service;
     }
 

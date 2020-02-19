@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("db-test")
 @RunWith(SpringRunner.class)
 @DataJdbcTest
-public class TapteDagsverkForKostnadsberegningRepositoryTest {
+public class KvartalsvisTapteDagsverkForKostnadsberegningRepositoryTest {
 
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;

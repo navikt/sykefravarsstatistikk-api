@@ -74,7 +74,7 @@ public class SykefraværsstatistikkLandUtilsJdbcTest {
     }
 
     @Test
-    public void deleteFunction_apply__skal_slette_data_i_lokale_sykefraværstatistikk_tabellen(){
+    public void deleteFunction_apply__skal_slette_data_i_lokale_sykefraværstatistikk_tabellen() {
         lagreSykefraværprosentLand(namedParameterJdbcTemplate, 2018, 3);
         lagreSykefraværprosentLand(namedParameterJdbcTemplate, 2018, 4);
         lagreSykefraværprosentLand(namedParameterJdbcTemplate, 2019, 1);

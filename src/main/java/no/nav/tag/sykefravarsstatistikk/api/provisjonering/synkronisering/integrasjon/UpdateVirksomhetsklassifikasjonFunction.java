@@ -2,4 +2,5 @@ package no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integ
 
 @FunctionalInterface
 public interface UpdateVirksomhetsklassifikasjonFunction<T> {
-    int apply(T t1, T t2);}
+    int apply(T t1, T t2);
+}

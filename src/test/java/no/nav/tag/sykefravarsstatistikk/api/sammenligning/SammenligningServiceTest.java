@@ -24,12 +24,18 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SammenligningServiceTest {
-    @Mock SammenligningRepository sammenligningRepository;
-    @Mock EnhetsregisteretClient enhetsregisteretClient;
-    @Mock SektorMappingService sektorMappingService;
-    @Mock KlassifikasjonerRepository klassifikasjonerRepository;
-    @Mock ApplicationEventPublisher eventPublisher;
-    @Mock Bransjeprogram bransjeprogram;
+    @Mock
+    SammenligningRepository sammenligningRepository;
+    @Mock
+    EnhetsregisteretClient enhetsregisteretClient;
+    @Mock
+    SektorMappingService sektorMappingService;
+    @Mock
+    KlassifikasjonerRepository klassifikasjonerRepository;
+    @Mock
+    ApplicationEventPublisher eventPublisher;
+    @Mock
+    Bransjeprogram bransjeprogram;
 
     private SammenligningService sammenligningService;
 

@@ -178,22 +178,26 @@ public class ApiTest {
                 "  {" +
                 "    \"tapteDagsverk\": 154.175982," +
                 "    \"årstall\": 2018," +
-                "    \"kvartal\": 3" +
+                "    \"kvartal\": 3," +
+                "    \"erMaskert\": false" +
                 "  }," +
                 "  {" +
                 "    \"tapteDagsverk\": 195.948185," +
                 "    \"årstall\": 2018," +
-                "    \"kvartal\": 4" +
+                "    \"kvartal\": 4," +
+                "    \"erMaskert\": false" +
                 "  }," +
                 "  {" +
                 "    \"tapteDagsverk\": 251.441100," +
                 "    \"årstall\": 2019," +
-                "    \"kvartal\": 1" +
+                "    \"kvartal\": 1," +
+                "    \"erMaskert\": false" +
                 "  }," +
                 "  {" +
                 "    \"tapteDagsverk\": 240.323100," +
                 "    \"årstall\": 2019," +
-                "    \"kvartal\": 2" +
+                "    \"kvartal\": 2," +
+                "    \"erMaskert\": false" +
                 "  }" +
                 "]"
         );
@@ -203,10 +207,46 @@ public class ApiTest {
     }
 
     @Test
+    public void oppsummertTapteDgsverk__skal_returnere_riktig_object() throws IOException, InterruptedException {
+        HttpResponse<String> response = newBuilder().build().send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET + "/summerTapteDagsverk"))
+                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .GET()
+                        .build(),
+                ofString()
+        );
+        JsonNode ønsketResponseJson = objectMapper.readTree(
+                "  {" +
+                        "    \"tapteDagsverk\": 841.888367," +
+                        "    \"erMaskert\": false" +
+                        "  }"
+        );
+
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(objectMapper.readTree(response.body())).isEqualTo(ønsketResponseJson);
+    }
+
+
+    @Test
     public void tapteDgsverk__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET_INGEN_TILGANG + "/tapteDagsverk"))
+                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .GET()
+                        .build(),
+                ofString()
+        );
+        assertThat(response.statusCode()).isEqualTo(403);
+        assertThat(response.body()).isEqualTo("{\"message\":\"You don't have access to this ressource\"}");
+    }
+
+    @Test
+    public void summertapteDgsverk__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
+        HttpResponse<String> response = newBuilder().build().send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET_INGEN_TILGANG + "/summerTapteDagsverk"))
                         .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
                         .GET()
                         .build(),

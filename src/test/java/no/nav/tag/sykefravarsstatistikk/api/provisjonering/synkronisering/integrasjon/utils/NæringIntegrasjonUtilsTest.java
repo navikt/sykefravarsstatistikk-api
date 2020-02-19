@@ -47,7 +47,7 @@ public class NæringIntegrasjonUtilsTest {
 
 
     @Test
-    public void createFunction_apply__skal_lagre_data_i_lokale_næring_tabellen(){
+    public void createFunction_apply__skal_lagre_data_i_lokale_næring_tabellen() {
         CreateVirksomhetsklassifikasjonFunction createFunction = utils.getCreateFunction();
 
         createFunction.apply(new Næring("01", "Jordbruk"));
@@ -58,7 +58,7 @@ public class NæringIntegrasjonUtilsTest {
     }
 
     @Test
-    public void fetchFunction_apply__skal_hente_data_i_lokale_næring_tabellen(){
+    public void fetchFunction_apply__skal_hente_data_i_lokale_næring_tabellen() {
         opprettNæring(namedParameterJdbcTemplate, "01", "Jordbruk");
         FetchVirksomhetsklassifikasjonFunction fetchFunction = utils.getFetchFunction();
 
@@ -69,7 +69,7 @@ public class NæringIntegrasjonUtilsTest {
     }
 
     @Test
-    public void updateFunction_apply__skal_oppdatere_data_i_lokale_næring_tabellen(){
+    public void updateFunction_apply__skal_oppdatere_data_i_lokale_næring_tabellen() {
         opprettNæring(namedParameterJdbcTemplate, "01", "Jordbruk");
         UpdateVirksomhetsklassifikasjonFunction updateFunction = utils.getUpdateFunction();
 

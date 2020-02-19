@@ -16,7 +16,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -62,7 +61,8 @@ public class AltinnClient {
                     uri,
                     HttpMethod.GET,
                     getHeaderEntity(),
-                    new ParameterizedTypeReference<List<AltinnOrganisasjon>>() {}
+                    new ParameterizedTypeReference<List<AltinnOrganisasjon>>() {
+                    }
             ).getBody());
 
             if (respons.isPresent()) {
@@ -90,7 +90,8 @@ public class AltinnClient {
                     uri,
                     HttpMethod.GET,
                     getHeaderEntity(),
-                    new ParameterizedTypeReference<List<AltinnRolle>>() {}
+                    new ParameterizedTypeReference<List<AltinnRolle>>() {
+                    }
             ).getBody());
 
             if (respons.isPresent()) {

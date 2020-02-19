@@ -22,7 +22,8 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class FeatureToggleControllerTest {
 
-    @Mock HttpServletResponse response;
+    @Mock
+    HttpServletResponse response;
     @Mock
     FeatureToggleService featureToggleService;
 
@@ -53,7 +54,7 @@ public class FeatureToggleControllerTest {
     @Test
     public void feature__skal_returnere_respons_fra_service() {
         List<String> features = Arrays.asList("darkMode", "nightMode");
-        Map<String, Boolean> toggles = new HashMap<>(){{
+        Map<String, Boolean> toggles = new HashMap<>() {{
             put("darkMode", true);
             put("nightMode", false);
         }};

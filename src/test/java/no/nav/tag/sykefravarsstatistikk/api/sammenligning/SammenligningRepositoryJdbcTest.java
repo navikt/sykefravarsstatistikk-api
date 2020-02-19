@@ -19,8 +19,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.math.BigDecimal;
 
 import static no.nav.tag.sykefravarsstatistikk.api.TestData.*;
-import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.insertStatistikkForVirksomhet;
+import static no.nav.tag.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static no.nav.tag.sykefravarsstatistikk.api.sammenligning.SammenligningRepository.NORGE;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
@@ -69,7 +69,7 @@ public class SammenligningRepositoryJdbcTest {
                 "insert into sykefravar_statistikk_sektor " +
                         "(sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES ( :sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(2018, 1, 5,8, 23).addValue("sektor_kode", "1")
+                parametre(2018, 1, 5, 8, 23).addValue("sektor_kode", "1")
         );
         Sektor sektor = enSektor();
         Sykefraværprosent resultat = repository.hentSykefraværprosentSektor(2018, 1, sektor);
@@ -86,7 +86,7 @@ public class SammenligningRepositoryJdbcTest {
     public void hentSykefraværprosentNæring__skal_returnere_riktig_sykefravær() {
         Næring næring = new Næring("74123", "Spesiell næring");
 
-        insertStatistikkForNæring2siffer("74123", 2017, 3, 10,56, 2051);
+        insertStatistikkForNæring2siffer("74123", 2017, 3, 10, 56, 2051);
 
         Sykefraværprosent resultat = repository.hentSykefraværprosentNæring(2017, 3, næring);
 
@@ -120,8 +120,8 @@ public class SammenligningRepositoryJdbcTest {
     @Test
     public void hentSykefraværprosentBransje__skal_summere_opp_næringer_på_2siffernivå_hvis_bransjen_spesifiseres_av_2sifferkoder() {
         Bransje bransje = new Bransje("bransje", "01", "02");
-        insertStatistikkForNæring2siffer("01", 2017, 3, 10,10, 1000);
-        insertStatistikkForNæring2siffer("02", 2017, 3, 20,30, 2000);
+        insertStatistikkForNæring2siffer("01", 2017, 3, 10, 10, 1000);
+        insertStatistikkForNæring2siffer("02", 2017, 3, 20, 30, 2000);
 
         Sykefraværprosent resultat = repository.hentSykefraværprosentBransje(2017, 3, bransje);
 
@@ -131,8 +131,8 @@ public class SammenligningRepositoryJdbcTest {
     @Test
     public void hentSykefraværprosentBransje__skal_summere_opp_næringer_på_5siffernivå_hvis_bransjen_spesifiseres_av_5sifferkoder() {
         Bransje bransje = new Bransje("bransje", "11111", "22222");
-        insertStatistikkForNæring5siffer("11111", 2017, 3, 10,10, 1000);
-        insertStatistikkForNæring5siffer("22222", 2017, 3, 20,30, 2000);
+        insertStatistikkForNæring5siffer("11111", 2017, 3, 10, 10, 1000);
+        insertStatistikkForNæring5siffer("22222", 2017, 3, 20, 30, 2000);
 
         Sykefraværprosent resultat = repository.hentSykefraværprosentBransje(2017, 3, bransje);
 
@@ -144,7 +144,7 @@ public class SammenligningRepositoryJdbcTest {
                 "insert into sykefravar_statistikk_naring " +
                         "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(årstall, kvartal, antallPersoner,tapteDagsverk, muligeDagsverk)
+                parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
                         .addValue("naring_kode", næringskode2siffer)
         );
     }
@@ -154,7 +154,7 @@ public class SammenligningRepositoryJdbcTest {
                 "insert into sykefravar_statistikk_naring5siffer " +
                         "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(årstall, kvartal, antallPersoner,tapteDagsverk, muligeDagsverk)
+                parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
                         .addValue("naring_kode", næringskode5siffer)
         );
     }

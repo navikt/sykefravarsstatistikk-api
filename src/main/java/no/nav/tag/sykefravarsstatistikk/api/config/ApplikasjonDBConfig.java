@@ -38,8 +38,7 @@ public class ApplikasjonDBConfig {
     @Bean(name = "sykefravarsstatistikkJdbcTemplate")
     public NamedParameterJdbcTemplate sykefravarsstatistikkJdbcTemplate(
             @Qualifier("sykefravarsstatistikkDataSource") DataSource dataSource
-    )
-    {
+    ) {
         return new NamedParameterJdbcTemplate(dataSource);
     }
 

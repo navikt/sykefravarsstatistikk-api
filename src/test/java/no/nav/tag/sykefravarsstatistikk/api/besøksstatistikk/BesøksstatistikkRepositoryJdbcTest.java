@@ -133,7 +133,7 @@ public class BesøksstatistikkRepositoryJdbcTest {
                 new MapSqlParameterSource(),
                 Integer.class
         );
-        return antallRader == null? 0 : antallRader;
+        return antallRader == null ? 0 : antallRader;
     }
 
     private static AltinnRolle altinnRolle(String definitionId, String name) {

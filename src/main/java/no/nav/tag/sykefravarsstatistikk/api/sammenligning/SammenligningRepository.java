@@ -5,7 +5,6 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværpros
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -29,8 +28,7 @@ public class SammenligningRepository {
 
     public SammenligningRepository(
             @Qualifier("sykefravarsstatistikkJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
-    )
-    {
+    ) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
@@ -87,10 +85,10 @@ public class SammenligningRepository {
     }
 
     public Sykefraværprosent hentSykefraværprosentBransje(int årstall, int kvartal, Bransje bransje) {
-            MapSqlParameterSource namedParameters = new MapSqlParameterSource()
-                    .addValue(ÅRSTALL, årstall)
-                    .addValue(KVARTAL, kvartal)
-                    .addValue(NÆRING, bransje.getKoderSomSpesifisererNæringer());
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue(ÅRSTALL, årstall)
+                .addValue(KVARTAL, kvartal)
+                .addValue(NÆRING, bransje.getKoderSomSpesifisererNæringer());
 
         if (bransje.lengdePåNæringskoder() == 2) {
             return queryForSykefraværsprosentOgHåndterHvisIngenResultat(

@@ -1,6 +1,5 @@
 package no.nav.tag.sykefravarsstatistikk.api.sammenligning;
 
-import lombok.extern.slf4j.Slf4j;
 import no.nav.metrics.MetricsFactory;
 import no.nav.metrics.Timer;
 import no.nav.security.oidc.api.Protected;

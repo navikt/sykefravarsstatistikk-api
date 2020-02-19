@@ -7,7 +7,7 @@ import java.util.Comparator;
 
 @Data
 @AllArgsConstructor
-public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal>{
+public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
     private final int årstall;
     private final int kvartal;
 

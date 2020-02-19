@@ -9,12 +9,13 @@ import java.math.BigDecimal;
 import java.util.Comparator;
 
 @Data
-public class KvartalsvisSykefraværprosent implements Comparable<KvartalsvisSykefraværprosent>{
+public class KvartalsvisSykefraværprosent implements Comparable<KvartalsvisSykefraværprosent> {
 
     @JsonIgnore
     private final ÅrstallOgKvartal årstallOgKvartal;
     @JsonIgnore
     private final Sykefraværprosent sykefraværprosent;
+
     public KvartalsvisSykefraværprosent(
             ÅrstallOgKvartal årstallOgKvartal,
             Sykefraværprosent sykefraværprosent
@@ -42,7 +43,6 @@ public class KvartalsvisSykefraværprosent implements Comparable<KvartalsvisSyke
     public boolean isErMaskert() {
         return sykefraværprosent.isErMaskert();
     }
-
 
 
     private KvartalsvisSykefraværprosent() {

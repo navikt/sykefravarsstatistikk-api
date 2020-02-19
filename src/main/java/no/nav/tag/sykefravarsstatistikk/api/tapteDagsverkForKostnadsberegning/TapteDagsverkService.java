@@ -2,10 +2,10 @@ package no.nav.tag.sykefravarsstatistikk.api.tapteDagsverkForKostnadsberegning;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
-import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,8 +25,24 @@ public class TapteDagsverkService {
         this.tapteDagsverkForKostnadsberegningRepository = tapteDagsverkForKostnadsberegningRepository;
     }
 
-    public List<TapteDagsverk> hentTapteDagsverkFraDeSiste4Kvartalene(Orgnr orgnr) {
+    public TapteDagsverk hentOgSummerTapteDagsverk(Orgnr orgnr) {
+        return summTapteDagsverk(
+                hentTapteDagsverkFraDeSiste4Kvartalene(orgnr)
+        );
+    }
+
+    public List<KvartalsvisTapteDagsverk> hentTapteDagsverkFraDeSiste4Kvartalene(Orgnr orgnr) {
         return tapteDagsverkForKostnadsberegningRepository.hentTapteDagsverkFor4Kvartaler(hentDe4SisteTilgjengeligeKvartalene(), orgnr);
+    }
+
+    private TapteDagsverk summTapteDagsverk(List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverksListe) {
+        if (kvartalsvisTapteDagsverksListe.stream().anyMatch(kvartalsvisTapteDagsverk -> kvartalsvisTapteDagsverk.isErMaskert())) {
+            return new TapteDagsverk(new BigDecimal(0), true);
+        }
+        return new TapteDagsverk(kvartalsvisTapteDagsverksListe
+                .stream()
+                .map(KvartalsvisTapteDagsverk::getTapteDagsverk)
+                .reduce(BigDecimal.ZERO, BigDecimal::add), false);
     }
 
     private List<ÅrstallOgKvartal> hentDe4SisteTilgjengeligeKvartalene() {
