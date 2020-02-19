@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
-@Profile({ "dev", "prod" })
+@Profile({"dev", "prod"})
 public class SensuConfig {
     public SensuConfig() {
         String miljø = System.getenv("NAIS_CLUSTER_NAME");

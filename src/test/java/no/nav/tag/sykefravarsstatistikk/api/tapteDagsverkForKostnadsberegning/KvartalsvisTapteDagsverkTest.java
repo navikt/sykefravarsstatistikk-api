@@ -39,20 +39,4 @@ class KvartalsvisTapteDagsverkTest {
         KvartalsvisTapteDagsverk kvartalsvisTapteDagsverk_3 = new KvartalsvisTapteDagsverk(new BigDecimal(100), 2019, 2, 3);
         assertEquals(kvartalsvisTapteDagsverk_3.isErMaskert(), true);
     }
-
-    @Test
-    void getAntallPersoner__skal_ikke_være_maskert_når_antall_personer_er_5_eller_mer() {
-        KvartalsvisTapteDagsverk kvartalsvisTapteDagsverk = new KvartalsvisTapteDagsverk(new BigDecimal(100), 2019, 2, 5);
-        assertEquals(kvartalsvisTapteDagsverk.getAntallPersoner(), Integer.valueOf(5));
-        KvartalsvisTapteDagsverk kvartalsvisTapteDagsverk_6 = new KvartalsvisTapteDagsverk(new BigDecimal(100), 2019, 2, 6);
-        assertEquals(kvartalsvisTapteDagsverk_6.getAntallPersoner(), Integer.valueOf(6));
-    }
-
-    @Test
-    void getAntallPersoner__skal_være_maskert_når_antall_personer_er_4_eller_færre() {
-        KvartalsvisTapteDagsverk kvartalsvisTapteDagsverk = new KvartalsvisTapteDagsverk(new BigDecimal(100), 2019, 2, 4);
-        assertEquals(kvartalsvisTapteDagsverk.getAntallPersoner(), null);
-        KvartalsvisTapteDagsverk kvartalsvisTapteDagsverk_3 = new KvartalsvisTapteDagsverk(new BigDecimal(100), 2019, 2, 3);
-        assertEquals(kvartalsvisTapteDagsverk_3.getAntallPersoner(), null);
-    }
 }

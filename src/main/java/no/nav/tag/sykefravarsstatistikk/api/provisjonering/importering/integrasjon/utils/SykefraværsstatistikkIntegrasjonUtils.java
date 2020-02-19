@@ -9,6 +9,7 @@ import java.util.List;
 public interface SykefraværsstatistikkIntegrasjonUtils {
 
     DeleteSykefraværsstatistikkFunction getDeleteFunction();
+
     BatchCreateSykefraværsstatistikkFunction getBatchCreateFunction(List<? extends Sykefraværsstatistikk> list);
 
 }

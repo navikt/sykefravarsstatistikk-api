@@ -17,9 +17,9 @@ public class SwaggerConfig {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
-          .select()
-          .apis(withClassAnnotation(RestController.class))
-          .paths(PathSelectors.any())
-          .build();
+                .select()
+                .apis(withClassAnnotation(RestController.class))
+                .paths(PathSelectors.any())
+                .build();
     }
 }

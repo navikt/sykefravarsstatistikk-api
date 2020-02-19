@@ -18,9 +18,8 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.Optional;
-
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -140,7 +139,7 @@ public class BesøksstatistikkRepository {
                         .addValue("ar", år)
                         .addValue("uke", uke),
                 keyHolder,
-                new String[] { "id" }
+                new String[]{"id"}
         );
 
         int uniktBesøkId = keyHolder.getKey().intValue();

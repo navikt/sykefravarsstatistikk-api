@@ -11,6 +11,7 @@ import java.util.Map;
 @Component
 public class SektorMappingService {
     private static final Map<String, String> mapFraSSBSektorKodeTilInstitusjonellSektorkode;
+
     static {
         Map<String, String> map = new HashMap<>();
         map.put("1110", "3");
@@ -53,10 +54,14 @@ public class SektorMappingService {
 
     private String hentLabel(String kode) {
         switch (kode) {
-            case "1": return "Statlig forvaltning";
-            case "2": return "Kommunal forvaltning";
-            case "3": return "Privat og offentlig næringsvirksomhet";
-            default: return "Ukjent";
+            case "1":
+                return "Statlig forvaltning";
+            case "2":
+                return "Kommunal forvaltning";
+            case "3":
+                return "Privat og offentlig næringsvirksomhet";
+            default:
+                return "Ukjent";
         }
     }
 }

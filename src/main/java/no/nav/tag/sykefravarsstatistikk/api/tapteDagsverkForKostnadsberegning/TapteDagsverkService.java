@@ -25,7 +25,7 @@ public class TapteDagsverkService {
         this.tapteDagsverkForKostnadsberegningRepository = tapteDagsverkForKostnadsberegningRepository;
     }
 
-    public TapteDagsverk hentSummerTapteDagsverk(Orgnr orgnr) {
+    public TapteDagsverk hentOgSummerTapteDagsverk(Orgnr orgnr) {
         return summTapteDagsverk(
                 hentTapteDagsverkFraDeSiste4Kvartalene(orgnr)
         );
@@ -35,7 +35,7 @@ public class TapteDagsverkService {
         return tapteDagsverkForKostnadsberegningRepository.hentTapteDagsverkFor4Kvartaler(hentDe4SisteTilgjengeligeKvartalene(), orgnr);
     }
 
-    public TapteDagsverk summTapteDagsverk(List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverksListe) {
+    private TapteDagsverk summTapteDagsverk(List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverksListe) {
         if (kvartalsvisTapteDagsverksListe.stream().anyMatch(kvartalsvisTapteDagsverk -> kvartalsvisTapteDagsverk.isErMaskert())) {
             return new TapteDagsverk(new BigDecimal(0), true);
         }

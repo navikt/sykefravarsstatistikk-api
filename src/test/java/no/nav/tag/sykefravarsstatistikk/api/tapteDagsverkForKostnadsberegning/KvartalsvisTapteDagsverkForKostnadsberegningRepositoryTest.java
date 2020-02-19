@@ -48,10 +48,10 @@ public class KvartalsvisTapteDagsverkForKostnadsberegningRepositoryTest {
         Orgnr orgnr = etOrgnr();
 
         List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverkListe = Arrays.asList(
-                testTapteDagsverk(1, 2019, 1,10),
-                testTapteDagsverk(10, 2019, 2,10),
-                testTapteDagsverk(100, 2019, 3,10),
-                testTapteDagsverk(1000, 2018, 4,10)
+                testTapteDagsverk(1, 2019, 1, 10),
+                testTapteDagsverk(10, 2019, 2, 10),
+                testTapteDagsverk(100, 2019, 3, 10),
+                testTapteDagsverk(1000, 2018, 4, 10)
         );
 
 
@@ -96,9 +96,9 @@ public class KvartalsvisTapteDagsverkForKostnadsberegningRepositoryTest {
         Orgnr orgnr = underenhet.getOrgnr();
 
         List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverkListe = Arrays.asList(
-                testTapteDagsverk(1, 2019, 1,10),
-                testTapteDagsverk(10, 2019, 2,10),
-                testTapteDagsverk(1000, 2018, 4,10)
+                testTapteDagsverk(1, 2019, 1, 10),
+                testTapteDagsverk(10, 2019, 2, 10),
+                testTapteDagsverk(1000, 2018, 4, 10)
         );
 
         insertTapteDagsverk(orgnr, kvartalsvisTapteDagsverkListe);
@@ -120,17 +120,17 @@ public class KvartalsvisTapteDagsverkForKostnadsberegningRepositoryTest {
         Orgnr orgnr2 = new Orgnr("222222222");
 
         List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverkOrgnr1 = Arrays.asList(
-                testTapteDagsverk(1, 2018, 1,10),
-                testTapteDagsverk(1, 2018, 2,10),
-                testTapteDagsverk(1, 2018, 3,10),
-                testTapteDagsverk(1, 2018, 4,10)
+                testTapteDagsverk(1, 2018, 1, 10),
+                testTapteDagsverk(1, 2018, 2, 10),
+                testTapteDagsverk(1, 2018, 3, 10),
+                testTapteDagsverk(1, 2018, 4, 10)
         );
 
         List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverkOrgnr2 = Arrays.asList(
-                testTapteDagsverk(2, 2018, 1,7),
-                testTapteDagsverk(2, 2018, 2,7),
-                testTapteDagsverk(2, 2018, 3,7),
-                testTapteDagsverk(2, 2018, 4,7)
+                testTapteDagsverk(2, 2018, 1, 7),
+                testTapteDagsverk(2, 2018, 2, 7),
+                testTapteDagsverk(2, 2018, 3, 7),
+                testTapteDagsverk(2, 2018, 4, 7)
         );
 
         insertTapteDagsverk(orgnr1, kvartalsvisTapteDagsverkOrgnr1);
@@ -152,17 +152,17 @@ public class KvartalsvisTapteDagsverkForKostnadsberegningRepositoryTest {
         Orgnr orgnr = new Orgnr("111111111");
 
         List<KvartalsvisTapteDagsverk> riktigeKvartalsvisTapteDagsverk = Arrays.asList(
-                testTapteDagsverk(100, 2018, 1,10),
-                testTapteDagsverk(100, 2018, 2,10),
-                testTapteDagsverk(100, 2018, 3,10),
-                testTapteDagsverk(100, 2018, 4,10)
+                testTapteDagsverk(100, 2018, 1, 10),
+                testTapteDagsverk(100, 2018, 2, 10),
+                testTapteDagsverk(100, 2018, 3, 10),
+                testTapteDagsverk(100, 2018, 4, 10)
         );
 
         List<KvartalsvisTapteDagsverk> feilKvartalsvisTapteDagsverk = Arrays.asList(
-                testTapteDagsverk(200, 2019, 1,7),
-                testTapteDagsverk(200, 2019, 2,7),
-                testTapteDagsverk(200, 2019, 3,7),
-                testTapteDagsverk(200, 2019, 4,7)
+                testTapteDagsverk(200, 2019, 1, 7),
+                testTapteDagsverk(200, 2019, 2, 7),
+                testTapteDagsverk(200, 2019, 3, 7),
+                testTapteDagsverk(200, 2019, 4, 7)
         );
 
         insertTapteDagsverk(orgnr, riktigeKvartalsvisTapteDagsverk);

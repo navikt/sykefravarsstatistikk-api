@@ -48,7 +48,7 @@ public class SykefraværsstatistikkNæringUtilsJdbcTest {
 
 
     @Test
-    public void createFunction_apply__skal_lagre_data_i_lokale_sykefraværstatistikk_tabellen(){
+    public void createFunction_apply__skal_lagre_data_i_lokale_sykefraværstatistikk_tabellen() {
         List<SykefraværsstatistikkNæring> list = new ArrayList<>();
         list.add(
                 new SykefraværsstatistikkNæring(
@@ -64,8 +64,8 @@ public class SykefraværsstatistikkNæringUtilsJdbcTest {
         utils.getBatchCreateFunction(list).apply();
 
         List<Sykefraværprosent> resultList = hentSykefraværprosentNæring(namedParameterJdbcTemplate);
-        assertThat(resultList .size()).isEqualTo(1);
-        assertThat(resultList .get(0)).isEqualTo(
+        assertThat(resultList.size()).isEqualTo(1);
+        assertThat(resultList.get(0)).isEqualTo(
                 new Sykefraværprosent(
                         LABEL,
                         new BigDecimal(55.123),
@@ -76,7 +76,7 @@ public class SykefraværsstatistikkNæringUtilsJdbcTest {
     }
 
     @Test
-    public void createFunction_delete__skal_slette_data_i_lokale_sykefraværstatistikk_tabellen(){
+    public void createFunction_delete__skal_slette_data_i_lokale_sykefraværstatistikk_tabellen() {
         lagreSykefraværprosentNæring(namedParameterJdbcTemplate, "01", 2018, 3);
         lagreSykefraværprosentNæring(namedParameterJdbcTemplate, "02", 2018, 3);
         lagreSykefraværprosentNæring(namedParameterJdbcTemplate, "01", 2018, 4);

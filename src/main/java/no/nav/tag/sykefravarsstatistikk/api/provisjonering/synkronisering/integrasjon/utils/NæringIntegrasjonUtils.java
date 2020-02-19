@@ -14,7 +14,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 public class NæringIntegrasjonUtils extends VirksomhetsklassifikasjonIntegrasjon
-    implements VirksomhetsklassifikasjonIntegrasjonUtils {
+        implements VirksomhetsklassifikasjonIntegrasjonUtils {
 
 
     public NæringIntegrasjonUtils(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {

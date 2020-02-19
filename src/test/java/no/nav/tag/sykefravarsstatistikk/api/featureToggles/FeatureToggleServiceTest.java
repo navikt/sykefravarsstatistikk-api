@@ -20,7 +20,8 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class FeatureToggleServiceTest {
 
-    @Mock private Unleash unleash;
+    @Mock
+    private Unleash unleash;
 
     private FeatureToggleService featureToggleService;
 

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Component
 public class TilgangskontrollUtils {
-    
+
     final static String ISSUER_ISSO = "isso";
     final static String ISSUER_SELVBETJENING = "selvbetjening";
 

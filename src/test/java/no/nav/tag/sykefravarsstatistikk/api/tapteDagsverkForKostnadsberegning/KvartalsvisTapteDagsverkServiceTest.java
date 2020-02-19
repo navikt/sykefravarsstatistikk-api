@@ -49,6 +49,7 @@ public class KvartalsvisTapteDagsverkServiceTest {
 
         verify(repository, times(1)).hentTapteDagsverkFor4Kvartaler(any(), eq(orgnr));
     }
+
     @Test
     public void oppsummerTapteDagsverk__skal_sende_riktige_årstall_og_kvartaler() {
         List<ÅrstallOgKvartal> årstallOgKvartal = Arrays.asList(
@@ -58,16 +59,16 @@ public class KvartalsvisTapteDagsverkServiceTest {
                 new ÅrstallOgKvartal(2018, 4)
         );
 
-        //tapteDagsverkService.hentTapteDagsverkFraDeSiste4Kvartalene(null);
+        tapteDagsverkService.hentOgSummerTapteDagsverk(null);
 
-        //verify(repository, times(1)).hentTapteDagsverkFor4Kvartaler(eq(årstallOgKvartal), any());
+        verify(repository, times(1)).hentTapteDagsverkFor4Kvartaler(eq(årstallOgKvartal), any());
     }
 
     @Test
     public void oppsummerTapteDagsverk__skal_sende_rikitg_underenhet() {
         Orgnr orgnr = etOrgnr();
-//        tapteDagsverkService.hentTapteDagsverkFraDeSiste4Kvartalene(orgnr);
+        tapteDagsverkService.hentOgSummerTapteDagsverk(orgnr);
 
-  //      verify(repository, times(1)).hentTapteDagsverkFor4Kvartaler(any(), eq(orgnr));
+        verify(repository, times(1)).hentTapteDagsverkFor4Kvartaler(any(), eq(orgnr));
     }
 }

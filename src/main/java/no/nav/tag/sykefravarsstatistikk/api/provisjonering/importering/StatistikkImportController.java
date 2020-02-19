@@ -21,7 +21,7 @@ public class StatistikkImportController {
     private final StatistikkImportService service;
 
     @Autowired
-    public StatistikkImportController(StatistikkImportService service){
+    public StatistikkImportController(StatistikkImportService service) {
         this.service = service;
     }
 

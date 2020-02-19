@@ -147,7 +147,7 @@ public class TestData {
     }
 
     public static KvartalsvisTapteDagsverk testTapteDagsverk(int tapteDagsverk, int årstall, int kvartal, int antallPersoner) {
-        return new KvartalsvisTapteDagsverk(new BigDecimal(tapteDagsverk).setScale(6), årstall, kvartal,antallPersoner);
+        return new KvartalsvisTapteDagsverk(new BigDecimal(tapteDagsverk).setScale(6), årstall, kvartal, antallPersoner);
     }
 
     public static Sykefraværprosent enSykefraværprosent() {

@@ -241,6 +241,7 @@ public class ApiTest {
         assertThat(response.statusCode()).isEqualTo(403);
         assertThat(response.body()).isEqualTo("{\"message\":\"You don't have access to this ressource\"}");
     }
+
     @Test
     public void summertapteDgsverk__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
         HttpResponse<String> response = newBuilder().build().send(

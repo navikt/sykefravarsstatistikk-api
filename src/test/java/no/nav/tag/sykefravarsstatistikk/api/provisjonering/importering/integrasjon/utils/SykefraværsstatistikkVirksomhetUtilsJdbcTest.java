@@ -49,7 +49,7 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
 
 
     @Test
-    public void createFunction_apply__skal_lagre_data_i_lokale_sykefraværstatistikk_tabellen(){
+    public void createFunction_apply__skal_lagre_data_i_lokale_sykefraværstatistikk_tabellen() {
 
         List<SykefraværsstatistikkVirksomhet> list = new ArrayList<>();
         list.add(new SykefraværsstatistikkVirksomhet(
@@ -77,7 +77,7 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
     }
 
     @Test
-    public void createFunction_apply__ytelsestest(){
+    public void createFunction_apply__ytelsestest() {
         utils.getBatchCreateFunction(createStatistikk(1000)).apply();
 
         List<Sykefraværprosent> resultList = hentSykefraværprosentVirksomhet(namedParameterJdbcTemplate);
@@ -86,7 +86,7 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
 
 
     @Test
-    public void createFunction_delete__skal_slette_data_i_lokale_sykefraværstatistikk_tabellen(){
+    public void createFunction_delete__skal_slette_data_i_lokale_sykefraværstatistikk_tabellen() {
         lagreSykefraværprosentVirksomhet(namedParameterJdbcTemplate, "987654321", 2018, 3);
         lagreSykefraværprosentVirksomhet(namedParameterJdbcTemplate, "987654321", 2018, 4);
         lagreSykefraværprosentVirksomhet(namedParameterJdbcTemplate, "987654321", 2019, 1);

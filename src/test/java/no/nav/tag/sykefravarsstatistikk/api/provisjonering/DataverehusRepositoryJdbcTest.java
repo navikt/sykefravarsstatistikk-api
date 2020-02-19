@@ -5,7 +5,6 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.Sykefraværsstatis
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkVirksomhet;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
-import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppering;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.junit.After;
 import org.junit.Before;
@@ -55,7 +54,7 @@ public class DataverehusRepositoryJdbcTest {
 
     @Test
     public void hentSykefraværsstatistikkSektor__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 1,5, 100);
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 1, 5, 100);
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, 10, 100);
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
 
@@ -184,7 +183,7 @@ public class DataverehusRepositoryJdbcTest {
                         + "values (:naringkode, :nargrpkode, :naringnavn)",
                 naringParams);
     }
-    
+
     private static void insertNæringsgrupperingInDvhTabell(
             NamedParameterJdbcTemplate jdbcTemplate,
             String næringkode,

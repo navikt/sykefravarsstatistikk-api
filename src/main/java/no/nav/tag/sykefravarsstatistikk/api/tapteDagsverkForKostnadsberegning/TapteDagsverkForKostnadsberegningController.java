@@ -39,7 +39,7 @@ public class TapteDagsverkForKostnadsberegningController {
                 "" + request.getRequestURL()
         );
 
-        return service.hentSummerTapteDagsverk(orgnr);
+        return service.hentOgSummerTapteDagsverk(orgnr);
     }
 
     @GetMapping(value = "/{orgnr}/tapteDagsverk")

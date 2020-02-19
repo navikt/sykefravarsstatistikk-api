@@ -17,8 +17,7 @@ import static no.nav.tag.sykefravarsstatistikk.api.TestData.testTapteDagsverk;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TapteDagsverkServiceTest {
@@ -67,16 +66,14 @@ public class TapteDagsverkServiceTest {
                 new ÅrstallOgKvartal(2019, 1),
                 new ÅrstallOgKvartal(2018, 4)
         );
-        tapteDagsverkService.hentSummerTapteDagsverk(null);
-
+        tapteDagsverkService.hentOgSummerTapteDagsverk(null);
         verify(repository, times(1)).hentTapteDagsverkFor4Kvartaler(eq(årstallOgKvartal), any());
     }
 
     @Test
     public void summerTapteDagsverk__skal_sende_rikitg_underenhet() {
         Orgnr orgnr = etOrgnr();
-        tapteDagsverkService.hentSummerTapteDagsverk(orgnr);
-
+        tapteDagsverkService.hentOgSummerTapteDagsverk(orgnr);
         verify(repository, times(1)).hentTapteDagsverkFor4Kvartaler(any(), eq(orgnr));
     }
 
@@ -88,7 +85,8 @@ public class TapteDagsverkServiceTest {
                 testTapteDagsverk(100, 2019, 3, 10),
                 testTapteDagsverk(1000, 2018, 4, 100)
         );
-        assertThat(tapteDagsverkService.summTapteDagsverk(kvartalsvisTapteDagsverkListe)).isEqualTo(new TapteDagsverk(new BigDecimal(1111).setScale(6), false));
+        when(repository.hentTapteDagsverkFor4Kvartaler(anyList(), eq(etOrgnr()))).thenReturn(kvartalsvisTapteDagsverkListe);
+        assertThat(tapteDagsverkService.hentOgSummerTapteDagsverk(etOrgnr())).isEqualTo(new TapteDagsverk(new BigDecimal(1111).setScale(6), false));
     }
 
     @Test
@@ -99,7 +97,8 @@ public class TapteDagsverkServiceTest {
                 testTapteDagsverk(100, 2019, 3, 10),
                 testTapteDagsverk(1000, 2018, 4, 10)
         );
-        assertThat(tapteDagsverkService.summTapteDagsverk(kvartalsvisTapteDagsverkListe)).isEqualTo(new TapteDagsverk(new BigDecimal(0), true));
+        when(repository.hentTapteDagsverkFor4Kvartaler(anyList(), eq(etOrgnr()))).thenReturn(kvartalsvisTapteDagsverkListe);
+        assertThat(tapteDagsverkService.hentOgSummerTapteDagsverk(etOrgnr())).isEqualTo(new TapteDagsverk(new BigDecimal(0), true));
     }
 }
 

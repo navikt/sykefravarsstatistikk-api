@@ -7,7 +7,9 @@ import no.nav.tag.sykefravarsstatistikk.api.provisjonering.synkronisering.integr
 public interface VirksomhetsklassifikasjonIntegrasjonUtils {
 
     FetchVirksomhetsklassifikasjonFunction getFetchFunction();
+
     CreateVirksomhetsklassifikasjonFunction getCreateFunction();
+
     UpdateVirksomhetsklassifikasjonFunction getUpdateFunction();
 
 }

@@ -27,7 +27,7 @@ public class SammenligningVerifikasjonController {
     private final KlassifikasjonerRepository klassifikasjonerRepository;
 
     @Autowired
-    public SammenligningVerifikasjonController(SammenligningRepository sykefravarprosentRepository, KlassifikasjonerRepository klassifikasjonerRepository){
+    public SammenligningVerifikasjonController(SammenligningRepository sykefravarprosentRepository, KlassifikasjonerRepository klassifikasjonerRepository) {
         this.sykefravarprosentRepository = sykefravarprosentRepository;
         this.klassifikasjonerRepository = klassifikasjonerRepository;
     }
