@@ -1,14 +1,13 @@
 package no.nav.tag.sykefravarsstatistikk.api.sykefraværshistorikk;
 
 import no.nav.security.oidc.api.Protected;
-import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
-import no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
 import no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Protected
@@ -23,17 +22,19 @@ public class SykefraværshistorikkController {
     }
 
     @GetMapping(value = "/{orgnr}/sykefravarshistorikk")
-    public List<Sykefraværshistorikk> hentSykefraværshistorikk(@PathVariable("orgnr") String orgnrStr) {
+    public List<Sykefraværshistorikk> hentSykefraværshistorikk(
+            @PathVariable("orgnr") String orgnrStr,
+            HttpServletRequest request
+    ) {
 
         Orgnr orgnr = new Orgnr(orgnrStr);
-        InnloggetBruker innloggetSelvbetjeningBruker = tilgangskontrollService.hentInnloggetBruker();
 
-        if (!innloggetSelvbetjeningBruker.harTilgang(orgnr)) {
-            throw new TilgangskontrollException("Har ikke tilgang til statistikk for denne bedriften.");
-        }
+        tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
+                orgnr,
+                request.getMethod(),
+                "" + request.getRequestURL()
+        );
 
         return sykefraværshistorikkService.hentSykefraværshistorikk(orgnr);
     }
-
-
 }
