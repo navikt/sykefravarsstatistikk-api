@@ -1,4 +1,4 @@
-package no.nav.tag.sykefravarsstatistikk.api.sykefravarprosenthistrorikk;
+package no.nav.tag.sykefravarsstatistikk.api.sykefraværshistorikk;
 
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjeprogram;
@@ -28,10 +28,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SykefraværprosentHistorikkServiceTest {
+public class SykefraværshistorikkServiceTest {
 
     @Mock
-    private KvartalsvisSykefraværprosentRepository kvartalsvisSykefraværprosentRepository;
+    private KvartalsvisSykefraværsprosentRepository kvartalsvisSykefraværprosentRepository;
     @Mock
     private EnhetsregisteretClient enhetsregisteretClient;
     @Mock
@@ -42,7 +42,7 @@ public class SykefraværprosentHistorikkServiceTest {
     private Bransjeprogram bransjeprogram;
 
     @InjectMocks
-    SykefraværprosentHistorikkService sykefraværprosentHistorikkService;
+    SykefraværshistorikkService sykefraværshistorikkService;
 
     @Before
     public void setUp() {
@@ -82,24 +82,24 @@ public class SykefraværprosentHistorikkServiceTest {
     }
 
     @Test
-    public void hentKvartalsvisSykefraværprosentHistorikk_skal_ikke_feile_dersom_uthenting_av_en_type_data_feiler() {
+    public void hentSykefraværshistorikk_skal_ikke_feile_dersom_uthenting_av_en_type_data_feiler() {
         when(klassifikasjonerRepository.hentNæring(any()))
                 .thenThrow(new EmptyResultDataAccessException(1));
 
-        List<KvartalsvisSykefraværprosentHistorikk> kvartalsvisSykefraværprosentHistorikk =
-                sykefraværprosentHistorikkService.hentKvartalsvisSykefraværprosentHistorikk(
+        List<Sykefraværshistorikk> sykefraværshistorikk =
+                sykefraværshistorikkService.hentSykefraværshistorikk(
                         new Orgnr("999999998")
                 );
 
         verify(kvartalsvisSykefraværprosentRepository, times(0))
                 .hentKvartalsvisSykefraværprosentNæring(any());
-        KvartalsvisSykefraværprosentHistorikk næringSFHistorikk = kvartalsvisSykefraværprosentHistorikk.get(2);
+        Sykefraværshistorikk næringSFHistorikk = sykefraværshistorikk.get(2);
         assertThat(næringSFHistorikk.getLabel()).isNull();
     }
 
 
-    private static KvartalsvisSykefraværprosent sykefraværprosent(String label) {
-        return new KvartalsvisSykefraværprosent(
+    private static KvartalsvisSykefraværsprosent sykefraværprosent(String label) {
+        return new KvartalsvisSykefraværsprosent(
                 new ÅrstallOgKvartal(2019, 1),
                 new Sykefraværprosent(label, new BigDecimal(50), new BigDecimal(100), 10));
     }

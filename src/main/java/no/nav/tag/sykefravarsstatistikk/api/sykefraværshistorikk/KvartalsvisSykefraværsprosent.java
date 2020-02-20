@@ -1,4 +1,4 @@
-package no.nav.tag.sykefravarsstatistikk.api.sykefravarprosenthistrorikk;
+package no.nav.tag.sykefravarsstatistikk.api.sykefraværshistorikk;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
@@ -9,14 +9,14 @@ import java.math.BigDecimal;
 import java.util.Comparator;
 
 @Data
-public class KvartalsvisSykefraværprosent implements Comparable<KvartalsvisSykefraværprosent> {
+public class KvartalsvisSykefraværsprosent implements Comparable<KvartalsvisSykefraværsprosent> {
 
     @JsonIgnore
     private final ÅrstallOgKvartal årstallOgKvartal;
     @JsonIgnore
     private final Sykefraværprosent sykefraværprosent;
 
-    public KvartalsvisSykefraværprosent(
+    public KvartalsvisSykefraværsprosent(
             ÅrstallOgKvartal årstallOgKvartal,
             Sykefraværprosent sykefraværprosent
     ) {
@@ -24,8 +24,8 @@ public class KvartalsvisSykefraværprosent implements Comparable<KvartalsvisSyke
         this.sykefraværprosent = sykefraværprosent;
     }
 
-    public static KvartalsvisSykefraværprosent tomKvartalsvisSykefraværprosent() {
-        return new KvartalsvisSykefraværprosent();
+    public static KvartalsvisSykefraværsprosent tomKvartalsvisSykefraværprosent() {
+        return new KvartalsvisSykefraværsprosent();
     }
 
     public int getKvartal() {
@@ -45,16 +45,16 @@ public class KvartalsvisSykefraværprosent implements Comparable<KvartalsvisSyke
     }
 
 
-    private KvartalsvisSykefraværprosent() {
+    private KvartalsvisSykefraværsprosent() {
         this.årstallOgKvartal = null;
         this.sykefraværprosent = null;
     }
 
 
     @Override
-    public int compareTo(KvartalsvisSykefraværprosent kvartalsvisSykefraværprosent) {
+    public int compareTo(KvartalsvisSykefraværsprosent kvartalsvisSykefraværsprosent) {
         return Comparator
-                .comparing(KvartalsvisSykefraværprosent::getÅrstallOgKvartal)
-                .compare(this, kvartalsvisSykefraværprosent);
+                .comparing(KvartalsvisSykefraværsprosent::getÅrstallOgKvartal)
+                .compare(this, kvartalsvisSykefraværsprosent);
     }
 }
