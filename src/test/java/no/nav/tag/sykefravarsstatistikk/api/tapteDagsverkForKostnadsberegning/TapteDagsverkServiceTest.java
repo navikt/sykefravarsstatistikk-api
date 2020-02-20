@@ -1,5 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api.tapteDagsverkForKostnadsberegning;
 
+import net.bytebuddy.implementation.bytecode.Throw;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import org.junit.Before;
@@ -90,7 +91,7 @@ public class TapteDagsverkServiceTest {
     }
 
     @Test
-    public void summerTapteDagsverk__skal_maskere_når_en_antall__personer_er_færre_enn_5() {
+    public void summerTapteDagsverk__skal_maskere_når_antall__personer_er_færre_enn_5() {
         List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverkListe = Arrays.asList(
                 testTapteDagsverk(1, 2019, 1, 10),
                 testTapteDagsverk(10, 2019, 2, 4),
@@ -100,5 +101,46 @@ public class TapteDagsverkServiceTest {
         when(repository.hentTapteDagsverkFor4Kvartaler(anyList(), eq(etOrgnr()))).thenReturn(kvartalsvisTapteDagsverkListe);
         assertThat(tapteDagsverkService.hentOgSummerTapteDagsverk(etOrgnr())).isEqualTo(new TapteDagsverk(new BigDecimal(0), true));
     }
+
+    @Test
+    public void summerTapteDagsverk__skal_maskere_når_repository_retunerer_3_rader() {
+        List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverkListe = Arrays.asList(
+                testTapteDagsverk(1, 2019, 1, 10),
+                testTapteDagsverk(100, 2019, 3, 10),
+                testTapteDagsverk(1000, 2018, 4, 10)
+        );
+        when(repository.hentTapteDagsverkFor4Kvartaler(anyList(), eq(etOrgnr()))).thenReturn(kvartalsvisTapteDagsverkListe);
+        assertThat(tapteDagsverkService.hentOgSummerTapteDagsverk(etOrgnr())).isEqualTo(new TapteDagsverk(new BigDecimal(0), true));
+    }
+    @Test
+    public void summerTapteDagsverk__skal_maskere_når_repository_retunerer_5_rader() {
+        List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverkListe = Arrays.asList(
+                testTapteDagsverk(1, 2019, 1, 10),
+                testTapteDagsverk(1, 2019, 2, 10),
+                testTapteDagsverk(1, 2018, 4, 10),
+                testTapteDagsverk(100, 2019, 3, 10),
+                testTapteDagsverk(1000, 2018, 4, 10)
+        );
+        when(repository.hentTapteDagsverkFor4Kvartaler(anyList(), eq(etOrgnr()))).thenReturn(kvartalsvisTapteDagsverkListe);
+        assertThat(tapteDagsverkService.hentOgSummerTapteDagsverk(etOrgnr())).isEqualTo(new TapteDagsverk(new BigDecimal(0), true));
+    }
+
+    @Test
+    public void summerTapteDagsverk__skal_maskere_når_repository_retunerer_1_rad() {
+        List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverkListe = Arrays.asList(
+                testTapteDagsverk(10, 2019, 2, 4)
+        );
+        when(repository.hentTapteDagsverkFor4Kvartaler(anyList(), eq(etOrgnr()))).thenReturn(kvartalsvisTapteDagsverkListe);
+        assertThat(tapteDagsverkService.hentOgSummerTapteDagsverk(etOrgnr())).isEqualTo(new TapteDagsverk(new BigDecimal(0), true));
+    }
+    @Test
+    public void summerTapteDagsverk__skal_maskere_når_repository_retunerer_tom_list_0_rad() {
+        List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverkListe = Arrays.asList(
+        );
+        when(repository.hentTapteDagsverkFor4Kvartaler(anyList(), eq(etOrgnr()))).thenReturn(kvartalsvisTapteDagsverkListe);
+        assertThat(tapteDagsverkService.hentOgSummerTapteDagsverk(etOrgnr())).isEqualTo(new TapteDagsverk(new BigDecimal(0), true));
+    }
+
+
 }
 
