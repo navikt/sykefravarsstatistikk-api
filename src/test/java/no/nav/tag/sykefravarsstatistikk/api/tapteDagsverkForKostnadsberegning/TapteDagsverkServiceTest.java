@@ -1,6 +1,5 @@
 package no.nav.tag.sykefravarsstatistikk.api.tapteDagsverkForKostnadsberegning;
 
-import net.bytebuddy.implementation.bytecode.Throw;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import org.junit.Before;
@@ -112,6 +111,7 @@ public class TapteDagsverkServiceTest {
         when(repository.hentTapteDagsverkFor4Kvartaler(anyList(), eq(etOrgnr()))).thenReturn(kvartalsvisTapteDagsverkListe);
         assertThat(tapteDagsverkService.hentOgSummerTapteDagsverk(etOrgnr())).isEqualTo(new TapteDagsverk(new BigDecimal(0), true));
     }
+
     @Test
     public void summerTapteDagsverk__skal_maskere_når_repository_retunerer_5_rader() {
         List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverkListe = Arrays.asList(
@@ -133,6 +133,7 @@ public class TapteDagsverkServiceTest {
         when(repository.hentTapteDagsverkFor4Kvartaler(anyList(), eq(etOrgnr()))).thenReturn(kvartalsvisTapteDagsverkListe);
         assertThat(tapteDagsverkService.hentOgSummerTapteDagsverk(etOrgnr())).isEqualTo(new TapteDagsverk(new BigDecimal(0), true));
     }
+
     @Test
     public void summerTapteDagsverk__skal_maskere_når_repository_retunerer_tom_list_0_rad() {
         List<KvartalsvisTapteDagsverk> kvartalsvisTapteDagsverkListe = Arrays.asList(
