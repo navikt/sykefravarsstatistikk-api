@@ -1,0 +1,17 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Alert"
+metadata:
+  name: sykefravarsstatistikk-api-alert
+  labels:
+    team: arbeidsgiver
+spec:
+  receivers:
+    slack:
+      channel: '#arbeidsgiver-notifications-test'
+      prependText: 'test '
+  alerts:
+    - alert: applikasjon nede
+      expr: up{app="sykefravarsstatistikk-api", job="kubernetes-pods"} == 0
+      for: 30s
+      description: "{{ $labels.app }} er nede"
+      action: "`kubectl describe pod {{ $labels.kubernetes_pod_name }}` for events, og `kubectl logs {{ $labels.kubernetes_pod_name }}` for logger"
