@@ -49,9 +49,9 @@ public class FeatureToggleController {
 
     }
 
-    @GetMapping("/testfeil")
-    public ResponseEntity<Object> responseEntityFeilLogger(){
-        logger.error("Uhåndtert feil for test error logg");
+    @GetMapping("/testfeillogger")
+    public ResponseEntity<Object> testFeilLogger(){
+        logger.error("Test feil for test error logg");
         return null;
     }
 

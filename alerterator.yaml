@@ -1,9 +1,9 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Alert"
 metadata:
-  name: sykefravarsstatistikk-api-alert
+  name: sykefravarsstatistikk-api-alert-test
   labels:
-    team: arbeidsgiver
+    team: teamtag
 spec:
   receivers:
     slack:
@@ -16,8 +16,8 @@ spec:
       description: "{{ $labels.app }} er nede"
       action: "`kubectl describe pod {{ $labels.kubernetes_pod_name }}` for events, og `kubectl logs {{ $labels.kubernetes_pod_name }}` for logger"
 
-    - alert: høy feilrate i logger for sykefraværsstatistikk-api
+    - alert: det har skjedd en feil i sykefraværsstatistikk-api
       expr: sum(increase(logd_messages_total{log_app="sykefravarsstatistikk-api",log_level="Error"}[3m]))> 0
-      for: 3m
-      description: "{{ $labels.app }} har logget en feil"
+      for: 30s
+      description: "{{ $labels.log_app }} har logget en feil"
       action: "`kubectl describe pod {{ $labels.kubernetes_pod_name }}` for events, og `kubectl logs {{ $labels.kubernetes_pod_name }}` for logger"
