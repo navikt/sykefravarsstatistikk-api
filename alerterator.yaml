@@ -7,11 +7,17 @@ metadata:
 spec:
   receivers:
     slack:
-      channel: '#arbeidsgiver-notifications-test'
-      prependText: 'test '
+      channel: '#arbeidsgiver-teamia-utvikling'
+      prependText: '<!here> | '
   alerts:
     - alert: applikasjon nede
       expr: up{app="sykefravarsstatistikk-api", job="kubernetes-pods"} == 0
-      for: 30s
+      for: 2m
       description: "{{ $labels.app }} er nede"
+      action: "`kubectl describe pod {{ $labels.kubernetes_pod_name }}` for events, og `kubectl logs {{ $labels.kubernetes_pod_name }}` for logger"
+
+    - alert: høy feilrate i logger for sykefraværsstatistikk-api
+      expr: sum(increase(logd_messages_total{log_app="sykefravarsstatistikk-api",log_level="Error"}[3m]))> 0
+      for: 3m
+      description: "{{ $labels.app }} har logget en feil"
       action: "`kubectl describe pod {{ $labels.kubernetes_pod_name }}` for events, og `kubectl logs {{ $labels.kubernetes_pod_name }}` for logger"
