@@ -1,8 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api.feratureToggles;
 
 import no.nav.security.oidc.api.Unprotected;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +8,6 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.Cookie;
@@ -25,7 +22,7 @@ public class FeatureToggleController {
     private final FeatureToggleService featureToggleService;
     private final String UNLEASH_SESSION_COOKIE_NAME = "unleash-session";
 
-    private static Logger logger = LoggerFactory.getLogger(ResponseEntityExceptionHandler.class);
+
     @Autowired
     public FeatureToggleController(FeatureToggleService featureToggleService) {
         this.featureToggleService = featureToggleService;
@@ -47,12 +44,6 @@ public class FeatureToggleController {
         Map<String, Boolean> toggles = featureToggleService.hentFeatureToggles(features, sessionId);
         return ResponseEntity.status(HttpStatus.OK).body(toggles);
 
-    }
-
-    @GetMapping("/testfeillogger")
-    public ResponseEntity<Object> testFeilLogger(){
-        logger.error("Test feil for test error logg");
-        return null;
     }
 
 }
