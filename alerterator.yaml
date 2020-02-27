@@ -1,7 +1,7 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Alert"
 metadata:
-  name: sykefravarsstatistikk-api-alert-test
+  name: sykefravarsstatistikk-api-alert
   labels:
     team: arbeidsgiver
 spec:
