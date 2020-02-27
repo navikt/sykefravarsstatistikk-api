@@ -3,7 +3,7 @@ kind: "Alert"
 metadata:
   name: sykefravarsstatistikk-api-alert-test
   labels:
-    team: teamtag
+    team: arbeidsgiver
 spec:
   receivers:
     slack:
@@ -17,7 +17,7 @@ spec:
       action: "`kubectl describe pod {{ $labels.kubernetes_pod_name }}` for events, og `kubectl logs {{ $labels.kubernetes_pod_name }}` for logger"
 
     - alert: det har skjedd en feil i sykefraværsstatistikk-api
-      expr: sum(increase(logd_messages_total{log_app="sykefravarsstatistikk-api",log_level="Error"}[3m]))> 0
+      expr: sum(increase(logd_messages_total{log_app="sykefravarsstatistikk-api",log_level="Error"}[3m])) by (log_app,log_pod_name) > 0
       for: 30s
       description: "{{ $labels.log_app }} har logget en feil"
-      action: "`kubectl describe pod {{ $labels.kubernetes_pod_name }}` for events, og `kubectl logs {{ $labels.kubernetes_pod_name }}` for logger"
+      action: "`kubectl describe pod {{ $labels.log_pod_name }}` for events, og `kubectl logs {{ $labels.log_pod_name }}` for logger"
