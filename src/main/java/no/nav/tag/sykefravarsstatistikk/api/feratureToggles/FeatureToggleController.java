@@ -22,6 +22,7 @@ public class FeatureToggleController {
     private final FeatureToggleService featureToggleService;
     private final String UNLEASH_SESSION_COOKIE_NAME = "unleash-session";
 
+
     @Autowired
     public FeatureToggleController(FeatureToggleService featureToggleService) {
         this.featureToggleService = featureToggleService;
