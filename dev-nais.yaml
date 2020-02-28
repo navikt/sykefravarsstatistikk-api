@@ -4,10 +4,10 @@ metadata:
   name: sykefravarsstatistikk-api
   namespace: default
   labels:
-    team: arbeidsgiver
+    team: {{team}}
 spec:
-  image: navikt/sykefravarsstatistikk-api:3a8014100e31fe531eb9fa33e03bcb0b9c89d24c
-  team: arbeidsgiver
+  image: {{version}}
+  team: {{team}}
   port: 8080
   ingresses:
     - https://arbeidsgiver.nais.preprod.local/sykefravarsstatistikk-api/

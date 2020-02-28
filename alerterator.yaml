@@ -3,7 +3,7 @@ kind: "Alert"
 metadata:
   name: sykefravarsstatistikk-api-alert
   labels:
-    team:  {{team}}
+    team: arbeidsgiver
 spec:
   receivers:
     slack:
