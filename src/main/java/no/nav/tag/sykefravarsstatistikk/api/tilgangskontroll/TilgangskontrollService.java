@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -45,6 +47,11 @@ public class TilgangskontrollService {
         } else {
             throw new TilgangskontrollException("Innlogget bruker er ikke selvbetjeningsbruker");
         }
+    }
+
+    public boolean hentTilgangTilOverordnetEnhetOgLoggSikkerhetshendelse(Enhet overordnetEnhet, Underenhet underenhet) {
+        // TODO Her det implementeres logging
+        return hentInnloggetBruker().harTilgang(overordnetEnhet.getOrgnr());
     }
 
     public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, String httpMetode, String requestUrl) {

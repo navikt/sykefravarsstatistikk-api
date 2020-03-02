@@ -6,10 +6,7 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjeprogram;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
-import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretClient;
-import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
-import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.*;
 import no.nav.tag.sykefravarsstatistikk.api.virksomhetsklassifikasjoner.KlassifikasjonerRepository;
 import no.nav.tag.sykefravarsstatistikk.api.virksomhetsklassifikasjoner.SektorMappingService;
 import org.springframework.stereotype.Component;
@@ -52,13 +49,12 @@ public class SykefraværshistorikkService {
         this.bransjeprogram = bransjeprogram;
     }
 
-
-    public List<Sykefraværshistorikk> hentSykefraværshistorikk(Orgnr orgnr) {
-        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
-        Enhet enhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
-
-        Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(enhet.getInstitusjonellSektorkode());
+    public List<Sykefraværshistorikk> hentSykefraværshistorikk(
+            Underenhet underenhet,
+            InstitusjonellSektorkode institusjonellSektorkode
+    ) {
         Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
+        Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(institusjonellSektorkode);
 
         boolean erIBransjeprogram =
                 bransje.isPresent()
@@ -94,6 +90,11 @@ public class SykefraværshistorikkService {
                         .collect(Collectors.toList());
 
         return kvartalsvisSykefraværprosentListe;
+    }
+
+    public List<Sykefraværshistorikk> hentSykefraværshistorikk(Underenhet underenhet, Enhet overordnetEnhet) {
+        // TODO implementer
+        return hentSykefraværshistorikk(underenhet, overordnetEnhet.getInstitusjonellSektorkode());
     }
 
 
