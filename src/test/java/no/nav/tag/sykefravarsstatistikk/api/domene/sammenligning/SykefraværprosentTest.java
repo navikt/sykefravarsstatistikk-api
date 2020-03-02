@@ -28,6 +28,8 @@ public class SykefraværprosentTest {
         assertThat(sykefraværprosent.isErMaskert()).isTrue();
         assertThat(sykefraværprosent.getAntallPersoner()).isNull();
         assertThat(sykefraværprosent.getProsent()).isNull();
+        assertThat(sykefraværprosent.getTapteDagsverk()).isNull();
+        assertThat(sykefraværprosent.getMuligeDagsverk()).isNull();
     }
 
     @Test
@@ -36,6 +38,8 @@ public class SykefraværprosentTest {
         assertThat(sykefraværprosent.isErMaskert()).isFalse();
         assertThat(sykefraværprosent.getAntallPersoner()).isNotNull();
         assertThat(sykefraværprosent.getProsent()).isNotNull();
+        assertThat(sykefraværprosent.getTapteDagsverk()).isNotNull();
+        assertThat(sykefraværprosent.getMuligeDagsverk()).isNotNull();
     }
 
     @Test

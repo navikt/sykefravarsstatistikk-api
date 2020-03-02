@@ -68,25 +68,25 @@ public class ApiTest {
         assertThat(alleSykefraværshistorikk.get(0).get("label")).isEqualTo(objectMapper.readTree("\"Norge\""));
         assertThat(alleSykefraværshistorikk.get(0).get("kvartalsvisSykefraværsprosent").get(0))
                 .isEqualTo(objectMapper.readTree(
-                        "{\"erMaskert\": false,\"kvartal\": 2,\"årstall\": 2014,\"prosent\": 5.2}"
+                        "{\"tapteDagsverk\":5884917.3,\"muligeDagsverk\":1.125256909E8,\"prosent\":5.2,\"erMaskert\":false,\"årstall\":2014,\"kvartal\":2}"
                         )
                 );
         assertThat(alleSykefraværshistorikk.get(1).get("label")).isEqualTo(objectMapper.readTree("\"Statlig forvaltning\""));
         assertThat(alleSykefraværshistorikk.get(1).get("kvartalsvisSykefraværsprosent").get(0))
                 .isEqualTo(objectMapper.readTree(
-                        "{\"erMaskert\": false,\"kvartal\": 2,\"årstall\": 2014,\"prosent\": 4.9}"
+                        "{\"tapteDagsverk\":657853.3,\"muligeDagsverk\":1.35587109E7,\"prosent\":4.9,\"årstall\":2014,\"kvartal\":2,\"erMaskert\":false}"
                         )
                 );
         assertThat(alleSykefraværshistorikk.get(2).get("label")).isEqualTo(objectMapper.readTree("\"Produksjon av nærings- og nytelsesmidler\""));
         assertThat(alleSykefraværshistorikk.get(2).get("kvartalsvisSykefraværsprosent").get(0))
                 .isEqualTo(objectMapper.readTree(
-                        "{\"erMaskert\": false,\"kvartal\": 1,\"årstall\": 2017,\"prosent\": 5.6}"
+                        "{\"tapteDagsverk\":144324.8,\"muligeDagsverk\":2562076.9,\"prosent\":5.6,\"årstall\":2017,\"kvartal\":1,\"erMaskert\":false}"
                         )
                 );
         assertThat(alleSykefraværshistorikk.get(3).get("label")).isEqualTo(objectMapper.readTree("\"NAV ARBEID OG YTELSER AVD OSLO\""));
         assertThat(alleSykefraværshistorikk.get(3).get("kvartalsvisSykefraværsprosent").get(0))
                 .isEqualTo(objectMapper.readTree(
-                        "{\"erMaskert\": false,\"kvartal\": 2,\"årstall\": 2014,\"prosent\": 25.3}"
+                        "{\"tapteDagsverk\":235.3,\"muligeDagsverk\":929.3,\"prosent\":25.3,\"årstall\":2014,\"kvartal\":2,\"erMaskert\":false}"
                         )
                 );
 

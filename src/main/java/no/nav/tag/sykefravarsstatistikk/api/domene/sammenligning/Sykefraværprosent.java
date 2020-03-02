@@ -15,6 +15,11 @@ public class Sykefraværprosent {
     private final boolean erMaskert;
 
     @JsonIgnore
+    private final BigDecimal tapteDagsverk;
+    @JsonIgnore
+    private final BigDecimal muligeDagsverk;
+
+    @JsonIgnore
     private final Integer antallPersoner;
 
     public Sykefraværprosent(String label, BigDecimal tapteDagsverk, BigDecimal muligeDagsverk, int antallPersoner) {
@@ -26,19 +31,25 @@ public class Sykefraværprosent {
             prosent = tapteDagsverk
                     .multiply(new BigDecimal(100))
                     .divide(muligeDagsverk, 1, RoundingMode.HALF_UP);
+            this.tapteDagsverk = tapteDagsverk.setScale(1, RoundingMode.HALF_UP);
+            this.muligeDagsverk = muligeDagsverk.setScale(1, RoundingMode.HALF_UP);
         } else {
             this.antallPersoner = null;
             erMaskert = true;
             prosent = null;
+            this.tapteDagsverk = null;
+            this.muligeDagsverk = null;
         }
     }
 
 
     private Sykefraværprosent(String label) {
         this.label = label;
-        this.erMaskert = false;
-        this.prosent = null;
-        this.antallPersoner = null;
+        erMaskert = false;
+        prosent = null;
+        antallPersoner = null;
+        tapteDagsverk = null;
+        muligeDagsverk = null;
     }
 
 
