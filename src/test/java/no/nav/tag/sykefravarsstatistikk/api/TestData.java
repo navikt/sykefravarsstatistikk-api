@@ -94,12 +94,16 @@ public class TestData {
         return new Orgnr("971800534");
     }
 
+    public static InstitusjonellSektorkode enInstitusjonellSektorkode() {
+        return new InstitusjonellSektorkode("1234", "sektor!");
+    }
+
     public static Enhet enEnhet() {
         return Enhet.builder()
                 .orgnr(etOrgnr())
                 .antallAnsatte(10)
                 .navn("Enhet AS")
-                .institusjonellSektorkode(new InstitusjonellSektorkode("1234", "sektor!"))
+                .institusjonellSektorkode(enInstitusjonellSektorkode())
                 .næringskode(enNæringskode5Siffer())
                 .build();
     }

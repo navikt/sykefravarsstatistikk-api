@@ -23,6 +23,8 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
+import static no.nav.tag.sykefravarsstatistikk.api.TestData.enInstitusjonellSektorkode;
+import static no.nav.tag.sykefravarsstatistikk.api.TestData.enUnderenhet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -88,7 +90,8 @@ public class SykefraværshistorikkServiceTest {
 
         List<Sykefraværshistorikk> sykefraværshistorikk =
                 sykefraværshistorikkService.hentSykefraværshistorikk(
-                        new Orgnr("999999998")
+                        enUnderenhet("999999998"),
+                        enInstitusjonellSektorkode()
                 );
 
         verify(kvartalsvisSykefraværprosentRepository, times(0))
