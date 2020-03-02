@@ -207,7 +207,7 @@ public class ApiTest {
     }
 
     @Test
-    public void oppsummertTapteDgsverk__skal_returnere_riktig_object() throws IOException, InterruptedException {
+    public void summerTapteDagsverk__skal_returnere_riktig_object() throws IOException, InterruptedException {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET + "/summerTapteDagsverk"))
@@ -229,7 +229,7 @@ public class ApiTest {
 
 
     @Test
-    public void tapteDgsverk__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
+    public void tapteDagsverk__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET_INGEN_TILGANG + "/tapteDagsverk"))
@@ -243,7 +243,7 @@ public class ApiTest {
     }
 
     @Test
-    public void summertapteDgsverk__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
+    public void summerTapteDagsverk__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET_INGEN_TILGANG + "/summerTapteDagsverk"))

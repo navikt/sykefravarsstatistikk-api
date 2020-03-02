@@ -59,43 +59,47 @@ public class SykefraværshistorikkService {
                 bransje.isPresent()
                         && bransje.get().lengdePåNæringskoder() == LENGDE_PÅ_NÆRINGSKODE_AV_BRANSJENIVÅ;
 
-        List<Sykefraværshistorikk> kvartalsvisSykefraværprosentListe =
+        List<Sykefraværshistorikk> sykefraværshistorikkListe =
                 Stream.of(
                         uthentingMedFeilhåndteringOgTimeout(
-                                () ->
-                                        hentSykefraværshistorikkLand(),
+                                () -> hentSykefraværshistorikkLand(),
                                 SykefraværshistorikkType.LAND,
                                 SYKEFRAVÆRPROSENT_LAND_LABEL),
                         uthentingMedFeilhåndteringOgTimeout(
-                                () ->
-                                        hentSykefraværshistorikkSektor(ssbSektor),
+                                () -> hentSykefraværshistorikkSektor(ssbSektor),
                                 SykefraværshistorikkType.SEKTOR,
                                 ssbSektor.getNavn()),
                         erIBransjeprogram ?
                                 uthentingMedFeilhåndteringOgTimeout(
-                                        () ->
-                                                hentSykefraværshistorikkBransje(bransje.get()),
+                                        () -> hentSykefraværshistorikkBransje(bransje.get()),
                                         SykefraværshistorikkType.BRANSJE,
                                         bransje.get().getNavn()
                                 )
                                 : uthentingAvSykefraværshistorikkNæring(underenhet),
                         uthentingMedFeilhåndteringOgTimeout(
-                                () ->
-                                        hentSykefraværshistorikkVirksomhet(underenhet),
+                                () -> hentSykefraværshistorikkVirksomhet(underenhet),
                                 SykefraværshistorikkType.VIRKSOMHET,
                                 underenhet.getNavn())
                 )
                         .map(CompletableFuture::join)
                         .collect(Collectors.toList());
 
-        return kvartalsvisSykefraværprosentListe;
+        return sykefraværshistorikkListe;
     }
 
     public List<Sykefraværshistorikk> hentSykefraværshistorikk(Underenhet underenhet, OverordnetEnhet overordnetEnhet) {
-        // TODO implementer
-        return hentSykefraværshistorikk(underenhet, overordnetEnhet.getInstitusjonellSektorkode());
-    }
 
+        Sykefraværshistorikk historikkForOverordnetEnhet = uthentingMedFeilhåndteringOgTimeout(
+                () -> hentSykefraværshistorikkVirksomhet(overordnetEnhet),
+                SykefraværshistorikkType.OVERORDNET_ENHET,
+                underenhet.getNavn()
+        ).join();
+
+        List<Sykefraværshistorikk> sykefraværshistorikkListe = hentSykefraværshistorikk(underenhet, overordnetEnhet.getInstitusjonellSektorkode());
+        sykefraværshistorikkListe.add(historikkForOverordnetEnhet);
+
+        return sykefraværshistorikkListe;
+    }
 
     private Sykefraværshistorikk hentSykefraværshistorikkLand() {
         return byggSykefraværshistorikk(
@@ -130,12 +134,12 @@ public class SykefraværshistorikkService {
     }
 
     private Sykefraværshistorikk hentSykefraværshistorikkVirksomhet(
-            Underenhet underenhet
+            Virksomhet virksomhet
     ) {
         return byggSykefraværshistorikk(
                 SykefraværshistorikkType.VIRKSOMHET,
-                underenhet.getNavn(),
-                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(underenhet)
+                virksomhet.getNavn(),
+                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(virksomhet)
         );
     }
 

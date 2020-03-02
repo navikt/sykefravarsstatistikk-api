@@ -5,5 +5,6 @@ public enum SykefraværshistorikkType {
     SEKTOR,
     NÆRING,
     BRANSJE,
-    VIRKSOMHET
+    VIRKSOMHET,
+    OVERORDNET_ENHET,
 }
