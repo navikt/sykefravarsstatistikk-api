@@ -49,9 +49,26 @@ public class TilgangskontrollService {
         }
     }
 
-    public boolean hentTilgangTilOverordnetEnhetOgLoggSikkerhetshendelse(OverordnetEnhet overordnetEnhet, Underenhet underenhet) {
-        // TODO Her det implementeres logging
-        return hentInnloggetBruker().harTilgang(overordnetEnhet.getOrgnr());
+    public boolean hentTilgangTilOverordnetEnhetOgLoggSikkerhetshendelse(OverordnetEnhet overordnetEnhet, Underenhet underenhet, String httpMetode, String requestUrl) {
+        InnloggetBruker bruker = hentInnloggetBruker();
+        boolean harTilgang = bruker.harTilgang(overordnetEnhet.getOrgnr());
+        String kommentar = String.format(
+                "Bruker ba om tilgang orgnr %s indirekte ved å kalle endepunktet til underenheten %s",
+                underenhet.getOrgnr().getVerdi(),
+                overordnetEnhet.getOrgnr().getVerdi()
+        );
+        sporbarhetslogg.loggHendelse(new Loggevent(
+                bruker,
+                overordnetEnhet.getOrgnr(),
+                harTilgang,
+                httpMetode,
+                requestUrl,
+                iawebServiceCode,
+                iawebServiceEdition
+        ),
+                kommentar);
+
+        return harTilgang;
     }
 
     public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, String httpMetode, String requestUrl) {
@@ -62,7 +79,7 @@ public class TilgangskontrollService {
     public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, InnloggetBruker bruker, String httpMetode, String requestUrl) {
         boolean harTilgang = bruker.harTilgang(orgnr);
 
-        sporbarhetslogg.loggHendelse(
+        sporbarhetslogg.loggHendelse(new Loggevent(
                 bruker,
                 orgnr,
                 harTilgang,
@@ -70,7 +87,7 @@ public class TilgangskontrollService {
                 requestUrl,
                 iawebServiceCode,
                 iawebServiceEdition
-        );
+        ));
 
         if (!harTilgang) {
             throw new TilgangskontrollException("Har ikke tilgang til statistikk for denne bedriften.");

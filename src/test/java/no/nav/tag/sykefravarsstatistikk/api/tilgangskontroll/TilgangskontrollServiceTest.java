@@ -90,7 +90,7 @@ public class TilgangskontrollServiceTest {
 
         tilgangskontroll.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(orgnr, httpMetode, requestUrl);
 
-        verify(sporbarhetslogg).loggHendelse(
+        verify(sporbarhetslogg).loggHendelse(new Loggevent(
                 bruker,
                 orgnr,
                 true,
@@ -98,8 +98,7 @@ public class TilgangskontrollServiceTest {
                 requestUrl,
                 IAWEB_SERVICE_CODE,
                 IAWEB_SERVICE_EDITION
-
-        );
+        ));
 
         MDC.remove(CORRELATION_ID_MDC_NAME);
     }

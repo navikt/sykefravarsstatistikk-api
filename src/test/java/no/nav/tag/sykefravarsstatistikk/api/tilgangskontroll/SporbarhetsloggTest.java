@@ -10,7 +10,8 @@ public class SporbarhetsloggTest {
     @Test
     public void loggHendelse__skal_ikke_feile_ved_nullfelter() {
         Sporbarhetslogg sporbarhetslogg = new Sporbarhetslogg();
-        sporbarhetslogg.loggHendelse(
+
+        sporbarhetslogg.loggHendelse(new Loggevent(
                 getInnloggetBruker(),
                 new Orgnr(null),
                 false,
@@ -18,6 +19,16 @@ public class SporbarhetsloggTest {
                 null,
                 null,
                 null
-        );
+        ));
+
+        sporbarhetslogg.loggHendelse(new Loggevent(
+                getInnloggetBruker(),
+                new Orgnr(null),
+                false,
+                null,
+                null,
+                null,
+                null
+        ), null);
     }
 }

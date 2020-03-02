@@ -49,7 +49,9 @@ public class SykefraværshistorikkController {
 
         boolean harTilgangTilOverordnetEnhet = tilgangskontrollService.hentTilgangTilOverordnetEnhetOgLoggSikkerhetshendelse(
                 overordnetEnhet,
-                underenhet
+                underenhet,
+                request.getMethod(),
+                "" + request.getRequestURL()
         );
 
         if (harTilgangTilOverordnetEnhet) {
