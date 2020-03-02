@@ -16,12 +16,17 @@ public class KvartalsvisSykefraværsprosent implements Comparable<KvartalsvisSyk
     @JsonIgnore
     private final Sykefraværprosent sykefraværprosent;
 
+    private final BigDecimal tapteDagsverk;
+    private final BigDecimal muligeDagsverk;
+
     public KvartalsvisSykefraværsprosent(
             ÅrstallOgKvartal årstallOgKvartal,
             Sykefraværprosent sykefraværprosent
     ) {
         this.årstallOgKvartal = årstallOgKvartal;
         this.sykefraværprosent = sykefraværprosent;
+        this.tapteDagsverk = sykefraværprosent.getTapteDagsverk();
+        this.muligeDagsverk = sykefraværprosent.getMuligeDagsverk();
     }
 
     public static KvartalsvisSykefraværsprosent tomKvartalsvisSykefraværprosent() {
@@ -48,6 +53,8 @@ public class KvartalsvisSykefraværsprosent implements Comparable<KvartalsvisSyk
     private KvartalsvisSykefraværsprosent() {
         this.årstallOgKvartal = null;
         this.sykefraværprosent = null;
+        this.tapteDagsverk = null;
+        this.muligeDagsverk = null;
     }
 
 
