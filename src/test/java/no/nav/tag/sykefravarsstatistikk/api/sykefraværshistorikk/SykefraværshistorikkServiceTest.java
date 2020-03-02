@@ -5,7 +5,7 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjeprogram
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.OverordnetEnhet;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
@@ -60,7 +60,7 @@ public class SykefraværshistorikkServiceTest {
                 );
         when(enhetsregisteretClient.hentInformasjonOmEnhet(any()))
                 .thenReturn(
-                        Enhet
+                        OverordnetEnhet
                                 .builder()
                                 .orgnr(new Orgnr("99999999"))
                                 .build()

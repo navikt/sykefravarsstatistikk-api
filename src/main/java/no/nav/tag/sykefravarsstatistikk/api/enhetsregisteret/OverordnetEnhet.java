@@ -6,7 +6,7 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 
 @Data
 @Builder
-public class Enhet {
+public class OverordnetEnhet {
     private final Orgnr orgnr;
     private final String navn;
     private final Næringskode5Siffer næringskode;

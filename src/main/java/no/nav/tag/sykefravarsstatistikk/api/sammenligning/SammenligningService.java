@@ -9,7 +9,7 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.OverordnetEnhet;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
@@ -59,8 +59,8 @@ public class SammenligningService {
     ) {
         Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
 
-        Enhet enhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
-        Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(enhet.getInstitusjonellSektorkode());
+        OverordnetEnhet overordnetEnhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
+        Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(overordnetEnhet.getInstitusjonellSektorkode());
         Næringskode5Siffer næring5siffer = underenhet.getNæringskode();
         Næring næring = klassifikasjonerRepository.hentNæring(næring5siffer.hentNæringskode2Siffer());
 
@@ -85,7 +85,7 @@ public class SammenligningService {
 
         eventPublisher.publishEvent(new SammenligningEvent(
                 underenhet,
-                enhet,
+                overordnetEnhet,
                 ssbSektor,
                 næring5siffer,
                 næring,

@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.tag.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.tag.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
-import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.OverordnetEnhet;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -49,7 +49,7 @@ public class TilgangskontrollService {
         }
     }
 
-    public boolean hentTilgangTilOverordnetEnhetOgLoggSikkerhetshendelse(Enhet overordnetEnhet, Underenhet underenhet) {
+    public boolean hentTilgangTilOverordnetEnhetOgLoggSikkerhetshendelse(OverordnetEnhet overordnetEnhet, Underenhet underenhet) {
         // TODO Her det implementeres logging
         return hentInnloggetBruker().harTilgang(overordnetEnhet.getOrgnr());
     }

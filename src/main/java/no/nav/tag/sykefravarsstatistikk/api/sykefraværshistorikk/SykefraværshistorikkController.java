@@ -2,7 +2,7 @@ package no.nav.tag.sykefravarsstatistikk.api.sykefraværshistorikk;
 
 import no.nav.security.oidc.api.Protected;
 import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
-import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.OverordnetEnhet;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import no.nav.tag.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
@@ -46,7 +46,7 @@ public class SykefraværshistorikkController {
                 "" + request.getRequestURL()
         );
 
-        Enhet overordnetEnhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
+        OverordnetEnhet overordnetEnhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
 
         boolean harTilgangTilOverordnetEnhet = tilgangskontrollService.hentTilgangTilOverordnetEnhetOgLoggSikkerhetshendelse(
                 overordnetEnhet,

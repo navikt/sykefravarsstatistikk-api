@@ -11,7 +11,7 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværpros
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppering;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.OverordnetEnhet;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.InstitusjonellSektorkode;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
@@ -63,7 +63,7 @@ public class TestData {
     public static SammenligningEvent.SammenligningEventBuilder enSammenligningEventBuilder() {
         return SammenligningEvent.builder()
                 .underenhet(enUnderenhet())
-                .enhet(enEnhet())
+                .overordnetEnhet(enEnhet())
                 .ssbSektor(enSektor())
                 .næring5siffer(enNæringskode5Siffer())
                 .næring2siffer(enNæring())
@@ -98,8 +98,8 @@ public class TestData {
         return new InstitusjonellSektorkode("1234", "sektor!");
     }
 
-    public static Enhet enEnhet() {
-        return Enhet.builder()
+    public static OverordnetEnhet enEnhet() {
+        return OverordnetEnhet.builder()
                 .orgnr(etOrgnr())
                 .antallAnsatte(10)
                 .navn("Enhet AS")

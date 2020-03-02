@@ -1,7 +1,6 @@
 package no.nav.tag.sykefravarsstatistikk.api.sykefraværshistorikk;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.tag.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjeprogram;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
@@ -92,7 +91,7 @@ public class SykefraværshistorikkService {
         return kvartalsvisSykefraværprosentListe;
     }
 
-    public List<Sykefraværshistorikk> hentSykefraværshistorikk(Underenhet underenhet, Enhet overordnetEnhet) {
+    public List<Sykefraværshistorikk> hentSykefraværshistorikk(Underenhet underenhet, OverordnetEnhet overordnetEnhet) {
         // TODO implementer
         return hentSykefraværshistorikk(underenhet, overordnetEnhet.getInstitusjonellSektorkode());
     }

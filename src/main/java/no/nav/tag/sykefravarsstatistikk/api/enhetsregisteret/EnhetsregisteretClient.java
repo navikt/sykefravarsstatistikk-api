@@ -30,14 +30,14 @@ public class EnhetsregisteretClient {
         this.enhetsregisteretUrl = enhetsregisteretUrl;
     }
 
-    public Enhet hentInformasjonOmEnhet(Orgnr orgnrTilEnhet) {
+    public OverordnetEnhet hentInformasjonOmEnhet(Orgnr orgnrTilEnhet) {
         String url = enhetsregisteretUrl + "enheter/" + orgnrTilEnhet.getVerdi();
 
         try {
             String respons = restTemplate.getForObject(url, String.class);
-            Enhet enhet = mapTilEnhet(respons);
-            validerReturnertOrgnr(orgnrTilEnhet, enhet.getOrgnr());
-            return enhet;
+            OverordnetEnhet overordnetEnhet = mapTilEnhet(respons);
+            validerReturnertOrgnr(orgnrTilEnhet, overordnetEnhet.getOrgnr());
+            return overordnetEnhet;
         } catch (RestClientException e) {
             throw new EnhetsregisteretException("Feil ved kall til Enhetsregisteret", e);
         }
@@ -55,13 +55,13 @@ public class EnhetsregisteretClient {
         }
     }
 
-    private Enhet mapTilEnhet(String jsonResponseFraEnhetsregisteret) {
+    private OverordnetEnhet mapTilEnhet(String jsonResponseFraEnhetsregisteret) {
         try {
             JsonNode enhetJson = objectMapper.readTree(jsonResponseFraEnhetsregisteret);
             JsonNode næringskodeJson = enhetJson.get("naeringskode1");
             JsonNode sektorJson = enhetJson.get("institusjonellSektorkode");
 
-            return new Enhet(
+            return new OverordnetEnhet(
                     new Orgnr(enhetJson.get("organisasjonsnummer").textValue()),
                     enhetJson.get("navn").textValue(),
                     objectMapper.treeToValue(næringskodeJson, Næringskode5Siffer.class),

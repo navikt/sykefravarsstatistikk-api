@@ -8,7 +8,7 @@ import no.nav.tag.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.tag.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.tag.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
+import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.OverordnetEnhet;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 
@@ -17,7 +17,7 @@ import no.nav.tag.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 @AllArgsConstructor
 public class SammenligningEvent {
     private final Underenhet underenhet;
-    private final Enhet enhet;
+    private final OverordnetEnhet overordnetEnhet;
     private final Sektor ssbSektor;
     private final Næringskode5Siffer næring5siffer;
     private final Næring næring2siffer;
