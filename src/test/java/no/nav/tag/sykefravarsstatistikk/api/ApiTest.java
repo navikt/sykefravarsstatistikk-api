@@ -38,7 +38,7 @@ public class ApiTest {
 
 
     @Test
-    public void sykefraværshistorikk_sektor___skal_returnere_riktig_objekt() throws Exception {
+    public void sykefraværshistorikk__skal_returnere_riktig_objekt() throws Exception {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET + "/sykefravarshistorikk"))
@@ -61,7 +61,8 @@ public class ApiTest {
                                 SykefraværshistorikkType.LAND.toString(),
                                 SykefraværshistorikkType.SEKTOR.toString(),
                                 SykefraværshistorikkType.NÆRING.toString(),
-                                SykefraværshistorikkType.VIRKSOMHET.toString()
+                                SykefraværshistorikkType.VIRKSOMHET.toString(),
+                                SykefraværshistorikkType.OVERORDNET_ENHET.toString()
                         )
                 );
 
@@ -87,6 +88,12 @@ public class ApiTest {
         assertThat(alleSykefraværshistorikk.get(3).get("kvartalsvisSykefraværsprosent").get(0))
                 .isEqualTo(objectMapper.readTree(
                         "{\"tapteDagsverk\":235.3,\"muligeDagsverk\":929.3,\"prosent\":25.3,\"årstall\":2014,\"kvartal\":2,\"erMaskert\":false}"
+                        )
+                );
+        assertThat(alleSykefraværshistorikk.get(4).get("label")).isEqualTo(objectMapper.readTree("\"NAV ARBEID OG YTELSER\""));
+        assertThat(alleSykefraværshistorikk.get(4).get("kvartalsvisSykefraværsprosent").get(0))
+                .isEqualTo(objectMapper.readTree(
+                        "{\"tapteDagsverk\":2000.3,\"muligeDagsverk\":9290.3,\"prosent\":21.5,\"årstall\":2014,\"kvartal\":2,\"erMaskert\":false}"
                         )
                 );
 

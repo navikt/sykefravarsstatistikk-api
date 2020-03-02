@@ -16,6 +16,14 @@
     "Status": "Active"
   },
   {
+    "Name": "NAV ARBEID OG YTELSER",
+    "Type": "Enterprise",
+    "ParentOrganizationNumber": null,
+    "OrganizationNumber": "999263550",
+    "OrganizationForm": "AS",
+    "Status": "Active"
+  },
+  {
     "Name": "DIGITAL JUNKIES AS ",
     "Type": "Enterprise",
     "OrganizationNumber": "822565212",

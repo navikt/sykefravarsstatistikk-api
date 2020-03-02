@@ -77,7 +77,7 @@ public class SykefraværshistorikkService {
                                 )
                                 : uthentingAvSykefraværshistorikkNæring(underenhet),
                         uthentingMedFeilhåndteringOgTimeout(
-                                () -> hentSykefraværshistorikkVirksomhet(underenhet),
+                                () -> hentSykefraværshistorikkVirksomhet(underenhet, SykefraværshistorikkType.VIRKSOMHET),
                                 SykefraværshistorikkType.VIRKSOMHET,
                                 underenhet.getNavn())
                 )
@@ -90,12 +90,15 @@ public class SykefraværshistorikkService {
     public List<Sykefraværshistorikk> hentSykefraværshistorikk(Underenhet underenhet, OverordnetEnhet overordnetEnhet) {
 
         Sykefraværshistorikk historikkForOverordnetEnhet = uthentingMedFeilhåndteringOgTimeout(
-                () -> hentSykefraværshistorikkVirksomhet(overordnetEnhet),
+                () -> hentSykefraværshistorikkVirksomhet(overordnetEnhet, SykefraværshistorikkType.OVERORDNET_ENHET),
                 SykefraværshistorikkType.OVERORDNET_ENHET,
                 underenhet.getNavn()
         ).join();
 
-        List<Sykefraværshistorikk> sykefraværshistorikkListe = hentSykefraværshistorikk(underenhet, overordnetEnhet.getInstitusjonellSektorkode());
+        List<Sykefraværshistorikk> sykefraværshistorikkListe = hentSykefraværshistorikk(
+                underenhet,
+                overordnetEnhet.getInstitusjonellSektorkode()
+        );
         sykefraværshistorikkListe.add(historikkForOverordnetEnhet);
 
         return sykefraværshistorikkListe;
@@ -134,10 +137,11 @@ public class SykefraværshistorikkService {
     }
 
     private Sykefraværshistorikk hentSykefraværshistorikkVirksomhet(
-            Virksomhet virksomhet
+            Virksomhet virksomhet,
+            SykefraværshistorikkType type
     ) {
         return byggSykefraværshistorikk(
-                SykefraværshistorikkType.VIRKSOMHET,
+                type,
                 virksomhet.getNavn(),
                 kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(virksomhet)
         );
