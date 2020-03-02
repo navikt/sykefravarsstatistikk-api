@@ -165,7 +165,7 @@ public class ApiTest {
     }
 
     @Test
-    public void tapteDgsverk__skal_returnere_riktig_object() throws IOException, InterruptedException {
+    public void tapteDagsverk__skal_returnere_riktig_object() throws IOException, InterruptedException {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET + "/tapteDagsverk"))

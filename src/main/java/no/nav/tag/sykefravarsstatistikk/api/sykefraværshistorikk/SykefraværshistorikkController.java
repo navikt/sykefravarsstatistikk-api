@@ -38,14 +38,13 @@ public class SykefraværshistorikkController {
 
         Orgnr orgnr = new Orgnr(orgnrStr);
 
-        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
-
         tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
                 orgnr,
                 request.getMethod(),
                 "" + request.getRequestURL()
         );
 
+        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
         OverordnetEnhet overordnetEnhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
 
         boolean harTilgangTilOverordnetEnhet = tilgangskontrollService.hentTilgangTilOverordnetEnhetOgLoggSikkerhetshendelse(
