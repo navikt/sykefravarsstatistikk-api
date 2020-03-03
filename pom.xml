@@ -9,7 +9,7 @@
     <packaging>jar</packaging>
 
     <name>sykefravarsstatistikk-api</name>
-    <description>#Arbeidsgiver - Sykefraværsstatistikk api</description>
+    <description>Arbeidsgiver - Sykefraværsstatistikk api</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
