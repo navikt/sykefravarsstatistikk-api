@@ -3,13 +3,13 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>no.nav.tag</groupId>
+    <groupId>no.nav.arbeidsgiver</groupId>
     <artifactId>sykefravarsstatistikk-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>sykefravarsstatistikk-api</name>
-    <description>#TAG - Sykefraværsstatistikk api</description>
+    <description>#Arbeidsgiver - Sykefraværsstatistikk api</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>

@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.CorrelationIdFilter;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Fnr;
@@ -17,7 +16,6 @@ import org.slf4j.MDC;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.CorrelationIdFilter.CORRELATION_ID_MDC_NAME;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getInnloggetBruker;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getOrganisasjon;
 import static org.mockito.Mockito.verify;
