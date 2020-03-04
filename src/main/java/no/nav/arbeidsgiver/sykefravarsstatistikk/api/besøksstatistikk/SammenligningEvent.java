@@ -7,9 +7,9 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 
 @Data
@@ -17,7 +17,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Næringsko
 @AllArgsConstructor
 public class SammenligningEvent {
     private final Underenhet underenhet;
-    private final Enhet enhet;
+    private final OverordnetEnhet overordnetEnhet;
     private final Sektor ssbSektor;
     private final Næringskode5Siffer næring5siffer;
     private final Næring næring2siffer;

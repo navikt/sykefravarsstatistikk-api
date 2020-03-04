@@ -1,8 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.CorrelationIdFilter;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.InnloggetBruker;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -12,20 +9,40 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.CorrelationIdFilter.CORRELATION_ID_MDC_NAME;
+
 @Component
 public class Sporbarhetslogg {
 
     private static final Logger SPORBARHETSLOGGER = LoggerFactory.getLogger("sporbarhetslogger");
 
+    public void loggHendelse(Loggevent event, String kommentar) {
+        List<String> extensions = getExtensions(event);
+        extensions.add("cs5=" + kommentar);
+        extensions.add("cs5Label=Kommentar");
+
+        String loggmelding = lagLoggmelding(extensions, event.isHarTilgang());
+
+        if (event.isHarTilgang()) {
+            SPORBARHETSLOGGER.info(loggmelding);
+        } else {
+            SPORBARHETSLOGGER.warn(loggmelding);
+        }
+    }
+
     public void loggHendelse(
-            InnloggetBruker innloggetBruker,
-            Orgnr orgnr,
-            boolean harTilgang,
-            String requestMethod,
-            String requestUrl,
-            String altinnServiceCode,
-            String altinnServiceEdition
+            Loggevent event
     ) {
+        String loggmelding = lagLoggmelding(getExtensions(event), event.isHarTilgang());
+
+        if (event.isHarTilgang()) {
+            SPORBARHETSLOGGER.info(loggmelding);
+        } else {
+            SPORBARHETSLOGGER.warn(loggmelding);
+        }
+    }
+
+    private String lagLoggmelding(List<String> extensions, boolean harTilgang) {
         String version = "CEF:0";
         String deviceVendor = "sykefravarsstatistikk-api";
         String deviceProduct = "sporbarhetslogg";
@@ -34,31 +51,9 @@ public class Sporbarhetslogg {
         String name = "sykefravarsstatistikk";
         String severity = harTilgang ? "INFO" : "WARN";
 
-        List<String> extensions = new ArrayList<>();
-        extensions.add("end=" + System.currentTimeMillis());
-        extensions.add("suid=" + innloggetBruker.getFnr().getVerdi());
-        extensions.add("request=" + requestUrl);
-        extensions.add("requestMethod=" + requestMethod);
-        extensions.add("cs3=" + orgnr.getVerdi());
-        extensions.add("cs3Label=OrgNr");
-        String decision = harTilgang ? "Permit" : "Deny";
-        extensions.add("flexString1=" + decision);
-        extensions.add("flexString1Label=Decision");
-
-        if (!harTilgang) {
-            extensions.add("flexString2=Bruker har ikke rettighet i Altinn");
-            extensions.add("flexString2Label=Begrunnelse");
-            extensions.add("cn1=" + altinnServiceCode);
-            extensions.add("cn1Label=Service Code");
-            extensions.add("cn2=" + altinnServiceEdition);
-            extensions.add("cn2Label=Service Edition");
-        }
-
-        extensions.add("sproc=" + MDC.get(CorrelationIdFilter.CORRELATION_ID_MDC_NAME));
-
         String extension = String.join(" ", extensions);
 
-        String loggmelding = String.join("|", Arrays.asList(
+        return String.join("|", Arrays.asList(
                 version,
                 deviceVendor,
                 deviceProduct,
@@ -68,11 +63,30 @@ public class Sporbarhetslogg {
                 severity,
                 extension
         ));
+    }
 
-        if (harTilgang) {
-            SPORBARHETSLOGGER.info(loggmelding);
-        } else {
-            SPORBARHETSLOGGER.warn(loggmelding);
+    private List<String> getExtensions(Loggevent event) {
+        List<String> extensions = new ArrayList<>();
+        extensions.add("end=" + System.currentTimeMillis());
+        extensions.add("suid=" + event.getInnloggetBruker().getFnr().getVerdi());
+        extensions.add("request=" + event.getRequestUrl());
+        extensions.add("requestMethod=" + event.getRequestMethod());
+        extensions.add("cs3=" + event.getOrgnr().getVerdi());
+        extensions.add("cs3Label=OrgNr");
+        String decision = event.isHarTilgang()? "Permit" : "Deny";
+        extensions.add("flexString1=" + decision);
+        extensions.add("flexString1Label=Decision");
+
+        if (!event.isHarTilgang()) {
+            extensions.add("flexString2=Bruker har ikke rettighet i Altinn");
+            extensions.add("flexString2Label=Begrunnelse");
+            extensions.add("cn1=" + event.getAltinnServiceCode());
+            extensions.add("cn1Label=Service Code");
+            extensions.add("cn2=" + event.getAltinnServiceEdition());
+            extensions.add("cn2Label=Service Edition");
         }
+
+        extensions.add("sproc=" + MDC.get(CORRELATION_ID_MDC_NAME));
+        return extensions;
     }
 }

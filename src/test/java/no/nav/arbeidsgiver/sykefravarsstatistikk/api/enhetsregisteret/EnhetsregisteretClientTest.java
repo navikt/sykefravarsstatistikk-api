@@ -35,15 +35,15 @@ public class EnhetsregisteretClientTest {
     @Test
     public void hentInformasjonOmEnhet__skal_hente_riktige_felter() {
         mockRespons(gyldigEnhetRespons("999263550"));
-        Enhet enhet = enhetsregisteretClient.hentInformasjonOmEnhet(new Orgnr("999263550"));
+        OverordnetEnhet overordnetEnhet = enhetsregisteretClient.hentInformasjonOmEnhet(new Orgnr("999263550"));
 
-        assertThat(enhet.getOrgnr().getVerdi()).isEqualTo("999263550");
-        assertThat(enhet.getNavn()).isEqualTo("NAV ARBEID OG YTELSER");
-        assertThat(enhet.getNæringskode().getKode()).isEqualTo("84300");
-        assertThat(enhet.getNæringskode().getBeskrivelse()).isEqualTo("Trygdeordninger underlagt offentlig forvaltning");
-        assertThat(enhet.getInstitusjonellSektorkode().getKode()).isEqualTo("6100");
-        assertThat(enhet.getInstitusjonellSektorkode().getBeskrivelse()).isEqualTo("Statsforvaltningen");
-        assertThat(enhet.getAntallAnsatte()).isEqualTo(40);
+        assertThat(overordnetEnhet.getOrgnr().getVerdi()).isEqualTo("999263550");
+        assertThat(overordnetEnhet.getNavn()).isEqualTo("NAV ARBEID OG YTELSER");
+        assertThat(overordnetEnhet.getNæringskode().getKode()).isEqualTo("84300");
+        assertThat(overordnetEnhet.getNæringskode().getBeskrivelse()).isEqualTo("Trygdeordninger underlagt offentlig forvaltning");
+        assertThat(overordnetEnhet.getInstitusjonellSektorkode().getKode()).isEqualTo("6100");
+        assertThat(overordnetEnhet.getInstitusjonellSektorkode().getBeskrivelse()).isEqualTo("Statsforvaltningen");
+        assertThat(overordnetEnhet.getAntallAnsatte()).isEqualTo(40);
     }
 
     @Test(expected = EnhetsregisteretException.class)

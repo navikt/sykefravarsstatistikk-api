@@ -1,9 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnClient;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.OverordnetEnhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -47,6 +49,33 @@ public class TilgangskontrollService {
         }
     }
 
+    public boolean hentTilgangTilOverordnetEnhetOgLoggSikkerhetshendelse(
+            OverordnetEnhet overordnetEnhet,
+            Underenhet underenhet,
+            String httpMetode,
+            String requestUrl
+    ) {
+        InnloggetBruker bruker = hentInnloggetBruker();
+        boolean harTilgang = bruker.harTilgang(overordnetEnhet.getOrgnr());
+        String kommentar = String.format(
+                "Bruker ba om tilgang orgnr %s indirekte ved å kalle endepunktet til underenheten %s",
+                overordnetEnhet.getOrgnr().getVerdi(),
+                underenhet.getOrgnr().getVerdi()
+        );
+        sporbarhetslogg.loggHendelse(new Loggevent(
+                bruker,
+                overordnetEnhet.getOrgnr(),
+                harTilgang,
+                httpMetode,
+                requestUrl,
+                iawebServiceCode,
+                iawebServiceEdition
+        ),
+                kommentar);
+
+        return harTilgang;
+    }
+
     public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, String httpMetode, String requestUrl) {
         InnloggetBruker bruker = hentInnloggetBruker();
         sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(orgnr, bruker, httpMetode, requestUrl);
@@ -55,7 +84,7 @@ public class TilgangskontrollService {
     public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, InnloggetBruker bruker, String httpMetode, String requestUrl) {
         boolean harTilgang = bruker.harTilgang(orgnr);
 
-        sporbarhetslogg.loggHendelse(
+        sporbarhetslogg.loggHendelse(new Loggevent(
                 bruker,
                 orgnr,
                 harTilgang,
@@ -63,7 +92,7 @@ public class TilgangskontrollService {
                 requestUrl,
                 iawebServiceCode,
                 iawebServiceEdition
-        );
+        ));
 
         if (!harTilgang) {
             throw new TilgangskontrollException("Har ikke tilgang til statistikk for denne bedriften.");

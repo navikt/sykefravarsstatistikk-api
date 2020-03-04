@@ -1,11 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.besøksstatistikk;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import no.nav.metrics.MetricsFactory;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnRolle;
@@ -14,7 +9,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Brans
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -80,7 +75,7 @@ public class BesøksstatistikkEventListener {
 
     private void sendEventForStorVirksomhetTilInfluxDB(SammenligningEvent sammenligningEvent) {
         Sammenligning sammenligning = sammenligningEvent.getSammenligning();
-        Enhet enhet = sammenligningEvent.getEnhet();
+        OverordnetEnhet overordnetEnhet = sammenligningEvent.getOverordnetEnhet();
         Sektor ssbSektor = sammenligningEvent.getSsbSektor();
         Underenhet underenhet = sammenligningEvent.getUnderenhet();
 
@@ -105,8 +100,8 @@ public class BesøksstatistikkEventListener {
                 .addTagToReport("naring_2siffer_kode", sammenligningEvent.getNæring2siffer().getKode())
                 .addTagToReport("naring_2siffer_beskrivelse", sammenligningEvent.getNæring2siffer().getNavn())
                 .addTagToReport("bransje_navn", bransjenavn.orElse(null))
-                .addTagToReport("institusjonell_sektor_kode", enhet.getInstitusjonellSektorkode().getKode())
-                .addTagToReport("institusjonell_sektor_beskrivelse", enhet.getInstitusjonellSektorkode().getBeskrivelse())
+                .addTagToReport("institusjonell_sektor_kode", overordnetEnhet.getInstitusjonellSektorkode().getKode())
+                .addTagToReport("institusjonell_sektor_beskrivelse", overordnetEnhet.getInstitusjonellSektorkode().getBeskrivelse())
                 .addTagToReport("ssb_sektor_kode", ssbSektor.getKode())
                 .addTagToReport("ssb_sektor_beskrivelse", ssbSektor.getNavn())
                 .addTagToReport("sykefravarsprosent_antall_personer", String.valueOf(sammenligning.getVirksomhet().getAntallPersoner()))

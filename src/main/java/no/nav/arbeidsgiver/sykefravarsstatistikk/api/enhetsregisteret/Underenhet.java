@@ -7,7 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 
 @Builder
 @Data
-public class Underenhet {
+public class Underenhet implements Virksomhet {
     private final Orgnr orgnr;
     private final Orgnr overordnetEnhetOrgnr;
     private final String navn;

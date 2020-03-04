@@ -5,7 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Brans
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
@@ -23,6 +23,8 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.enInstitusjonellSektorkode;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.enUnderenhet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -58,7 +60,7 @@ public class SykefraværshistorikkServiceTest {
                 );
         when(enhetsregisteretClient.hentInformasjonOmEnhet(any()))
                 .thenReturn(
-                        Enhet
+                        OverordnetEnhet
                                 .builder()
                                 .orgnr(new Orgnr("99999999"))
                                 .build()
@@ -88,7 +90,8 @@ public class SykefraværshistorikkServiceTest {
 
         List<Sykefraværshistorikk> sykefraværshistorikk =
                 sykefraværshistorikkService.hentSykefraværshistorikk(
-                        new Orgnr("999999998")
+                        enUnderenhet("999999998"),
+                        enInstitusjonellSektorkode()
                 );
 
         verify(kvartalsvisSykefraværprosentRepository, times(0))

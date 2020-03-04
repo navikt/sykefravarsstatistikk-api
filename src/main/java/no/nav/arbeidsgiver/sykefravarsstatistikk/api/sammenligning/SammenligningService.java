@@ -1,11 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sammenligning;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.InnloggetBruker;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.besøksstatistikk.SammenligningEvent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
@@ -15,7 +9,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sammen
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
@@ -65,8 +59,8 @@ public class SammenligningService {
     ) {
         Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
 
-        Enhet enhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
-        Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(enhet.getInstitusjonellSektorkode());
+        OverordnetEnhet overordnetEnhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
+        Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(overordnetEnhet.getInstitusjonellSektorkode());
         Næringskode5Siffer næring5siffer = underenhet.getNæringskode();
         Næring næring = klassifikasjonerRepository.hentNæring(næring5siffer.hentNæringskode2Siffer());
 
@@ -91,7 +85,7 @@ public class SammenligningService {
 
         eventPublisher.publishEvent(new SammenligningEvent(
                 underenhet,
-                enhet,
+                overordnetEnhet,
                 ssbSektor,
                 næring5siffer,
                 næring,

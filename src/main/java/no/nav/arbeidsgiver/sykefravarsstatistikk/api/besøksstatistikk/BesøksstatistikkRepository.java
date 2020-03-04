@@ -1,18 +1,13 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.besøksstatistikk;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnRolle;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -88,7 +83,7 @@ public class BesøksstatistikkRepository {
         Sammenligning sammenligning = sammenligningEvent.getSammenligning();
         Underenhet underenhet = sammenligningEvent.getUnderenhet();
         Næringskode5Siffer næring5siffer = sammenligningEvent.getNæring5siffer();
-        Enhet enhet = sammenligningEvent.getEnhet();
+        OverordnetEnhet overordnetEnhet = sammenligningEvent.getOverordnetEnhet();
         Sektor ssbSektor = sammenligningEvent.getSsbSektor();
 
         Optional<BigDecimal> prosentNæring = Optional.ofNullable(sammenligning.getNæring()).map(Sykefraværprosent::getProsent);
@@ -114,8 +109,8 @@ public class BesøksstatistikkRepository {
                         .addValue(NÆRING_5SIFFER_BESKRIVELSE, næring5siffer.getBeskrivelse())
                         .addValue(NÆRING_2SIFFER_BESKRIVELSE, sammenligningEvent.getNæring2siffer().getNavn())
                         .addValue(BRANSJE_NAVN, bransjenavn.orElse(null))
-                        .addValue(INSTITUSJONELL_SEKTOR_KODE, enhet.getInstitusjonellSektorkode().getKode())
-                        .addValue(INSTITUSJONELL_SEKTOR_BESKRIVELSE, enhet.getInstitusjonellSektorkode().getBeskrivelse())
+                        .addValue(INSTITUSJONELL_SEKTOR_KODE, overordnetEnhet.getInstitusjonellSektorkode().getKode())
+                        .addValue(INSTITUSJONELL_SEKTOR_BESKRIVELSE, overordnetEnhet.getInstitusjonellSektorkode().getBeskrivelse())
                         .addValue(SSB_SEKTOR_KODE, ssbSektor.getKode())
                         .addValue(SSB_SEKTOR_BESKRIVELSE, ssbSektor.getNavn())
                         .addValue(SESSION_ID, sammenligningEvent.getSessionId())

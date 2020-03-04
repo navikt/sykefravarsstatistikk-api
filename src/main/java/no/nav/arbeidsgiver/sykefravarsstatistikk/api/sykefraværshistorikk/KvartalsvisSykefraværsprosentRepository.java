@@ -5,12 +5,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Virksomhet;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -96,7 +92,7 @@ public class KvartalsvisSykefraværsprosentRepository {
         }
     }
 
-    public List<KvartalsvisSykefraværsprosent> hentKvartalsvisSykefraværprosentVirksomhet(Underenhet underenhet) {
+    public List<KvartalsvisSykefraværsprosent> hentKvartalsvisSykefraværprosentVirksomhet(Virksomhet virksomhet) {
         try {
             return namedParameterJdbcTemplate.query(
                     "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal " +
@@ -104,8 +100,8 @@ public class KvartalsvisSykefraværsprosentRepository {
                             "where orgnr = :orgnr " +
                             "ORDER BY arstall, kvartal ",
                     new MapSqlParameterSource()
-                            .addValue("orgnr", underenhet.getOrgnr().getVerdi()),
-                    (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs, underenhet.getNavn())
+                            .addValue("orgnr", virksomhet.getOrgnr().getVerdi()),
+                    (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs, virksomhet.getNavn())
             );
         } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();

@@ -11,7 +11,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.InstitusjonellSektorkode;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
@@ -63,7 +63,7 @@ public class TestData {
     public static SammenligningEvent.SammenligningEventBuilder enSammenligningEventBuilder() {
         return SammenligningEvent.builder()
                 .underenhet(enUnderenhet())
-                .enhet(enEnhet())
+                .overordnetEnhet(enEnhet())
                 .ssbSektor(enSektor())
                 .næring5siffer(enNæringskode5Siffer())
                 .næring2siffer(enNæring())
@@ -94,12 +94,16 @@ public class TestData {
         return new Orgnr("971800534");
     }
 
-    public static Enhet enEnhet() {
-        return Enhet.builder()
+    public static InstitusjonellSektorkode enInstitusjonellSektorkode() {
+        return new InstitusjonellSektorkode("1234", "sektor!");
+    }
+
+    public static OverordnetEnhet enEnhet() {
+        return OverordnetEnhet.builder()
                 .orgnr(etOrgnr())
                 .antallAnsatte(10)
                 .navn("Enhet AS")
-                .institusjonellSektorkode(new InstitusjonellSektorkode("1234", "sektor!"))
+                .institusjonellSektorkode(enInstitusjonellSektorkode())
                 .næringskode(enNæringskode5Siffer())
                 .build();
     }

@@ -1,23 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjeprogram;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretClient;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.virksomhetsklassifikasjoner.KlassifikasjonerRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.virksomhetsklassifikasjoner.SektorMappingService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjeprogram;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Enhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretClient;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.virksomhetsklassifikasjoner.KlassifikasjonerRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.virksomhetsklassifikasjoner.SektorMappingService;
 import org.springframework.stereotype.Component;
@@ -60,50 +48,61 @@ public class SykefraværshistorikkService {
         this.bransjeprogram = bransjeprogram;
     }
 
-
-    public List<Sykefraværshistorikk> hentSykefraværshistorikk(Orgnr orgnr) {
-        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
-        Enhet enhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
-
-        Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(enhet.getInstitusjonellSektorkode());
+    public List<Sykefraværshistorikk> hentSykefraværshistorikk(
+            Underenhet underenhet,
+            InstitusjonellSektorkode institusjonellSektorkode
+    ) {
         Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
+        Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(institusjonellSektorkode);
 
         boolean erIBransjeprogram =
                 bransje.isPresent()
                         && bransje.get().lengdePåNæringskoder() == LENGDE_PÅ_NÆRINGSKODE_AV_BRANSJENIVÅ;
 
-        List<Sykefraværshistorikk> kvartalsvisSykefraværprosentListe =
+        List<Sykefraværshistorikk> sykefraværshistorikkListe =
                 Stream.of(
                         uthentingMedFeilhåndteringOgTimeout(
-                                () ->
-                                        hentSykefraværshistorikkLand(),
+                                () -> hentSykefraværshistorikkLand(),
                                 SykefraværshistorikkType.LAND,
                                 SYKEFRAVÆRPROSENT_LAND_LABEL),
                         uthentingMedFeilhåndteringOgTimeout(
-                                () ->
-                                        hentSykefraværshistorikkSektor(ssbSektor),
+                                () -> hentSykefraværshistorikkSektor(ssbSektor),
                                 SykefraværshistorikkType.SEKTOR,
                                 ssbSektor.getNavn()),
                         erIBransjeprogram ?
                                 uthentingMedFeilhåndteringOgTimeout(
-                                        () ->
-                                                hentSykefraværshistorikkBransje(bransje.get()),
+                                        () -> hentSykefraværshistorikkBransje(bransje.get()),
                                         SykefraværshistorikkType.BRANSJE,
                                         bransje.get().getNavn()
                                 )
                                 : uthentingAvSykefraværshistorikkNæring(underenhet),
                         uthentingMedFeilhåndteringOgTimeout(
-                                () ->
-                                        hentSykefraværshistorikkVirksomhet(underenhet),
+                                () -> hentSykefraværshistorikkVirksomhet(underenhet, SykefraværshistorikkType.VIRKSOMHET),
                                 SykefraværshistorikkType.VIRKSOMHET,
                                 underenhet.getNavn())
                 )
                         .map(CompletableFuture::join)
                         .collect(Collectors.toList());
 
-        return kvartalsvisSykefraværprosentListe;
+        return sykefraværshistorikkListe;
     }
 
+    public List<Sykefraværshistorikk> hentSykefraværshistorikk(Underenhet underenhet, OverordnetEnhet overordnetEnhet) {
+
+        Sykefraværshistorikk historikkForOverordnetEnhet = uthentingMedFeilhåndteringOgTimeout(
+                () -> hentSykefraværshistorikkVirksomhet(overordnetEnhet, SykefraværshistorikkType.OVERORDNET_ENHET),
+                SykefraværshistorikkType.OVERORDNET_ENHET,
+                underenhet.getNavn()
+        ).join();
+
+        List<Sykefraværshistorikk> sykefraværshistorikkListe = hentSykefraværshistorikk(
+                underenhet,
+                overordnetEnhet.getInstitusjonellSektorkode()
+        );
+        sykefraværshistorikkListe.add(historikkForOverordnetEnhet);
+
+        return sykefraværshistorikkListe;
+    }
 
     private Sykefraværshistorikk hentSykefraværshistorikkLand() {
         return byggSykefraværshistorikk(
@@ -138,12 +137,13 @@ public class SykefraværshistorikkService {
     }
 
     private Sykefraværshistorikk hentSykefraværshistorikkVirksomhet(
-            Underenhet underenhet
+            Virksomhet virksomhet,
+            SykefraværshistorikkType type
     ) {
         return byggSykefraværshistorikk(
-                SykefraværshistorikkType.VIRKSOMHET,
-                underenhet.getNavn(),
-                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(underenhet)
+                type,
+                virksomhet.getNavn(),
+                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(virksomhet)
         );
     }
 
