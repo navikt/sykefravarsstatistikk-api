@@ -10,10 +10,10 @@ import java.math.BigDecimal;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.etÅrstallOgKvartal;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class KvartalsvisSykefraværsprosentTest {
+public class KvartalsvisSykefraværTest {
     @Test
     public void sykefraværprosent__skal_regne_ut_riktig_prosent_ut_i_fra_tapte_og_mulige_dagsverk() {
-        KvartalsvisSykefraværsprosent sykefravær = new KvartalsvisSykefraværsprosent(
+        KvartalsvisSykefravær sykefravær = new KvartalsvisSykefravær(
                 etÅrstallOgKvartal(),
                 new BigDecimal(5),
                 new BigDecimal(10),
@@ -24,7 +24,7 @@ public class KvartalsvisSykefraværsprosentTest {
 
     @Test
     public void sykefraværprosent__skal_runde_prosenten_opp_ved_tvil() {
-        KvartalsvisSykefraværsprosent sykefravær = new KvartalsvisSykefraværsprosent(
+        KvartalsvisSykefravær sykefravær = new KvartalsvisSykefravær(
                 etÅrstallOgKvartal(),
                 new BigDecimal(455),
                 new BigDecimal(10000),
@@ -35,7 +35,7 @@ public class KvartalsvisSykefraværsprosentTest {
 
     @Test
     public void sykefraværprosent__skal_være_maskert_hvis_antallPersoner_er_4_eller_under() {
-        KvartalsvisSykefraværsprosent sykefravær = new KvartalsvisSykefraværsprosent(
+        KvartalsvisSykefravær sykefravær = new KvartalsvisSykefravær(
                 etÅrstallOgKvartal(),
                 new BigDecimal(1),
                 new BigDecimal(10),
@@ -49,7 +49,7 @@ public class KvartalsvisSykefraværsprosentTest {
 
     @Test
     public void sykefraværprosent__skal_være_maskert_hvis_antallPersoner_over_4() {
-        KvartalsvisSykefraværsprosent sykefravær = new KvartalsvisSykefraværsprosent(
+        KvartalsvisSykefravær sykefravær = new KvartalsvisSykefravær(
                 etÅrstallOgKvartal(),
                 new BigDecimal(1),
                 new BigDecimal(10),
@@ -66,7 +66,7 @@ public class KvartalsvisSykefraværsprosentTest {
     public void sykefraværprosent__skal_bare_inkludere_relevante_felt_i_json_konvertering() {
         ObjectMapper mapper = new ObjectMapper();
 
-        KvartalsvisSykefraværsprosent sykefravær = new KvartalsvisSykefraværsprosent(
+        KvartalsvisSykefravær sykefravær = new KvartalsvisSykefravær(
                 etÅrstallOgKvartal(),
                 new BigDecimal(5),
                 new BigDecimal(10),

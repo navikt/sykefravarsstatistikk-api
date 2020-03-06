@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Konstanter;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 
 import java.math.BigDecimal;
@@ -11,7 +10,7 @@ import java.math.RoundingMode;
 import java.util.Comparator;
 
 @Data
-public class KvartalsvisSykefraværsprosent implements Comparable<KvartalsvisSykefraværsprosent> {
+public class KvartalsvisSykefravær implements Comparable<KvartalsvisSykefravær> {
 
     @JsonIgnore
     private final ÅrstallOgKvartal årstallOgKvartal;
@@ -21,7 +20,7 @@ public class KvartalsvisSykefraværsprosent implements Comparable<KvartalsvisSyk
     private final BigDecimal muligeDagsverk;
     private final boolean erMaskert;
 
-    public KvartalsvisSykefraværsprosent(
+    public KvartalsvisSykefravær(
             ÅrstallOgKvartal årstallOgKvartal,
             BigDecimal tapteDagsverk,
             BigDecimal muligeDagsverk,
@@ -53,9 +52,9 @@ public class KvartalsvisSykefraværsprosent implements Comparable<KvartalsvisSyk
 
 
     @Override
-    public int compareTo(KvartalsvisSykefraværsprosent kvartalsvisSykefraværsprosent) {
+    public int compareTo(KvartalsvisSykefravær kvartalsvisSykefravær) {
         return Comparator
-                .comparing(KvartalsvisSykefraværsprosent::getÅrstallOgKvartal)
-                .compare(this, kvartalsvisSykefraværsprosent);
+                .comparing(KvartalsvisSykefravær::getÅrstallOgKvartal)
+                .compare(this, kvartalsvisSykefravær);
     }
 }
