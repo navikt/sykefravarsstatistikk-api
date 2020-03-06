@@ -27,14 +27,14 @@ public class KvartalsvisSykefraværRepository {
 
     }
 
-    public List<KvartalsvisSykefravær> hentKvartalsvisSykefraværprosentLand(String label) {
+    public List<KvartalsvisSykefravær> hentKvartalsvisSykefraværprosentLand() {
         try {
             return namedParameterJdbcTemplate.query(
                     "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal " +
                             "FROM SYKEFRAVAR_STATISTIKK_LAND " +
                             "ORDER BY arstall, kvartal ",
                     new HashMap<>(),
-                    (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs, label)
+                    (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs)
             );
         } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();
@@ -50,7 +50,7 @@ public class KvartalsvisSykefraværRepository {
                             "ORDER BY arstall, kvartal ",
                     new MapSqlParameterSource()
                             .addValue("sektorKode", sektor.getKode()),
-                    (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs, sektor.getNavn())
+                    (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs)
             );
         } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();
@@ -66,7 +66,7 @@ public class KvartalsvisSykefraværRepository {
                             "ORDER BY arstall, kvartal ",
                     new MapSqlParameterSource()
                             .addValue("naringKode", næring.getKode()),
-                    (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs, næring.getNavn())
+                    (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs)
             );
         } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();
@@ -83,7 +83,7 @@ public class KvartalsvisSykefraværRepository {
                             "ORDER BY arstall, kvartal ",
                     new MapSqlParameterSource()
                             .addValue("naringKoder", bransje.getKoderSomSpesifisererNæringer()),
-                    (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs, bransje.getNavn())
+                    (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs)
             );
         } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();
@@ -99,7 +99,7 @@ public class KvartalsvisSykefraværRepository {
                             "ORDER BY arstall, kvartal ",
                     new MapSqlParameterSource()
                             .addValue("orgnr", virksomhet.getOrgnr().getVerdi()),
-                    (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs, virksomhet.getNavn())
+                    (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs)
             );
         } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();
@@ -107,7 +107,7 @@ public class KvartalsvisSykefraværRepository {
     }
 
 
-    private KvartalsvisSykefravær mapTilKvartalsvisSykefraværprosent(ResultSet rs, String label /*TODO fjern ubrukt variabel*/) throws SQLException {
+    private KvartalsvisSykefravær mapTilKvartalsvisSykefraværprosent(ResultSet rs) throws SQLException {
         return new KvartalsvisSykefravær(
                 new ÅrstallOgKvartal(
                         rs.getInt("arstall"),

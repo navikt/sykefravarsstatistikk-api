@@ -68,7 +68,7 @@ public class SykefraværshistorikkServiceTest {
                 .thenReturn(
                         new Sektor("1", "Statlig forvaltning")
                 );
-        when(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand(any()))
+        when(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand())
                 .thenReturn(
                         Arrays.asList(sykefraværprosent("Norge"))
                 );

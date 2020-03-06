@@ -62,7 +62,7 @@ public class KvartalsvisSykefraværRepositoryJdbcTest {
                 parametre(2018, 4, 10, 6, 100)
         );
 
-        List<KvartalsvisSykefravær> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand("Norge");
+        List<KvartalsvisSykefravær> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand();
         assertThat(resultat.size()).isEqualTo(3);
         assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefravær(
                 new ÅrstallOgKvartal(2018, 4),
@@ -225,7 +225,7 @@ public class KvartalsvisSykefraværRepositoryJdbcTest {
                 parametre(2019, 1, 10, 5, 100)
         );
 
-        List<KvartalsvisSykefravær> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand("Norge");
+        List<KvartalsvisSykefravær> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand();
 
         assertThat(resultat.size()).isEqualTo(2);
 

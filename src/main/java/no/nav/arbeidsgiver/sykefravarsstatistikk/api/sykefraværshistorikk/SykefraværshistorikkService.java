@@ -108,7 +108,7 @@ public class SykefraværshistorikkService {
         return byggSykefraværshistorikk(
                 SykefraværshistorikkType.LAND,
                 SYKEFRAVÆRPROSENT_LAND_LABEL,
-                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand(SYKEFRAVÆRPROSENT_LAND_LABEL)
+                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand()
         );
     }
 
