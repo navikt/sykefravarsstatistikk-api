@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjeprogram;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.OverordnetEnhet;
@@ -33,7 +32,7 @@ import static org.mockito.Mockito.*;
 public class SykefraværshistorikkServiceTest {
 
     @Mock
-    private KvartalsvisSykefraværsprosentRepository kvartalsvisSykefraværprosentRepository;
+    private KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository;
     @Mock
     private EnhetsregisteretClient enhetsregisteretClient;
     @Mock
@@ -69,7 +68,7 @@ public class SykefraværshistorikkServiceTest {
                 .thenReturn(
                         new Sektor("1", "Statlig forvaltning")
                 );
-        when(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand(any()))
+        when(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand())
                 .thenReturn(
                         Arrays.asList(sykefraværprosent("Norge"))
                 );
@@ -101,9 +100,12 @@ public class SykefraværshistorikkServiceTest {
     }
 
 
-    private static KvartalsvisSykefraværsprosent sykefraværprosent(String label) {
-        return new KvartalsvisSykefraværsprosent(
+    private static KvartalsvisSykefravær sykefraværprosent(String label) {
+        return new KvartalsvisSykefravær(
                 new ÅrstallOgKvartal(2019, 1),
-                new Sykefraværprosent(label, new BigDecimal(50), new BigDecimal(100), 10));
+                new BigDecimal(50),
+                new BigDecimal(100),
+                10
+        );
     }
 }

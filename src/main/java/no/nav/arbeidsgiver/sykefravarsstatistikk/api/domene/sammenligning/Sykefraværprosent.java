@@ -7,6 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Konstanter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+@Deprecated
 @Value
 public class Sykefraværprosent {
 

@@ -29,14 +29,14 @@ public class SykefraværshistorikkService {
     public static final int LENGDE_PÅ_NÆRINGSKODE_AV_BRANSJENIVÅ = 5;
     public static final String SYKEFRAVÆRPROSENT_LAND_LABEL = "Norge";
 
-    private final KvartalsvisSykefraværsprosentRepository kvartalsvisSykefraværprosentRepository;
+    private final KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository;
     private final EnhetsregisteretClient enhetsregisteretClient;
     private final SektorMappingService sektorMappingService;
     private final KlassifikasjonerRepository klassifikasjonerRepository;
     private final Bransjeprogram bransjeprogram;
 
     public SykefraværshistorikkService(
-            KvartalsvisSykefraværsprosentRepository kvartalsvisSykefraværprosentRepository,
+            KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository,
             EnhetsregisteretClient enhetsregisteretClient,
             SektorMappingService sektorMappingService,
             KlassifikasjonerRepository klassifikasjonerRepository,
@@ -108,7 +108,7 @@ public class SykefraværshistorikkService {
         return byggSykefraværshistorikk(
                 SykefraværshistorikkType.LAND,
                 SYKEFRAVÆRPROSENT_LAND_LABEL,
-                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand(SYKEFRAVÆRPROSENT_LAND_LABEL)
+                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand()
         );
     }
 
@@ -217,12 +217,12 @@ public class SykefraværshistorikkService {
     private static Sykefraværshistorikk byggSykefraværshistorikk(
             SykefraværshistorikkType sykefraværshistorikkType,
             String label,
-            List<KvartalsvisSykefraværsprosent> kvartalsvisSykefraværsprosent
+            List<KvartalsvisSykefravær> kvartalsvisSykefravær
     ) {
         Sykefraværshistorikk sykefraværshistorikk = new Sykefraværshistorikk();
         sykefraværshistorikk.setType(sykefraværshistorikkType);
         sykefraværshistorikk.setLabel(label);
-        sykefraværshistorikk.setKvartalsvisSykefraværsprosent(kvartalsvisSykefraværsprosent);
+        sykefraværshistorikk.setKvartalsvisSykefravær(kvartalsvisSykefravær);
 
         return sykefraværshistorikk;
     }

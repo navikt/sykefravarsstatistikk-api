@@ -8,6 +8,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
@@ -15,7 +16,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Overordnet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.InstitusjonellSektorkode;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tapteDagsverkForKostnadsberegning.KvartalsvisTapteDagsverk;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -150,10 +150,6 @@ public class TestData {
         return new Sykefraværprosent("Hei AS", new BigDecimal(5), new BigDecimal(100), antallAnsatte);
     }
 
-    public static KvartalsvisTapteDagsverk testTapteDagsverk(int tapteDagsverk, int årstall, int kvartal, int antallPersoner) {
-        return new KvartalsvisTapteDagsverk(new BigDecimal(tapteDagsverk).setScale(6), årstall, kvartal, antallPersoner);
-    }
-
     public static Sykefraværprosent enSykefraværprosent() {
         return enSykefraværprosent(8);
     }
@@ -164,5 +160,9 @@ public class TestData {
 
     public static Bransje enBransje() {
         return new Bransje("bransje", "12322");
+    }
+
+    public static ÅrstallOgKvartal etÅrstallOgKvartal() {
+        return new ÅrstallOgKvartal(2019, 4);
     }
 }

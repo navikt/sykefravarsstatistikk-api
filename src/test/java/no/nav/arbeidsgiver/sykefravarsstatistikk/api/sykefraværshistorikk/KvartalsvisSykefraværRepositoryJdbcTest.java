@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
@@ -28,15 +27,15 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 @ActiveProfiles("db-test")
 @RunWith(SpringRunner.class)
 @DataJdbcTest
-public class KvartalsvisSykefraværsprosentRepositoryJdbcTest {
+public class KvartalsvisSykefraværRepositoryJdbcTest {
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    private KvartalsvisSykefraværsprosentRepository kvartalsvisSykefraværprosentRepository;
+    private KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository;
 
     @Before
     public void setUp() {
-        kvartalsvisSykefraværprosentRepository = new KvartalsvisSykefraværsprosentRepository(jdbcTemplate);
+        kvartalsvisSykefraværprosentRepository = new KvartalsvisSykefraværRepository(jdbcTemplate);
         slettAllStatistikkFraDatabase(jdbcTemplate);
     }
 
@@ -63,18 +62,14 @@ public class KvartalsvisSykefraværsprosentRepositoryJdbcTest {
                 parametre(2018, 4, 10, 6, 100)
         );
 
-        List<KvartalsvisSykefraværsprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand("Norge");
+        List<KvartalsvisSykefravær> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand();
         assertThat(resultat.size()).isEqualTo(3);
-        assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefraværsprosent(
-                        new ÅrstallOgKvartal(2018, 4),
-                        new Sykefraværprosent(
-                                "Norge",
-                                new BigDecimal(6),
-                                new BigDecimal(100),
-                                10
-                        )
-                )
-        );
+        assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefravær(
+                new ÅrstallOgKvartal(2018, 4),
+                new BigDecimal(6),
+                new BigDecimal(100),
+                10
+        ));
     }
 
     @Test
@@ -101,19 +96,15 @@ public class KvartalsvisSykefraværsprosentRepositoryJdbcTest {
                 parametre(new Sektor("2", "Kommunal forvaltning"), 2018, 4, 10, 5, 100)
         );
 
-        List<KvartalsvisSykefraværsprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor
+        List<KvartalsvisSykefravær> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor
                 (statligForvaltning);
         assertThat(resultat.size()).isEqualTo(3);
-        assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefraværsprosent(
-                        new ÅrstallOgKvartal(2018, 4),
-                        new Sykefraværprosent(
-                                "Statlig forvaltning",
-                                new BigDecimal(4),
-                                new BigDecimal(100),
-                                10
-                        )
-                )
-        );
+        assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefravær(
+                new ÅrstallOgKvartal(2018, 4),
+                new BigDecimal(4),
+                new BigDecimal(100),
+                10
+        ));
     }
 
     @Test
@@ -135,16 +126,13 @@ public class KvartalsvisSykefraværsprosentRepositoryJdbcTest {
                 parametre(new Næring("85", "Undervisning"), 2018, 4, 10, 5, 100)
         );
 
-        List<KvartalsvisSykefraværsprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentNæring(produksjonAvKlær);
+        List<KvartalsvisSykefravær> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentNæring(produksjonAvKlær);
         assertThat(resultat.size()).isEqualTo(2);
-        assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefraværsprosent(
+        assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefravær(
                         new ÅrstallOgKvartal(2019, 1),
-                        new Sykefraværprosent(
-                                produksjonAvKlær.getNavn(),
-                                new BigDecimal(3),
-                                new BigDecimal(100),
-                                10
-                        )
+                        new BigDecimal(3),
+                        new BigDecimal(100),
+                        10
                 )
         );
     }
@@ -181,18 +169,14 @@ public class KvartalsvisSykefraværsprosentRepositoryJdbcTest {
         );
 
         Bransje sykehjem = new Bransje("Sykehjem", "87101", "87102");
-        List<KvartalsvisSykefraværsprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentBransje(sykehjem);
+        List<KvartalsvisSykefravær> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentBransje(sykehjem);
         assertThat(resultat.size()).isEqualTo(2);
-        assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefraværsprosent(
-                        new ÅrstallOgKvartal(2019, 1),
-                        new Sykefraværprosent(
-                                sykehjem.getNavn(),
-                                new BigDecimal(8),
-                                new BigDecimal(200),
-                                20
-                        )
-                )
-        );
+        assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefravær(
+                new ÅrstallOgKvartal(2019, 1),
+                new BigDecimal(8),
+                new BigDecimal(200),
+                20
+        ));
     }
 
     @Test
@@ -218,18 +202,14 @@ public class KvartalsvisSykefraværsprosentRepositoryJdbcTest {
                 parametre(barnehage.getOrgnr(), 2018, 4, 10, 5, 100)
         );
 
-        List<KvartalsvisSykefraværsprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(barnehage);
+        List<KvartalsvisSykefravær> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(barnehage);
         assertThat(resultat.size()).isEqualTo(2);
-        assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefraværsprosent(
-                        new ÅrstallOgKvartal(2018, 4),
-                        new Sykefraværprosent(
-                                barnehage.getNavn(),
-                                new BigDecimal(5),
-                                new BigDecimal(100),
-                                10
-                        )
-                )
-        );
+        assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefravær(
+                new ÅrstallOgKvartal(2018, 4),
+                new BigDecimal(5),
+                new BigDecimal(100),
+                10
+        ));
     }
 
     @Test
@@ -245,17 +225,17 @@ public class KvartalsvisSykefraværsprosentRepositoryJdbcTest {
                 parametre(2019, 1, 10, 5, 100)
         );
 
-        List<KvartalsvisSykefraværsprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand("Norge");
+        List<KvartalsvisSykefravær> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand();
 
         assertThat(resultat.size()).isEqualTo(2);
 
-        KvartalsvisSykefraværsprosent ikkeMaskertKvartalsvisSykefraværsprosent = resultat.get(0);
-        assertThat(ikkeMaskertKvartalsvisSykefraværsprosent.isErMaskert()).isFalse();
-        assertThat(ikkeMaskertKvartalsvisSykefraværsprosent.getProsent().setScale(2)).isEqualTo(new BigDecimal(5).setScale(2));
+        KvartalsvisSykefravær ikkeMaskertKvartalsvisSykefravær = resultat.get(0);
+        assertThat(ikkeMaskertKvartalsvisSykefravær.isErMaskert()).isFalse();
+        assertThat(ikkeMaskertKvartalsvisSykefravær.getProsent().setScale(2)).isEqualTo(new BigDecimal(5).setScale(2));
 
-        KvartalsvisSykefraværsprosent maskertKvartalsvisSykefraværsprosent = resultat.get(1);
-        assertThat(maskertKvartalsvisSykefraværsprosent.isErMaskert()).isTrue();
-        assertThat(maskertKvartalsvisSykefraværsprosent.getProsent()).isNull();
+        KvartalsvisSykefravær maskertKvartalsvisSykefravær = resultat.get(1);
+        assertThat(maskertKvartalsvisSykefravær.isErMaskert()).isTrue();
+        assertThat(maskertKvartalsvisSykefravær.getProsent()).isNull();
     }
 
 

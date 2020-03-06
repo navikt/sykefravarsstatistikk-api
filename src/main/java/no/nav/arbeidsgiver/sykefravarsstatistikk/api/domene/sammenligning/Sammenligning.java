@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+@Deprecated // TODO Brukes i Besøksstatistikk. Må vurdere om statistikken fremdeles skal lages, og i så fall knytte det til Sykefraværshistorikk-objektet.
 @Data
 @Builder
 @AllArgsConstructor
