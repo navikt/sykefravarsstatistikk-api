@@ -104,6 +104,9 @@ public class SykefraværshistorikkServiceTest {
     private static KvartalsvisSykefraværsprosent sykefraværprosent(String label) {
         return new KvartalsvisSykefraværsprosent(
                 new ÅrstallOgKvartal(2019, 1),
-                new Sykefraværprosent(label, new BigDecimal(50), new BigDecimal(100), 10));
+                new BigDecimal(50),
+                new BigDecimal(100),
+                10
+        );
     }
 }

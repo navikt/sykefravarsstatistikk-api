@@ -1,11 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Virksomhet;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -109,17 +107,15 @@ public class KvartalsvisSykefraværsprosentRepository {
     }
 
 
-    private KvartalsvisSykefraværsprosent mapTilKvartalsvisSykefraværprosent(ResultSet rs, String label) throws SQLException {
+    private KvartalsvisSykefraværsprosent mapTilKvartalsvisSykefraværprosent(ResultSet rs, String label /*TODO fjern ubrukt variabel*/) throws SQLException {
         return new KvartalsvisSykefraværsprosent(
                 new ÅrstallOgKvartal(
                         rs.getInt("arstall"),
                         rs.getInt("kvartal")
                 ),
-                new Sykefraværprosent(
-                        label,
-                        rs.getBigDecimal("tapte_dagsverk"),
-                        rs.getBigDecimal("mulige_dagsverk"),
-                        rs.getInt("antall_personer")
-                ));
+                rs.getBigDecimal("tapte_dagsverk"),
+                rs.getBigDecimal("mulige_dagsverk"),
+                rs.getInt("antall_personer")
+        );
     }
 }

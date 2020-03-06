@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
@@ -66,15 +65,11 @@ public class KvartalsvisSykefraværsprosentRepositoryJdbcTest {
         List<KvartalsvisSykefraværsprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand("Norge");
         assertThat(resultat.size()).isEqualTo(3);
         assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefraværsprosent(
-                        new ÅrstallOgKvartal(2018, 4),
-                        new Sykefraværprosent(
-                                "Norge",
-                                new BigDecimal(6),
-                                new BigDecimal(100),
-                                10
-                        )
-                )
-        );
+                new ÅrstallOgKvartal(2018, 4),
+                new BigDecimal(6),
+                new BigDecimal(100),
+                10
+        ));
     }
 
     @Test
@@ -105,15 +100,11 @@ public class KvartalsvisSykefraværsprosentRepositoryJdbcTest {
                 (statligForvaltning);
         assertThat(resultat.size()).isEqualTo(3);
         assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefraværsprosent(
-                        new ÅrstallOgKvartal(2018, 4),
-                        new Sykefraværprosent(
-                                "Statlig forvaltning",
-                                new BigDecimal(4),
-                                new BigDecimal(100),
-                                10
-                        )
-                )
-        );
+                new ÅrstallOgKvartal(2018, 4),
+                new BigDecimal(4),
+                new BigDecimal(100),
+                10
+        ));
     }
 
     @Test
@@ -139,12 +130,9 @@ public class KvartalsvisSykefraværsprosentRepositoryJdbcTest {
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefraværsprosent(
                         new ÅrstallOgKvartal(2019, 1),
-                        new Sykefraværprosent(
-                                produksjonAvKlær.getNavn(),
-                                new BigDecimal(3),
-                                new BigDecimal(100),
-                                10
-                        )
+                        new BigDecimal(3),
+                        new BigDecimal(100),
+                        10
                 )
         );
     }
@@ -184,15 +172,11 @@ public class KvartalsvisSykefraværsprosentRepositoryJdbcTest {
         List<KvartalsvisSykefraværsprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentBransje(sykehjem);
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefraværsprosent(
-                        new ÅrstallOgKvartal(2019, 1),
-                        new Sykefraværprosent(
-                                sykehjem.getNavn(),
-                                new BigDecimal(8),
-                                new BigDecimal(200),
-                                20
-                        )
-                )
-        );
+                new ÅrstallOgKvartal(2019, 1),
+                new BigDecimal(8),
+                new BigDecimal(200),
+                20
+        ));
     }
 
     @Test
@@ -221,15 +205,11 @@ public class KvartalsvisSykefraværsprosentRepositoryJdbcTest {
         List<KvartalsvisSykefraværsprosent> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(barnehage);
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefraværsprosent(
-                        new ÅrstallOgKvartal(2018, 4),
-                        new Sykefraværprosent(
-                                barnehage.getNavn(),
-                                new BigDecimal(5),
-                                new BigDecimal(100),
-                                10
-                        )
-                )
-        );
+                new ÅrstallOgKvartal(2018, 4),
+                new BigDecimal(5),
+                new BigDecimal(100),
+                10
+        ));
     }
 
     @Test

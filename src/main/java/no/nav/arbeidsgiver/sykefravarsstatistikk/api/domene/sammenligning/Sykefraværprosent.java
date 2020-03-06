@@ -7,7 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Konstanter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-@Deprecated // TODO Brukes i KvartalsvisSykefraværsprosent. Burde refaktoreres bort.
+@Deprecated
 @Value
 public class Sykefraværprosent {
 
