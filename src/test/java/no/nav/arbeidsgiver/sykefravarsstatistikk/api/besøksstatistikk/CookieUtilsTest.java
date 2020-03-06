@@ -1,5 +1,6 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sammenligning;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.besøksstatistikk;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.besøksstatistikk.CookieUtils;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;

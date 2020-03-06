@@ -15,7 +15,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Overordnet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.InstitusjonellSektorkode;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tapteDagsverkForKostnadsberegning.KvartalsvisTapteDagsverk;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -148,10 +147,6 @@ public class TestData {
 
     public static Sykefraværprosent enSykefraværprosent(int antallAnsatte) {
         return new Sykefraværprosent("Hei AS", new BigDecimal(5), new BigDecimal(100), antallAnsatte);
-    }
-
-    public static KvartalsvisTapteDagsverk testTapteDagsverk(int tapteDagsverk, int årstall, int kvartal, int antallPersoner) {
-        return new KvartalsvisTapteDagsverk(new BigDecimal(tapteDagsverk).setScale(6), årstall, kvartal, antallPersoner);
     }
 
     public static Sykefraværprosent enSykefraværprosent() {
