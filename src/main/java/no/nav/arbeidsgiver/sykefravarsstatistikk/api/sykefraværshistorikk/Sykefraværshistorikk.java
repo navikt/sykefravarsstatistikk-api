@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
@@ -8,5 +9,7 @@ import java.util.List;
 public class Sykefraværshistorikk {
     private SykefraværshistorikkType type;
     private String label;
-    private List<KvartalsvisSykefravær> kvartalsvisSykefraværsprosent; // TODO Refaktorer til kvartalsvisSykefravær
+
+    @JsonProperty("kvartalsvisSykefraværsprosent")
+    private List<KvartalsvisSykefravær> kvartalsvisSykefravær;
 }

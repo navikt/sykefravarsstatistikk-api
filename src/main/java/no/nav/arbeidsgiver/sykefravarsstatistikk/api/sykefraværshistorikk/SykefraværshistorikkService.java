@@ -222,7 +222,7 @@ public class SykefraværshistorikkService {
         Sykefraværshistorikk sykefraværshistorikk = new Sykefraværshistorikk();
         sykefraværshistorikk.setType(sykefraværshistorikkType);
         sykefraværshistorikk.setLabel(label);
-        sykefraværshistorikk.setKvartalsvisSykefraværsprosent(kvartalsvisSykefravær);
+        sykefraværshistorikk.setKvartalsvisSykefravær(kvartalsvisSykefravær);
 
         return sykefraværshistorikk;
     }
