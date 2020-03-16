@@ -38,6 +38,30 @@ public class ApiTest {
 
 
     @Test
+    public void bedriftsmetrikker__skal_returnere_riktig_objekt() throws Exception {
+        HttpResponse<String> response = newBuilder().build().send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET + "/bedriftsmetrikker"))
+                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .GET()
+                        .build(),
+                ofString()
+        );
+
+        assertThat(response.statusCode()).isEqualTo(200);
+        JsonNode bedriftsmetrikker = objectMapper.readTree(response.body());
+
+        assertThat(bedriftsmetrikker.get("næringskode5Siffer"))
+                .isEqualTo(objectMapper.readTree("{" +
+                        "        \"kode\": \"10300\"," +
+                        "        \"beskrivelse\": \"Trygdeordninger underlagt offentlig forvaltning\"" +
+                        "    }")
+                );
+
+        assertThat(bedriftsmetrikker.get("antallAnsatte")).isEqualTo(objectMapper.readTree("143"));
+    }
+
+    @Test
     public void sykefraværshistorikk__skal_returnere_riktig_objekt() throws Exception {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
