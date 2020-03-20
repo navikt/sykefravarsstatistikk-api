@@ -140,20 +140,19 @@ public class AltinnClient {
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-NAV-APIKEY", altinnAPIGWApikey);
         headers.set("APIKEY", altinnHeader);
-        headers.setBearerAuth(tilgangskontrollUtils.getSelvbetjeningToken());
         return new HttpEntity<>(headers);
     }
 
     private HttpHeaders getAuthHeadersForInnloggetBruker() {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("X-NAV-APIKEY", altinnAPIGWApikey);
-        headers.set("APIKEY", altinnHeader);
+        headers.setBearerAuth(tilgangskontrollUtils.getSelvbetjeningToken());
         return headers;
     }
 
     private HttpHeaders getAuthHeadersMotAltinn() {
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(tilgangskontrollUtils.getSelvbetjeningToken());
+        headers.set("X-NAV-APIKEY", altinnAPIGWApikey);
+        headers.set("APIKEY", altinnHeader);
         return headers;
     }
 }
