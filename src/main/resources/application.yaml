@@ -106,8 +106,6 @@ altinn:
   url: "http://localhost:1331/altinn/"
   apikey: "test"
   apigw.apikey: "test"
-  proxy:
-    url: https://arbeidsgiver.nais.preprod.local/altinn-rettigheter-proxy
   iaweb.service:
     code: 3403
     edition: 1
@@ -128,7 +126,7 @@ altinn:
   apikey: ${ALTINN_APIKEY}
   apigw.apikey: ${ALTINN_APIGW_APIKEY}
   proxy:
-    url: https://arbeidsgiver.nais.adeo.no/altinn-rettigheter-proxy
+    url: https://arbeidsgiver.nais.preprod.local/altinn-rettigheter-proxy
   iaweb.service:
     code: 3403
     edition: 1
@@ -165,6 +163,8 @@ altinn:
   url: "https://api-gw.adeo.no/"
   apikey: ${ALTINN_APIKEY}
   apigw.apikey: ${ALTINN_APIGW_APIKEY}
+  proxy:
+    url: https://arbeidsgiver.nais.adeo.no/altinn-rettigheter-proxy
   iaweb.service:
     code: 3403
     edition: 2
