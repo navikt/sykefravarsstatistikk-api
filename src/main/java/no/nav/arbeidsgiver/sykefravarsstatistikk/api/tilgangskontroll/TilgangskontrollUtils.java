@@ -54,4 +54,8 @@ public class TilgangskontrollUtils {
                 .map(claims -> claims.getClaimSet());
     }
 
+    public String getSelvbetjeningToken() {
+        return contextHolder.getOIDCValidationContext().getToken(ISSUER_SELVBETJENING).getIdToken();
+    }
+
 }
