@@ -24,7 +24,7 @@ import static java.lang.String.format;
 @Slf4j
 @Component
 public class AltinnClient {
-        private final RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
     private final String altinnUrl;
     private final String altinnProxyUrl;
