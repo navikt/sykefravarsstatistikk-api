@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.CorrelationIdFilter;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;

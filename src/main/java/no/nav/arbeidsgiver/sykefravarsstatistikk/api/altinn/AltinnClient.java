@@ -3,6 +3,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.feratureToggles.FeatureToggleService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -22,33 +24,59 @@ import static java.lang.String.format;
 @Slf4j
 @Component
 public class AltinnClient {
-    private final RestTemplate restTemplate;
+        private final RestTemplate restTemplate;
 
     private final String altinnUrl;
+    private final String altinnProxyUrl;
     private final String altinnAPIGWApikey;
     private final String altinnHeader;
 
     private final String iawebServiceCode;
     private final String iawebServiceEdition;
 
+    private final TilgangskontrollUtils tilgangskontrollUtils;
+    private final FeatureToggleService featureToggles;
+
     public AltinnClient(
             RestTemplate restTemplate,
             @Value("${altinn.url}") String altinnUrl,
+            @Value("${altinn.proxy.url}") String altinnProxyUrl,
             @Value("${altinn.apigw.apikey}") String altinnAPIGWApikey,
             @Value("${altinn.apikey}") String altinnApikey,
             @Value("${altinn.iaweb.service.code}") String iawebServiceCode,
-            @Value("${altinn.iaweb.service.edition}") String iawebServiceEdition
+            @Value("${altinn.iaweb.service.edition}") String iawebServiceEdition,
+            TilgangskontrollUtils tilgangskontrollUtils,
+            FeatureToggleService featureToggles
     ) {
         this.restTemplate = restTemplate;
         this.altinnUrl = altinnUrl;
+        this.altinnProxyUrl = altinnProxyUrl;
         this.altinnAPIGWApikey = altinnAPIGWApikey;
         this.altinnHeader = altinnApikey;
         this.iawebServiceCode = iawebServiceCode;
         this.iawebServiceEdition = iawebServiceEdition;
+        this.tilgangskontrollUtils = tilgangskontrollUtils;
+        this.featureToggles = featureToggles;
     }
 
     public List<AltinnOrganisasjon> hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(Fnr fnr) {
-        URI uri = UriComponentsBuilder.fromUriString(altinnUrl)
+        if (featureToggles.erEnabled("arbeidsgiver.sykefravarsstatikk-api.bruk-altinn-proxy")) {
+            return hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
+                    altinnProxyUrl,
+                    fnr,
+                    getAuthHeadersForInnloggetBruker()
+            );
+        } else {
+            return hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
+                    altinnUrl,
+                    fnr,
+                    getAuthHeadersMotAltinn()
+            );
+        }
+    }
+
+    public List<AltinnOrganisasjon> hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(String baseUrl, Fnr fnr, HttpHeaders headers) {
+        URI uri = UriComponentsBuilder.fromUriString(baseUrl)
                 .pathSegment("ekstern", "altinn", "api", "serviceowner", "reportees")
                 .queryParam("ForceEIAuthentication")
                 .queryParam("subject", fnr.getVerdi())
@@ -60,7 +88,7 @@ public class AltinnClient {
             Optional<List<AltinnOrganisasjon>> respons = Optional.ofNullable(restTemplate.exchange(
                     uri,
                     HttpMethod.GET,
-                    getHeaderEntity(),
+                    new HttpEntity<>(headers),
                     new ParameterizedTypeReference<List<AltinnOrganisasjon>>() {
                     }
             ).getBody());
@@ -108,10 +136,24 @@ public class AltinnClient {
     }
 
 
-    private HttpEntity<Object> getHeaderEntity() {
+    private HttpEntity<HttpHeaders> getHeaderEntity() {
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-NAV-APIKEY", altinnAPIGWApikey);
         headers.set("APIKEY", altinnHeader);
+        headers.setBearerAuth(tilgangskontrollUtils.getSelvbetjeningToken());
         return new HttpEntity<>(headers);
+    }
+
+    private HttpHeaders getAuthHeadersForInnloggetBruker() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-NAV-APIKEY", altinnAPIGWApikey);
+        headers.set("APIKEY", altinnHeader);
+        return headers;
+    }
+
+    private HttpHeaders getAuthHeadersMotAltinn() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(tilgangskontrollUtils.getSelvbetjeningToken());
+        return headers;
     }
 }

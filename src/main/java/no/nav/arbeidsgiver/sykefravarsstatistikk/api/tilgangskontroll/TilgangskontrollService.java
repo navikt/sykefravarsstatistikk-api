@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.OverordnetEnhet;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TilgangskontrollService {
 
-    private final AltinnService altinnService;
+    private final AltinnClient altinnClient;
     private final TilgangskontrollUtils tokenUtils;
     private final Sporbarhetslogg sporbarhetslogg;
 
@@ -21,13 +21,13 @@ public class TilgangskontrollService {
     private final String iawebServiceEdition;
 
     public TilgangskontrollService(
-            AltinnService altinnService,
+            AltinnClient altinnClient,
             TilgangskontrollUtils tokenUtils,
             Sporbarhetslogg sporbarhetslogg,
             @Value("${altinn.iaweb.service.code}") String iawebServiceCode,
             @Value("${altinn.iaweb.service.edition}") String iawebServiceEdition
     ) {
-        this.altinnService = altinnService;
+        this.altinnClient = altinnClient;
         this.tokenUtils = tokenUtils;
         this.sporbarhetslogg = sporbarhetslogg;
 
@@ -39,7 +39,7 @@ public class TilgangskontrollService {
         if (tokenUtils.erInnloggetSelvbetjeningBruker()) {
             InnloggetBruker innloggetSelvbetjeningBruker = tokenUtils.hentInnloggetSelvbetjeningBruker();
             innloggetSelvbetjeningBruker.setOrganisasjoner(
-                    altinnService.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
+                    altinnClient.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
                             innloggetSelvbetjeningBruker.getFnr()
                     )
             );
