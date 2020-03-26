@@ -60,30 +60,17 @@ public class AltinnClient {
     }
 
     public List<AltinnOrganisasjon> hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(Fnr fnr) {
-        if (featureToggles.erEnabled("arbeidsgiver.sykefravarsstatikk-api.bruk-altinn-proxy")) {
-            return hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
-                    altinnProxyUrl,
-                    fnr,
-                    getAuthHeadersForInnloggetBruker()
-            );
-        } else {
-            return hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
-                    altinnUrl,
-                    fnr,
-                    getAuthHeadersMotAltinn()
-            );
-        }
-    }
+        HttpHeaders headers;
+        URI uri;
 
-    public List<AltinnOrganisasjon> hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(String baseUrl, Fnr fnr, HttpHeaders headers) {
-        URI uri = UriComponentsBuilder.fromUriString(baseUrl)
-                .pathSegment("ekstern", "altinn", "api", "serviceowner", "reportees")
-                .queryParam("ForceEIAuthentication")
-                .queryParam("subject", fnr.getVerdi())
-                .queryParam("serviceCode", iawebServiceCode)
-                .queryParam("serviceEdition", iawebServiceEdition)
-                .build()
-                .toUri();
+        if (featureToggles.erEnabled("arbeidsgiver.sykefravarsstatikk-api.bruk-altinn-proxy")) {
+            headers = getAuthHeadersForInnloggetBruker();
+            uri = getProxyURI();
+        } else {
+            headers = getAuthHeadersMotAltinn();
+            uri = getAltinnURI(fnr);
+        }
+
         try {
             Optional<List<AltinnOrganisasjon>> respons = Optional.ofNullable(restTemplate.exchange(
                     uri,
@@ -103,6 +90,27 @@ public class AltinnClient {
             log.error("Feil ved kall til Altinn", e);
             throw new AltinnException("Feil ved kall til Altinn", e);
         }
+    }
+
+    private URI getProxyURI() {
+        return UriComponentsBuilder.fromUriString(altinnProxyUrl)
+                .pathSegment("ekstern", "altinn", "api", "serviceowner", "reportees")
+                .queryParam("ForceEIAuthentication")
+                .queryParam("serviceCode", iawebServiceCode)
+                .queryParam("serviceEdition", iawebServiceEdition)
+                .build()
+                .toUri();
+    }
+
+    private URI getAltinnURI(Fnr fnr) {
+        return UriComponentsBuilder.fromUriString(altinnUrl)
+                .pathSegment("ekstern", "altinn", "api", "serviceowner", "reportees")
+                .queryParam("ForceEIAuthentication")
+                .queryParam("subject", fnr.getVerdi())
+                .queryParam("serviceCode", iawebServiceCode)
+                .queryParam("serviceEdition", iawebServiceEdition)
+                .build()
+                .toUri();
     }
 
     public List<AltinnRolle> hentRoller(Fnr fnr, Orgnr orgnr) {
