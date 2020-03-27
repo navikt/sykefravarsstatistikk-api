@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
 import no.nav.security.spring.oidc.validation.interceptor.OIDCUnauthorizedException;
 import org.slf4j.Logger;
@@ -22,6 +23,14 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
     private static Logger logger = LoggerFactory.getLogger(ResponseEntityExceptionHandler.class);
 
+
+    @ExceptionHandler(value = {EnhetsregisteretException.class})
+    @ResponseBody
+    protected ResponseEntity<Object> handleEnhetsregisteretException(RuntimeException e, WebRequest webRequest) {
+        return getResponseEntity(e,
+                "Could not get all necessary data for this organization from enhetsregistret",
+                HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(value = {TilgangskontrollException.class})
     @ResponseBody
