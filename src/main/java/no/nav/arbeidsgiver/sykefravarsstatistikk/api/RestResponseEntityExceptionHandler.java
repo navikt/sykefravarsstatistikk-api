@@ -28,7 +28,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ResponseBody
     protected ResponseEntity<Object> handleEnhetsregisteretException(RuntimeException e, WebRequest webRequest) {
         return getResponseEntity(e,
-                "Could not get all necessary data for this organization from enhetsregistret",
+                "Kunne ikke hente informasjon om enheten fra enhetsregisteret",
                 HttpStatus.BAD_REQUEST);
     }
 

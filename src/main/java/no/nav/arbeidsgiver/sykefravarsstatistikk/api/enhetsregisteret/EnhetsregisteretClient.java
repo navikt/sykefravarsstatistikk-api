@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -38,6 +39,8 @@ public class EnhetsregisteretClient {
             OverordnetEnhet overordnetEnhet = mapTilEnhet(respons);
             validerReturnertOrgnr(orgnrTilEnhet, overordnetEnhet.getOrgnr());
             return overordnetEnhet;
+        } catch (HttpServerErrorException hsee) {
+            throw hsee;
         } catch (RestClientException e) {
             throw new EnhetsregisteretException("Feil ved kall til Enhetsregisteret", e);
         }
@@ -50,6 +53,8 @@ public class EnhetsregisteretClient {
             Underenhet underenhet = mapTilUnderenhet(respons);
             validerReturnertOrgnr(orgnrTilUnderenhet, underenhet.getOrgnr());
             return underenhet;
+        } catch (HttpServerErrorException hsee) {
+            throw hsee;
         } catch (RestClientException e) {
             throw new EnhetsregisteretException("Feil ved kall til Enhetsregisteret", e);
         }
