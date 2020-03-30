@@ -10,6 +10,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.etOrgnr;
@@ -47,6 +49,20 @@ public class EnhetsregisteretClientTest {
     }
 
     @Test(expected = EnhetsregisteretException.class)
+    public void hentInformasjonOmEnhet__skal_feile_hvis_server_returnerer_5xx_server_returnerer_5xx() {
+        when(
+                restTemplate.getForObject(
+                        anyString(),
+                        any()
+                )
+        ).thenThrow(
+                new HttpServerErrorException(HttpStatus.BAD_GATEWAY)
+        );
+
+        enhetsregisteretClient.hentInformasjonOmEnhet(etOrgnr());
+    }
+
+    @Test(expected = EnhetsregisteretMappingException.class)
     public void hentInformasjonOmEnhet__skal_feile_hvis_et_felt_mangler() {
         ObjectNode responsMedManglendeFelt = gyldigEnhetRespons("999263550");
         responsMedManglendeFelt.remove("institusjonellSektorkode");
@@ -76,6 +92,19 @@ public class EnhetsregisteretClientTest {
     }
 
     @Test(expected = EnhetsregisteretException.class)
+    public void hentInformasjonOmUnderenhet__skal_feile_hvis_server_returnerer_5xx() {
+        when(
+                restTemplate.getForObject(
+                        anyString(),
+                        any()
+                )
+        ).thenThrow(
+                new HttpServerErrorException(HttpStatus.BAD_GATEWAY)
+        );
+
+        enhetsregisteretClient.hentInformasjonOmUnderenhet(etOrgnr());
+    }
+    @Test(expected = EnhetsregisteretMappingException.class)
     public void hentInformasjonOmUnderenhet__skal_feile_hvis_et_felt_mangler() {
         ObjectNode responsMedManglendeFelt = gyldigUnderenhetRespons("822565212");
         responsMedManglendeFelt.remove("navn");

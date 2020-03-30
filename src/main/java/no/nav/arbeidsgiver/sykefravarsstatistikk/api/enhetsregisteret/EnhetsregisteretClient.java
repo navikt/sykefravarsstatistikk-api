@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -70,7 +71,7 @@ public class EnhetsregisteretClient {
             );
 
         } catch (IOException | NullPointerException e) {
-            throw new EnhetsregisteretException("Feil ved kall til Enhetsregisteret. Kunne ikke parse respons.", e);
+            throw new EnhetsregisteretMappingException("Feil ved kall til Enhetsregisteret. Kunne ikke parse respons.", e);
         }
     }
 
@@ -99,7 +100,7 @@ public class EnhetsregisteretClient {
             );
 
         } catch (IOException | NullPointerException e) {
-            throw new EnhetsregisteretException("Feil ved kall til Enhetsregisteret. Kunne ikke parse respons.", e);
+            throw new EnhetsregisteretMappingException("Feil ved kall til Enhetsregisteret. Kunne ikke parse respons.", e);
         }
     }
 
