@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretMappingException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
 import no.nav.security.spring.oidc.validation.interceptor.OIDCUnauthorizedException;
 import org.slf4j.Logger;
@@ -24,7 +25,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     private static Logger logger = LoggerFactory.getLogger(ResponseEntityExceptionHandler.class);
 
 
-    @ExceptionHandler(value = {EnhetsregisteretException.class})
+    @ExceptionHandler(value = {EnhetsregisteretMappingException.class})
     @ResponseBody
     protected ResponseEntity<Object> handleEnhetsregisteretException(RuntimeException e, WebRequest webRequest) {
         return getResponseEntity(e,

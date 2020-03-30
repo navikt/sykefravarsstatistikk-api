@@ -39,8 +39,6 @@ public class EnhetsregisteretClient {
             OverordnetEnhet overordnetEnhet = mapTilEnhet(respons);
             validerReturnertOrgnr(orgnrTilEnhet, overordnetEnhet.getOrgnr());
             return overordnetEnhet;
-        } catch (HttpServerErrorException hsee) {
-            throw hsee;
         } catch (RestClientException e) {
             throw new EnhetsregisteretException("Feil ved kall til Enhetsregisteret", e);
         }
@@ -53,8 +51,6 @@ public class EnhetsregisteretClient {
             Underenhet underenhet = mapTilUnderenhet(respons);
             validerReturnertOrgnr(orgnrTilUnderenhet, underenhet.getOrgnr());
             return underenhet;
-        } catch (HttpServerErrorException hsee) {
-            throw hsee;
         } catch (RestClientException e) {
             throw new EnhetsregisteretException("Feil ved kall til Enhetsregisteret", e);
         }
@@ -75,7 +71,7 @@ public class EnhetsregisteretClient {
             );
 
         } catch (IOException | NullPointerException e) {
-            throw new EnhetsregisteretException("Feil ved kall til Enhetsregisteret. Kunne ikke parse respons.", e);
+            throw new EnhetsregisteretMappingException("Feil ved kall til Enhetsregisteret. Kunne ikke parse respons.", e);
         }
     }
 
@@ -104,7 +100,7 @@ public class EnhetsregisteretClient {
             );
 
         } catch (IOException | NullPointerException e) {
-            throw new EnhetsregisteretException("Feil ved kall til Enhetsregisteret. Kunne ikke parse respons.", e);
+            throw new EnhetsregisteretMappingException("Feil ved kall til Enhetsregisteret. Kunne ikke parse respons.", e);
         }
     }
 

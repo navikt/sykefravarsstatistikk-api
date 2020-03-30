@@ -52,7 +52,7 @@ public class ApiErrorMappingTest {
         assertThat(response.statusCode()).isEqualTo(400);
         assertThat(response.body()).isEqualTo(
                 "{" +
-                        "\"message\":\"Could not get all necessary data for this organization from enhetsregistret\"" +
+                        "\"message\":\"Kunne ikke hente informasjon om enheten fra enhetsregisteret\"" +
                 "}"
         );
     }

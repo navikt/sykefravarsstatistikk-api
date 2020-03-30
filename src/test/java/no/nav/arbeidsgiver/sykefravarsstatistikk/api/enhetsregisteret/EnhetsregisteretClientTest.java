@@ -48,8 +48,8 @@ public class EnhetsregisteretClientTest {
         assertThat(overordnetEnhet.getAntallAnsatte()).isEqualTo(40);
     }
 
-    @Test(expected = HttpServerErrorException.class)
-    public void hentInformasjonOmEnhet__skal_ikke_sperre_server_error__dersom_server_returnerer_5xx() {
+    @Test(expected = EnhetsregisteretException.class)
+    public void hentInformasjonOmEnhet__skal_feile_hvis_server_returnerer_5xx_server_returnerer_5xx() {
         when(
                 restTemplate.getForObject(
                         anyString(),
@@ -62,7 +62,7 @@ public class EnhetsregisteretClientTest {
         enhetsregisteretClient.hentInformasjonOmEnhet(etOrgnr());
     }
 
-    @Test(expected = EnhetsregisteretException.class)
+    @Test(expected = EnhetsregisteretMappingException.class)
     public void hentInformasjonOmEnhet__skal_feile_hvis_et_felt_mangler() {
         ObjectNode responsMedManglendeFelt = gyldigEnhetRespons("999263550");
         responsMedManglendeFelt.remove("institusjonellSektorkode");
@@ -91,8 +91,8 @@ public class EnhetsregisteretClientTest {
         assertThat(underenhet.getAntallAnsatte()).isEqualTo(40);
     }
 
-    @Test(expected = HttpServerErrorException.class)
-    public void hentInformasjonOmUnderenhet__skal_ikke_sperre_server_error__dersom_server_returnerer_5xx() {
+    @Test(expected = EnhetsregisteretException.class)
+    public void hentInformasjonOmUnderenhet__skal_feile_hvis_server_returnerer_5xx() {
         when(
                 restTemplate.getForObject(
                         anyString(),
@@ -104,7 +104,7 @@ public class EnhetsregisteretClientTest {
 
         enhetsregisteretClient.hentInformasjonOmUnderenhet(etOrgnr());
     }
-    @Test(expected = EnhetsregisteretException.class)
+    @Test(expected = EnhetsregisteretMappingException.class)
     public void hentInformasjonOmUnderenhet__skal_feile_hvis_et_felt_mangler() {
         ObjectNode responsMedManglendeFelt = gyldigUnderenhetRespons("822565212");
         responsMedManglendeFelt.remove("navn");
