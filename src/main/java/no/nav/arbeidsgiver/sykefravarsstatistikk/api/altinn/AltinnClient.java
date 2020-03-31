@@ -5,6 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.feratureToggles.FeatureToggleService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollUtils;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -20,6 +21,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.lang.String.format;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.CorrelationIdFilter.CORRELATION_ID_MDC_NAME;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Konstanter.CONSUMER_ID_HEADER_NAME;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Konstanter.CORRELATION_ID_HEADER_NAME;
 
 @Slf4j
 @Component
@@ -125,7 +129,7 @@ public class AltinnClient {
             Optional<List<AltinnRolle>> respons = Optional.ofNullable(restTemplate.exchange(
                     uri,
                     HttpMethod.GET,
-                    getHeaderEntity(),
+                    new HttpEntity<>(getAuthHeadersMotAltinn()),
                     new ParameterizedTypeReference<List<AltinnRolle>>() {
                     }
             ).getBody());
@@ -143,17 +147,11 @@ public class AltinnClient {
         }
     }
 
-
-    private HttpEntity<HttpHeaders> getHeaderEntity() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-NAV-APIKEY", altinnAPIGWApikey);
-        headers.set("APIKEY", altinnHeader);
-        return new HttpEntity<>(headers);
-    }
-
     private HttpHeaders getAuthHeadersForInnloggetBruker() {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(tilgangskontrollUtils.getSelvbetjeningToken());
+        headers.set(CORRELATION_ID_HEADER_NAME, MDC.get(CORRELATION_ID_MDC_NAME));
+        headers.set(CONSUMER_ID_HEADER_NAME, "sykefravarsstatistikk-api");
         return headers;
     }
 

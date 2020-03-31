@@ -11,12 +11,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Konstanter.CORRELATION_ID_HEADER_NAME;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Component
 public class CorrelationIdFilter extends OncePerRequestFilter {
     public static final String CORRELATION_ID_MDC_NAME = "correlationId";
-    private static final String CORRELATION_ID_HEADER_NAME = "X-Correlation-Id";
 
     @Override
     protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain) throws ServletException, IOException {
