@@ -4,6 +4,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
+import no.nav.security.oidc.context.TokenContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -56,6 +57,10 @@ public class TilgangskontrollUtils {
 
     public String getSelvbetjeningToken() {
         return contextHolder.getOIDCValidationContext().getToken(ISSUER_SELVBETJENING).getIdToken();
+    }
+
+    public TokenContext getSelvbetjeningTokenContext() {
+        return contextHolder.getOIDCValidationContext().getToken(ISSUER_SELVBETJENING);
     }
 
 }

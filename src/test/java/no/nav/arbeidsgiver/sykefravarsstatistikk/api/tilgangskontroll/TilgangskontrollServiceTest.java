@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.CorrelationIdFilter;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnKlientWrapper;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
@@ -18,6 +18,8 @@ import java.util.Arrays;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getInnloggetBruker;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getOrganisasjon;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,7 +30,7 @@ public class TilgangskontrollServiceTest {
     private static final String IAWEB_SERVICE_EDITION = "3";
 
     @Mock
-    private AltinnClient altinnClient;
+    private AltinnKlientWrapper altinnKlientWrapper;
     @Mock
     private TilgangskontrollService tilgangskontroll;
     @Mock
@@ -42,7 +44,7 @@ public class TilgangskontrollServiceTest {
     @Before
     public void setUp() {
         tilgangskontroll = new TilgangskontrollService(
-                altinnClient,
+                altinnKlientWrapper,
                 tokenUtils,
                 sporbarhetslogg,
                 IAWEB_SERVICE_CODE,
@@ -54,7 +56,7 @@ public class TilgangskontrollServiceTest {
     @Test(expected = AltinnException.class)
     public void hentInnloggetBruker__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
         værInnloggetSom(new InnloggetBruker(fnr));
-        when(altinnClient.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(fnr)).thenThrow(new AltinnException(""));
+        when(altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(any(), eq(fnr))).thenThrow(new AltinnException(""));
 
         tilgangskontroll.hentInnloggetBruker();
     }
@@ -106,7 +108,7 @@ public class TilgangskontrollServiceTest {
     private void værInnloggetSom(InnloggetBruker bruker) {
         when(tokenUtils.erInnloggetSelvbetjeningBruker()).thenReturn(true);
         when(tokenUtils.hentInnloggetSelvbetjeningBruker()).thenReturn(bruker);
-        when(altinnClient.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(bruker.getFnr())).thenReturn(bruker.getOrganisasjoner());
+        when(altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(any(), eq(bruker.getFnr()))).thenReturn(bruker.getOrganisasjoner());
     }
 
 }

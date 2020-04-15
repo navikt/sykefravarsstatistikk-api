@@ -1,7 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.model.Subject;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnClient;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnKlientWrapper;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.OverordnetEnhet;
@@ -13,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TilgangskontrollService {
 
-    private final AltinnClient altinnClient;
+    private final AltinnKlientWrapper altinnKlientWrapper;
     private final TilgangskontrollUtils tokenUtils;
     private final Sporbarhetslogg sporbarhetslogg;
 
@@ -21,16 +23,15 @@ public class TilgangskontrollService {
     private final String iawebServiceEdition;
 
     public TilgangskontrollService(
-            AltinnClient altinnClient,
+            AltinnKlientWrapper altinnKlientWrapper,
             TilgangskontrollUtils tokenUtils,
             Sporbarhetslogg sporbarhetslogg,
             @Value("${altinn.iaweb.service.code}") String iawebServiceCode,
             @Value("${altinn.iaweb.service.edition}") String iawebServiceEdition
     ) {
-        this.altinnClient = altinnClient;
+        this.altinnKlientWrapper = altinnKlientWrapper;
         this.tokenUtils = tokenUtils;
         this.sporbarhetslogg = sporbarhetslogg;
-
         this.iawebServiceCode = iawebServiceCode;
         this.iawebServiceEdition = iawebServiceEdition;
     }
@@ -39,7 +40,8 @@ public class TilgangskontrollService {
         if (tokenUtils.erInnloggetSelvbetjeningBruker()) {
             InnloggetBruker innloggetSelvbetjeningBruker = tokenUtils.hentInnloggetSelvbetjeningBruker();
             innloggetSelvbetjeningBruker.setOrganisasjoner(
-                    altinnClient.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
+                    altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
+                            tokenUtils.getSelvbetjeningTokenContext(),
                             innloggetSelvbetjeningBruker.getFnr()
                     )
             );
