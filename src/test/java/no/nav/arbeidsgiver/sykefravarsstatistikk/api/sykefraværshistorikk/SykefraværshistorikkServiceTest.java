@@ -47,23 +47,6 @@ public class SykefraværshistorikkServiceTest {
 
     @Before
     public void setUp() {
-        when(enhetsregisteretClient.hentInformasjonOmUnderenhet(any()))
-                .thenReturn(
-                        Underenhet
-                                .builder()
-                                .orgnr(new Orgnr("99999998"))
-                                .overordnetEnhetOrgnr(new Orgnr("999999999"))
-                                .navn("Test Underenhet")
-                                .næringskode(new Næringskode5Siffer("12345", "testkode"))
-                                .build()
-                );
-        when(enhetsregisteretClient.hentInformasjonOmEnhet(any()))
-                .thenReturn(
-                        OverordnetEnhet
-                                .builder()
-                                .orgnr(new Orgnr("99999999"))
-                                .build()
-                );
         when(sektorMappingService.mapTilSSBSektorKode(any()))
                 .thenReturn(
                         new Sektor("1", "Statlig forvaltning")

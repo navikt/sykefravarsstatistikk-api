@@ -22,6 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <oidc-support.version>0.2.18</oidc-support.version>
+        <altinn-rettigheter-proxy-klient.version>0.0.7</altinn-rettigheter-proxy-klient.version>
         <java.version>11</java.version>
     </properties>
 
@@ -151,6 +152,12 @@
         </dependency>
 
         <dependency>
+            <groupId>no.nav.arbeidsgiver</groupId>
+            <artifactId>altinn-rettigheter-proxy-klient</artifactId>
+            <version>${altinn-rettigheter-proxy-klient.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>no.nav.common</groupId>
             <artifactId>metrics</artifactId>
             <version>1.2019.07.25-08.54-f2bfe18c24bc</version>
@@ -161,20 +168,7 @@
             <artifactId>unleash-client-java</artifactId>
             <version>3.2.6</version>
         </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.4.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.4.0</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
-
 
     <build>
         <plugins>
