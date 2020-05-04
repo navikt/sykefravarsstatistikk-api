@@ -1,0 +1,23 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Alert"
+metadata:
+  name: sykefravarsstatistikk-api
+  labels:
+    team: arbeidsgiver
+spec:
+  receivers:
+    slack:
+      channel: 'arbeidsgiver-teamia-utvikling'
+      prependText: '<!here> | '
+  alerts:
+    - alert: applikasjon nede
+      expr: up{app="sykefravarsstatistikk-api", job="kubernetes-pods"} == 0
+      for: 2m
+      description: "{{ $labels.app }} er nede"
+      action: "`kubectl describe pod {{ $labels.kubernetes_pod_name }}` for events, og `kubectl logs {{ $labels.kubernetes_pod_name }}` for logger"
+
+    - alert: det har skjedd en feil i sykefravarsstatistikk-api
+      expr: sum(increase(logd_messages_total{log_app="sykefravarsstatistikk-api",log_level="Error"}[5m])) by (log_app,log_pod_name) > 0
+      for: 10s
+      description: "{{ $labels.log_app }} har logget en feil"
+      action: "`kubectl describe pod {{ $labels.log_pod_name }}` for events, og `kubectl logs {{ $labels.log_pod_name }}` for logger"
