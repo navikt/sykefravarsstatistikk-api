@@ -4,13 +4,13 @@ metadata:
   name: sykefravarsstatistikk-api
   namespace: default
   labels:
-    team: {{team}}
+    team: arbeidsgiver
 spec:
-  image: {{version}}
-  team: {{team}}
+  image: {{ image }}
+  team: arbeidsgiver
   port: 8080
   ingresses:
-    - https://arbeidsgiver.nais.preprod.local/sykefravarsstatistikk-api/
+    - https://arbeidsgiver.nais.adeo.no/sykefravarsstatistikk-api/
   liveness:
     path: /sykefravarsstatistikk-api/internal/healthcheck
     initialDelay: 30
@@ -19,7 +19,7 @@ spec:
     initialDelay: 30
   env:
     - name: SPRING_PROFILES_ACTIVE
-      value: dev
+      value: prod
   prometheus:
     enabled: true
     path: /sykefravarsstatistikk-api/internal/actuator/prometheus
