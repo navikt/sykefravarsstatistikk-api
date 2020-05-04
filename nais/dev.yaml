@@ -1,0 +1,33 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+metadata:
+  name: sykefravarsstatistikk-api
+  namespace: default
+  labels:
+    team: arbeidsgiver
+spec:
+  image: {{ image }}
+  team: arbeidsgiver
+  port: 8080
+  ingresses:
+    - https://arbeidsgiver.nais.preprod.local/sykefravarsstatistikk-api/
+  liveness:
+    path: /sykefravarsstatistikk-api/internal/healthcheck
+    initialDelay: 30
+  readiness:
+    path: /sykefravarsstatistikk-api/internal/healthcheck
+    initialDelay: 30
+  env:
+    - name: SPRING_PROFILES_ACTIVE
+      value: dev
+  prometheus:
+    enabled: true
+    path: /sykefravarsstatistikk-api/internal/actuator/prometheus
+  webproxy: true
+  vault:
+    enabled: true
+  resources:
+    limits:
+      memory: 1024Mi
+    requests:
+      memory: 512Mi
