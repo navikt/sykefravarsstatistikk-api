@@ -1,13 +1,13 @@
-apiVersion: "nais.io/v1alpha1"
-kind: "Application"
+apiVersion: nais.io/v1alpha1
+kind: Application
 metadata:
   name: sykefravarsstatistikk-api
   namespace: default
   labels:
-    team: {{team}}
+    team: arbeidsgiver
 spec:
-  image: {{version}}
-  team: {{team}}
+  image: {{ image }}
+  team: arbeidsgiver
   port: 8080
   ingresses:
     - https://arbeidsgiver.nais.preprod.local/sykefravarsstatistikk-api/
