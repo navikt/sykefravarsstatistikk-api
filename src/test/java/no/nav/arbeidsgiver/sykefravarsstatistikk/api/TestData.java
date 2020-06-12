@@ -6,6 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjetype;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
@@ -159,7 +160,7 @@ public class TestData {
     }
 
     public static Bransje enBransje() {
-        return new Bransje("bransje", "12322");
+        return new Bransje(Bransjetype.SYKEHUS, "bransje", "12322");
     }
 
     public static ÅrstallOgKvartal etÅrstallOgKvartal() {

@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker;
 
 import lombok.Builder;
 import lombok.Data;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjetype;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
 
 import java.math.BigDecimal;
@@ -12,5 +12,5 @@ import java.math.BigDecimal;
 public class Bedriftsmetrikker {
     private BigDecimal antallAnsatte;
     private Næringskode5Siffer næringskode5Siffer;
-    private String bransje;
+    private Bransjetype bransje;
 }
