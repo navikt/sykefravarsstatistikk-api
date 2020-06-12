@@ -40,7 +40,7 @@ public class BedriftsmetrikkerController {
         return Bedriftsmetrikker.builder()
                 .antallAnsatte(new BigDecimal(underenhet.getAntallAnsatte()))
                 .næringskode5Siffer(underenhet.getNæringskode())
-                .bransje(bransje.isPresent() ? bransje.get().getNavn() : null)
+                .bransje(bransje.isPresent() ? bransje.get().getType() : null)
                 .build();
     }
 }

@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjetype;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
@@ -168,7 +169,7 @@ public class KvartalsvisSykefraværRepositoryJdbcTest {
                 parametre(new Næring("87301", "Aldershjem"), 2018, 4, 10, 6, 100)
         );
 
-        Bransje sykehjem = new Bransje("Sykehjem", "87101", "87102");
+        Bransje sykehjem = new Bransje(Bransjetype.SYKEHUS, "Sykehjem", "87101", "87102");
         List<KvartalsvisSykefravær> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentBransje(sykehjem);
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefravær(
