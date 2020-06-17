@@ -13,4 +13,5 @@ public class Bedriftsmetrikker {
     private BigDecimal antallAnsatte;
     private Næringskode5Siffer næringskode5Siffer;
     private Bransjetype bransje;
+    private String bransjenavn;
 }
