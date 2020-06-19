@@ -49,11 +49,7 @@ public class ApiErrorMappingTest {
                 ofString()
         );
 
-        assertThat(response.statusCode()).isEqualTo(400);
-        assertThat(response.body()).isEqualTo(
-                "{" +
-                        "\"message\":\"Kunne ikke hente informasjon om enheten fra enhetsregisteret\"" +
-                "}"
-        );
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(response.body()).isEqualTo("");
     }
 }
