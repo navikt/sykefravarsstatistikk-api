@@ -49,7 +49,7 @@ public class BedriftsmetrikkerController {
                     .bransje(bransje.isPresent() ? bransje.get().getType() : null)
                     .build();
         } catch (Exception e) {
-            logger.info("sdfsdf");
+            logger.warn("Feil ved kall til Enhetsregisteret");
             return null;
         }
     }
