@@ -50,6 +50,6 @@ public class ApiErrorMappingTest {
         );
 
         assertThat(response.statusCode()).isEqualTo(400);
-        assertThat(response.body()).isEqualTo("");
+        assertThat(response.body()).isEqualTo("{\"message\":\"Kunne ikke hente informasjon om enheten fra enhetsregisteret\"}");
     }
 }

@@ -4,6 +4,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjeprogram;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretClient;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import no.nav.security.oidc.api.Unprotected;
 import org.slf4j.Logger;
@@ -36,19 +37,15 @@ public class BedriftsmetrikkerController {
     @GetMapping(value = "/{orgnr}/bedriftsmetrikker")
     public ResponseEntity<Bedriftsmetrikker> hentBedriftsmetrikker(
             @PathVariable("orgnr") String orgnrStr) {
-        try {
-            Orgnr orgnr = new Orgnr(orgnrStr);
-            Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
-            Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
-            Bedriftsmetrikker bedriftsmetrikker = Bedriftsmetrikker.builder()
-                    .antallAnsatte(new BigDecimal(underenhet.getAntallAnsatte()))
-                    .næringskode5Siffer(underenhet.getNæringskode())
-                    .bransje(bransje.isPresent() ? bransje.get().getType() : null)
-                    .build();
-            return ResponseEntity.status(HttpStatus.OK).body(bedriftsmetrikker);
-        } catch (Exception e) {
-            logger.warn("Feil ved kall til Enhetsregisteret");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
+
+        Orgnr orgnr = new Orgnr(orgnrStr);
+        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
+        Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
+        Bedriftsmetrikker bedriftsmetrikker = Bedriftsmetrikker.builder()
+                .antallAnsatte(new BigDecimal(underenhet.getAntallAnsatte()))
+                .næringskode5Siffer(underenhet.getNæringskode())
+                .bransje(bransje.isPresent() ? bransje.get().getType() : null)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(bedriftsmetrikker);
     }
 }

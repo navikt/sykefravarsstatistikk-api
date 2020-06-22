@@ -91,7 +91,7 @@ public class EnhetsregisteretClientTest {
         assertThat(underenhet.getAntallAnsatte()).isEqualTo(40);
     }
 
-    @Test(expected = EnhetsregisteretException.class)
+    @Test(expected = EnhetsregisteretIkkeTilgjengeligException.class)
     public void hentInformasjonOmUnderenhet__skal_feile_hvis_server_returnerer_5xx() {
         when(
                 restTemplate.getForObject(
