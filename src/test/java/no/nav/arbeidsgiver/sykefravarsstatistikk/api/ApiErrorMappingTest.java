@@ -49,7 +49,7 @@ public class ApiErrorMappingTest {
                 ofString()
         );
 
-        assertThat(response.statusCode()).isEqualTo(500);
+        assertThat(response.statusCode()).isEqualTo(400);
         assertThat(response.body()).isEqualTo("");
     }
 }

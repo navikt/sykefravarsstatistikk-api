@@ -48,7 +48,7 @@ public class BedriftsmetrikkerController {
             return ResponseEntity.status(HttpStatus.OK).body(bedriftsmetrikker);
         } catch (Exception e) {
             logger.warn("Feil ved kall til Enhetsregisteret");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 }
