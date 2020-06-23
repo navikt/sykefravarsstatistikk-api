@@ -2,11 +2,13 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretIkkeTilgjengeligException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretMappingException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
 import no.nav.security.spring.oidc.validation.interceptor.OIDCUnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.interceptor.AbstractTraceInterceptor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +33,14 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return getResponseEntity(e,
                 "Kunne ikke hente informasjon om enheten fra enhetsregisteret",
                 HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = {EnhetsregisteretIkkeTilgjengeligException.class})
+    @ResponseBody
+    protected ResponseEntity<Object> handleEnhetsregisteretIkkeTilgjengeligException(RuntimeException e, WebRequest webRequest) {
+        logger.warn("Kunne ikke hente informasjon om enheten fra enhetsregisteret fordi Enhetsregisteret ikke er tilgjengelig", e);
+        return getResponseEntity(e, "Internal error", HttpStatus.INTERNAL_SERVER_ERROR);
+
     }
 
     @ExceptionHandler(value = {TilgangskontrollException.class})

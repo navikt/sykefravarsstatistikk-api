@@ -51,6 +51,8 @@ public class EnhetsregisteretClient {
             Underenhet underenhet = mapTilUnderenhet(respons);
             validerReturnertOrgnr(orgnrTilUnderenhet, underenhet.getOrgnr());
             return underenhet;
+        } catch (HttpServerErrorException hsee) {
+            throw new EnhetsregisteretIkkeTilgjengeligException("Enhetsregisteret svarer ikke", hsee);
         } catch (RestClientException e) {
             throw new EnhetsregisteretException("Feil ved kall til Enhetsregisteret", e);
         }
