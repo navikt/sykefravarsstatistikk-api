@@ -271,7 +271,7 @@ public class DataverehusRepositoryJdbcTest {
         jdbcTemplate.update(
                 "insert into dt_p.agg_ia_sykefravar_v ("
                         + "arstall, kvartal, "
-                        + "orgnr, naring, sektor, storrelse, fylkarb, "
+                        + "orgnr, naering_kode, sektor, storrelse, fylkarb, "
                         + "alder, kjonn,  fylkbo, "
                         + "sftype, varighet, "
                         + "taptedv, muligedv, antpers) "
