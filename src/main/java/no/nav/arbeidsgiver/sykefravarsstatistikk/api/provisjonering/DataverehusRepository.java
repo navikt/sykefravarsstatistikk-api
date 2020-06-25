@@ -67,7 +67,7 @@ public class DataverehusRepository {
                         "sum(antpers) as sum_antall_personer, " +
                         "sum(taptedv) as sum_tapte_dagsverk, " +
                         "sum(muligedv) as sum_mulige_dagsverk " +
-                        "from dt_p.v_agg_ia_sykefravar_land " +
+                        "from dt_p.agg_ia_sykefravar_land_v " +
                         "where kjonn != 'X' and naring != 'X' " +
                         "and arstall = :arstall and kvartal = :kvartal " +
                         "group by arstall, kvartal",
@@ -92,7 +92,7 @@ public class DataverehusRepository {
                         "sum(antpers) as sum_antall_personer, " +
                         "sum(taptedv) as sum_tapte_dagsverk, " +
                         "sum(muligedv) as sum_mulige_dagsverk " +
-                        "from dt_p.v_agg_ia_sykefravar_land " +
+                        "from dt_p.agg_ia_sykefravar_land_v " +
                         "where kjonn != 'X' and naring != 'X' " +
                         "and arstall = :arstall and kvartal = :kvartal " +
                         "group by arstall, kvartal, sektor",
@@ -170,7 +170,7 @@ public class DataverehusRepository {
                         "sum(antpers) as sum_antall_personer, " +
                         "sum(taptedv) as sum_tapte_dagsverk, " +
                         "sum(muligedv) as sum_mulige_dagsverk " +
-                        "from dt_p.v_agg_ia_sykefravar " +
+                        "from dt_p.agg_ia_sykefravar_v " +
                         "where kjonn != 'X' and naring != 'X' " +
                         "and arstall = :arstall and kvartal = :kvartal " +
                         "group by arstall, kvartal, orgnr",

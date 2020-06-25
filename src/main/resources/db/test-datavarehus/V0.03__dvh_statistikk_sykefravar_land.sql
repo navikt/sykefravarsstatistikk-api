@@ -1,7 +1,7 @@
 -- Aggregates statistikk tabeller fra datavarehus
 
 -- Land
-insert into dt_p.v_agg_ia_sykefravar_land
+insert into dt_p.agg_ia_sykefravar_land_v
  (
   arstall, kvartal,
   naring, naringnavn,
@@ -25,7 +25,7 @@ insert into dt_p.v_agg_ia_sykefravar_land
   0, 0, 0,
   0, 0, 0
  );
-insert into dt_p.v_agg_ia_sykefravar_land
+insert into dt_p.agg_ia_sykefravar_land_v
 (
     arstall, kvartal,
     naring, naringnavn,
@@ -49,7 +49,7 @@ values
     0, 0, 0,
     0, 0, 0
 );
-insert into dt_p.v_agg_ia_sykefravar_land
+insert into dt_p.agg_ia_sykefravar_land_v
 (
     arstall, kvartal,
     naring, naringnavn,
@@ -73,7 +73,7 @@ values
     0, 0, 0,
     0, 0, 0
 );
-insert into dt_p.v_agg_ia_sykefravar_land
+insert into dt_p.agg_ia_sykefravar_land_v
 (
     arstall, kvartal,
     naring, naringnavn,

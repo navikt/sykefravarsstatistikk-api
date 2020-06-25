@@ -146,8 +146,8 @@ public class DataverehusRepositoryJdbcTest {
     private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
         delete(jdbcTemplate, "dt_p.v_dim_ia_naring_sn2007");
         delete(jdbcTemplate, "dt_p.v_dim_ia_sektor");
-        delete(jdbcTemplate, "dt_p.v_agg_ia_sykefravar_land");
-        delete(jdbcTemplate, "dt_p.v_agg_ia_sykefravar");
+        delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_land_v");
+        delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_v");
     }
 
     private static int delete(NamedParameterJdbcTemplate jdbcTemplate, String tabell) {
@@ -232,7 +232,7 @@ public class DataverehusRepositoryJdbcTest {
                         .addValue("muligedv", muligedagsverk);
 
         jdbcTemplate.update(
-                "insert into dt_p.V_AGG_IA_SYKEFRAVAR_LAND ("
+                "insert into dt_p.agg_ia_sykefravar_land_v ("
                         + "arstall, kvartal, "
                         + "naring, naringnavn, "
                         + "alder, kjonn, "
@@ -269,7 +269,7 @@ public class DataverehusRepositoryJdbcTest {
                         .addValue("muligedv", muligedagsverk);
 
         jdbcTemplate.update(
-                "insert into dt_p.v_agg_ia_sykefravar ("
+                "insert into dt_p.agg_ia_sykefravar_v ("
                         + "arstall, kvartal, "
                         + "orgnr, naring, sektor, storrelse, fylkarb, "
                         + "alder, kjonn,  fylkbo, "
