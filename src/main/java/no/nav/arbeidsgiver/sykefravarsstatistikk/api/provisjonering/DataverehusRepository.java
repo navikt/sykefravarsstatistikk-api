@@ -171,8 +171,7 @@ public class DataverehusRepository {
                         "sum(taptedv) as sum_tapte_dagsverk, " +
                         "sum(muligedv) as sum_mulige_dagsverk " +
                         "from dt_p.agg_ia_sykefravar_v " +
-                        "where kjonn != 'X' and naring != 'X' " +
-                        "and arstall = :arstall and kvartal = :kvartal " +
+                        "where arstall = :arstall and kvartal = :kvartal " +
                         "group by arstall, kvartal, orgnr",
                 namedParameters,
                 (resultSet, rowNum) ->
