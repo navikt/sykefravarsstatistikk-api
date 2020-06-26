@@ -277,7 +277,7 @@ public class DataverehusRepositoryJdbcTest {
                         + "taptedv, muligedv, antpers) "
                         + "values ("
                         + ":arstall, :kvartal, "
-                        + ":orgnr, '62', '3', 'G', '03', "
+                        + ":orgnr, '10062', '3', 'G', '03', "
                         + "'B', :kjonn, '02', "
                         + "'L', 'A', "
                         + ":taptedv, :muligedv, :antpers)",
