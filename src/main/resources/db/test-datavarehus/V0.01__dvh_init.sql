@@ -15,7 +15,7 @@ create table dt_p.v_dim_ia_naring_sn2007
     constraint r1_naring_sn2007_pk primary key (naringkode)
 );
 
-create table dt_p.v_agg_ia_sykefravar_land
+create table dt_p.agg_ia_sykefravar_land_v
 (
      arstall char(4) not null,
      kvartal char(1) not null,
@@ -54,12 +54,12 @@ create table dt_p.v_agg_ia_sykefravar_naring
     antpers decimal(7,0)
 );
 
-create table dt_p.v_agg_ia_sykefravar
+create table dt_p.agg_ia_sykefravar_v
 (
     arstall char(4) not null,
     kvartal char(1) not null,
     orgnr char(9) not null,
-    naring char(2) not null,
+    naering_kode char(5) not null,
     alder char(1) not null,
     kjonn char(1) not null,
     fylkbo varchar(2) not null,

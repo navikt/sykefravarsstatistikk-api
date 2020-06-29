@@ -5,10 +5,10 @@
 --  rad #1 har taptedv, mens muligedev og antpers er null
 --  rad #2 har muligedev og antpers, mens taptedv er null (sftype er 'X' og varighet er 'X')
 
-insert into dt_p.v_agg_ia_sykefravar
+insert into dt_p.agg_ia_sykefravar_v
 (
     arstall, kvartal,
-    orgnr, naring, sektor, storrelse, fylkarb,
+    orgnr, naering_kode, sektor, storrelse, fylkarb,
     alder, kjonn,  fylkbo,
     sftype, varighet,
     taptedv, muligedv, antpers
@@ -22,10 +22,10 @@ values
     13, 0, 0
 );
 
-insert into dt_p.v_agg_ia_sykefravar
+insert into dt_p.agg_ia_sykefravar_v
 (
     arstall, kvartal,
-    orgnr, naring, sektor, storrelse, fylkarb,
+    orgnr, naering_kode, sektor, storrelse, fylkarb,
     alder, kjonn,  fylkbo,
     sftype, varighet,
     taptedv, muligedv, antpers
