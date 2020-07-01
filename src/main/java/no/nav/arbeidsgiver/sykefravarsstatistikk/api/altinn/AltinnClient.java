@@ -5,7 +5,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.feratureToggles.FeatureToggleService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollUtils;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -21,9 +20,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.lang.String.format;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.CorrelationIdFilter.CORRELATION_ID_MDC_NAME;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Konstanter.CONSUMER_ID_HEADER_NAME;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Konstanter.CORRELATION_ID_HEADER_NAME;
 
 @Slf4j
 @Component
@@ -63,60 +59,6 @@ public class AltinnClient {
         this.featureToggles = featureToggles;
     }
 
-    public List<AltinnOrganisasjon> hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(Fnr fnr) {
-        HttpHeaders headers;
-        URI uri;
-
-        if (featureToggles.erEnabled("arbeidsgiver.sykefravarsstatikk-api.bruk-altinn-proxy")) {
-            headers = getAuthHeadersForInnloggetBruker();
-            uri = getProxyURI();
-        } else {
-            headers = getAuthHeadersMotAltinn();
-            uri = getAltinnURI(fnr);
-        }
-
-        try {
-            Optional<List<AltinnOrganisasjon>> respons = Optional.ofNullable(restTemplate.exchange(
-                    uri,
-                    HttpMethod.GET,
-                    new HttpEntity<>(headers),
-                    new ParameterizedTypeReference<List<AltinnOrganisasjon>>() {
-                    }
-            ).getBody());
-
-            if (respons.isPresent()) {
-                return respons.get();
-            } else {
-                throw new AltinnException("Feil ved kall til Altinn. Response body er null.");
-            }
-
-        } catch (RestClientException e) {
-            log.error("Feil ved kall til Altinn", e);
-            throw new AltinnException("Feil ved kall til Altinn", e);
-        }
-    }
-
-    private URI getProxyURI() {
-        return UriComponentsBuilder.fromUriString(altinnProxyUrl)
-                .pathSegment("ekstern", "altinn", "api", "serviceowner", "reportees")
-                .queryParam("ForceEIAuthentication")
-                .queryParam("serviceCode", iawebServiceCode)
-                .queryParam("serviceEdition", iawebServiceEdition)
-                .build()
-                .toUri();
-    }
-
-    private URI getAltinnURI(Fnr fnr) {
-        return UriComponentsBuilder.fromUriString(altinnUrl)
-                .pathSegment("ekstern", "altinn", "api", "serviceowner", "reportees")
-                .queryParam("ForceEIAuthentication")
-                .queryParam("subject", fnr.getVerdi())
-                .queryParam("serviceCode", iawebServiceCode)
-                .queryParam("serviceEdition", iawebServiceEdition)
-                .build()
-                .toUri();
-    }
-
     public List<AltinnRolle> hentRoller(Fnr fnr, Orgnr orgnr) {
         URI uri = UriComponentsBuilder.fromUriString(altinnUrl)
                 .pathSegment("ekstern", "altinn", "api", "serviceowner", "authorization", "roles")
@@ -145,14 +87,6 @@ public class AltinnClient {
         } catch (RestClientException e) {
             throw new AltinnException("Feil ved kall til Altinn", e);
         }
-    }
-
-    private HttpHeaders getAuthHeadersForInnloggetBruker() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(tilgangskontrollUtils.getSelvbetjeningToken());
-        headers.set(CORRELATION_ID_HEADER_NAME, MDC.get(CORRELATION_ID_MDC_NAME));
-        headers.set(CONSUMER_ID_HEADER_NAME, "sykefravarsstatistikk-api");
-        return headers;
     }
 
     private HttpHeaders getAuthHeadersMotAltinn() {

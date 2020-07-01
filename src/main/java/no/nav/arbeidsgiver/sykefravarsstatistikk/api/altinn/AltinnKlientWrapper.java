@@ -5,10 +5,7 @@ import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.AltinnConfig;
 import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.AltinnrettigheterProxyKlient;
 import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.AltinnrettigheterProxyKlientConfig;
 import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.ProxyConfig;
-import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.model.AltinnReportee;
-import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.model.ServiceCode;
-import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.model.ServiceEdition;
-import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.model.Subject;
+import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.model.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.security.oidc.context.TokenContext;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,9 +46,10 @@ public class AltinnKlientWrapper {
 
 
     public List<AltinnOrganisasjon> hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(TokenContext tokenContext, Fnr fnr){
+
         return mapTo(
                 klient.hentOrganisasjoner(
-                        tokenContext,
+                        new SelvbetjeningToken(tokenContext.getIdToken()),
                         new Subject(fnr.getVerdi()),
                         new ServiceCode(serviceCode),
                         new ServiceEdition(serviceEdition)
