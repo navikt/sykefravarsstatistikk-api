@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
+import com.github.tomakehurst.wiremock.matching.UrlPattern;
 import io.micrometer.core.instrument.util.IOUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ public class MockServer {
     public MockServer(
             @Value("${wiremock.mock.port}") Integer port,
             @Value("${altinn.url}") String altinnUrl,
+            @Value("${altinn.proxy.url}") String altinnProxyUrl,
             @Value("${enhetsregisteret.url}") String enhetsregisteretUrl,
             Environment environment
     ) {
@@ -40,6 +42,8 @@ public class MockServer {
                     altinnUrl + "ekstern/altinn/api/serviceowner/authorization/roles",
                     "altinnAuthorization-roles.json"
             );
+            mockKall(altinnProxyUrl + "organisasjoner", HttpStatus.NOT_FOUND);
+
         }
 
         log.info("Mocker kall fra Enhetsregisteret");
@@ -79,6 +83,17 @@ public class MockServer {
                         .withHeader("Content-Type", "application/json")
                         .withStatus(HttpStatus.OK.value())
                         .withBody(body)
+                )
+        );
+    }
+
+    @SneakyThrows
+    private void mockKall(String url, HttpStatus status) {
+        String path = new URL(url).getPath();
+        UrlPattern urlMatching = WireMock.urlMatching(".*" + path + ".*");
+        server.stubFor(
+                WireMock.get(urlMatching).willReturn(WireMock.aResponse()
+                        .withStatus(status.value())
                 )
         );
     }
