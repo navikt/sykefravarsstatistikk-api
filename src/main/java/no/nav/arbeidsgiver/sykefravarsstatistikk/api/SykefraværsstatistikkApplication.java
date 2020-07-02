@@ -1,11 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
-import no.nav.security.spring.oidc.api.EnableOIDCTokenValidation;
+import no.nav.security.token.support.spring.api.EnableJwtTokenValidation;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@EnableOIDCTokenValidation(ignore = {
+@EnableJwtTokenValidation(ignore = {
         "springfox.documentation.swagger.web.ApiResourceController",
         "org.springframework"
 })

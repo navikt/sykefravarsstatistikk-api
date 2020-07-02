@@ -1,14 +1,12 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnException;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretIkkeTilgjengeligException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretMappingException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
-import no.nav.security.spring.oidc.validation.interceptor.OIDCUnauthorizedException;
+import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.aop.interceptor.AbstractTraceInterceptor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +47,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return getResponseEntity(e, "You don't have access to this ressource", HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler(value = {OIDCUnauthorizedException.class, AccessDeniedException.class})
+    @ExceptionHandler(value = {JwtTokenUnauthorizedException.class, AccessDeniedException.class})
     @ResponseBody
     protected ResponseEntity<Object> handleUnauthorizedException(RuntimeException e, WebRequest webRequest) {
         return getResponseEntity(e, "You are not authorized to access this ressource", HttpStatus.UNAUTHORIZED);

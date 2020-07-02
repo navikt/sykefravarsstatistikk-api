@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.synkronisering;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.security.oidc.api.Protected;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.OpprettEllerOppdaterResultat;
+import no.nav.security.token.support.core.api.Protected;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

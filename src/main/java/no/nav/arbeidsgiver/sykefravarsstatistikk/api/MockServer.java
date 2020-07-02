@@ -72,6 +72,8 @@ public class MockServer {
 
     @SneakyThrows
     private void mockKall(UrlPathPattern urlPathPattern, String body) {
+
+
         server.stubFor(
                 WireMock.get(urlPathPattern).willReturn(WireMock.aResponse()
                         .withHeader("Content-Type", "application/json")

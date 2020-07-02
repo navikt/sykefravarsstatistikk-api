@@ -34,8 +34,7 @@ altinn:
 enhetsregisteret:
   url: "http://localhost:${wiremock.mock.port}/enhetsregisteret/"
 
-no.nav.security.oidc:
-  issuers: iss-localhost, selvbetjening
+no.nav.security.jwt:
   issuer:
     iss-localhost:
       discoveryurl: http://metadata
@@ -89,8 +88,7 @@ datavarehus.datasource:
 spring:
   profiles: mvc-test
 
-no.nav.security.oidc:
-  issuers: iss-localhost, selvbetjening
+no.nav.security.jwt:
   issuer:
     iss-localhost:
       discoveryurl: http://metadata
@@ -169,8 +167,7 @@ altinn:
     code: 3403
     edition: 2
 
-no.nav.security.oidc:
-  issuers: selvbetjening
+no.nav.security.jwt:
   issuer.selvbetjening:
     discoveryurl: https://login.microsoftonline.com/navnob2c.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1A_idporten
     accepted_audience: 45104d6a-f5bc-4e8c-b352-4bbfc9381f25
