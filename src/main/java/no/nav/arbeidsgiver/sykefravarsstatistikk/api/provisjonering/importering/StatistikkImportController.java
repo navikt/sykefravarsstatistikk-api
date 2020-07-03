@@ -1,10 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
-import no.nav.security.oidc.api.Protected;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.SlettOgOpprettResultat;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
+import no.nav.security.token.support.core.api.Protected;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.PathVariable;

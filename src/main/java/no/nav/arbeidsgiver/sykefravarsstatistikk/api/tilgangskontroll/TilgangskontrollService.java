@@ -1,8 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.model.Subject;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnKlientWrapper;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
@@ -41,7 +39,7 @@ public class TilgangskontrollService {
             InnloggetBruker innloggetSelvbetjeningBruker = tokenUtils.hentInnloggetSelvbetjeningBruker();
             innloggetSelvbetjeningBruker.setOrganisasjoner(
                     altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
-                            tokenUtils.getSelvbetjeningTokenContext(),
+                            tokenUtils.getSelvbetjeningToken(),
                             innloggetSelvbetjeningBruker.getFnr()
                     )
             );

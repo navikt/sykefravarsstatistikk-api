@@ -7,7 +7,7 @@ import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.AltinnrettigheterProxy
 import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.ProxyConfig;
 import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.model.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Fnr;
-import no.nav.security.oidc.context.TokenContext;
+import no.nav.security.token.support.core.jwt.JwtToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -45,11 +45,11 @@ public class AltinnKlientWrapper {
     }
 
 
-    public List<AltinnOrganisasjon> hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(TokenContext tokenContext, Fnr fnr){
+    public List<AltinnOrganisasjon> hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(JwtToken idToken, Fnr fnr){
 
         return mapTo(
                 klient.hentOrganisasjoner(
-                        new SelvbetjeningToken(tokenContext.getIdToken()),
+                        new SelvbetjeningToken(idToken.getTokenAsString()),
                         new Subject(fnr.getVerdi()),
                         new ServiceCode(serviceCode),
                         new ServiceEdition(serviceEdition)

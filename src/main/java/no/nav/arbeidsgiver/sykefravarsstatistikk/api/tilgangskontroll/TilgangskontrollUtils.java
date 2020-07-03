@@ -1,10 +1,13 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 
 import com.nimbusds.jwt.JWTClaimsSet;
+import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.model.SelvbetjeningToken;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Fnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.InnloggetBruker;
-import no.nav.security.oidc.context.OIDCRequestContextHolder;
-import no.nav.security.oidc.context.TokenContext;
+import no.nav.security.token.support.core.context.TokenValidationContext;
+import no.nav.security.token.support.core.context.TokenValidationContextHolder;
+import no.nav.security.token.support.core.jwt.JwtToken;
+import no.nav.security.token.support.core.jwt.JwtTokenClaims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,10 +19,10 @@ public class TilgangskontrollUtils {
     final static String ISSUER_ISSO = "isso";
     final static String ISSUER_SELVBETJENING = "selvbetjening";
 
-    private final OIDCRequestContextHolder contextHolder;
+    private final TokenValidationContextHolder contextHolder;
 
     @Autowired
-    public TilgangskontrollUtils(OIDCRequestContextHolder contextHolder) {
+    public TilgangskontrollUtils(TokenValidationContextHolder contextHolder) {
         this.contextHolder = contextHolder;
     }
 
@@ -46,21 +49,15 @@ public class TilgangskontrollUtils {
     }
 
     private Optional<String> hentClaim(String issuer, String claim) {
-        Optional<JWTClaimsSet> claimSet = hentClaimSet(issuer);
-        return claimSet.map(jwtClaimsSet -> String.valueOf(jwtClaimsSet.getClaim(claim)));
+        Optional<JwtTokenClaims> claims = hentClaimSet(issuer);
+        return claims.map(jwtClaims -> String.valueOf(jwtClaims.get(claim)));
     }
 
-    private Optional<JWTClaimsSet> hentClaimSet(String issuer) {
-        return Optional.ofNullable(contextHolder.getOIDCValidationContext().getClaims(issuer))
-                .map(claims -> claims.getClaimSet());
+    private Optional<JwtTokenClaims> hentClaimSet(String issuer) {
+        return Optional.ofNullable(contextHolder.getTokenValidationContext().getClaims(issuer));
     }
 
-    public String getSelvbetjeningToken() {
-        return contextHolder.getOIDCValidationContext().getToken(ISSUER_SELVBETJENING).getIdToken();
+    public JwtToken getSelvbetjeningToken() {
+        return contextHolder.getTokenValidationContext().getJwtToken(ISSUER_SELVBETJENING);
     }
-
-    public TokenContext getSelvbetjeningTokenContext() {
-        return contextHolder.getOIDCValidationContext().getToken(ISSUER_SELVBETJENING);
-    }
-
 }

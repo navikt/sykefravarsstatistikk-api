@@ -34,15 +34,12 @@ altinn:
 enhetsregisteret:
   url: "http://localhost:${wiremock.mock.port}/enhetsregisteret/"
 
-no.nav.security.oidc:
-  issuers: iss-localhost, selvbetjening
+no.nav.security.jwt:
   issuer:
-    iss-localhost:
-      discoveryurl: http://metadata
-      accepted_audience: aud-localhost
     selvbetjening:
       discoveryurl: http://metadata
       accepted_audience: aud-localhost
+      cookiename: selvbetjening-idtoken
 
 statistikk.import.siste.arstall: 2019
 statistikk.import.siste.kvartal: 2
@@ -89,15 +86,10 @@ datavarehus.datasource:
 spring:
   profiles: mvc-test
 
-no.nav.security.oidc:
-  issuers: iss-localhost, selvbetjening
-  issuer:
-    iss-localhost:
+no.nav.security.jwt.issuer.selvbetjening:
       discoveryurl: http://metadata
       accepted_audience: aud-localhost
-    selvbetjening:
-      discoveryurl: http://metadata
-      accepted_audience: aud-localhost
+      cookiename: selvbetjening-idtoken
 
 enhetsregisteret:
   url: "http://localhost:1331/enhetsregisteret/"
@@ -131,11 +123,10 @@ altinn:
     code: 3403
     edition: 1
 
-no.nav.security.oidc:
-  issuers: selvbetjening
-  issuer.selvbetjening:
+no.nav.security.jwt.issuer.selvbetjening:
     discoveryurl: https://login.microsoftonline.com/NAVtestB2C.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1A_idporten_ver1
     accepted_audience: 0090b6e1-ffcc-4c37-bc21-049f7d1f0fe5
+    cookiename: selvbetjening-idtoken
 
 statistikk.import.siste.arstall: 2019
 statistikk.import.siste.kvartal: 1
@@ -169,11 +160,10 @@ altinn:
     code: 3403
     edition: 2
 
-no.nav.security.oidc:
-  issuers: selvbetjening
-  issuer.selvbetjening:
+no.nav.security.jwt.issuer.selvbetjening:
     discoveryurl: https://login.microsoftonline.com/navnob2c.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1A_idporten
     accepted_audience: 45104d6a-f5bc-4e8c-b352-4bbfc9381f25
+    cookiename: selvbetjening-idtoken
 
 statistikk.import.siste.arstall: 2019
 statistikk.import.siste.kvartal: 3
