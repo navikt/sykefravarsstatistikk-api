@@ -68,6 +68,18 @@ public class DataverehusRepositoryJdbcTest {
     }
 
     @Test
+    public void hentSisteÅrstallOgKvartalFraSykefraværsstatistikkLand__returnerer_siste_ÅrstallOgKvartal() {
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 4, 4, 5, 100);
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 4, 6, 10, 100);
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2020, 1, 1, 1, 10);
+
+        ÅrstallOgKvartal sisteÅrstallOgKvartal =
+                repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikkLand();
+
+        assertEquals(new ÅrstallOgKvartal(2020, 1), sisteÅrstallOgKvartal);
+    }
+
+    @Test
     public void hentSykefraværsstatistikkLand__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, 5, 100);
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, 10, 100);
