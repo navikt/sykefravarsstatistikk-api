@@ -18,8 +18,7 @@ public class ImporteringScheduler {
         this.taskExecutor = taskExecutor;
     }
 
-    //@Scheduled(cron = "5 8 * * * ?")
-    @Scheduled(cron = "* * * * * ?")
+    @Scheduled(cron = "5 8 * * * ?")
     public void scheduledImportering() {
         Duration lockAtMostUntil = Duration.of(1, ChronoUnit.HOURS);
         Duration lockAtLeastUntil = Duration.of(1, ChronoUnit.MINUTES);
@@ -30,7 +29,7 @@ public class ImporteringScheduler {
     }
 
     private void importering() {
-        log.info("@@@ Importerer data");
+        log.info("Jobb for å importere sykefraværsstatistikk er startet. Selve importeringen er skrudd av for øyeblikket.");
     }
 
 }
