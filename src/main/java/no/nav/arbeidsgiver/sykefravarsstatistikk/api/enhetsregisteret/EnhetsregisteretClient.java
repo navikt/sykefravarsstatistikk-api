@@ -93,6 +93,10 @@ public class EnhetsregisteretClient {
             JsonNode enhetJson = objectMapper.readTree(jsonResponseFraEnhetsregisteret);
             JsonNode næringskodeJson = enhetJson.get("naeringskode1");
 
+            if (næringskodeJson == null) {
+                throw new IngenNæringException("Feil ved kall til Enhetsregisteret. Ingen næring for virksomhet.");
+            }
+
             return new Underenhet(
                     new Orgnr(enhetJson.get("organisasjonsnummer").textValue()),
                     new Orgnr(enhetJson.get("overordnetEnhet").textValue()),
