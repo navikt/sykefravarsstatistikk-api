@@ -56,6 +56,22 @@ public class DataverehusRepository {
    Statistikk
   */
 
+    public ÅrstallOgKvartal hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde type) {
+        List<ÅrstallOgKvartal> alleÅrstallOgKvartal = namedParameterJdbcTemplate.query(
+                String.format("select distinct arstall, kvartal " +
+                        "from %s " +
+                        "order by arstall desc, kvartal desc", type.tabell),
+                new MapSqlParameterSource(),
+                (resultSet, rowNum) ->
+                        new ÅrstallOgKvartal(
+                                resultSet.getInt(ARSTALL),
+                                resultSet.getInt(KVARTAL)
+                        )
+        );
+        return alleÅrstallOgKvartal.get(0);
+    }
+
+
     public List<SykefraværsstatistikkLand> hentSykefraværsstatistikkLand(ÅrstallOgKvartal årstallOgKvartal) {
         SqlParameterSource namedParameters =
                 new MapSqlParameterSource()
