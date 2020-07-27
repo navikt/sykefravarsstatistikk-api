@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk;
 
-public enum StatistikkKilde {
+public enum Statistikkkilde {
     LAND_OG_SEKTOR("dt_p.agg_ia_sykefravar_land_v"),
     NÆRING("dt_p.v_agg_ia_sykefravar_naring"),
     NÆRING_5_SIFFER("dt_p.agg_ia_sykefravar_naring_kode"),
@@ -8,7 +8,7 @@ public enum StatistikkKilde {
 
     public final String tabell;
 
-    StatistikkKilde(String tabell) {
+    Statistikkkilde(String tabell) {
         this.tabell = tabell;
     }
 }

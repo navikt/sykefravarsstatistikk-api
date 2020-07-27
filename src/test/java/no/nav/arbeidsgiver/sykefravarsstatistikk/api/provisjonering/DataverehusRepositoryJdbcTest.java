@@ -54,7 +54,7 @@ public class DataverehusRepositoryJdbcTest {
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2020, 1, 1, 1, 10);
 
         ÅrstallOgKvartal sisteÅrstallOgKvartal =
-                repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkKilde.LAND_OG_SEKTOR);
+                repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.LAND_OG_SEKTOR);
 
         assertEquals(new ÅrstallOgKvartal(2020, 1), sisteÅrstallOgKvartal);
     }
@@ -83,7 +83,7 @@ public class DataverehusRepositoryJdbcTest {
         );
 
         ÅrstallOgKvartal sisteÅrstallOgKvartal =
-                repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkKilde.NÆRING);
+                repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.NÆRING);
 
         assertEquals(new ÅrstallOgKvartal(2020, 1), sisteÅrstallOgKvartal);
     }
@@ -112,7 +112,7 @@ public class DataverehusRepositoryJdbcTest {
         );
 
         ÅrstallOgKvartal sisteÅrstallOgKvartal =
-                repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkKilde.NÆRING_5_SIFFER);
+                repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.NÆRING_5_SIFFER);
 
         assertEquals(new ÅrstallOgKvartal(2020, 2), sisteÅrstallOgKvartal);
     }
@@ -139,7 +139,7 @@ public class DataverehusRepositoryJdbcTest {
         );
 
         ÅrstallOgKvartal sisteÅrstallOgKvartal =
-                repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkKilde.VIRKSOMHET);
+                repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.VIRKSOMHET);
 
         assertEquals(new ÅrstallOgKvartal(2019, 1), sisteÅrstallOgKvartal);
     }
