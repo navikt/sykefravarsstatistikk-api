@@ -1,9 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkLand;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkSektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkVirksomhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import org.junit.After;
@@ -21,7 +18,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.DataverehusRepository.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -51,6 +47,102 @@ public class DataverehusRepositoryJdbcTest {
         cleanUpTestDb(namedParameterJdbcTemplate);
     }
 
+    @Test
+    public void hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Land_og_sektor() {
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 4, 4, 5, 100);
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 4, 6, 10, 100);
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2020, 1, 1, 1, 10);
+
+        ÅrstallOgKvartal sisteÅrstallOgKvartal =
+                repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkKilde.LAND_OG_SEKTOR);
+
+        assertEquals(new ÅrstallOgKvartal(2020, 1), sisteÅrstallOgKvartal);
+    }
+
+    @Test
+    public void hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Næring() {
+        insertSykefraværsstatistikkNæringInDvhTabell(
+                namedParameterJdbcTemplate,
+                2019,
+                4,
+                4,
+                "23",
+                "K",
+                5,
+                100
+        );
+        insertSykefraværsstatistikkNæringInDvhTabell(
+                namedParameterJdbcTemplate,
+                2020,
+                1,
+                2,
+                "90",
+                "M",
+                12,
+                100
+        );
+
+        ÅrstallOgKvartal sisteÅrstallOgKvartal =
+                repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkKilde.NÆRING);
+
+        assertEquals(new ÅrstallOgKvartal(2020, 1), sisteÅrstallOgKvartal);
+    }
+
+    @Test
+    public void hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Næring5Siffer() {
+        insertSykefraværsstatistikkNærin5SiffergInDvhTabell(
+                namedParameterJdbcTemplate,
+                2020,
+                2,
+                4,
+                "01110",
+                "K",
+                5,
+                100
+        );
+        insertSykefraværsstatistikkNærin5SiffergInDvhTabell(
+                namedParameterJdbcTemplate,
+                2020,
+                1,
+                2,
+                "01110",
+                "M",
+                12,
+                100
+        );
+
+        ÅrstallOgKvartal sisteÅrstallOgKvartal =
+                repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkKilde.NÆRING_5_SIFFER);
+
+        assertEquals(new ÅrstallOgKvartal(2020, 2), sisteÅrstallOgKvartal);
+    }
+
+    @Test
+    public void hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Virksomhet() {
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(
+                namedParameterJdbcTemplate,
+                2018,
+                4,
+                4, ORGNR_VIRKSOMHET_1,
+                "K",
+                5, 100
+        );
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(
+                namedParameterJdbcTemplate,
+                2019,
+                1,
+                5,
+                ORGNR_VIRKSOMHET_2,
+                "M",
+                5,
+                101
+        );
+
+        ÅrstallOgKvartal sisteÅrstallOgKvartal =
+                repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkKilde.VIRKSOMHET);
+
+        assertEquals(new ÅrstallOgKvartal(2019, 1), sisteÅrstallOgKvartal);
+    }
 
     @Test
     public void hentSykefraværsstatistikkSektor__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
@@ -65,18 +157,6 @@ public class DataverehusRepositoryJdbcTest {
         SykefraværsstatistikkSektor sykefraværsstatistikkSektorExpected = new SykefraværsstatistikkSektor(2018, 4, "1", 4, new BigDecimal(15), new BigDecimal(200));
         SykefraværsstatistikkSektor sykefraværsstatistikkSektorActual = sykefraværsstatistikkSektor.get(0);
         assertTrue(new ReflectionEquals(sykefraværsstatistikkSektorExpected).matches(sykefraværsstatistikkSektorActual));
-    }
-
-    @Test
-    public void hentSisteÅrstallOgKvartalFraSykefraværsstatistikkLand__returnerer_siste_ÅrstallOgKvartal() {
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 4, 4, 5, 100);
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 4, 6, 10, 100);
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2020, 1, 1, 1, 10);
-
-        ÅrstallOgKvartal sisteÅrstallOgKvartal =
-                repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikkLand();
-
-        assertEquals(new ÅrstallOgKvartal(2020, 1), sisteÅrstallOgKvartal);
     }
 
     @Test
@@ -102,10 +182,10 @@ public class DataverehusRepositoryJdbcTest {
 
     @Test
     public void hentSykefraværsstatistikkVirksomhet__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
-        insertSykefraværsstatistikkInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, ORGNR_VIRKSOMHET_1, "K", 5, 100);
-        insertSykefraværsstatistikkInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, ORGNR_VIRKSOMHET_1, "M", 8, 88);
-        insertSykefraværsstatistikkInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, ORGNR_VIRKSOMHET_2, "K", 3, 75);
-        insertSykefraværsstatistikkInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 5, ORGNR_VIRKSOMHET_1, "M", 5, 101);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, ORGNR_VIRKSOMHET_1, "K", 5, 100);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, ORGNR_VIRKSOMHET_1, "M", 8, 88);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, ORGNR_VIRKSOMHET_2, "K", 3, 75);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 5, ORGNR_VIRKSOMHET_1, "M", 5, 101);
 
         List<SykefraværsstatistikkVirksomhet> sykefraværsstatistikkVirksomhet =
                 repository.hentSykefraværsstatistikkVirksomhet(new ÅrstallOgKvartal(2018, 4));
@@ -196,38 +276,6 @@ public class DataverehusRepositoryJdbcTest {
                 naringParams);
     }
 
-    private static void insertNæringsgrupperingInDvhTabell(
-            NamedParameterJdbcTemplate jdbcTemplate,
-            String næringkode,
-            String næringbeskrivelse,
-            String gruppe1kode,
-            String gruppe1beskrivelse,
-            String gruppe2kode,
-            String gruppe2beskrivelse,
-            String gruppe3kode,
-            String gruppe3beskrivelse,
-            String gruppe4kode,
-            String gruppe4beskrivelse
-    ) {
-        MapSqlParameterSource naringParams =
-                new MapSqlParameterSource()
-                        .addValue(NAERING_KODE, næringkode)
-                        .addValue(NAERING_BESKRIVELSE, næringbeskrivelse)
-                        .addValue(GRUPPE1_KODE, gruppe1kode)
-                        .addValue(GRUPPE1_BESKRIVELSE, gruppe1beskrivelse)
-                        .addValue(GRUPPE2_KODE, gruppe2kode)
-                        .addValue(GRUPPE2_BESKRIVELSE, gruppe2beskrivelse)
-                        .addValue(GRUPPE3_KODE, gruppe3kode)
-                        .addValue(GRUPPE3_BESKRIVELSE, gruppe3beskrivelse)
-                        .addValue(GRUPPE4_KODE, gruppe4kode)
-                        .addValue(GRUPPE4_BESKRIVELSE, gruppe4beskrivelse);
-
-        jdbcTemplate.update(
-                "insert into dt_p.dim_ia_naring (naering_kode, naering_besk_lang, gruppe1_kode, gruppe1_besk_lang, gruppe2_kode, gruppe2_besk_lang, gruppe3_kode, gruppe3_besk_lang, gruppe4_kode, gruppe4_besk_lang) "
-                        + "values (:naering_kode,  :naering_besk_lang,  :gruppe1_kode,  :gruppe1_besk_lang,  :gruppe2_kode,  :gruppe2_besk_lang,  :gruppe3_kode,  :gruppe3_besk_lang,  :gruppe4_kode,  :gruppe4_besk_lang)",
-                naringParams);
-    }
-
     private static void insertSykefraværsstatistikkLandInDvhTabell(
             NamedParameterJdbcTemplate jdbcTemplate,
             int årstall,
@@ -261,7 +309,7 @@ public class DataverehusRepositoryJdbcTest {
                 params);
     }
 
-    private static void insertSykefraværsstatistikkInDvhTabell(
+    private static void insertSykefraværsstatistikkVirksomhetInDvhTabell(
             NamedParameterJdbcTemplate jdbcTemplate,
             int årstall,
             int kvartal,
@@ -296,4 +344,69 @@ public class DataverehusRepositoryJdbcTest {
                 params);
     }
 
+    private static void insertSykefraværsstatistikkNæringInDvhTabell(
+            NamedParameterJdbcTemplate jdbcTemplate,
+            int årstall,
+            int kvartal,
+            int antallPersoner,
+            String næring,
+            String kjonn,
+            long taptedagsverk,
+            long muligedagsverk) {
+        MapSqlParameterSource params =
+                new MapSqlParameterSource()
+                        .addValue("arstall", årstall)
+                        .addValue("kvartal", kvartal)
+                        .addValue("antpers", antallPersoner)
+                        .addValue("naring", næring)
+                        .addValue("kjonn", kjonn)
+                        .addValue("taptedv", taptedagsverk)
+                        .addValue("muligedv", muligedagsverk);
+
+        jdbcTemplate.update(
+                "insert into dt_p.v_agg_ia_sykefravar_naring ("
+                        + "arstall, kvartal, "
+                        + "naring, "
+                        + "alder, kjonn, "
+                        + "taptedv, muligedv, antpers) "
+                        + "values ("
+                        + ":arstall, :kvartal, "
+                        + ":naring, "
+                        + "'A', :kjonn, "
+                        + ":taptedv, :muligedv, :antpers)",
+                params);
+    }
+
+    private static void insertSykefraværsstatistikkNærin5SiffergInDvhTabell(
+            NamedParameterJdbcTemplate jdbcTemplate,
+            int årstall,
+            int kvartal,
+            int antallPersoner,
+            String næringKode,
+            String kjonn,
+            long taptedagsverk,
+            long muligedagsverk) {
+        MapSqlParameterSource params =
+                new MapSqlParameterSource()
+                        .addValue("arstall", årstall)
+                        .addValue("kvartal", kvartal)
+                        .addValue("antpers", antallPersoner)
+                        .addValue("næringKode", næringKode)
+                        .addValue("kjonn", kjonn)
+                        .addValue("taptedv", taptedagsverk)
+                        .addValue("muligedv", muligedagsverk);
+
+        jdbcTemplate.update(
+                "insert into dt_p.agg_ia_sykefravar_naring_kode ("
+                        + "arstall, kvartal, "
+                        + "naering_kode, "
+                        + "alder, kjonn, "
+                        + "taptedv, muligedv, antpers) "
+                        + "values ("
+                        + ":arstall, :kvartal, "
+                        + ":næringKode, "
+                        + "'A', :kjonn, "
+                        + ":taptedv, :muligedv, :antpers)",
+                params);
+    }
 }
