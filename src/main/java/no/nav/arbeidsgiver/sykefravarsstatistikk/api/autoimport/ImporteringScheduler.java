@@ -30,7 +30,7 @@ public class ImporteringScheduler {
     }
 
     private void importering() {
-        log.info("Importerer data");
+        log.info("@@@ Importerer data");
     }
 
 }
