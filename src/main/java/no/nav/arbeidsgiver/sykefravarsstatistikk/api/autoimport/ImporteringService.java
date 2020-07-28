@@ -1,11 +1,13 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.autoimport;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.SlettOgOpprettResultat;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.Statistikkkilde;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.StatistikkkildeDvh;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.DataverehusRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering.StatistikkImportRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering.StatistikkImportService;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -15,12 +17,18 @@ import java.util.List;
 @Component
 public class ImporteringService {
 
-    final StatistikkImportRepository statistikkImportRepository;
-    final DataverehusRepository dataverehusRepository;
+    private final StatistikkImportRepository statistikkImportRepository;
+    private final DataverehusRepository dataverehusRepository;
+    private final StatistikkImportService statistikkImportService;
 
-    public ImporteringService(StatistikkImportRepository statistikkImportRepository, DataverehusRepository dataverehusRepository) {
+    public ImporteringService(
+            StatistikkImportRepository statistikkImportRepository,
+            DataverehusRepository dataverehusRepository,
+            StatistikkImportService statistikkImportService
+    ) {
         this.statistikkImportRepository = statistikkImportRepository;
         this.dataverehusRepository = dataverehusRepository;
+        this.statistikkImportService = statistikkImportService;
     }
 
     public void importerHvisDetFinnesNyStatistikk() {
@@ -39,10 +47,43 @@ public class ImporteringService {
         );
 
         if (kanImportStartes(årstallOgKvartalForSykefraværsstatistikk, årstallOgKvartalForDvh)) {
-            //TODO
+            log.info("Importerer ny statistikk");
+            importerNyStatistikk(årstallOgKvartalForDvh.get(0));
         } else {
-            log.info("Fant ingen ny statistikk");
+            log.info("Importerer ikke ny statistikk");
         }
+    }
+
+    private void importerNyStatistikk(ÅrstallOgKvartal årstallOgKvartal) {
+        SlettOgOpprettResultat resultatLand = statistikkImportService
+                .importSykefraværsstatistikkLand(årstallOgKvartal);
+        logResultatAvImportering("land", resultatLand, årstallOgKvartal);
+
+        SlettOgOpprettResultat resultatSektor = statistikkImportService
+                .importSykefraværsstatistikkSektor(årstallOgKvartal);
+        logResultatAvImportering("sektor", resultatSektor, årstallOgKvartal);
+
+        SlettOgOpprettResultat resultatNæring = statistikkImportService
+                .importSykefraværsstatistikkNæring(årstallOgKvartal);
+        logResultatAvImportering("næring", resultatNæring, årstallOgKvartal);
+
+        SlettOgOpprettResultat resultatNæring5siffer = statistikkImportService
+                .importSykefraværsstatistikkNæring(årstallOgKvartal);
+        logResultatAvImportering("næring5siffer", resultatNæring5siffer, årstallOgKvartal);
+
+        SlettOgOpprettResultat resultatVirksomhet = statistikkImportService
+                .importSykefraværsstatistikkNæring(årstallOgKvartal);
+        logResultatAvImportering("virksomhet", resultatVirksomhet, årstallOgKvartal);
+    }
+
+    private void logResultatAvImportering(String type, SlettOgOpprettResultat resultat, ÅrstallOgKvartal årstallOgKvartal) {
+        log.info("Importert ny statistikk for {} fra årstall {} og kvartal {}. Antall rader slettet: {}, antall rader opprettet: {}",
+                type,
+                årstallOgKvartal.getÅrstall(),
+                årstallOgKvartal.getKvartal(),
+                resultat.getAntallRadSlettet(),
+                resultat.getAntallRadOpprettet()
+        );
     }
 
     protected boolean kanImportStartes(
