@@ -30,7 +30,7 @@ public class SykefraværshistorikkController {
         this.enhetsregisteretClient = enhetsregisteretClient;
     }
 
-    @GetMapping(value = "/{orgnr}/sykefravarshistorikk")
+        @GetMapping(value = "/{orgnr}/sykefravarshistorikk")
     public List<Sykefraværshistorikk> hentSykefraværshistorikk(
             @PathVariable("orgnr") String orgnrStr,
             HttpServletRequest request

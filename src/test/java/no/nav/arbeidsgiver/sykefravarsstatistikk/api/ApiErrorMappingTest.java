@@ -29,7 +29,7 @@ public class ApiErrorMappingTest {
 
 
     @Test
-    public void bedriftsmetrikker__skal_returnere_BAD_REQUEST_dersom_underenhet_ikke_har_noe_næringskode()
+    public void sykefraværshistorikk__skal_returnere_SERVER_ERROR_med_causedBy_dersom_underenhet_ikke_har_noe_næringskode()
             throws Exception {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
@@ -37,7 +37,7 @@ public class ApiErrorMappingTest {
                                 URI.create(
                                         "http://localhost:" + port
                                                 + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET_UTEN_NÆRING
-                                                + "/bedriftsmetrikker"
+                                                + "/sykefravarshistorikk"
                                 )
                         )
                         .header(
@@ -49,7 +49,7 @@ public class ApiErrorMappingTest {
                 ofString()
         );
 
-        assertThat(response.statusCode()).isEqualTo(400);
-        assertThat(response.body()).isEqualTo("{\"message\":\"Kunne ikke hente informasjon om enheten fra enhetsregisteret\"}");
+        assertThat(response.statusCode()).isEqualTo(500);
+        assertThat(response.body()).isEqualTo("{\"message\":\"Internal error\",\"causedBy\":\"INGEN_NÆRING\"}");
     }
 }

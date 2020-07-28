@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretIkkeTilgjengeligException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretMappingException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.IngenNæringException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException;
 import org.slf4j.Logger;
@@ -17,27 +18,43 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.nio.file.AccessDeniedException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static Logger logger = LoggerFactory.getLogger(ResponseEntityExceptionHandler.class);
 
+    private static final String INGEN_NÆRING = "INGEN_NÆRING";
 
     @ExceptionHandler(value = {EnhetsregisteretMappingException.class})
     @ResponseBody
     protected ResponseEntity<Object> handleEnhetsregisteretException(RuntimeException e, WebRequest webRequest) {
         return getResponseEntity(e,
-                "Kunne ikke hente informasjon om enheten fra enhetsregisteret",
+                "Kunne ikke lese informasjon om enheten fra Enhetsregisteret",
                 HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = {EnhetsregisteretIkkeTilgjengeligException.class})
     @ResponseBody
     protected ResponseEntity<Object> handleEnhetsregisteretIkkeTilgjengeligException(RuntimeException e, WebRequest webRequest) {
-        logger.warn("Kunne ikke hente informasjon om enheten fra enhetsregisteret fordi Enhetsregisteret ikke er tilgjengelig", e);
+        logger.warn("Kunne ikke hente informasjon om enheten fra Enhetsregisteret fordi Enhetsregisteret ikke er tilgjengelig", e);
         return getResponseEntity(e, "Internal error", HttpStatus.INTERNAL_SERVER_ERROR);
+
+    }
+
+    @ExceptionHandler(value = {IngenNæringException.class})
+    @ResponseBody
+    protected ResponseEntity<Object> handleIngenNæringException(RuntimeException e, WebRequest webRequest) {
+        logger.warn("Kunne ikke lese informasjon om enheten fra Enhetsregisteret fordi enheten ikke har næring", e);
+        return getResponseEntity(
+                e,
+                "Internal error",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                Collections.singletonMap("causedBy", INGEN_NÆRING)
+        );
 
     }
 
@@ -68,7 +85,11 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     }
 
     private ResponseEntity<Object> getResponseEntity(RuntimeException e, String melding, HttpStatus status) {
-        HashMap<String, String> body = new HashMap<>(1);
+        return getResponseEntity(e, melding, status, new HashMap<>());
+    }
+
+    private ResponseEntity<Object> getResponseEntity(RuntimeException e, String melding, HttpStatus status, Map<String, String> bodyTillegg) {
+        HashMap<String, String> body = new HashMap<>(bodyTillegg);
         body.put("message", melding);
         logger.info(
                 String.format(
