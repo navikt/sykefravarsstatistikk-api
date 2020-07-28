@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjetype;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.Statistikkkilde;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
@@ -43,6 +44,23 @@ public class KvartalsvisSykefraværRepositoryJdbcTest {
     @After
     public void tearDown() {
         slettAllStatistikkFraDatabase(jdbcTemplate);
+    }
+
+    @Test
+    public void hentSisteÅrstallOgKvartalForSykefraværsstatistikk__skal_returnere_siste_ÅrstallOgKvartal_for_import() {
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(2019, 2, 10, 4, 100)
+        );
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(2019, 1, 10, 5, 100)
+        );
+
+        ÅrstallOgKvartal årstallOgKvartal = kvartalsvisSykefraværprosentRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.LAND);
+        assertThat(årstallOgKvartal).isEqualTo(new ÅrstallOgKvartal(2019, 2));
     }
 
     @Test

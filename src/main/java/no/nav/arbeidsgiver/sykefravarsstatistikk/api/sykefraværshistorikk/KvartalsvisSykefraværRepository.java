@@ -1,6 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.Statistikkkilde;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.StatistikkkildeDvh;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
@@ -27,11 +29,26 @@ public class KvartalsvisSykefraværRepository {
 
     }
 
+    public ÅrstallOgKvartal hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde type) {
+        List<ÅrstallOgKvartal> alleÅrstallOgKvartal = namedParameterJdbcTemplate.query(
+                String.format("select distinct arstall, kvartal " +
+                        "from %s " +
+                        "order by arstall desc, kvartal desc", type.tabell),
+                new MapSqlParameterSource(),
+                (resultSet, rowNum) ->
+                        new ÅrstallOgKvartal(
+                                resultSet.getInt("arstall"),
+                                resultSet.getInt("kvartal")
+                        )
+        );
+        return alleÅrstallOgKvartal.get(0);
+    }
+
     public List<KvartalsvisSykefravær> hentKvartalsvisSykefraværprosentLand() {
         try {
             return namedParameterJdbcTemplate.query(
                     "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal " +
-                            "FROM SYKEFRAVAR_STATISTIKK_LAND " +
+                            "FROM sykefravar_statistikk_land " +
                             "ORDER BY arstall, kvartal ",
                     new HashMap<>(),
                     (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs)
