@@ -31,7 +31,7 @@ public class ImporteringService {
         this.statistikkImportService = statistikkImportService;
     }
 
-    public void importerHvisDetFinnesNyStatistikk() {
+    public void importerHvisDetFinnesNyStatistikk(boolean erImporteringAktivert) {
         List<ÅrstallOgKvartal> årstallOgKvartalForSykefraværsstatistikk = Arrays.asList(
                 statistikkImportRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.LAND),
                 statistikkImportRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.SEKTOR),
@@ -47,8 +47,12 @@ public class ImporteringService {
         );
 
         if (kanImportStartes(årstallOgKvartalForSykefraværsstatistikk, årstallOgKvartalForDvh)) {
-            log.info("Importerer ny statistikk");
-            importerNyStatistikk(årstallOgKvartalForDvh.get(0));
+            if (erImporteringAktivert) {
+                log.info("Importerer ny statistikk");
+                importerNyStatistikk(årstallOgKvartalForDvh.get(0));
+            } else {
+                log.info("Statistikk er klar til importering men automatisk importering er ikke aktivert");
+            }
         } else {
             log.info("Importerer ikke ny statistikk");
         }

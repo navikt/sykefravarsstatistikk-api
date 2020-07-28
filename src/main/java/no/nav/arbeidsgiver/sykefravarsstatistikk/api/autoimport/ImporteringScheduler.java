@@ -13,9 +13,11 @@ import java.time.temporal.ChronoUnit;
 @Slf4j
 public class ImporteringScheduler {
     private final LockingTaskExecutor taskExecutor;
+    private final ImporteringService importeringService;
 
-    public ImporteringScheduler(LockingTaskExecutor taskExecutor) {
+    public ImporteringScheduler(LockingTaskExecutor taskExecutor, ImporteringService importeringService) {
         this.taskExecutor = taskExecutor;
+        this.importeringService = importeringService;
     }
 
     @Scheduled(cron = "5 8 * * * ?")
@@ -29,7 +31,8 @@ public class ImporteringScheduler {
     }
 
     private void importering() {
-        log.info("Jobb for å importere sykefraværsstatistikk er startet. Selve importeringen er skrudd av for øyeblikket.");
+        log.info("Jobb for å importere sykefraværsstatistikk er startet.");
+        importeringService.importerHvisDetFinnesNyStatistikk(false);
     }
 
 }
