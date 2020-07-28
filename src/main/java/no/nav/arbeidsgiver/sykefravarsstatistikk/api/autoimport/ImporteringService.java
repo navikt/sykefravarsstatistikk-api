@@ -2,12 +2,9 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.autoimport;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.SlettOgOpprettResultat;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.Statistikkkilde;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.StatistikkkildeDvh;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.DataverehusRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering.StatistikkImportRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering.StatistikkImportService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -17,33 +14,33 @@ import java.util.List;
 @Component
 public class ImporteringService {
 
-    private final StatistikkImportRepository statistikkImportRepository;
-    private final DataverehusRepository dataverehusRepository;
-    private final StatistikkImportService statistikkImportService;
+    private final ImporteringRepository importeringRepository;
+    private final DataverehusRepository datavarehusRepository;
+    private final boolean erImporteringAktivert;
 
     public ImporteringService(
-            StatistikkImportRepository statistikkImportRepository,
-            DataverehusRepository dataverehusRepository,
-            StatistikkImportService statistikkImportService
-    ) {
-        this.statistikkImportRepository = statistikkImportRepository;
-        this.dataverehusRepository = dataverehusRepository;
-        this.statistikkImportService = statistikkImportService;
+            ImporteringRepository importeringRepository,
+            DataverehusRepository datavarehusRepository,
+            @Value("${statistikk.importering.aktivert}")
+            Boolean erImporteringAktivert) {
+        this.importeringRepository = importeringRepository;
+        this.datavarehusRepository = datavarehusRepository;
+        this.erImporteringAktivert = erImporteringAktivert;
     }
 
-    public void importerHvisDetFinnesNyStatistikk(boolean erImporteringAktivert) {
+    public void importerHvisDetFinnesNyStatistikk() {
         List<ÅrstallOgKvartal> årstallOgKvartalForSykefraværsstatistikk = Arrays.asList(
-                statistikkImportRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.LAND),
-                statistikkImportRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.SEKTOR),
-                statistikkImportRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.NÆRING),
-                statistikkImportRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.NÆRING_5_SIFFER),
-                statistikkImportRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.VIRKSOMHET)
+                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.LAND),
+                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.SEKTOR),
+                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.NÆRING),
+                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.NÆRING_5_SIFFER),
+                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.VIRKSOMHET)
         );
         List<ÅrstallOgKvartal> årstallOgKvartalForDvh = Arrays.asList(
-                dataverehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkkildeDvh.LAND_OG_SEKTOR),
-                dataverehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkkildeDvh.NÆRING),
-                dataverehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkkildeDvh.NÆRING_5_SIFFER),
-                dataverehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkkildeDvh.VIRKSOMHET)
+                datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkkildeDvh.LAND_OG_SEKTOR),
+                datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkkildeDvh.NÆRING),
+                datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkkildeDvh.NÆRING_5_SIFFER),
+                datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkkildeDvh.VIRKSOMHET)
         );
 
         if (kanImportStartes(årstallOgKvartalForSykefraværsstatistikk, årstallOgKvartalForDvh)) {
@@ -58,37 +55,6 @@ public class ImporteringService {
         }
     }
 
-    private void importerNyStatistikk(ÅrstallOgKvartal årstallOgKvartal) {
-        SlettOgOpprettResultat resultatLand = statistikkImportService
-                .importSykefraværsstatistikkLand(årstallOgKvartal);
-        logResultatAvImportering("land", resultatLand, årstallOgKvartal);
-
-        SlettOgOpprettResultat resultatSektor = statistikkImportService
-                .importSykefraværsstatistikkSektor(årstallOgKvartal);
-        logResultatAvImportering("sektor", resultatSektor, årstallOgKvartal);
-
-        SlettOgOpprettResultat resultatNæring = statistikkImportService
-                .importSykefraværsstatistikkNæring(årstallOgKvartal);
-        logResultatAvImportering("næring", resultatNæring, årstallOgKvartal);
-
-        SlettOgOpprettResultat resultatNæring5siffer = statistikkImportService
-                .importSykefraværsstatistikkNæring(årstallOgKvartal);
-        logResultatAvImportering("næring5siffer", resultatNæring5siffer, årstallOgKvartal);
-
-        SlettOgOpprettResultat resultatVirksomhet = statistikkImportService
-                .importSykefraværsstatistikkNæring(årstallOgKvartal);
-        logResultatAvImportering("virksomhet", resultatVirksomhet, årstallOgKvartal);
-    }
-
-    private void logResultatAvImportering(String type, SlettOgOpprettResultat resultat, ÅrstallOgKvartal årstallOgKvartal) {
-        log.info("Importert ny statistikk for {} fra årstall {} og kvartal {}. Antall rader slettet: {}, antall rader opprettet: {}",
-                type,
-                årstallOgKvartal.getÅrstall(),
-                årstallOgKvartal.getKvartal(),
-                resultat.getAntallRadSlettet(),
-                resultat.getAntallRadOpprettet()
-        );
-    }
 
     protected boolean kanImportStartes(
             List<ÅrstallOgKvartal> årstallOgKvartalForSykefraværsstatistikk,
@@ -100,8 +66,8 @@ public class ImporteringService {
 
         if (!allImportertStatistikkHarSammeÅrstallOgKvartal || !allStatistikkFraDvhHarSammeÅrstallOgKvartal) {
             log.warn("Kunne ikke importere ny statistikk, statistikk hadde forskjellige årstall og kvartal. " +
-                    "Har importert statistikk samme årstall og kvartal? {}. " +
-                    "Har statistikk fra Dvh samme årstall og kvartal? {}",
+                            "Har importert statistikk samme årstall og kvartal? {}. " +
+                            "Har statistikk fra Dvh samme årstall og kvartal? {}",
                     allImportertStatistikkHarSammeÅrstallOgKvartal,
                     allStatistikkFraDvhHarSammeÅrstallOgKvartal
             );
@@ -136,6 +102,103 @@ public class ImporteringService {
             );
             return false;
         }
+    }
+
+
+    private void importerNyStatistikk(ÅrstallOgKvartal årstallOgKvartal) {
+        importSykefraværsstatistikkLand(årstallOgKvartal);
+        importSykefraværsstatistikkSektor(årstallOgKvartal);
+        importSykefraværsstatistikkNæring(årstallOgKvartal);
+        importSykefraværsstatistikkNæring5siffer(årstallOgKvartal);
+        importSykefraværsstatistikkVirksomhet(årstallOgKvartal);
+    }
+
+
+    private SlettOgOpprettResultat importSykefraværsstatistikkLand(ÅrstallOgKvartal årstallOgKvartal) {
+        List<SykefraværsstatistikkLand> sykefraværsstatistikkLand =
+                datavarehusRepository.hentSykefraværsstatistikkLand(årstallOgKvartal);
+
+        SlettOgOpprettResultat resultat = importeringRepository.importSykefraværsstatistikkLand(
+                sykefraværsstatistikkLand,
+                årstallOgKvartal
+        );
+        loggResultat(årstallOgKvartal, resultat, "land");
+
+        return resultat;
+    }
+
+    private SlettOgOpprettResultat importSykefraværsstatistikkSektor(ÅrstallOgKvartal årstallOgKvartal) {
+        List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor =
+                datavarehusRepository.hentSykefraværsstatistikkSektor(årstallOgKvartal);
+
+        SlettOgOpprettResultat resultat = importeringRepository.importSykefraværsstatistikkSektor(
+                sykefraværsstatistikkSektor,
+                årstallOgKvartal
+        );
+        loggResultat(årstallOgKvartal, resultat, "sektor");
+
+        return resultat;
+    }
+
+    private SlettOgOpprettResultat importSykefraværsstatistikkNæring(ÅrstallOgKvartal årstallOgKvartal) {
+        List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring =
+                datavarehusRepository.hentSykefraværsstatistikkNæring(årstallOgKvartal);
+
+        SlettOgOpprettResultat resultat = importeringRepository.importSykefraværsstatistikkNæring(
+                sykefraværsstatistikkNæring,
+                årstallOgKvartal
+        );
+        loggResultat(årstallOgKvartal, resultat, "næring");
+
+        return resultat;
+    }
+
+    private SlettOgOpprettResultat importSykefraværsstatistikkNæring5siffer(ÅrstallOgKvartal årstallOgKvartal) {
+        List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring =
+                datavarehusRepository.hentSykefraværsstatistikkNæring5siffer(årstallOgKvartal);
+
+        SlettOgOpprettResultat resultat = importeringRepository.importSykefraværsstatistikkNæring5siffer(
+                sykefraværsstatistikkNæring,
+                årstallOgKvartal
+        );
+        loggResultat(årstallOgKvartal, resultat, "næring5siffer");
+
+        return resultat;
+    }
+
+    private SlettOgOpprettResultat importSykefraværsstatistikkVirksomhet(ÅrstallOgKvartal årstallOgKvartal) {
+        List<SykefraværsstatistikkVirksomhet> sykefraværsstatistikkVirksomhet =
+                datavarehusRepository.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal);
+
+        SlettOgOpprettResultat resultat = importeringRepository.importSykefraværsstatistikkVirksomhet(
+                sykefraværsstatistikkVirksomhet,
+                årstallOgKvartal
+        );
+        loggResultat(årstallOgKvartal, resultat, "virksomhet");
+
+        return resultat;
+    }
+
+
+    private static void loggResultat(ÅrstallOgKvartal årstallOgKvartal, SlettOgOpprettResultat resultat, String type) {
+        String melding = resultat.getAntallRadOpprettet() == 0 && resultat.getAntallRadSlettet() == 0 ?
+                "Ingenting å importere"
+                :
+                String.format(
+                        "Antall opprettet: %d, antall slettet: %d",
+                        resultat.getAntallRadOpprettet(),
+                        resultat.getAntallRadSlettet()
+                );
+
+        log.info(
+                String.format(
+                        "Import av sykefraværsstatistikk (%s) for årstall '%d' og kvartal '%d 'er ferdig. %s",
+                        type,
+                        årstallOgKvartal.getÅrstall(),
+                        årstallOgKvartal.getKvartal(),
+                        melding
+                )
+        );
     }
 
     private boolean alleErLike(List<ÅrstallOgKvartal> årstallOgKvartal) {

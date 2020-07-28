@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.autoimport;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.SlettOgOpprettResultat;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.Sykefraværsstatistikk;
@@ -24,23 +24,23 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 @RunWith(MockitoJUnitRunner.class)
-public class StatistikkImportRepositoryTest {
+public class ImporteringRepositoryTest {
 
     @Mock
     NamedParameterJdbcTemplate jdbcTemplate;
 
-    private StatistikkImportRepository statistikkImportRepository;
+    private ImporteringRepository importeringRepository;
 
 
     @Before
     public void setUp() {
-        statistikkImportRepository = new StatistikkImportRepository(jdbcTemplate);
+        importeringRepository = new ImporteringRepository(jdbcTemplate);
     }
 
     @Test
     public void importStatistikk__skal_ikke_slette_eksisterende_statistikk_når_det_ikke_er_noe_data_å_importere() {
 
-        SlettOgOpprettResultat resultat = statistikkImportRepository.importStatistikk(
+        SlettOgOpprettResultat resultat = importeringRepository.importStatistikk(
                 "Test stats",
                 Collections.emptyList(),
                 new ÅrstallOgKvartal(2019, 3),
@@ -54,7 +54,7 @@ public class StatistikkImportRepositoryTest {
     public void batchOpprett__deler_import_i_små_batch() {
         List<SykefraværsstatistikkVirksomhet> list = getSykefraværsstatistikkVirksomhetList(5);
 
-        int resultat = statistikkImportRepository.batchOpprett(
+        int resultat = importeringRepository.batchOpprett(
                 list,
                 dummyUtils(),
                 2
@@ -67,7 +67,7 @@ public class StatistikkImportRepositoryTest {
     public void batchOpprett__ikke_deler_dersom_batch_størrelse_er_større_enn_listen() {
         List<SykefraværsstatistikkVirksomhet> list = getSykefraværsstatistikkVirksomhetList(5);
 
-        int resultat = statistikkImportRepository.batchOpprett(
+        int resultat = importeringRepository.batchOpprett(
                 list,
                 dummyUtils(),
                 1000

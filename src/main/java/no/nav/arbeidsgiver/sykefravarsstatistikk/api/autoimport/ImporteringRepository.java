@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.autoimport;
 
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -16,12 +16,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Component
-public class StatistikkImportRepository {
+public class ImporteringRepository {
 
     public static final int INSERT_BATCH_STØRRELSE = 10000;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public StatistikkImportRepository(
+    public ImporteringRepository(
             @Qualifier("sykefravarsstatistikkJdbcTemplate")
                     NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;

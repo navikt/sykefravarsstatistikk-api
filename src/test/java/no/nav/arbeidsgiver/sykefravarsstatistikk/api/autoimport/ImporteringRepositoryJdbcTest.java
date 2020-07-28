@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.autoimport;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.Statistikkkilde;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
@@ -19,16 +19,16 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 @ActiveProfiles("db-test")
 @RunWith(SpringRunner.class)
 @DataJdbcTest
-public class StatistikkImportRepositoryJdbcTest {
+public class ImporteringRepositoryJdbcTest {
 
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    private StatistikkImportRepository statistikkImportRepository;
+    private ImporteringRepository importeringRepository;
 
     @Before
     public void setUp() {
-        statistikkImportRepository = new StatistikkImportRepository(jdbcTemplate);
+        importeringRepository = new ImporteringRepository(jdbcTemplate);
         slettAllStatistikkFraDatabase(jdbcTemplate);
     }
 
@@ -51,7 +51,7 @@ public class StatistikkImportRepositoryJdbcTest {
                 parametreForStatistikk(2019, 1, 10, 5, 100)
         );
 
-        ÅrstallOgKvartal årstallOgKvartal = statistikkImportRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.LAND);
+        ÅrstallOgKvartal årstallOgKvartal = importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.LAND);
         assertThat(årstallOgKvartal).isEqualTo(new ÅrstallOgKvartal(2019, 2));
     }
 

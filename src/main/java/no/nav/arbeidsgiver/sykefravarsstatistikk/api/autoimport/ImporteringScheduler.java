@@ -32,7 +32,7 @@ public class ImporteringScheduler {
 
     private void importering() {
         log.info("Jobb for å importere sykefraværsstatistikk er startet.");
-        importeringService.importerHvisDetFinnesNyStatistikk(false);
+        importeringService.importerHvisDetFinnesNyStatistikk();
     }
 
 }
