@@ -47,23 +47,6 @@ public class KvartalsvisSykefraværRepositoryJdbcTest {
     }
 
     @Test
-    public void hentSisteÅrstallOgKvartalForSykefraværsstatistikk__skal_returnere_siste_ÅrstallOgKvartal_for_import() {
-        jdbcTemplate.update(
-                "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                        + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(2019, 2, 10, 4, 100)
-        );
-        jdbcTemplate.update(
-                "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                        + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(2019, 1, 10, 5, 100)
-        );
-
-        ÅrstallOgKvartal årstallOgKvartal = kvartalsvisSykefraværprosentRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.LAND);
-        assertThat(årstallOgKvartal).isEqualTo(new ÅrstallOgKvartal(2019, 2));
-    }
-
-    @Test
     public void hentSykefraværprosentLand__skal_returnere_riktig_sykefravær() {
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "

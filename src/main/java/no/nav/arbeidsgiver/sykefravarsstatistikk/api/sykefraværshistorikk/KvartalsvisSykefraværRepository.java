@@ -29,21 +29,6 @@ public class KvartalsvisSykefraværRepository {
 
     }
 
-    public ÅrstallOgKvartal hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde type) {
-        List<ÅrstallOgKvartal> alleÅrstallOgKvartal = namedParameterJdbcTemplate.query(
-                String.format("select distinct arstall, kvartal " +
-                        "from %s " +
-                        "order by arstall desc, kvartal desc", type.tabell),
-                new MapSqlParameterSource(),
-                (resultSet, rowNum) ->
-                        new ÅrstallOgKvartal(
-                                resultSet.getInt("arstall"),
-                                resultSet.getInt("kvartal")
-                        )
-        );
-        return alleÅrstallOgKvartal.get(0);
-    }
-
     public List<KvartalsvisSykefravær> hentKvartalsvisSykefraværprosentLand() {
         try {
             return namedParameterJdbcTemplate.query(
