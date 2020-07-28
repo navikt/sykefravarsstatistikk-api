@@ -29,7 +29,7 @@ public class ApiErrorMappingTest {
 
 
     @Test
-    public void bedriftsmetrikker__skal_returnere_SERVER_ERROR_med_causedBy_dersom_underenhet_ikke_har_noe_næringskode()
+    public void sykefraværshistorikk__skal_returnere_SERVER_ERROR_med_causedBy_dersom_underenhet_ikke_har_noe_næringskode()
             throws Exception {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
