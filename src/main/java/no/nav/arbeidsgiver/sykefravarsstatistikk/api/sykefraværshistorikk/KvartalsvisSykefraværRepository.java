@@ -1,8 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.Statistikkkilde;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.StatistikkkildeDvh;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
@@ -27,21 +25,6 @@ public class KvartalsvisSykefraværRepository {
     public KvartalsvisSykefraværRepository(@Qualifier("sykefravarsstatistikkJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
 
-    }
-
-    public ÅrstallOgKvartal hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde type) {
-        List<ÅrstallOgKvartal> alleÅrstallOgKvartal = namedParameterJdbcTemplate.query(
-                String.format("select distinct arstall, kvartal " +
-                        "from %s " +
-                        "order by arstall desc, kvartal desc", type.tabell),
-                new MapSqlParameterSource(),
-                (resultSet, rowNum) ->
-                        new ÅrstallOgKvartal(
-                                resultSet.getInt("arstall"),
-                                resultSet.getInt("kvartal")
-                        )
-        );
-        return alleÅrstallOgKvartal.get(0);
     }
 
     public List<KvartalsvisSykefravær> hentKvartalsvisSykefraværprosentLand() {

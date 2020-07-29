@@ -1,12 +1,13 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.autoimport;
 
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.*;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.SlettOgOpprettResultat;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.DeleteSykefraværsstatistikkFunction;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils.*;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -15,17 +16,31 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Component
-public class StatistikkImportRepository {
+public class ImporteringRepository {
 
     public static final int INSERT_BATCH_STØRRELSE = 10000;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public StatistikkImportRepository(
+    public ImporteringRepository(
             @Qualifier("sykefravarsstatistikkJdbcTemplate")
                     NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
+    public ÅrstallOgKvartal hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde type) {
+        List<ÅrstallOgKvartal> alleÅrstallOgKvartal = namedParameterJdbcTemplate.query(
+                String.format("select distinct arstall, kvartal " +
+                        "from %s " +
+                        "order by arstall desc, kvartal desc", type.tabell),
+                new MapSqlParameterSource(),
+                (resultSet, rowNum) ->
+                        new ÅrstallOgKvartal(
+                                resultSet.getInt("arstall"),
+                                resultSet.getInt("kvartal")
+                        )
+        );
+        return alleÅrstallOgKvartal.get(0);
+    }
 
     public SlettOgOpprettResultat importSykefraværsstatistikkLand(
             List<SykefraværsstatistikkLand> landStatistikk,

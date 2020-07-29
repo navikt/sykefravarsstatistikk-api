@@ -41,8 +41,7 @@ no.nav.security.jwt:
       accepted_audience: aud-localhost
       cookiename: selvbetjening-idtoken
 
-statistikk.import.siste.arstall: 2019
-statistikk.import.siste.kvartal: 2
+statistikk.importering.aktivert: true
 
 applikasjon.datasource:
   url: jdbc:h2:mem:test
@@ -128,8 +127,7 @@ no.nav.security.jwt.issuer.selvbetjening:
     accepted_audience: 0090b6e1-ffcc-4c37-bc21-049f7d1f0fe5
     cookiename: selvbetjening-idtoken
 
-statistikk.import.siste.arstall: 2019
-statistikk.import.siste.kvartal: 1
+statistikk.importering.aktivert: true
 
 database.navn: sykefravarsstatistikk
 vault.mount-path: postgresql/preprod-fss
@@ -165,8 +163,7 @@ no.nav.security.jwt.issuer.selvbetjening:
     accepted_audience: 45104d6a-f5bc-4e8c-b352-4bbfc9381f25
     cookiename: selvbetjening-idtoken
 
-statistikk.import.siste.arstall: 2019
-statistikk.import.siste.kvartal: 3
+statistikk.importering.aktivert: false
 
 database.navn: sykefravarsstatistikk
 vault.mount-path: postgresql/prod-fss
