@@ -30,17 +30,17 @@ public class ImporteringService {
 
     public void importerHvisDetFinnesNyStatistikk() {
         List<ÅrstallOgKvartal> årstallOgKvartalForSykefraværsstatistikk = Arrays.asList(
-                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.LAND),
-                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.SEKTOR),
-                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.NÆRING),
-                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.NÆRING_5_SIFFER),
-                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.VIRKSOMHET)
+                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.LAND),
+                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.SEKTOR),
+                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.NÆRING),
+                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.NÆRING_5_SIFFER),
+                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.VIRKSOMHET)
         );
         List<ÅrstallOgKvartal> årstallOgKvartalForDvh = Arrays.asList(
-                datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkkildeDvh.LAND_OG_SEKTOR),
-                datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkkildeDvh.NÆRING),
-                datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkkildeDvh.NÆRING_5_SIFFER),
-                datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkkildeDvh.VIRKSOMHET)
+                datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh.LAND_OG_SEKTOR),
+                datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh.NÆRING),
+                datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh.NÆRING_5_SIFFER),
+                datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh.VIRKSOMHET)
         );
 
         if (kanImportStartes(årstallOgKvartalForSykefraværsstatistikk, årstallOgKvartalForDvh)) {

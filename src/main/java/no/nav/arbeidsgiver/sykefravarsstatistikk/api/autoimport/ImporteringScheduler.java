@@ -22,7 +22,7 @@ public class ImporteringScheduler {
 
     @Scheduled(cron = "5 8 * * * ?")
     public void scheduledImportering() {
-        Duration lockAtMostUntil = Duration.of(1, ChronoUnit.HOURS);
+        Duration lockAtMostUntil = Duration.of(10, ChronoUnit.MINUTES);
         Duration lockAtLeastUntil = Duration.of(1, ChronoUnit.MINUTES);
         taskExecutor.executeWithLock(
                 (Runnable) this::importering,

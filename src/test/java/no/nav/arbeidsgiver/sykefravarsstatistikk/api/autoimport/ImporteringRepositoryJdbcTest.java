@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.autoimport;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.Statistikkkilde;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.Statistikkilde;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import org.junit.After;
 import org.junit.Before;
@@ -51,7 +51,7 @@ public class ImporteringRepositoryJdbcTest {
                 parametreForStatistikk(2019, 1, 10, 5, 100)
         );
 
-        ÅrstallOgKvartal årstallOgKvartal = importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkkilde.LAND);
+        ÅrstallOgKvartal årstallOgKvartal = importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.LAND);
         assertThat(årstallOgKvartal).isEqualTo(new ÅrstallOgKvartal(2019, 2));
     }
 
