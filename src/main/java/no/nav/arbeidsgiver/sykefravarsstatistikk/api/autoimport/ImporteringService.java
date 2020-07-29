@@ -29,6 +29,8 @@ public class ImporteringService {
     }
 
     public void importerHvisDetFinnesNyStatistikk() {
+        log.info("Er importering aktivert? {}", erImporteringAktivert);
+
         List<ÅrstallOgKvartal> årstallOgKvartalForSykefraværsstatistikk = Arrays.asList(
                 importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.LAND),
                 importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.SEKTOR),
