@@ -20,7 +20,7 @@ public class ImporteringScheduler {
         this.importeringService = importeringService;
     }
 
-    @Scheduled(cron = "5 8 * * * ?")
+    @Scheduled(cron = "0 5 8 * * ?")
     public void scheduledImportering() {
         Duration lockAtMostUntil = Duration.of(10, ChronoUnit.MINUTES);
         Duration lockAtLeastUntil = Duration.of(1, ChronoUnit.MINUTES);
