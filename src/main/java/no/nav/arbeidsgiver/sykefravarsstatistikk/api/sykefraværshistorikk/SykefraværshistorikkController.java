@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretClient;
@@ -38,8 +39,11 @@ public class SykefraværshistorikkController {
 
         Orgnr orgnr = new Orgnr(orgnrStr);
 
+        InnloggetBruker bruker = tilgangskontrollService.hentInnloggetBruker();
+
         tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
                 orgnr,
+                bruker,
                 request.getMethod(),
                 "" + request.getRequestURL()
         );
@@ -48,6 +52,7 @@ public class SykefraværshistorikkController {
         OverordnetEnhet overordnetEnhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
 
         boolean harTilgangTilOverordnetEnhet = tilgangskontrollService.hentTilgangTilOverordnetEnhetOgLoggSikkerhetshendelse(
+                bruker,
                 overordnetEnhet,
                 underenhet,
                 request.getMethod(),

@@ -50,12 +50,12 @@ public class TilgangskontrollService {
     }
 
     public boolean hentTilgangTilOverordnetEnhetOgLoggSikkerhetshendelse(
+            InnloggetBruker bruker,
             OverordnetEnhet overordnetEnhet,
             Underenhet underenhet,
             String httpMetode,
             String requestUrl
     ) {
-        InnloggetBruker bruker = hentInnloggetBruker();
         boolean harTilgang = bruker.harTilgang(overordnetEnhet.getOrgnr());
         String kommentar = String.format(
                 "Bruker ba om tilgang orgnr %s indirekte ved å kalle endepunktet til underenheten %s",
