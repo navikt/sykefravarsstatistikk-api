@@ -22,7 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <oidc-support.version>1.2.0</oidc-support.version>
-        <altinn-rettigheter-proxy-klient.version>1.0.0</altinn-rettigheter-proxy-klient.version>
+        <altinn-rettigheter-proxy-klient.version>1.1.2</altinn-rettigheter-proxy-klient.version>
         <java.version>11</java.version>
     </properties>
 
