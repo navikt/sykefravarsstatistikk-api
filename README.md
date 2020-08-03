@@ -19,6 +19,9 @@ Bygg image
 Kjør container
 `docker run -d -p 8080:8080 sykefravarsstatistikk-api`
 
+## Koble til H2-database lokalt
+Åpne H2-konsollen på `http://localhost:8080/sykefravarsstatistikk-api/h2` og fyll inn det som står under `applikasjon.datasource` i `application.yaml`.
+
 ---
 
 # Henvendelser

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
@@ -30,6 +31,7 @@ public class ApplikasjonDBConfigLocal {
     private String driverClassName;
 
 
+    @Primary
     @Bean(name = "sykefravarsstatistikkDataSource")
     public DataSource sykefravarsstatistikkDataSource() {
         HikariConfig config = new HikariConfig();
@@ -43,6 +45,7 @@ public class ApplikasjonDBConfigLocal {
         return new HikariDataSource(config);
     }
 
+    @Primary
     @Bean(name = "sykefravarsstatistikkJdbcTemplate")
     public NamedParameterJdbcTemplate sykefravarsstatistikkJdbcTemplate(
             @Qualifier("sykefravarsstatistikkDataSource") DataSource dataSource
