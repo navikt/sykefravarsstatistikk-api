@@ -72,7 +72,7 @@ public class EnhetsregisteretClient {
                     enhetJson.get("antallAnsatte").intValue()
             );
 
-        } catch (IOException | NullPointerException e) {
+        } catch (IOException | NullPointerException | IllegalArgumentException e) {
             throw new EnhetsregisteretMappingException("Feil ved kall til Enhetsregisteret. Kunne ikke parse respons.", e);
         }
     }
