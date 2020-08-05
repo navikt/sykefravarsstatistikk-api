@@ -13,11 +13,11 @@ spec:
     - alert: applikasjon nede
       expr: sum(up{app="sykefravarsstatistikk-api", job="kubernetes-pods"}) == 0
       for: 2m
-      description: "{{ $labels.app }} er nede"
-      action: "`kubectl describe pod {{ $labels.kubernetes_pod_name }}` for events, og `kubectl logs {{ $labels.kubernetes_pod_name }}` for logger"
+      description: "sykefravarsstatistikk-api er nede"
+      action: "Sjekk logs.adeo.no for logger, og Grafana-dashboardet vårt: https://grafana.adeo.no/d/MwhvlzSMz/team-ia-samledashboard"
 
     - alert: det har skjedd en feil i sykefraværsstatistikk-api
       expr: sum(increase(logd_messages_total{log_app="sykefravarsstatistikk-api",log_level="Error"}[10m])) > 0
       for: 10s
-      description: "{{ $labels.log_app }} har logget en feil"
-      action: "`kubectl describe pod {{ $labels.log_pod_name }}` for events, og `kubectl logs {{ $labels.log_pod_name }}` for logger"
+      description: "sykefravarsstatistikk-api har logget en feil"
+      action: "Sjekk logs.adeo.no for logger, og Grafana-dashboardet vårt: https://grafana.adeo.no/d/MwhvlzSMz/team-ia-samledashboard"
