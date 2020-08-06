@@ -6,7 +6,7 @@ metadata:
   labels:
     team: arbeidsgiver
 spec:
-  image: {{ image }}
+  image: docker.pkg.github.com/navikt/sykefravarsstatistikk-api/sykefravarsstatistikk-api:df446c1f7962c7088cd446a538d9fedfe4ca8e69
   team: arbeidsgiver
   port: 8080
   ingresses:
