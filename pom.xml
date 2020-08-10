@@ -155,12 +155,6 @@
         </dependency>
 
         <dependency>
-            <groupId>no.nav.common</groupId>
-            <artifactId>metrics</artifactId>
-            <version>1.2020.06.15_15.55-ecdbeb12b893</version>
-        </dependency>
-
-        <dependency>
             <groupId>no.finn.unleash</groupId>
             <artifactId>unleash-client-java</artifactId>
             <version>3.3.3</version>

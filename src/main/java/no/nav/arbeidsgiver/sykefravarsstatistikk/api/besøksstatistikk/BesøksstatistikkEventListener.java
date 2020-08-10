@@ -1,25 +1,16 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.besøksstatistikk;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.metrics.MetricsFactory;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnRolle;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sammenligning;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.OverordnetEnhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.time.temporal.IsoFields;
 import java.util.List;
-import java.util.Optional;
 
 import static java.time.ZonedDateTime.now;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Konstanter.MINIMUM_ANTALL_PERSONER_SOM_SKAL_TIL_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
@@ -48,10 +39,8 @@ public class BesøksstatistikkEventListener {
 
         if (kanLagreBesøksdata(sammenligningEvent)) {
             besøksstatistikkRepository.lagreBesøkFraStorVirksomhet(sammenligningEvent);
-            sendEventForStorVirksomhetTilInfluxDB(sammenligningEvent);
         } else {
             besøksstatistikkRepository.lagreBesøkFraLitenVirksomhet(sammenligningEvent.getSessionId());
-            sendEventForLitenVirksomhetTilInfluxDB();
         }
         lagreRollerIDatabase(sammenligningEvent);
     }
@@ -67,53 +56,6 @@ public class BesøksstatistikkEventListener {
                 now.getYear(),
                 now.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR),
                 altinnRoller);
-    }
-
-    private void sendEventForLitenVirksomhetTilInfluxDB() {
-        MetricsFactory.createEvent("sykefravarsstatistikk.liten-bedrift.besok").report();
-    }
-
-    private void sendEventForStorVirksomhetTilInfluxDB(SammenligningEvent sammenligningEvent) {
-        Sammenligning sammenligning = sammenligningEvent.getSammenligning();
-        OverordnetEnhet overordnetEnhet = sammenligningEvent.getOverordnetEnhet();
-        Sektor ssbSektor = sammenligningEvent.getSsbSektor();
-        Underenhet underenhet = sammenligningEvent.getUnderenhet();
-
-        Optional<String> bransjenavn = Optional.ofNullable(sammenligningEvent.getBransje()).map(Bransje::getNavn);
-        Optional<BigDecimal> prosentVirksomhet = Optional.ofNullable(sammenligning.getVirksomhet().getProsent());
-        Optional<BigDecimal> sykefraværprosentNæring = Optional.ofNullable(sammenligning.getNæring()).map(Sykefraværprosent::getProsent);
-        Optional<BigDecimal> sykefraværprosentBransje = Optional.ofNullable(sammenligning.getBransje()).map(Sykefraværprosent::getProsent);
-
-        boolean virksomhetErOverSnittetINæringenEllerBransjen = false;
-
-        if (prosentVirksomhet.isPresent()) {
-            if (sykefraværprosentNæring.isPresent()) {
-                virksomhetErOverSnittetINæringenEllerBransjen = prosentVirksomhet.get().compareTo(sykefraværprosentNæring.get()) > 0;
-            } else if (sykefraværprosentBransje.isPresent()) {
-                virksomhetErOverSnittetINæringenEllerBransjen = prosentVirksomhet.get().compareTo(sykefraværprosentBransje.get()) > 0;
-            }
-        }
-
-        MetricsFactory.createEvent("sykefravarsstatistikk.stor-bedrift.besok")
-                .addTagToReport("arstall", String.valueOf(sammenligning.getÅrstall()))
-                .addTagToReport("kvartal", String.valueOf(sammenligning.getKvartal()))
-                .addTagToReport("naring_2siffer_kode", sammenligningEvent.getNæring2siffer().getKode())
-                .addTagToReport("naring_2siffer_beskrivelse", sammenligningEvent.getNæring2siffer().getNavn())
-                .addTagToReport("bransje_navn", bransjenavn.orElse(null))
-                .addTagToReport("institusjonell_sektor_kode", overordnetEnhet.getInstitusjonellSektorkode().getKode())
-                .addTagToReport("institusjonell_sektor_beskrivelse", overordnetEnhet.getInstitusjonellSektorkode().getBeskrivelse())
-                .addTagToReport("ssb_sektor_kode", ssbSektor.getKode())
-                .addTagToReport("ssb_sektor_beskrivelse", ssbSektor.getNavn())
-                .addTagToReport("sykefravarsprosent_antall_personer", String.valueOf(sammenligning.getVirksomhet().getAntallPersoner()))
-                .addTagToReport("naring_2siffer_sykefravarsprosent", String.valueOf(sykefraværprosentNæring.orElse(null)))
-                .addTagToReport("bransje_sykefravarsprosent", String.valueOf(sykefraværprosentBransje.orElse(null)))
-                .addTagToReport("ssb_sektor_sykefravarsprosent", String.valueOf(sammenligning.getSektor().getProsent()))
-                .addTagToReport("sykefravarsprosent_over_naring_snitt", virksomhetErOverSnittetINæringenEllerBransjen ? "true" : "false")
-
-                .addFieldToReport("virksomhet_sykefravarsprosent", prosentVirksomhet.isPresent() ? prosentVirksomhet.get().floatValue() : null)
-                .addFieldToReport("antall_ansatte", underenhet.getAntallAnsatte())
-
-                .report();
     }
 
     private boolean kanLagreBesøksdata(SammenligningEvent event) {
