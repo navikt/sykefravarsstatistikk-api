@@ -22,6 +22,9 @@ Kjør container
 ## Koble til H2-database lokalt
 Åpne H2-konsollen på `http://localhost:8080/sykefravarsstatistikk-api/h2` og fyll inn det som står under `applikasjon.datasource` i `application.yaml`.
 
+## Grafisk fremstilling av API-ene (swagger-ui)
+API-et kan sees og testes på `http://localhost:8080/sykefravarsstatistikk-api/swagger-ui.html`
+
 ---
 
 # Henvendelser
