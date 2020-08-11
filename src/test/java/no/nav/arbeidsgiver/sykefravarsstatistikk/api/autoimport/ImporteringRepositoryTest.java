@@ -92,6 +92,7 @@ public class ImporteringRepositoryTest {
                 årstall,
                 kvartal,
                 "987654321",
+                "A",
                 10,
                 new BigDecimal(15),
                 new BigDecimal(450)

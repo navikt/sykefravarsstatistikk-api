@@ -124,6 +124,7 @@ public class DataverehusRepositoryJdbcTest {
                 2018,
                 4,
                 4, ORGNR_VIRKSOMHET_1,
+                "B",
                 "K",
                 5, 100
         );
@@ -133,6 +134,7 @@ public class DataverehusRepositoryJdbcTest {
                 1,
                 5,
                 ORGNR_VIRKSOMHET_2,
+                "B",
                 "M",
                 5,
                 101
@@ -182,10 +184,11 @@ public class DataverehusRepositoryJdbcTest {
 
     @Test
     public void hentSykefraværsstatistikkVirksomhet__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
-        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, ORGNR_VIRKSOMHET_1, "K", 5, 100);
-        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, ORGNR_VIRKSOMHET_1, "M", 8, 88);
-        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, ORGNR_VIRKSOMHET_2, "K", 3, 75);
-        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 5, ORGNR_VIRKSOMHET_1, "M", 5, 101);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, ORGNR_VIRKSOMHET_1, "A", "K", 5, 100);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, ORGNR_VIRKSOMHET_1, "A", "M", 8, 88);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, ORGNR_VIRKSOMHET_2, "A", "K", 3, 75);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 5, ORGNR_VIRKSOMHET_1, "A", "M", 5, 101);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2019, 2, 9, ORGNR_VIRKSOMHET_1, "B", "M", 9, 99);
 
         List<SykefraværsstatistikkVirksomhet> sykefraværsstatistikkVirksomhet =
                 repository.hentSykefraværsstatistikkVirksomhet(new ÅrstallOgKvartal(2018, 4));
@@ -195,6 +198,7 @@ public class DataverehusRepositoryJdbcTest {
                 2018,
                 4,
                 ORGNR_VIRKSOMHET_1,
+                "A",
                 7,
                 new BigDecimal(13).setScale(6),
                 new BigDecimal(188).setScale(6)
@@ -315,6 +319,7 @@ public class DataverehusRepositoryJdbcTest {
             int kvartal,
             int antallPersoner,
             String orgnr,
+            String varighet,
             String kjonn,
             long taptedagsverk,
             long muligedagsverk) {
@@ -324,6 +329,7 @@ public class DataverehusRepositoryJdbcTest {
                         .addValue("kvartal", kvartal)
                         .addValue("antpers", antallPersoner)
                         .addValue("orgnr", orgnr)
+                        .addValue("varighet", varighet)
                         .addValue("kjonn", kjonn)
                         .addValue("taptedv", taptedagsverk)
                         .addValue("muligedv", muligedagsverk);
@@ -339,7 +345,7 @@ public class DataverehusRepositoryJdbcTest {
                         + ":arstall, :kvartal, "
                         + ":orgnr, '10062', '3', 'G', '03', "
                         + "'B', :kjonn, '02', "
-                        + "'L', 'A', "
+                        + "'L', :varighet, "
                         + ":taptedv, :muligedv, :antpers)",
                 params);
     }

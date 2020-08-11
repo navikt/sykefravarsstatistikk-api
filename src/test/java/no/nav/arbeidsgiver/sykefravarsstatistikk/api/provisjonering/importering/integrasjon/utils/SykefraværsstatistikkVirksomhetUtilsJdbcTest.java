@@ -56,6 +56,7 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
                 2019,
                 1,
                 "987654321",
+                "A",
                 14,
                 new BigDecimal(55.123),
                 new BigDecimal(856.891)
@@ -107,6 +108,7 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
                                 2019,
                                 1,
                                 Integer.valueOf(987000000 + i).toString(),
+                                "A",
                                 14,
                                 new BigDecimal(55.123),
                                 new BigDecimal(856.891)
