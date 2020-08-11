@@ -58,7 +58,7 @@ public class ImporteringService {
     }
 
     public void reimporterSykefraværsstatistikk(ÅrstallOgKvartal fra, ÅrstallOgKvartal til) {
-        ÅrstallOgKvartal.range(til, fra).forEach(this::importerNyStatistikk);
+        ÅrstallOgKvartal.range(fra, til).forEach(this::importerNyStatistikk);
     }
 
     protected boolean kanImportStartes(
