@@ -92,6 +92,7 @@ public class KvartalsvisSykefraværRepository {
 
     public List<KvartalsvisSykefravær> hentKvartalsvisSykefraværprosentVirksomhet(Virksomhet virksomhet) {
         try {
+            // TODO Her må vi summere opp, fordi vi må ha med varighet?
             return namedParameterJdbcTemplate.query(
                     "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal " +
                             "FROM sykefravar_statistikk_virksomhet " +
