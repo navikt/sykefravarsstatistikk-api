@@ -57,6 +57,9 @@ public class ImporteringService {
         }
     }
 
+    public void reimporterSykefraværsstatistikk(ÅrstallOgKvartal fra, ÅrstallOgKvartal til) {
+        ÅrstallOgKvartal.range(til, fra).forEach(this::importerNyStatistikk);
+    }
 
     protected boolean kanImportStartes(
             List<ÅrstallOgKvartal> årstallOgKvartalForSykefraværsstatistikk,
@@ -105,7 +108,6 @@ public class ImporteringService {
             return false;
         }
     }
-
 
     private void importerNyStatistikk(ÅrstallOgKvartal årstallOgKvartal) {
         importSykefraværsstatistikkLand(årstallOgKvartal);

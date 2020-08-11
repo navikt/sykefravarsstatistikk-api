@@ -24,4 +24,9 @@ public class ImporteringController {
     public void importStatistikk() {
         importeringService.importerHvisDetFinnesNyStatistikk();
     }
+
+    @PostMapping(value = "/reimport")
+    public void reimporter() {
+        importeringService.importerHvisDetFinnesNyStatistikk();
+    }
 }
