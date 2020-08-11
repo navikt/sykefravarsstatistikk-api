@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class DataverehusRepository {
+public class DatavarehusRepository {
 
     public static final String NARINGKODE = "naringkode";
     public static final String NARINGNAVN = "naringnavn";
@@ -47,7 +47,7 @@ public class DataverehusRepository {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public DataverehusRepository(
+    public DatavarehusRepository(
             @Qualifier("datavarehusJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }

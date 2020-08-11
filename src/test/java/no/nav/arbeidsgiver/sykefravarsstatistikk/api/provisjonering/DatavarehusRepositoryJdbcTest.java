@@ -27,18 +27,18 @@ import static org.junit.Assert.assertTrue;
 @ActiveProfiles("db-test")
 @RunWith(SpringRunner.class)
 @DataJdbcTest
-public class DataverehusRepositoryJdbcTest {
+public class DatavarehusRepositoryJdbcTest {
 
     public static final String ORGNR_VIRKSOMHET_1 = "987654321";
     public static final String ORGNR_VIRKSOMHET_2 = "999999999";
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    private DataverehusRepository repository;
+    private DatavarehusRepository repository;
 
     @Before
     public void setUp() {
-        repository = new DataverehusRepository(namedParameterJdbcTemplate);
+        repository = new DatavarehusRepository(namedParameterJdbcTemplate);
         cleanUpTestDb(namedParameterJdbcTemplate);
     }
 

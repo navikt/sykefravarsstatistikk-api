@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.autoimport;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.SlettOgOpprettResultat;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.*;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.DataverehusRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.DatavarehusRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -15,12 +15,12 @@ import java.util.List;
 public class ImporteringService {
 
     private final ImporteringRepository importeringRepository;
-    private final DataverehusRepository datavarehusRepository;
+    private final DatavarehusRepository datavarehusRepository;
     private final boolean erImporteringAktivert;
 
     public ImporteringService(
             ImporteringRepository importeringRepository,
-            DataverehusRepository datavarehusRepository,
+            DatavarehusRepository datavarehusRepository,
             @Value("${statistikk.importering.aktivert}")
             Boolean erImporteringAktivert) {
         this.importeringRepository = importeringRepository;
