@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -20,7 +21,7 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
         }
         ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
         for (int i = 0; i < antallKvartaler; i++) {
-            årstallOgKvartal = årstallOgKvartal.hentForrigeKvartal();
+            årstallOgKvartal = årstallOgKvartal.forrigeKvartal();
         }
         return årstallOgKvartal;
     }
@@ -31,7 +32,7 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
         }
         ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
         for (int i = 0; i < antallKvartaler; i++) {
-            årstallOgKvartal = årstallOgKvartal.hentNesteKvartal();
+            årstallOgKvartal = årstallOgKvartal.nesteKvartal();
         }
         return årstallOgKvartal;
     }
@@ -44,7 +45,7 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
         return årstallOgKvartal;
     }
 
-    private ÅrstallOgKvartal hentForrigeKvartal() {
+    private ÅrstallOgKvartal forrigeKvartal() {
         if (kvartal == 1) {
             return new ÅrstallOgKvartal(årstall - 1, 4);
         } else {
@@ -52,7 +53,7 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
         }
     }
 
-    private ÅrstallOgKvartal hentNesteKvartal() {
+    private ÅrstallOgKvartal nesteKvartal() {
         if (kvartal == 4) {
             return new ÅrstallOgKvartal(årstall + 1, 1);
         } else {
@@ -61,7 +62,7 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
     }
 
     @Override
-    public int compareTo(ÅrstallOgKvartal årstallOgKvartal) {
+    public int compareTo(@NotNull ÅrstallOgKvartal årstallOgKvartal) {
         return Comparator.comparing(ÅrstallOgKvartal::getÅrstall)
                 .thenComparing(ÅrstallOgKvartal::getKvartal)
                 .compare(this, årstallOgKvartal);
