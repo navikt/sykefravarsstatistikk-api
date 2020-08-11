@@ -44,7 +44,7 @@ public class ÅrstallOgKvartalTest {
     @Test
     public void range__skal_returnere_alle_årstall_og_kvartal_mellom_angitt_input() {
         List<ÅrstallOgKvartal> liste = ÅrstallOgKvartal.range(new ÅrstallOgKvartal(2000, 1), new ÅrstallOgKvartal(2002, 3));
-        assertThat(liste.equals(Arrays.asList(
+        assertThat(liste).isEqualTo(Arrays.asList(
                 new ÅrstallOgKvartal(2000, 1),
                 new ÅrstallOgKvartal(2000, 2),
                 new ÅrstallOgKvartal(2000, 3),
@@ -56,6 +56,15 @@ public class ÅrstallOgKvartalTest {
                 new ÅrstallOgKvartal(2002, 1),
                 new ÅrstallOgKvartal(2002, 2),
                 new ÅrstallOgKvartal(2002, 3)
-        )));
+        ));
+    }
+
+    @Test
+    public void range__skal_returnere_tom_liste_hvis_til_er_før_fra() {
+        List<ÅrstallOgKvartal> liste = ÅrstallOgKvartal.range(
+                new ÅrstallOgKvartal(2004, 1),
+                new ÅrstallOgKvartal(2002, 1)
+        );
+        assertThat(liste).isEmpty();
     }
 }

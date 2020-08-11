@@ -38,7 +38,7 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
 
     public static List<ÅrstallOgKvartal> range(ÅrstallOgKvartal fra, ÅrstallOgKvartal til) {
         List<ÅrstallOgKvartal> årstallOgKvartal = new ArrayList<>();
-        for (ÅrstallOgKvartal i = fra; i.equals(til); i = i.plussKvartaler(1)) {
+        for (ÅrstallOgKvartal i = fra; i.compareTo(til) <= 0; i = i.plussKvartaler(1)) {
             årstallOgKvartal.add(i);
         }
         return årstallOgKvartal;
