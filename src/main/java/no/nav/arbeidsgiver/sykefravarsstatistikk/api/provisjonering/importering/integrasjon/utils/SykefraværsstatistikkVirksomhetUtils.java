@@ -53,9 +53,9 @@ public class SykefraværsstatistikkVirksomhetUtils extends Sykefraværsstatistik
 
                     int[] results = namedParameterJdbcTemplate.batchUpdate(
                             "insert into sykefravar_statistikk_virksomhet " +
-                                    "(arstall, kvartal, orgnr, antall_personer, tapte_dagsverk, mulige_dagsverk)  " +
+                                    "(arstall, kvartal, orgnr, varighet, antall_personer, tapte_dagsverk, mulige_dagsverk)  " +
                                     "values " +
-                                    "(:årstall, :kvartal, :orgnr, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
+                                    "(:årstall, :kvartal, :orgnr, :varighet, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
                             batch);
                     return Arrays.stream(results).sum();
                 };
