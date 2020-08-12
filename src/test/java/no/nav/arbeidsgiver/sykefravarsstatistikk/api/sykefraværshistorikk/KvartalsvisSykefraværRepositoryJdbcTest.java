@@ -20,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
@@ -190,17 +191,17 @@ public class KvartalsvisSykefraværRepositoryJdbcTest {
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(barnehage.getOrgnr(), 2019, 2, 10, 2, 100)
+                parametre(barnehage.getOrgnr(), 2019, 2, 10, 2, 100, "A")
         );
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(new Orgnr("987654321"), 2019, 1, 10, 3, 100)
+                parametre(new Orgnr("987654321"), 2019, 1, 10, 3, 100, "A")
         );
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(barnehage.getOrgnr(), 2018, 4, 10, 5, 100)
+                parametre(barnehage.getOrgnr(), 2018, 4, 10, 5, 100, "A")
         );
 
         List<KvartalsvisSykefravær> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(barnehage);
@@ -211,6 +212,31 @@ public class KvartalsvisSykefraværRepositoryJdbcTest {
                 new BigDecimal(100),
                 10
         ));
+    }
+    @Test
+    public void hentSykefraværprosentVirksomhet__skal_summere_sykefravær_på_varighet() {
+        Underenhet barnehage = Underenhet.builder().orgnr(new Orgnr("999999999"))
+                .navn("test Barnehage")
+                .næringskode(new Næringskode5Siffer("88911", "Barnehage"))
+                .antallAnsatte(10)
+                .overordnetEnhetOrgnr(new Orgnr("1111111111")).build();
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(barnehage.getOrgnr(), 2019, 2, 10, 2, 100, "A")
+        );
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(barnehage.getOrgnr(), 2019, 2, 10, 5, 100, "A")
+        );
+        List<KvartalsvisSykefravær> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(barnehage);
+        assertThat(resultat).isEqualTo(Arrays.asList(new KvartalsvisSykefravær(
+                new ÅrstallOgKvartal(2019, 2),
+                new BigDecimal(7),
+                new BigDecimal(200),
+                20
+        )));
     }
 
     @Test
@@ -259,8 +285,9 @@ public class KvartalsvisSykefraværRepositoryJdbcTest {
                 .addValue("naring_kode", næring.getKode());
     }
 
-    private MapSqlParameterSource parametre(Orgnr orgnr, int årstall, int kvartal, int antallPersoner, int tapteDagsverk, int muligeDagsverk) {
+    private MapSqlParameterSource parametre(Orgnr orgnr, int årstall, int kvartal, int antallPersoner, int tapteDagsverk, int muligeDagsverk, String varighet) {
         return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
-                .addValue("orgnr", orgnr.getVerdi());
+                .addValue("orgnr", orgnr.getVerdi())
+                .addValue("varighet", varighet);
     }
 }
