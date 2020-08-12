@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Varighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkVirksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
@@ -56,7 +57,7 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
                 2019,
                 1,
                 "987654321",
-                "A",
+                Varighet.KORTTID_1_TIL_7DAGER,
                 14,
                 new BigDecimal(55.123),
                 new BigDecimal(856.891)
@@ -108,7 +109,7 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
                                 2019,
                                 1,
                                 Integer.valueOf(987000000 + i).toString(),
-                                "A",
+                                Varighet.KORTTID_1_TIL_7DAGER,
                                 14,
                                 new BigDecimal(55.123),
                                 new BigDecimal(856.891)

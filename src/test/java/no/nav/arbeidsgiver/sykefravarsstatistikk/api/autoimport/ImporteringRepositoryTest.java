@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.autoimport;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.SlettOgOpprettResultat;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Varighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.Sykefraværsstatistikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkVirksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
@@ -92,7 +93,7 @@ public class ImporteringRepositoryTest {
                 årstall,
                 kvartal,
                 "987654321",
-                "A",
+                Varighet.KORTTID_1_TIL_7DAGER,
                 10,
                 new BigDecimal(15),
                 new BigDecimal(450)

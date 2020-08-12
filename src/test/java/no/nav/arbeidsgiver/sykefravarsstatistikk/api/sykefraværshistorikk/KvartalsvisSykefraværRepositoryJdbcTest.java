@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Varighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjetype;
@@ -191,17 +192,17 @@ public class KvartalsvisSykefraværRepositoryJdbcTest {
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(barnehage.getOrgnr(), 2019, 2, 10, 2, 100, "A")
+                parametre(barnehage.getOrgnr(), 2019, 2, 10, 2, 100, Varighet.KORTTID_1_TIL_7DAGER)
         );
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(new Orgnr("987654321"), 2019, 1, 10, 3, 100, "A")
+                parametre(new Orgnr("987654321"), 2019, 1, 10, 3, 100, Varighet.KORTTID_1_TIL_7DAGER)
         );
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(barnehage.getOrgnr(), 2018, 4, 10, 5, 100, "A")
+                parametre(barnehage.getOrgnr(), 2018, 4, 10, 5, 100, Varighet.KORTTID_1_TIL_7DAGER)
         );
 
         List<KvartalsvisSykefravær> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(barnehage);
@@ -223,12 +224,12 @@ public class KvartalsvisSykefraværRepositoryJdbcTest {
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(barnehage.getOrgnr(), 2019, 2, 10, 2, 100, "A")
+                parametre(barnehage.getOrgnr(), 2019, 2, 10, 2, 100, Varighet.KORTTID_1_TIL_7DAGER)
         );
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(barnehage.getOrgnr(), 2019, 2, 10, 5, 100, "A")
+                parametre(barnehage.getOrgnr(), 2019, 2, 10, 5, 100, Varighet.KORTTID_1_TIL_7DAGER)
         );
         List<KvartalsvisSykefravær> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(barnehage);
         assertThat(resultat).isEqualTo(Arrays.asList(new KvartalsvisSykefravær(

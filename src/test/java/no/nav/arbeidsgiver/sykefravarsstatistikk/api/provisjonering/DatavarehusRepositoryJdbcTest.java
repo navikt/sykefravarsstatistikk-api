@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Varighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
@@ -184,10 +185,10 @@ public class DatavarehusRepositoryJdbcTest {
 
     @Test
     public void hentSykefraværsstatistikkVirksomhet__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
-        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, ORGNR_VIRKSOMHET_1, "A", "K", 5, 100);
-        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, ORGNR_VIRKSOMHET_1, "A", "M", 8, 88);
-        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, ORGNR_VIRKSOMHET_2, "A", "K", 3, 75);
-        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 5, ORGNR_VIRKSOMHET_1, "A", "M", 5, 101);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, ORGNR_VIRKSOMHET_1, Varighet.KORTTID_1_TIL_7DAGER, "K", 5, 100);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, ORGNR_VIRKSOMHET_1, Varighet.KORTTID_1_TIL_7DAGER, "M", 8, 88);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, ORGNR_VIRKSOMHET_2, Varighet.KORTTID_1_TIL_7DAGER, "K", 3, 75);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 5, ORGNR_VIRKSOMHET_1, Varighet.KORTTID_1_TIL_7DAGER, "M", 5, 101);
         insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2019, 2, 9, ORGNR_VIRKSOMHET_1, "B", "M", 9, 99);
 
         List<SykefraværsstatistikkVirksomhet> sykefraværsstatistikkVirksomhet =
@@ -198,7 +199,7 @@ public class DatavarehusRepositoryJdbcTest {
                 2018,
                 4,
                 ORGNR_VIRKSOMHET_1,
-                "A",
+                Varighet.KORTTID_1_TIL_7DAGER,
                 7,
                 new BigDecimal(13).setScale(6),
                 new BigDecimal(188).setScale(6)
