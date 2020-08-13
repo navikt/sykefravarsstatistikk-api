@@ -46,7 +46,6 @@ public class AltinnKlientWrapper {
 
 
     public List<AltinnOrganisasjon> hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(JwtToken idToken, Fnr fnr){
-
         return mapTo(
                 klient.hentOrganisasjoner(
                         new SelvbetjeningToken(idToken.getTokenAsString()),

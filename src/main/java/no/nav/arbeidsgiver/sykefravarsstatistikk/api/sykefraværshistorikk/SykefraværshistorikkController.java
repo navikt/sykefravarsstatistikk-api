@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.altinn.AltinnClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretClient;
@@ -20,15 +21,17 @@ public class SykefraværshistorikkController {
     private final SykefraværshistorikkService sykefraværshistorikkService;
     private final TilgangskontrollService tilgangskontrollService;
     private final EnhetsregisteretClient enhetsregisteretClient;
+    private final AltinnClient altinnClient;
 
     public SykefraværshistorikkController(
             SykefraværshistorikkService sykefraværshistorikkService,
             TilgangskontrollService tilgangskontrollService,
-            EnhetsregisteretClient enhetsregisteretClient
-    ) {
+            EnhetsregisteretClient enhetsregisteretClient,
+            AltinnClient altinnClient) {
         this.sykefraværshistorikkService = sykefraværshistorikkService;
         this.tilgangskontrollService = tilgangskontrollService;
         this.enhetsregisteretClient = enhetsregisteretClient;
+        this.altinnClient = altinnClient;
     }
 
         @GetMapping(value = "/{orgnr}/sykefravarshistorikk")
@@ -36,10 +39,9 @@ public class SykefraværshistorikkController {
             @PathVariable("orgnr") String orgnrStr,
             HttpServletRequest request
     ) {
-
         Orgnr orgnr = new Orgnr(orgnrStr);
-
         InnloggetBruker bruker = tilgangskontrollService.hentInnloggetBruker();
+        altinnClient.hentRoller(bruker.getFnr(), orgnr);
 
         tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
                 orgnr,
