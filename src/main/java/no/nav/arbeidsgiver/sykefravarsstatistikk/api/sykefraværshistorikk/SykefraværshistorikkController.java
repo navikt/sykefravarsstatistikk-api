@@ -41,7 +41,7 @@ public class SykefraværshistorikkController {
     ) {
         Orgnr orgnr = new Orgnr(orgnrStr);
         InnloggetBruker bruker = tilgangskontrollService.hentInnloggetBruker();
-        altinnClient.hentRoller(bruker.getFnr(), orgnr);
+        altinnClient.hentRoller( bruker.getFnr(), orgnr);
 
         tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
                 orgnr,
