@@ -51,7 +51,8 @@ public class AltinnKlientWrapper {
                         new SelvbetjeningToken(idToken.getTokenAsString()),
                         new Subject(fnr.getVerdi()),
                         new ServiceCode(serviceCode),
-                        new ServiceEdition(serviceEdition)
+                        new ServiceEdition(serviceEdition),
+                        true
                 )
         );
     }
