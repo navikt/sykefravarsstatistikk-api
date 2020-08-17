@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Varighet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Sykefraværsvarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjetype;
@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Sykefraværsvarighet._1_DAG_TIL_7_DAGER;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 @ActiveProfiles("db-test")
@@ -192,17 +193,17 @@ public class KvartalsvisSykefraværRepositoryJdbcTest {
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(barnehage.getOrgnr(), 2019, 2, 10, 2, 100, Varighet.KORTTID_1_TIL_7DAGER)
+                parametre(barnehage.getOrgnr(), 2019, 2, 10, 2, 100, _1_DAG_TIL_7_DAGER)
         );
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(new Orgnr("987654321"), 2019, 1, 10, 3, 100, Varighet.KORTTID_1_TIL_7DAGER)
+                parametre(new Orgnr("987654321"), 2019, 1, 10, 3, 100, _1_DAG_TIL_7_DAGER)
         );
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(barnehage.getOrgnr(), 2018, 4, 10, 5, 100, Varighet.KORTTID_1_TIL_7DAGER)
+                parametre(barnehage.getOrgnr(), 2018, 4, 10, 5, 100, _1_DAG_TIL_7_DAGER)
         );
 
         List<KvartalsvisSykefravær> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(barnehage);
@@ -224,12 +225,12 @@ public class KvartalsvisSykefraværRepositoryJdbcTest {
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(barnehage.getOrgnr(), 2019, 2, 10, 2, 100, Varighet.KORTTID_1_TIL_7DAGER)
+                parametre(barnehage.getOrgnr(), 2019, 2, 10, 2, 100, _1_DAG_TIL_7_DAGER)
         );
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(barnehage.getOrgnr(), 2019, 2, 10, 5, 100, Varighet.KORTTID_1_TIL_7DAGER)
+                parametre(barnehage.getOrgnr(), 2019, 2, 10, 5, 100, _1_DAG_TIL_7_DAGER)
         );
         List<KvartalsvisSykefravær> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(barnehage);
         assertThat(resultat).isEqualTo(Arrays.asList(new KvartalsvisSykefravær(
@@ -286,9 +287,17 @@ public class KvartalsvisSykefraværRepositoryJdbcTest {
                 .addValue("naring_kode", næring.getKode());
     }
 
-    private MapSqlParameterSource parametre(Orgnr orgnr, int årstall, int kvartal, int antallPersoner, int tapteDagsverk, int muligeDagsverk, String varighet) {
+    private MapSqlParameterSource parametre(
+            Orgnr orgnr,
+            int årstall,
+            int kvartal,
+            int antallPersoner,
+            int tapteDagsverk,
+            int muligeDagsverk,
+            Sykefraværsvarighet varighet
+    ) {
         return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
                 .addValue("orgnr", orgnr.getVerdi())
-                .addValue("varighet", varighet);
+                .addValue("varighet", varighet.kode);
     }
 }

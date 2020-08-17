@@ -1,18 +1,20 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.Sykefraværsstatistikk;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.Sykefraværsstatistikk;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkVirksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.BatchCreateSykefraværsstatistikkFunction;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.DeleteSykefraværsstatistikkFunction;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SykefraværsstatistikkVirksomhetUtils extends SykefraværsstatistikkIntegrasjon
         implements SykefraværsstatistikkIntegrasjonUtils {
@@ -42,6 +44,18 @@ public class SykefraværsstatistikkVirksomhetUtils extends Sykefraværsstatistik
         return function;
     }
 
+    private Map<String, Object> tilMap(SykefraværsstatistikkVirksomhet statistikk) {
+        return Map.of(
+                "årstall", statistikk.getÅrstall(),
+                "kvartal", statistikk.getKvartal(),
+                "orgnr", statistikk.getOrgnr(),
+                "varighet", statistikk.getVarighet().kode,
+                "antallPersoner", statistikk.getAntallPersoner(),
+                "tapteDagsverk", statistikk.getTapteDagsverk(),
+                "muligeDagsverk", statistikk.getMuligeDagsverk()
+        );
+    }
+
     @Override
     public BatchCreateSykefraværsstatistikkFunction getBatchCreateFunction(
             List<? extends Sykefraværsstatistikk> statistikk
@@ -49,14 +63,19 @@ public class SykefraværsstatistikkVirksomhetUtils extends Sykefraværsstatistik
 
         BatchCreateSykefraværsstatistikkFunction function =
                 () -> {
-                    SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(statistikk.toArray());
+                    List<BeanPropertySqlParameterSource> batch = statistikk
+                            .stream()
+                            .map(stat -> new BeanPropertySqlParameterSource(tilMap((SykefraværsstatistikkVirksomhet) stat)))
+                            .collect(Collectors.toList());
+
+                    BeanPropertySqlParameterSource[] hei = (BeanPropertySqlParameterSource[]) batch.toArray();
 
                     int[] results = namedParameterJdbcTemplate.batchUpdate(
                             "insert into sykefravar_statistikk_virksomhet " +
                                     "(arstall, kvartal, orgnr, varighet, antall_personer, tapte_dagsverk, mulige_dagsverk)  " +
                                     "values " +
                                     "(:årstall, :kvartal, :orgnr, :varighet, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
-                            batch);
+                            hei);
                     return Arrays.stream(results).sum();
                 };
 

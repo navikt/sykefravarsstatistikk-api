@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.autoimport;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.SlettOgOpprettResultat;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Varighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.Sykefraværsstatistikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkVirksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
@@ -21,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Sykefraværsvarighet._1_DAG_TIL_7_DAGER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -93,7 +93,7 @@ public class ImporteringRepositoryTest {
                 årstall,
                 kvartal,
                 "987654321",
-                Varighet.KORTTID_1_TIL_7DAGER,
+                _1_DAG_TIL_7_DAGER,
                 10,
                 new BigDecimal(15),
                 new BigDecimal(450)

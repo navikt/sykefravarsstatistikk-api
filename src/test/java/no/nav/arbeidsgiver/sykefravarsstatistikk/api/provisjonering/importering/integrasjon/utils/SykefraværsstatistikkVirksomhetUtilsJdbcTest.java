@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Varighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sammenligning.Sykefraværprosent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkVirksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
@@ -22,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Sykefraværsvarighet._1_DAG_TIL_7_DAGER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("db-test")
@@ -57,7 +57,7 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
                 2019,
                 1,
                 "987654321",
-                Varighet.KORTTID_1_TIL_7DAGER,
+                _1_DAG_TIL_7_DAGER,
                 14,
                 new BigDecimal(55.123),
                 new BigDecimal(856.891)
@@ -109,7 +109,7 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
                                 2019,
                                 1,
                                 Integer.valueOf(987000000 + i).toString(),
-                                Varighet.KORTTID_1_TIL_7DAGER,
+                        _1_DAG_TIL_7_DAGER,
                                 14,
                                 new BigDecimal(55.123),
                                 new BigDecimal(856.891)

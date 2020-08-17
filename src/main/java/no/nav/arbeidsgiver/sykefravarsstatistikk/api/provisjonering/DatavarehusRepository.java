@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Sykefraværsvarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppering;
@@ -196,7 +197,7 @@ public class DatavarehusRepository {
                                 resultSet.getInt(ARSTALL),
                                 resultSet.getInt(KVARTAL),
                                 resultSet.getString(ORGNR),
-                                resultSet.getString(VARIGHET),
+                                Sykefraværsvarighet.fraKode(resultSet.getString(VARIGHET)),
                                 resultSet.getInt(SUM_ANTALL_PERSONER),
                                 resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
                                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
