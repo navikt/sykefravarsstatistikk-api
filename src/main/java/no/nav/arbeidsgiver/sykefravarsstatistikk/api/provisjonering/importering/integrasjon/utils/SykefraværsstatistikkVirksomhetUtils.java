@@ -1,18 +1,17 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.utils;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.Sykefraværsstatistikk;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.Sykefraværsstatistikk;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.SykefraværsstatistikkVirksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.BatchCreateSykefraværsstatistikkFunction;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.importering.integrasjon.DeleteSykefraværsstatistikkFunction;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
+import org.springframework.jdbc.core.namedparam.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SykefraværsstatistikkVirksomhetUtils extends SykefraværsstatistikkIntegrasjon
         implements SykefraværsstatistikkIntegrasjonUtils {
@@ -53,9 +52,9 @@ public class SykefraværsstatistikkVirksomhetUtils extends Sykefraværsstatistik
 
                     int[] results = namedParameterJdbcTemplate.batchUpdate(
                             "insert into sykefravar_statistikk_virksomhet " +
-                                    "(arstall, kvartal, orgnr, antall_personer, tapte_dagsverk, mulige_dagsverk)  " +
+                                    "(arstall, kvartal, orgnr, varighet, antall_personer, tapte_dagsverk, mulige_dagsverk)  " +
                                     "values " +
-                                    "(:årstall, :kvartal, :orgnr, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
+                                    "(:årstall, :kvartal, :orgnr, :varighet, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
                             batch);
                     return Arrays.stream(results).sum();
                 };

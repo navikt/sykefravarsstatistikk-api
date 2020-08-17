@@ -3,11 +3,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.synkroniser
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.DataverehusRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.DatavarehusRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.OpprettEllerOppdaterResultat;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering.DataverehusRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,12 +13,12 @@ import java.util.List;
 @Component
 public class VirksomhetsklassifikasjonerSynkroniseringService {
 
-    private final DataverehusRepository datavarehusRepository;
+    private final DatavarehusRepository datavarehusRepository;
     private final VirksomhetsklassifikasjonerSynkroniseringRepository
             virksomhetsklassifikasjonerSynkroniseringRepository;
 
     public VirksomhetsklassifikasjonerSynkroniseringService(
-            DataverehusRepository datavarehusRepository,
+            DatavarehusRepository datavarehusRepository,
             VirksomhetsklassifikasjonerSynkroniseringRepository virksomhetsklassifikasjonerSynkroniseringRepository
     ) {
         this.datavarehusRepository = datavarehusRepository;

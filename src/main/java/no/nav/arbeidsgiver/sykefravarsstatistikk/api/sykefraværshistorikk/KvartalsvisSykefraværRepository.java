@@ -93,9 +93,13 @@ public class KvartalsvisSykefraværRepository {
     public List<KvartalsvisSykefravær> hentKvartalsvisSykefraværprosentVirksomhet(Virksomhet virksomhet) {
         try {
             return namedParameterJdbcTemplate.query(
-                    "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal " +
+                    "SELECT sum(tapte_dagsverk) as tapte_dagsverk," +
+                            "sum(mulige_dagsverk) as mulige_dagsverk," +
+                            "sum(antall_personer) as antall_personer," +
+                            "arstall, kvartal " +
                             "FROM sykefravar_statistikk_virksomhet " +
                             "where orgnr = :orgnr " +
+                            "GROUP BY arstall, kvartal " +
                             "ORDER BY arstall, kvartal ",
                     new MapSqlParameterSource()
                             .addValue("orgnr", virksomhet.getOrgnr().getVerdi()),

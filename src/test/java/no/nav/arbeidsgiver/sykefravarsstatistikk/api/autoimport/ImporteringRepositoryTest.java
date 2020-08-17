@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Sykefraværsvarighet._1_DAG_TIL_7_DAGER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -92,6 +93,7 @@ public class ImporteringRepositoryTest {
                 årstall,
                 kvartal,
                 "987654321",
+                _1_DAG_TIL_7_DAGER.kode,
                 10,
                 new BigDecimal(15),
                 new BigDecimal(450)

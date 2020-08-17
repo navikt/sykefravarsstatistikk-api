@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.provisjonering;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Sykefraværsvarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næringsgruppering;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class DataverehusRepository {
+public class DatavarehusRepository {
 
     public static final String NARINGKODE = "naringkode";
     public static final String NARINGNAVN = "naringnavn";
@@ -27,6 +28,7 @@ public class DataverehusRepository {
     public static final String NARING = "naring";
     public static final String NARING_5SIFFER = "naering_kode";
     public static final String ORGNR = "orgnr";
+    public static final String VARIGHET = "varighet";
     public static final String SUM_ANTALL_PERSONER = "sum_antall_personer";
     public static final String SUM_TAPTE_DAGSVERK = "sum_tapte_dagsverk";
     public static final String SUM_MULIGE_DAGSVERK = "sum_mulige_dagsverk";
@@ -46,7 +48,7 @@ public class DataverehusRepository {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public DataverehusRepository(
+    public DatavarehusRepository(
             @Qualifier("datavarehusJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
@@ -182,19 +184,20 @@ public class DataverehusRepository {
                         .addValue(KVARTAL, årstallOgKvartal.getKvartal());
 
         return namedParameterJdbcTemplate.query(
-                "select arstall, kvartal, orgnr, " +
+                "select arstall, kvartal, orgnr, varighet, " +
                         "sum(antpers) as sum_antall_personer, " +
                         "sum(taptedv) as sum_tapte_dagsverk, " +
                         "sum(muligedv) as sum_mulige_dagsverk " +
                         "from dt_p.agg_ia_sykefravar_v " +
                         "where arstall = :arstall and kvartal = :kvartal " +
-                        "group by arstall, kvartal, orgnr",
+                        "group by arstall, kvartal, orgnr, varighet",
                 namedParameters,
                 (resultSet, rowNum) ->
                         new SykefraværsstatistikkVirksomhet(
                                 resultSet.getInt(ARSTALL),
                                 resultSet.getInt(KVARTAL),
                                 resultSet.getString(ORGNR),
+                                resultSet.getString(VARIGHET),
                                 resultSet.getInt(SUM_ANTALL_PERSONER),
                                 resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
                                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
