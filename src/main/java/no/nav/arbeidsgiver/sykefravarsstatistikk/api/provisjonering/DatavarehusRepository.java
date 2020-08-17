@@ -197,7 +197,7 @@ public class DatavarehusRepository {
                                 resultSet.getInt(ARSTALL),
                                 resultSet.getInt(KVARTAL),
                                 resultSet.getString(ORGNR),
-                                Sykefraværsvarighet.fraKode(resultSet.getString(VARIGHET)),
+                                resultSet.getString(VARIGHET),
                                 resultSet.getInt(SUM_ANTALL_PERSONER),
                                 resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
                                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));

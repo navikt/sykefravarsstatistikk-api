@@ -93,7 +93,7 @@ public class ImporteringRepositoryTest {
                 årstall,
                 kvartal,
                 "987654321",
-                _1_DAG_TIL_7_DAGER,
+                _1_DAG_TIL_7_DAGER.kode,
                 10,
                 new BigDecimal(15),
                 new BigDecimal(450)

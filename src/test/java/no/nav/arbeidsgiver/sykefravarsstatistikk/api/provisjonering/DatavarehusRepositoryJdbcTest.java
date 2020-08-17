@@ -201,7 +201,7 @@ public class DatavarehusRepositoryJdbcTest {
                 2018,
                 4,
                 ORGNR_VIRKSOMHET_1,
-                _1_DAG_TIL_7_DAGER,
+                _1_DAG_TIL_7_DAGER.kode,
                 7,
                 new BigDecimal(13).setScale(6),
                 new BigDecimal(188).setScale(6)

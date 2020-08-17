@@ -57,7 +57,7 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
                 2019,
                 1,
                 "987654321",
-                _1_DAG_TIL_7_DAGER,
+                _1_DAG_TIL_7_DAGER.kode,
                 14,
                 new BigDecimal(55.123),
                 new BigDecimal(856.891)
@@ -109,7 +109,7 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
                                 2019,
                                 1,
                                 Integer.valueOf(987000000 + i).toString(),
-                        _1_DAG_TIL_7_DAGER,
+                        _1_DAG_TIL_7_DAGER.kode,
                                 14,
                                 new BigDecimal(55.123),
                                 new BigDecimal(856.891)
