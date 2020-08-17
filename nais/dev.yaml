@@ -26,6 +26,11 @@ spec:
   webproxy: true
   vault:
     enabled: true
+    paths:
+      - kvPath: /kv/preprod/fss/sykefravarsstatistikk-api/arbeidsgiver
+        mountPath: /var/run/secrets/nais.io/vault
+      - kvPath: /apikey/apigw/dev/eksternapp.altinn.serviceowner/sykefravarsstatistikk-api_q1
+        mountPath: /var/run/secrets/nais.io/altinn
   resources:
     limits:
       memory: 1024Mi
