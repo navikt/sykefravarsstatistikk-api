@@ -10,7 +10,8 @@ public enum Sykefraværsvarighet {
     _8_UKER_TIL_20_UKER("D"),
     _20_UKER_TIL_39_UKER("E"),
     MER_ENN_39_UKER("F"),
-    UKJENT("X");
+    TOTAL("X"),
+    UKJENT(null);
 
     public final String kode;
 
