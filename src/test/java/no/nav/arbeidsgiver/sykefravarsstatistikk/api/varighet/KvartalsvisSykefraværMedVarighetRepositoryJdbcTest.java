@@ -25,15 +25,15 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 @ActiveProfiles("db-test")
 @RunWith(SpringRunner.class)
 @DataJdbcTest
-public class VarighetSykefraværRepositoryJdbcTest {
+public class KvartalsvisSykefraværMedVarighetRepositoryJdbcTest {
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    private VarighetSykefraværRepository varighetSykefraværRepository;
+    private KvartalsvisSykefraværVarighetRepository kvartalsvisSykefraværVarighetRepository;
 
     @Before
     public void setUp() {
-        varighetSykefraværRepository = new VarighetSykefraværRepository(jdbcTemplate);
+        kvartalsvisSykefraværVarighetRepository = new KvartalsvisSykefraværVarighetRepository(jdbcTemplate);
         slettAllStatistikkFraDatabase(jdbcTemplate);
     }
 
@@ -60,17 +60,17 @@ public class VarighetSykefraværRepositoryJdbcTest {
                 parametre(2019, 2, barnehage.getOrgnr().getVerdi(), "X", 6, 0, 100)
         );
 
-        List<KvartalsvisSykefraværVarighet> resultat = varighetSykefraværRepository.hentSykefraværprosentMedVarighet(barnehage);
+        List<KvartalsvisSykefraværMedVarighet> resultat = kvartalsvisSykefraværVarighetRepository.hentKvartalsvisSykefraværMedVarighet(barnehage);
 
         assertThat(resultat.size()).isEqualTo(2);
-        assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefraværVarighet(
+        assertThat(resultat.get(0)).isEqualTo(new KvartalsvisSykefraværMedVarighet(
                 new ÅrstallOgKvartal(2019, 2),
                 new BigDecimal(4),
                 new BigDecimal(0),
                 0,
                 Sykefraværsvarighet._1_DAG_TIL_7_DAGER.kode
         ));
-        assertThat(resultat.get(1)).isEqualTo(new KvartalsvisSykefraværVarighet(
+        assertThat(resultat.get(1)).isEqualTo(new KvartalsvisSykefraværMedVarighet(
                 new ÅrstallOgKvartal(2019, 2),
                 new BigDecimal(0),
                 new BigDecimal(100),

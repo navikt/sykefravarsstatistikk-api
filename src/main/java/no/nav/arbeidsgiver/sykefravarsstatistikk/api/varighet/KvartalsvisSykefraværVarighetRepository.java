@@ -14,15 +14,15 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
-public class VarighetSykefraværRepository {
+public class KvartalsvisSykefraværVarighetRepository {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public VarighetSykefraværRepository(@Qualifier("sykefravarsstatistikkJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public KvartalsvisSykefraværVarighetRepository(@Qualifier("sykefravarsstatistikkJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-    public List<KvartalsvisSykefraværVarighet> hentSykefraværprosentMedVarighet(Virksomhet virksomhet) {
+    public List<KvartalsvisSykefraværMedVarighet> hentKvartalsvisSykefraværMedVarighet(Virksomhet virksomhet) {
         try {
             return namedParameterJdbcTemplate.query(
                     "select tapte_dagsverk, mulige_dagsverk, antall_personer, varighet, arstall, kvartal " +
@@ -33,15 +33,15 @@ public class VarighetSykefraværRepository {
                             " order by arstall, kvartal, varighet",
                     new MapSqlParameterSource()
                             .addValue("orgnr", virksomhet.getOrgnr().getVerdi()),
-                    (rs, rowNum) -> mapTilKvartalsvisSykefraværprosentVarighet(rs)
+                    (rs, rowNum) -> mapTilKvartalsvisSykefraværMedVarighet(rs)
             );
         } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();
         }
     }
 
-    private KvartalsvisSykefraværVarighet mapTilKvartalsvisSykefraværprosentVarighet(ResultSet rs) throws SQLException {
-        return new KvartalsvisSykefraværVarighet(
+    private KvartalsvisSykefraværMedVarighet mapTilKvartalsvisSykefraværMedVarighet(ResultSet rs) throws SQLException {
+        return new KvartalsvisSykefraværMedVarighet(
                 new ÅrstallOgKvartal(
                         rs.getInt("arstall"),
                         rs.getInt("kvartal")

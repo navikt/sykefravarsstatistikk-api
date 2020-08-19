@@ -9,7 +9,7 @@ import java.math.RoundingMode;
 import java.util.Comparator;
 
 @Data
-public class KvartalsvisSykefraværVarighet implements Comparable<KvartalsvisSykefraværVarighet> {
+public class KvartalsvisSykefraværMedVarighet implements Comparable<KvartalsvisSykefraværMedVarighet> {
 
     @JsonIgnore
     private final ÅrstallOgKvartal årstallOgKvartal;
@@ -18,7 +18,7 @@ public class KvartalsvisSykefraværVarighet implements Comparable<KvartalsvisSyk
     private final int antallPersoner;
     private final String typeVarighet;
 
-    public KvartalsvisSykefraværVarighet(
+    public KvartalsvisSykefraværMedVarighet(
             ÅrstallOgKvartal årstallOgKvartal,
             BigDecimal tapteDagsverk,
             BigDecimal muligeDagsverk,
@@ -41,9 +41,9 @@ public class KvartalsvisSykefraværVarighet implements Comparable<KvartalsvisSyk
 
 
     @Override
-    public int compareTo(KvartalsvisSykefraværVarighet kvartalsvisSykefravær) {
+    public int compareTo(KvartalsvisSykefraværMedVarighet kvartalsvisSykefravær) {
         return Comparator
-                .comparing(KvartalsvisSykefraværVarighet::getÅrstallOgKvartal)
+                .comparing(KvartalsvisSykefraværMedVarighet::getÅrstallOgKvartal)
                 .compare(this, kvartalsvisSykefravær);
     }
 }
