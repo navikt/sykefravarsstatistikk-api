@@ -8,7 +8,7 @@ public class SykefraværMedVarighetshistorikk {
     private String varighet; // langtid | korttid
 
     @JsonProperty("siste4KvartalerSykefravær")
-    private Siste4KvartalerSykefraværsprosent siste4KvartalerSykefraværsprosent;
+    private Siste4KvartalerSykefravær siste4KvartalerSykefravær;
 }
 
 
