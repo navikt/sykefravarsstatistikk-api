@@ -35,6 +35,23 @@ public enum Sykefraværsvarighet {
         }
     }
 
+    public boolean erKorttidVarighet(){
+        switch (this.kode){
+            case "A":
+            case "B": return true;
+            default: return false;
+        }
+    }
+    public boolean erLangtidVarighet(){
+        switch (this.kode){
+            case "C":
+            case "D":
+            case "E":
+            case "F": return true;
+            default: return false;
+        }
+    }
+
     @Override
     public String toString() {
         return kode;

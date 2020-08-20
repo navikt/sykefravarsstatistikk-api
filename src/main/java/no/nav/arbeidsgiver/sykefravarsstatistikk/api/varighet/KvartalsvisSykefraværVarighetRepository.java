@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.varighet;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Sykefraværsvarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Virksomhet;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,7 +23,7 @@ public class KvartalsvisSykefraværVarighetRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-    public List<KvartalsvisSykefraværMedVarighet> hentKvartalsvisSykefraværMedVarighet(Virksomhet virksomhet) {
+    public List<UmaskertKvartalsvisSykefraværMedVarighet> hentKvartalsvisSykefraværMedVarighet(Virksomhet virksomhet) {
         try {
             return namedParameterJdbcTemplate.query(
                     "select tapte_dagsverk, mulige_dagsverk, antall_personer, varighet, arstall, kvartal " +
@@ -40,8 +41,8 @@ public class KvartalsvisSykefraværVarighetRepository {
         }
     }
 
-    private KvartalsvisSykefraværMedVarighet mapTilKvartalsvisSykefraværMedVarighet(ResultSet rs) throws SQLException {
-        return new KvartalsvisSykefraværMedVarighet(
+    private UmaskertKvartalsvisSykefraværMedVarighet mapTilKvartalsvisSykefraværMedVarighet(ResultSet rs) throws SQLException {
+        return new UmaskertKvartalsvisSykefraværMedVarighet(
                 new ÅrstallOgKvartal(
                         rs.getInt("arstall"),
                         rs.getInt("kvartal")
@@ -49,7 +50,7 @@ public class KvartalsvisSykefraværVarighetRepository {
                 rs.getBigDecimal("tapte_dagsverk"),
                 rs.getBigDecimal("mulige_dagsverk"),
                 rs.getInt("antall_personer"),
-                rs.getString("varighet"));
+                Sykefraværsvarighet.fraKode( rs.getString("varighet")));
     }
 
 }
