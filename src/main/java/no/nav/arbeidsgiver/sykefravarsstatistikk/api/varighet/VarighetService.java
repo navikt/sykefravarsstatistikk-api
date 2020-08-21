@@ -48,15 +48,17 @@ public class VarighetService {
                 (årstallOgKvartal, kvartalsvisSykefraværMedVarighets) ->
                 {
                     korttidKVartalsvisSykefravar.add(
-                            getKorttidsSiste4KvartalerSykefravær(
+                            getSummertSykefravær(
                                     årstallOgKvartal,
-                                    kvartalsvisSykefraværMedVarighets
+                                    kvartalsvisSykefraværMedVarighets,
+                                    "korttid"
                             )
                     );
                     langtidKVartalsvisSykefravar.add(
-                            getLangtidsSiste4KvartalerSykefravær(
+                            getSummertSykefravær(
                                     årstallOgKvartal,
-                                    kvartalsvisSykefraværMedVarighets
+                                    kvartalsvisSykefraværMedVarighets,
+                                    "langtid"
                             )
                     );
                 }
@@ -125,53 +127,21 @@ public class VarighetService {
         return new Siste4KvartalerSykefravær(totalTaptedagsverk, totalMuligedagsverk, maksAntallPersoner);
     }
 
-
     /**
      *
      * @param årstallOgKvartal
      * @param sykefraværVarighet en liste med alle kvartalsvis sykefravær med varighet (umaskert, direkte fra DB)
-     *                           {årstal: 2020, kvartal: 1, taptedagsverk: 10, muligedagsverk: 0, antallPersoner: 0, varighet: A}
-     *                           {årstal: 2020, kvartal: 1, taptedagsverk: 20, muligedagsverk: 0, antallPersoner: 0, varighet: B}
+     *                           {årstal: 2020, kvartal: 1, taptedagsverk: 10, muligedagsverk: 0, antallPersoner: 0, varighet: D}
+     *                           {årstal: 2020, kvartal: 1, taptedagsverk: 20, muligedagsverk: 0, antallPersoner: 0, varighet: E}
      *                           {årstal: 2020, kvartal: 1, taptedagsverk: 0, muligedagsverk: 100, antallPersoner: 10, varighet: X}
      * @return
      *                            {årstal: 2020, kvartal: 1, taptedagsverk: 30, muligedagsverk: 100, antallPersoner: 10}
      */
     @NotNull
-    private UmaskertKvartalsvisSykefravær getLangtidsSiste4KvartalerSykefravær(
+    private UmaskertKvartalsvisSykefravær getSummertSykefravær(
             ÅrstallOgKvartal årstallOgKvartal,
-            List<UmaskertKvartalsvisSykefraværMedVarighet> sykefraværVarighet
-            // TODO: sende en liste av koder som er til Langtid
-    ) {
-        BigDecimal muligeDagsverk = sykefraværVarighet.stream()
-                .filter(p ->
-                        p.getVarighet().equals(Sykefraværsvarighet.TOTAL)
-                ).collect(Collectors.toList())
-                .get(0)
-                .getMuligeDagsverk();
-
-        int antallPers = sykefraværVarighet.stream()
-                .filter(p ->
-                        p.getVarighet().equals(Sykefraværsvarighet.TOTAL)
-                ).collect(Collectors.toList())
-                .get(0)
-                .getAntallPersoner();
-
-        // TODO: det må fungere med flere objekter i listen
-        BigDecimal tapteDagsverk = sykefraværVarighet.stream()
-                .filter(p ->
-                        p.getVarighet().erLangtidVarighet()
-                ).collect(Collectors.toList())
-                .get(0)
-                .getTapteDagsverk();
-
-        return new UmaskertKvartalsvisSykefravær(årstallOgKvartal, tapteDagsverk, muligeDagsverk, antallPers);
-    }
-
-    @NotNull
-    private UmaskertKvartalsvisSykefravær getKorttidsSiste4KvartalerSykefravær(
-            ÅrstallOgKvartal årstallOgKvartal,
-            List<UmaskertKvartalsvisSykefraværMedVarighet> sykefraværVarighet
-            // TODO: sende en liste av koder som er til Korttid
+            List<UmaskertKvartalsvisSykefraværMedVarighet> sykefraværVarighet,
+            String korttidEllerLangtid
     ) {
         BigDecimal muligeDagsverk = sykefraværVarighet.stream()
                 .filter(p ->
@@ -188,9 +158,14 @@ public class VarighetService {
                 .getAntallPersoner();
 
         BigDecimal tapteDagsverk = sykefraværVarighet.stream()
-                .filter(p ->
-                        p.getVarighet().erKorttidVarighet()
-                ).collect(Collectors.toList())
+                .filter(p -> {
+                    if ("korttid".equals(korttidEllerLangtid)) {
+                        return p.getVarighet().erKorttidVarighet();
+                    } else {
+                        return p.getVarighet().erLangtidVarighet();
+                    }
+                })
+                .collect(Collectors.toList())
                 .get(0)
                 .getTapteDagsverk();
 

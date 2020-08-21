@@ -116,6 +116,11 @@ public class VarighetServiceTest {
         );
     }
 
+    @Test
+    public void hentLangtidOgKorttidsSykefraværshistorikk__skal_summere_opp_riktig_hvis_det_er_flere_innslag_i_hvert_kvartal() {
+
+    }
+
     private UmaskertKvartalsvisSykefraværMedVarighet getSykefraværMedVarighet(
             ÅrstallOgKvartal årstallOgKvartal,
             int tapteDagsverk,
