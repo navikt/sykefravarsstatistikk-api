@@ -44,7 +44,7 @@ public class VarighetServiceTest {
     }
 
     @Test
-    public void hentLangtidOgKorttidsSykefraværshistorikk__skal_returnere_langtid_og_korttid_historikk() {
+    public void hentKorttidsOgLangtidsfraværSiste4Kvartaler__skal_returnere_langtid_og_korttid_historikk() {
         ÅrstallOgKvartal kvartal = new ÅrstallOgKvartal(2020, 1);
         List<UmaskertKvartalsvisSykefraværMedVarighet> sykefraværMed1Kvartal = Arrays.asList(
                 getSykefraværMedVarighet(kvartal, 5, 0, 0, Sykefraværsvarighet._1_DAG_TIL_7_DAGER),
@@ -77,7 +77,7 @@ public class VarighetServiceTest {
     }
 
     @Test
-    public void hentLangtidOgKorttidsSykefraværshistorikk__skal_returnere_langtid_og_korttid_historikk_for_flere_kvartaler() {
+    public void hentKorttidsOgLangtidsfraværSiste4Kvartaler__skal_returnere_langtid_og_korttid_historikk_for_flere_kvartaler() {
         ÅrstallOgKvartal kvartal1 = new ÅrstallOgKvartal(2019, 4);
         ÅrstallOgKvartal kvartal2 = new ÅrstallOgKvartal(2020, 1);
 
@@ -117,7 +117,7 @@ public class VarighetServiceTest {
     }
 
     @Test
-    public void hentLangtidOgKorttidsSykefraværshistorikk__skal_summere_opp_riktig_hvis_det_er_flere_innslag_i_hvert_kvartal() {
+    public void hentKorttidsOgLangtidsfraværSiste4Kvartaler__skal_summere_opp_riktig_hvis_det_er_flere_innslag_i_hvert_kvartal() {
 
     }
 
