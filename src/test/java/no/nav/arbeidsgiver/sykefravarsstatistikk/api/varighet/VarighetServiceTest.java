@@ -41,8 +41,6 @@ public class VarighetServiceTest {
                 .næringskode(new Næringskode5Siffer("88911", "Barnehage"))
                 .antallAnsatte(10)
                 .overordnetEnhetOrgnr(new Orgnr("1111111111")).build();
-
-
     }
 
 
@@ -53,20 +51,25 @@ public class VarighetServiceTest {
                         lagKvartalsvisSykefravarMedVarighet1kvaartal()
                 );
 
-        LangtidOgKorttidsSykefraværshistorikk langtidOgKorttidsSykefraværshistorikk =
+        KorttidsOgLangtidsfraværSiste4Kvartaler korttidsOgLangtidsfraværSiste4Kvartaler =
                 varighetService.hentLangtidOgKorttidsSykefraværshistorikk(barnehage);
 
-        SykefraværMedVarighetshistorikk korttidssykefravær =
-                langtidOgKorttidsSykefraværshistorikk.getKorttidssykefravær();
-        SykefraværMedVarighetshistorikk langtidssykefravær =
-                langtidOgKorttidsSykefraværshistorikk.getLangtidssykefravær();
-
-        assertThat(korttidssykefravær.getKvartalsvisSykefravær().size()).isEqualTo(1);
-        assertThat(korttidssykefravær.getKvartalsvisSykefravær().get(0).getTapteDagsverk()).isEqualTo(BigDecimal.valueOf(5.0));
-        assertThat(korttidssykefravær.getVarighet()).isEqualTo("korttid");
-        assertThat(langtidssykefravær.getKvartalsvisSykefravær().size()).isEqualTo(1);
-        assertThat(langtidssykefravær.getKvartalsvisSykefravær().get(0).getTapteDagsverk()).isEqualTo(BigDecimal.valueOf(2.0));
-        assertThat(langtidssykefravær.getVarighet()).isEqualTo("langtid");
+        assertIsEqual(
+                korttidsOgLangtidsfraværSiste4Kvartaler.getKorttidsfraværSiste4Kvartaler(),
+                100,
+                5,
+                5,
+                false,
+                "korttid"
+        );
+        assertIsEqual(
+                korttidsOgLangtidsfraværSiste4Kvartaler.getLangtidsfraværSiste4Kvartaler(),
+                100,
+                2,
+                2,
+                false,
+                "langtid"
+        );
     }
 
     @Test
@@ -76,23 +79,27 @@ public class VarighetServiceTest {
                         lagKvartalsvisSykefravarMedVarighet2Kvartaler()
                 );
 
-        LangtidOgKorttidsSykefraværshistorikk langtidOgKorttidsSykefraværshistorikk =
+        KorttidsOgLangtidsfraværSiste4Kvartaler korttidsOgLangtidsfraværSiste4Kvartaler =
                 varighetService.hentLangtidOgKorttidsSykefraværshistorikk(barnehage);
 
-        SykefraværMedVarighetshistorikk korttidssykefravær =
-                langtidOgKorttidsSykefraværshistorikk.getKorttidssykefravær();
-        SykefraværMedVarighetshistorikk langtidssykefravær =
-                langtidOgKorttidsSykefraværshistorikk.getLangtidssykefravær();
-
-        assertThat(korttidssykefravær.getKvartalsvisSykefravær().size()).isEqualTo(2);
-        assertThat(korttidssykefravær.getKvartalsvisSykefravær().get(0).getTapteDagsverk()).isEqualTo(BigDecimal.valueOf(9.0));
-        assertThat(korttidssykefravær.getKvartalsvisSykefravær().get(1).getTapteDagsverk()).isEqualTo(BigDecimal.valueOf(5.0));
-        assertThat(korttidssykefravær.getVarighet()).isEqualTo("korttid");
-        assertThat(langtidssykefravær.getKvartalsvisSykefravær().size()).isEqualTo(2);
-        assertThat(langtidssykefravær.getKvartalsvisSykefravær().get(0).getTapteDagsverk()).isEqualTo(BigDecimal.valueOf(6.0));
-        assertThat(langtidssykefravær.getKvartalsvisSykefravær().get(1).getTapteDagsverk()).isEqualTo(BigDecimal.valueOf(2.0));
-        assertThat(langtidssykefravær.getVarighet()).isEqualTo("langtid");
+        assertIsEqual(
+                korttidsOgLangtidsfraværSiste4Kvartaler.getKorttidsfraværSiste4Kvartaler(),
+                200,
+                14,
+                7,
+                false,
+                "korttid"
+        );
+        assertIsEqual(
+                korttidsOgLangtidsfraværSiste4Kvartaler.getLangtidsfraværSiste4Kvartaler(),
+                200,
+                8,
+                4,
+                false,
+                "langtid"
+        );
     }
+
 
     private List<UmaskertKvartalsvisSykefraværMedVarighet> lagKvartalsvisSykefravarMedVarighet1kvaartal() {
         return Arrays.asList(
@@ -117,9 +124,7 @@ public class VarighetServiceTest {
                         10,
                         Sykefraværsvarighet.TOTAL
                 )
-
-        )
-                ;
+        );
     }
 
     private List<UmaskertKvartalsvisSykefraværMedVarighet> lagKvartalsvisSykefravarMedVarighet2Kvartaler() {
@@ -167,8 +172,45 @@ public class VarighetServiceTest {
                         Sykefraværsvarighet.TOTAL
                 )
 
+        );
+    }
+
+    private void assertIsEqual(
+            KorttidsEllerLangtidsfraværSiste4Kvartaler korttidsEllerLangtidsfraværSiste4Kvartaler,
+            int expectedMuligeDagsverk,
+            int expectedTapteDagsverk,
+            int expectedProsent,
+            boolean expectedErMaskert,
+            String expectedLangtidEllerKorttid
+    ) {
+        assertBigDecimalIsEqual(
+                korttidsEllerLangtidsfraværSiste4Kvartaler.getSiste4KvartalerSykefravær().getMuligeDagsverk(),
+                expectedMuligeDagsverk
+        );
+        assertBigDecimalIsEqual(
+                korttidsEllerLangtidsfraværSiste4Kvartaler.getSiste4KvartalerSykefravær().getTapteDagsverk(),
+                expectedTapteDagsverk
+        );
+        assertBigDecimalIsEqual(
+                korttidsEllerLangtidsfraværSiste4Kvartaler.getSiste4KvartalerSykefravær().getProsent(),
+                expectedProsent
+        );
+        assertThat(
+                korttidsEllerLangtidsfraværSiste4Kvartaler.getSiste4KvartalerSykefravær().isErMaskert()
         )
-                ;
+                .isEqualTo(
+                        expectedErMaskert
+                );
+        assertThat(
+                korttidsEllerLangtidsfraværSiste4Kvartaler.getLangtidEllerKorttid()
+        )
+                .isEqualTo(
+                        expectedLangtidEllerKorttid
+                );
+    }
+
+    private void assertBigDecimalIsEqual(BigDecimal actual, int expected) {
+        assertThat(actual.setScale(6)).isEqualTo(BigDecimal.valueOf(expected).setScale(6));
     }
 
 }

@@ -30,13 +30,12 @@ public class VarighetController {
 
     }
 
+    // TODO avklare navn til endepunkt
     @GetMapping(value = "/{orgnr}/varighet")
-    public LangtidOgKorttidsSykefraværshistorikk hentVarighet(
+    public KorttidsOgLangtidsfraværSiste4Kvartaler hentVarighet(
             @PathVariable("orgnr") String orgnrStr,
             HttpServletRequest request
     ) {
-
-
         Orgnr orgnr = new Orgnr(orgnrStr);
         Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
         InnloggetBruker bruker = tilgangskontrollService.hentInnloggetBruker();

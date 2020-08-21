@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Sykefraværsvarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk.KvartalsvisSykefravær;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -26,56 +25,131 @@ public class VarighetService {
     }
 
 
-    public LangtidOgKorttidsSykefraværshistorikk hentLangtidOgKorttidsSykefraværshistorikk(Underenhet underenhet) {
+    // TODO: tilpasse navnet til metoden ift til retur objektet som ikke inneholder historikk
+    public KorttidsOgLangtidsfraværSiste4Kvartaler hentLangtidOgKorttidsSykefraværshistorikk(Underenhet underenhet) {
 
+        // #1 vi henter alle umaskerte kvartalsvis sykefravær med varighet
+        // OBS det kan være hul i serien og vi må ta hensyn til det
+        // (dvs de fire siste kvartalene skal ikke være for gamle) TODO: filtrere bort de som er for gamle
         List<UmaskertKvartalsvisSykefraværMedVarighet> sykefraværVarighet =
                 kvartalsvisSykefraværVarighetRepository.hentKvartalsvisSykefraværMedVarighet(
-                        underenhet);
+                        underenhet
+                );
 
+        // #2 Grupper sammen disse UmaskertKvartalsvisSykefraværMedVarighet per ÅrstallOgKvartal
         Map<ÅrstallOgKvartal, List<UmaskertKvartalsvisSykefraværMedVarighet>> årstallOgKvartals = sykefraværVarighet.stream()
                 .collect(Collectors.
                         groupingBy(UmaskertKvartalsvisSykefraværMedVarighet::getÅrstallOgKvartal));
 
-        List<Siste4KvartalerSykefravær> korttidKVartalsvisSykefravar = new ArrayList<>();
-        List<Siste4KvartalerSykefravær> langtidKVartalsvisSykefravar = new ArrayList<>();
+        // #3 Her skiller vi korttids sykefravære fra langtiddssykefravære i to forskjellige lister
+        List<UmaskertKvartalsvisSykefravær> korttidKVartalsvisSykefravar = new ArrayList<>();
+        List<UmaskertKvartalsvisSykefravær> langtidKVartalsvisSykefravar = new ArrayList<>();
 
         årstallOgKvartals.forEach(
                 (årstallOgKvartal, kvartalsvisSykefraværMedVarighets) ->
                 {
-                    korttidKVartalsvisSykefravar.add(getKorttidSykefraværMedVarighetshistorikk
-                            (kvartalsvisSykefraværMedVarighets, årstallOgKvartal));
-                    langtidKVartalsvisSykefravar.add(getLangtidSykefraværMedVarighetshistorikk(
-                            kvartalsvisSykefraværMedVarighets, årstallOgKvartal));
+                    korttidKVartalsvisSykefravar.add(
+                            getKorttidsSiste4KvartalerSykefravær(
+                                    årstallOgKvartal,
+                                    kvartalsvisSykefraværMedVarighets
+                            )
+                    );
+                    langtidKVartalsvisSykefravar.add(
+                            getLangtidsSiste4KvartalerSykefravær(
+                                    årstallOgKvartal,
+                                    kvartalsvisSykefraværMedVarighets
+                            )
+                    );
                 }
         );
-        SykefraværMedVarighetshistorikk korttidSykefravarMedVarighetHistorikk =
-                new SykefraværMedVarighetshistorikk();
-        korttidSykefravarMedVarighetHistorikk.setVarighet("korttid");
 
+        // #4 Sette sammen korttid og langtid i et objekt som vi returnerer
+        KorttidsEllerLangtidsfraværSiste4Kvartaler korttidSiste4KvartalerSykefravær =
+                new KorttidsEllerLangtidsfraværSiste4Kvartaler();
+        korttidSiste4KvartalerSykefravær.setLangtidEllerKorttid("korttid");
+        korttidSiste4KvartalerSykefravær.setSiste4KvartalerSykefravær(
+                getSiste4KvartalerSykefravær(korttidKVartalsvisSykefravar
+                )
+        );
 
+        KorttidsEllerLangtidsfraværSiste4Kvartaler langtidSiste4KvartalerSykefravær =
+                new KorttidsEllerLangtidsfraværSiste4Kvartaler();
+        langtidSiste4KvartalerSykefravær.setLangtidEllerKorttid("langtid");
+        langtidSiste4KvartalerSykefravær.setSiste4KvartalerSykefravær(getSiste4KvartalerSykefravær(langtidKVartalsvisSykefravar));
 
-        SykefraværMedVarighetshistorikk langtidSykefravarMedVarighetHistorikk =
-                new SykefraværMedVarighetshistorikk();
-        langtidSykefravarMedVarighetHistorikk.setVarighet("langtid");
-        langtidSykefravarMedVarighetHistorikk.setSiste4KvartalerSykefravær(langtidKVartalsvisSykefravar);
+        KorttidsOgLangtidsfraværSiste4Kvartaler korttidsOgLangtidsfraværSiste4Kvartaler = new KorttidsOgLangtidsfraværSiste4Kvartaler();
+        korttidsOgLangtidsfraværSiste4Kvartaler.setKorttidsfraværSiste4Kvartaler(korttidSiste4KvartalerSykefravær);
+        korttidsOgLangtidsfraværSiste4Kvartaler.setLangtidsfraværSiste4Kvartaler(langtidSiste4KvartalerSykefravær);
 
-        LangtidOgKorttidsSykefraværshistorikk langtidOgKorttidsSykefraværshistorikk = new LangtidOgKorttidsSykefraværshistorikk();
-        langtidOgKorttidsSykefraværshistorikk.setLangtidssykefravær(korttidSykefravarMedVarighetHistorikk);
-        langtidOgKorttidsSykefraværshistorikk.setLangtidssykefravær(langtidSykefravarMedVarighetHistorikk);
-        return langtidOgKorttidsSykefraværshistorikk;
-        // return getLangtidOgKorttidsSykefraværshistorikk(sykefraværVarighet);
+        return korttidsOgLangtidsfraværSiste4Kvartaler;
     }
 
 
+    /**
+     *
+     * @param kvartalsvisSykefravær en liste av UmaskertKvartalsvisSykefravær
+     *                           {{årstal: 2020, kvartal: 1}, taptedagsverk: 10, muligedagsverk: 500, antallPersoner: 10}
+     *                           {{årstal: 2019, kvartal: 4}, taptedagsverk: 20, muligedagsverk: 200, antallPersoner: 10}
+     *                           {{årstal: 2019, kvartal: 3}, taptedagsverk: 5, muligedagsverk: 100, antallPersoner: 10}
+     * @return Siste4KvartalerSykefravær
+     *          prosent;
+     *          tapteDagsverk;
+     *          muligeDagsverk;
+     *          erMaskert;
+     */
+    private Siste4KvartalerSykefravær getSiste4KvartalerSykefravær(
+            List<UmaskertKvartalsvisSykefravær> kvartalsvisSykefravær
+    ) {
+
+        BigDecimal totalTaptedagsverk = kvartalsvisSykefravær
+                .stream()
+                .map( e -> e.getTapteDagsverk())
+                .reduce(
+                        new BigDecimal(0),
+                        (subtotal, element) -> subtotal.add(element)
+                );
+
+        BigDecimal totalMuligedagsverk = kvartalsvisSykefravær
+                .stream()
+                .map( e -> e.getMuligeDagsverk())
+                .reduce(
+                        new BigDecimal(0),
+                        (subtotal, element) -> subtotal.add(element)
+                );
+
+        int maksAntallPersoner = kvartalsvisSykefravær
+                .stream()
+                .map( e -> e.getAntallPersoner())
+                .max(Integer::compare)
+                .get();
+
+        return new Siste4KvartalerSykefravær(totalTaptedagsverk, totalMuligedagsverk, maksAntallPersoner);
+    }
+
+
+    /**
+     *
+     * @param årstallOgKvartal
+     * @param sykefraværVarighet en liste med alle kvartalsvis sykefravær med varighet (umaskert, direkte fra DB)
+     *                           {årstal: 2020, kvartal: 1, taptedagsverk: 10, muligedagsverk: 0, antallPersoner: 0, varighet: A}
+     *                           {årstal: 2020, kvartal: 1, taptedagsverk: 20, muligedagsverk: 0, antallPersoner: 0, varighet: B}
+     *                           {årstal: 2020, kvartal: 1, taptedagsverk: 0, muligedagsverk: 100, antallPersoner: 10, varighet: X}
+     * @return
+     *                            {årstal: 2020, kvartal: 1, taptedagsverk: 30, muligedagsverk: 100, antallPersoner: 10}
+     */
     @NotNull
-    private Siste4KvartalerSykefravær getLangtidSykefraværMedVarighetshistorikk
-            (List<UmaskertKvartalsvisSykefraværMedVarighet> sykefraværVarighet, ÅrstallOgKvartal årstallOgKvartal) {
+    private UmaskertKvartalsvisSykefravær getLangtidsSiste4KvartalerSykefravær(
+            ÅrstallOgKvartal årstallOgKvartal,
+            List<UmaskertKvartalsvisSykefraværMedVarighet> sykefraværVarighet
+            // TODO: sende en liste av koder som er til Langtid
+    ) {
         BigDecimal muligeDagsverk = sykefraværVarighet.stream()
                 .filter(p ->
                         p.getVarighet().equals(Sykefraværsvarighet.TOTAL)
                 ).collect(Collectors.toList())
                 .get(0)
                 .getMuligeDagsverk();
+
         int antallPers = sykefraværVarighet.stream()
                 .filter(p ->
                         p.getVarighet().equals(Sykefraværsvarighet.TOTAL)
@@ -83,31 +157,30 @@ public class VarighetService {
                 .get(0)
                 .getAntallPersoner();
 
-        BigDecimal tapteDagsverkLangtid = sykefraværVarighet.stream()
+        // TODO: det må fungere med flere objekter i listen
+        BigDecimal tapteDagsverk = sykefraværVarighet.stream()
                 .filter(p ->
                         p.getVarighet().erLangtidVarighet()
                 ).collect(Collectors.toList())
                 .get(0)
                 .getTapteDagsverk();
-       /* SykefraværMedVarighetshistorikk langtid = new SykefraværMedVarighetshistorikk();
-        langtid.setVarighet("langtid");
-        langtid.setKvartalsvisSykefravær(Arrays.asList(
-                new KvartalsvisSykefravær
-                        (årstallOgKvartal, tapteDagsverkLangtid, muligeDagsverk, antallPers)
-        ));*/
-        return new Siste4KvartalerSykefravær(tapteDagsverkLangtid, muligeDagsverk, antallPers);
+
+        return new UmaskertKvartalsvisSykefravær(årstallOgKvartal, tapteDagsverk, muligeDagsverk, antallPers);
     }
 
     @NotNull
-    private Siste4KvartalerSykefravær getKorttidSykefraværMedVarighetshistorikk
-            (List<UmaskertKvartalsvisSykefraværMedVarighet> sykefraværVarighet, ÅrstallOgKvartal årstallOgKvartal) {
-
+    private UmaskertKvartalsvisSykefravær getKorttidsSiste4KvartalerSykefravær(
+            ÅrstallOgKvartal årstallOgKvartal,
+            List<UmaskertKvartalsvisSykefraværMedVarighet> sykefraværVarighet
+            // TODO: sende en liste av koder som er til Korttid
+    ) {
         BigDecimal muligeDagsverk = sykefraværVarighet.stream()
                 .filter(p ->
                         p.getVarighet().equals(Sykefraværsvarighet.TOTAL)
                 ).collect(Collectors.toList())
                 .get(0)
                 .getMuligeDagsverk();
+
         int antallPers = sykefraværVarighet.stream()
                 .filter(p ->
                         p.getVarighet().equals(Sykefraværsvarighet.TOTAL)
@@ -115,13 +188,13 @@ public class VarighetService {
                 .get(0)
                 .getAntallPersoner();
 
-        BigDecimal tapteDagsverkKorttid = sykefraværVarighet.stream()
+        BigDecimal tapteDagsverk = sykefraværVarighet.stream()
                 .filter(p ->
                         p.getVarighet().erKorttidVarighet()
                 ).collect(Collectors.toList())
                 .get(0)
                 .getTapteDagsverk();
 
-        return new Siste4KvartalerSykefravær(tapteDagsverkKorttid, muligeDagsverk, antallPers);
+        return new UmaskertKvartalsvisSykefravær(årstallOgKvartal, tapteDagsverk, muligeDagsverk, antallPers);
     }
 }

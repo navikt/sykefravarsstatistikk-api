@@ -8,27 +8,26 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallO
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Comparator;
+
+// TODO gjør inheritance mellom UmaskertKvartalsvisSykefravær, UmaskertKvartalsvisSykefraværMedVarighet og KvartalsvisSykefravær
 @Data
-public class UmaskertKvartalsvisSykefraværMedVarighet implements Comparable<UmaskertKvartalsvisSykefraværMedVarighet> {
+public class UmaskertKvartalsvisSykefravær implements Comparable<UmaskertKvartalsvisSykefravær>  {
 
     @JsonIgnore
     private final ÅrstallOgKvartal årstallOgKvartal;
     private final BigDecimal tapteDagsverk;
     private final BigDecimal muligeDagsverk;
     private final int antallPersoner;
-    private final Sykefraværsvarighet varighet;
 
-    public UmaskertKvartalsvisSykefraværMedVarighet(
+    public UmaskertKvartalsvisSykefravær(
             ÅrstallOgKvartal årstallOgKvartal,
             BigDecimal tapteDagsverk,
             BigDecimal muligeDagsverk,
-            int antallPersoner,
-            Sykefraværsvarighet varighet) {
+            int antallPersoner) {
         this.årstallOgKvartal = årstallOgKvartal;
-        this.tapteDagsverk = tapteDagsverk.setScale(6, RoundingMode.HALF_UP);
-        this.muligeDagsverk = muligeDagsverk.setScale(6, RoundingMode.HALF_UP);
+        this.tapteDagsverk = tapteDagsverk.setScale(1, RoundingMode.HALF_UP);
+        this.muligeDagsverk = muligeDagsverk.setScale(1, RoundingMode.HALF_UP);
         this.antallPersoner = antallPersoner;
-        this.varighet = varighet;
     }
 
     public int getKvartal() {
@@ -41,9 +40,9 @@ public class UmaskertKvartalsvisSykefraværMedVarighet implements Comparable<Uma
 
 
     @Override
-    public int compareTo(UmaskertKvartalsvisSykefraværMedVarighet kvartalsvisSykefravær) {
+    public int compareTo(UmaskertKvartalsvisSykefravær kvartalsvisSykefravær) {
         return Comparator
-                .comparing(UmaskertKvartalsvisSykefraværMedVarighet::getÅrstallOgKvartal)
+                .comparing(UmaskertKvartalsvisSykefravær::getÅrstallOgKvartal)
                 .compare(this, kvartalsvisSykefravær);
     }
 }
