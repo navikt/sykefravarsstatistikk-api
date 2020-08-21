@@ -127,50 +127,26 @@ public class VarighetService {
         return new Siste4KvartalerSykefravær(totalTaptedagsverk, totalMuligedagsverk, maksAntallPersoner);
     }
 
-    /**
-     *
-     * @param årstallOgKvartal
-     * @param sykefraværVarighet en liste med alle kvartalsvis sykefravær med varighet (umaskert, direkte fra DB)
-     *                           {årstal: 2020, kvartal: 1, taptedagsverk: 10, muligedagsverk: 0, antallPersoner: 0, varighet: D}
-     *                           {årstal: 2020, kvartal: 1, taptedagsverk: 20, muligedagsverk: 0, antallPersoner: 0, varighet: E}
-     *                           {årstal: 2020, kvartal: 1, taptedagsverk: 0, muligedagsverk: 100, antallPersoner: 10, varighet: X}
-     * @return
-     *                            {årstal: 2020, kvartal: 1, taptedagsverk: 30, muligedagsverk: 100, antallPersoner: 10}
-     */
-    @NotNull
     private UmaskertKvartalsvisSykefravær getSummertSykefravær(
             ÅrstallOgKvartal årstallOgKvartal,
             List<UmaskertKvartalsvisSykefraværMedVarighet> sykefraværVarighet,
             String korttidEllerLangtid
     ) {
-        BigDecimal muligeDagsverk = sykefraværVarighet.stream()
-                .filter(p ->
-                        p.getVarighet().equals(Sykefraværsvarighet.TOTAL)
-                ).collect(Collectors.toList())
-                .get(0)
-                .getMuligeDagsverk();
-
-        int antallPers = sykefraværVarighet.stream()
-                .filter(p ->
-                        p.getVarighet().equals(Sykefraværsvarighet.TOTAL)
-                ).collect(Collectors.toList())
-                .get(0)
-                .getAntallPersoner();
-
-        BigDecimal summerteTapteDagsverk = sykefraværVarighet.stream()
+        return sykefraværVarighet.stream()
                 .filter(p -> {
+                    if (p.getVarighet().equals(Sykefraværsvarighet.TOTAL)) {
+                        return true;
+                    }
                     if ("korttid".equals(korttidEllerLangtid)) {
                         return p.getVarighet().erKorttidVarighet();
                     } else {
                         return p.getVarighet().erLangtidVarighet();
                     }
                 })
-                .map(UmaskertKvartalsvisSykefraværMedVarighet::getTapteDagsverk)
+                .map(UmaskertKvartalsvisSykefraværMedVarighet::tilUmaskertKvartalsvisSykefravær)
                 .reduce(
-                        new BigDecimal(0),
-                        BigDecimal::add
+                        UmaskertKvartalsvisSykefravær.tomtUmaskertKvartalsvisSykefravær(årstallOgKvartal),
+                        UmaskertKvartalsvisSykefravær::add
                 );
-
-        return new UmaskertKvartalsvisSykefravær(årstallOgKvartal, summerteTapteDagsverk, muligeDagsverk, antallPers);
     }
 }

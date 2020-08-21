@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Comparator;
 
+import static java.lang.Integer.max;
+
 // TODO gjør inheritance mellom UmaskertKvartalsvisSykefravær, UmaskertKvartalsvisSykefraværMedVarighet og KvartalsvisSykefravær
 @Data
 public class UmaskertKvartalsvisSykefravær implements Comparable<UmaskertKvartalsvisSykefravær>  {
@@ -38,6 +40,23 @@ public class UmaskertKvartalsvisSykefravær implements Comparable<UmaskertKvarta
         return årstallOgKvartal != null ? årstallOgKvartal.getÅrstall() : 0;
     }
 
+    public static UmaskertKvartalsvisSykefravær tomtUmaskertKvartalsvisSykefravær(ÅrstallOgKvartal årstallOgKvartal) {
+        return new UmaskertKvartalsvisSykefravær(årstallOgKvartal, new BigDecimal(0), new BigDecimal(0), 0);
+    }
+
+    public UmaskertKvartalsvisSykefravær add(
+            UmaskertKvartalsvisSykefravær sykefravær
+    ) {
+        if (!sykefravær.getÅrstallOgKvartal().equals(årstallOgKvartal)) {
+            throw new IllegalArgumentException("Kan ikke summere kvartalsvis sykefravær med forskjellige kvartaler");
+        }
+        return new UmaskertKvartalsvisSykefravær(
+                årstallOgKvartal,
+                tapteDagsverk.add(sykefravær.getTapteDagsverk()),
+                muligeDagsverk.add(sykefravær.getMuligeDagsverk()),
+                max(antallPersoner, sykefravær.getAntallPersoner())
+        );
+    }
 
     @Override
     public int compareTo(UmaskertKvartalsvisSykefravær kvartalsvisSykefravær) {

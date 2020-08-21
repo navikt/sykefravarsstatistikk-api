@@ -8,6 +8,9 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallO
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Comparator;
+
+import static java.lang.Integer.max;
+
 @Data
 public class UmaskertKvartalsvisSykefraværMedVarighet implements Comparable<UmaskertKvartalsvisSykefraværMedVarighet> {
 
@@ -39,6 +42,9 @@ public class UmaskertKvartalsvisSykefraværMedVarighet implements Comparable<Uma
         return årstallOgKvartal != null ? årstallOgKvartal.getÅrstall() : 0;
     }
 
+    public UmaskertKvartalsvisSykefravær tilUmaskertKvartalsvisSykefravær() {
+        return new UmaskertKvartalsvisSykefravær(årstallOgKvartal, tapteDagsverk, muligeDagsverk, antallPersoner);
+    }
 
     @Override
     public int compareTo(UmaskertKvartalsvisSykefraværMedVarighet kvartalsvisSykefravær) {
