@@ -47,6 +47,6 @@ public class VarighetController {
                 "" + request.getRequestURL()
         );
 
-        return varighetService.hentLangtidOgKorttidsSykefraværshistorikk(underenhet);
+        return varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(underenhet);
     }
 }

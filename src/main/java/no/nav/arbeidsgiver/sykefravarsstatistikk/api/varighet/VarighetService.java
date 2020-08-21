@@ -25,8 +25,7 @@ public class VarighetService {
     }
 
 
-    // TODO: tilpasse navnet til metoden ift til retur objektet som ikke inneholder historikk
-    public KorttidsOgLangtidsfraværSiste4Kvartaler hentLangtidOgKorttidsSykefraværshistorikk(Underenhet underenhet) {
+    public KorttidsOgLangtidsfraværSiste4Kvartaler hentKorttidsOgLangtidsfraværSiste4Kvartaler(Underenhet underenhet) {
 
         // #1 vi henter alle umaskerte kvartalsvis sykefravær med varighet
         // OBS det kan være hul i serien og vi må ta hensyn til det

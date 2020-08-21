@@ -43,16 +43,20 @@ public class VarighetServiceTest {
                 .overordnetEnhetOrgnr(new Orgnr("1111111111")).build();
     }
 
-
     @Test
     public void hentLangtidOgKorttidsSykefraværshistorikk__skal_returnere_langtid_og_korttid_historikk() {
-        when(kvartalsvisSykefraværVarighetRepository.hentKvartalsvisSykefraværMedVarighet(any()))
-                .thenReturn(
-                        lagKvartalsvisSykefravarMedVarighet1kvaartal()
-                );
+        ÅrstallOgKvartal kvartal = new ÅrstallOgKvartal(2020, 1);
+        List<UmaskertKvartalsvisSykefraværMedVarighet> sykefraværMed1Kvartal = Arrays.asList(
+                getSykefraværMedVarighet(kvartal, 5, 0, 0, Sykefraværsvarighet._1_DAG_TIL_7_DAGER),
+                getSykefraværMedVarighet(kvartal, 2, 0, 0, Sykefraværsvarighet.MER_ENN_39_UKER),
+                getSykefraværMedVarighet(kvartal, 0, 100, 10, Sykefraværsvarighet.TOTAL)
+        );
+        when(kvartalsvisSykefraværVarighetRepository.hentKvartalsvisSykefraværMedVarighet(any())).thenReturn(
+                sykefraværMed1Kvartal
+        );
 
         KorttidsOgLangtidsfraværSiste4Kvartaler korttidsOgLangtidsfraværSiste4Kvartaler =
-                varighetService.hentLangtidOgKorttidsSykefraværshistorikk(barnehage);
+                varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(barnehage);
 
         assertIsEqual(
                 korttidsOgLangtidsfraværSiste4Kvartaler.getKorttidsfraværSiste4Kvartaler(),
@@ -74,13 +78,25 @@ public class VarighetServiceTest {
 
     @Test
     public void hentLangtidOgKorttidsSykefraværshistorikk__skal_returnere_langtid_og_korttid_historikk_for_flere_kvartaler() {
-        when(kvartalsvisSykefraværVarighetRepository.hentKvartalsvisSykefraværMedVarighet(any()))
-                .thenReturn(
-                        lagKvartalsvisSykefravarMedVarighet2Kvartaler()
-                );
+        ÅrstallOgKvartal kvartal1 = new ÅrstallOgKvartal(2019, 4);
+        ÅrstallOgKvartal kvartal2 = new ÅrstallOgKvartal(2020, 1);
+
+        List<UmaskertKvartalsvisSykefraværMedVarighet> sykefraværMed2Kvartaler = Arrays.asList(
+                getSykefraværMedVarighet(kvartal1,9, 0, 0, Sykefraværsvarighet._8_DAGER_TIL_16_DAGER),
+                getSykefraværMedVarighet(kvartal1, 6, 0, 0, Sykefraværsvarighet._17_DAGER_TIL_8_UKER),
+                getSykefraværMedVarighet(kvartal1, 0, 100, 10, Sykefraværsvarighet.TOTAL),
+
+                getSykefraværMedVarighet(kvartal2, 5, 0, 0, Sykefraværsvarighet._1_DAG_TIL_7_DAGER),
+                getSykefraværMedVarighet(kvartal2, 2, 0, 0, Sykefraværsvarighet.MER_ENN_39_UKER),
+                getSykefraværMedVarighet(kvartal2, 0, 100, 10, Sykefraværsvarighet.TOTAL)
+        );
+
+        when(kvartalsvisSykefraværVarighetRepository.hentKvartalsvisSykefraværMedVarighet(any())).thenReturn(
+                sykefraværMed2Kvartaler
+        );
 
         KorttidsOgLangtidsfraværSiste4Kvartaler korttidsOgLangtidsfraværSiste4Kvartaler =
-                varighetService.hentLangtidOgKorttidsSykefraværshistorikk(barnehage);
+                varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(barnehage);
 
         assertIsEqual(
                 korttidsOgLangtidsfraværSiste4Kvartaler.getKorttidsfraværSiste4Kvartaler(),
@@ -100,78 +116,19 @@ public class VarighetServiceTest {
         );
     }
 
-
-    private List<UmaskertKvartalsvisSykefraværMedVarighet> lagKvartalsvisSykefravarMedVarighet1kvaartal() {
-        return Arrays.asList(
-                new UmaskertKvartalsvisSykefraværMedVarighet(
-                        new ÅrstallOgKvartal(2020, 1),
-                        BigDecimal.valueOf(5),
-                        BigDecimal.valueOf(0),
-                        0,
-                        Sykefraværsvarighet._1_DAG_TIL_7_DAGER
-                ),
-                new UmaskertKvartalsvisSykefraværMedVarighet(
-                        new ÅrstallOgKvartal(2020, 1),
-                        BigDecimal.valueOf(2),
-                        BigDecimal.valueOf(0),
-                        0,
-                        Sykefraværsvarighet.MER_ENN_39_UKER
-                ),
-                new UmaskertKvartalsvisSykefraværMedVarighet(
-                        new ÅrstallOgKvartal(2020, 1),
-                        BigDecimal.valueOf(0),
-                        BigDecimal.valueOf(100),
-                        10,
-                        Sykefraværsvarighet.TOTAL
-                )
-        );
-    }
-
-    private List<UmaskertKvartalsvisSykefraværMedVarighet> lagKvartalsvisSykefravarMedVarighet2Kvartaler() {
-        return Arrays.asList(
-                new UmaskertKvartalsvisSykefraværMedVarighet(
-                        new ÅrstallOgKvartal(2019, 4),
-                        BigDecimal.valueOf(9),
-                        BigDecimal.valueOf(0),
-                        0,
-                        Sykefraværsvarighet._8_DAGER_TIL_16_DAGER
-                ),
-                new UmaskertKvartalsvisSykefraværMedVarighet(
-                        new ÅrstallOgKvartal(2019, 4),
-                        BigDecimal.valueOf(6),
-                        BigDecimal.valueOf(0),
-                        0,
-                        Sykefraværsvarighet._17_DAGER_TIL_8_UKER
-                ),
-                new UmaskertKvartalsvisSykefraværMedVarighet(
-                        new ÅrstallOgKvartal(2019, 4),
-                        BigDecimal.valueOf(0),
-                        BigDecimal.valueOf(100),
-                        10,
-                        Sykefraværsvarighet.TOTAL
-                ),
-                new UmaskertKvartalsvisSykefraværMedVarighet(
-                        new ÅrstallOgKvartal(2020, 1),
-                        BigDecimal.valueOf(5),
-                        BigDecimal.valueOf(0),
-                        0,
-                        Sykefraværsvarighet._1_DAG_TIL_7_DAGER
-                ),
-                new UmaskertKvartalsvisSykefraværMedVarighet(
-                        new ÅrstallOgKvartal(2020, 1),
-                        BigDecimal.valueOf(2),
-                        BigDecimal.valueOf(0),
-                        0,
-                        Sykefraværsvarighet.MER_ENN_39_UKER
-                ),
-                new UmaskertKvartalsvisSykefraværMedVarighet(
-                        new ÅrstallOgKvartal(2020, 1),
-                        BigDecimal.valueOf(0),
-                        BigDecimal.valueOf(100),
-                        10,
-                        Sykefraværsvarighet.TOTAL
-                )
-
+    private UmaskertKvartalsvisSykefraværMedVarighet getSykefraværMedVarighet(
+            ÅrstallOgKvartal årstallOgKvartal,
+            int tapteDagsverk,
+            int muligeDagsverk,
+            int antallPersoner,
+            Sykefraværsvarighet varighet
+    ) {
+        return new UmaskertKvartalsvisSykefraværMedVarighet(
+                årstallOgKvartal,
+                BigDecimal.valueOf(tapteDagsverk),
+                BigDecimal.valueOf(muligeDagsverk),
+                antallPersoner,
+                varighet
         );
     }
 
