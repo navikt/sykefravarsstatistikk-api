@@ -10,7 +10,7 @@ import java.math.RoundingMode;
 
 @Setter
 @Getter
-public class Siste4KvartalerSykefravær {
+public class SykefraværSiste4Kvartaler {
 
     private final BigDecimal prosent;
     private final BigDecimal tapteDagsverk;
@@ -19,7 +19,7 @@ public class Siste4KvartalerSykefravær {
 
     // TODO: vi vil ha en liste av de kvartalene som gjelder
 
-    public Siste4KvartalerSykefravær(
+    public SykefraværSiste4Kvartaler(
             BigDecimal tapteDagsverk,
             BigDecimal muligeDagsverk,
             int maksAntallPersonerOverPerioden

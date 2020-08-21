@@ -29,9 +29,6 @@ public class VarighetService {
             ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal
     ) {
 
-        // #1 vi henter alle umaskerte kvartalsvis sykefravær med varighet
-        // OBS det kan være hul i serien og vi må ta hensyn til det
-        // (dvs de fire siste kvartalene skal ikke være for gamle) TODO: filtrere bort de som er for gamle
         List<UmaskertKvartalsvisSykefraværMedVarighet> sykefraværVarighet =
                 kvartalsvisSykefraværVarighetRepository.hentKvartalsvisSykefraværMedVarighet(
                         underenhet
@@ -42,17 +39,15 @@ public class VarighetService {
                 sistePubliserteÅrstallOgKvartal
         );
 
-        // #2 Grupper sammen disse UmaskertKvartalsvisSykefraværMedVarighet per ÅrstallOgKvartal
         Map<ÅrstallOgKvartal, List<UmaskertKvartalsvisSykefraværMedVarighet>> årstallOgKvartals =
                 sykefraværVarighet.stream()
-                        .filter( v -> gjeldendeÅrstallOgKvartal.contains(v.getÅrstallOgKvartal()))
+                        .filter(v -> gjeldendeÅrstallOgKvartal.contains(v.getÅrstallOgKvartal()))
                         .collect(
                                 Collectors.groupingBy(
                                         UmaskertKvartalsvisSykefraværMedVarighet::getÅrstallOgKvartal
                                 )
                         );
 
-        // #3 Her skiller vi korttids sykefravære fra langtiddssykefravære i to forskjellige lister
         List<UmaskertKvartalsvisSykefravær> korttidKVartalsvisSykefravar = new ArrayList<>();
         List<UmaskertKvartalsvisSykefravær> langtidKVartalsvisSykefravar = new ArrayList<>();
 
@@ -76,35 +71,20 @@ public class VarighetService {
                 }
         );
 
-        // #4 Sette sammen korttid og langtid i et objekt som vi returnerer
-        KorttidsEllerLangtidsfraværSiste4Kvartaler korttidSiste4KvartalerSykefravær =
-                new KorttidsEllerLangtidsfraværSiste4Kvartaler();
-        korttidSiste4KvartalerSykefravær.setLangtidEllerKorttid("korttid");
-        korttidSiste4KvartalerSykefravær.setSiste4KvartalerSykefravær(
-                getSiste4KvartalerSykefravær(korttidKVartalsvisSykefravar
-                )
+        return new KorttidsOgLangtidsfraværSiste4Kvartaler(
+                getSiste4KvartalerSykefravær(korttidKVartalsvisSykefravar),
+                getSiste4KvartalerSykefravær(langtidKVartalsvisSykefravar)
         );
-
-        KorttidsEllerLangtidsfraværSiste4Kvartaler langtidSiste4KvartalerSykefravær =
-                new KorttidsEllerLangtidsfraværSiste4Kvartaler();
-        langtidSiste4KvartalerSykefravær.setLangtidEllerKorttid("langtid");
-        langtidSiste4KvartalerSykefravær.setSiste4KvartalerSykefravær(getSiste4KvartalerSykefravær(langtidKVartalsvisSykefravar));
-
-        KorttidsOgLangtidsfraværSiste4Kvartaler korttidsOgLangtidsfraværSiste4Kvartaler = new KorttidsOgLangtidsfraværSiste4Kvartaler();
-        korttidsOgLangtidsfraværSiste4Kvartaler.setKorttidsfraværSiste4Kvartaler(korttidSiste4KvartalerSykefravær);
-        korttidsOgLangtidsfraværSiste4Kvartaler.setLangtidsfraværSiste4Kvartaler(langtidSiste4KvartalerSykefravær);
-
-        return korttidsOgLangtidsfraværSiste4Kvartaler;
     }
 
 
-    private Siste4KvartalerSykefravær getSiste4KvartalerSykefravær(
+    private SykefraværSiste4Kvartaler getSiste4KvartalerSykefravær(
             List<UmaskertKvartalsvisSykefravær> kvartalsvisSykefravær
     ) {
 
         BigDecimal totalTaptedagsverk = kvartalsvisSykefravær
                 .stream()
-                .map( e -> e.getTapteDagsverk())
+                .map(e -> e.getTapteDagsverk())
                 .reduce(
                         new BigDecimal(0),
                         BigDecimal::add
@@ -112,7 +92,7 @@ public class VarighetService {
 
         BigDecimal totalMuligedagsverk = kvartalsvisSykefravær
                 .stream()
-                .map( e -> e.getMuligeDagsverk())
+                .map(e -> e.getMuligeDagsverk())
                 .reduce(
                         new BigDecimal(0),
                         BigDecimal::add
@@ -120,11 +100,11 @@ public class VarighetService {
 
         int maksAntallPersoner = kvartalsvisSykefravær
                 .stream()
-                .map( e -> e.getAntallPersoner())
+                .map(e -> e.getAntallPersoner())
                 .max(Integer::compare)
                 .get();
 
-        return new Siste4KvartalerSykefravær(totalTaptedagsverk, totalMuligedagsverk, maksAntallPersoner);
+        return new SykefraværSiste4Kvartaler(totalTaptedagsverk, totalMuligedagsverk, maksAntallPersoner);
     }
 
     private UmaskertKvartalsvisSykefravær getSummertSykefravær(

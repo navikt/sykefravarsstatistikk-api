@@ -61,16 +61,14 @@ public class VarighetServiceTest {
                 100,
                 5,
                 5,
-                false,
-                "korttid"
+                false
         );
         assertIsEqual(
                 korttidsOgLangtidsfraværSiste4Kvartaler.getLangtidsfraværSiste4Kvartaler(),
                 100,
                 2,
                 2,
-                false,
-                "langtid"
+                false
         );
     }
 
@@ -101,16 +99,14 @@ public class VarighetServiceTest {
                 200,
                 14,
                 7,
-                false,
-                "korttid"
+                false
         );
         assertIsEqual(
                 korttidsOgLangtidsfraværSiste4Kvartaler.getLangtidsfraværSiste4Kvartaler(),
                 200,
                 8,
                 4,
-                false,
-                "langtid"
+                false
         );
     }
 
@@ -141,16 +137,14 @@ public class VarighetServiceTest {
                 100000,
                 5000,
                 5,
-                false,
-                "korttid"
+                false
         );
         assertIsEqual(
                 korttidsOgLangtidsfraværSiste4Kvartaler.getLangtidsfraværSiste4Kvartaler(),
                 100000,
                 1111,
                 1.1f,
-                false,
-                "langtid"
+                false
         );
     }
 
@@ -182,16 +176,14 @@ public class VarighetServiceTest {
                 100,
                 10,
                 10,
-                false,
-                "korttid"
+                false
         );
         assertIsEqual(
                 korttidsOgLangtidsfraværSiste4Kvartaler.getLangtidsfraværSiste4Kvartaler(),
                 100,
                 20,
                 20,
-                false,
-                "langtid"
+                false
         );
     }
 
@@ -213,36 +205,29 @@ public class VarighetServiceTest {
     }
 
     private void assertIsEqual(
-            KorttidsEllerLangtidsfraværSiste4Kvartaler korttidsEllerLangtidsfraværSiste4Kvartaler,
+            SykefraværSiste4Kvartaler korttidsEllerLangtidsfraværSiste4Kvartaler,
             int expectedMuligeDagsverk,
             int expectedTapteDagsverk,
             float expectedProsent,
-            boolean expectedErMaskert,
-            String expectedLangtidEllerKorttid
+            boolean expectedErMaskert
     ) {
         assertBigDecimalIsEqual(
-                korttidsEllerLangtidsfraværSiste4Kvartaler.getSiste4KvartalerSykefravær().getMuligeDagsverk(),
+                korttidsEllerLangtidsfraværSiste4Kvartaler.getMuligeDagsverk(),
                 expectedMuligeDagsverk
         );
         assertBigDecimalIsEqual(
-                korttidsEllerLangtidsfraværSiste4Kvartaler.getSiste4KvartalerSykefravær().getTapteDagsverk(),
+                korttidsEllerLangtidsfraværSiste4Kvartaler.getTapteDagsverk(),
                 expectedTapteDagsverk
         );
         assertBigDecimalIsEqual(
-                korttidsEllerLangtidsfraværSiste4Kvartaler.getSiste4KvartalerSykefravær().getProsent(),
+                korttidsEllerLangtidsfraværSiste4Kvartaler.getProsent(),
                 expectedProsent
         );
         assertThat(
-                korttidsEllerLangtidsfraværSiste4Kvartaler.getSiste4KvartalerSykefravær().isErMaskert()
+                korttidsEllerLangtidsfraværSiste4Kvartaler.isErMaskert()
         )
                 .isEqualTo(
                         expectedErMaskert
-                );
-        assertThat(
-                korttidsEllerLangtidsfraværSiste4Kvartaler.getLangtidEllerKorttid()
-        )
-                .isEqualTo(
-                        expectedLangtidEllerKorttid
                 );
     }
 
