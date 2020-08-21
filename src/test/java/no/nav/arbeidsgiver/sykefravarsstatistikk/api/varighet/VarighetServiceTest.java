@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,7 +24,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@RunWith(JUnitPlatform.class)
 public class VarighetServiceTest {
 
     @Mock
@@ -117,8 +117,43 @@ public class VarighetServiceTest {
     }
 
     @Test
-    public void hentKorttidsOgLangtidsfraværSiste4Kvartaler__skal_summere_opp_riktig_hvis_det_er_flere_innslag_i_hvert_kvartal() {
+    public void hentKorttidsOgLangtidsfraværSiste4Kvartaler__skal_summere_opp_riktig_hvis_det_er_flere_innslag_med_samme_varighet_i_hvert_kvartal() {
+        ÅrstallOgKvartal kvartal = new ÅrstallOgKvartal(2020, 1);
+        List<UmaskertKvartalsvisSykefraværMedVarighet> sykefraværMed1Kvartal = Arrays.asList(
+                getSykefraværMedVarighet(kvartal, 3000, 0, 0, Sykefraværsvarighet._1_DAG_TIL_7_DAGER),
+                getSykefraværMedVarighet(kvartal, 2000, 0, 0, Sykefraværsvarighet._8_DAGER_TIL_16_DAGER),
 
+                getSykefraværMedVarighet(kvartal, 1000, 0, 0, Sykefraværsvarighet._17_DAGER_TIL_8_UKER),
+                getSykefraværMedVarighet(kvartal, 100, 0, 0, Sykefraværsvarighet._8_UKER_TIL_20_UKER),
+                getSykefraværMedVarighet(kvartal, 10, 0, 0, Sykefraværsvarighet._20_UKER_TIL_39_UKER),
+                getSykefraværMedVarighet(kvartal, 1, 0, 0, Sykefraværsvarighet.MER_ENN_39_UKER),
+
+                getSykefraværMedVarighet(kvartal, 0, 100000, 2000, Sykefraværsvarighet.TOTAL)
+        );
+
+        when(kvartalsvisSykefraværVarighetRepository.hentKvartalsvisSykefraværMedVarighet(any())).thenReturn(
+                sykefraværMed1Kvartal
+        );
+
+        KorttidsOgLangtidsfraværSiste4Kvartaler korttidsOgLangtidsfraværSiste4Kvartaler =
+                varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(barnehage);
+
+        assertIsEqual(
+                korttidsOgLangtidsfraværSiste4Kvartaler.getKorttidsfraværSiste4Kvartaler(),
+                100000,
+                5000,
+                5,
+                false,
+                "korttid"
+        );
+        assertIsEqual(
+                korttidsOgLangtidsfraværSiste4Kvartaler.getLangtidsfraværSiste4Kvartaler(),
+                100000,
+                1111,
+                1.1f,
+                false,
+                "langtid"
+        );
     }
 
     private UmaskertKvartalsvisSykefraværMedVarighet getSykefraværMedVarighet(
@@ -141,7 +176,7 @@ public class VarighetServiceTest {
             KorttidsEllerLangtidsfraværSiste4Kvartaler korttidsEllerLangtidsfraværSiste4Kvartaler,
             int expectedMuligeDagsverk,
             int expectedTapteDagsverk,
-            int expectedProsent,
+            float expectedProsent,
             boolean expectedErMaskert,
             String expectedLangtidEllerKorttid
     ) {
@@ -171,8 +206,9 @@ public class VarighetServiceTest {
                 );
     }
 
-    private void assertBigDecimalIsEqual(BigDecimal actual, int expected) {
-        assertThat(actual.setScale(6)).isEqualTo(BigDecimal.valueOf(expected).setScale(6));
+    private void assertBigDecimalIsEqual(BigDecimal actual, float expected) {
+        assertThat(actual.setScale(6, RoundingMode.HALF_UP))
+                .isEqualTo(BigDecimal.valueOf(expected).setScale(6, RoundingMode.HALF_UP));
     }
 
 }

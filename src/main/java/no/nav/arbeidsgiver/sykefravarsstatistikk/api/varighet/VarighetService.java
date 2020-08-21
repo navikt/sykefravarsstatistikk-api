@@ -107,7 +107,7 @@ public class VarighetService {
                 .map( e -> e.getTapteDagsverk())
                 .reduce(
                         new BigDecimal(0),
-                        (subtotal, element) -> subtotal.add(element)
+                        BigDecimal::add
                 );
 
         BigDecimal totalMuligedagsverk = kvartalsvisSykefravær
@@ -115,7 +115,7 @@ public class VarighetService {
                 .map( e -> e.getMuligeDagsverk())
                 .reduce(
                         new BigDecimal(0),
-                        (subtotal, element) -> subtotal.add(element)
+                        BigDecimal::add
                 );
 
         int maksAntallPersoner = kvartalsvisSykefravær
@@ -157,7 +157,7 @@ public class VarighetService {
                 .get(0)
                 .getAntallPersoner();
 
-        BigDecimal tapteDagsverk = sykefraværVarighet.stream()
+        BigDecimal summerteTapteDagsverk = sykefraværVarighet.stream()
                 .filter(p -> {
                     if ("korttid".equals(korttidEllerLangtid)) {
                         return p.getVarighet().erKorttidVarighet();
@@ -165,10 +165,12 @@ public class VarighetService {
                         return p.getVarighet().erLangtidVarighet();
                     }
                 })
-                .collect(Collectors.toList())
-                .get(0)
-                .getTapteDagsverk();
+                .map(UmaskertKvartalsvisSykefraværMedVarighet::getTapteDagsverk)
+                .reduce(
+                        new BigDecimal(0),
+                        BigDecimal::add
+                );
 
-        return new UmaskertKvartalsvisSykefravær(årstallOgKvartal, tapteDagsverk, muligeDagsverk, antallPers);
+        return new UmaskertKvartalsvisSykefravær(årstallOgKvartal, summerteTapteDagsverk, muligeDagsverk, antallPers);
     }
 }
