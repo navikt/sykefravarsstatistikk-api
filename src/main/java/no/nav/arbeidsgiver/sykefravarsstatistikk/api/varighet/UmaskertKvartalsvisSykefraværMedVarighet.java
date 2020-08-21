@@ -9,8 +9,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Comparator;
 
-import static java.lang.Integer.max;
-
 @Data
 public class UmaskertKvartalsvisSykefraværMedVarighet implements Comparable<UmaskertKvartalsvisSykefraværMedVarighet> {
 

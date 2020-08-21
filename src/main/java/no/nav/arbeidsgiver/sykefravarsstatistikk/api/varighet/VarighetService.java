@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Sykefraværsvarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -25,7 +24,10 @@ public class VarighetService {
     }
 
 
-    public KorttidsOgLangtidsfraværSiste4Kvartaler hentKorttidsOgLangtidsfraværSiste4Kvartaler(Underenhet underenhet) {
+    public KorttidsOgLangtidsfraværSiste4Kvartaler hentKorttidsOgLangtidsfraværSiste4Kvartaler(
+            Underenhet underenhet,
+            ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal
+    ) {
 
         // #1 vi henter alle umaskerte kvartalsvis sykefravær med varighet
         // OBS det kan være hul i serien og vi må ta hensyn til det
@@ -35,10 +37,20 @@ public class VarighetService {
                         underenhet
                 );
 
+        List<ÅrstallOgKvartal> gjeldendeÅrstallOgKvartal = ÅrstallOgKvartal.range(
+                sistePubliserteÅrstallOgKvartal.minusKvartaler(3),
+                sistePubliserteÅrstallOgKvartal
+        );
+
         // #2 Grupper sammen disse UmaskertKvartalsvisSykefraværMedVarighet per ÅrstallOgKvartal
-        Map<ÅrstallOgKvartal, List<UmaskertKvartalsvisSykefraværMedVarighet>> årstallOgKvartals = sykefraværVarighet.stream()
-                .collect(Collectors.
-                        groupingBy(UmaskertKvartalsvisSykefraværMedVarighet::getÅrstallOgKvartal));
+        Map<ÅrstallOgKvartal, List<UmaskertKvartalsvisSykefraværMedVarighet>> årstallOgKvartals =
+                sykefraværVarighet.stream()
+                        .filter( v -> gjeldendeÅrstallOgKvartal.contains(v.getÅrstallOgKvartal()))
+                        .collect(
+                                Collectors.groupingBy(
+                                        UmaskertKvartalsvisSykefraværMedVarighet::getÅrstallOgKvartal
+                                )
+                        );
 
         // #3 Her skiller vi korttids sykefravære fra langtiddssykefravære i to forskjellige lister
         List<UmaskertKvartalsvisSykefravær> korttidKVartalsvisSykefravar = new ArrayList<>();
@@ -86,18 +98,6 @@ public class VarighetService {
     }
 
 
-    /**
-     *
-     * @param kvartalsvisSykefravær en liste av UmaskertKvartalsvisSykefravær
-     *                           {{årstal: 2020, kvartal: 1}, taptedagsverk: 10, muligedagsverk: 500, antallPersoner: 10}
-     *                           {{årstal: 2019, kvartal: 4}, taptedagsverk: 20, muligedagsverk: 200, antallPersoner: 10}
-     *                           {{årstal: 2019, kvartal: 3}, taptedagsverk: 5, muligedagsverk: 100, antallPersoner: 10}
-     * @return Siste4KvartalerSykefravær
-     *          prosent;
-     *          tapteDagsverk;
-     *          muligeDagsverk;
-     *          erMaskert;
-     */
     private Siste4KvartalerSykefravær getSiste4KvartalerSykefravær(
             List<UmaskertKvartalsvisSykefravær> kvartalsvisSykefravær
     ) {

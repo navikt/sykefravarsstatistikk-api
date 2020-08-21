@@ -8,8 +8,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -33,6 +31,7 @@ public class VarighetServiceTest {
     VarighetService varighetService;
 
     private Underenhet barnehage;
+    private final ÅrstallOgKvartal sistePublisertÅrstallOgKvartal = new ÅrstallOgKvartal(2020, 1);
 
     @BeforeEach
     public void setUp() {
@@ -45,18 +44,17 @@ public class VarighetServiceTest {
 
     @Test
     public void hentKorttidsOgLangtidsfraværSiste4Kvartaler__skal_returnere_langtid_og_korttid_historikk() {
-        ÅrstallOgKvartal kvartal = new ÅrstallOgKvartal(2020, 1);
         List<UmaskertKvartalsvisSykefraværMedVarighet> sykefraværMed1Kvartal = Arrays.asList(
-                getSykefraværMedVarighet(kvartal, 5, 0, 0, Sykefraværsvarighet._1_DAG_TIL_7_DAGER),
-                getSykefraværMedVarighet(kvartal, 2, 0, 0, Sykefraværsvarighet.MER_ENN_39_UKER),
-                getSykefraværMedVarighet(kvartal, 0, 100, 10, Sykefraværsvarighet.TOTAL)
+                getSykefraværMedVarighet(sistePublisertÅrstallOgKvartal, 5, 0, 0, Sykefraværsvarighet._1_DAG_TIL_7_DAGER),
+                getSykefraværMedVarighet(sistePublisertÅrstallOgKvartal, 2, 0, 0, Sykefraværsvarighet.MER_ENN_39_UKER),
+                getSykefraværMedVarighet(sistePublisertÅrstallOgKvartal, 0, 100, 10, Sykefraværsvarighet.TOTAL)
         );
         when(kvartalsvisSykefraværVarighetRepository.hentKvartalsvisSykefraværMedVarighet(any())).thenReturn(
                 sykefraværMed1Kvartal
         );
 
         KorttidsOgLangtidsfraværSiste4Kvartaler korttidsOgLangtidsfraværSiste4Kvartaler =
-                varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(barnehage);
+                varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(barnehage, new ÅrstallOgKvartal(2020, 1));
 
         assertIsEqual(
                 korttidsOgLangtidsfraværSiste4Kvartaler.getKorttidsfraværSiste4Kvartaler(),
@@ -96,7 +94,7 @@ public class VarighetServiceTest {
         );
 
         KorttidsOgLangtidsfraværSiste4Kvartaler korttidsOgLangtidsfraværSiste4Kvartaler =
-                varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(barnehage);
+                varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(barnehage, new ÅrstallOgKvartal(2020, 1));
 
         assertIsEqual(
                 korttidsOgLangtidsfraværSiste4Kvartaler.getKorttidsfraværSiste4Kvartaler(),
@@ -136,7 +134,7 @@ public class VarighetServiceTest {
         );
 
         KorttidsOgLangtidsfraværSiste4Kvartaler korttidsOgLangtidsfraværSiste4Kvartaler =
-                varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(barnehage);
+                varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(barnehage, new ÅrstallOgKvartal(2020, 1));
 
         assertIsEqual(
                 korttidsOgLangtidsfraværSiste4Kvartaler.getKorttidsfraværSiste4Kvartaler(),
@@ -155,6 +153,48 @@ public class VarighetServiceTest {
                 "langtid"
         );
     }
+
+    @Test
+    public void hentKorttidsOgLangtidsfraværSiste4Kvartaler__filtrerer_bort_kvartaler_som_er_eldre_enn_de_4_siste() {
+        ÅrstallOgKvartal sistePublisertKvartal = new ÅrstallOgKvartal(2020, 1);
+        ÅrstallOgKvartal utdatertKvartal = sistePublisertKvartal.minusKvartaler(4);
+        ÅrstallOgKvartal ikkeUtdatertKvartal = sistePublisertKvartal.minusKvartaler(2);
+
+        List<UmaskertKvartalsvisSykefraværMedVarighet> umaskertKvartalsvisSykefraværMedVarighet = Arrays.asList(
+                getSykefraværMedVarighet(utdatertKvartal, 10, 0, 0, Sykefraværsvarighet._1_DAG_TIL_7_DAGER),
+                getSykefraværMedVarighet(utdatertKvartal, 20, 0, 0, Sykefraværsvarighet.MER_ENN_39_UKER),
+                getSykefraværMedVarighet(utdatertKvartal, 0, 500, 2000, Sykefraværsvarighet.TOTAL),
+
+                getSykefraværMedVarighet(ikkeUtdatertKvartal, 10, 0, 0, Sykefraværsvarighet._1_DAG_TIL_7_DAGER),
+                getSykefraværMedVarighet(ikkeUtdatertKvartal, 20, 0, 0, Sykefraværsvarighet.MER_ENN_39_UKER),
+                getSykefraværMedVarighet(ikkeUtdatertKvartal, 0, 100, 200, Sykefraværsvarighet.TOTAL)
+        );
+
+        when(kvartalsvisSykefraværVarighetRepository.hentKvartalsvisSykefraværMedVarighet(any())).thenReturn(
+                umaskertKvartalsvisSykefraværMedVarighet
+        );
+
+        KorttidsOgLangtidsfraværSiste4Kvartaler korttidsOgLangtidsfraværSiste4Kvartaler =
+                varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(barnehage, new ÅrstallOgKvartal(2020, 1));
+
+        assertIsEqual(
+                korttidsOgLangtidsfraværSiste4Kvartaler.getKorttidsfraværSiste4Kvartaler(),
+                100,
+                10,
+                10,
+                false,
+                "korttid"
+        );
+        assertIsEqual(
+                korttidsOgLangtidsfraværSiste4Kvartaler.getLangtidsfraværSiste4Kvartaler(),
+                100,
+                20,
+                20,
+                false,
+                "langtid"
+        );
+    }
+
 
     private UmaskertKvartalsvisSykefraværMedVarighet getSykefraværMedVarighet(
             ÅrstallOgKvartal årstallOgKvartal,

@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.varighet;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
@@ -47,6 +48,6 @@ public class VarighetController {
                 "" + request.getRequestURL()
         );
 
-        return varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(underenhet);
+        return varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(underenhet, new ÅrstallOgKvartal(2020, 1));
     }
 }
