@@ -7,9 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Underenhet
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -71,6 +69,9 @@ public class VarighetService {
                 }
         );
 
+        korttidKVartalsvisSykefravar.sort(UmaskertKvartalsvisSykefravær::compareTo);
+        langtidKVartalsvisSykefravar.sort(UmaskertKvartalsvisSykefravær::compareTo);
+
         return new KorttidsOgLangtidsfraværSiste4Kvartaler(
                 getSiste4KvartalerSykefravær(korttidKVartalsvisSykefravar),
                 getSiste4KvartalerSykefravær(langtidKVartalsvisSykefravar)
@@ -104,7 +105,12 @@ public class VarighetService {
                 .max(Integer::compare)
                 .get();
 
-        return new SykefraværSiste4Kvartaler(totalTaptedagsverk, totalMuligedagsverk, maksAntallPersoner);
+        return new SykefraværSiste4Kvartaler(
+                totalTaptedagsverk,
+                totalMuligedagsverk,
+                maksAntallPersoner,
+                kvartalsvisSykefravær.stream().map( k -> k.getÅrstallOgKvartal()).collect(Collectors.toList())
+        );
     }
 
     private UmaskertKvartalsvisSykefravær getSummertSykefravær(

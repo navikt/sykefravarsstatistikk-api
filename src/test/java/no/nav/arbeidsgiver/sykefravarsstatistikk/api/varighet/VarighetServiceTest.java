@@ -61,14 +61,16 @@ public class VarighetServiceTest {
                 100,
                 5,
                 5,
-                false
+                false,
+                sistePublisertÅrstallOgKvartal
         );
         assertIsEqual(
                 korttidsOgLangtidsfraværSiste4Kvartaler.getLangtidsfraværSiste4Kvartaler(),
                 100,
                 2,
                 2,
-                false
+                false,
+                sistePublisertÅrstallOgKvartal
         );
     }
 
@@ -99,14 +101,18 @@ public class VarighetServiceTest {
                 200,
                 14,
                 7,
-                false
+                false,
+                kvartal1,
+                kvartal2
         );
         assertIsEqual(
                 korttidsOgLangtidsfraværSiste4Kvartaler.getLangtidsfraværSiste4Kvartaler(),
                 200,
                 8,
                 4,
-                false
+                false,
+                kvartal1,
+                kvartal2
         );
     }
 
@@ -137,14 +143,16 @@ public class VarighetServiceTest {
                 100000,
                 5000,
                 5,
-                false
+                false,
+                kvartal
         );
         assertIsEqual(
                 korttidsOgLangtidsfraværSiste4Kvartaler.getLangtidsfraværSiste4Kvartaler(),
                 100000,
                 1111,
                 1.1f,
-                false
+                false,
+                kvartal
         );
     }
 
@@ -176,14 +184,16 @@ public class VarighetServiceTest {
                 100,
                 10,
                 10,
-                false
+                false,
+                ikkeUtdatertKvartal
         );
         assertIsEqual(
                 korttidsOgLangtidsfraværSiste4Kvartaler.getLangtidsfraværSiste4Kvartaler(),
                 100,
                 20,
                 20,
-                false
+                false,
+                ikkeUtdatertKvartal
         );
     }
 
@@ -209,7 +219,8 @@ public class VarighetServiceTest {
             int expectedMuligeDagsverk,
             int expectedTapteDagsverk,
             float expectedProsent,
-            boolean expectedErMaskert
+            boolean expectedErMaskert,
+            ÅrstallOgKvartal... expectedKvartaler
     ) {
         assertBigDecimalIsEqual(
                 korttidsEllerLangtidsfraværSiste4Kvartaler.getMuligeDagsverk(),
@@ -229,6 +240,8 @@ public class VarighetServiceTest {
                 .isEqualTo(
                         expectedErMaskert
                 );
+        assertThat(korttidsEllerLangtidsfraværSiste4Kvartaler.getKvartaler())
+                .isEqualTo(Arrays.asList(expectedKvartaler));
     }
 
     private void assertBigDecimalIsEqual(BigDecimal actual, float expected) {
