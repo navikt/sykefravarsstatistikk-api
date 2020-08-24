@@ -20,6 +20,7 @@ public class SykefraværSiste4Kvartaler {
     private final boolean erMaskert;
     private final List<ÅrstallOgKvartal> kvartaler;
 
+
     public SykefraværSiste4Kvartaler(
             BigDecimal tapteDagsverk,
             BigDecimal muligeDagsverk,
@@ -27,12 +28,14 @@ public class SykefraværSiste4Kvartaler {
             List<ÅrstallOgKvartal> kvartaler
     ) {
         // TODO: IKKE dupliser logikk for maskering (abstract|interface)
-        erMaskert =
+        boolean harSykefraværData = !kvartaler.isEmpty();
+
+        erMaskert = harSykefraværData &&
                 maksAntallPersonerOverPerioden <
                         Konstanter.MINIMUM_ANTALL_PERSONER_SOM_SKAL_TIL_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
         this.kvartaler = kvartaler;
 
-        if (!erMaskert) {
+        if (harSykefraværData && !erMaskert) {
             prosent = tapteDagsverk
                     .multiply(new BigDecimal(100))
                     .divide(muligeDagsverk, 1, RoundingMode.HALF_UP);

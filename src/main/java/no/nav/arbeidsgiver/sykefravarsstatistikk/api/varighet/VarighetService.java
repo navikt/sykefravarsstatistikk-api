@@ -103,7 +103,7 @@ public class VarighetService {
                 .stream()
                 .map(e -> e.getAntallPersoner())
                 .max(Integer::compare)
-                .get();
+                .orElse(0);
 
         return new SykefraværSiste4Kvartaler(
                 totalTaptedagsverk,

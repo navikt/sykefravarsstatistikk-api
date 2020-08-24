@@ -18,7 +18,13 @@ insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_pe
 insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values (910969439, 2018, 3, 10, 154.175982, 2185.841245);
 insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values (910969439, 2018, 4, 10, 195.948185, 2171.961287);
 insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values (910969439, 2019, 1, 10, 251.4411, 1964.405661);
-insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values (910969439, 2019, 2, 10, 240.3231, 2001.123456);
+insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk, varighet) values (910969439, 2019, 2, 0, 40.3231, 0, 'A');
+insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk, varighet) values (910969439, 2019, 2, 0, 100.3434, 0, 'B');
+insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk, varighet) values (910969439, 2019, 2, 0, 5.1111, 0, 'C');
+insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk, varighet) values (910969439, 2019, 2, 0, 45.8787, 0, 'F');
+insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk, varighet) values (910969439, 2019, 2, 10, 0, 2001.123456, 'X');
+insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk, varighet) values (910969439, 2019, 3, 0, 65.6687, 0, 'F');
+insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk, varighet) values (910969439, 2019, 3, 10, 0, 1989.33336, 'X');
 
 insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values (444444444, 2014, 2, 4, 25.315251, 929.320038);
 insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values (444444444, 2014, 3, 4, 29.078753, 1026.185439);
