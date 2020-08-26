@@ -38,15 +38,16 @@ public class VarighetController {
             HttpServletRequest request
     ) {
         Orgnr orgnr = new Orgnr(orgnrStr);
-        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
-        InnloggetBruker bruker = tilgangskontrollService.hentInnloggetBruker();
 
+        InnloggetBruker bruker = tilgangskontrollService.hentInnloggetBruker();
         tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
                 orgnr,
                 bruker,
                 request.getMethod(),
                 "" + request.getRequestURL()
         );
+        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
+
 
         return varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(underenhet, new ÅrstallOgKvartal(2020, 1));
     }
