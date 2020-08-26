@@ -142,7 +142,7 @@ public class ApiTest {
     public void varighetsiste4kvartaler__skal_returnere_riktig_objekt() throws Exception {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET + "/sykefravarshistorikk"))
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET + "/varighetsiste4kvartaler"))
                         .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
                         .GET()
                         .build(),
@@ -150,53 +150,16 @@ public class ApiTest {
         );
 
         assertThat(response.statusCode()).isEqualTo(200);
-        JsonNode alleSykefraværshistorikk = objectMapper.readTree(response.body());
+        JsonNode varighetsiste4kvartaler = objectMapper.readTree(response.body());
 
-        assertThat(
-                alleSykefraværshistorikk.findValues("type")
-                        .stream()
-                        .map(v -> v.textValue())
-                        .collect(Collectors.toList()))
-                .containsExactlyInAnyOrderElementsOf(
-                        Arrays.asList(
-                                SykefraværshistorikkType.LAND.toString(),
-                                SykefraværshistorikkType.SEKTOR.toString(),
-                                SykefraværshistorikkType.NÆRING.toString(),
-                                SykefraværshistorikkType.VIRKSOMHET.toString(),
-                                SykefraværshistorikkType.OVERORDNET_ENHET.toString()
-                        )
-                );
-
-        assertThat(alleSykefraværshistorikk.get(0).get("label")).isEqualTo(objectMapper.readTree("\"Norge\""));
-        assertThat(alleSykefraværshistorikk.get(0).get("kvartalsvisSykefraværsprosent").get(0))
+        assertThat(varighetsiste4kvartaler.get("korttidsfraværSiste4Kvartaler"))
                 .isEqualTo(objectMapper.readTree(
-                        "{\"tapteDagsverk\":5884917.3,\"muligeDagsverk\":1.125256909E8,\"prosent\":5.2,\"erMaskert\":false,\"årstall\":2014,\"kvartal\":2}"
-                        )
-                );
-        assertThat(alleSykefraværshistorikk.get(1).get("label")).isEqualTo(objectMapper.readTree("\"Statlig forvaltning\""));
-        assertThat(alleSykefraværshistorikk.get(1).get("kvartalsvisSykefraværsprosent").get(0))
+                        "{\"prosent\":3.5,\"tapteDagsverk\":140.6,\"muligeDagsverk\":3990.4,\"erMaskert\":false,\"kvartaler\":[{\"årstall\":2019,\"kvartal\":2},{\"årstall\":2019,\"kvartal\":3}]}"
+                ));
+        assertThat(varighetsiste4kvartaler.get("langtidsfraværSiste4Kvartaler"))
                 .isEqualTo(objectMapper.readTree(
-                        "{\"tapteDagsverk\":657853.3,\"muligeDagsverk\":1.35587109E7,\"prosent\":4.9,\"årstall\":2014,\"kvartal\":2,\"erMaskert\":false}"
-                        )
-                );
-        assertThat(alleSykefraværshistorikk.get(2).get("label")).isEqualTo(objectMapper.readTree("\"Produksjon av nærings- og nytelsesmidler\""));
-        assertThat(alleSykefraværshistorikk.get(2).get("kvartalsvisSykefraværsprosent").get(0))
-                .isEqualTo(objectMapper.readTree(
-                        "{\"tapteDagsverk\":144324.8,\"muligeDagsverk\":2562076.9,\"prosent\":5.6,\"årstall\":2017,\"kvartal\":1,\"erMaskert\":false}"
-                        )
-                );
-        assertThat(alleSykefraværshistorikk.get(3).get("label")).isEqualTo(objectMapper.readTree("\"NAV ARBEID OG YTELSER AVD OSLO\""));
-        assertThat(alleSykefraværshistorikk.get(3).get("kvartalsvisSykefraværsprosent").get(0))
-                .isEqualTo(objectMapper.readTree(
-                        "{\"tapteDagsverk\":235.3,\"muligeDagsverk\":929.3,\"prosent\":25.3,\"årstall\":2014,\"kvartal\":2,\"erMaskert\":false}"
-                        )
-                );
-        assertThat(alleSykefraværshistorikk.get(4).get("label")).isEqualTo(objectMapper.readTree("\"NAV ARBEID OG YTELSER\""));
-        assertThat(alleSykefraværshistorikk.get(4).get("kvartalsvisSykefraværsprosent").get(0))
-                .isEqualTo(objectMapper.readTree(
-                        "{\"tapteDagsverk\":2000.3,\"muligeDagsverk\":9290.3,\"prosent\":21.5,\"årstall\":2014,\"kvartal\":2,\"erMaskert\":false}"
-                        )
-                );
+                        "{\"prosent\":2.9,\"tapteDagsverk\":116.7,\"muligeDagsverk\":3990.4,\"erMaskert\":false,\"kvartaler\":[{\"årstall\":2019,\"kvartal\":2},{\"årstall\":2019,\"kvartal\":3}]}"
+                ));
 
     }
 
