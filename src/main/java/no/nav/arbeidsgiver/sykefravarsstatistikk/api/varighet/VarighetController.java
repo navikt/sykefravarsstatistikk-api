@@ -32,7 +32,7 @@ public class VarighetController {
     }
 
     // TODO avklare navn til endepunkt
-    @GetMapping(value = "/{orgnr}/varighet")
+    @GetMapping(value = "/{orgnr}/varighetsiste4kvartaler")
     public KorttidsOgLangtidsfraværSiste4Kvartaler hentVarighet(
             @PathVariable("orgnr") String orgnrStr,
             HttpServletRequest request
