@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.varighet;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Sykefraværsvarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 
 import java.math.BigDecimal;
@@ -20,7 +19,6 @@ public class UmaskertKvartalsvisSykefravær implements Comparable<UmaskertKvarta
     private final BigDecimal tapteDagsverk;
     private final BigDecimal muligeDagsverk;
     private final int antallPersoner;
-
     public UmaskertKvartalsvisSykefravær(
             ÅrstallOgKvartal årstallOgKvartal,
             BigDecimal tapteDagsverk,

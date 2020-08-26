@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sykefravær.KvartalsvisSykefravær;
 import org.junit.Test;
 
 import java.math.BigDecimal;

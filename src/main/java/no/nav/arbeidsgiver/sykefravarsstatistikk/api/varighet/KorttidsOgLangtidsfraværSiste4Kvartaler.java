@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.varighet;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sykefravær.SykefraværSiste4Kvartaler;
 
 @Data
 @AllArgsConstructor
