@@ -1,7 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.varighet;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 
 import java.math.BigDecimal;
@@ -11,7 +12,8 @@ import java.util.Comparator;
 import static java.lang.Integer.max;
 
 // TODO gjør inheritance mellom UmaskertKvartalsvisSykefravær, UmaskertKvartalsvisSykefraværMedVarighet og KvartalsvisSykefravær
-@Data
+@Getter
+@EqualsAndHashCode
 public class UmaskertKvartalsvisSykefravær implements Comparable<UmaskertKvartalsvisSykefravær>  {
 
     @JsonIgnore

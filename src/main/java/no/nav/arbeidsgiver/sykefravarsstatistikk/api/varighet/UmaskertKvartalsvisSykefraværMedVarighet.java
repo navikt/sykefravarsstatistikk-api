@@ -1,22 +1,15 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.varighet;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import lombok.Getter;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.common.Sykefraværsvarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.statistikk.ÅrstallOgKvartal;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.Comparator;
 
-@Data
-public class UmaskertKvartalsvisSykefraværMedVarighet implements Comparable<UmaskertKvartalsvisSykefraværMedVarighet> {
+@Getter
+public class UmaskertKvartalsvisSykefraværMedVarighet extends UmaskertKvartalsvisSykefravær  {
 
-    @JsonIgnore
-    private final ÅrstallOgKvartal årstallOgKvartal;
-    private final BigDecimal tapteDagsverk;
-    private final BigDecimal muligeDagsverk;
-    private final int antallPersoner;
+
     private final Sykefraværsvarighet varighet;
 
     public UmaskertKvartalsvisSykefraværMedVarighet(
@@ -25,29 +18,17 @@ public class UmaskertKvartalsvisSykefraværMedVarighet implements Comparable<Uma
             BigDecimal muligeDagsverk,
             int antallPersoner,
             Sykefraværsvarighet varighet) {
-        this.årstallOgKvartal = årstallOgKvartal;
-        this.tapteDagsverk = tapteDagsverk.setScale(6, RoundingMode.HALF_UP);
-        this.muligeDagsverk = muligeDagsverk.setScale(6, RoundingMode.HALF_UP);
-        this.antallPersoner = antallPersoner;
+        super(årstallOgKvartal, tapteDagsverk, muligeDagsverk, antallPersoner);
         this.varighet = varighet;
     }
 
-    public int getKvartal() {
-        return årstallOgKvartal != null ? årstallOgKvartal.getKvartal() : 0;
-    }
-
-    public int getÅrstall() {
-        return årstallOgKvartal != null ? årstallOgKvartal.getÅrstall() : 0;
-    }
-
     public UmaskertKvartalsvisSykefravær tilUmaskertKvartalsvisSykefravær() {
-        return new UmaskertKvartalsvisSykefravær(årstallOgKvartal, tapteDagsverk, muligeDagsverk, antallPersoner);
+        return new UmaskertKvartalsvisSykefravær(
+                super.getÅrstallOgKvartal(),
+                super.getTapteDagsverk(),
+                super. getMuligeDagsverk(),
+                super.getAntallPersoner());
     }
 
-    @Override
-    public int compareTo(UmaskertKvartalsvisSykefraværMedVarighet kvartalsvisSykefravær) {
-        return Comparator
-                .comparing(UmaskertKvartalsvisSykefraværMedVarighet::getÅrstallOgKvartal)
-                .compare(this, kvartalsvisSykefravær);
-    }
+
 }
