@@ -11,7 +11,6 @@ import java.util.Comparator;
 
 import static java.lang.Integer.max;
 
-// TODO gjør inheritance mellom UmaskertKvartalsvisSykefravær, UmaskertKvartalsvisSykefraværMedVarighet og KvartalsvisSykefravær
 @Getter
 @EqualsAndHashCode
 public class UmaskertKvartalsvisSykefravær implements Comparable<UmaskertKvartalsvisSykefravær>  {
