@@ -33,14 +33,14 @@ public class VarighetService {
                         underenhet
                 );
 
-        List<ÅrstallOgKvartal> gjeldendeÅrstallOgKvartal = ÅrstallOgKvartal.range(
+        List<ÅrstallOgKvartal> fireSistePubliserteKvartaler = ÅrstallOgKvartal.range(
                 sistePubliserteÅrstallOgKvartal.minusKvartaler(3),
                 sistePubliserteÅrstallOgKvartal
         );
 
         Map<ÅrstallOgKvartal, List<UmaskertKvartalsvisSykefraværMedVarighet>> årstallOgKvartals =
                 sykefraværVarighet.stream()
-                        .filter(v -> gjeldendeÅrstallOgKvartal.contains(v.getÅrstallOgKvartal()))
+                        .filter(v -> fireSistePubliserteKvartaler.contains(v.getÅrstallOgKvartal()))
                         .collect(
                                 Collectors.groupingBy(
                                         UmaskertKvartalsvisSykefraværMedVarighet::getÅrstallOgKvartal
@@ -54,14 +54,14 @@ public class VarighetService {
                 (årstallOgKvartal, kvartalsvisSykefraværMedVarighets) ->
                 {
                     korttidKVartalsvisSykefravar.add(
-                            getSummertSykefravær(
+                            summerSykefraværPåVarighet(
                                     årstallOgKvartal,
                                     kvartalsvisSykefraværMedVarighets,
                                     "korttid"
                             )
                     );
                     langtidKVartalsvisSykefravar.add(
-                            getSummertSykefravær(
+                            summerSykefraværPåVarighet(
                                     årstallOgKvartal,
                                     kvartalsvisSykefraværMedVarighets,
                                     "langtid"
@@ -74,13 +74,13 @@ public class VarighetService {
         langtidKVartalsvisSykefravar.sort(UmaskertKvartalsvisSykefravær::compareTo);
 
         return new KorttidsOgLangtidsfraværSiste4Kvartaler(
-                getSiste4KvartalerSykefravær(korttidKVartalsvisSykefravar),
-                getSiste4KvartalerSykefravær(langtidKVartalsvisSykefravar)
+                getSykefraværSiste4Kvartaler(korttidKVartalsvisSykefravar),
+                getSykefraværSiste4Kvartaler(langtidKVartalsvisSykefravar)
         );
     }
 
 
-    private SykefraværSiste4Kvartaler getSiste4KvartalerSykefravær(
+    private SykefraværSiste4Kvartaler getSykefraværSiste4Kvartaler(
             List<UmaskertKvartalsvisSykefravær> kvartalsvisSykefravær
     ) {
 
@@ -114,7 +114,7 @@ public class VarighetService {
         );
     }
 
-    private UmaskertKvartalsvisSykefravær getSummertSykefravær(
+    private UmaskertKvartalsvisSykefravær summerSykefraværPåVarighet(
             ÅrstallOgKvartal årstallOgKvartal,
             List<UmaskertKvartalsvisSykefraværMedVarighet> sykefraværVarighet,
             String korttidEllerLangtid
