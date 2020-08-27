@@ -78,5 +78,21 @@
     "OrganizationNumber": "555555555",
     "OrganizationForm": "BEDR",
     "Status": "Active"
+  },
+  {
+    "Name": "HEI OG HÅ BARNEHAGE",
+    "Type": "Enterprise",
+    "ParentOrganizationNumber": null,
+    "OrganizationNumber": "777777777",
+    "OrganizationForm": "AS",
+    "Status": "Active"
+  },
+  {
+    "Name": "HEI OG HÅ BARNEHAGE",
+    "Type": "Business",
+    "ParentOrganizationNumber": "777777777",
+    "OrganizationNumber": "888888888",
+    "OrganizationForm": "BEDR",
+    "Status": "Active"
   }
 ]
