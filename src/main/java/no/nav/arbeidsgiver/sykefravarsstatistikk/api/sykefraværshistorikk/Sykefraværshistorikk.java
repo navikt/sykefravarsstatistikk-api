@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sykefravær.KvartalsvisSykefravær;
 
 import java.util.List;
 

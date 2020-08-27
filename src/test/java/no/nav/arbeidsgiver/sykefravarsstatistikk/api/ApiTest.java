@@ -137,4 +137,44 @@ public class ApiTest {
         assertThat(response.statusCode()).isEqualTo(403);
         assertThat(response.body()).isEqualTo("{\"message\":\"You don't have access to this ressource\"}");
     }
+
+    @Test
+    public void varighetsiste4kvartaler__skal_returnere_riktig_objekt() throws Exception {
+        HttpResponse<String> response = newBuilder().build().send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET + "/varighetsiste4kvartaler"))
+                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .GET()
+                        .build(),
+                ofString()
+        );
+
+        assertThat(response.statusCode()).isEqualTo(200);
+        JsonNode varighetsiste4kvartaler = objectMapper.readTree(response.body());
+
+        assertThat(varighetsiste4kvartaler.get("korttidsfraværSiste4Kvartaler"))
+                .isEqualTo(objectMapper.readTree(
+                        "{\"prosent\":3.5,\"tapteDagsverk\":140.6,\"muligeDagsverk\":3990.4,\"erMaskert\":false,\"kvartaler\":[{\"årstall\":2019,\"kvartal\":2},{\"årstall\":2019,\"kvartal\":3}]}"
+                ));
+        assertThat(varighetsiste4kvartaler.get("langtidsfraværSiste4Kvartaler"))
+                .isEqualTo(objectMapper.readTree(
+                        "{\"prosent\":2.9,\"tapteDagsverk\":116.7,\"muligeDagsverk\":3990.4,\"erMaskert\":false,\"kvartaler\":[{\"årstall\":2019,\"kvartal\":2},{\"årstall\":2019,\"kvartal\":3}]}"
+                ));
+
+    }
+
+    @Test
+    public void varighetsiste4kvartaler__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
+        HttpResponse<String> response = newBuilder().build().send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/"
+                                + ORGNR_UNDERENHET_INGEN_TILGANG + "/varighetsiste4kvartaler"))
+                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .GET()
+                        .build(),
+                ofString()
+        );
+        assertThat(response.statusCode()).isEqualTo(403);
+        assertThat(response.body()).isEqualTo("{\"message\":\"You don't have access to this ressource\"}");
+    }
 }

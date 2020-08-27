@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjeprogram;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.sykefravær.KvartalsvisSykefravær;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.virksomhetsklassifikasjoner.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.*;
