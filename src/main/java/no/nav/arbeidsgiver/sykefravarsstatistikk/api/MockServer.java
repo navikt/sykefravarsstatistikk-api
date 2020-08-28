@@ -39,7 +39,7 @@ public class MockServer {
                 WireMockConfiguration.wireMockConfig()
                         .port(port)
                         .notifier(
-                                new ConsoleNotifier(true)
+                                new ConsoleNotifier(false)
                         )
         );
 
