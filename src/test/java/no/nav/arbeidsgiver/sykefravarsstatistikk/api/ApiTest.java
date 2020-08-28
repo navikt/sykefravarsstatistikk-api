@@ -34,7 +34,7 @@ public class ApiTest {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private final static String ORGNR_UNDERENHET = "910969439";
-    private final static String ORGNR_UNDERENHET_INGEN_TILGANG = "777777777";
+    private final static String ORGNR_UNDERENHET_INGEN_TILGANG = "900900900";
 
 
     @Test
