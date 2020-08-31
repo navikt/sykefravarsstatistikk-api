@@ -2,6 +2,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.common.ConsoleNotifier;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
 import com.github.tomakehurst.wiremock.matching.UrlPattern;
 import io.micrometer.core.instrument.util.IOUtils;
@@ -22,6 +24,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Component
 @Profile({"local", "dev"})
 public class MockServer {
+    public static final boolean AKTIVER_VERBOSE_LOGGING_I_KONSOLEN = false;
     private final WireMockServer server;
 
     public MockServer(
@@ -33,7 +36,13 @@ public class MockServer {
     ) {
         log.info("Starter mock-server på port " + port);
 
-        this.server = new WireMockServer(port);
+        this.server = new WireMockServer(
+                WireMockConfiguration.wireMockConfig()
+                        .port(port)
+                        .notifier(
+                                new ConsoleNotifier(AKTIVER_VERBOSE_LOGGING_I_KONSOLEN)
+                        )
+        );
 
         if (Arrays.asList(environment.getActiveProfiles()).contains("local")) {
             log.info("Mocker kall fra Altinn");
