@@ -24,6 +24,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Component
 @Profile({"local", "dev"})
 public class MockServer {
+    public static final boolean AKTIVER_VERBOSE_LOGGING_I_KONSOLEN = false;
     private final WireMockServer server;
 
     public MockServer(
@@ -39,7 +40,7 @@ public class MockServer {
                 WireMockConfiguration.wireMockConfig()
                         .port(port)
                         .notifier(
-                                new ConsoleNotifier(false)
+                                new ConsoleNotifier(AKTIVER_VERBOSE_LOGGING_I_KONSOLEN)
                         )
         );
 
