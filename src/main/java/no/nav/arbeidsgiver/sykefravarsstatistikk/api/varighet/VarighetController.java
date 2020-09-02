@@ -48,6 +48,6 @@ public class VarighetController {
         Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
 
 
-        return varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(underenhet, new ÅrstallOgKvartal(2020, 1));
+        return varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(underenhet, new ÅrstallOgKvartal(2020, 2));
     }
 }

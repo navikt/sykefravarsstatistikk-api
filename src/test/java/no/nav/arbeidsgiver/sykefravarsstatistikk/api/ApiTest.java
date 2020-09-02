@@ -154,11 +154,11 @@ public class ApiTest {
 
         assertThat(varighetsiste4kvartaler.get("korttidsfraværSiste4Kvartaler"))
                 .isEqualTo(objectMapper.readTree(
-                        "{\"prosent\":3.5,\"tapteDagsverk\":140.6,\"muligeDagsverk\":3990.4,\"erMaskert\":false,\"kvartaler\":[{\"årstall\":2019,\"kvartal\":2},{\"årstall\":2019,\"kvartal\":3}]}"
+                        "{\"prosent\":3.7,\"tapteDagsverk\":148.9,\"muligeDagsverk\":3979.6,\"erMaskert\":false,\"kvartaler\":[{\"årstall\":2019,\"kvartal\":3}, {\"årstall\":2020,\"kvartal\":1}]}"
                 ));
         assertThat(varighetsiste4kvartaler.get("langtidsfraværSiste4Kvartaler"))
                 .isEqualTo(objectMapper.readTree(
-                        "{\"prosent\":2.9,\"tapteDagsverk\":116.7,\"muligeDagsverk\":3990.4,\"erMaskert\":false,\"kvartaler\":[{\"årstall\":2019,\"kvartal\":2},{\"årstall\":2019,\"kvartal\":3}]}"
+                        "{\"prosent\":3.0,\"tapteDagsverk\":121.3,\"muligeDagsverk\":3979.6,\"erMaskert\":false,\"kvartaler\":[{\"årstall\":2019,\"kvartal\":3},{\"årstall\":2020,\"kvartal\":1}]}"
                 ));
 
     }
