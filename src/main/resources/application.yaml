@@ -163,7 +163,7 @@ no.nav.security.jwt.issuer.selvbetjening:
     accepted_audience: 45104d6a-f5bc-4e8c-b352-4bbfc9381f25
     cookiename: selvbetjening-idtoken
 
-statistikk.importering.aktivert: false
+statistikk.importering.aktivert: true
 
 database.navn: sykefravarsstatistikk
 vault.mount-path: postgresql/prod-fss
