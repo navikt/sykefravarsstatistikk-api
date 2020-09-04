@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 // Tomcat logger feilformaterte cookies by default. Dette er et sikkerhetshull.
 // Her fikser vi dette ved å bruke LegacyCookieProcessor, som ikke logger slike.
+// Se https://www.jvt.me/posts/2020/04/07/tomcat-cookie-disclosure/ for mer informasjon.
 @Configuration
 public class TomcatConfig {
     @Bean
