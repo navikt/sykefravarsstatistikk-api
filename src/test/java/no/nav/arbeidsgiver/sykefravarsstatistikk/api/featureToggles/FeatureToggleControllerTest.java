@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.featureToggles;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.feratureToggles.FeatureToggleController;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.feratureToggles.FeatureToggleService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.featureToggling.FeatureToggleController;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.featureToggling.FeatureToggleService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

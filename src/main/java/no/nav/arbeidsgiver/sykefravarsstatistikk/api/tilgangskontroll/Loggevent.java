@@ -2,8 +2,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.InnloggetBruker;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.domene.InnloggetBruker;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 
 @AllArgsConstructor
 @Data

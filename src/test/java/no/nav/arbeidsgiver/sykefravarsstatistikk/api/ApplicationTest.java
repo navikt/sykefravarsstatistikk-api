@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk.SykefraværshistorikkController;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværshistorikkController;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

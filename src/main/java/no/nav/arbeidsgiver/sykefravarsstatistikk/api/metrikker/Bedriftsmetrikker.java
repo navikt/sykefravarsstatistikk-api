@@ -2,8 +2,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker;
 
 import lombok.Builder;
 import lombok.Data;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.domene.bransjeprogram.Bransjetype;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.enhetsregisteret.Næringskode5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.bransjeprogram.Bransjetype;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.Næringskode5Siffer;
 
 import java.math.BigDecimal;
 

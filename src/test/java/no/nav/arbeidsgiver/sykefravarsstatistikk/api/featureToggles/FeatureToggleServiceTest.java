@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.featureToggles;
 
 import no.finn.unleash.Unleash;
 import no.finn.unleash.UnleashContext;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.feratureToggles.FeatureToggleService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.featureToggling.FeatureToggleService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

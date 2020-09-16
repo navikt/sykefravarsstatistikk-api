@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.CorrelationIdFilter.CORRELATION_ID_MDC_NAME;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.CorrelationIdFilter.CORRELATION_ID_MDC_NAME;
 
 @Component
 public class Sporbarhetslogg {
