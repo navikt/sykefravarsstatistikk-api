@@ -1,15 +1,15 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorik;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.SykefraværshistorikkService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.KorttidsOgLangtidsfraværSiste4Kvartaler;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikk;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikkService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertKorttidsOgLangtidsfravær;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.VarighetService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.domene.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.EnhetsregisteretClient;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.OverordnetEnhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
 import no.nav.security.token.support.core.api.Protected;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,17 +22,17 @@ import java.util.List;
 @Protected
 @RestController
 public class SykefraværshistorikkController {
-    private final SykefraværshistorikkService sykefraværshistorikkService;
+    private final KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService;
     private final TilgangskontrollService tilgangskontrollService;
     private final EnhetsregisteretClient enhetsregisteretClient;
     private final VarighetService varighetService;
 
     public SykefraværshistorikkController(
-            SykefraværshistorikkService sykefraværshistorikkService,
+            KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService,
             TilgangskontrollService tilgangskontrollService,
             EnhetsregisteretClient enhetsregisteretClient,
             VarighetService varighetService) {
-        this.sykefraværshistorikkService = sykefraværshistorikkService;
+        this.kvartalsvisSykefraværshistorikkService = kvartalsvisSykefraværshistorikkService;
         this.tilgangskontrollService = tilgangskontrollService;
         this.enhetsregisteretClient = enhetsregisteretClient;
         this.varighetService = varighetService;
@@ -40,7 +40,7 @@ public class SykefraværshistorikkController {
 
     // /{orgnr}/sykefravarshistorikk/kvartalsvis
     @GetMapping(value = "/{orgnr}/sykefravarshistorikk")
-    public List<KvartalsvisSykefraværshistorik> hentSykefraværshistorikk(
+    public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikk(
             @PathVariable("orgnr") String orgnrStr,
             HttpServletRequest request
     ) {
@@ -68,12 +68,12 @@ public class SykefraværshistorikkController {
         );
 
         if (harTilgangTilOverordnetEnhet) {
-            return sykefraværshistorikkService.hentSykefraværshistorikk(
+            return kvartalsvisSykefraværshistorikkService.hentSykefraværshistorikk(
                     underenhet,
                     overordnetEnhet
             );
         } else {
-            return sykefraværshistorikkService.hentSykefraværshistorikk(
+            return kvartalsvisSykefraværshistorikkService.hentSykefraværshistorikk(
                     underenhet,
                     overordnetEnhet.getInstitusjonellSektorkode()
             );
@@ -83,7 +83,7 @@ public class SykefraværshistorikkController {
 
     // TODO Endre til /{orgnr}/sykefravarshistorikk/summert?kvartaler=4
     @GetMapping(value = "/{orgnr}/varighetsiste4kvartaler")
-    public KorttidsOgLangtidsfraværSiste4Kvartaler hentVarighet(
+    public SummertKorttidsOgLangtidsfravær hentVarighet(
             @PathVariable("orgnr") String orgnrStr,
             HttpServletRequest request
     ) {

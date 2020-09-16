@@ -1,13 +1,13 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sykefraværsvarighet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.StatistikkildeDvh;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.SykefraværsstatistikkLand;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.SykefraværsstatistikkSektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.SykefraværsstatistikkVirksomhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,8 +23,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sykefraværsvarighet._1_DAG_TIL_7_DAGER;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sykefraværsvarighet._8_DAGER_TIL_16_DAGER;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._8_DAGER_TIL_16_DAGER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -326,7 +326,7 @@ public class DatavarehusRepositoryJdbcTest {
             int kvartal,
             int antallPersoner,
             String orgnr,
-            Sykefraværsvarighet varighet,
+            Varighetskategori varighet,
             String kjonn,
             long taptedagsverk,
             long muligedagsverk) {

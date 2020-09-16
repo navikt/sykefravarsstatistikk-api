@@ -1,9 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.SlettOgOpprettResultat;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.Sykefraværsstatistikk;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.SykefraværsstatistikkVirksomhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.importering.integrasjon.BatchCreateSykefraværsstatistikkFunction;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.importering.integrasjon.DeleteSykefraværsstatistikkFunction;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.importering.integrasjon.utils.SykefraværsstatistikkIntegrasjonUtils;
@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sykefraværsvarighet._1_DAG_TIL_7_DAGER;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 

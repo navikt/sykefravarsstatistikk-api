@@ -4,13 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Fnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.bransjeprogram.Bransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.OverordnetEnhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.Underenhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.sammenligning.Sammenligning;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.Næringskode5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.besøksstatistikk.sammenligning.Sammenligning;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 
 @Data
 @Builder

@@ -5,18 +5,18 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.besøksstatistikk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Fnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.domene.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.bransjeprogram.Bransjetype;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.sammenligning.Sammenligning;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.sammenligning.Sykefraværprosent;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjetype;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.besøksstatistikk.sammenligning.Sammenligning;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.besøksstatistikk.sammenligning.Sykefraværprosent;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner.Næringsgruppering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.OverordnetEnhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.InstitusjonellSektorkode;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.Næringskode5Siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.InstitusjonellSektorkode;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

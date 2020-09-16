@@ -1,11 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.sykefravær.KvartalsvisSykefravær;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.Virksomhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -28,7 +28,7 @@ public class KvartalsvisSykefraværRepository {
 
     }
 
-    public List<KvartalsvisSykefravær> hentKvartalsvisSykefraværprosentLand() {
+    public List<SykefraværForEttKvartal> hentKvartalsvisSykefraværprosentLand() {
         try {
             return namedParameterJdbcTemplate.query(
                     "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal " +
@@ -42,7 +42,7 @@ public class KvartalsvisSykefraværRepository {
         }
     }
 
-    public List<KvartalsvisSykefravær> hentKvartalsvisSykefraværprosentSektor(Sektor sektor) {
+    public List<SykefraværForEttKvartal> hentKvartalsvisSykefraværprosentSektor(Sektor sektor) {
         try {
             return namedParameterJdbcTemplate.query(
                     "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal " +
@@ -58,7 +58,7 @@ public class KvartalsvisSykefraværRepository {
         }
     }
 
-    public List<KvartalsvisSykefravær> hentKvartalsvisSykefraværprosentNæring(Næring næring) {
+    public List<SykefraværForEttKvartal> hentKvartalsvisSykefraværprosentNæring(Næring næring) {
         try {
             return namedParameterJdbcTemplate.query(
                     "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal " +
@@ -74,7 +74,7 @@ public class KvartalsvisSykefraværRepository {
         }
     }
 
-    public List<KvartalsvisSykefravær> hentKvartalsvisSykefraværprosentBransje(Bransje bransje) {
+    public List<SykefraværForEttKvartal> hentKvartalsvisSykefraværprosentBransje(Bransje bransje) {
         try {
             return namedParameterJdbcTemplate.query(
                     "SELECT sum(tapte_dagsverk) as tapte_dagsverk, sum(mulige_dagsverk) as mulige_dagsverk, sum(antall_personer) as antall_personer, arstall, kvartal " +
@@ -91,7 +91,7 @@ public class KvartalsvisSykefraværRepository {
         }
     }
 
-    public List<KvartalsvisSykefravær> hentKvartalsvisSykefraværprosentVirksomhet(Virksomhet virksomhet) {
+    public List<SykefraværForEttKvartal> hentKvartalsvisSykefraværprosentVirksomhet(Virksomhet virksomhet) {
         try {
             return namedParameterJdbcTemplate.query(
                     "SELECT sum(tapte_dagsverk) as tapte_dagsverk," +
@@ -112,8 +112,8 @@ public class KvartalsvisSykefraværRepository {
     }
 
 
-    private KvartalsvisSykefravær mapTilKvartalsvisSykefraværprosent(ResultSet rs) throws SQLException {
-        return new KvartalsvisSykefravær(
+    private SykefraværForEttKvartal mapTilKvartalsvisSykefraværprosent(ResultSet rs) throws SQLException {
+        return new SykefraværForEttKvartal(
                 new ÅrstallOgKvartal(
                         rs.getInt("arstall"),
                         rs.getInt("kvartal")

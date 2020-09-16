@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.SykefraværshistorikkType;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.security.token.support.test.JwtTokenGenerator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -82,11 +82,11 @@ public class ApiTest {
                         .collect(Collectors.toList()))
                 .containsExactlyInAnyOrderElementsOf(
                         Arrays.asList(
-                                SykefraværshistorikkType.LAND.toString(),
-                                SykefraværshistorikkType.SEKTOR.toString(),
-                                SykefraværshistorikkType.NÆRING.toString(),
-                                SykefraværshistorikkType.VIRKSOMHET.toString(),
-                                SykefraværshistorikkType.OVERORDNET_ENHET.toString()
+                                Statistikkategori.LAND.toString(),
+                                Statistikkategori.SEKTOR.toString(),
+                                Statistikkategori.NÆRING.toString(),
+                                Statistikkategori.VIRKSOMHET.toString(),
+                                Statistikkategori.OVERORDNET_ENHET.toString()
                         )
                 );
 

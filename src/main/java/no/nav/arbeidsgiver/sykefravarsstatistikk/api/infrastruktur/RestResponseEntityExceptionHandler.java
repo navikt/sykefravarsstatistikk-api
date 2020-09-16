@@ -1,9 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.altinn.AltinnException;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.EnhetsregisteretIkkeTilgjengeligException;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.EnhetsregisteretMappingException;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.IngenNæringException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.integrasjoner.enhetsregisteret.EnhetsregisteretIkkeTilgjengeligException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.integrasjoner.enhetsregisteret.EnhetsregisteretMappingException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.integrasjoner.enhetsregisteret.IngenNæringException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException;
 import org.slf4j.Logger;
