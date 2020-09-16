@@ -7,7 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.sykefrav�
 import java.util.List;
 
 @Data
-public class Sykefraværshistorikk {
+public class KvartalsvisSykefraværshistorik {
     private SykefraværshistorikkType type;
     private String label;
 

@@ -49,7 +49,7 @@ public class SykefraværshistorikkService {
         this.bransjeprogram = bransjeprogram;
     }
 
-    public List<Sykefraværshistorikk> hentSykefraværshistorikk(
+    public List<KvartalsvisSykefraværshistorik> hentSykefraværshistorikk(
             Underenhet underenhet,
             InstitusjonellSektorkode institusjonellSektorkode
     ) {
@@ -60,7 +60,7 @@ public class SykefraværshistorikkService {
                 bransje.isPresent()
                         && bransje.get().lengdePåNæringskoder() == LENGDE_PÅ_NÆRINGSKODE_AV_BRANSJENIVÅ;
 
-        List<Sykefraværshistorikk> sykefraværshistorikkListe =
+        List<KvartalsvisSykefraværshistorik> kvartalsvisSykefraværshistorikListe =
                 Stream.of(
                         uthentingMedFeilhåndteringOgTimeout(
                                 () -> hentSykefraværshistorikkLand(),
@@ -85,27 +85,27 @@ public class SykefraværshistorikkService {
                         .map(CompletableFuture::join)
                         .collect(Collectors.toList());
 
-        return sykefraværshistorikkListe;
+        return kvartalsvisSykefraværshistorikListe;
     }
 
-    public List<Sykefraværshistorikk> hentSykefraværshistorikk(Underenhet underenhet, OverordnetEnhet overordnetEnhet) {
+    public List<KvartalsvisSykefraværshistorik> hentSykefraværshistorikk(Underenhet underenhet, OverordnetEnhet overordnetEnhet) {
 
-        Sykefraværshistorikk historikkForOverordnetEnhet = uthentingMedFeilhåndteringOgTimeout(
+        KvartalsvisSykefraværshistorik historikkForOverordnetEnhet = uthentingMedFeilhåndteringOgTimeout(
                 () -> hentSykefraværshistorikkVirksomhet(overordnetEnhet, SykefraværshistorikkType.OVERORDNET_ENHET),
                 SykefraværshistorikkType.OVERORDNET_ENHET,
                 underenhet.getNavn()
         ).join();
 
-        List<Sykefraværshistorikk> sykefraværshistorikkListe = hentSykefraværshistorikk(
+        List<KvartalsvisSykefraværshistorik> kvartalsvisSykefraværshistorikListe = hentSykefraværshistorikk(
                 underenhet,
                 overordnetEnhet.getInstitusjonellSektorkode()
         );
-        sykefraværshistorikkListe.add(historikkForOverordnetEnhet);
+        kvartalsvisSykefraværshistorikListe.add(historikkForOverordnetEnhet);
 
-        return sykefraværshistorikkListe;
+        return kvartalsvisSykefraværshistorikListe;
     }
 
-    private Sykefraværshistorikk hentSykefraværshistorikkLand() {
+    private KvartalsvisSykefraværshistorik hentSykefraværshistorikkLand() {
         return byggSykefraværshistorikk(
                 SykefraværshistorikkType.LAND,
                 SYKEFRAVÆRPROSENT_LAND_LABEL,
@@ -113,7 +113,7 @@ public class SykefraværshistorikkService {
         );
     }
 
-    private Sykefraværshistorikk hentSykefraværshistorikkSektor(Sektor ssbSektor) {
+    private KvartalsvisSykefraværshistorik hentSykefraværshistorikkSektor(Sektor ssbSektor) {
         return byggSykefraværshistorikk(
                 SykefraværshistorikkType.SEKTOR,
                 ssbSektor.getNavn(),
@@ -121,7 +121,7 @@ public class SykefraværshistorikkService {
         );
     }
 
-    private Sykefraværshistorikk hentSykefraværshistorikkNæring(Næring næring) {
+    private KvartalsvisSykefraværshistorik hentSykefraværshistorikkNæring(Næring næring) {
         return byggSykefraværshistorikk(
                 SykefraværshistorikkType.NÆRING,
                 næring.getNavn(),
@@ -129,7 +129,7 @@ public class SykefraværshistorikkService {
         );
     }
 
-    private Sykefraværshistorikk hentSykefraværshistorikkBransje(Bransje bransje) {
+    private KvartalsvisSykefraværshistorik hentSykefraværshistorikkBransje(Bransje bransje) {
         return byggSykefraværshistorikk(
                 SykefraværshistorikkType.BRANSJE,
                 bransje.getNavn(),
@@ -137,7 +137,7 @@ public class SykefraværshistorikkService {
         );
     }
 
-    private Sykefraværshistorikk hentSykefraværshistorikkVirksomhet(
+    private KvartalsvisSykefraværshistorik hentSykefraværshistorikkVirksomhet(
             Virksomhet virksomhet,
             SykefraværshistorikkType type
     ) {
@@ -148,7 +148,7 @@ public class SykefraværshistorikkService {
         );
     }
 
-    private CompletableFuture<Sykefraværshistorikk> uthentingAvSykefraværshistorikkNæring(Underenhet underenhet) {
+    private CompletableFuture<KvartalsvisSykefraværshistorik> uthentingAvSykefraværshistorikkNæring(Underenhet underenhet) {
         Næringskode5Siffer næring5siffer = underenhet.getNæringskode();
         return uthentingMedTimeout(
                 () -> klassifikasjonerRepository.hentNæring(næring5siffer.hentNæringskode2Siffer())
@@ -189,8 +189,8 @@ public class SykefraværshistorikkService {
                 .orTimeout(TIMEOUT_UTHENTING_FRA_DB_I_SEKUNDER, TimeUnit.SECONDS);
     }
 
-    private static CompletableFuture<Sykefraværshistorikk> uthentingMedFeilhåndteringOgTimeout(
-            Supplier<Sykefraværshistorikk> sykefraværshistorikkSupplier,
+    private static CompletableFuture<KvartalsvisSykefraværshistorik> uthentingMedFeilhåndteringOgTimeout(
+            Supplier<KvartalsvisSykefraværshistorik> sykefraværshistorikkSupplier,
             SykefraværshistorikkType sykefraværshistorikkType,
             String sykefraværshistorikkLabel
     ) {
@@ -215,16 +215,16 @@ public class SykefraværshistorikkService {
                         });
     }
 
-    private static Sykefraværshistorikk byggSykefraværshistorikk(
+    private static KvartalsvisSykefraværshistorik byggSykefraværshistorikk(
             SykefraværshistorikkType sykefraværshistorikkType,
             String label,
             List<KvartalsvisSykefravær> kvartalsvisSykefravær
     ) {
-        Sykefraværshistorikk sykefraværshistorikk = new Sykefraværshistorikk();
-        sykefraværshistorikk.setType(sykefraværshistorikkType);
-        sykefraværshistorikk.setLabel(label);
-        sykefraværshistorikk.setKvartalsvisSykefravær(kvartalsvisSykefravær);
+        KvartalsvisSykefraværshistorik kvartalsvisSykefraværshistorik = new KvartalsvisSykefraværshistorik();
+        kvartalsvisSykefraværshistorik.setType(sykefraværshistorikkType);
+        kvartalsvisSykefraværshistorik.setLabel(label);
+        kvartalsvisSykefraværshistorik.setKvartalsvisSykefravær(kvartalsvisSykefravær);
 
-        return sykefraværshistorikk;
+        return kvartalsvisSykefraværshistorik;
     }
 }

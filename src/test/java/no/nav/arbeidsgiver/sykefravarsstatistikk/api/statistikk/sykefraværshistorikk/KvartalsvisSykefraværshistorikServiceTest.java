@@ -8,7 +8,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.SektorMappingService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.Sykefraværshistorikk;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorik;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.SykefraværshistorikkService;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SykefraværshistorikkServiceTest {
+public class KvartalsvisSykefraværshistorikServiceTest {
 
     @Mock
     private KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository;
@@ -70,7 +70,7 @@ public class SykefraværshistorikkServiceTest {
         when(klassifikasjonerRepository.hentNæring(any()))
                 .thenThrow(new EmptyResultDataAccessException(1));
 
-        List<Sykefraværshistorikk> sykefraværshistorikk =
+        List<KvartalsvisSykefraværshistorik> kvartalsvisSykefraværshistorik =
                 sykefraværshistorikkService.hentSykefraværshistorikk(
                         enUnderenhet("999999998"),
                         enInstitusjonellSektorkode()
@@ -78,7 +78,7 @@ public class SykefraværshistorikkServiceTest {
 
         verify(kvartalsvisSykefraværprosentRepository, times(0))
                 .hentKvartalsvisSykefraværprosentNæring(any());
-        Sykefraværshistorikk næringSFHistorikk = sykefraværshistorikk.get(2);
+        KvartalsvisSykefraværshistorik næringSFHistorikk = kvartalsvisSykefraværshistorik.get(2);
         assertThat(næringSFHistorikk.getLabel()).isNull();
     }
 

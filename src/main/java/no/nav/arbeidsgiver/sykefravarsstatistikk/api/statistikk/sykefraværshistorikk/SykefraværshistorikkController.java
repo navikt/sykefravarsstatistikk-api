@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.Sykefraværshistorikk;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorik;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.SykefraværshistorikkService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.KorttidsOgLangtidsfraværSiste4Kvartaler;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.VarighetService;
@@ -40,7 +40,7 @@ public class SykefraværshistorikkController {
 
     // /{orgnr}/sykefravarshistorikk/kvartalsvis
     @GetMapping(value = "/{orgnr}/sykefravarshistorikk")
-    public List<Sykefraværshistorikk> hentSykefraværshistorikk(
+    public List<KvartalsvisSykefraværshistorik> hentSykefraværshistorikk(
             @PathVariable("orgnr") String orgnrStr,
             HttpServletRequest request
     ) {
