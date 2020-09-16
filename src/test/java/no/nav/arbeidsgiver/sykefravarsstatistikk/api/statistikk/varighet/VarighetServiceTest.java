@@ -6,6 +6,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.ÅrstallO
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.sykefravær.SykefraværSiste4Kvartaler;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.KorttidsOgLangtidsfraværSiste4Kvartaler;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.KvartalsvisSykefraværVarighetRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.UmaskertKvartalsvisSykefraværMedVarighet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.VarighetService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

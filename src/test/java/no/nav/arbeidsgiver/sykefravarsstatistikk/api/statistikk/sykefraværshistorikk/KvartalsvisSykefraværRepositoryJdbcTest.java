@@ -10,6 +10,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

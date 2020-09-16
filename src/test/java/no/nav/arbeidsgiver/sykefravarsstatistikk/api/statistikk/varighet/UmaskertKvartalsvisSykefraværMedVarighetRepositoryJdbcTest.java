@@ -5,6 +5,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.enhetsregisteret.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.KvartalsvisSykefraværVarighetRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.UmaskertKvartalsvisSykefraværMedVarighet;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,7 +72,7 @@ public class UmaskertKvartalsvisSykefraværMedVarighetRepositoryJdbcTest {
                 0,
                 Sykefraværsvarighet._1_DAG_TIL_7_DAGER
         ));
-        
+
         assertThat(resultat.get(1)).isEqualTo(new UmaskertKvartalsvisSykefraværMedVarighet(
                 new ÅrstallOgKvartal(2019, 2),
                 new BigDecimal(0),

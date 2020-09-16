@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.varighet;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

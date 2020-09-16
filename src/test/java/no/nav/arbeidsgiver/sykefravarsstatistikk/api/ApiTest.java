@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværshistorikkType;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.SykefraværshistorikkType;
 import no.nav.security.token.support.test.JwtTokenGenerator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
