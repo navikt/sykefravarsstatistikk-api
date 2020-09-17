@@ -38,7 +38,7 @@ public class SykefraværshistorikkController {
         this.varighetService = varighetService;
     }
 
-    // /{orgnr}/sykefravarshistorikk/kvartalsvis
+    // TODO Bytt til /{orgnr}/sykefravarshistorikk/kvartalsvis
     @GetMapping(value = "/{orgnr}/sykefravarshistorikk")
     public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikk(
             @PathVariable("orgnr") String orgnrStr,
@@ -81,7 +81,7 @@ public class SykefraværshistorikkController {
     }
 
 
-    // TODO Endre til /{orgnr}/sykefravarshistorikk/summert?kvartaler=4
+    // TODO Bytt til /{orgnr}/sykefravarshistorikk/summert?kvartaler=4
     @GetMapping(value = "/{orgnr}/varighetsiste4kvartaler")
     public SummertKorttidsOgLangtidsfravær hentVarighet(
             @PathVariable("orgnr") String orgnrStr,
