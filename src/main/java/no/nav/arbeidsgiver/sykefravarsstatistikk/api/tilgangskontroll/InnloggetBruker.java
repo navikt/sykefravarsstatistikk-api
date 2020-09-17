@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 import lombok.Data;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Fnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.integrasjoner.altinn.AltinnOrganisasjon;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnOrganisasjon;
 
 import java.util.ArrayList;
 import java.util.List;

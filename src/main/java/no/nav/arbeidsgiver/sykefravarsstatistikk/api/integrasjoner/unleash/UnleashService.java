@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.featureToggling;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash;
 
 import no.finn.unleash.Unleash;
 import no.finn.unleash.UnleashContext;
@@ -10,11 +10,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class FeatureToggleService {
+public class UnleashService {
     private final Unleash unleash;
 
     @Autowired
-    public FeatureToggleService(Unleash unleash) {
+    public UnleashService(Unleash unleash) {
         this.unleash = unleash;
     }
 

@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.featureToggles;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.featureToggling.FeatureToggleController;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.featureToggling.FeatureToggleService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.featuretoggling.FeatureToggleController;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.UnleashService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,13 +25,13 @@ public class FeatureToggleControllerTest {
     @Mock
     HttpServletResponse response;
     @Mock
-    FeatureToggleService featureToggleService;
+    UnleashService unleashService;
 
     private FeatureToggleController featureToggleController;
 
     @Before
     public void setup() {
-        featureToggleController = new FeatureToggleController(featureToggleService);
+        featureToggleController = new FeatureToggleController(unleashService);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class FeatureToggleControllerTest {
             put("nightMode", false);
         }};
 
-        when(featureToggleService.hentFeatureToggles(eq(features), any())).thenReturn(toggles);
+        when(unleashService.hentFeatureToggles(eq(features), any())).thenReturn(toggles);
 
         Map<String, Boolean> resultat = featureToggleController.feature(features, null, response).getBody();
 

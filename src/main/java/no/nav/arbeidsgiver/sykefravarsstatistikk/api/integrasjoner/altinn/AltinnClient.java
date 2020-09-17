@@ -1,9 +1,9 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.integrasjoner.altinn;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Fnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.featureToggling.FeatureToggleService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.UnleashService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -35,7 +35,7 @@ public class AltinnClient {
     private final String iawebServiceEdition;
 
     private final TilgangskontrollUtils tilgangskontrollUtils;
-    private final FeatureToggleService featureToggles;
+    private final UnleashService featureToggles;
 
     public AltinnClient(
             RestTemplate restTemplate,
@@ -46,7 +46,7 @@ public class AltinnClient {
             @Value("${altinn.iaweb.service.code}") String iawebServiceCode,
             @Value("${altinn.iaweb.service.edition}") String iawebServiceEdition,
             TilgangskontrollUtils tilgangskontrollUtils,
-            FeatureToggleService featureToggles
+            UnleashService featureToggles
     ) {
         this.restTemplate = restTemplate;
         this.altinnUrl = altinnUrl;

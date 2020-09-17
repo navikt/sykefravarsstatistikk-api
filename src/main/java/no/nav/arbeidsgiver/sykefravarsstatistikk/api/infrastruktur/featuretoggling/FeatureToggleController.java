@@ -1,6 +1,7 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.featureToggling;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.featuretoggling;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.UnleashService;
 import no.nav.security.token.support.core.api.Unprotected;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,13 +20,13 @@ import java.util.UUID;
 @Unprotected
 @RestController
 public class FeatureToggleController {
-    private final FeatureToggleService featureToggleService;
+    private final UnleashService unleashService;
     private final String UNLEASH_SESSION_COOKIE_NAME = "unleash-session";
 
 
     @Autowired
-    public FeatureToggleController(FeatureToggleService featureToggleService) {
-        this.featureToggleService = featureToggleService;
+    public FeatureToggleController(UnleashService unleashService) {
+        this.unleashService = unleashService;
     }
 
     @GetMapping("/feature")
@@ -41,7 +42,7 @@ public class FeatureToggleController {
             response.addCookie(new Cookie(UNLEASH_SESSION_COOKIE_NAME, sessionId));
         }
 
-        Map<String, Boolean> toggles = featureToggleService.hentFeatureToggles(features, sessionId);
+        Map<String, Boolean> toggles = unleashService.hentFeatureToggles(features, sessionId);
         return ResponseEntity.status(HttpStatus.OK).body(toggles);
 
     }

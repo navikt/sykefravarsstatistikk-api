@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.featureToggling;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash;
 
 import no.finn.unleash.DefaultUnleash;
 import no.finn.unleash.Unleash;
@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 
 
 @Configuration
-public class FeatureToggleConfig {
+public class UnleashFeatureToggleConfig {
 
     private final String APP_NAME = "sykefravarsstatistikk-api";
     private final ByClusterStrategy byClusterStrategy;
@@ -20,7 +20,7 @@ public class FeatureToggleConfig {
     private String unleashUrl;
 
     @Autowired
-    public FeatureToggleConfig(ByClusterStrategy byClusterStrategy) {
+    public UnleashFeatureToggleConfig(ByClusterStrategy byClusterStrategy) {
         this.byClusterStrategy = byClusterStrategy;
     }
 

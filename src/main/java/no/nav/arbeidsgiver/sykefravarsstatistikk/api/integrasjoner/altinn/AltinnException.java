@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.integrasjoner.altinn;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn;
 
 public class AltinnException extends RuntimeException {
     AltinnException(String msg, Exception e) {

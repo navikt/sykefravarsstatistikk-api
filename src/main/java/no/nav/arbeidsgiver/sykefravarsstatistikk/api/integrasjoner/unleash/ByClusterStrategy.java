@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.featureToggling;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash;
 
 import no.finn.unleash.strategy.Strategy;
 import org.springframework.beans.factory.annotation.Value;

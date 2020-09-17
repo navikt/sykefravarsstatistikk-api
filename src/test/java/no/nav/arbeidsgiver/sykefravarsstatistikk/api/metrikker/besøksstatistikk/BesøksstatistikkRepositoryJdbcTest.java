@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.besøksstatistikk;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.integrasjoner.altinn.AltinnRolle;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnRolle;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import org.junit.After;
 import org.junit.Before;
