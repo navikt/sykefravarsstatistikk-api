@@ -4,9 +4,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.SlettOgOpprettResult
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.utils.BatchCreateSykefraværsstatistikkFunction;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.utils.DeleteSykefraværsstatistikkFunction;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.utils.SykefraværsstatistikkIntegrasjonUtils;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.BatchCreateSykefraværsstatistikkFunction;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.DeleteSykefraværsstatistikkFunction;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.StatistikkRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.SykefraværsstatistikkIntegrasjonUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,23 +26,23 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ImporteringRepositoryTest {
+public class StatistikkRepositoryTest {
 
     @Mock
     NamedParameterJdbcTemplate jdbcTemplate;
 
-    private ImporteringRepository importeringRepository;
+    private StatistikkRepository statistikkRepository;
 
 
     @Before
     public void setUp() {
-        importeringRepository = new ImporteringRepository(jdbcTemplate);
+        statistikkRepository = new StatistikkRepository(jdbcTemplate);
     }
 
     @Test
     public void importStatistikk__skal_ikke_slette_eksisterende_statistikk_når_det_ikke_er_noe_data_å_importere() {
 
-        SlettOgOpprettResultat resultat = importeringRepository.importStatistikk(
+        SlettOgOpprettResultat resultat = statistikkRepository.importStatistikk(
                 "Test stats",
                 Collections.emptyList(),
                 new ÅrstallOgKvartal(2019, 3),
@@ -55,7 +56,7 @@ public class ImporteringRepositoryTest {
     public void batchOpprett__deler_import_i_små_batch() {
         List<SykefraværsstatistikkVirksomhet> list = getSykefraværsstatistikkVirksomhetList(5);
 
-        int resultat = importeringRepository.batchOpprett(
+        int resultat = statistikkRepository.batchOpprett(
                 list,
                 dummyUtils(),
                 2
@@ -68,7 +69,7 @@ public class ImporteringRepositoryTest {
     public void batchOpprett__ikke_deler_dersom_batch_størrelse_er_større_enn_listen() {
         List<SykefraværsstatistikkVirksomhet> list = getSykefraværsstatistikkVirksomhetList(5);
 
-        int resultat = importeringRepository.batchOpprett(
+        int resultat = statistikkRepository.batchOpprett(
                 list,
                 dummyUtils(),
                 1000

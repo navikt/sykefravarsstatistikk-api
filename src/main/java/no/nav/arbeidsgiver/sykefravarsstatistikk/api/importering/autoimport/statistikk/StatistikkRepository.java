@@ -1,12 +1,11 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk;
 
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.SlettOgOpprettResultat;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.utils.*;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.utils.DeleteSykefraværsstatistikkFunction;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -17,12 +16,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Component
-public class ImporteringRepository {
+public class StatistikkRepository {
 
     public static final int INSERT_BATCH_STØRRELSE = 10000;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public ImporteringRepository(
+    public StatistikkRepository(
             @Qualifier("sykefravarsstatistikkJdbcTemplate")
                     NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
@@ -121,7 +120,7 @@ public class ImporteringRepository {
     }
 
 
-    SlettOgOpprettResultat importStatistikk(
+    public SlettOgOpprettResultat importStatistikk(
             String statistikktype,
             List<? extends Sykefraværsstatistikk> sykefraværsstatistikk,
             ÅrstallOgKvartal årstallOgKvartal,
@@ -165,7 +164,7 @@ public class ImporteringRepository {
         return antallSlettet;
     }
 
-    int batchOpprett(
+    public int batchOpprett(
             List<? extends Sykefraværsstatistikk> sykefraværsstatistikk,
             SykefraværsstatistikkIntegrasjonUtils utils,
             int insertBatchStørrelse

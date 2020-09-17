@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.utils;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
@@ -10,11 +10,11 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import java.util.Arrays;
 import java.util.List;
 
-public class SykefraværsstatistikkSektorUtils extends SykefraværsstatistikkIntegrasjon
+public class SykefraværsstatistikkNæring5sifferUtils extends SykefraværsstatistikkIntegrasjon
         implements SykefraværsstatistikkIntegrasjonUtils {
 
 
-    public SykefraværsstatistikkSektorUtils(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public SykefraværsstatistikkNæring5sifferUtils(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         super(namedParameterJdbcTemplate);
     }
 
@@ -30,7 +30,7 @@ public class SykefraværsstatistikkSektorUtils extends SykefraværsstatistikkInt
                     int antallSlettet =
                             namedParameterJdbcTemplate.update(
                                     String.format(
-                                            "delete from sykefravar_statistikk_sektor where arstall = :%s and kvartal = :%s",
+                                            "delete from sykefravar_statistikk_naring5siffer where arstall = :%s and kvartal = :%s",
                                             ARSTALL, KVARTAL),
                                     namedParameters);
                     return antallSlettet;
@@ -48,10 +48,10 @@ public class SykefraværsstatistikkSektorUtils extends SykefraværsstatistikkInt
                     SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(statistikk.toArray());
 
                     int[] results = namedParameterJdbcTemplate.batchUpdate(
-                            "insert into sykefravar_statistikk_sektor " +
-                                    "(arstall, kvartal, sektor_kode, antall_personer, tapte_dagsverk, mulige_dagsverk) " +
+                            "insert into sykefravar_statistikk_naring5siffer " +
+                                    "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk) " +
                                     "values " +
-                                    "(:årstall, :kvartal, :sektorkode, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
+                                    "(:årstall, :kvartal, :næringkode, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
                             batch);
                     return Arrays.stream(results).sum();
                 };

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.SlettOgOpprettResultat;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.StatistikkRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -14,16 +15,16 @@ import java.util.List;
 @Component
 public class ImporteringService {
 
-    private final ImporteringRepository importeringRepository;
+    private final StatistikkRepository statistikkRepository;
     private final DatavarehusRepository datavarehusRepository;
     private final boolean erImporteringAktivert;
 
     public ImporteringService(
-            ImporteringRepository importeringRepository,
+            StatistikkRepository statistikkRepository,
             DatavarehusRepository datavarehusRepository,
             @Value("${statistikk.importering.aktivert}")
             Boolean erImporteringAktivert) {
-        this.importeringRepository = importeringRepository;
+        this.statistikkRepository = statistikkRepository;
         this.datavarehusRepository = datavarehusRepository;
         this.erImporteringAktivert = erImporteringAktivert;
     }
@@ -32,11 +33,11 @@ public class ImporteringService {
         log.info("Er importering aktivert? {}", erImporteringAktivert);
 
         List<ÅrstallOgKvartal> årstallOgKvartalForSykefraværsstatistikk = Arrays.asList(
-                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.LAND),
-                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.SEKTOR),
-                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.NÆRING),
-                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.NÆRING_5_SIFFER),
-                importeringRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.VIRKSOMHET)
+                statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.LAND),
+                statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.SEKTOR),
+                statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.NÆRING),
+                statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.NÆRING_5_SIFFER),
+                statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.VIRKSOMHET)
         );
         List<ÅrstallOgKvartal> årstallOgKvartalForDvh = Arrays.asList(
                 datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh.LAND_OG_SEKTOR),
@@ -122,7 +123,7 @@ public class ImporteringService {
         List<SykefraværsstatistikkLand> sykefraværsstatistikkLand =
                 datavarehusRepository.hentSykefraværsstatistikkLand(årstallOgKvartal);
 
-        SlettOgOpprettResultat resultat = importeringRepository.importSykefraværsstatistikkLand(
+        SlettOgOpprettResultat resultat = statistikkRepository.importSykefraværsstatistikkLand(
                 sykefraværsstatistikkLand,
                 årstallOgKvartal
         );
@@ -135,7 +136,7 @@ public class ImporteringService {
         List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor =
                 datavarehusRepository.hentSykefraværsstatistikkSektor(årstallOgKvartal);
 
-        SlettOgOpprettResultat resultat = importeringRepository.importSykefraværsstatistikkSektor(
+        SlettOgOpprettResultat resultat = statistikkRepository.importSykefraværsstatistikkSektor(
                 sykefraværsstatistikkSektor,
                 årstallOgKvartal
         );
@@ -148,7 +149,7 @@ public class ImporteringService {
         List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring =
                 datavarehusRepository.hentSykefraværsstatistikkNæring(årstallOgKvartal);
 
-        SlettOgOpprettResultat resultat = importeringRepository.importSykefraværsstatistikkNæring(
+        SlettOgOpprettResultat resultat = statistikkRepository.importSykefraværsstatistikkNæring(
                 sykefraværsstatistikkNæring,
                 årstallOgKvartal
         );
@@ -161,7 +162,7 @@ public class ImporteringService {
         List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring =
                 datavarehusRepository.hentSykefraværsstatistikkNæring5siffer(årstallOgKvartal);
 
-        SlettOgOpprettResultat resultat = importeringRepository.importSykefraværsstatistikkNæring5siffer(
+        SlettOgOpprettResultat resultat = statistikkRepository.importSykefraværsstatistikkNæring5siffer(
                 sykefraværsstatistikkNæring,
                 årstallOgKvartal
         );
@@ -174,7 +175,7 @@ public class ImporteringService {
         List<SykefraværsstatistikkVirksomhet> sykefraværsstatistikkVirksomhet =
                 datavarehusRepository.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal);
 
-        SlettOgOpprettResultat resultat = importeringRepository.importSykefraværsstatistikkVirksomhet(
+        SlettOgOpprettResultat resultat = statistikkRepository.importSykefraværsstatistikkVirksomhet(
                 sykefraværsstatistikkVirksomhet,
                 årstallOgKvartal
         );
