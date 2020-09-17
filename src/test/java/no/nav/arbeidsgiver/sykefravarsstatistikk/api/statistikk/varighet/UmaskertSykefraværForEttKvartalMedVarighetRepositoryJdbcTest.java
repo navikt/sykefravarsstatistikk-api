@@ -62,7 +62,7 @@ public class UmaskertSykefraværForEttKvartalMedVarighetRepositoryJdbcTest {
                 parametre(2019, 2, barnehage.getOrgnr().getVerdi(), "X", 6, 0, 100)
         );
 
-        List<UmaskertSykefraværForEttKvartalMedVarighet> resultat = varighetRepository.hentKvartalsvisSykefraværMedVarighet(barnehage);
+        List<UmaskertSykefraværForEttKvartalMedVarighet> resultat = varighetRepository.hentSykefraværForEttKvartalMedVarighet(barnehage);
 
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(new UmaskertSykefraværForEttKvartalMedVarighet(

@@ -24,7 +24,7 @@ public class VarighetRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-    public List<UmaskertSykefraværForEttKvartalMedVarighet> hentKvartalsvisSykefraværMedVarighet(Virksomhet virksomhet) {
+    public List<UmaskertSykefraværForEttKvartalMedVarighet> hentSykefraværForEttKvartalMedVarighet(Virksomhet virksomhet) {
         try {
             return namedParameterJdbcTemplate.query(
                     "select tapte_dagsverk, mulige_dagsverk, antall_personer, varighet, arstall, kvartal " +

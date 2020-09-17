@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SummertSykefravær;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
 import org.springframework.stereotype.Component;
@@ -23,65 +24,68 @@ public class VarighetService {
         this.varighetRepository = varighetRepository;
     }
 
-
-    public SummertKorttidsOgLangtidsfravær hentKorttidsOgLangtidsfraværSiste4Kvartaler(
+    public SummertKorttidsOgLangtidsfravær hentSummertKorttidsOgLangtidsfravær(
             Underenhet underenhet,
-            ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal
+            ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal,
+            int antallKvartalerSomSkalSummeres
     ) {
+        if (antallKvartalerSomSkalSummeres < 1) {
+            throw new IllegalArgumentException("Kan ikke summere færre enn ett kvartal");
+        }
 
         List<UmaskertSykefraværForEttKvartalMedVarighet> sykefraværVarighet =
-                varighetRepository.hentKvartalsvisSykefraværMedVarighet(
+                varighetRepository.hentSykefraværForEttKvartalMedVarighet(
                         underenhet
                 );
 
-        List<ÅrstallOgKvartal> fireSistePubliserteKvartaler = ÅrstallOgKvartal.range(
-                sistePubliserteÅrstallOgKvartal.minusKvartaler(3),
+        List<ÅrstallOgKvartal> kvartalerSomSkalSummeres = ÅrstallOgKvartal.range(
+                sistePubliserteÅrstallOgKvartal.minusKvartaler(antallKvartalerSomSkalSummeres - 1),
                 sistePubliserteÅrstallOgKvartal
         );
 
         Map<ÅrstallOgKvartal, List<UmaskertSykefraværForEttKvartalMedVarighet>> årstallOgKvartals =
                 sykefraværVarighet.stream()
-                        .filter(v -> fireSistePubliserteKvartaler.contains(v.getÅrstallOgKvartal()))
+                        .filter(v -> kvartalerSomSkalSummeres.contains(v.getÅrstallOgKvartal()))
                         .collect(
                                 Collectors.groupingBy(
                                         UmaskertSykefraværForEttKvartalMedVarighet::getÅrstallOgKvartal
                                 )
                         );
 
-        List<UmaskertSykefraværForEttKvartal> korttidKVartalsvisSykefravar = new ArrayList<>();
-        List<UmaskertSykefraværForEttKvartal> langtidKVartalsvisSykefravar = new ArrayList<>();
+        List<UmaskertSykefraværForEttKvartal> korttidsfravær = new ArrayList<>();
+        List<UmaskertSykefraværForEttKvartal> langtidsfravær = new ArrayList<>();
 
         årstallOgKvartals.forEach(
-                (årstallOgKvartal, kvartalsvisSykefraværMedVarighets) ->
+                (årstallOgKvartal, sykefraværForEttKvartal) ->
                 {
-                    korttidKVartalsvisSykefravar.add(
+                    korttidsfravær.add(
                             summerSykefraværPåVarighet(
                                     årstallOgKvartal,
-                                    kvartalsvisSykefraværMedVarighets,
+                                    sykefraværForEttKvartal,
                                     "korttid"
                             )
                     );
-                    langtidKVartalsvisSykefravar.add(
+                    langtidsfravær.add(
                             summerSykefraværPåVarighet(
                                     årstallOgKvartal,
-                                    kvartalsvisSykefraværMedVarighets,
+                                    sykefraværForEttKvartal,
                                     "langtid"
                             )
                     );
                 }
         );
 
-        korttidKVartalsvisSykefravar.sort(UmaskertSykefraværForEttKvartal::compareTo);
-        langtidKVartalsvisSykefravar.sort(UmaskertSykefraværForEttKvartal::compareTo);
+        korttidsfravær.sort(UmaskertSykefraværForEttKvartal::compareTo);
+        langtidsfravær.sort(UmaskertSykefraværForEttKvartal::compareTo);
 
         return new SummertKorttidsOgLangtidsfravær(
-                getSykefraværSiste4Kvartaler(korttidKVartalsvisSykefravar),
-                getSykefraværSiste4Kvartaler(langtidKVartalsvisSykefravar)
+                getSummertSykefravær(korttidsfravær),
+                getSummertSykefravær(langtidsfravær)
         );
     }
 
 
-    private SummertSykefravær getSykefraværSiste4Kvartaler(
+    private SummertSykefravær getSummertSykefravær(
             List<UmaskertSykefraværForEttKvartal> kvartalsvisSykefravær
     ) {
 

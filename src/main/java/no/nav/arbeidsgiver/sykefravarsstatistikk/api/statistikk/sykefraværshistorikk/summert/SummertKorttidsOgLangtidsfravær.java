@@ -2,13 +2,14 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SummertSykefravær;
 
 @Data
 @AllArgsConstructor
 public class SummertKorttidsOgLangtidsfravær {
 
-    private SummertSykefravær korttidsfraværSiste4Kvartaler;
-    private SummertSykefravær langtidsfraværSiste4Kvartaler;
+    private SummertSykefravær summertKorttidsfravær;
+    private SummertSykefravær summertLangtidsfravær;
 
 }
 

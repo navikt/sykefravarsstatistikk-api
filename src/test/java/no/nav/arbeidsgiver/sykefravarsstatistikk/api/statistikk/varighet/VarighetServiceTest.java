@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.varighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertSykefravær;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SummertSykefravær;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertKorttidsOgLangtidsfravær;
@@ -50,14 +50,14 @@ public class VarighetServiceTest {
 
     @Test
     public void hentKorttidsOgLangtidsfraværSiste4Kvartaler__skal_returnere_et_tomt_KorttidsOgLangtidsfraværSiste4Kvartaler_dersom_ingen_data_er_tilgjengelig() {
-        when(varighetRepository.hentKvartalsvisSykefraværMedVarighet(any())).thenReturn(
+        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any())).thenReturn(
                 new ArrayList<>()
         );
 
         SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
-                varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(barnehage, new ÅrstallOgKvartal(2020, 1));
+                varighetService.hentSummertKorttidsOgLangtidsfravær(barnehage, new ÅrstallOgKvartal(2020, 1), 4);
 
-        assertIsEmptyObject(summertKorttidsOgLangtidsfravær.getKorttidsfraværSiste4Kvartaler());
+        assertIsEmptyObject(summertKorttidsOgLangtidsfravær.getSummertKorttidsfravær());
     }
 
     @Test
@@ -67,15 +67,15 @@ public class VarighetServiceTest {
                 getSykefraværMedVarighet(sistePublisertÅrstallOgKvartal, 2, 0, 0, Varighetskategori.MER_ENN_39_UKER),
                 getSykefraværMedVarighet(sistePublisertÅrstallOgKvartal, 0, 100, 10, Varighetskategori.TOTAL)
         );
-        when(varighetRepository.hentKvartalsvisSykefraværMedVarighet(any())).thenReturn(
+        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any())).thenReturn(
                 sykefraværMed1Kvartal
         );
 
         SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
-                varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(barnehage, new ÅrstallOgKvartal(2020, 1));
+                varighetService.hentSummertKorttidsOgLangtidsfravær(barnehage, new ÅrstallOgKvartal(2020, 1), 4);
 
         assertIsEqual(
-                summertKorttidsOgLangtidsfravær.getKorttidsfraværSiste4Kvartaler(),
+                summertKorttidsOgLangtidsfravær.getSummertKorttidsfravær(),
                 100,
                 5,
                 5,
@@ -83,7 +83,7 @@ public class VarighetServiceTest {
                 sistePublisertÅrstallOgKvartal
         );
         assertIsEqual(
-                summertKorttidsOgLangtidsfravær.getLangtidsfraværSiste4Kvartaler(),
+                summertKorttidsOgLangtidsfravær.getSummertLangtidsfravær(),
                 100,
                 2,
                 2,
@@ -107,15 +107,15 @@ public class VarighetServiceTest {
                 getSykefraværMedVarighet(kvartal2, 0, 100, 10, Varighetskategori.TOTAL)
         );
 
-        when(varighetRepository.hentKvartalsvisSykefraværMedVarighet(any())).thenReturn(
+        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any())).thenReturn(
                 sykefraværMed2Kvartaler
         );
 
         SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
-                varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(barnehage, new ÅrstallOgKvartal(2020, 1));
+                varighetService.hentSummertKorttidsOgLangtidsfravær(barnehage, new ÅrstallOgKvartal(2020, 1), 4);
 
         assertIsEqual(
-                summertKorttidsOgLangtidsfravær.getKorttidsfraværSiste4Kvartaler(),
+                summertKorttidsOgLangtidsfravær.getSummertKorttidsfravær(),
                 200,
                 14,
                 7,
@@ -124,7 +124,7 @@ public class VarighetServiceTest {
                 kvartal2
         );
         assertIsEqual(
-                summertKorttidsOgLangtidsfravær.getLangtidsfraværSiste4Kvartaler(),
+                summertKorttidsOgLangtidsfravær.getSummertLangtidsfravær(),
                 200,
                 8,
                 4,
@@ -149,15 +149,15 @@ public class VarighetServiceTest {
                 getSykefraværMedVarighet(kvartal, 0, 100000, 2000, Varighetskategori.TOTAL)
         );
 
-        when(varighetRepository.hentKvartalsvisSykefraværMedVarighet(any())).thenReturn(
+        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any())).thenReturn(
                 sykefraværMed1Kvartal
         );
 
         SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
-                varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(barnehage, new ÅrstallOgKvartal(2020, 1));
+                varighetService.hentSummertKorttidsOgLangtidsfravær(barnehage, new ÅrstallOgKvartal(2020, 1), 4);
 
         assertIsEqual(
-                summertKorttidsOgLangtidsfravær.getKorttidsfraværSiste4Kvartaler(),
+                summertKorttidsOgLangtidsfravær.getSummertKorttidsfravær(),
                 100000,
                 5000,
                 5,
@@ -165,7 +165,7 @@ public class VarighetServiceTest {
                 kvartal
         );
         assertIsEqual(
-                summertKorttidsOgLangtidsfravær.getLangtidsfraværSiste4Kvartaler(),
+                summertKorttidsOgLangtidsfravær.getSummertLangtidsfravær(),
                 100000,
                 1111,
                 1.1f,
@@ -190,15 +190,15 @@ public class VarighetServiceTest {
                 getSykefraværMedVarighet(ikkeUtdatertKvartal, 0, 100, 200, Varighetskategori.TOTAL)
         );
 
-        when(varighetRepository.hentKvartalsvisSykefraværMedVarighet(any())).thenReturn(
+        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any())).thenReturn(
                 umaskertKvartalsvisSykefraværMedVarighet
         );
 
         SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
-                varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(barnehage, new ÅrstallOgKvartal(2020, 1));
+                varighetService.hentSummertKorttidsOgLangtidsfravær(barnehage, new ÅrstallOgKvartal(2020, 1), 4);
 
         assertIsEqual(
-                summertKorttidsOgLangtidsfravær.getKorttidsfraværSiste4Kvartaler(),
+                summertKorttidsOgLangtidsfravær.getSummertKorttidsfravær(),
                 100,
                 10,
                 10,
@@ -206,7 +206,7 @@ public class VarighetServiceTest {
                 ikkeUtdatertKvartal
         );
         assertIsEqual(
-                summertKorttidsOgLangtidsfravær.getLangtidsfraværSiste4Kvartaler(),
+                summertKorttidsOgLangtidsfravær.getSummertLangtidsfravær(),
                 100,
                 20,
                 20,
@@ -229,15 +229,15 @@ public class VarighetServiceTest {
                 getSykefraværMedVarighet(kvartalMedKorttidOgLangtidsfravær, 0, 100, 200, Varighetskategori.TOTAL)
         );
 
-        when(varighetRepository.hentKvartalsvisSykefraværMedVarighet(any())).thenReturn(
+        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any())).thenReturn(
                 umaskertKvartalsvisSykefraværMedVarighet
         );
 
         SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
-                varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(barnehage, new ÅrstallOgKvartal(2020, 1));
+                varighetService.hentSummertKorttidsOgLangtidsfravær(barnehage, new ÅrstallOgKvartal(2020, 1), 4);
 
         assertIsEqual(
-                summertKorttidsOgLangtidsfravær.getKorttidsfraværSiste4Kvartaler(),
+                summertKorttidsOgLangtidsfravær.getSummertKorttidsfravær(),
                 200,
                 10,
                 5,
@@ -246,7 +246,7 @@ public class VarighetServiceTest {
         );
 
         assertIsEqual(
-                summertKorttidsOgLangtidsfravær.getLangtidsfraværSiste4Kvartaler(),
+                summertKorttidsOgLangtidsfravær.getSummertLangtidsfravær(),
                 200,
                 30,
                 15,
@@ -269,15 +269,15 @@ public class VarighetServiceTest {
                 getSykefraværMedVarighet(kvartalMedKorttidOgLangtidsfravær, 0, 100, 200, Varighetskategori.TOTAL)
         );
 
-        when(varighetRepository.hentKvartalsvisSykefraværMedVarighet(any())).thenReturn(
+        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any())).thenReturn(
                 umaskertKvartalsvisSykefraværMedVarighet
         );
 
         SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
-                varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(barnehage, new ÅrstallOgKvartal(2020, 1));
+                varighetService.hentSummertKorttidsOgLangtidsfravær(barnehage, new ÅrstallOgKvartal(2020, 1), 4);
 
         assertIsEqual(
-                summertKorttidsOgLangtidsfravær.getKorttidsfraværSiste4Kvartaler(),
+                summertKorttidsOgLangtidsfravær.getSummertKorttidsfravær(),
                 100,
                 20,
                 20,
@@ -286,7 +286,7 @@ public class VarighetServiceTest {
         );
 
         assertIsEqual(
-                summertKorttidsOgLangtidsfravær.getLangtidsfraværSiste4Kvartaler(),
+                summertKorttidsOgLangtidsfravær.getSummertLangtidsfravær(),
                 100,
                 30,
                 30,
@@ -310,20 +310,20 @@ public class VarighetServiceTest {
                 getSykefraværMedVarighet(kvartal2, 0, 100, 4, Varighetskategori.TOTAL)
         );
 
-        when(varighetRepository.hentKvartalsvisSykefraværMedVarighet(any())).thenReturn(
+        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any())).thenReturn(
                 umaskertKvartalsvisSykefraværMedVarighet
         );
 
         SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
-                varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(barnehage, new ÅrstallOgKvartal(2020, 1));
+                varighetService.hentSummertKorttidsOgLangtidsfravær(barnehage, new ÅrstallOgKvartal(2020, 1), 4);
 
         assertIsMaskert(
-                summertKorttidsOgLangtidsfravær.getKorttidsfraværSiste4Kvartaler(),
+                summertKorttidsOgLangtidsfravær.getSummertKorttidsfravær(),
                 kvartal1, kvartal2
         );
 
         assertIsMaskert(
-                summertKorttidsOgLangtidsfravær.getLangtidsfraværSiste4Kvartaler(),
+                summertKorttidsOgLangtidsfravær.getSummertLangtidsfravær(),
                 kvartal1, kvartal2
         );
     }
@@ -343,15 +343,15 @@ public class VarighetServiceTest {
                 getSykefraværMedVarighet(kvartal2, 0, 100, 5, Varighetskategori.TOTAL)
         );
 
-        when(varighetRepository.hentKvartalsvisSykefraværMedVarighet(any())).thenReturn(
+        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any())).thenReturn(
                 sykefraværMed2Kvartaler
         );
 
         SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
-                varighetService.hentKorttidsOgLangtidsfraværSiste4Kvartaler(barnehage, new ÅrstallOgKvartal(2020, 1));
+                varighetService.hentSummertKorttidsOgLangtidsfravær(barnehage, new ÅrstallOgKvartal(2020, 1), 4);
 
         assertIsEqual(
-                summertKorttidsOgLangtidsfravær.getKorttidsfraværSiste4Kvartaler(),
+                summertKorttidsOgLangtidsfravær.getSummertKorttidsfravær(),
                 200,
                 14,
                 7,
@@ -360,7 +360,7 @@ public class VarighetServiceTest {
                 kvartal2
         );
         assertIsEqual(
-                summertKorttidsOgLangtidsfravær.getLangtidsfraværSiste4Kvartaler(),
+                summertKorttidsOgLangtidsfravær.getSummertLangtidsfravær(),
                 200,
                 8,
                 4,
