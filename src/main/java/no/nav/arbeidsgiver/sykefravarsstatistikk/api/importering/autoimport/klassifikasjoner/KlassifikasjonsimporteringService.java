@@ -66,7 +66,7 @@ public class KlassifikasjonsimporteringService {
     ) {
         return virksomhetsklassifikasjonerIDatavarehus
                 .stream()
-                .map(sektor -> opprettEllerOppdater(sektor, klassifikasjonskilde))
+                .map(klassifikasjon -> opprettEllerOppdater(klassifikasjon, klassifikasjonskilde))
                 .reduce(new OpprettEllerOppdaterResultat(), OpprettEllerOppdaterResultat::add);
     }
 
