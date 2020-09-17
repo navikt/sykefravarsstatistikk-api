@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequestMapping(value = "provisjonering/synkronisering")
-public class VirksomhetsklassifikasjonerSynkroniseringController {
+public class KlassifikasjonsimporteringController {
 
     private final KlassifikasjonsimporteringService service;
 
     @Autowired
-    public VirksomhetsklassifikasjonerSynkroniseringController(KlassifikasjonsimporteringService service) {
+    public KlassifikasjonsimporteringController(KlassifikasjonsimporteringService service) {
         this.service = service;
     }
 
