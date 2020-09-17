@@ -14,11 +14,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.klassifikasjoner.VirksomhetsklassifikasjonIntegrasjon.KODE;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.klassifikasjoner.VirksomhetsklassifikasjonIntegrasjon.NAVN;
-
 @Component
 public class KlassifikasjonsimporteringRepository {
+
+    private static final String KODE = "kode";
+    private static final String NAVN = "navn";
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
