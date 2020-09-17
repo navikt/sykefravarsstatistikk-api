@@ -30,96 +30,63 @@ public class KlassifikasjonerRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-    public Optional<Sektor> hentSektor(Sektor sektor) {
+    public Optional<Virksomhetsklassifikasjon> hent(
+            Virksomhetsklassifikasjon virksomhetsklassifikasjon,
+            Klassifikasjonskilde klassifikasjonskilde
+    ) {
         SqlParameterSource namedParameters =
-                new MapSqlParameterSource().addValue(KODE, sektor.getKode());
+                new MapSqlParameterSource().addValue(KODE, virksomhetsklassifikasjon.getKode());
 
         try {
-            Sektor hentetSektor =
+            Virksomhetsklassifikasjon hentetVirksomhetsklassifikasjon =
                     namedParameterJdbcTemplate.queryForObject(
-                            "select kode, navn from sektor where kode = :kode",
+                            "select kode, navn from " + klassifikasjonskilde.tabell + " where kode = :kode",
                             namedParameters,
-                            (resultSet, rowNum) -> mapTilSektor(resultSet));
-            return Optional.of(hentetSektor);
+                            (resultSet, rowNum) -> mapTilVirksomhetsklassifikasjon(resultSet, klassifikasjonskilde));
+            return Optional.of(hentetVirksomhetsklassifikasjon);
         } catch (EmptyResultDataAccessException erdae) {
             return Optional.empty();
         }
     }
 
-    public int opprett(Sektor sektor) {
+    public int opprett(
+            Virksomhetsklassifikasjon virksomhetsklassifikasjon,
+            Klassifikasjonskilde klassifikasjonskilde
+    ) {
         SqlParameterSource namedParameters =
                 new MapSqlParameterSource()
-                        .addValue(KODE, sektor.getKode())
-                        .addValue(NAVN, sektor.getNavn());
+                        .addValue(KODE, virksomhetsklassifikasjon.getKode())
+                        .addValue(NAVN, virksomhetsklassifikasjon.getNavn());
 
         return namedParameterJdbcTemplate.update(
-                "insert into SEKTOR (kode, navn)  values (:kode, :navn)",
+                "insert into " + klassifikasjonskilde.tabell + " (kode, navn)  values (:kode, :navn)",
                 namedParameters);
     }
 
-    public int opprett(Næring næring) {
+    public int oppdater(
+            Virksomhetsklassifikasjon virksomhetsklassifikasjon,
+            Klassifikasjonskilde klassifikasjonskilde
+    ) {
         SqlParameterSource namedParameters =
                 new MapSqlParameterSource()
-                        .addValue(KODE, næring.getKode())
-                        .addValue(NAVN, næring.getNavn());
+                        .addValue(KODE, virksomhetsklassifikasjon.getKode())
+                        .addValue(NAVN, virksomhetsklassifikasjon.getNavn());
 
         return namedParameterJdbcTemplate.update(
-                "insert into naring (kode, navn)   values (:kode, :navn)",
+                "update "+klassifikasjonskilde.tabell+" set navn = :navn where kode = :kode",
                 namedParameters
         );
     }
 
-
-    public int oppdater(Sektor sektor) {
-        SqlParameterSource namedParameters =
-                new MapSqlParameterSource()
-                        .addValue(KODE, sektor.getKode())
-                        .addValue(NAVN, sektor.getNavn());
-
-        return namedParameterJdbcTemplate.update(
-                "update SEKTOR set navn = :navn where kode = :kode",
-                namedParameters
-        );
-    }
-
-    public int oppdater(Næring næring) {
-
-        SqlParameterSource namedParameters =
-                new MapSqlParameterSource()
-                        .addValue(KODE, næring.getKode())
-                        .addValue(NAVN, næring.getNavn());
-
-        return namedParameterJdbcTemplate.update(
-                "update naring set navn = :navn where kode = :kode",
-                namedParameters
-        );
-
-
-    }
-
-
-    private static Sektor mapTilSektor(ResultSet rs) throws SQLException {
-        return new Sektor(rs.getString(KODE), rs.getString(NAVN));
-    }
-
-
-    public Optional<Næring> hentNæring(Virksomhetsklassifikasjon næring) {
-        SqlParameterSource namedParameters =
-                new MapSqlParameterSource().addValue(KODE, næring.getKode());
-
-        try {
-            Næring hentetNæring =
-                    namedParameterJdbcTemplate.queryForObject(
-                            "select kode, navn from naring where kode = :kode",
-                            namedParameters,
-                            (resultSet, rowNum) -> mapTilNæring(resultSet));
-            return Optional.of(hentetNæring);
-        } catch (EmptyResultDataAccessException erdae) {
-            return Optional.empty();
+    private static Virksomhetsklassifikasjon mapTilVirksomhetsklassifikasjon
+            (ResultSet rs, Klassifikasjonskilde klassifikasjonskilde) throws SQLException {
+        switch (klassifikasjonskilde) {
+            case SEKTOR:
+                return new Sektor(rs.getString(KODE), rs.getString(NAVN));
+            case NÆRING:
+                return new Næring(rs.getString(KODE), rs.getString(NAVN));
+            default:
+                throw new IllegalArgumentException();
         }
-    }
-
-    private static Næring mapTilNæring(ResultSet rs) throws SQLException {
-        return new Næring(rs.getString(KODE), rs.getString(NAVN));
     }
 }

@@ -66,15 +66,15 @@ public class KlassifikasjonerService {
             Sektor sektor) {
         final OpprettEllerOppdaterResultat resultat = new OpprettEllerOppdaterResultat();
 
-        klassifikasjonerRepository.hentSektor(sektor).ifPresentOrElse(
+        klassifikasjonerRepository.hent(sektor, Klassifikasjonskilde.SEKTOR).ifPresentOrElse(
                 eksisterendeSektor -> {
                     if (!eksisterendeSektor.equals(sektor)) {
-                        klassifikasjonerRepository.oppdater(sektor);
+                        klassifikasjonerRepository.oppdater(sektor, Klassifikasjonskilde.SEKTOR);
                         resultat.setAntallRadOppdatert(1);
                     }
                 },
                 () -> {
-                    klassifikasjonerRepository.opprett(sektor);
+                    klassifikasjonerRepository.opprett(sektor, Klassifikasjonskilde.SEKTOR);
                     resultat.setAntallRadOpprettet(1);
                 }
         );
@@ -93,15 +93,15 @@ public class KlassifikasjonerService {
             Næring næring) {
         final OpprettEllerOppdaterResultat resultat = new OpprettEllerOppdaterResultat();
 
-        klassifikasjonerRepository.hentNæring(næring).ifPresentOrElse(
+        klassifikasjonerRepository.hent(næring, Klassifikasjonskilde.NÆRING).ifPresentOrElse(
                 eksisterendeNæring -> {
                     if (!eksisterendeNæring.equals(næring)) {
-                        klassifikasjonerRepository.oppdater(næring);
+                        klassifikasjonerRepository.oppdater(næring, Klassifikasjonskilde.NÆRING);
                         resultat.setAntallRadOppdatert(1);
                     }
                 },
                 () -> {
-                    klassifikasjonerRepository.opprett(næring);
+                    klassifikasjonerRepository.opprett(næring, Klassifikasjonskilde.NÆRING);
                     resultat.setAntallRadOpprettet(1);
                 }
         );
