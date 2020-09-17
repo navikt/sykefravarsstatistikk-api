@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "provisjonering/synkronisering")
 public class VirksomhetsklassifikasjonerSynkroniseringController {
 
-    private final VirksomhetsklassifikasjonerSynkroniseringService service;
+    private final KlassifikasjonerService service;
 
     @Autowired
-    public VirksomhetsklassifikasjonerSynkroniseringController(VirksomhetsklassifikasjonerSynkroniseringService service) {
+    public VirksomhetsklassifikasjonerSynkroniseringController(KlassifikasjonerService service) {
         this.service = service;
     }
 

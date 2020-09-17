@@ -12,8 +12,9 @@ public class OpprettEllerOppdaterResultat {
     private int antallRadOpprettet;
     private int antallRadOppdatert;
 
-    public void add(OpprettEllerOppdaterResultat resultat) {
+    public OpprettEllerOppdaterResultat add(OpprettEllerOppdaterResultat resultat) {
         antallRadOpprettet = antallRadOpprettet + resultat.getAntallRadOpprettet();
         antallRadOppdatert = antallRadOppdatert + resultat.getAntallRadOppdatert();
+        return this;
     }
 }
