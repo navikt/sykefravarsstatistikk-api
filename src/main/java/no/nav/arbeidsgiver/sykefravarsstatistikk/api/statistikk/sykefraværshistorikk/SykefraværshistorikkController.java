@@ -1,15 +1,15 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikkService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertKorttidsOgLangtidsfravær;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.VarighetService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetBruker;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
 import no.nav.security.token.support.core.api.Protected;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,8 +38,7 @@ public class SykefraværshistorikkController {
         this.varighetService = varighetService;
     }
 
-    // TODO Bytt til /{orgnr}/sykefravarshistorikk/kvartalsvis
-    @GetMapping(value = "/{orgnr}/sykefravarshistorikk")
+    @GetMapping(value = "/{orgnr}/sykefravarshistorikk/kvartalsvis")
     public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikk(
             @PathVariable("orgnr") String orgnrStr,
             HttpServletRequest request
@@ -81,10 +80,10 @@ public class SykefraværshistorikkController {
     }
 
 
-    // TODO Bytt til /{orgnr}/sykefravarshistorikk/summert?kvartaler=4
-    @GetMapping(value = "/{orgnr}/varighetsiste4kvartaler")
+    @GetMapping(value = "/{orgnr}/sykefravarshistorikk/summert?antallKvartaler=4")
     public SummertKorttidsOgLangtidsfravær hentVarighet(
             @PathVariable("orgnr") String orgnrStr,
+            @PathVariable("antallKvartaler") int antallKvartaler,
             HttpServletRequest request
     ) {
         Orgnr orgnr = new Orgnr(orgnrStr);
@@ -98,6 +97,33 @@ public class SykefraværshistorikkController {
         );
         Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
 
-        return varighetService.hentSummertKorttidsOgLangtidsfravær(underenhet, new ÅrstallOgKvartal(2020, 2), 4);
+        if (antallKvartaler != 4) {
+            throw new IllegalArgumentException("For øyeblikket støtter vi kun summering av 4 kvartaler.");
+        }
+
+        return varighetService.hentSummertKorttidsOgLangtidsfravær(
+                underenhet,
+                new ÅrstallOgKvartal(2020, 2),
+                antallKvartaler
+        );
+    }
+
+    // TODO Disse er bare her for bakoverkompatilibitet med frontend; fjern når frontend er oppdatert
+    @Deprecated
+    @GetMapping(value = "/{orgnr}/varighetsiste4kvartaler")
+    public SummertKorttidsOgLangtidsfravær hentVarighetOld(
+            @PathVariable("orgnr") String orgnrStr,
+            HttpServletRequest request
+    ) {
+        return hentVarighet(orgnrStr, 4, request);
+    }
+
+    @Deprecated
+    @GetMapping(value = "/{orgnr}/sykefravarshistorikk")
+    public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikkOld(
+            @PathVariable("orgnr") String orgnrStr,
+            HttpServletRequest request
+    ) {
+        return hentSykefraværshistorikk(orgnrStr, request);
     }
 }
