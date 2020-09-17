@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("db-test")
 @RunWith(SpringRunner.class)
 @DataJdbcTest
-public class KlassifikasjonerRepositoryJdbcTest {
+public class KlassifikasjonsimporteringRepositoryJdbcTest {
 
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;

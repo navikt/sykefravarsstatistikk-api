@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.kla
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhetsklassifikasjon;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OpprettEllerOppdaterResultat;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -13,18 +12,17 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Optional;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.klassifikasjoner.VirksomhetsklassifikasjonIntegrasjon.KODE;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.klassifikasjoner.VirksomhetsklassifikasjonIntegrasjon.NAVN;
 
 @Component
-public class KlassifikasjonerRepository {
+public class KlassifikasjonsimporteringRepository {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public KlassifikasjonerRepository(
+    public KlassifikasjonsimporteringRepository(
             @Qualifier("sykefravarsstatistikkJdbcTemplate")
                     NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
@@ -73,7 +71,7 @@ public class KlassifikasjonerRepository {
                         .addValue(NAVN, virksomhetsklassifikasjon.getNavn());
 
         return namedParameterJdbcTemplate.update(
-                "update "+klassifikasjonskilde.tabell+" set navn = :navn where kode = :kode",
+                "update " + klassifikasjonskilde.tabell + " set navn = :navn where kode = :kode",
                 namedParameters
         );
     }
