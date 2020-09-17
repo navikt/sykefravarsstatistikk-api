@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.integrasjoner.enhetsregisteret;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.integrasjoner.enhetsregisteret;
 
 public class EnhetsregisteretMappingException extends RuntimeException {
     EnhetsregisteretMappingException(String msg, Exception e) {

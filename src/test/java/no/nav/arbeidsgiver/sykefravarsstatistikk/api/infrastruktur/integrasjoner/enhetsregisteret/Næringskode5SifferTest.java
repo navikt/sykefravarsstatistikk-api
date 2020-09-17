@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.integrasjoner.enhetsregisteret;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.integrasjoner.enhetsregisteret;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import org.junit.Test;

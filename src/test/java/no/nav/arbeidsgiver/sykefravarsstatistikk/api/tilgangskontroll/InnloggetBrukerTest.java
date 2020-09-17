@@ -2,8 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.altinn.AltinnOrganisasjon;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.domene.InnloggetBruker;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.integrasjoner.altinn.AltinnOrganisasjon;
 import org.junit.Test;
 
 import java.util.List;

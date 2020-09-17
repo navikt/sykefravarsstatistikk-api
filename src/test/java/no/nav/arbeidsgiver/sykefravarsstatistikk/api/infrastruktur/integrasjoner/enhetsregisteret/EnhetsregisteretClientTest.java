@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.integrasjoner.enhetsregisteret;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.integrasjoner.enhetsregisteret;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

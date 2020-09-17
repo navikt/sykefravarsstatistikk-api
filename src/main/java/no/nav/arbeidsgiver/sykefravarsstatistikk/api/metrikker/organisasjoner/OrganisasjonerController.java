@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.organisasjoner;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.altinn.AltinnOrganisasjon;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.domene.InnloggetBruker;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.integrasjoner.altinn.AltinnOrganisasjon;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
 import no.nav.security.token.support.core.api.Protected;
 import org.springframework.web.bind.annotation.GetMapping;

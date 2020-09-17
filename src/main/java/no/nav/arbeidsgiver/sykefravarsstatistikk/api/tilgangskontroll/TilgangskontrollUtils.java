@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Fnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.domene.InnloggetBruker;
 import no.nav.security.token.support.core.context.TokenValidationContextHolder;
 import no.nav.security.token.support.core.jwt.JwtToken;
 import no.nav.security.token.support.core.jwt.JwtTokenClaims;

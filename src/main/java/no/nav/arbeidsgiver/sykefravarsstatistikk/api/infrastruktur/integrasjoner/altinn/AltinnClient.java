@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.altinn;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.integrasjoner.altinn;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Fnr;

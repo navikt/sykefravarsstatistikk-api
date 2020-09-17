@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.sporbarhet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

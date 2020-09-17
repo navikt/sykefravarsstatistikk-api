@@ -1,9 +1,9 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.sporbarhet;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.domene.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetBruker;
 
 @AllArgsConstructor
 @Data

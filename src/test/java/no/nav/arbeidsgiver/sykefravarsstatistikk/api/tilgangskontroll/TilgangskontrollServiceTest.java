@@ -1,11 +1,12 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.CorrelationIdFilter;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.altinn.AltinnException;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.altinn.AltinnKlientWrapper;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.integrasjoner.altinn.AltinnException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.integrasjoner.altinn.AltinnKlientWrapper;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Fnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.domene.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.sporbarhet.Loggevent;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.sporbarhet.Sporbarhetslogg;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
