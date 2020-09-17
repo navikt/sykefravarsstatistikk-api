@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
@@ -204,7 +204,7 @@ public class DatavarehusRepository {
     }
 
     /*
-     Dimensjoner
+     Klassifikasjoner
     */
 
     public List<Sektor> hentAlleSektorer() {
@@ -229,24 +229,4 @@ public class DatavarehusRepository {
                                 resultSet.getString(NARINGNAVN)));
     }
 
-    public List<Næringsgruppering> hentAlleNæringsgrupperinger() {
-        SqlParameterSource namedParameters = new MapSqlParameterSource();
-
-        return namedParameterJdbcTemplate.query(
-                "select naering_kode, naering_besk_lang, gruppe1_kode, gruppe1_besk_lang, gruppe2_kode, gruppe2_besk_lang, gruppe3_kode, gruppe3_besk_lang, gruppe4_kode, gruppe4_besk_lang from dt_p.dim_ia_naring",
-                namedParameters,
-                (resultSet, rowNum) ->
-                        new Næringsgruppering(
-                                resultSet.getString(NAERING_KODE),
-                                resultSet.getString(NAERING_BESKRIVELSE),
-                                resultSet.getString(GRUPPE1_KODE),
-                                resultSet.getString(GRUPPE1_BESKRIVELSE),
-                                resultSet.getString(GRUPPE2_KODE),
-                                resultSet.getString(GRUPPE2_BESKRIVELSE),
-                                resultSet.getString(GRUPPE3_KODE),
-                                resultSet.getString(GRUPPE3_BESKRIVELSE),
-                                resultSet.getString(GRUPPE4_KODE),
-                                resultSet.getString(GRUPPE4_BESKRIVELSE)
-                        ));
-    }
 }

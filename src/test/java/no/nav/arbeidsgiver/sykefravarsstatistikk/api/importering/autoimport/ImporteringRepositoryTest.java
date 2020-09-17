@@ -4,9 +4,9 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.SlettOgOpprettResult
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.importering.integrasjon.BatchCreateSykefraværsstatistikkFunction;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.importering.integrasjon.DeleteSykefraværsstatistikkFunction;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.importering.integrasjon.utils.SykefraværsstatistikkIntegrasjonUtils;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.utils.BatchCreateSykefraværsstatistikkFunction;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.utils.DeleteSykefraværsstatistikkFunction;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.utils.SykefraværsstatistikkIntegrasjonUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

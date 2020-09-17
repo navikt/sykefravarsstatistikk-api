@@ -1,12 +1,12 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.synkronisering;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.klassifikasjoner;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhetsklassifikasjon;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OpprettEllerOppdaterResultat;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.synkronisering.integrasjon.utils.NæringIntegrasjonUtils;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.synkronisering.integrasjon.utils.SektorIntegrasjonUtils;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.synkronisering.integrasjon.utils.VirksomhetsklassifikasjonIntegrasjonUtils;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.klassifikasjoner.utils.NæringIntegrasjonUtils;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.klassifikasjoner.utils.SektorIntegrasjonUtils;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.klassifikasjoner.utils.VirksomhetsklassifikasjonIntegrasjonUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;

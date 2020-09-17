@@ -1,22 +1,17 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.importering.integrasjon.utils;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.utils;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.importering.integrasjon.BatchCreateSykefraværsstatistikkFunction;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.importering.integrasjon.DeleteSykefraværsstatistikkFunction;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
+import org.springframework.jdbc.core.namedparam.*;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class SykefraværsstatistikkSektorUtils extends SykefraværsstatistikkIntegrasjon
+public class SykefraværsstatistikkVirksomhetUtils extends SykefraværsstatistikkIntegrasjon
         implements SykefraværsstatistikkIntegrasjonUtils {
 
 
-    public SykefraværsstatistikkSektorUtils(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public SykefraværsstatistikkVirksomhetUtils(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         super(namedParameterJdbcTemplate);
     }
 
@@ -32,7 +27,7 @@ public class SykefraværsstatistikkSektorUtils extends SykefraværsstatistikkInt
                     int antallSlettet =
                             namedParameterJdbcTemplate.update(
                                     String.format(
-                                            "delete from sykefravar_statistikk_sektor where arstall = :%s and kvartal = :%s",
+                                            "delete from sykefravar_statistikk_virksomhet where arstall = :%s and kvartal = :%s",
                                             ARSTALL, KVARTAL),
                                     namedParameters);
                     return antallSlettet;
@@ -50,10 +45,10 @@ public class SykefraværsstatistikkSektorUtils extends SykefraværsstatistikkInt
                     SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(statistikk.toArray());
 
                     int[] results = namedParameterJdbcTemplate.batchUpdate(
-                            "insert into sykefravar_statistikk_sektor " +
-                                    "(arstall, kvartal, sektor_kode, antall_personer, tapte_dagsverk, mulige_dagsverk) " +
+                            "insert into sykefravar_statistikk_virksomhet " +
+                                    "(arstall, kvartal, orgnr, varighet, antall_personer, tapte_dagsverk, mulige_dagsverk)  " +
                                     "values " +
-                                    "(:årstall, :kvartal, :sektorkode, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
+                                    "(:årstall, :kvartal, :orgnr, :varighet, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
                             batch);
                     return Arrays.stream(results).sum();
                 };

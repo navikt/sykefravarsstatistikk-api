@@ -1,9 +1,9 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.synkronisering;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.klassifikasjoner;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.DatavarehusRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OpprettEllerOppdaterResultat;
 import org.springframework.stereotype.Component;
 

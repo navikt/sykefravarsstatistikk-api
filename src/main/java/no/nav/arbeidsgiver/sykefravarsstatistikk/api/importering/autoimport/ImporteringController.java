@@ -21,11 +21,6 @@ public class ImporteringController {
         this.importeringService = importeringService;
     }
 
-    @PostMapping(value = "/statistikk")
-    public void importStatistikk() {
-        importeringService.importerHvisDetFinnesNyStatistikk();
-    }
-
     @PostMapping(value = "/reimport")
     public ResponseEntity<HttpStatus> reimporter(
             @RequestParam int fraÅrstall,

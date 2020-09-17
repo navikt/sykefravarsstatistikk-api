@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.StatistikkildeDvh;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;

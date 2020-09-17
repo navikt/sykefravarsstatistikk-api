@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.synkronisering.integrasjon.utils;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.klassifikasjoner.utils;
 
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
