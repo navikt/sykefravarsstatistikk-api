@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.sykefraværshistorikk.SykefraværshistorikkType;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.security.token.support.test.JwtTokenGenerator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -82,11 +82,11 @@ public class ApiTest {
                         .collect(Collectors.toList()))
                 .containsExactlyInAnyOrderElementsOf(
                         Arrays.asList(
-                                SykefraværshistorikkType.LAND.toString(),
-                                SykefraværshistorikkType.SEKTOR.toString(),
-                                SykefraværshistorikkType.NÆRING.toString(),
-                                SykefraværshistorikkType.VIRKSOMHET.toString(),
-                                SykefraværshistorikkType.OVERORDNET_ENHET.toString()
+                                Statistikkategori.LAND.toString(),
+                                Statistikkategori.SEKTOR.toString(),
+                                Statistikkategori.NÆRING.toString(),
+                                Statistikkategori.VIRKSOMHET.toString(),
+                                Statistikkategori.OVERORDNET_ENHET.toString()
                         )
                 );
 
@@ -152,6 +152,16 @@ public class ApiTest {
         assertThat(response.statusCode()).isEqualTo(200);
         JsonNode varighetsiste4kvartaler = objectMapper.readTree(response.body());
 
+        assertThat(varighetsiste4kvartaler.get("summertKorttidsfravær"))
+                .isEqualTo(objectMapper.readTree(
+                        "{\"prosent\":3.7,\"tapteDagsverk\":148.9,\"muligeDagsverk\":3979.6,\"erMaskert\":false,\"kvartaler\":[{\"årstall\":2019,\"kvartal\":3}, {\"årstall\":2020,\"kvartal\":1}]}"
+                ));
+        assertThat(varighetsiste4kvartaler.get("summertLangtidsfravær"))
+                .isEqualTo(objectMapper.readTree(
+                        "{\"prosent\":3.0,\"tapteDagsverk\":121.3,\"muligeDagsverk\":3979.6,\"erMaskert\":false,\"kvartaler\":[{\"årstall\":2019,\"kvartal\":3},{\"årstall\":2020,\"kvartal\":1}]}"
+                ));
+
+        // TODO Disse er bare her for bakoverkompatilibitet med frontend; fjern når frontend er oppdatert
         assertThat(varighetsiste4kvartaler.get("korttidsfraværSiste4Kvartaler"))
                 .isEqualTo(objectMapper.readTree(
                         "{\"prosent\":3.7,\"tapteDagsverk\":148.9,\"muligeDagsverk\":3979.6,\"erMaskert\":false,\"kvartaler\":[{\"årstall\":2019,\"kvartal\":3}, {\"årstall\":2020,\"kvartal\":1}]}"
