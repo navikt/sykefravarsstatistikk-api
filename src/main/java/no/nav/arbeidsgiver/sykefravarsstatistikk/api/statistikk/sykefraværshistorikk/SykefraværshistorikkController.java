@@ -14,6 +14,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.Tilgangsko
 import no.nav.security.token.support.core.api.Protected;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -80,10 +81,10 @@ public class SykefraværshistorikkController {
     }
 
 
-    @GetMapping(value = "/{orgnr}/sykefravarshistorikk/summert?antallKvartaler=4")
+    @GetMapping(value = "/{orgnr}/sykefravarshistorikk/summert")
     public SummertKorttidsOgLangtidsfravær hentVarighet(
             @PathVariable("orgnr") String orgnrStr,
-            @PathVariable("antallKvartaler") int antallKvartaler,
+            @RequestParam("antallKvartaler") int antallKvartaler,
             HttpServletRequest request
     ) {
         Orgnr orgnr = new Orgnr(orgnrStr);
