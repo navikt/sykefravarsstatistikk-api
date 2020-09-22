@@ -65,7 +65,9 @@ public class ApiTest {
     public void sykefraværshistorikk__skal_returnere_riktig_objekt() throws Exception {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET + "/sykefravarshistorikk"))
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET +
+                                "/sykefravarshistorikk/kvartalsvis")
+                        )
                         .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
                         .GET()
                         .build(),
@@ -128,7 +130,7 @@ public class ApiTest {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/"
-                                + ORGNR_UNDERENHET_INGEN_TILGANG + "/sykefravarshistorikk"))
+                                + ORGNR_UNDERENHET_INGEN_TILGANG + "/sykefravarshistorikk/kvartalsvis"))
                         .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
                         .GET()
                         .build(),
@@ -139,10 +141,11 @@ public class ApiTest {
     }
 
     @Test
-    public void varighetsiste4kvartaler__skal_returnere_riktig_objekt() throws Exception {
+    public void summert_sykefraværshistorikk_siste_4_kvartaler__skal_returnere_riktig_objekt() throws Exception {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET + "/varighetsiste4kvartaler"))
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET
+                                + "/sykefravarshistorikk/summert?antallKvartaler=4"))
                         .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
                         .GET()
                         .build(),
@@ -160,25 +163,14 @@ public class ApiTest {
                 .isEqualTo(objectMapper.readTree(
                         "{\"prosent\":3.0,\"tapteDagsverk\":121.3,\"muligeDagsverk\":3979.6,\"erMaskert\":false,\"kvartaler\":[{\"årstall\":2019,\"kvartal\":3},{\"årstall\":2020,\"kvartal\":1}]}"
                 ));
-
-        // TODO Disse er bare her for bakoverkompatilibitet med frontend; fjern når frontend er oppdatert
-        assertThat(varighetsiste4kvartaler.get("korttidsfraværSiste4Kvartaler"))
-                .isEqualTo(objectMapper.readTree(
-                        "{\"prosent\":3.7,\"tapteDagsverk\":148.9,\"muligeDagsverk\":3979.6,\"erMaskert\":false,\"kvartaler\":[{\"årstall\":2019,\"kvartal\":3}, {\"årstall\":2020,\"kvartal\":1}]}"
-                ));
-        assertThat(varighetsiste4kvartaler.get("langtidsfraværSiste4Kvartaler"))
-                .isEqualTo(objectMapper.readTree(
-                        "{\"prosent\":3.0,\"tapteDagsverk\":121.3,\"muligeDagsverk\":3979.6,\"erMaskert\":false,\"kvartaler\":[{\"årstall\":2019,\"kvartal\":3},{\"årstall\":2020,\"kvartal\":1}]}"
-                ));
-
     }
 
     @Test
-    public void varighetsiste4kvartaler__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
+    public void summert_sykefraværshistorikk_siste_4_kvartaler__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/"
-                                + ORGNR_UNDERENHET_INGEN_TILGANG + "/varighetsiste4kvartaler"))
+                                + ORGNR_UNDERENHET_INGEN_TILGANG + "/sykefravarshistorikk/summert?antallKvartaler=4"))
                         .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
                         .GET()
                         .build(),

@@ -37,7 +37,7 @@ public class ApiErrorMappingTest {
                                 URI.create(
                                         "http://localhost:" + port
                                                 + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET_UTEN_NÆRING
-                                                + "/sykefravarshistorikk"
+                                                + "/sykefravarshistorikk/summert?antallKvartaler=4"
                                 )
                         )
                         .header(
