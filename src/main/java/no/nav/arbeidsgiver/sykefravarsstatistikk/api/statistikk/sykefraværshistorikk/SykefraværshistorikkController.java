@@ -82,7 +82,7 @@ public class SykefraværshistorikkController {
 
 
     @GetMapping(value = "/{orgnr}/sykefravarshistorikk/summert")
-    public SummertKorttidsOgLangtidsfravær hentVarighet(
+    public SummertKorttidsOgLangtidsfravær hentSummertKorttidsOgLangtidsfravær(
             @PathVariable("orgnr") String orgnrStr,
             @RequestParam("antallKvartaler") int antallKvartaler,
             HttpServletRequest request
@@ -109,22 +109,4 @@ public class SykefraværshistorikkController {
         );
     }
 
-    // TODO Disse er bare her for bakoverkompatilibitet med frontend; fjern når frontend er oppdatert
-    @Deprecated
-    @GetMapping(value = "/{orgnr}/varighetsiste4kvartaler")
-    public SummertKorttidsOgLangtidsfravær hentVarighetOld(
-            @PathVariable("orgnr") String orgnrStr,
-            HttpServletRequest request
-    ) {
-        return hentVarighet(orgnrStr, 4, request);
-    }
-
-    @Deprecated
-    @GetMapping(value = "/{orgnr}/sykefravarshistorikk")
-    public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikkOld(
-            @PathVariable("orgnr") String orgnrStr,
-            HttpServletRequest request
-    ) {
-        return hentSykefraværshistorikk(orgnrStr, request);
-    }
 }
