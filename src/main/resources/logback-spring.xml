@@ -1,7 +1,9 @@
 <configuration scan="true">
     <springProfile name="dev,prod">
-        <appender name="consoleJsonAppender" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+        <appender name="maskedJsonConsoleAppender" class="no.nav.common.log.MaskingAppender">
+            <appender name="consoleJsonAppender" class="ch.qos.logback.core.ConsoleAppender">
+                <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+            </appender>
         </appender>
 
         <appender name="sporbarhetsloggAppender" class="com.papertrailapp.logback.Syslog4jAppender">
@@ -22,7 +24,7 @@
         </logger>
 
         <root level="INFO">
-            <appender-ref ref="consoleJsonAppender"/>
+            <appender-ref ref="maskedJsonConsoleAppender"/>
         </root>
     </springProfile>
     <springProfile name="local">
