@@ -20,6 +20,8 @@ spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: dev
+  envFrom:
+    - configmap: loginservice-idporten
   prometheus:
     enabled: true
     path: /sykefravarsstatistikk-api/internal/actuator/prometheus

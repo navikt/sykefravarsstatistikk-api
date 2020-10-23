@@ -123,8 +123,8 @@ altinn:
     edition: 1
 
 no.nav.security.jwt.issuer.selvbetjening:
-    discoveryurl: https://login.microsoftonline.com/NAVtestB2C.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1A_idporten_ver1
-    accepted_audience: 0090b6e1-ffcc-4c37-bc21-049f7d1f0fe5
+    discoveryurl: ${LOGINSERVICE_IDPORTEN_DISCOVERY_URL}
+    accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
     cookiename: selvbetjening-idtoken
 
 statistikk.importering.aktivert: true
@@ -159,8 +159,8 @@ altinn:
     edition: 2
 
 no.nav.security.jwt.issuer.selvbetjening:
-    discoveryurl: https://login.microsoftonline.com/navnob2c.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1A_idporten
-    accepted_audience: 45104d6a-f5bc-4e8c-b352-4bbfc9381f25
+    discoveryurl: ${LOGINSERVICE_IDPORTEN_DISCOVERY_URL}
+    accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
     cookiename: selvbetjening-idtoken
 
 statistikk.importering.aktivert: true
