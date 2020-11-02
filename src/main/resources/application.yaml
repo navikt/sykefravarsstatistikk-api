@@ -138,7 +138,7 @@ datavarehus.datasource:
   password: ${DVH_PASSORD}
   driver-class-name: oracle.jdbc.OracleDriver
 
-unleash.url: https://unleash.nais.adeo.no/api/
+unleash.url: https://unleash.nais.io/api/
 
 ---
 
