@@ -1,13 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.StatistikkildeDvh;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import org.junit.After;
 import org.junit.Before;
@@ -39,6 +36,9 @@ public class DatavarehusRepositoryJdbcTest {
 
     public static final String ORGNR_VIRKSOMHET_1 = "987654321";
     public static final String ORGNR_VIRKSOMHET_2 = "999999999";
+    public static final String ORGNR_VIRKSOMHET_3 = "999999999";
+
+    public static final String NÆRINGSKODE_5SIFFER = "10062";
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
@@ -131,7 +131,7 @@ public class DatavarehusRepositoryJdbcTest {
                 namedParameterJdbcTemplate,
                 2018,
                 4,
-                4, ORGNR_VIRKSOMHET_1,
+                4, ORGNR_VIRKSOMHET_1,"10062",
                 _8_DAGER_TIL_16_DAGER,
                 "K",
                 5, 100
@@ -141,7 +141,7 @@ public class DatavarehusRepositoryJdbcTest {
                 2019,
                 1,
                 5,
-                ORGNR_VIRKSOMHET_2,
+                ORGNR_VIRKSOMHET_2,"10062",
                 _8_DAGER_TIL_16_DAGER,
                 "M",
                 5,
@@ -192,11 +192,11 @@ public class DatavarehusRepositoryJdbcTest {
 
     @Test
     public void hentSykefraværsstatistikkVirksomhet__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
-        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, ORGNR_VIRKSOMHET_1, _1_DAG_TIL_7_DAGER, "K", 5, 100);
-        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, ORGNR_VIRKSOMHET_1, _1_DAG_TIL_7_DAGER, "M", 8, 88);
-        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, ORGNR_VIRKSOMHET_2, _1_DAG_TIL_7_DAGER, "K", 3, 75);
-        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 5, ORGNR_VIRKSOMHET_1, _1_DAG_TIL_7_DAGER, "M", 5, 101);
-        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2019, 2, 9, ORGNR_VIRKSOMHET_1, _8_DAGER_TIL_16_DAGER, "M", 9, 99);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, ORGNR_VIRKSOMHET_1,"10062", _1_DAG_TIL_7_DAGER, "K", 5, 100);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, ORGNR_VIRKSOMHET_1, "10062",_1_DAG_TIL_7_DAGER, "M", 8, 88);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, ORGNR_VIRKSOMHET_2, "10062",_1_DAG_TIL_7_DAGER, "K", 3, 75);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 5, ORGNR_VIRKSOMHET_1, "10062",_1_DAG_TIL_7_DAGER, "M", 5, 101);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2019, 2, 9, ORGNR_VIRKSOMHET_1, "10062",_8_DAGER_TIL_16_DAGER, "M", 9, 99);
 
         List<SykefraværsstatistikkVirksomhet> sykefraværsstatistikkVirksomhet =
                 repository.hentSykefraværsstatistikkVirksomhet(new ÅrstallOgKvartal(2018, 4));
@@ -212,6 +212,33 @@ public class DatavarehusRepositoryJdbcTest {
                 new BigDecimal(188).setScale(6)
         );
         assertThat(sykefraværsstatistikkVirksomhet.get(0), equalTo(expected));
+    }
+
+    @Test
+    public void hentSykefraværsstatistikkNæringMedVarighet__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk_med_varighet() {
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, ORGNR_VIRKSOMHET_1,"10062", _1_DAG_TIL_7_DAGER, "K", 5, 100);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, ORGNR_VIRKSOMHET_1,"10062", _8_DAGER_TIL_16_DAGER, "K", 5, 100);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, ORGNR_VIRKSOMHET_1,"10062", _1_DAG_TIL_7_DAGER, "M", 8, 88);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, ORGNR_VIRKSOMHET_2,"10062", _1_DAG_TIL_7_DAGER, "K", 3, 75);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, ORGNR_VIRKSOMHET_3,"85000", _1_DAG_TIL_7_DAGER, "K", 10, 80);
+
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 5, ORGNR_VIRKSOMHET_1, "10062",_1_DAG_TIL_7_DAGER, "M", 5, 101);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2019, 2, 9, ORGNR_VIRKSOMHET_3, "85000",_8_DAGER_TIL_16_DAGER, "M", 9, 99);
+
+        List<SykefraværsstatistikkNæringMedVarighet> sykefraværsstatistikkNæringMedVarighet =
+                repository.hentSykefraværsstatistikkNæringMedVarighet(new ÅrstallOgKvartal(2018, 4));
+
+        assertThat(sykefraværsstatistikkNæringMedVarighet, hasSize(3));
+        SykefraværsstatistikkNæringMedVarighet expected = new SykefraværsstatistikkNæringMedVarighet(
+                2018,
+                4,
+                NÆRINGSKODE_5SIFFER,
+                _1_DAG_TIL_7_DAGER.kode,
+                13,
+                new BigDecimal(16).setScale(6),
+                new BigDecimal(263).setScale(6)
+        );
+        assertThat(sykefraværsstatistikkNæringMedVarighet.get(0), equalTo(expected));
     }
 
     @Test
@@ -327,6 +354,7 @@ public class DatavarehusRepositoryJdbcTest {
             int kvartal,
             int antallPersoner,
             String orgnr,
+            String næringskode5siffer,
             Varighetskategori varighet,
             String kjonn,
             long taptedagsverk,
@@ -338,6 +366,7 @@ public class DatavarehusRepositoryJdbcTest {
                         .addValue("antpers", antallPersoner)
                         .addValue("orgnr", orgnr)
                         .addValue("varighet", varighet.kode)
+                        .addValue("naering_kode",næringskode5siffer)
                         .addValue("kjonn", kjonn)
                         .addValue("taptedv", taptedagsverk)
                         .addValue("muligedv", muligedagsverk);
@@ -351,7 +380,7 @@ public class DatavarehusRepositoryJdbcTest {
                         + "taptedv, muligedv, antpers) "
                         + "values ("
                         + ":arstall, :kvartal, "
-                        + ":orgnr, '10062', '3', 'G', '03', "
+                        + ":orgnr, :naering_kode, '3', 'G', '03', "
                         + "'B', :kjonn, '02', "
                         + "'L', :varighet, "
                         + ":taptedv, :muligedv, :antpers)",

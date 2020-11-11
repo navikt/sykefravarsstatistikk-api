@@ -164,7 +164,7 @@ public class DatavarehusRepository {
                         "sum(muligedv) as sum_mulige_dagsverk " +
                         "from dt_p.agg_ia_sykefravar_naring_kode " +
                         "where arstall = :arstall and kvartal = :kvartal " +
-                        "group by arstall, kvartal, naering_kode",
+                        " group by arstall, kvartal, naering_kode",
                 namedParameters,
                 (resultSet, rowNum) ->
                         new SykefraværsstatistikkNæring(
@@ -197,6 +197,32 @@ public class DatavarehusRepository {
                                 resultSet.getInt(ARSTALL),
                                 resultSet.getInt(KVARTAL),
                                 resultSet.getString(ORGNR),
+                                resultSet.getString(VARIGHET),
+                                resultSet.getInt(SUM_ANTALL_PERSONER),
+                                resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
+                                resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
+    }
+
+    public List<SykefraværsstatistikkNæringMedVarighet> hentSykefraværsstatistikkNæringMedVarighet(ÅrstallOgKvartal årstallOgKvartal) {
+        SqlParameterSource namedParameters =
+                new MapSqlParameterSource()
+                        .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+                        .addValue(KVARTAL, årstallOgKvartal.getKvartal());
+
+        return namedParameterJdbcTemplate.query(
+                "select arstall, kvartal, naering_kode, varighet, " +
+                        "sum(antpers) as sum_antall_personer, " +
+                        "sum(taptedv) as sum_tapte_dagsverk, " +
+                        "sum(muligedv) as sum_mulige_dagsverk " +
+                        "from dt_p.agg_ia_sykefravar_v " +
+                        "where arstall = :arstall and kvartal = :kvartal " +
+                        "group by arstall, kvartal, naering_kode, varighet",
+                namedParameters,
+                (resultSet, rowNum) ->
+                        new SykefraværsstatistikkNæringMedVarighet(
+                                resultSet.getInt(ARSTALL),
+                                resultSet.getInt(KVARTAL),
+                                resultSet.getString(NARING_5SIFFER),
                                 resultSet.getString(VARIGHET),
                                 resultSet.getInt(SUM_ANTALL_PERSONER),
                                 resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
