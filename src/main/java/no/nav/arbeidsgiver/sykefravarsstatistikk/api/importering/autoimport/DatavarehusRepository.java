@@ -1,10 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner.Næringsgruppering;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -32,9 +31,8 @@ public class DatavarehusRepository {
     public static final String SUM_ANTALL_PERSONER = "sum_antall_personer";
     public static final String SUM_TAPTE_DAGSVERK = "sum_tapte_dagsverk";
     public static final String SUM_MULIGE_DAGSVERK = "sum_mulige_dagsverk";
-
-
     public static final String NAERING_KODE = "naering_kode";
+
     public static final String NAERING_BESKRIVELSE = "naering_besk_lang";
     public static final String GRUPPE1_KODE = "gruppe1_kode";
     public static final String GRUPPE1_BESKRIVELSE = "gruppe1_besk_lang";
@@ -187,7 +185,8 @@ public class DatavarehusRepository {
                 "select arstall, kvartal, orgnr, varighet, " +
                         "sum(antpers) as sum_antall_personer, " +
                         "sum(taptedv) as sum_tapte_dagsverk, " +
-                        "sum(muligedv) as sum_mulige_dagsverk " +
+                        "sum(muligedv) as sum_mulige_dagsverk, " +
+                        "naering_kode " +
                         "from dt_p.agg_ia_sykefravar_v " +
                         "where arstall = :arstall and kvartal = :kvartal " +
                         "group by arstall, kvartal, orgnr, varighet",
@@ -200,7 +199,9 @@ public class DatavarehusRepository {
                                 resultSet.getString(VARIGHET),
                                 resultSet.getInt(SUM_ANTALL_PERSONER),
                                 resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
-                                resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
+                                resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK),
+                                resultSet.getString(NAERING_KODE)
+                        ));
     }
 
     /*

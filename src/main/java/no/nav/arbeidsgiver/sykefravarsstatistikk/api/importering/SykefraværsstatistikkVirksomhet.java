@@ -15,4 +15,5 @@ public class SykefraværsstatistikkVirksomhet implements Sykefraværsstatistikk 
     private int antallPersoner;
     private BigDecimal tapteDagsverk;
     private BigDecimal muligeDagsverk;
+    private String næringskode5siffer;
 }

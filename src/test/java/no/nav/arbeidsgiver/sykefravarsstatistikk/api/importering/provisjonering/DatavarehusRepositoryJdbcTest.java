@@ -134,7 +134,9 @@ public class DatavarehusRepositoryJdbcTest {
                 4, ORGNR_VIRKSOMHET_1,
                 _8_DAGER_TIL_16_DAGER,
                 "K",
-                5, 100
+                5,
+                100,
+                "12345"
         );
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
                 namedParameterJdbcTemplate,
@@ -145,7 +147,8 @@ public class DatavarehusRepositoryJdbcTest {
                 _8_DAGER_TIL_16_DAGER,
                 "M",
                 5,
-                101
+                101,
+                "12345"
         );
 
         ÅrstallOgKvartal sisteÅrstallOgKvartal =
@@ -192,11 +195,11 @@ public class DatavarehusRepositoryJdbcTest {
 
     @Test
     public void hentSykefraværsstatistikkVirksomhet__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
-        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, ORGNR_VIRKSOMHET_1, _1_DAG_TIL_7_DAGER, "K", 5, 100);
-        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, ORGNR_VIRKSOMHET_1, _1_DAG_TIL_7_DAGER, "M", 8, 88);
-        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, ORGNR_VIRKSOMHET_2, _1_DAG_TIL_7_DAGER, "K", 3, 75);
-        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 5, ORGNR_VIRKSOMHET_1, _1_DAG_TIL_7_DAGER, "M", 5, 101);
-        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2019, 2, 9, ORGNR_VIRKSOMHET_1, _8_DAGER_TIL_16_DAGER, "M", 9, 99);
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, ORGNR_VIRKSOMHET_1, _1_DAG_TIL_7_DAGER, "K", 5, 100, "12345");
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, ORGNR_VIRKSOMHET_1, _1_DAG_TIL_7_DAGER, "M", 8, 88, "12345");
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, ORGNR_VIRKSOMHET_2, _1_DAG_TIL_7_DAGER, "K", 3, 75, "12345");
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 5, ORGNR_VIRKSOMHET_1, _1_DAG_TIL_7_DAGER, "M", 5, 101, "12345");
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2019, 2, 9, ORGNR_VIRKSOMHET_1, _8_DAGER_TIL_16_DAGER, "M", 9, 99, "12345");
 
         List<SykefraværsstatistikkVirksomhet> sykefraværsstatistikkVirksomhet =
                 repository.hentSykefraværsstatistikkVirksomhet(new ÅrstallOgKvartal(2018, 4));
@@ -209,7 +212,8 @@ public class DatavarehusRepositoryJdbcTest {
                 _1_DAG_TIL_7_DAGER.kode,
                 7,
                 new BigDecimal(13).setScale(6),
-                new BigDecimal(188).setScale(6)
+                new BigDecimal(188).setScale(6),
+                "12345"
         );
         assertThat(sykefraværsstatistikkVirksomhet.get(0), equalTo(expected));
     }
@@ -330,7 +334,9 @@ public class DatavarehusRepositoryJdbcTest {
             Varighetskategori varighet,
             String kjonn,
             long taptedagsverk,
-            long muligedagsverk) {
+            long muligedagsverk,
+            String næringskode5siffer
+        ) {
         MapSqlParameterSource params =
                 new MapSqlParameterSource()
                         .addValue("arstall", årstall)
@@ -340,7 +346,8 @@ public class DatavarehusRepositoryJdbcTest {
                         .addValue("varighet", varighet.kode)
                         .addValue("kjonn", kjonn)
                         .addValue("taptedv", taptedagsverk)
-                        .addValue("muligedv", muligedagsverk);
+                        .addValue("muligedv", muligedagsverk)
+                        .addValue("næringskode5siffer", næringskode5siffer);
 
         jdbcTemplate.update(
                 "insert into dt_p.agg_ia_sykefravar_v ("
@@ -351,7 +358,7 @@ public class DatavarehusRepositoryJdbcTest {
                         + "taptedv, muligedv, antpers) "
                         + "values ("
                         + ":arstall, :kvartal, "
-                        + ":orgnr, '10062', '3', 'G', '03', "
+                        + ":orgnr, :næringskode5siffer, '3', 'G', '03', "
                         + "'B', :kjonn, '02', "
                         + "'L', :varighet, "
                         + ":taptedv, :muligedv, :antpers)",

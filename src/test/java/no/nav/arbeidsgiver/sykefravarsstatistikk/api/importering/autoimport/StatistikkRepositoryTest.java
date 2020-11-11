@@ -97,7 +97,8 @@ public class StatistikkRepositoryTest {
                 _1_DAG_TIL_7_DAGER.kode,
                 10,
                 new BigDecimal(15),
-                new BigDecimal(450)
+                new BigDecimal(450),
+                "12345"
         );
     }
 
