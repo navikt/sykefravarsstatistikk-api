@@ -116,6 +116,7 @@ public class ImporteringService {
         importSykefraværsstatistikkNæring(årstallOgKvartal);
         importSykefraværsstatistikkNæring5siffer(årstallOgKvartal);
         importSykefraværsstatistikkVirksomhet(årstallOgKvartal);
+        importSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal);
     }
 
 
@@ -184,6 +185,18 @@ public class ImporteringService {
         return resultat;
     }
 
+    private SlettOgOpprettResultat importSykefraværsstatistikkNæringMedVarighet(ÅrstallOgKvartal årstallOgKvartal) {
+        List<SykefraværsstatistikkNæringMedVarighet> sykefraværsstatistikkNæringMedVarighet =
+                datavarehusRepository.hentSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal);
+
+        SlettOgOpprettResultat resultat = statistikkRepository.importSykefraværsstatistikkNæringMedVarighet(
+                sykefraværsstatistikkNæringMedVarighet,
+                årstallOgKvartal
+        );
+        loggResultat(årstallOgKvartal, resultat, "næring med varighet");
+
+        return resultat;
+    }
 
     private static void loggResultat(ÅrstallOgKvartal årstallOgKvartal, SlettOgOpprettResultat resultat, String type) {
         String melding = resultat.getAntallRadOpprettet() == 0 && resultat.getAntallRadSlettet() == 0 ?

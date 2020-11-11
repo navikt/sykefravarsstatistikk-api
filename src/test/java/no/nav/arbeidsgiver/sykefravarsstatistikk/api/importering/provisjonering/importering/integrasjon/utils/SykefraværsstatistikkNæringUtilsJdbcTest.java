@@ -77,7 +77,7 @@ public class SykefraværsstatistikkNæringUtilsJdbcTest {
     }
 
     @Test
-    public void createFunction_delete__skal_slette_data_i_lokale_sykefraværstatistikk_tabellen() {
+    public void deleteFunction__skal_slette_data_i_lokale_sykefraværstatistikk_tabellen() {
         lagreSykefraværprosentNæring(namedParameterJdbcTemplate, "01", 2018, 3);
         lagreSykefraværprosentNæring(namedParameterJdbcTemplate, "02", 2018, 3);
         lagreSykefraværprosentNæring(namedParameterJdbcTemplate, "01", 2018, 4);
