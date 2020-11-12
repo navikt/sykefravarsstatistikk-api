@@ -129,23 +129,14 @@ public class StatistikkRepository {
             ÅrstallOgKvartal årstallOgKvartal
     ) {
         if (sykefraværsstatistikkNæringMedVarighet.isEmpty()) {
-            log.info(
-                    String.format("Ingen sykefraværsstatistikk (næring med varighet) til import for årstall '%d' og kvartal '%d'. ",
-                            årstallOgKvartal.getÅrstall(),
-                            årstallOgKvartal.getKvartal()
-                    )
-            );
+            loggInfoIngenDataTilImport(årstallOgKvartal, "næring med varighet");
             return SlettOgOpprettResultat.tomtResultat();
         }
 
-        log.info(
-                String.format(
-                        "Starter import av sykefraværsstatistikk (næring med varighet) for årstall '%d' og kvartal '%d'. " +
-                                "Skal importere %d rader",
-                        årstallOgKvartal.getÅrstall(),
-                        årstallOgKvartal.getKvartal(),
-                        sykefraværsstatistikkNæringMedVarighet.size()
-                )
+        loggInfoImportStarter(
+                sykefraværsstatistikkNæringMedVarighet.size(),
+                "næring med varighet",
+                årstallOgKvartal
         );
         int antallSlettet = slettSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal);
         int antallOprettet = batchOpprettSykefraværsstatistikkNæringMedVarighet(
@@ -270,4 +261,28 @@ public class StatistikkRepository {
 
         return antallOpprettet.get();
     }
+
+    private void loggInfoIngenDataTilImport(ÅrstallOgKvartal årstallOgKvartal, final String beskrivelse) {
+        log.info(
+                String.format("Ingen sykefraværsstatistikk ('%s') til import for årstall '%d' og kvartal '%d'. ",
+                        beskrivelse,
+                        årstallOgKvartal.getÅrstall(),
+                        årstallOgKvartal.getKvartal()
+                )
+        );
+    }
+
+    private void loggInfoImportStarter(int importSize, String beskrivelse, ÅrstallOgKvartal årstallOgKvartal) {
+        log.info(
+                String.format(
+                        "Starter import av sykefraværsstatistikk (%s) for årstall '%d' og kvartal '%d'. " +
+                                "Skal importere %d rader",
+                        beskrivelse,
+                        årstallOgKvartal.getÅrstall(),
+                        årstallOgKvartal.getKvartal(),
+                        importSize
+                )
+        );
+    }
+
 }
