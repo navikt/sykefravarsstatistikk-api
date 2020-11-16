@@ -24,6 +24,16 @@ jobs:
       - name: Run tests
         run: mvn test
 
+  deploy-alert:
+    name: Deploy alert to dev
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/deploy-alerts'
+    steps:
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-fss
+          RESOURCE: nais/alerterator.yaml
+
   deploy-to-dev:
     name: Deploy to dev
     needs: test
@@ -58,7 +68,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           VAR: version=${{ env.IMAGE }}
-          RESOURCE: nais/dev.yaml, nais/alerterator.yaml
+          RESOURCE: nais/dev.yaml
 
   deploy-to-prod:
     name: Deploy to prod
