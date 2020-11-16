@@ -2,13 +2,14 @@ apiVersion: "nais.io/v1"
 kind: "Alert"
 metadata:
   name: sykefravarsstatistikk-api-alert
+  namespace: arbeidsgiver
   labels:
     team: arbeidsgiver
 spec:
   receivers:
     slack:
       channel: 'arbeidsgiver-teamia-utvikling'
-      prependText: '<!here> | '
+      prependText: '<!channel> | '
   alerts:
     - alert: applikasjon nede
       expr: sum(up{app="sykefravarsstatistikk-api", job="kubernetes-pods"}) == 0
