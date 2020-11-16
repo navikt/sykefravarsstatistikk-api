@@ -25,8 +25,8 @@ jobs:
         run: mvn test
 
   deploy-alert:
-    name: Deploy alert to dev
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/deploy-alerts'
+    name: Deploy alert to prod
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
