@@ -33,6 +33,8 @@ public class DatavarehusRepository {
     public static final String SUM_TAPTE_DAGSVERK = "sum_tapte_dagsverk";
     public static final String SUM_MULIGE_DAGSVERK = "sum_mulige_dagsverk";
 
+    public static final String RECTYPE_FOR_FORETAK = "1";
+    public static final String RECTYPE_FOR_VIRKSOMHET = "2";
 
     public static final String NAERING_KODE = "naering_kode";
     public static final String NAERING_BESKRIVELSE = "naering_besk_lang";
@@ -216,6 +218,7 @@ public class DatavarehusRepository {
                         "sum(muligedv) as sum_mulige_dagsverk " +
                         "from dt_p.agg_ia_sykefravar_v " +
                         "where arstall = :arstall and kvartal = :kvartal and varighet is not null " +
+                        "and rectype='"+ RECTYPE_FOR_VIRKSOMHET + "'" +
                         "group by arstall, kvartal, naering_kode, varighet",
                 namedParameters,
                 (resultSet, rowNum) ->

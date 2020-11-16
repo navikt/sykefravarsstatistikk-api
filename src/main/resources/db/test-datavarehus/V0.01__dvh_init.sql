@@ -70,7 +70,8 @@ create table dt_p.agg_ia_sykefravar_v
     fylkarb varchar(2) not null,
     taptedv decimal(14,6),
     muligedv decimal(15,6),
-    antpers decimal(7,0)
+    antpers decimal(7,0),
+    rectype char(1) not null
 );
 
 create table dt_p.agg_ia_sykefravar_naring_kode
