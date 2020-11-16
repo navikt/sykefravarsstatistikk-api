@@ -10,7 +10,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         "org.springframework"
 })
 public class SykefraværsstatistikkApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(SykefraværsstatistikkApplication.class, args);
     }
