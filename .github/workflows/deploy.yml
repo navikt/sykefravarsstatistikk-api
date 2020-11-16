@@ -27,6 +27,7 @@ jobs:
   deploy-alert:
     name: Deploy alert to dev
     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/deploy-alerts'
+    runs-on: ubuntu-latest
     steps:
       - uses: nais/deploy/actions/deploy@v1
         env:
