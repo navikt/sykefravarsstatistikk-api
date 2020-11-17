@@ -19,12 +19,17 @@ import java.util.List;
 public class ImporteringController {
 
     private final ImporteringService importeringService;
+    private final AutoimportTestService autoimportTestService;
 
-    public ImporteringController(ImporteringService importeringService) {
+    public ImporteringController(
+            ImporteringService importeringService,
+            AutoimportTestService autoimportTestService
+    ) {
         this.importeringService = importeringService;
+        this.autoimportTestService = autoimportTestService;
     }
 
-    @PostMapping(value = "/reimport")
+    @PostMapping("/reimport")
     public ResponseEntity<HttpStatus> reimporter(
             @RequestParam int fraÅrstall,
             @RequestParam int fraKvartal,
@@ -45,5 +50,10 @@ public class ImporteringController {
             );
         }
         return ResponseEntity.ok(HttpStatus.CREATED);
+    }
+
+    @GetMapping("/test-av-naring-med-varighet")
+    public ResponseEntity<List<String>> testAvNæringMedVarighet() {
+        return ResponseEntity.ok(autoimportTestService.testNæringMedVarighetMotNæringstabell());
     }
 }
