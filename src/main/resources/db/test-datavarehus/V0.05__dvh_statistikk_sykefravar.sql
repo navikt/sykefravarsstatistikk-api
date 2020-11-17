@@ -11,7 +11,7 @@ insert into dt_p.agg_ia_sykefravar_v
     orgnr, naering_kode, sektor, storrelse, fylkarb,
     alder, kjonn,  fylkbo,
     sftype, varighet,
-    taptedv, muligedv, antpers
+    taptedv, muligedv, antpers, rectype
 )
 values
 (
@@ -19,7 +19,7 @@ values
     '987654321', '62', '3', 'G', '03',
     'B', 'K', '02',
     'L', 'A',
-    13, 0, 0
+    13, 0, 0, '2'
 );
 
 insert into dt_p.agg_ia_sykefravar_v
@@ -28,7 +28,7 @@ insert into dt_p.agg_ia_sykefravar_v
     orgnr, naering_kode, sektor, storrelse, fylkarb,
     alder, kjonn,  fylkbo,
     sftype, varighet,
-    taptedv, muligedv, antpers
+    taptedv, muligedv, antpers, rectype
 )
 values
 (
@@ -36,5 +36,5 @@ values
     '987654321', '62', '3', 'G', '03',
     'B', 'K', '02',
     'X', 'X',
-    0, 386.123, 6
+    0, 386.123, 6, '2'
 );

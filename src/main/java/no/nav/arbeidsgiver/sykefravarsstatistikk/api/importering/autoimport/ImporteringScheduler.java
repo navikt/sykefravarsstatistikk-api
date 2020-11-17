@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 @Component
@@ -22,11 +23,12 @@ public class ImporteringScheduler {
 
     @Scheduled(cron = "0 5 8 * * ?")
     public void scheduledImportering() {
-        Duration lockAtMostUntil = Duration.of(10, ChronoUnit.MINUTES);
-        Duration lockAtLeastUntil = Duration.of(1, ChronoUnit.MINUTES);
+        Duration lockAtMostFor = Duration.of(10, ChronoUnit.MINUTES);
+        Duration lockAtLeastFor = Duration.of(1, ChronoUnit.MINUTES);
+
         taskExecutor.executeWithLock(
                 (Runnable) this::importering,
-                new LockConfiguration("importering", lockAtMostUntil, lockAtLeastUntil)
+                new LockConfiguration(Instant.now(), "importering", lockAtMostFor, lockAtLeastFor)
         );
     }
 

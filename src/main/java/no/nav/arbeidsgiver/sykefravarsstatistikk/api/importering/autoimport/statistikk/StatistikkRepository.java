@@ -5,14 +5,19 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.SlettOgOpprettResultat;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.SykefraværsstatistikkIntegrasjon.ARSTALL;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.SykefraværsstatistikkIntegrasjon.KVARTAL;
 
 @Slf4j
 @Component
@@ -119,6 +124,77 @@ public class StatistikkRepository {
         );
     }
 
+    public SlettOgOpprettResultat importSykefraværsstatistikkNæringMedVarighet(
+            List<SykefraværsstatistikkNæringMedVarighet> sykefraværsstatistikkNæringMedVarighet,
+            ÅrstallOgKvartal årstallOgKvartal
+    ) {
+        if (sykefraværsstatistikkNæringMedVarighet.isEmpty()) {
+            loggInfoIngenDataTilImport(årstallOgKvartal, "næring med varighet");
+            return SlettOgOpprettResultat.tomtResultat();
+        }
+
+        loggInfoImportStarter(
+                sykefraværsstatistikkNæringMedVarighet.size(),
+                "næring med varighet",
+                årstallOgKvartal
+        );
+        int antallSlettet = slettSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal);
+        int antallOprettet = batchOpprettSykefraværsstatistikkNæringMedVarighet(
+                sykefraværsstatistikkNæringMedVarighet,
+                INSERT_BATCH_STØRRELSE
+        );
+
+        return new SlettOgOpprettResultat(antallSlettet, antallOprettet);
+
+    }
+
+    public int slettSykefraværsstatistikkNæringMedVarighet(ÅrstallOgKvartal årstallOgKvartal) {
+        SqlParameterSource namedParameters =
+                new MapSqlParameterSource()
+                        .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+                        .addValue(KVARTAL, årstallOgKvartal.getKvartal());
+
+        return namedParameterJdbcTemplate.update(
+                String.format(
+                        "delete from sykefravar_statistikk_naring_med_varighet where arstall = :%s and kvartal = :%s",
+                        ARSTALL, KVARTAL),
+                namedParameters);
+    }
+
+    public int batchOpprettSykefraværsstatistikkNæringMedVarighet(
+            List<? extends Sykefraværsstatistikk> sykefraværsstatistikk,
+            int insertBatchStørrelse
+    ) {
+
+        List<? extends List<? extends Sykefraværsstatistikk>> subsets =
+                Lists.partition(sykefraværsstatistikk, insertBatchStørrelse);
+
+        AtomicInteger antallOpprettet = new AtomicInteger();
+
+        subsets.forEach(subset -> {
+                    int opprettet = opprettSykefraværsstatistikkNæringMedVarighet(subset);
+                    int opprettetHittilNå = antallOpprettet.addAndGet(opprettet);
+
+                    log.info(String.format("Opprettet %d rader", opprettetHittilNå));
+                }
+        );
+
+        return antallOpprettet.get();
+    }
+
+    public int opprettSykefraværsstatistikkNæringMedVarighet(
+            List<? extends Sykefraværsstatistikk> sykefraværsstatistikk
+    ) {
+        SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(sykefraværsstatistikk.toArray());
+
+        int[] results = namedParameterJdbcTemplate.batchUpdate(
+                "insert into sykefravar_statistikk_naring_med_varighet " +
+                        "(arstall, kvartal, naring_kode, varighet, antall_personer, tapte_dagsverk, mulige_dagsverk) " +
+                        "values " +
+                        "(:årstall, :kvartal, :næringkode, :varighet, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
+                batch);
+        return Arrays.stream(results).sum();
+    }
 
     public SlettOgOpprettResultat importStatistikk(
             String statistikktype,
@@ -148,14 +224,14 @@ public class StatistikkRepository {
                         sykefraværsstatistikk.size()
                 )
         );
-        int antallSletet = slett(årstallOgKvartal, sykefraværsstatistikkIntegrasjonUtils.getDeleteFunction());
+        int antallSlettet = slett(årstallOgKvartal, sykefraværsstatistikkIntegrasjonUtils.getDeleteFunction());
         int antallOprettet = batchOpprett(
                 sykefraværsstatistikk,
                 sykefraværsstatistikkIntegrasjonUtils,
                 INSERT_BATCH_STØRRELSE
         );
 
-        return new SlettOgOpprettResultat(antallSletet, antallOprettet);
+        return new SlettOgOpprettResultat(antallSlettet, antallOprettet);
     }
 
 
@@ -185,4 +261,28 @@ public class StatistikkRepository {
 
         return antallOpprettet.get();
     }
+
+    private void loggInfoIngenDataTilImport(ÅrstallOgKvartal årstallOgKvartal, final String beskrivelse) {
+        log.info(
+                String.format("Ingen sykefraværsstatistikk ('%s') til import for årstall '%d' og kvartal '%d'. ",
+                        beskrivelse,
+                        årstallOgKvartal.getÅrstall(),
+                        årstallOgKvartal.getKvartal()
+                )
+        );
+    }
+
+    private void loggInfoImportStarter(int importSize, String beskrivelse, ÅrstallOgKvartal årstallOgKvartal) {
+        log.info(
+                String.format(
+                        "Starter import av sykefraværsstatistikk (%s) for årstall '%d' og kvartal '%d'. " +
+                                "Skal importere %d rader",
+                        beskrivelse,
+                        årstallOgKvartal.getÅrstall(),
+                        årstallOgKvartal.getKvartal(),
+                        importSize
+                )
+        );
+    }
+
 }
