@@ -35,10 +35,23 @@ public class AutoimportTestService {
         resultatlinjer.add("Antall linjer næring: " + rådataNæring.size());
         resultatlinjer.add("Antall linjer næring med varighet: " + rådataNæringMedVarighet.size());
 
-        List<Boolean> resultat = rådataErLike(rådataNæring, rådataNæringMedVarighet);
+        List<ÅrstallOgKvartal> årstallOgKvartal = rådataNæring
+                .stream()
+                .map(Rådata::getÅrstallOgKvartal)
+                .collect(Collectors.toList());
 
-        resultatlinjer.add("Antall like match: " + count(resultat, true));
-        resultatlinjer.add("Antall mismatch: " + count(resultat, false));
+        årstallOgKvartal.forEach(kvartal -> {
+            resultatlinjer.add("");
+            resultatlinjer.add("For årstall=" + kvartal.getÅrstall() + ", kvartal=" + kvartal.getKvartal());
+
+            List<Rådata> dataNæring = getRådataForKvartal(rådataNæring, kvartal);
+            List<Rådata> dataNæringMedVarighet = getRådataForKvartal(rådataNæringMedVarighet, kvartal);
+
+            List<Boolean> resultat = rådataErLike(dataNæring, dataNæringMedVarighet);
+
+            resultatlinjer.add("Antall match: " + count(resultat, true));
+            resultatlinjer.add("Antall mismatch: " + count(resultat, false));
+        });
 
         return resultatlinjer;
     }
