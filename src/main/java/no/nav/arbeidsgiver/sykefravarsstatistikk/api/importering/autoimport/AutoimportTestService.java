@@ -38,6 +38,7 @@ public class AutoimportTestService {
         List<ÅrstallOgKvartal> årstallOgKvartal = rådataNæring
                 .stream()
                 .map(Rådata::getÅrstallOgKvartal)
+                .distinct()
                 .collect(Collectors.toList());
 
         årstallOgKvartal.forEach(kvartal -> {
@@ -79,58 +80,6 @@ public class AutoimportTestService {
         return rådataList.stream()
                 .filter(rådataListElement -> erLikeUtenomTall(rådataListElement, rådata))
                 .findAny();
-    }
-
-    public List<String> testNæringMedVarighetMotNæringstabellOld() {
-        List<String> resultatlinjer = new ArrayList<>();
-
-
-        List<Rådata> rådataNæring = hentRådataForNæring();
-        List<Rådata> rådataNæringMedVarighet = hentRådataForNæringMedVarighet();
-
-        resultatlinjer.add("Antall linjer næring: " + rådataNæring.size());
-        resultatlinjer.add("Antall linjer næring med varighet: " + rådataNæringMedVarighet.size());
-
-        List<ÅrstallOgKvartal> årstallOgKvartal = rådataNæring
-                .stream()
-                .map(Rådata::getÅrstallOgKvartal)
-                .collect(Collectors.toList());
-
-        årstallOgKvartal.forEach(kvartal -> {
-            String resultatlinje = kvartal.toString() + ":";
-
-            List<Rådata> dataNæring = getRådataForKvartal(rådataNæring, kvartal);
-            List<Rådata> dataNæringMedVarighet = getRådataForKvartal(rådataNæringMedVarighet, kvartal);
-
-            resultatlinje += " Antall rader næring: " + dataNæring.size();
-            resultatlinje += " Antall rader næring m varighet: " + dataNæringMedVarighet.size();
-
-            int antallForskjelligeRader = 0;
-            //dataNæring
-
-            resultatlinjer.add(resultatlinje);
-        });
-
-        return resultatlinjer;
-    }
-
-    private String rådataSammenligningResultat(Rådata dataNæring, Rådata dataNæringMedVarighet) {
-        String resultat = "AVVIK - ";
-
-        if (!dataNæring.getÅrstallOgKvartal().equals(dataNæringMedVarighet.getÅrstallOgKvartal())) {
-            resultat += "årstall: " + dataNæring.getÅrstallOgKvartal().toString() + ", " + dataNæringMedVarighet.toString() + "\n";
-        }
-        if (!dataNæring.getNæringskode().equals(dataNæringMedVarighet.getNæringskode())) {
-            resultat += "årstall: " + dataNæring.getÅrstallOgKvartal().toString() + ", " + dataNæringMedVarighet.toString() + "\n";
-        }
-        /*
-        *
-        private final String næringskode;
-        private ÅrstallOgKvartal årstallOgKvartal;
-        private final int antallPersoner;
-        private final BigDecimal tapteDagsverk;
-        private final BigDecimal muligeDagsverk;*/
-        return resultat;
     }
 
     private boolean erLike(Rådata data1, Rådata data2) {
