@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class AutoimportTestService {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    private final BigDecimal BIG_DECIMAL_FEILMARGIN = new BigDecimal("1e-5");
+    private final BigDecimal BIG_DECIMAL_FEILMARGIN = new BigDecimal("0.01");
 
     public AutoimportTestService(
             @Qualifier("sykefravarsstatistikkJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
