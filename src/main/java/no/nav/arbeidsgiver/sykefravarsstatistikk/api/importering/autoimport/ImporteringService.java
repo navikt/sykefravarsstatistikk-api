@@ -23,8 +23,7 @@ public class ImporteringService {
     public ImporteringService(
             StatistikkRepository statistikkRepository,
             DatavarehusRepository datavarehusRepository,
-            @Value("${statistikk.importering.aktivert}")
-                    Boolean erImporteringAktivert) {
+            @Value("${statistikk.importering.aktivert}") Boolean erImporteringAktivert) {
         this.statistikkRepository = statistikkRepository;
         this.datavarehusRepository = datavarehusRepository;
         this.erImporteringAktivert = erImporteringAktivert;
