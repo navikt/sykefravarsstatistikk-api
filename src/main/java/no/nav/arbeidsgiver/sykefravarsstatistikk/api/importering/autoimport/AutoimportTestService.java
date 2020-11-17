@@ -37,8 +37,8 @@ public class AutoimportTestService {
 
         List<Boolean> resultat = rådataErLike(rådataNæring, rådataNæringMedVarighet);
 
-        resultatlinjer.add("Antall like rader: " + count(resultat, true));
-        resultatlinjer.add("Antall ulike rader: " + count(resultat, false));
+        resultatlinjer.add("Antall like match: " + count(resultat, true));
+        resultatlinjer.add("Antall mismatch: " + count(resultat, false));
 
         return resultatlinjer;
     }
@@ -47,9 +47,12 @@ public class AutoimportTestService {
         List<Boolean> resultat = new ArrayList<>();
         for (int i = 0; i < rådataNæring.size(); i++) {
             Rådata dataNæring = rådataNæring.get(i);
-            if (i < rådataNæringMedVarighet.size()) {
-                Rådata dataNæringMedVarighet = rådataNæringMedVarighet.get(i);
-                resultat.add(erLike(dataNæring, dataNæringMedVarighet));
+            Optional<Rådata> dataNæringMedVarighet = finnTilsvarendeRådata(dataNæring, rådataNæringMedVarighet);
+
+            if (dataNæringMedVarighet.isPresent()) {
+                resultat.add(erLike(dataNæring, dataNæringMedVarighet.get()));
+            } else {
+                resultat.add(false);
             }
         }
         return resultat;
