@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping(value = "importering")
-@Profile({"local", "dev", "prod"})
+@Profile({"local", "dev"})
 public class ImporteringController {
 
     private final ImporteringService importeringService;
