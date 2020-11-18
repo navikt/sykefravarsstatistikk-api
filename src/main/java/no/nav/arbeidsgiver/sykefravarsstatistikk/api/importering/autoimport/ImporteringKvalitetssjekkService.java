@@ -15,18 +15,18 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-public class ImporteringTestService {
+public class ImporteringKvalitetssjekkService {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final BigDecimal BIG_DECIMAL_FEILMARGIN = new BigDecimal("0.01");
 
-    public ImporteringTestService(
+    public ImporteringKvalitetssjekkService(
             @Qualifier("sykefravarsstatistikkJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
     ) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-    public List<String> testNæringMedVarighetMotNæringstabell() {
+    public List<String> kvalitetssjekkNæringMedVarighetMotNæringstabell() {
         List<String> resultatlinjer = new ArrayList<>();
 
         List<Rådata> rådataNæring = hentRådataForNæring();

@@ -19,11 +19,11 @@ import java.util.List;
 public class ImporteringController {
 
     private final ImporteringService importeringService;
-    private final ImporteringTestService importeringTestService;
+    private final ImporteringKvalitetssjekkService importeringTestService;
 
     public ImporteringController(
             ImporteringService importeringService,
-            ImporteringTestService importeringTestService
+            ImporteringKvalitetssjekkService importeringTestService
     ) {
         this.importeringService = importeringService;
         this.importeringTestService = importeringTestService;
@@ -52,8 +52,8 @@ public class ImporteringController {
         return ResponseEntity.ok(HttpStatus.CREATED);
     }
 
-    @GetMapping("/test-av-naring-med-varighet")
+    @GetMapping("/kvalitetssjekk")
     public ResponseEntity<List<String>> testAvNæringMedVarighet() {
-        return ResponseEntity.ok(importeringTestService.testNæringMedVarighetMotNæringstabell());
+        return ResponseEntity.ok(importeringTestService.kvalitetssjekkNæringMedVarighetMotNæringstabell());
     }
 }
