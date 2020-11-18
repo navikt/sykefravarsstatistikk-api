@@ -15,12 +15,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-public class AutoimportTestService {
+public class ImporteringTestService {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final BigDecimal BIG_DECIMAL_FEILMARGIN = new BigDecimal("0.01");
 
-    public AutoimportTestService(
+    public ImporteringTestService(
             @Qualifier("sykefravarsstatistikkJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
     ) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
@@ -59,8 +59,7 @@ public class AutoimportTestService {
 
     private List<Boolean> rådataErLike(List<Rådata> rådataNæring, List<Rådata> rådataNæringMedVarighet) {
         List<Boolean> resultat = new ArrayList<>();
-        for (int i = 0; i < rådataNæring.size(); i++) {
-            Rådata dataNæring = rådataNæring.get(i);
+        for (Rådata dataNæring : rådataNæring) {
             Optional<Rådata> dataNæringMedVarighet = finnTilsvarendeRådata(dataNæring, rådataNæringMedVarighet);
 
             if (dataNæringMedVarighet.isPresent()) {
