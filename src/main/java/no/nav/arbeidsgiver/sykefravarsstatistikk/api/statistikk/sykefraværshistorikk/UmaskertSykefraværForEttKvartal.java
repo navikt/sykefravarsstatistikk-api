@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 
 import java.math.BigDecimal;
@@ -13,6 +14,7 @@ import static java.lang.Integer.max;
 
 @Getter
 @EqualsAndHashCode
+@ToString
 public class UmaskertSykefraværForEttKvartal implements Comparable<UmaskertSykefraværForEttKvartal>  {
 
     @JsonIgnore

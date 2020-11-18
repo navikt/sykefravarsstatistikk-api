@@ -1,11 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.varighet;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SummertSykefravær;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertKorttidsOgLangtidsfravær;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.VarighetRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
@@ -50,7 +47,7 @@ public class VarighetServiceTest {
 
     @Test
     public void hentKorttidsOgLangtidsfraværSiste4Kvartaler__skal_returnere_et_tomt_KorttidsOgLangtidsfraværSiste4Kvartaler_dersom_ingen_data_er_tilgjengelig() {
-        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any())).thenReturn(
+        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any(Virksomhet.class))).thenReturn(
                 new ArrayList<>()
         );
 
@@ -67,7 +64,7 @@ public class VarighetServiceTest {
                 getSykefraværMedVarighet(sistePublisertÅrstallOgKvartal, 2, 0, 0, Varighetskategori.MER_ENN_39_UKER),
                 getSykefraværMedVarighet(sistePublisertÅrstallOgKvartal, 0, 100, 10, Varighetskategori.TOTAL)
         );
-        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any())).thenReturn(
+        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any(Virksomhet.class))).thenReturn(
                 sykefraværMed1Kvartal
         );
 
@@ -107,7 +104,7 @@ public class VarighetServiceTest {
                 getSykefraværMedVarighet(kvartal2, 0, 100, 10, Varighetskategori.TOTAL)
         );
 
-        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any())).thenReturn(
+        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any(Virksomhet.class))).thenReturn(
                 sykefraværMed2Kvartaler
         );
 
@@ -149,7 +146,7 @@ public class VarighetServiceTest {
                 getSykefraværMedVarighet(kvartal, 0, 100000, 2000, Varighetskategori.TOTAL)
         );
 
-        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any())).thenReturn(
+        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any(Virksomhet.class))).thenReturn(
                 sykefraværMed1Kvartal
         );
 
@@ -190,7 +187,7 @@ public class VarighetServiceTest {
                 getSykefraværMedVarighet(ikkeUtdatertKvartal, 0, 100, 200, Varighetskategori.TOTAL)
         );
 
-        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any())).thenReturn(
+        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any(Virksomhet.class))).thenReturn(
                 umaskertKvartalsvisSykefraværMedVarighet
         );
 
@@ -229,7 +226,7 @@ public class VarighetServiceTest {
                 getSykefraværMedVarighet(kvartalMedKorttidOgLangtidsfravær, 0, 100, 200, Varighetskategori.TOTAL)
         );
 
-        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any())).thenReturn(
+        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any(Virksomhet.class))).thenReturn(
                 umaskertKvartalsvisSykefraværMedVarighet
         );
 
@@ -269,7 +266,7 @@ public class VarighetServiceTest {
                 getSykefraværMedVarighet(kvartalMedKorttidOgLangtidsfravær, 0, 100, 200, Varighetskategori.TOTAL)
         );
 
-        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any())).thenReturn(
+        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any(Virksomhet.class))).thenReturn(
                 umaskertKvartalsvisSykefraværMedVarighet
         );
 
@@ -310,7 +307,7 @@ public class VarighetServiceTest {
                 getSykefraværMedVarighet(kvartal2, 0, 100, 4, Varighetskategori.TOTAL)
         );
 
-        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any())).thenReturn(
+        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any(Virksomhet.class))).thenReturn(
                 umaskertKvartalsvisSykefraværMedVarighet
         );
 
@@ -343,7 +340,7 @@ public class VarighetServiceTest {
                 getSykefraværMedVarighet(kvartal2, 0, 100, 5, Varighetskategori.TOTAL)
         );
 
-        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any())).thenReturn(
+        when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any(Virksomhet.class))).thenReturn(
                 sykefraværMed2Kvartaler
         );
 
