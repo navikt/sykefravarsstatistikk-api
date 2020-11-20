@@ -26,7 +26,6 @@ import static java.lang.String.format;
 public class KvartalsvisSykefraværshistorikkService {
 
     public static final int TIMEOUT_UTHENTING_FRA_DB_I_SEKUNDER = 3;
-    public static final int LENGDE_PÅ_NÆRINGSKODE_AV_BRANSJENIVÅ = 5;
     public static final String SYKEFRAVÆRPROSENT_LAND_LABEL = "Norge";
 
     private final KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository;
@@ -50,11 +49,11 @@ public class KvartalsvisSykefraværshistorikkService {
             InstitusjonellSektorkode institusjonellSektorkode
     ) {
         Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
-        Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(institusjonellSektorkode);
+        boolean skalHenteDataPåNæring2Siffer =
+                bransje.isEmpty()
+                        || bransje.get().lengdePåNæringskoder() == 2;
 
-        boolean erIBransjeprogram =
-                bransje.isPresent()
-                        && bransje.get().lengdePåNæringskoder() == LENGDE_PÅ_NÆRINGSKODE_AV_BRANSJENIVÅ;
+        Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(institusjonellSektorkode);
 
         List<KvartalsvisSykefraværshistorikk> kvartalsvisSykefraværshistorikkListe =
                 Stream.of(
@@ -66,13 +65,13 @@ public class KvartalsvisSykefraværshistorikkService {
                                 () -> hentSykefraværshistorikkSektor(ssbSektor),
                                 Statistikkategori.SEKTOR,
                                 ssbSektor.getNavn()),
-                        erIBransjeprogram ?
-                                uthentingMedFeilhåndteringOgTimeout(
-                                        () -> hentSykefraværshistorikkBransje(bransje.get()),
-                                        Statistikkategori.BRANSJE,
-                                        bransje.get().getNavn()
-                                )
-                                : uthentingAvSykefraværshistorikkNæring(underenhet),
+                        skalHenteDataPåNæring2Siffer ?
+                                uthentingAvSykefraværshistorikkNæring(underenhet)
+                                : uthentingMedFeilhåndteringOgTimeout(
+                                () -> hentSykefraværshistorikkBransje(bransje.get()),
+                                Statistikkategori.BRANSJE,
+                                bransje.get().getNavn()
+                        ),
                         uthentingMedFeilhåndteringOgTimeout(
                                 () -> hentSykefraværshistorikkVirksomhet(underenhet, Statistikkategori.VIRKSOMHET),
                                 Statistikkategori.VIRKSOMHET,
@@ -100,6 +99,7 @@ public class KvartalsvisSykefraværshistorikkService {
 
         return kvartalsvisSykefraværshistorikkListe;
     }
+
 
     private KvartalsvisSykefraværshistorikk hentSykefraværshistorikkLand() {
         return byggSykefraværshistorikk(
