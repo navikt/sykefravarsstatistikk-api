@@ -7,6 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Brans
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
 import org.springframework.stereotype.Component;
 
@@ -26,13 +27,13 @@ public class VarighetService {
             VarighetRepository varighetRepository,
             Bransjeprogram bransjeprogram,
             KlassifikasjonerRepository klassifikasjonerRepository
-            ) {
+    ) {
         this.varighetRepository = varighetRepository;
         this.bransjeprogram = bransjeprogram;
         this.klassifikasjonerRepository = klassifikasjonerRepository;
     }
 
-    public SummertKorttidsOgLangtidsfravær hentSummertKorttidsOgLangtidsfraværForBransjeEllerNæring(
+    public SummertSykefraværshistorikk hentSummertKorttidsOgLangtidsfraværForBransjeEllerNæring(
             Underenhet underenhet,
             ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal,
             int antallKvartalerSomSkalSummeres
@@ -47,19 +48,32 @@ public class VarighetService {
                         || bransje.get().lengdePåNæringskoder() == 2;
 
         List<UmaskertSykefraværForEttKvartalMedVarighet> sykefraværVarighet;
+        Statistikkategori type;
+        String label;
 
         if (skalHenteDataPåNæring2Siffer) {
+            type = Statistikkategori.NÆRING;
             Næring næring = klassifikasjonerRepository.hentNæring(underenhet.getNæringskode().hentNæringskode2Siffer());
+            label = næring.getNavn();
             sykefraværVarighet = varighetRepository.hentSykefraværForEttKvartalMedVarighet(næring);
         } else {
+            type = Statistikkategori.BRANSJE;
+            label = bransje.get().getNavn();
             sykefraværVarighet = varighetRepository.hentSykefraværForEttKvartalMedVarighet(bransje.get());
         }
 
-        return SummertKorttidsOgLangtidsfravær.getSummertKorttidsOgLangtidsfravær(
-                sistePubliserteÅrstallOgKvartal,
-                antallKvartalerSomSkalSummeres,
-                sykefraværVarighet
-        );
+        SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
+                SummertKorttidsOgLangtidsfravær.getSummertKorttidsOgLangtidsfravær(
+                        sistePubliserteÅrstallOgKvartal,
+                        antallKvartalerSomSkalSummeres,
+                        sykefraværVarighet
+                );
+
+        return SummertSykefraværshistorikk.builder()
+                .type(type)
+                .label(label)
+                .summertKorttidsOgLangtidsfravær(summertKorttidsOgLangtidsfravær)
+                .build();
     }
 
     public SummertKorttidsOgLangtidsfravær hentSummertKorttidsOgLangtidsfravær(

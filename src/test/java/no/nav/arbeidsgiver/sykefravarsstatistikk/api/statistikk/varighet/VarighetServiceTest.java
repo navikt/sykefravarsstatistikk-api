@@ -7,9 +7,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Brans
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertKorttidsOgLangtidsfravær;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertSykefraværshistorikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.VarighetRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.VarighetService;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,7 +59,6 @@ public class VarighetServiceTest {
                 0,
                 Varighetskategori._1_DAG_TIL_7_DAGER
         );
-
         List<UmaskertSykefraværForEttKvartalMedVarighet> sykefraværMed1Kvartal = Arrays.asList(
                 new UmaskertSykefraværForEttKvartalMedVarighet(
                         new ÅrstallOgKvartal(2020, 1),
@@ -75,14 +75,19 @@ public class VarighetServiceTest {
                         Varighetskategori.TOTAL
                 )
         );
-
         when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any(Bransje.class))).thenReturn(sykefraværMed1Kvartal);
 
-        SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
-                varighetService.hentSummertKorttidsOgLangtidsfraværForBransjeEllerNæring(barnehage, new ÅrstallOgKvartal(2020, 1), 4);
+        SummertSykefraværshistorikk summertSykefraværshistorikk =
+                varighetService.hentSummertKorttidsOgLangtidsfraværForBransjeEllerNæring(
+                        barnehage,
+                        new ÅrstallOgKvartal(2020, 1),
+                        4
+                );
 
-        assertThat(summertKorttidsOgLangtidsfravær.getSummertKorttidsfravær()).isNotNull();
-        assertThat(summertKorttidsOgLangtidsfravær.getSummertLangtidsfravær()).isNotNull();
+        assertThat(summertSykefraværshistorikk.getType()).isEqualTo(Statistikkategori.BRANSJE);
+        assertThat(summertSykefraværshistorikk.getLabel()).isEqualTo("Barnehager");
+        assertThat(summertSykefraværshistorikk.getSummertKorttidsOgLangtidsfravær().getSummertKorttidsfravær()).isNotNull();
+        assertThat(summertSykefraværshistorikk.getSummertKorttidsOgLangtidsfravær().getSummertLangtidsfravær()).isNotNull();
     }
 
 }

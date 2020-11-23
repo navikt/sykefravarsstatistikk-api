@@ -5,9 +5,11 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikkService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertKorttidsOgLangtidsfravær;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertSykefraværshistorikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.VarighetService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.List;
 
 @Protected
@@ -80,7 +83,6 @@ public class SykefraværshistorikkController {
         }
     }
 
-
     @GetMapping(value = "/{orgnr}/sykefravarshistorikk/summert")
     public SummertKorttidsOgLangtidsfravær hentSummertKorttidsOgLangtidsfravær(
             @PathVariable("orgnr") String orgnrStr,
@@ -107,6 +109,50 @@ public class SykefraværshistorikkController {
                 new ÅrstallOgKvartal(2020, 2),
                 antallKvartaler
         );
+    }
+
+    @GetMapping(value = "/{orgnr}/sykefravarshistorikk/summert/v2")
+    public List<SummertSykefraværshistorikk> hentSummertKorttidsOgLangtidsfraværV2(
+            @PathVariable("orgnr") String orgnrStr,
+            @RequestParam("antallKvartaler") int antallKvartaler,
+            HttpServletRequest request
+    ) {
+
+        InnloggetBruker bruker = tilgangskontrollService.hentInnloggetBruker();
+        tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
+                new Orgnr(orgnrStr),
+                bruker,
+                request.getMethod(),
+                "" + request.getRequestURL()
+        );
+        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr(orgnrStr));
+
+        if (antallKvartaler != 4) {
+            throw new IllegalArgumentException("For øyeblikket støtter vi kun summering av 4 kvartaler.");
+        }
+
+        SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfraværVirksomhet =
+                varighetService.hentSummertKorttidsOgLangtidsfravær(
+                        underenhet,
+                        new ÅrstallOgKvartal(2020, 2),
+                        antallKvartaler
+                );
+
+        SummertSykefraværshistorikk summertSykefraværshistorikkVirksomhet =
+                SummertSykefraværshistorikk.builder()
+                        .type(Statistikkategori.VIRKSOMHET)
+                        .label(underenhet.getNavn())
+                        .summertKorttidsOgLangtidsfravær(summertKorttidsOgLangtidsfraværVirksomhet)
+                        .build();
+
+        SummertSykefraværshistorikk summertSykefraværshistorikkBransjeEllerNæring =
+                varighetService.hentSummertKorttidsOgLangtidsfraværForBransjeEllerNæring(
+                        underenhet,
+                        new ÅrstallOgKvartal(2020, 2),
+                        antallKvartaler
+                );
+
+        return Arrays.asList(summertSykefraværshistorikkVirksomhet, summertSykefraværshistorikkBransjeEllerNæring);
     }
 
 }
