@@ -1,12 +1,14 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
 import lombok.Getter;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
+import lombok.ToString;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 
 import java.math.BigDecimal;
 
 @Getter
+@ToString(callSuper = true)
 public class UmaskertSykefraværForEttKvartalMedVarighet extends UmaskertSykefraværForEttKvartal {
 
     private final Varighetskategori varighet;
@@ -29,6 +31,5 @@ public class UmaskertSykefraværForEttKvartalMedVarighet extends UmaskertSykefra
                 super. getMuligeDagsverk(),
                 super.getAntallPersoner());
     }
-
 
 }
