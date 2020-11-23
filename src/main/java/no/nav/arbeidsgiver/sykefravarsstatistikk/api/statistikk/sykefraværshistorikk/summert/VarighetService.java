@@ -76,7 +76,7 @@ public class VarighetService {
                 .build();
     }
 
-    public SummertKorttidsOgLangtidsfravær hentSummertKorttidsOgLangtidsfravær(
+    public SummertSykefraværshistorikk hentSummertKorttidsOgLangtidsfravær(
             Underenhet underenhet,
             ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal,
             int antallKvartalerSomSkalSummeres
@@ -88,10 +88,16 @@ public class VarighetService {
         List<UmaskertSykefraværForEttKvartalMedVarighet> sykefraværVarighet =
                 varighetRepository.hentSykefraværForEttKvartalMedVarighet(underenhet);
 
-        return SummertKorttidsOgLangtidsfravær.getSummertKorttidsOgLangtidsfravær(
+        SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær = SummertKorttidsOgLangtidsfravær.getSummertKorttidsOgLangtidsfravær(
                 sistePubliserteÅrstallOgKvartal,
                 antallKvartalerSomSkalSummeres,
                 sykefraværVarighet
         );
+
+        return SummertSykefraværshistorikk.builder()
+                .type(Statistikkategori.VIRKSOMHET)
+                .label(underenhet.getNavn())
+                .summertKorttidsOgLangtidsfravær(summertKorttidsOgLangtidsfravær)
+                .build();
     }
 }

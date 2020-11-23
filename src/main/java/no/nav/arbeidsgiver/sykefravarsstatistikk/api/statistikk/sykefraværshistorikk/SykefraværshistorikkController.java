@@ -5,7 +5,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikkService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertKorttidsOgLangtidsfravær;
@@ -104,11 +103,12 @@ public class SykefraværshistorikkController {
             throw new IllegalArgumentException("For øyeblikket støtter vi kun summering av 4 kvartaler.");
         }
 
-        return varighetService.hentSummertKorttidsOgLangtidsfravær(
+        SummertSykefraværshistorikk summertSykefraværshistorikk = varighetService.hentSummertKorttidsOgLangtidsfravær(
                 underenhet,
                 new ÅrstallOgKvartal(2020, 2),
                 antallKvartaler
         );
+        return summertSykefraværshistorikk.getSummertKorttidsOgLangtidsfravær();
     }
 
     @GetMapping(value = "/{orgnr}/sykefravarshistorikk/summert/v2")
@@ -131,19 +131,12 @@ public class SykefraværshistorikkController {
             throw new IllegalArgumentException("For øyeblikket støtter vi kun summering av 4 kvartaler.");
         }
 
-        SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfraværVirksomhet =
+        SummertSykefraværshistorikk summertSykefraværshistorikkVirksomhet =
                 varighetService.hentSummertKorttidsOgLangtidsfravær(
                         underenhet,
                         new ÅrstallOgKvartal(2020, 2),
                         antallKvartaler
                 );
-
-        SummertSykefraværshistorikk summertSykefraværshistorikkVirksomhet =
-                SummertSykefraværshistorikk.builder()
-                        .type(Statistikkategori.VIRKSOMHET)
-                        .label(underenhet.getNavn())
-                        .summertKorttidsOgLangtidsfravær(summertKorttidsOgLangtidsfraværVirksomhet)
-                        .build();
 
         SummertSykefraværshistorikk summertSykefraværshistorikkBransjeEllerNæring =
                 varighetService.hentSummertKorttidsOgLangtidsfraværForBransjeEllerNæring(

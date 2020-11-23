@@ -179,4 +179,137 @@ public class ApiTest {
         assertThat(response.statusCode()).isEqualTo(403);
         assertThat(response.body()).isEqualTo("{\"message\":\"You don't have access to this ressource\"}");
     }
+
+    @Test
+    public void summert_sykefraværshistorikk_siste_4_kvartaler_V2__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
+        HttpResponse<String> response = newBuilder().build().send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/"
+                                + ORGNR_UNDERENHET_INGEN_TILGANG + "/sykefravarshistorikk/summert/v2?antallKvartaler=4"))
+                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .GET()
+                        .build(),
+                ofString()
+        );
+        assertThat(response.statusCode()).isEqualTo(403);
+        assertThat(response.body()).isEqualTo("{\"message\":\"You don't have access to this ressource\"}");
+    }
+
+    @Test
+    public void summert_sykefraværshistorikk_siste_4_kvartaler_v2__skal_returnere_riktig_objekt() throws Exception {
+        HttpResponse<String> response = newBuilder().build().send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET
+                                + "/sykefravarshistorikk/summert/v2?antallKvartaler=4"))
+                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .GET()
+                        .build(),
+                ofString()
+        );
+
+        assertThat(response.statusCode()).isEqualTo(200);
+        JsonNode responseBody = objectMapper.readTree(response.body());
+
+
+        assertThat(responseBody).isEqualTo(objectMapper.readTree(getSummertSykefraværshistorikkResponseBody()));
+    }
+
+
+    private static String getSummertSykefraværshistorikkResponseBody() {
+        return 
+                "[" +
+                        "  {" +
+                        "    \"type\": \"VIRKSOMHET\"," +
+                        "    \"label\": \"NAV ARBEID OG YTELSER AVD OSLO\"," +
+                        "    \"summertKorttidsOgLangtidsfravær\": {" +
+                        "      \"summertKorttidsfravær\": {" +
+                        "        \"prosent\": 3.7," +
+                        "        \"tapteDagsverk\": 148.9," +
+                        "        \"muligeDagsverk\": 3979.6," +
+                        "        \"erMaskert\": false," +
+                        "        \"kvartaler\": [" +
+                        "          {" +
+                        "            \"årstall\": 2019," +
+                        "            \"kvartal\": 3" +
+                        "          }," +
+                        "          {" +
+                        "            \"årstall\": 2020," +
+                        "            \"kvartal\": 1" +
+                        "          }" +
+                        "        ]" +
+                        "      }," +
+                        "      \"summertLangtidsfravær\": {" +
+                        "        \"prosent\": 3.0," +
+                        "        \"tapteDagsverk\": 121.3," +
+                        "        \"muligeDagsverk\": 3979.6," +
+                        "        \"erMaskert\": false," +
+                        "        \"kvartaler\": [" +
+                        "          {" +
+                        "            \"årstall\": 2019," +
+                        "            \"kvartal\": 3" +
+                        "          }," +
+                        "          {" +
+                        "            \"årstall\": 2020," +
+                        "            \"kvartal\": 1" +
+                        "          }" +
+                        "        ]" +
+                        "      }" +
+                        "    }" +
+                        "  }," +
+                        "  {" +
+                        "    \"type\": \"NÆRING\"," +
+                        "    \"label\": \"Produksjon av nærings- og nytelsesmidler\"," +
+                        "    \"summertKorttidsOgLangtidsfravær\": {" +
+                        "      \"summertKorttidsfravær\": {" +
+                        "        \"prosent\": 9.7," +
+                        "        \"tapteDagsverk\": 394.1," +
+                        "        \"muligeDagsverk\": 4082.8," +
+                        "        \"erMaskert\": false," +
+                        "        \"kvartaler\": [" +
+                        "          {" +
+                        "            \"årstall\": 2019," +
+                        "            \"kvartal\": 3" +
+                        "          }," +
+                        "          {" +
+                        "            \"årstall\": 2019," +
+                        "            \"kvartal\": 4" +
+                        "          }," +
+                        "          {" +
+                        "            \"årstall\": 2020," +
+                        "            \"kvartal\": 1" +
+                        "          }," +
+                        "          {" +
+                        "            \"årstall\": 2020," +
+                        "            \"kvartal\": 2" +
+                        "          }" +
+                        "        ]" +
+                        "      }," +
+                        "      \"summertLangtidsfravær\": {" +
+                        "        \"prosent\": 10.1," +
+                        "        \"tapteDagsverk\": 411.1," +
+                        "        \"muligeDagsverk\": 4082.8," +
+                        "        \"erMaskert\": false," +
+                        "        \"kvartaler\": [" +
+                        "          {" +
+                        "            \"årstall\": 2019," +
+                        "            \"kvartal\": 3" +
+                        "          }," +
+                        "          {" +
+                        "            \"årstall\": 2019," +
+                        "            \"kvartal\": 4" +
+                        "          }," +
+                        "          {" +
+                        "            \"årstall\": 2020," +
+                        "            \"kvartal\": 1" +
+                        "          }," +
+                        "          {" +
+                        "            \"årstall\": 2020," +
+                        "            \"kvartal\": 2" +
+                        "          }" +
+                        "        ]" +
+                        "      }" +
+                        "    }" +
+                        "  }" +
+                        "]";
+    }
 }
