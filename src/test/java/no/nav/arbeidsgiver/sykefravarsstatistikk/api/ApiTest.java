@@ -140,45 +140,6 @@ public class ApiTest {
         assertThat(response.body()).isEqualTo("{\"message\":\"You don't have access to this ressource\"}");
     }
 
-    @Test
-    public void summert_sykefraværshistorikk_siste_4_kvartaler__skal_returnere_riktig_objekt() throws Exception {
-        HttpResponse<String> response = newBuilder().build().send(
-                HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET
-                                + "/sykefravarshistorikk/summert?antallKvartaler=4"))
-                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
-                        .GET()
-                        .build(),
-                ofString()
-        );
-
-        assertThat(response.statusCode()).isEqualTo(200);
-        JsonNode varighetsiste4kvartaler = objectMapper.readTree(response.body());
-
-        assertThat(varighetsiste4kvartaler.get("summertKorttidsfravær"))
-                .isEqualTo(objectMapper.readTree(
-                        "{\"prosent\":3.7,\"tapteDagsverk\":148.9,\"muligeDagsverk\":3979.6,\"erMaskert\":false,\"kvartaler\":[{\"årstall\":2019,\"kvartal\":3}, {\"årstall\":2020,\"kvartal\":1}]}"
-                ));
-        assertThat(varighetsiste4kvartaler.get("summertLangtidsfravær"))
-                .isEqualTo(objectMapper.readTree(
-                        "{\"prosent\":3.0,\"tapteDagsverk\":121.3,\"muligeDagsverk\":3979.6,\"erMaskert\":false,\"kvartaler\":[{\"årstall\":2019,\"kvartal\":3},{\"årstall\":2020,\"kvartal\":1}]}"
-                ));
-    }
-
-    @Test
-    public void summert_sykefraværshistorikk_siste_4_kvartaler__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
-        HttpResponse<String> response = newBuilder().build().send(
-                HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/"
-                                + ORGNR_UNDERENHET_INGEN_TILGANG + "/sykefravarshistorikk/summert?antallKvartaler=4"))
-                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
-                        .GET()
-                        .build(),
-                ofString()
-        );
-        assertThat(response.statusCode()).isEqualTo(403);
-        assertThat(response.body()).isEqualTo("{\"message\":\"You don't have access to this ressource\"}");
-    }
 
     @Test
     public void summert_sykefraværshistorikk_siste_4_kvartaler_V2__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
@@ -213,10 +174,43 @@ public class ApiTest {
 
         assertThat(responseBody).isEqualTo(objectMapper.readTree(getSummertSykefraværshistorikkResponseBody()));
     }
+@Test
+    public void summert_sykefraværshistorikk_siste_4_kvartaler__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
+        HttpResponse<String> response = newBuilder().build().send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/"
+                                + ORGNR_UNDERENHET_INGEN_TILGANG + "/sykefravarshistorikk/summert?antallKvartaler=4"))
+                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .GET()
+                        .build(),
+                ofString()
+        );
+        assertThat(response.statusCode()).isEqualTo(403);
+        assertThat(response.body()).isEqualTo("{\"message\":\"You don't have access to this ressource\"}");
+    }
+
+    @Test
+    public void summert_sykefraværshistorikk_siste_4_kvartaler__skal_returnere_riktig_objekt() throws Exception {
+        HttpResponse<String> response = newBuilder().build().send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET
+                                + "/sykefravarshistorikk/summert?antallKvartaler=4"))
+                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .GET()
+                        .build(),
+                ofString()
+        );
+
+        assertThat(response.statusCode()).isEqualTo(200);
+        JsonNode responseBody = objectMapper.readTree(response.body());
+
+
+        assertThat(responseBody).isEqualTo(objectMapper.readTree(getSummertSykefraværshistorikkResponseBody()));
+    }
 
 
     private static String getSummertSykefraværshistorikkResponseBody() {
-        return 
+        return
                 "[" +
                         "  {" +
                         "    \"type\": \"VIRKSOMHET\"," +
