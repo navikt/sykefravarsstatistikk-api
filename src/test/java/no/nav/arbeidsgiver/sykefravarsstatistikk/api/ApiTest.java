@@ -142,39 +142,6 @@ public class ApiTest {
 
 
     @Test
-    public void summert_sykefraværshistorikk_siste_4_kvartaler_V2__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
-        HttpResponse<String> response = newBuilder().build().send(
-                HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/"
-                                + ORGNR_UNDERENHET_INGEN_TILGANG + "/sykefravarshistorikk/summert/v2?antallKvartaler=4"))
-                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
-                        .GET()
-                        .build(),
-                ofString()
-        );
-        assertThat(response.statusCode()).isEqualTo(403);
-        assertThat(response.body()).isEqualTo("{\"message\":\"You don't have access to this ressource\"}");
-    }
-
-    @Test
-    public void summert_sykefraværshistorikk_siste_4_kvartaler_v2__skal_returnere_riktig_objekt() throws Exception {
-        HttpResponse<String> response = newBuilder().build().send(
-                HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET
-                                + "/sykefravarshistorikk/summert/v2?antallKvartaler=4"))
-                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
-                        .GET()
-                        .build(),
-                ofString()
-        );
-
-        assertThat(response.statusCode()).isEqualTo(200);
-        JsonNode responseBody = objectMapper.readTree(response.body());
-
-
-        assertThat(responseBody).isEqualTo(objectMapper.readTree(getSummertSykefraværshistorikkResponseBody()));
-    }
-@Test
     public void summert_sykefraværshistorikk_siste_4_kvartaler__skal_utføre_tilgangskontroll() throws IOException, InterruptedException {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()

@@ -83,7 +83,7 @@ public class SykefraværshistorikkController {
     }
 
 
-    @GetMapping(value = {"/{orgnr}/sykefravarshistorikk/summert/v2", "/{orgnr}/sykefravarshistorikk/summert"})
+    @GetMapping(value = "/{orgnr}/sykefravarshistorikk/summert")
     public List<SummertSykefraværshistorikk> hentSummertKorttidsOgLangtidsfraværV2(
             @PathVariable("orgnr") String orgnrStr,
             @RequestParam("antallKvartaler") int antallKvartaler,
