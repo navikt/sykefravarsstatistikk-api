@@ -82,36 +82,8 @@ public class SykefraværshistorikkController {
         }
     }
 
-    @GetMapping(value = "/{orgnr}/sykefravarshistorikk/summert")
-    public SummertKorttidsOgLangtidsfravær hentSummertKorttidsOgLangtidsfravær(
-            @PathVariable("orgnr") String orgnrStr,
-            @RequestParam("antallKvartaler") int antallKvartaler,
-            HttpServletRequest request
-    ) {
-        Orgnr orgnr = new Orgnr(orgnrStr);
 
-        InnloggetBruker bruker = tilgangskontrollService.hentInnloggetBruker();
-        tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
-                orgnr,
-                bruker,
-                request.getMethod(),
-                "" + request.getRequestURL()
-        );
-        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
-
-        if (antallKvartaler != 4) {
-            throw new IllegalArgumentException("For øyeblikket støtter vi kun summering av 4 kvartaler.");
-        }
-
-        SummertSykefraværshistorikk summertSykefraværshistorikk = varighetService.hentSummertKorttidsOgLangtidsfravær(
-                underenhet,
-                new ÅrstallOgKvartal(2020, 2),
-                antallKvartaler
-        );
-        return summertSykefraværshistorikk.getSummertKorttidsOgLangtidsfravær();
-    }
-
-    @GetMapping(value = "/{orgnr}/sykefravarshistorikk/summert/v2")
+    @GetMapping(value = {"/{orgnr}/sykefravarshistorikk/summert/v2", "/{orgnr}/sykefravarshistorikk/summert"})
     public List<SummertSykefraværshistorikk> hentSummertKorttidsOgLangtidsfraværV2(
             @PathVariable("orgnr") String orgnrStr,
             @RequestParam("antallKvartaler") int antallKvartaler,
