@@ -234,6 +234,10 @@ public class StatistikkRepository {
         return new SlettOgOpprettResultat(antallSlettet, antallOprettet);
     }
 
+    public SlettOgOpprettResultat importSykefraværsstatistikkVirksomhetGradering(List<SykefraværsstatistikkVirksomhetGradering> sykefraværsstatistikkNæringMedVarighet, ÅrstallOgKvartal årstallOgKvartal) {
+        return null; // TODO
+    }
+
 
     private int slett(ÅrstallOgKvartal årstallOgKvartal, DeleteSykefraværsstatistikkFunction deleteFunction) {
         int antallSlettet = deleteFunction.apply(årstallOgKvartal);

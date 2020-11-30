@@ -216,6 +216,19 @@ public class ImporteringService {
         return resultat;
     }
 
+    private SlettOgOpprettResultat importSykefraværsstatistikkGradering(ÅrstallOgKvartal årstallOgKvartal) {
+        List<SykefraværsstatistikkVirksomhetGradering> sykefraværsstatistikkNæringMedVarighet =
+                datavarehusRepository.hentSykefraværsstatistikkVirksomhetGradering(årstallOgKvartal);
+
+        SlettOgOpprettResultat resultat = statistikkRepository.importSykefraværsstatistikkVirksomhetGradering(
+                sykefraværsstatistikkNæringMedVarighet,
+                årstallOgKvartal
+        );
+        loggResultat(årstallOgKvartal, resultat, "virksomhet gradering");
+
+        return resultat;
+    }
+
     private SlettOgOpprettResultat importSykefraværsstatistikkNæringMedVarighet(ÅrstallOgKvartal årstallOgKvartal) {
         List<SykefraværsstatistikkNæringMedVarighet> sykefraværsstatistikkNæringMedVarighet =
                 datavarehusRepository.hentSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal);

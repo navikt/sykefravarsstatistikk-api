@@ -232,6 +232,33 @@ public class DatavarehusRepository {
                                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
     }
 
+    public List<SykefraværsstatistikkVirksomhetGradering> hentSykefraværsstatistikkVirksomhetGradering(ÅrstallOgKvartal årstallOgKvartal) {
+        SqlParameterSource namedParameters =
+                new MapSqlParameterSource()
+                        .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+                        .addValue(KVARTAL, årstallOgKvartal.getKvartal());
+
+        return namedParameterJdbcTemplate.query(
+                "select arstall, kvartal, orgnr, naering_kode, " +
+                        "sum(antpers) as sum_antall_personer, " +
+                        "sum(taptedv_gs) as sum_tapte_dagsverk, " +
+                        "sum(mulige_dv) as sum_mulige_dagsverk " +
+                        "from dt_p.agg_ia_sykefravar_v_2 " +
+                        "where arstall = :arstall and kvartal = :kvartal " +
+                        "and rectype='"+ RECTYPE_FOR_VIRKSOMHET + "'" +
+                        "group by arstall, kvartal, orgnr, naering_kode",
+                namedParameters,
+                (resultSet, rowNum) ->
+                        new SykefraværsstatistikkVirksomhetGradering(
+                                resultSet.getInt(ARSTALL),
+                                resultSet.getInt(KVARTAL),
+                                resultSet.getString(ORGNR),
+                                resultSet.getString(NARING_5SIFFER),
+                                resultSet.getInt(SUM_ANTALL_PERSONER),
+                                resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
+                                resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
+    }
+
     /*
      Klassifikasjoner
     */
