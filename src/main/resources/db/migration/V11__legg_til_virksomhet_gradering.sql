@@ -1,6 +1,7 @@
 create table sykefravar_statistikk_virksomhet_gradering (
   id serial primary key,
   orgnr varchar(20) not null,
+  naring varchar not null,
   naring_kode varchar not null,
   arstall smallint not null,
   kvartal smallint not null,

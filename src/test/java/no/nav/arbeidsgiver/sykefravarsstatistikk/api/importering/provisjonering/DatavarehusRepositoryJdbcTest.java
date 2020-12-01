@@ -41,6 +41,7 @@ public class DatavarehusRepositoryJdbcTest {
     public static final String ORGNR_VIRKSOMHET_3 = "999999999";
 
     public static final String NÆRINGSKODE_5SIFFER = "10062";
+    private static final String NÆRINGSKODE_2SIFFER = "10";
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
@@ -133,7 +134,7 @@ public class DatavarehusRepositoryJdbcTest {
                 namedParameterJdbcTemplate,
                 2018,
                 4,
-                4, ORGNR_VIRKSOMHET_1,"10062",
+                4, ORGNR_VIRKSOMHET_1, "10062",
                 _8_DAGER_TIL_16_DAGER,
                 "K",
                 5, 100
@@ -242,6 +243,84 @@ public class DatavarehusRepositoryJdbcTest {
                 new BigDecimal(263).setScale(6)
         );
         assertThat(sykefraværsstatistikkNæringMedVarighet.get(0), equalTo(expected));
+    }
+
+    @Test
+    public void hentSykefraværsstatistikkGradering__lager_sum_og_returnerer_antall_tapte_gradert_og_mulige_dagsverk() {
+        insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(namedParameterJdbcTemplate,
+                2018, 4, 13, ORGNR_VIRKSOMHET_1, NÆRINGSKODE_2SIFFER, NÆRINGSKODE_5SIFFER
+                , 3, 1, 16, 100);
+        insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(namedParameterJdbcTemplate,
+                2018, 4, 26,
+                ORGNR_VIRKSOMHET_2,
+                NÆRINGSKODE_2SIFFER,
+                NÆRINGSKODE_5SIFFER,
+                6,
+                2,
+                32,
+                200
+        );
+        insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(namedParameterJdbcTemplate,
+                2019, 4, 13,
+                ORGNR_VIRKSOMHET_2,
+                NÆRINGSKODE_2SIFFER,
+                NÆRINGSKODE_5SIFFER,
+                10,
+                1,
+                20,
+                100
+        );
+
+        List<SykefraværsstatistikkVirksomhetGradering> sykefraværsstatistikkVirksomhetGradering =
+                repository.hentSykefraværsstatistikkVirksomhetGradering(new ÅrstallOgKvartal(2018, 4));
+
+        assertThat(sykefraværsstatistikkVirksomhetGradering, hasSize(2));
+        SykefraværsstatistikkVirksomhetGradering expected = new SykefraværsstatistikkVirksomhetGradering(
+                2018,
+                4,
+                ORGNR_VIRKSOMHET_1,
+                NÆRINGSKODE_2SIFFER,
+                NÆRINGSKODE_5SIFFER,
+                new BigDecimal(3).setScale(6),
+                13,
+                new BigDecimal(16).setScale(6),
+                new BigDecimal(100).setScale(6)
+        );
+        SykefraværsstatistikkVirksomhetGradering expectedLinje2 = new SykefraværsstatistikkVirksomhetGradering(
+                2018,
+                4,
+                ORGNR_VIRKSOMHET_2,
+                NÆRINGSKODE_2SIFFER,
+                NÆRINGSKODE_5SIFFER,
+                new BigDecimal(6).setScale(6),
+                26,
+                new BigDecimal(32).setScale(6),
+                new BigDecimal(200).setScale(6)
+        );
+        assertThat(sykefraværsstatistikkVirksomhetGradering.get(0), equalTo(expected));
+        assertThat(sykefraværsstatistikkVirksomhetGradering.get(1), equalTo(expectedLinje2));
+    }
+
+    private void insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
+            NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+            int årstall, int kvartal, int antallPersoner, String orgnrVirksomhet1, String næringskode2siffer, String næringskode5siffer,
+            long tapteDagsverkGradertSykemelding, long antallGradertSykemeldinger, long tapteDagsverk, long muligeDagsverk) {
+        insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(namedParameterJdbcTemplate,
+                årstall,
+                kvartal,
+                antallPersoner,
+                orgnrVirksomhet1,
+                næringskode2siffer,
+                næringskode5siffer,
+                "A",
+                "M",
+                "03",
+                "4200",
+                tapteDagsverkGradertSykemelding,
+                antallGradertSykemeldinger,
+                tapteDagsverk,
+                muligeDagsverk,
+                RECTYPE_FOR_VIRKSOMHET);
     }
 
     @Test
@@ -483,4 +562,61 @@ public class DatavarehusRepositoryJdbcTest {
                         + ":taptedv, :muligedv, :antpers)",
                 params);
     }
+
+    private static void insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
+            NamedParameterJdbcTemplate jdbcTemplate,
+            int årstall,
+            int kvartal,
+            int antallPersoner,
+            String orgnr,
+            String næring,
+            String næringskode5siffer,
+            String alder,
+            String kjonn,
+            String fylkbo,
+            String kommnr,
+            long taptedagsverkGradertSykemelding,
+            long antallGradertSykemeldinger,
+            long taptedagsverk,
+            long muligedagsverk,
+            String rectype) {
+        MapSqlParameterSource params =
+                new MapSqlParameterSource()
+                        .addValue("arstall", årstall)
+                        .addValue("kvartal", kvartal)
+                        .addValue("orgnr", orgnr)
+                        .addValue("naring", næring)
+                        .addValue("naering_kode", næringskode5siffer)
+                        .addValue("alder", alder)
+                        .addValue("kjonn", kjonn)
+                        .addValue("fylkbo", fylkbo)
+                        .addValue("kommnr", kommnr)
+                        .addValue("rectype", rectype)
+                        .addValue("antall_gs", antallGradertSykemeldinger)
+                        .addValue("taptedv_gs", taptedagsverkGradertSykemelding)
+                        .addValue("antall", 0)
+                        .addValue("taptedv", taptedagsverk)
+                        .addValue("mulige_dv", muligedagsverk)
+                        .addValue("antpers", antallPersoner);
+
+        jdbcTemplate.update(
+                "insert into dt_p.agg_ia_sykefravar_v_2 ("
+                        + "arstall, kvartal, "
+                        + "orgnr, naring, naering_kode, "
+                        + "alder, kjonn,  fylkbo, "
+                        + "kommnr, rectype, "
+                        + "antall_gs, taptedv_gs, "
+                        + "antall, "
+                        + "taptedv, mulige_dv, antpers) "
+                        + "values ("
+                        + ":arstall, :kvartal, "
+                        + ":orgnr,:naring, :naering_kode, :alder, "
+                        + ":kjonn, :fylkbo, :kommnr, "
+                        + ":rectype, "
+                        + ":antall_gs, :taptedv_gs, "
+                        + ":antall, "
+                        + ":taptedv, :mulige_dv, :antpers)",
+                params);
+    }
+
 }

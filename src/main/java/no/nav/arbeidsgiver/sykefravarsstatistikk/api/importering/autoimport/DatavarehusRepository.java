@@ -29,6 +29,7 @@ public class DatavarehusRepository {
     public static final String NARING_5SIFFER = "naering_kode";
     public static final String ORGNR = "orgnr";
     public static final String VARIGHET = "varighet";
+    public static final String SUM_TAPTE_DAGSVERK_GS = "sum_tapte_dagsverk_gs";
     public static final String SUM_ANTALL_PERSONER = "sum_antall_personer";
     public static final String SUM_TAPTE_DAGSVERK = "sum_tapte_dagsverk";
     public static final String SUM_MULIGE_DAGSVERK = "sum_mulige_dagsverk";
@@ -239,21 +240,24 @@ public class DatavarehusRepository {
                         .addValue(KVARTAL, årstallOgKvartal.getKvartal());
 
         return namedParameterJdbcTemplate.query(
-                "select arstall, kvartal, orgnr, naering_kode, " +
+                "select arstall, kvartal, orgnr, naring, naering_kode, " +
+                        "sum(taptedv_gs) as sum_tapte_dagsverk_gs, " +
                         "sum(antpers) as sum_antall_personer, " +
-                        "sum(taptedv_gs) as sum_tapte_dagsverk, " +
+                        "sum(taptedv) as sum_tapte_dagsverk, " +
                         "sum(mulige_dv) as sum_mulige_dagsverk " +
                         "from dt_p.agg_ia_sykefravar_v_2 " +
                         "where arstall = :arstall and kvartal = :kvartal " +
-                        "and rectype='"+ RECTYPE_FOR_VIRKSOMHET + "'" +
-                        "group by arstall, kvartal, orgnr, naering_kode",
+                        "and rectype='"+ RECTYPE_FOR_VIRKSOMHET + "' " +
+                        "group by arstall, kvartal, orgnr, naring, naering_kode",
                 namedParameters,
                 (resultSet, rowNum) ->
                         new SykefraværsstatistikkVirksomhetGradering(
                                 resultSet.getInt(ARSTALL),
                                 resultSet.getInt(KVARTAL),
                                 resultSet.getString(ORGNR),
+                                resultSet.getString(NARING),
                                 resultSet.getString(NARING_5SIFFER),
+                                resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK_GS),
                                 resultSet.getInt(SUM_ANTALL_PERSONER),
                                 resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
                                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
