@@ -1,11 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class DatavarehusRepositoryJdbcTest {
     public static final String ORGNR_VIRKSOMHET_3 = "999999999";
 
     public static final String NÆRINGSKODE_5SIFFER = "10062";
-    private static final String NÆRINGSKODE_2SIFFER = "10";
+    public static final String NÆRINGSKODE_2SIFFER = "10";
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
@@ -246,16 +246,28 @@ public class DatavarehusRepositoryJdbcTest {
     }
 
     @Test
-    public void hentSykefraværsstatistikkGradering__lager_sum_og_returnerer_antall_tapte_gradert_og_mulige_dagsverk() {
-        insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(namedParameterJdbcTemplate,
-                2018, 4, 13, ORGNR_VIRKSOMHET_1, NÆRINGSKODE_2SIFFER, NÆRINGSKODE_5SIFFER
-                , 3, 1, 16, 100);
+    public void hentSykefraværsstatistikkVirksomhetForGradertSykemelding__lager_sum_og_returnerer_antall_tapte_dagsverk_i_gradert_sykemelding_og_mulige_dagsverk() {
+        insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
+                namedParameterJdbcTemplate,
+                2018,
+                4,
+                13,
+                ORGNR_VIRKSOMHET_1,
+                NÆRINGSKODE_2SIFFER,
+                NÆRINGSKODE_5SIFFER,
+                3,
+                1,
+                3,
+                16,
+                100
+        );
         insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(namedParameterJdbcTemplate,
                 2018, 4, 26,
                 ORGNR_VIRKSOMHET_2,
                 NÆRINGSKODE_2SIFFER,
                 NÆRINGSKODE_5SIFFER,
                 6,
+                2,
                 2,
                 32,
                 200
@@ -266,61 +278,44 @@ public class DatavarehusRepositoryJdbcTest {
                 NÆRINGSKODE_2SIFFER,
                 NÆRINGSKODE_5SIFFER,
                 10,
-                1,
+                2,
+                4,
                 20,
                 100
         );
 
-        List<SykefraværsstatistikkVirksomhetGradering> sykefraværsstatistikkVirksomhetGradering =
-                repository.hentSykefraværsstatistikkVirksomhetGradering(new ÅrstallOgKvartal(2018, 4));
+        List<SykefraværsstatistikkVirksomhetForGradertSykemelding> sykefraværsstatistikkVirksomhetForGradertSykemelding =
+                repository.hentSykefraværsstatistikkVirksomhetForGradertSykemelding(new ÅrstallOgKvartal(2018, 4));
 
-        assertThat(sykefraværsstatistikkVirksomhetGradering, hasSize(2));
-        SykefraværsstatistikkVirksomhetGradering expected = new SykefraværsstatistikkVirksomhetGradering(
+        assertThat(sykefraværsstatistikkVirksomhetForGradertSykemelding, hasSize(2));
+        SykefraværsstatistikkVirksomhetForGradertSykemelding expected = new SykefraværsstatistikkVirksomhetForGradertSykemelding(
                 2018,
                 4,
                 ORGNR_VIRKSOMHET_1,
                 NÆRINGSKODE_2SIFFER,
                 NÆRINGSKODE_5SIFFER,
+                1,
                 new BigDecimal(3).setScale(6),
+                3,
                 13,
                 new BigDecimal(16).setScale(6),
                 new BigDecimal(100).setScale(6)
         );
-        SykefraværsstatistikkVirksomhetGradering expectedLinje2 = new SykefraværsstatistikkVirksomhetGradering(
+        SykefraværsstatistikkVirksomhetForGradertSykemelding expectedLinje2 = new SykefraværsstatistikkVirksomhetForGradertSykemelding(
                 2018,
                 4,
                 ORGNR_VIRKSOMHET_2,
                 NÆRINGSKODE_2SIFFER,
                 NÆRINGSKODE_5SIFFER,
+                2,
                 new BigDecimal(6).setScale(6),
+                2,
                 26,
                 new BigDecimal(32).setScale(6),
                 new BigDecimal(200).setScale(6)
         );
-        assertThat(sykefraværsstatistikkVirksomhetGradering.get(0), equalTo(expected));
-        assertThat(sykefraværsstatistikkVirksomhetGradering.get(1), equalTo(expectedLinje2));
-    }
-
-    private void insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
-            NamedParameterJdbcTemplate namedParameterJdbcTemplate,
-            int årstall, int kvartal, int antallPersoner, String orgnrVirksomhet1, String næringskode2siffer, String næringskode5siffer,
-            long tapteDagsverkGradertSykemelding, long antallGradertSykemeldinger, long tapteDagsverk, long muligeDagsverk) {
-        insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(namedParameterJdbcTemplate,
-                årstall,
-                kvartal,
-                antallPersoner,
-                orgnrVirksomhet1,
-                næringskode2siffer,
-                næringskode5siffer,
-                "A",
-                "M",
-                "03",
-                "4200",
-                tapteDagsverkGradertSykemelding,
-                antallGradertSykemeldinger,
-                tapteDagsverk,
-                muligeDagsverk,
-                RECTYPE_FOR_VIRKSOMHET);
+        assertThat(sykefraværsstatistikkVirksomhetForGradertSykemelding.get(0), equalTo(expected));
+        assertThat(sykefraværsstatistikkVirksomhetForGradertSykemelding.get(1), equalTo(expectedLinje2));
     }
 
     @Test
@@ -576,7 +571,8 @@ public class DatavarehusRepositoryJdbcTest {
             String fylkbo,
             String kommnr,
             long taptedagsverkGradertSykemelding,
-            long antallGradertSykemeldinger,
+            int antallGradertSykemeldinger,
+            int antallSykemeldinger,
             long taptedagsverk,
             long muligedagsverk,
             String rectype) {
@@ -594,7 +590,7 @@ public class DatavarehusRepositoryJdbcTest {
                         .addValue("rectype", rectype)
                         .addValue("antall_gs", antallGradertSykemeldinger)
                         .addValue("taptedv_gs", taptedagsverkGradertSykemelding)
-                        .addValue("antall", 0)
+                        .addValue("antall", antallSykemeldinger)
                         .addValue("taptedv", taptedagsverk)
                         .addValue("mulige_dv", muligedagsverk)
                         .addValue("antpers", antallPersoner);
@@ -619,4 +615,35 @@ public class DatavarehusRepositoryJdbcTest {
                 params);
     }
 
+    private void insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
+            NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+            int årstall,
+            int kvartal,
+            int antallPersoner,
+            String orgnrVirksomhet1,
+            String næringskode2siffer,
+            String næringskode5siffer,
+            long tapteDagsverkGradertSykemelding,
+            int antallGradertSykemeldinger,
+            int antallSykemeldinger,
+            long tapteDagsverk,
+            long muligeDagsverk) {
+        insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(namedParameterJdbcTemplate,
+                årstall,
+                kvartal,
+                antallPersoner,
+                orgnrVirksomhet1,
+                næringskode2siffer,
+                næringskode5siffer,
+                "A",
+                "M",
+                "03",
+                "4200",
+                tapteDagsverkGradertSykemelding,
+                antallGradertSykemeldinger,
+                antallSykemeldinger,
+                tapteDagsverk,
+                muligeDagsverk,
+                RECTYPE_FOR_VIRKSOMHET);
+    }
 }

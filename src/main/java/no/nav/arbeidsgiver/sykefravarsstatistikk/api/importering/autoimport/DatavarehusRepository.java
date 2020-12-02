@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner.Næringsgruppering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -233,7 +232,9 @@ public class DatavarehusRepository {
                                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
     }
 
-    public List<SykefraværsstatistikkVirksomhetGradering> hentSykefraværsstatistikkVirksomhetGradering(ÅrstallOgKvartal årstallOgKvartal) {
+    public List<SykefraværsstatistikkVirksomhetForGradertSykemelding> hentSykefraværsstatistikkVirksomhetForGradertSykemelding(
+            ÅrstallOgKvartal årstallOgKvartal
+    ) {
         SqlParameterSource namedParameters =
                 new MapSqlParameterSource()
                         .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
@@ -242,6 +243,8 @@ public class DatavarehusRepository {
         return namedParameterJdbcTemplate.query(
                 "select arstall, kvartal, orgnr, naring, naering_kode, " +
                         "sum(taptedv_gs) as sum_tapte_dagsverk_gs, " +
+                        "sum(antall_gs) as sum_antall_graderte_sykemeldinger, " +
+                        "sum(antall) as sum_antall_sykemeldinger, " +
                         "sum(antpers) as sum_antall_personer, " +
                         "sum(taptedv) as sum_tapte_dagsverk, " +
                         "sum(mulige_dv) as sum_mulige_dagsverk " +
@@ -251,13 +254,15 @@ public class DatavarehusRepository {
                         "group by arstall, kvartal, orgnr, naring, naering_kode",
                 namedParameters,
                 (resultSet, rowNum) ->
-                        new SykefraværsstatistikkVirksomhetGradering(
+                        new SykefraværsstatistikkVirksomhetForGradertSykemelding(
                                 resultSet.getInt(ARSTALL),
                                 resultSet.getInt(KVARTAL),
                                 resultSet.getString(ORGNR),
                                 resultSet.getString(NARING),
                                 resultSet.getString(NARING_5SIFFER),
+                                resultSet.getInt("sum_antall_graderte_sykemeldinger"),
                                 resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK_GS),
+                                resultSet.getInt("sum_antall_sykemeldinger"),
                                 resultSet.getInt(SUM_ANTALL_PERSONER),
                                 resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
                                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));

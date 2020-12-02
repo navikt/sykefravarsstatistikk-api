@@ -216,15 +216,15 @@ public class ImporteringService {
         return resultat;
     }
 
-    private SlettOgOpprettResultat importSykefraværsstatistikkGradering(ÅrstallOgKvartal årstallOgKvartal) {
-        List<SykefraværsstatistikkVirksomhetGradering> sykefraværsstatistikkVirksomhetGradering =
-                datavarehusRepository.hentSykefraværsstatistikkVirksomhetGradering(årstallOgKvartal);
+    private SlettOgOpprettResultat importSykefraværsstatistikkForGradertSykemelding(ÅrstallOgKvartal årstallOgKvartal) {
+        List<SykefraværsstatistikkVirksomhetForGradertSykemelding> sykefraværsstatistikkVirksomhetForGradertSykemelding =
+                datavarehusRepository.hentSykefraværsstatistikkVirksomhetForGradertSykemelding(årstallOgKvartal);
 
-        SlettOgOpprettResultat resultat = statistikkRepository.importSykefraværsstatistikkVirksomhetGradering(
-                sykefraværsstatistikkVirksomhetGradering,
+        SlettOgOpprettResultat resultat = statistikkRepository.importSykefraværsstatistikkVirksomhetForGradertSykemelding(
+                sykefraværsstatistikkVirksomhetForGradertSykemelding,
                 årstallOgKvartal
         );
-        loggResultat(årstallOgKvartal, resultat, "virksomhet gradering");
+        loggResultat(årstallOgKvartal, resultat, "virksomhet gradert sykemelding");
 
         return resultat;
     }

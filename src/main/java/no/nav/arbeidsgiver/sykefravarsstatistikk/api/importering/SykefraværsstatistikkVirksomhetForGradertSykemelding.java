@@ -7,13 +7,15 @@ import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
-public class SykefraværsstatistikkVirksomhetGradering implements Sykefraværsstatistikk {
+public class SykefraværsstatistikkVirksomhetForGradertSykemelding implements Sykefraværsstatistikk {
     private int årstall;
     private int kvartal;
     private String orgnr;
     private String næring;
     private String næringkode;
-    private BigDecimal tapteDagsverkIGradertSykemelding;
+    private int antallGraderteSykemeldinger;
+    private BigDecimal tapteDagsverkGradertSykemelding;
+    private int antallSykemeldinger;
     private int antallPersoner;
     private BigDecimal tapteDagsverk;
     private BigDecimal muligeDagsverk;

@@ -47,6 +47,9 @@ public class StatistikkRepository {
         return alleÅrstallOgKvartal.get(0);
     }
 
+
+    // IMPORT metoder
+
     public SlettOgOpprettResultat importSykefraværsstatistikkLand(
             List<SykefraværsstatistikkLand> landStatistikk,
             ÅrstallOgKvartal årstallOgKvartal
@@ -145,8 +148,34 @@ public class StatistikkRepository {
         );
 
         return new SlettOgOpprettResultat(antallSlettet, antallOprettet);
+    }
+
+    public SlettOgOpprettResultat importSykefraværsstatistikkVirksomhetForGradertSykemelding(
+            List<SykefraværsstatistikkVirksomhetForGradertSykemelding> sykefraværsstatistikkVirksomhetForGradertSykemelding,
+            ÅrstallOgKvartal årstallOgKvartal
+    ) {
+        if (sykefraværsstatistikkVirksomhetForGradertSykemelding.isEmpty()) {
+            loggInfoIngenDataTilImport(årstallOgKvartal, "virksomhet gradert sykemelding");
+            return SlettOgOpprettResultat.tomtResultat();
+        }
+
+        loggInfoImportStarter(
+                sykefraværsstatistikkVirksomhetForGradertSykemelding.size(),
+                "virksomhet gradert sykemelding",
+                årstallOgKvartal
+        );
+        int antallSlettet = slettSykefraværsstatistikkVirksomhetForGradertSykemelding(årstallOgKvartal);
+        int antallOprettet = batchOpprettSykefraværsstatistikkVirksomhetForGradertSykemelding(
+                sykefraværsstatistikkVirksomhetForGradertSykemelding,
+                INSERT_BATCH_STØRRELSE
+        );
+
+        return new SlettOgOpprettResultat(antallSlettet, antallOprettet);
 
     }
+
+
+    // Slett metoder
 
     public int slettSykefraværsstatistikkNæringMedVarighet(ÅrstallOgKvartal årstallOgKvartal) {
         SqlParameterSource namedParameters =
@@ -160,6 +189,22 @@ public class StatistikkRepository {
                         ARSTALL, KVARTAL),
                 namedParameters);
     }
+
+    public int slettSykefraværsstatistikkVirksomhetForGradertSykemelding(ÅrstallOgKvartal årstallOgKvartal) {
+        SqlParameterSource namedParameters =
+                new MapSqlParameterSource()
+                        .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+                        .addValue(KVARTAL, årstallOgKvartal.getKvartal());
+
+        return namedParameterJdbcTemplate.update(
+                String.format(
+                        "delete from sykefravar_statistikk_virksomhet_for_gradert_sykemelding where arstall = :%s and kvartal = :%s",
+                        ARSTALL, KVARTAL),
+                namedParameters);
+    }
+
+
+    // batchOpprett metoder
 
     public int batchOpprettSykefraværsstatistikkNæringMedVarighet(
             List<? extends Sykefraværsstatistikk> sykefraværsstatistikk,
@@ -182,6 +227,30 @@ public class StatistikkRepository {
         return antallOpprettet.get();
     }
 
+    public int batchOpprettSykefraværsstatistikkVirksomhetForGradertSykemelding(
+            List<? extends Sykefraværsstatistikk> sykefraværsstatistikk,
+            int insertBatchStørrelse
+    ) {
+
+        List<? extends List<? extends Sykefraværsstatistikk>> subsets =
+                Lists.partition(sykefraværsstatistikk, insertBatchStørrelse);
+
+        AtomicInteger antallOpprettet = new AtomicInteger();
+
+        subsets.forEach(subset -> {
+                    int opprettet = opprettSykefraværsstatistikkVirksomhetForGradertSykemelding(subset);
+                    int opprettetHittilNå = antallOpprettet.addAndGet(opprettet);
+
+                    log.info(String.format("Opprettet %d rader", opprettetHittilNå));
+                }
+        );
+
+        return antallOpprettet.get();
+    }
+
+
+    // opprett metoder
+
     public int opprettSykefraværsstatistikkNæringMedVarighet(
             List<? extends Sykefraværsstatistikk> sykefraværsstatistikk
     ) {
@@ -192,6 +261,26 @@ public class StatistikkRepository {
                         "(arstall, kvartal, naring_kode, varighet, antall_personer, tapte_dagsverk, mulige_dagsverk) " +
                         "values " +
                         "(:årstall, :kvartal, :næringkode, :varighet, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
+                batch);
+        return Arrays.stream(results).sum();
+    }
+
+    public int opprettSykefraværsstatistikkVirksomhetForGradertSykemelding(
+            List<? extends Sykefraværsstatistikk> sykefraværsstatistikk
+    ) {
+        SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(sykefraværsstatistikk.toArray());
+
+        int[] results = namedParameterJdbcTemplate.batchUpdate(
+                "insert into sykefravar_statistikk_virksomhet_for_gradert_sykemelding " +
+                        "(arstall, kvartal, orgnr, naring, naring_kode, " +
+                        "antall_graderte_sykemeldinger, tapte_dagsverk_gradert_sykemelding, " +
+                        "antall_sykemeldinger, " +
+                        "antall_personer, tapte_dagsverk, mulige_dagsverk) " +
+                        "values " +
+                        "(:årstall, :kvartal, :orgnr, :næring, :næringkode, " +
+                        ":antallGraderteSykemeldinger, :tapteDagsverkGradertSykemelding, " +
+                        ":antallSykemeldinger, " +
+                        ":antallPersoner, :tapteDagsverk, :muligeDagsverk)",
                 batch);
         return Arrays.stream(results).sum();
     }
@@ -234,16 +323,6 @@ public class StatistikkRepository {
         return new SlettOgOpprettResultat(antallSlettet, antallOprettet);
     }
 
-    public SlettOgOpprettResultat importSykefraværsstatistikkVirksomhetGradering(List<SykefraværsstatistikkVirksomhetGradering> sykefraværsstatistikkNæringMedVarighet, ÅrstallOgKvartal årstallOgKvartal) {
-        return null; // TODO
-    }
-
-
-    private int slett(ÅrstallOgKvartal årstallOgKvartal, DeleteSykefraværsstatistikkFunction deleteFunction) {
-        int antallSlettet = deleteFunction.apply(årstallOgKvartal);
-        return antallSlettet;
-    }
-
     public int batchOpprett(
             List<? extends Sykefraværsstatistikk> sykefraværsstatistikk,
             SykefraværsstatistikkIntegrasjonUtils utils,
@@ -264,6 +343,12 @@ public class StatistikkRepository {
         );
 
         return antallOpprettet.get();
+    }
+
+
+    private int slett(ÅrstallOgKvartal årstallOgKvartal, DeleteSykefraværsstatistikkFunction deleteFunction) {
+        int antallSlettet = deleteFunction.apply(årstallOgKvartal);
+        return antallSlettet;
     }
 
     private void loggInfoIngenDataTilImport(ÅrstallOgKvartal årstallOgKvartal, final String beskrivelse) {
