@@ -184,15 +184,11 @@ public class ApiTest {
                         "    \"label\": \"NAV ARBEID OG YTELSER AVD OSLO\"," +
                         "    \"summertKorttidsOgLangtidsfravær\": {" +
                         "      \"summertKorttidsfravær\": {" +
-                        "        \"prosent\": 3.7," +
+                        "        \"prosent\": 7.5," +
                         "        \"tapteDagsverk\": 148.9," +
-                        "        \"muligeDagsverk\": 3979.6," +
+                        "        \"muligeDagsverk\": 1990.3," +
                         "        \"erMaskert\": false," +
                         "        \"kvartaler\": [" +
-                        "          {" +
-                        "            \"årstall\": 2019," +
-                        "            \"kvartal\": 3" +
-                        "          }," +
                         "          {" +
                         "            \"årstall\": 2020," +
                         "            \"kvartal\": 1" +
@@ -200,15 +196,11 @@ public class ApiTest {
                         "        ]" +
                         "      }," +
                         "      \"summertLangtidsfravær\": {" +
-                        "        \"prosent\": 3.0," +
-                        "        \"tapteDagsverk\": 121.3," +
-                        "        \"muligeDagsverk\": 3979.6," +
+                        "        \"prosent\": 2.8," +
+                        "        \"tapteDagsverk\": 55.6," +
+                        "        \"muligeDagsverk\": 1990.3," +
                         "        \"erMaskert\": false," +
                         "        \"kvartaler\": [" +
-                        "          {" +
-                        "            \"årstall\": 2019," +
-                        "            \"kvartal\": 3" +
-                        "          }," +
                         "          {" +
                         "            \"årstall\": 2020," +
                         "            \"kvartal\": 1" +
@@ -222,15 +214,11 @@ public class ApiTest {
                         "    \"label\": \"Produksjon av nærings- og nytelsesmidler\"," +
                         "    \"summertKorttidsOgLangtidsfravær\": {" +
                         "      \"summertKorttidsfravær\": {" +
-                        "        \"prosent\": 9.7," +
-                        "        \"tapteDagsverk\": 394.1," +
-                        "        \"muligeDagsverk\": 4082.8," +
+                        "        \"prosent\": 8.2," +
+                        "        \"tapteDagsverk\": 258.7," +
+                        "        \"muligeDagsverk\": 3153.5," +
                         "        \"erMaskert\": false," +
                         "        \"kvartaler\": [" +
-                        "          {" +
-                        "            \"årstall\": 2019," +
-                        "            \"kvartal\": 3" +
-                        "          }," +
                         "          {" +
                         "            \"årstall\": 2019," +
                         "            \"kvartal\": 4" +
@@ -246,15 +234,11 @@ public class ApiTest {
                         "        ]" +
                         "      }," +
                         "      \"summertLangtidsfravær\": {" +
-                        "        \"prosent\": 10.1," +
-                        "        \"tapteDagsverk\": 411.1," +
-                        "        \"muligeDagsverk\": 4082.8," +
+                        "        \"prosent\": 10.3," +
+                        "        \"tapteDagsverk\": 325.6," +
+                        "        \"muligeDagsverk\": 3153.5," +
                         "        \"erMaskert\": false," +
                         "        \"kvartaler\": [" +
-                        "          {" +
-                        "            \"årstall\": 2019," +
-                        "            \"kvartal\": 3" +
-                        "          }," +
                         "          {" +
                         "            \"årstall\": 2019," +
                         "            \"kvartal\": 4" +
