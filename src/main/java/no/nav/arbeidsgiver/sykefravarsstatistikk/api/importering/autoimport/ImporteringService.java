@@ -139,6 +139,10 @@ public class ImporteringService {
         if (importeringsobjekter.contains(Importeringsobjekt.NÆRING_MED_VARIGHET)) {
             importSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal);
         }
+
+        if (importeringsobjekter.contains(Importeringsobjekt.GRADERING)) {
+            importSykefraværsstatistikkForGradertSykemelding(årstallOgKvartal);
+        }
     }
 
     private void importerNyStatistikk(ÅrstallOgKvartal årstallOgKvartal) {
@@ -148,6 +152,7 @@ public class ImporteringService {
         importSykefraværsstatistikkNæring5siffer(årstallOgKvartal);
         importSykefraværsstatistikkVirksomhet(årstallOgKvartal);
         importSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal);
+        importSykefraværsstatistikkForGradertSykemelding(årstallOgKvartal);
     }
 
 
