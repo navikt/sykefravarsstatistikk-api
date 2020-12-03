@@ -100,7 +100,7 @@ create table dt_p.agg_ia_sykefravar_v_2
     rectype char(1) not null,
     antall_gs decimal(7,0),
     taptedv_gs decimal(14,6),
-    antall decimal(7,0), -- ????
+    antall decimal(7,0),
     taptedv decimal(14,6),
     mulige_dv decimal(15,6),
     antpers decimal(7,0)

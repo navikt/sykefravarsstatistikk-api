@@ -32,20 +32,11 @@ public class DatavarehusRepository {
     public static final String SUM_ANTALL_PERSONER = "sum_antall_personer";
     public static final String SUM_TAPTE_DAGSVERK = "sum_tapte_dagsverk";
     public static final String SUM_MULIGE_DAGSVERK = "sum_mulige_dagsverk";
+    public static final String SUM_ANTALL_GRADERTE_SYKEMELDINGER = "sum_antall_graderte_sykemeldinger";
+    public static final String SUM_ANTALL_SYKEMELDINGER = "sum_antall_sykemeldinger";
 
     public static final String RECTYPE_FOR_FORETAK = "1";
     public static final String RECTYPE_FOR_VIRKSOMHET = "2";
-
-    public static final String NAERING_KODE = "naering_kode";
-    public static final String NAERING_BESKRIVELSE = "naering_besk_lang";
-    public static final String GRUPPE1_KODE = "gruppe1_kode";
-    public static final String GRUPPE1_BESKRIVELSE = "gruppe1_besk_lang";
-    public static final String GRUPPE2_KODE = "gruppe2_kode";
-    public static final String GRUPPE2_BESKRIVELSE = "gruppe2_besk_lang";
-    public static final String GRUPPE3_KODE = "gruppe3_kode";
-    public static final String GRUPPE3_BESKRIVELSE = "gruppe3_besk_lang";
-    public static final String GRUPPE4_KODE = "gruppe4_kode";
-    public static final String GRUPPE4_BESKRIVELSE = "gruppe4_besk_lang";
 
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -260,9 +251,9 @@ public class DatavarehusRepository {
                                 resultSet.getString(ORGNR),
                                 resultSet.getString(NARING),
                                 resultSet.getString(NARING_5SIFFER),
-                                resultSet.getInt("sum_antall_graderte_sykemeldinger"),
+                                resultSet.getInt(SUM_ANTALL_GRADERTE_SYKEMELDINGER),
                                 resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK_GS),
-                                resultSet.getInt("sum_antall_sykemeldinger"),
+                                resultSet.getInt(SUM_ANTALL_SYKEMELDINGER),
                                 resultSet.getInt(SUM_ANTALL_PERSONER),
                                 resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
                                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
