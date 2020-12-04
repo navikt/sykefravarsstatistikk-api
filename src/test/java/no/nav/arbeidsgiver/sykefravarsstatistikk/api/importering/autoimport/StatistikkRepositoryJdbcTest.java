@@ -3,12 +3,10 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Statistikkilde;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæringMedVarighet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetForGradertSykemelding;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.DeleteSykefraværsstatistikkFunction;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetMedGradering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.StatistikkRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.besøksstatistikk.sammenligning.Sykefraværprosent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalForGradertSykemelding;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedGradering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
 import org.assertj.core.api.Assertions;
 import org.junit.After;
@@ -28,7 +26,6 @@ import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.*;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.StatistikkRepository.INSERT_BATCH_STØRRELSE;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.DatavarehusRepositoryJdbcTest.*;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 @ActiveProfiles("db-test")
@@ -103,8 +100,8 @@ public class StatistikkRepositoryJdbcTest {
 
     @Test
     public void batchOpprettSykefraværsstatistikkVirksomhetForGradertSykemelding__skal_lagre_data_i_tabellen() {
-        List<SykefraværsstatistikkVirksomhetForGradertSykemelding> list = new ArrayList<>();
-        SykefraværsstatistikkVirksomhetForGradertSykemelding gradertSykemelding = new SykefraværsstatistikkVirksomhetForGradertSykemelding(
+        List<SykefraværsstatistikkVirksomhetMedGradering> list = new ArrayList<>();
+        SykefraværsstatistikkVirksomhetMedGradering gradertSykemelding = new SykefraværsstatistikkVirksomhetMedGradering(
                 2020,
                 3,
                 ORGNR_VIRKSOMHET_1,
@@ -122,10 +119,10 @@ public class StatistikkRepositoryJdbcTest {
 
         statistikkRepository.batchOpprettSykefraværsstatistikkVirksomhetForGradertSykemelding(list, INSERT_BATCH_STØRRELSE);
 
-        List<UmaskertSykefraværForEttKvartalForGradertSykemelding> resultList = hentSykefraværprosentForGradertSykemelding();
+        List<UmaskertSykefraværForEttKvartalMedGradering> resultList = hentSykefraværprosentForGradertSykemelding();
         Assertions.assertThat(resultList.size()).isEqualTo(1);
         Assertions.assertThat(resultList.get(0)).isEqualTo(
-                new UmaskertSykefraværForEttKvartalForGradertSykemelding(
+                new UmaskertSykefraværForEttKvartalMedGradering(
                         new ÅrstallOgKvartal(2020, 3),
                         1,
                         new BigDecimal("3"),
@@ -189,11 +186,11 @@ public class StatistikkRepositoryJdbcTest {
         );
     }
 
-    private List<UmaskertSykefraværForEttKvartalForGradertSykemelding> hentSykefraværprosentForGradertSykemelding() {
+    private List<UmaskertSykefraværForEttKvartalMedGradering> hentSykefraværprosentForGradertSykemelding() {
         return jdbcTemplate.query(
-                "select * from sykefravar_statistikk_virksomhet_for_gradert_sykemelding",
+                "select * from sykefravar_statistikk_virksomhet_med_gradering",
                 new MapSqlParameterSource(),
-                (rs, rowNum) -> new UmaskertSykefraværForEttKvartalForGradertSykemelding(
+                (rs, rowNum) -> new UmaskertSykefraværForEttKvartalMedGradering(
                         new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
                         rs.getInt("antall_graderte_sykemeldinger"),
                         rs.getBigDecimal("tapte_dagsverk_gradert_sykemelding"),

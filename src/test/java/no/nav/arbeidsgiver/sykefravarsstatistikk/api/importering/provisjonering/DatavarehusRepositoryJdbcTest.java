@@ -277,11 +277,11 @@ public class DatavarehusRepositoryJdbcTest {
                 100
         );
 
-        List<SykefraværsstatistikkVirksomhetForGradertSykemelding> sykefraværsstatistikkVirksomhetForGradertSykemelding =
+        List<SykefraværsstatistikkVirksomhetMedGradering> sykefraværsstatistikkVirksomhetMedGradering =
                 repository.hentSykefraværsstatistikkVirksomhetForGradertSykemelding(new ÅrstallOgKvartal(2018, 4));
 
-        assertThat(sykefraværsstatistikkVirksomhetForGradertSykemelding, hasSize(2));
-        SykefraværsstatistikkVirksomhetForGradertSykemelding expected = new SykefraværsstatistikkVirksomhetForGradertSykemelding(
+        assertThat(sykefraværsstatistikkVirksomhetMedGradering, hasSize(2));
+        SykefraværsstatistikkVirksomhetMedGradering expected = new SykefraværsstatistikkVirksomhetMedGradering(
                 2018,
                 4,
                 ORGNR_VIRKSOMHET_1,
@@ -294,7 +294,7 @@ public class DatavarehusRepositoryJdbcTest {
                 new BigDecimal(16).setScale(6),
                 new BigDecimal(100).setScale(6)
         );
-        SykefraværsstatistikkVirksomhetForGradertSykemelding expectedLinje2 = new SykefraværsstatistikkVirksomhetForGradertSykemelding(
+        SykefraværsstatistikkVirksomhetMedGradering expectedLinje2 = new SykefraværsstatistikkVirksomhetMedGradering(
                 2018,
                 4,
                 ORGNR_VIRKSOMHET_2,
@@ -307,8 +307,8 @@ public class DatavarehusRepositoryJdbcTest {
                 new BigDecimal(32).setScale(6),
                 new BigDecimal(200).setScale(6)
         );
-        assertThat(sykefraværsstatistikkVirksomhetForGradertSykemelding.get(0), equalTo(expected));
-        assertThat(sykefraværsstatistikkVirksomhetForGradertSykemelding.get(1), equalTo(expectedLinje2));
+        assertThat(sykefraværsstatistikkVirksomhetMedGradering.get(0), equalTo(expected));
+        assertThat(sykefraværsstatistikkVirksomhetMedGradering.get(1), equalTo(expectedLinje2));
     }
 
     @Test

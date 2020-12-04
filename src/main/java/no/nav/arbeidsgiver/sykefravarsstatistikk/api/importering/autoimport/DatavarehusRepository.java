@@ -223,7 +223,7 @@ public class DatavarehusRepository {
                                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
     }
 
-    public List<SykefraværsstatistikkVirksomhetForGradertSykemelding> hentSykefraværsstatistikkVirksomhetForGradertSykemelding(
+    public List<SykefraværsstatistikkVirksomhetMedGradering> hentSykefraværsstatistikkVirksomhetForGradertSykemelding(
             ÅrstallOgKvartal årstallOgKvartal
     ) {
         SqlParameterSource namedParameters =
@@ -245,7 +245,7 @@ public class DatavarehusRepository {
                         "group by arstall, kvartal, orgnr, naring, naering_kode",
                 namedParameters,
                 (resultSet, rowNum) ->
-                        new SykefraværsstatistikkVirksomhetForGradertSykemelding(
+                        new SykefraværsstatistikkVirksomhetMedGradering(
                                 resultSet.getInt(ARSTALL),
                                 resultSet.getInt(KVARTAL),
                                 resultSet.getString(ORGNR),

@@ -151,22 +151,22 @@ public class StatistikkRepository {
     }
 
     public SlettOgOpprettResultat importSykefraværsstatistikkVirksomhetForGradertSykemelding(
-            List<SykefraværsstatistikkVirksomhetForGradertSykemelding> sykefraværsstatistikkVirksomhetForGradertSykemelding,
+            List<SykefraværsstatistikkVirksomhetMedGradering> sykefraværsstatistikkVirksomhetMedGradering,
             ÅrstallOgKvartal årstallOgKvartal
     ) {
-        if (sykefraværsstatistikkVirksomhetForGradertSykemelding.isEmpty()) {
+        if (sykefraværsstatistikkVirksomhetMedGradering.isEmpty()) {
             loggInfoIngenDataTilImport(årstallOgKvartal, "virksomhet gradert sykemelding");
             return SlettOgOpprettResultat.tomtResultat();
         }
 
         loggInfoImportStarter(
-                sykefraværsstatistikkVirksomhetForGradertSykemelding.size(),
+                sykefraværsstatistikkVirksomhetMedGradering.size(),
                 "virksomhet gradert sykemelding",
                 årstallOgKvartal
         );
         int antallSlettet = slettSykefraværsstatistikkVirksomhetForGradertSykemelding(årstallOgKvartal);
         int antallOprettet = batchOpprettSykefraværsstatistikkVirksomhetForGradertSykemelding(
-                sykefraværsstatistikkVirksomhetForGradertSykemelding,
+                sykefraværsstatistikkVirksomhetMedGradering,
                 INSERT_BATCH_STØRRELSE
         );
 
@@ -198,7 +198,7 @@ public class StatistikkRepository {
 
         return namedParameterJdbcTemplate.update(
                 String.format(
-                        "delete from sykefravar_statistikk_virksomhet_for_gradert_sykemelding where arstall = :%s and kvartal = :%s",
+                        "delete from sykefravar_statistikk_virksomhet_med_gradering where arstall = :%s and kvartal = :%s",
                         ARSTALL, KVARTAL),
                 namedParameters);
     }
@@ -271,7 +271,7 @@ public class StatistikkRepository {
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(sykefraværsstatistikk.toArray());
 
         int[] results = namedParameterJdbcTemplate.batchUpdate(
-                "insert into sykefravar_statistikk_virksomhet_for_gradert_sykemelding " +
+                "insert into sykefravar_statistikk_virksomhet_med_gradering " +
                         "(arstall, kvartal, orgnr, naring, naring_kode, " +
                         "antall_graderte_sykemeldinger, tapte_dagsverk_gradert_sykemelding, " +
                         "antall_sykemeldinger, " +

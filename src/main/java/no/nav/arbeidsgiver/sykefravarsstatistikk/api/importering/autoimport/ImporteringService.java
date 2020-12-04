@@ -222,11 +222,11 @@ public class ImporteringService {
     }
 
     private SlettOgOpprettResultat importSykefraværsstatistikkForGradertSykemelding(ÅrstallOgKvartal årstallOgKvartal) {
-        List<SykefraværsstatistikkVirksomhetForGradertSykemelding> sykefraværsstatistikkVirksomhetForGradertSykemelding =
+        List<SykefraværsstatistikkVirksomhetMedGradering> sykefraværsstatistikkVirksomhetMedGradering =
                 datavarehusRepository.hentSykefraværsstatistikkVirksomhetForGradertSykemelding(årstallOgKvartal);
 
         SlettOgOpprettResultat resultat = statistikkRepository.importSykefraværsstatistikkVirksomhetForGradertSykemelding(
-                sykefraværsstatistikkVirksomhetForGradertSykemelding,
+                sykefraværsstatistikkVirksomhetMedGradering,
                 årstallOgKvartal
         );
         loggResultat(årstallOgKvartal, resultat, "virksomhet gradert sykemelding");

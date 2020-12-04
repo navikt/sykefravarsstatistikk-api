@@ -1,4 +1,4 @@
-create table sykefravar_statistikk_virksomhet_for_gradert_sykemelding (
+create table sykefravar_statistikk_virksomhet_med_gradering (
   id serial primary key,
   orgnr varchar(20) not null,
   naring varchar not null,

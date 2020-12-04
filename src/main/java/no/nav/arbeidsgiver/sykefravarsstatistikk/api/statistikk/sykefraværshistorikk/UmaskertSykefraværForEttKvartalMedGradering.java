@@ -9,13 +9,13 @@ import java.math.BigDecimal;
 
 @Getter
 @ToString(callSuper = true)
-public class UmaskertSykefraværForEttKvartalForGradertSykemelding extends UmaskertSykefraværForEttKvartal {
+public class UmaskertSykefraværForEttKvartalMedGradering extends UmaskertSykefraværForEttKvartal {
 
     private int antallSykemeldinger;
     private int antallGraderteSykemeldinger;
     private BigDecimal tapteDagsverkGradertSykemelding;
 
-    public UmaskertSykefraværForEttKvartalForGradertSykemelding(
+    public UmaskertSykefraværForEttKvartalMedGradering(
             ÅrstallOgKvartal årstallOgKvartal,
             int antallGraderteSykemeldinger,
             BigDecimal tapteDagsverkGradertSykemelding,

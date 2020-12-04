@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
-public class SykefraværsstatistikkVirksomhetForGradertSykemelding implements Sykefraværsstatistikk {
+public class SykefraværsstatistikkVirksomhetMedGradering implements Sykefraværsstatistikk {
     private int årstall;
     private int kvartal;
     private String orgnr;
