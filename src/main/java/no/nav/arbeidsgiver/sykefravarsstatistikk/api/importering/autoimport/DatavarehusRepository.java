@@ -34,6 +34,7 @@ public class DatavarehusRepository {
     public static final String SUM_MULIGE_DAGSVERK = "sum_mulige_dagsverk";
     public static final String SUM_ANTALL_GRADERTE_SYKEMELDINGER = "sum_antall_graderte_sykemeldinger";
     public static final String SUM_ANTALL_SYKEMELDINGER = "sum_antall_sykemeldinger";
+    public static final String RECTYPE = "rectype";
 
     public static final String RECTYPE_FOR_FORETAK = "1";
     public static final String RECTYPE_FOR_VIRKSOMHET = "2";
@@ -229,7 +230,8 @@ public class DatavarehusRepository {
         SqlParameterSource namedParameters =
                 new MapSqlParameterSource()
                         .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
-                        .addValue(KVARTAL, årstallOgKvartal.getKvartal());
+                        .addValue(KVARTAL, årstallOgKvartal.getKvartal())
+                        .addValue(RECTYPE, RECTYPE_FOR_VIRKSOMHET);
 
         return namedParameterJdbcTemplate.query(
                 "select arstall, kvartal, orgnr, naring, naering_kode, " +
@@ -241,7 +243,7 @@ public class DatavarehusRepository {
                         "sum(mulige_dv) as sum_mulige_dagsverk " +
                         "from dt_p.agg_ia_sykefravar_v_2 " +
                         "where arstall = :arstall and kvartal = :kvartal " +
-                        "and rectype='"+ RECTYPE_FOR_VIRKSOMHET + "' " +
+                        "and rectype = :rectype " +
                         "group by arstall, kvartal, orgnr, naring, naering_kode",
                 namedParameters,
                 (resultSet, rowNum) ->
