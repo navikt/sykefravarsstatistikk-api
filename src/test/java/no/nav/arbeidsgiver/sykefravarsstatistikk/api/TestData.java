@@ -23,6 +23,13 @@ import java.util.Arrays;
 
 public class TestData {
 
+    public static final String ORGNR_VIRKSOMHET_1 = "987654321";
+    public static final String ORGNR_VIRKSOMHET_2 = "999999999";
+    public static final String ORGNR_VIRKSOMHET_3 = "999999777";
+
+    public static final String NÆRINGSKODE_5SIFFER = "10062";
+    public static final String NÆRINGSKODE_2SIFFER = "10";
+
     public static InnloggetBruker getInnloggetBruker() {
         return getInnloggetBruker(getFnr().getVerdi());
     }
