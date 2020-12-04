@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner.Næringsgruppering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -29,23 +28,16 @@ public class DatavarehusRepository {
     public static final String NARING_5SIFFER = "naering_kode";
     public static final String ORGNR = "orgnr";
     public static final String VARIGHET = "varighet";
+    public static final String SUM_TAPTE_DAGSVERK_GS = "sum_tapte_dagsverk_gs";
     public static final String SUM_ANTALL_PERSONER = "sum_antall_personer";
     public static final String SUM_TAPTE_DAGSVERK = "sum_tapte_dagsverk";
     public static final String SUM_MULIGE_DAGSVERK = "sum_mulige_dagsverk";
+    public static final String SUM_ANTALL_GRADERTE_SYKEMELDINGER = "sum_antall_graderte_sykemeldinger";
+    public static final String SUM_ANTALL_SYKEMELDINGER = "sum_antall_sykemeldinger";
+    public static final String RECTYPE = "rectype";
 
     public static final String RECTYPE_FOR_FORETAK = "1";
     public static final String RECTYPE_FOR_VIRKSOMHET = "2";
-
-    public static final String NAERING_KODE = "naering_kode";
-    public static final String NAERING_BESKRIVELSE = "naering_besk_lang";
-    public static final String GRUPPE1_KODE = "gruppe1_kode";
-    public static final String GRUPPE1_BESKRIVELSE = "gruppe1_besk_lang";
-    public static final String GRUPPE2_KODE = "gruppe2_kode";
-    public static final String GRUPPE2_BESKRIVELSE = "gruppe2_besk_lang";
-    public static final String GRUPPE3_KODE = "gruppe3_kode";
-    public static final String GRUPPE3_BESKRIVELSE = "gruppe3_besk_lang";
-    public static final String GRUPPE4_KODE = "gruppe4_kode";
-    public static final String GRUPPE4_BESKRIVELSE = "gruppe4_besk_lang";
 
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -227,6 +219,43 @@ public class DatavarehusRepository {
                                 resultSet.getInt(KVARTAL),
                                 resultSet.getString(NARING_5SIFFER),
                                 resultSet.getString(VARIGHET),
+                                resultSet.getInt(SUM_ANTALL_PERSONER),
+                                resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
+                                resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
+    }
+
+    public List<SykefraværsstatistikkVirksomhetMedGradering> hentSykefraværsstatistikkVirksomhetMedGradering(
+            ÅrstallOgKvartal årstallOgKvartal
+    ) {
+        SqlParameterSource namedParameters =
+                new MapSqlParameterSource()
+                        .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+                        .addValue(KVARTAL, årstallOgKvartal.getKvartal())
+                        .addValue(RECTYPE, RECTYPE_FOR_VIRKSOMHET);
+
+        return namedParameterJdbcTemplate.query(
+                "select arstall, kvartal, orgnr, naring, naering_kode, " +
+                        "sum(taptedv_gs) as sum_tapte_dagsverk_gs, " +
+                        "sum(antall_gs) as sum_antall_graderte_sykemeldinger, " +
+                        "sum(antall) as sum_antall_sykemeldinger, " +
+                        "sum(antpers) as sum_antall_personer, " +
+                        "sum(taptedv) as sum_tapte_dagsverk, " +
+                        "sum(mulige_dv) as sum_mulige_dagsverk " +
+                        "from dt_p.agg_ia_sykefravar_v_2 " +
+                        "where arstall = :arstall and kvartal = :kvartal " +
+                        "and rectype = :rectype " +
+                        "group by arstall, kvartal, orgnr, naring, naering_kode",
+                namedParameters,
+                (resultSet, rowNum) ->
+                        new SykefraværsstatistikkVirksomhetMedGradering(
+                                resultSet.getInt(ARSTALL),
+                                resultSet.getInt(KVARTAL),
+                                resultSet.getString(ORGNR),
+                                resultSet.getString(NARING),
+                                resultSet.getString(NARING_5SIFFER),
+                                resultSet.getInt(SUM_ANTALL_GRADERTE_SYKEMELDINGER),
+                                resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK_GS),
+                                resultSet.getInt(SUM_ANTALL_SYKEMELDINGER),
                                 resultSet.getInt(SUM_ANTALL_PERSONER),
                                 resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
                                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));

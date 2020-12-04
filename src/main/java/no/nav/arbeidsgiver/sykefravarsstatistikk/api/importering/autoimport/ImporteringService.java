@@ -139,6 +139,10 @@ public class ImporteringService {
         if (importeringsobjekter.contains(Importeringsobjekt.NÆRING_MED_VARIGHET)) {
             importSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal);
         }
+
+        if (importeringsobjekter.contains(Importeringsobjekt.GRADERING)) {
+            importSykefraværsstatistikkMedGradering(årstallOgKvartal);
+        }
     }
 
     private void importerNyStatistikk(ÅrstallOgKvartal årstallOgKvartal) {
@@ -148,6 +152,7 @@ public class ImporteringService {
         importSykefraværsstatistikkNæring5siffer(årstallOgKvartal);
         importSykefraværsstatistikkVirksomhet(årstallOgKvartal);
         importSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal);
+        importSykefraværsstatistikkMedGradering(årstallOgKvartal);
     }
 
 
@@ -212,6 +217,19 @@ public class ImporteringService {
                 årstallOgKvartal
         );
         loggResultat(årstallOgKvartal, resultat, "virksomhet");
+
+        return resultat;
+    }
+
+    private SlettOgOpprettResultat importSykefraværsstatistikkMedGradering(ÅrstallOgKvartal årstallOgKvartal) {
+        List<SykefraværsstatistikkVirksomhetMedGradering> sykefraværsstatistikkVirksomhetMedGradering =
+                datavarehusRepository.hentSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal);
+
+        SlettOgOpprettResultat resultat = statistikkRepository.importSykefraværsstatistikkVirksomhetMedGradering(
+                sykefraværsstatistikkVirksomhetMedGradering,
+                årstallOgKvartal
+        );
+        loggResultat(årstallOgKvartal, resultat, "virksomhet gradert sykemelding");
 
         return resultat;
     }
