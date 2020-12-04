@@ -20,7 +20,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.*;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_FORETAK;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.DatavarehusRepositoryJdbcTestUtils.*;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
@@ -240,7 +239,7 @@ public class DatavarehusRepositoryJdbcTest {
     }
 
     @Test
-    public void hentSykefraværsstatistikkVirksomhetForGradertSykemelding__lager_sum_og_returnerer_antall_tapte_dagsverk_i_gradert_sykemelding_og_mulige_dagsverk() {
+    public void hentSykefraværsstatistikkVirksomhetMedGradering__lager_sum_og_returnerer_antall_tapte_dagsverk_i_gradert_sykemelding_og_mulige_dagsverk() {
         insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
                 namedParameterJdbcTemplate,
                 2018,
@@ -279,7 +278,7 @@ public class DatavarehusRepositoryJdbcTest {
         );
 
         List<SykefraværsstatistikkVirksomhetMedGradering> sykefraværsstatistikkVirksomhetMedGradering =
-                repository.hentSykefraværsstatistikkVirksomhetForGradertSykemelding(new ÅrstallOgKvartal(2018, 4));
+                repository.hentSykefraværsstatistikkVirksomhetMedGradering(new ÅrstallOgKvartal(2018, 4));
 
         assertThat(sykefraværsstatistikkVirksomhetMedGradering, hasSize(2));
         SykefraværsstatistikkVirksomhetMedGradering expected = new SykefraværsstatistikkVirksomhetMedGradering(

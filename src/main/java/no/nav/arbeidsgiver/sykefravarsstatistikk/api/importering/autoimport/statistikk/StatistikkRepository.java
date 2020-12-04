@@ -150,7 +150,7 @@ public class StatistikkRepository {
         return new SlettOgOpprettResultat(antallSlettet, antallOprettet);
     }
 
-    public SlettOgOpprettResultat importSykefraværsstatistikkVirksomhetForGradertSykemelding(
+    public SlettOgOpprettResultat importSykefraværsstatistikkVirksomhetMedGradering(
             List<SykefraværsstatistikkVirksomhetMedGradering> sykefraværsstatistikkVirksomhetMedGradering,
             ÅrstallOgKvartal årstallOgKvartal
     ) {
@@ -164,8 +164,8 @@ public class StatistikkRepository {
                 "virksomhet gradert sykemelding",
                 årstallOgKvartal
         );
-        int antallSlettet = slettSykefraværsstatistikkVirksomhetForGradertSykemelding(årstallOgKvartal);
-        int antallOprettet = batchOpprettSykefraværsstatistikkVirksomhetForGradertSykemelding(
+        int antallSlettet = slettSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal);
+        int antallOprettet = batchOpprettSykefraværsstatistikkVirksomhetMedGradering(
                 sykefraværsstatistikkVirksomhetMedGradering,
                 INSERT_BATCH_STØRRELSE
         );
@@ -190,7 +190,7 @@ public class StatistikkRepository {
                 namedParameters);
     }
 
-    public int slettSykefraværsstatistikkVirksomhetForGradertSykemelding(ÅrstallOgKvartal årstallOgKvartal) {
+    public int slettSykefraværsstatistikkVirksomhetMedGradering(ÅrstallOgKvartal årstallOgKvartal) {
         SqlParameterSource namedParameters =
                 new MapSqlParameterSource()
                         .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
@@ -227,7 +227,7 @@ public class StatistikkRepository {
         return antallOpprettet.get();
     }
 
-    public int batchOpprettSykefraværsstatistikkVirksomhetForGradertSykemelding(
+    public int batchOpprettSykefraværsstatistikkVirksomhetMedGradering(
             List<? extends Sykefraværsstatistikk> sykefraværsstatistikk,
             int insertBatchStørrelse
     ) {
@@ -238,7 +238,7 @@ public class StatistikkRepository {
         AtomicInteger antallOpprettet = new AtomicInteger();
 
         subsets.forEach(subset -> {
-                    int opprettet = opprettSykefraværsstatistikkVirksomhetForGradertSykemelding(subset);
+                    int opprettet = opprettSykefraværsstatistikkVirksomhetMedGradering(subset);
                     int opprettetHittilNå = antallOpprettet.addAndGet(opprettet);
 
                     log.info(String.format("Opprettet %d rader", opprettetHittilNå));
@@ -265,7 +265,7 @@ public class StatistikkRepository {
         return Arrays.stream(results).sum();
     }
 
-    public int opprettSykefraværsstatistikkVirksomhetForGradertSykemelding(
+    public int opprettSykefraværsstatistikkVirksomhetMedGradering(
             List<? extends Sykefraværsstatistikk> sykefraværsstatistikk
     ) {
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(sykefraværsstatistikk.toArray());

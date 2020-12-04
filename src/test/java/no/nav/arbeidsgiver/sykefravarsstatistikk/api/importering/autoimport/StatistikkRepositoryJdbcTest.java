@@ -100,7 +100,7 @@ public class StatistikkRepositoryJdbcTest {
     }
 
     @Test
-    public void batchOpprettSykefraværsstatistikkVirksomhetForGradertSykemelding__skal_lagre_data_i_tabellen() {
+    public void batchOpprettSykefraværsstatistikkVirksomhetMedGradering__skal_lagre_data_i_tabellen() {
         List<SykefraværsstatistikkVirksomhetMedGradering> list = new ArrayList<>();
         SykefraværsstatistikkVirksomhetMedGradering gradertSykemelding = new SykefraværsstatistikkVirksomhetMedGradering(
                 2020,
@@ -118,9 +118,9 @@ public class StatistikkRepositoryJdbcTest {
 
         list.add(gradertSykemelding);
 
-        statistikkRepository.batchOpprettSykefraværsstatistikkVirksomhetForGradertSykemelding(list, INSERT_BATCH_STØRRELSE);
+        statistikkRepository.batchOpprettSykefraværsstatistikkVirksomhetMedGradering(list, INSERT_BATCH_STØRRELSE);
 
-        List<UmaskertSykefraværForEttKvartalMedGradering> resultList = hentSykefraværprosentForGradertSykemelding();
+        List<UmaskertSykefraværForEttKvartalMedGradering> resultList = hentSykefraværprosentMedGradering();
         Assertions.assertThat(resultList.size()).isEqualTo(1);
         Assertions.assertThat(resultList.get(0)).isEqualTo(
                 new UmaskertSykefraværForEttKvartalMedGradering(
@@ -187,7 +187,7 @@ public class StatistikkRepositoryJdbcTest {
         );
     }
 
-    private List<UmaskertSykefraværForEttKvartalMedGradering> hentSykefraværprosentForGradertSykemelding() {
+    private List<UmaskertSykefraværForEttKvartalMedGradering> hentSykefraværprosentMedGradering() {
         return jdbcTemplate.query(
                 "select * from sykefravar_statistikk_virksomhet_med_gradering",
                 new MapSqlParameterSource(),

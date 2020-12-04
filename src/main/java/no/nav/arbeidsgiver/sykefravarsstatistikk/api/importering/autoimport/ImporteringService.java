@@ -141,7 +141,7 @@ public class ImporteringService {
         }
 
         if (importeringsobjekter.contains(Importeringsobjekt.GRADERING)) {
-            importSykefraværsstatistikkForGradertSykemelding(årstallOgKvartal);
+            importSykefraværsstatistikkMedGradering(årstallOgKvartal);
         }
     }
 
@@ -152,7 +152,7 @@ public class ImporteringService {
         importSykefraværsstatistikkNæring5siffer(årstallOgKvartal);
         importSykefraværsstatistikkVirksomhet(årstallOgKvartal);
         importSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal);
-        importSykefraværsstatistikkForGradertSykemelding(årstallOgKvartal);
+        importSykefraværsstatistikkMedGradering(årstallOgKvartal);
     }
 
 
@@ -221,11 +221,11 @@ public class ImporteringService {
         return resultat;
     }
 
-    private SlettOgOpprettResultat importSykefraværsstatistikkForGradertSykemelding(ÅrstallOgKvartal årstallOgKvartal) {
+    private SlettOgOpprettResultat importSykefraværsstatistikkMedGradering(ÅrstallOgKvartal årstallOgKvartal) {
         List<SykefraværsstatistikkVirksomhetMedGradering> sykefraværsstatistikkVirksomhetMedGradering =
-                datavarehusRepository.hentSykefraværsstatistikkVirksomhetForGradertSykemelding(årstallOgKvartal);
+                datavarehusRepository.hentSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal);
 
-        SlettOgOpprettResultat resultat = statistikkRepository.importSykefraværsstatistikkVirksomhetForGradertSykemelding(
+        SlettOgOpprettResultat resultat = statistikkRepository.importSykefraværsstatistikkVirksomhetMedGradering(
                 sykefraværsstatistikkVirksomhetMedGradering,
                 årstallOgKvartal
         );

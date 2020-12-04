@@ -223,7 +223,7 @@ public class DatavarehusRepository {
                                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
     }
 
-    public List<SykefraværsstatistikkVirksomhetMedGradering> hentSykefraværsstatistikkVirksomhetForGradertSykemelding(
+    public List<SykefraværsstatistikkVirksomhetMedGradering> hentSykefraværsstatistikkVirksomhetMedGradering(
             ÅrstallOgKvartal årstallOgKvartal
     ) {
         SqlParameterSource namedParameters =
