@@ -7,10 +7,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils.assertBigDecimalIsEqual;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class SummertKorttidsOgLangtidsfraværTest {
@@ -375,11 +375,6 @@ class SummertKorttidsOgLangtidsfraværTest {
 
         assertThat(korttidsEllerLangtidsfraværSiste4Kvartaler.getKvartaler())
                 .isEqualTo(expectedKvartalerAsList);
-    }
-
-    private void assertBigDecimalIsEqual(BigDecimal actual, float expected) {
-        assertThat(actual.setScale(6, RoundingMode.HALF_UP))
-                .isEqualTo(BigDecimal.valueOf(expected).setScale(6, RoundingMode.HALF_UP));
     }
 
     private void assertIsMaskert(

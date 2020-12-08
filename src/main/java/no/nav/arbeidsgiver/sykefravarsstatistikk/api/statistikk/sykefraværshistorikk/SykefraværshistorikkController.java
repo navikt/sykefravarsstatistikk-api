@@ -8,7 +8,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregiste
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikkService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertSykefraværshistorikk;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.VarighetService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertSykefraværService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
 import no.nav.security.token.support.core.api.Protected;
@@ -27,17 +27,17 @@ public class SykefraværshistorikkController {
     private final KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService;
     private final TilgangskontrollService tilgangskontrollService;
     private final EnhetsregisteretClient enhetsregisteretClient;
-    private final VarighetService varighetService;
+    private final SummertSykefraværService summertSykefraværService;
 
     public SykefraværshistorikkController(
             KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService,
             TilgangskontrollService tilgangskontrollService,
             EnhetsregisteretClient enhetsregisteretClient,
-            VarighetService varighetService) {
+            SummertSykefraværService summertSykefraværService) {
         this.kvartalsvisSykefraværshistorikkService = kvartalsvisSykefraværshistorikkService;
         this.tilgangskontrollService = tilgangskontrollService;
         this.enhetsregisteretClient = enhetsregisteretClient;
-        this.varighetService = varighetService;
+        this.summertSykefraværService = summertSykefraværService;
     }
 
     @GetMapping(value = "/{orgnr}/sykefravarshistorikk/kvartalsvis")
@@ -103,14 +103,14 @@ public class SykefraværshistorikkController {
         }
 
         SummertSykefraværshistorikk summertSykefraværshistorikkVirksomhet =
-                varighetService.hentSummertKorttidsOgLangtidsfravær(
+                summertSykefraværService.hentSummertSykefraværshistorikk(
                         underenhet,
                         new ÅrstallOgKvartal(2020, 3),
                         antallKvartaler
                 );
 
         SummertSykefraværshistorikk summertSykefraværshistorikkBransjeEllerNæring =
-                varighetService.hentSummertKorttidsOgLangtidsfraværForBransjeEllerNæring(
+                summertSykefraværService.hentSummertSykefraværshistorikkForBransjeEllerNæring(
                         underenhet,
                         new ÅrstallOgKvartal(2020, 3),
                         antallKvartaler

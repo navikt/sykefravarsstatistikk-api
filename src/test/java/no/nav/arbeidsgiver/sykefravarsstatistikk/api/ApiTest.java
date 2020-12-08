@@ -207,6 +207,26 @@ public class ApiTest {
                         "          }" +
                         "        ]" +
                         "      }" +
+                        "    }," +
+                        "    \"summertGradertFravær\": {" +
+                        "      \"prosent\": 0.7," +
+                        "      \"tapteDagsverk\": 14.1," +
+                        "      \"muligeDagsverk\": 1990.3," +
+                        "      \"erMaskert\": false," +
+                        "      \"kvartaler\": [" +
+                        "        {" +
+                        "          \"årstall\": 2019," +
+                        "          \"kvartal\": 4" +
+                        "        }," +
+                        "        {" +
+                        "          \"årstall\": 2020," +
+                        "          \"kvartal\": 1" +
+                        "        }," +
+                        "        {" +
+                        "          \"årstall\": 2020," +
+                        "          \"kvartal\": 2" +
+                        "        }" +
+                        "      ]" +
                         "    }" +
                         "  }," +
                         "  {" +
@@ -253,7 +273,8 @@ public class ApiTest {
                         "          }" +
                         "        ]" +
                         "      }" +
-                        "    }" +
+                        "    }," +
+                        "    \"summertGradertFravær\": null" +
                         "  }" +
                         "]";
     }

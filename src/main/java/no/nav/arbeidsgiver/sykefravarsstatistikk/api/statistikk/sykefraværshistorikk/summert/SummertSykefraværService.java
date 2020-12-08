@@ -8,33 +8,41 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Brans
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SummertSykefravær;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedGradering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class VarighetService {
+public class SummertSykefraværService {
 
     private final VarighetRepository varighetRepository;
+    private final GraderingRepository graderingRepository;
     private final Bransjeprogram bransjeprogram;
     private final KlassifikasjonerRepository klassifikasjonerRepository;
 
 
-    public VarighetService(
+    public SummertSykefraværService(
             VarighetRepository varighetRepository,
+            GraderingRepository graderingRepository,
             Bransjeprogram bransjeprogram,
             KlassifikasjonerRepository klassifikasjonerRepository
     ) {
         this.varighetRepository = varighetRepository;
+        this.graderingRepository = graderingRepository;
         this.bransjeprogram = bransjeprogram;
         this.klassifikasjonerRepository = klassifikasjonerRepository;
     }
 
-    public SummertSykefraværshistorikk hentSummertKorttidsOgLangtidsfraværForBransjeEllerNæring(
+    public SummertSykefraværshistorikk hentSummertSykefraværshistorikkForBransjeEllerNæring(
             Underenhet underenhet,
             ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal,
             int antallKvartalerSomSkalSummeres
@@ -77,7 +85,7 @@ public class VarighetService {
                 .build();
     }
 
-    public SummertSykefraværshistorikk hentSummertKorttidsOgLangtidsfravær(
+    public SummertSykefraværshistorikk hentSummertSykefraværshistorikk(
             Underenhet underenhet,
             ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal,
             int antallKvartalerSomSkalSummeres
@@ -88,17 +96,55 @@ public class VarighetService {
 
         List<UmaskertSykefraværForEttKvartalMedVarighet> sykefraværVarighet =
                 varighetRepository.hentSykefraværForEttKvartalMedVarighet(underenhet);
+        List<UmaskertSykefraværForEttKvartalMedGradering> sykefraværGradering =
+                graderingRepository.hentSykefraværForEttKvartalMedGradering(underenhet);
 
-        SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær = SummertKorttidsOgLangtidsfravær.getSummertKorttidsOgLangtidsfravær(
+        SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
+                SummertKorttidsOgLangtidsfravær.getSummertKorttidsOgLangtidsfravær(
+                        sistePubliserteÅrstallOgKvartal,
+                        antallKvartalerSomSkalSummeres,
+                        sykefraværVarighet
+                );
+
+        SummertSykefravær summertSykefraværGradering = getSummerSykefraværGradering(
                 sistePubliserteÅrstallOgKvartal,
                 antallKvartalerSomSkalSummeres,
-                sykefraværVarighet
+                sykefraværGradering
         );
 
         return SummertSykefraværshistorikk.builder()
                 .type(Statistikkategori.VIRKSOMHET)
                 .label(underenhet.getNavn())
                 .summertKorttidsOgLangtidsfravær(summertKorttidsOgLangtidsfravær)
+                .summertGradertFravær(summertSykefraværGradering)
                 .build();
+    }
+
+
+    protected SummertSykefravær getSummerSykefraværGradering(
+            ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal,
+            int antallKvartalerSomSkalSummeres,
+            List<UmaskertSykefraværForEttKvartalMedGradering> sykefraværGradering
+    ) {
+        List<ÅrstallOgKvartal> kvartalerSomSkalSummeres = ÅrstallOgKvartal.range(
+                sistePubliserteÅrstallOgKvartal.minusKvartaler(antallKvartalerSomSkalSummeres - 1),
+                sistePubliserteÅrstallOgKvartal
+        );
+
+        List<UmaskertSykefraværForEttKvartal> gradertSykefraværForDeKvartaleneSomSkalSummeres =
+                sykefraværGradering.stream()
+                        .filter(v -> kvartalerSomSkalSummeres.contains(v.getÅrstallOgKvartal()))
+                        .map(
+                                gradertSykefravær -> new UmaskertSykefraværForEttKvartal(
+                                        gradertSykefravær.getÅrstallOgKvartal(),
+                                        gradertSykefravær.getTapteDagsverkGradertSykemelding(),
+                                        gradertSykefravær.getMuligeDagsverk(),
+                                        gradertSykefravær.getAntallPersoner()
+                                )
+                        )
+                        .sorted(UmaskertSykefraværForEttKvartal::compareTo)
+                        .collect(Collectors.toList());
+
+        return SummertSykefravær.getSummertSykefravær(gradertSykefraværForDeKvartaleneSomSkalSummeres);
     }
 }

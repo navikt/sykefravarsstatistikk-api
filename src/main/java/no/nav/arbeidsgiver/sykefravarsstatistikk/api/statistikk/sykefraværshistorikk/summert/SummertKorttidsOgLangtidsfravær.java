@@ -74,6 +74,7 @@ public class SummertKorttidsOgLangtidsfravær {
         );
     }
 
+    @Deprecated
     private static SummertSykefravær getSummertSykefravær(
             List<UmaskertSykefraværForEttKvartal> kvartalsvisSykefravær
     ) {
