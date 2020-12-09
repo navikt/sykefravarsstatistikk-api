@@ -1,10 +1,9 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.varighet;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjetype;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.VarighetRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
 import org.junit.After;
 import org.junit.Before;
@@ -26,7 +25,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 @ActiveProfiles("db-test")
 @RunWith(SpringRunner.class)
 @DataJdbcTest
-public class UmaskertSykefraværForEttKvartalMedVarighetRepositoryJdbcTest {
+public class VarighetRepositoryJdbcTest {
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 

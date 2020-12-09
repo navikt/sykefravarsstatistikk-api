@@ -6,7 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværssta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetMedGradering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.StatistikkRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedGradering;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
 import org.assertj.core.api.Assertions;
 import org.junit.After;
@@ -25,7 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.*;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.parametreForStatistikk;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.StatistikkRepository.INSERT_BATCH_STØRRELSE;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
@@ -120,15 +121,12 @@ public class StatistikkRepositoryJdbcTest {
 
         statistikkRepository.batchOpprettSykefraværsstatistikkVirksomhetMedGradering(list, INSERT_BATCH_STØRRELSE);
 
-        List<UmaskertSykefraværForEttKvartalMedGradering> resultList = hentSykefraværprosentMedGradering();
+        List<UmaskertSykefraværForEttKvartal> resultList = hentSykefraværprosentMedGradering();
         Assertions.assertThat(resultList.size()).isEqualTo(1);
         Assertions.assertThat(resultList.get(0)).isEqualTo(
-                new UmaskertSykefraværForEttKvartalMedGradering(
+                new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2020, 3),
-                        1,
                         new BigDecimal("3"),
-                        3,
-                        new BigDecimal("16"),
                         new BigDecimal("100"),
                         13
                 )
@@ -187,16 +185,13 @@ public class StatistikkRepositoryJdbcTest {
         );
     }
 
-    private List<UmaskertSykefraværForEttKvartalMedGradering> hentSykefraværprosentMedGradering() {
+    private List<UmaskertSykefraværForEttKvartal> hentSykefraværprosentMedGradering() {
         return jdbcTemplate.query(
                 "select * from sykefravar_statistikk_virksomhet_med_gradering",
                 new MapSqlParameterSource(),
-                (rs, rowNum) -> new UmaskertSykefraværForEttKvartalMedGradering(
+                (rs, rowNum) -> new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
-                        rs.getInt("antall_graderte_sykemeldinger"),
                         rs.getBigDecimal("tapte_dagsverk_gradert_sykemelding"),
-                        rs.getInt("antall_sykemeldinger"),
-                        rs.getBigDecimal("tapte_dagsverk"),
                         rs.getBigDecimal("mulige_dagsverk"),
                         rs.getInt("antall_personer")
                 )
