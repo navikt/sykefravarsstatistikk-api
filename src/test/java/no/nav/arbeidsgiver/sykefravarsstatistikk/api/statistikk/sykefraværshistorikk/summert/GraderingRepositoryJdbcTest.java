@@ -1,6 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjetype;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import org.junit.After;
 import org.junit.Before;
@@ -14,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
@@ -26,6 +30,7 @@ public class GraderingRepositoryJdbcTest {
 
     private static final Næring PRODUKSJON_AV_KLÆR = new Næring("14", "Produksjon av klær");
     private static final Næring PRODUKSJON_AV_LÆR_OG_LÆRVARER = new Næring("15", "Produksjon av lær og lærvarer");
+    private static final Næring HELSETJENESTER = new Næring("86", "Helsetjenester");
     private static Underenhet UNDERENHET_1_NÆRING_14 = Underenhet.builder()
             .orgnr(new Orgnr("999999999"))
             .næringskode(new Næringskode5Siffer("14120", "Produksjon av arbeidstøy"))
@@ -240,6 +245,87 @@ public class GraderingRepositoryJdbcTest {
                         new BigDecimal(12),
                         new BigDecimal(100),
                         7
+                )
+        );
+    }
+
+    @Test
+    public void hentSykefraværForEttKvartalMedGradering__skal_returnere_riktig_sykefravær_for_bransje() {
+        Næringskode5Siffer sykehus = new Næringskode5Siffer("86101", "Alminnelige somatiske sykehus");
+        Næringskode5Siffer legetjeneste = new Næringskode5Siffer("86211", "Allmenn legetjeneste");
+        Næringskode5Siffer næringskodeIkkeErFraBransje = new Næringskode5Siffer("86902", "Fysioterapitjeneste");
+
+        insertDataMedGradering(
+                jdbcTemplate,
+                UNDERENHET_1_NÆRING_14.getOrgnr().getVerdi(),
+                HELSETJENESTER.getKode(),
+                sykehus.getKode(),
+                _2019_4,
+                5,
+                9,
+                7,
+                new BigDecimal(10),
+                new BigDecimal(20),
+                new BigDecimal(100)
+        );
+        insertDataMedGradering(
+                jdbcTemplate,
+                UNDERENHET_3_NÆRING_14.getOrgnr().getVerdi(),
+                HELSETJENESTER.getKode(),
+                sykehus.getKode(),
+                _2020_1,
+                2,
+                9,
+                7,
+                new BigDecimal(12),
+                new BigDecimal(20),
+                new BigDecimal(100)
+        );
+        insertDataMedGradering(
+                jdbcTemplate,
+                UNDERENHET_2_NÆRING_15.getOrgnr().getVerdi(),
+                HELSETJENESTER.getKode(),
+                legetjeneste.getKode(),
+                _2020_1,
+                19,
+                30,
+                15,
+                new BigDecimal(25),
+                new BigDecimal(50),
+                new BigDecimal(300)
+        );
+        insertDataMedGradering(
+                jdbcTemplate,
+                UNDERENHET_2_NÆRING_15.getOrgnr().getVerdi(),
+                HELSETJENESTER.getKode(),
+                næringskodeIkkeErFraBransje.getKode(),
+                _2020_1,
+                35,
+                1,
+                4,
+                new BigDecimal(55),
+                new BigDecimal(66),
+                new BigDecimal(3000)
+        );
+
+        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværForEttKvartalMedGradering(
+                new Bransje(Bransjetype.SYKEHUS, "sykehus", "86101", "86211"));
+
+        assertThat(resultat.size()).isEqualTo(2);
+        assertThat(resultat.get(0)).isEqualTo(
+                new UmaskertSykefraværForEttKvartal(
+                        new ÅrstallOgKvartal(2019, 4),
+                        new BigDecimal(10),
+                        new BigDecimal(100),
+                        7
+                )
+        );
+        assertThat(resultat.get(1)).isEqualTo(
+                new UmaskertSykefraværForEttKvartal(
+                        new ÅrstallOgKvartal(2020, 1),
+                        new BigDecimal(37),
+                        new BigDecimal(400),
+                        22
                 )
         );
     }

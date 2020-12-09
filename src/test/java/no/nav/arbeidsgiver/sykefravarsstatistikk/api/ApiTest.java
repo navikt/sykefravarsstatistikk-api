@@ -274,7 +274,26 @@ public class ApiTest {
                         "        ]" +
                         "      }" +
                         "    }," +
-                        "    \"summertGradertFravær\": null" +
+                        "    \"summertGradertFravær\": {" +
+                        "      \"prosent\": 1.3," +
+                        "      \"tapteDagsverk\": 50.1," +
+                        "      \"muligeDagsverk\": 3980.6," +
+                        "      \"erMaskert\": false," +
+                        "      \"kvartaler\": [" +
+                        "        {" +
+                        "          \"årstall\": 2019," +
+                        "          \"kvartal\": 4" +
+                        "        }," +
+                        "        {" +
+                        "          \"årstall\": 2020," +
+                        "          \"kvartal\": 1" +
+                        "        }," +
+                        "        {" +
+                        "          \"årstall\": 2020," +
+                        "          \"kvartal\": 2" +
+                        "        }" +
+                        "      ]" +
+                        "    }" +
                         "  }" +
                         "]";
     }

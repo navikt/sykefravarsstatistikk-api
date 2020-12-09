@@ -70,7 +70,24 @@ public class GraderingRepository {
     }
 
     public List<UmaskertSykefraværForEttKvartal> hentSykefraværForEttKvartalMedGradering(Bransje bransje) {
-        return null;
+        try {
+            return namedParameterJdbcTemplate.query(
+                    "select arstall, kvartal," +
+                            " sum(tapte_dagsverk_gradert_sykemelding) as sum_tapte_dagsverk_gradert_sykemelding, " +
+                            " sum(mulige_dagsverk) as sum_mulige_dagsverk, " +
+                            " sum(antall_personer) as sum_antall_personer " +
+                            " from sykefravar_statistikk_virksomhet_med_gradering " +
+                            " where " +
+                            " naring_kode in (:naringKoder) " +
+                            " group by arstall, kvartal" +
+                            " order by arstall, kvartal",
+                    new MapSqlParameterSource()
+                            .addValue("naringKoder", bransje.getKoderSomSpesifisererNæringer()),
+                    (rs, rowNum) -> mapTilKvartalsvisSykefravær(rs)
+            );
+        } catch (EmptyResultDataAccessException e) {
+            return Collections.emptyList();
+        }
     }
 
 
