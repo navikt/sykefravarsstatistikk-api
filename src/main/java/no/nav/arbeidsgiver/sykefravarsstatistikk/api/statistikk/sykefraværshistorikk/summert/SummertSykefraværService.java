@@ -10,13 +10,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Klassifikasjoner
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SummertSykefravær;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedGradering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -96,7 +93,7 @@ public class SummertSykefraværService {
 
         List<UmaskertSykefraværForEttKvartalMedVarighet> sykefraværVarighet =
                 varighetRepository.hentSykefraværForEttKvartalMedVarighet(underenhet);
-        List<UmaskertSykefraværForEttKvartalMedGradering> sykefraværGradering =
+        List<UmaskertSykefraværForEttKvartal> sykefraværGradering =
                 graderingRepository.hentSykefraværForEttKvartalMedGradering(underenhet);
 
         SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
@@ -124,7 +121,7 @@ public class SummertSykefraværService {
     protected SummertSykefravær getSummerSykefraværGradering(
             ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal,
             int antallKvartalerSomSkalSummeres,
-            List<UmaskertSykefraværForEttKvartalMedGradering> sykefraværGradering
+            List<UmaskertSykefraværForEttKvartal> sykefraværGradering
     ) {
         List<ÅrstallOgKvartal> kvartalerSomSkalSummeres = ÅrstallOgKvartal.range(
                 sistePubliserteÅrstallOgKvartal.minusKvartaler(antallKvartalerSomSkalSummeres - 1),
@@ -134,14 +131,6 @@ public class SummertSykefraværService {
         List<UmaskertSykefraværForEttKvartal> gradertSykefraværForDeKvartaleneSomSkalSummeres =
                 sykefraværGradering.stream()
                         .filter(v -> kvartalerSomSkalSummeres.contains(v.getÅrstallOgKvartal()))
-                        .map(
-                                gradertSykefravær -> new UmaskertSykefraværForEttKvartal(
-                                        gradertSykefravær.getÅrstallOgKvartal(),
-                                        gradertSykefravær.getTapteDagsverkGradertSykemelding(),
-                                        gradertSykefravær.getMuligeDagsverk(),
-                                        gradertSykefravær.getAntallPersoner()
-                                )
-                        )
                         .sorted(UmaskertSykefraværForEttKvartal::compareTo)
                         .collect(Collectors.toList());
 

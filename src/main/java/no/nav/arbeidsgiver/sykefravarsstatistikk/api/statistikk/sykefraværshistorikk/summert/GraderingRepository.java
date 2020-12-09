@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedGradering;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -24,15 +24,11 @@ public class GraderingRepository {
     }
 
 
-
-    public List<UmaskertSykefraværForEttKvartalMedGradering> hentSykefraværForEttKvartalMedGradering(Virksomhet virksomhet) {
+    public List<UmaskertSykefraværForEttKvartal> hentSykefraværForEttKvartalMedGradering(Virksomhet virksomhet) {
         try {
             return namedParameterJdbcTemplate.query(
                     "select arstall, kvartal," +
-                            " sum(antall_graderte_sykemeldinger) as sum_antall_graderte_sykemeldinger," +
                             " sum(tapte_dagsverk_gradert_sykemelding) as sum_tapte_dagsverk_gradert_sykemelding, " +
-                            " sum(antall_sykemeldinger) as sum_antall_sykemeldinger," +
-                            " sum(tapte_dagsverk) as sum_tapte_dagsverk," +
                             " sum(mulige_dagsverk) as sum_mulige_dagsverk, " +
                             " sum(antall_personer) as sum_antall_personer " +
                             " from sykefravar_statistikk_virksomhet_med_gradering " +
@@ -42,25 +38,23 @@ public class GraderingRepository {
                             " order by arstall, kvartal",
                     new MapSqlParameterSource()
                             .addValue("orgnr", virksomhet.getOrgnr().getVerdi()),
-                    (rs, rowNum) -> mapTilKvartalsvisSykefraværMedGradering(rs)
+                    (rs, rowNum) -> mapTilKvartalsvisSykefravær(rs)
             );
         } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();
         }
     }
 
-    private UmaskertSykefraværForEttKvartalMedGradering mapTilKvartalsvisSykefraværMedGradering(ResultSet rs) throws SQLException {
-        return new UmaskertSykefraværForEttKvartalMedGradering(
+    private UmaskertSykefraværForEttKvartal mapTilKvartalsvisSykefravær(ResultSet rs) throws SQLException {
+        return new UmaskertSykefraværForEttKvartal(
                 new ÅrstallOgKvartal(
                         rs.getInt("arstall"),
                         rs.getInt("kvartal")
-                ),rs.getInt("sum_antall_graderte_sykemeldinger"),
+                ),
                 rs.getBigDecimal("sum_tapte_dagsverk_gradert_sykemelding"),
-                rs.getInt("sum_antall_sykemeldinger"),
-                rs.getBigDecimal("sum_tapte_dagsverk"),
                 rs.getBigDecimal("sum_mulige_dagsverk"),
                 rs.getInt("sum_antall_personer")
-                );
+        );
     }
 
 }

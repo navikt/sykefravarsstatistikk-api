@@ -4,7 +4,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedGradering;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -90,27 +90,21 @@ public class GraderingRepositoryJdbcTest {
                 new BigDecimal(300)
         );
 
-        List<UmaskertSykefraværForEttKvartalMedGradering> resultat = graderingRepository.hentSykefraværForEttKvartalMedGradering(underenhet);
+        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværForEttKvartalMedGradering(underenhet);
 
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(
-                new UmaskertSykefraværForEttKvartalMedGradering(
+                new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2019, 4),
-                        7,
                         new BigDecimal(22),
-                        18,
-                        new BigDecimal(40),
                         new BigDecimal(200),
                         14
                 )
         );
         assertThat(resultat.get(1)).isEqualTo(
-                new UmaskertSykefraværForEttKvartalMedGradering(
+                new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2020, 1),
-                        19,
                         new BigDecimal(25),
-                        30,
-                        new BigDecimal(50),
                         new BigDecimal(300),
                         15
                 )
@@ -171,27 +165,21 @@ public class GraderingRepositoryJdbcTest {
                 new BigDecimal(300)
         );
 
-        List<UmaskertSykefraværForEttKvartalMedGradering> resultat = graderingRepository.hentSykefraværForEttKvartalMedGradering(underenhet1);
+        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværForEttKvartalMedGradering(underenhet1);
 
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(
-                new UmaskertSykefraværForEttKvartalMedGradering(
+                new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2019, 4),
-                        5,
                         new BigDecimal(10),
-                        9,
-                        new BigDecimal(20),
                         new BigDecimal(100),
                         7
                 )
         );
         assertThat(resultat.get(1)).isEqualTo(
-                new UmaskertSykefraværForEttKvartalMedGradering(
+                new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2020, 1),
-                        2,
                         new BigDecimal(12),
-                        9,
-                        new BigDecimal(20),
                         new BigDecimal(100),
                         7
                 )

@@ -11,7 +11,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SummertSykefravær;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedGradering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,7 +66,7 @@ public class SummertSykefraværServiceTest {
 
     @Test
     void getSummerSykefraværGradering() {
-        List<UmaskertSykefraværForEttKvartalMedGradering> listeAvGraderteSykemeldinger = new ArrayList<>();
+        List<UmaskertSykefraværForEttKvartal> listeAvGraderteSykemeldinger = new ArrayList<>();
 
         listeAvGraderteSykemeldinger.add(getGradertSykefravær(_2020_3, new BigDecimal(15.455), new BigDecimal(100), 5));
         listeAvGraderteSykemeldinger.add(getGradertSykefravær(_2020_2, new BigDecimal(22.500), new BigDecimal(200), 5));
@@ -135,19 +134,16 @@ public class SummertSykefraværServiceTest {
     }
 
 
-    private UmaskertSykefraværForEttKvartalMedGradering getGradertSykefravær(
+    private UmaskertSykefraværForEttKvartal getGradertSykefravær(
             ÅrstallOgKvartal årstallOgKvartal,
             BigDecimal tapteDagsverkGradertSykemelding,
             BigDecimal muligeDagsverk,
             int antallPersoner
     ) {
         return
-                new UmaskertSykefraværForEttKvartalMedGradering(
+                new UmaskertSykefraværForEttKvartal(
                         årstallOgKvartal,
-                        5,
                         tapteDagsverkGradertSykemelding,
-                        3,
-                        new BigDecimal(0),
                         muligeDagsverk,
                         antallPersoner
                 );
