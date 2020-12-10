@@ -65,19 +65,33 @@ public class ImporteringKvalitetssjekkService {
             resultatlinjer.add("Antall match med gradering data: " + count(resultatForNæringMedGradering, true));
             resultatlinjer.add("Antall mismatch med gradering data: " + count(resultatForNæringMedGradering, false));
 
-            List<Boolean> resultatForVirksomhetMedGradering = sykefraværRådataErLike(sykefraværRådata, sykefraværRådataMedGradering);
+            List<Boolean> resultatForVirksomhetMedGradering = sykefraværRådataErLike(
+                    sykefraværRådata,
+                    sykefraværRådataMedGradering
+            );
 
-            resultatlinjer.add("Antall match med gradering for virksomhet: " + count(resultatForVirksomhetMedGradering, true));
-            resultatlinjer.add("Antall mismatch med gradering for virksomhet: " + count(resultatForVirksomhetMedGradering, false));
+            resultatlinjer.add(
+                    "Antall match med gradering for virksomhet: "
+                    + count(resultatForVirksomhetMedGradering, true)
+            );
+            resultatlinjer.add(
+                    "Antall mismatch med gradering for virksomhet: "
+                    + count(resultatForVirksomhetMedGradering, false)
+            );
         });
 
         return resultatlinjer;
     }
 
-    private List<Boolean> sykefraværRådataErLike(List<SykefraværRådata> sykefraværRådata, List<SykefraværRådata> sykefraværRådataMedGradering) {
+
+    private List<Boolean> sykefraværRådataErLike(
+            List<SykefraværRådata> sykefraværRådata,
+            List<SykefraværRådata> sykefraværRådataMedGradering
+    ) {
         List<Boolean> resultat = new ArrayList<>();
         for (SykefraværRådata dataVirksomhet : sykefraværRådata) {
-            Optional<SykefraværRådata> dataVirksomhetMedGradering = finnTilsvarendeRådata(dataVirksomhet, sykefraværRådataMedGradering);
+            Optional<SykefraværRådata> dataVirksomhetMedGradering =
+                    finnTilsvarendeRådata(dataVirksomhet, sykefraværRådataMedGradering);
 
             if (dataVirksomhetMedGradering.isPresent()) {
                 resultat.add(erLike(dataVirksomhet, dataVirksomhetMedGradering.get()));
@@ -90,6 +104,7 @@ public class ImporteringKvalitetssjekkService {
 
     private List<Boolean> rådataErLike(List<Rådata> rådataNæring, List<Rådata> rådataNæringMedVarighet) {
         List<Boolean> resultat = new ArrayList<>();
+
         for (Rådata dataNæring : rådataNæring) {
             Optional<Rådata> dataNæringMedVarighet = finnTilsvarendeRådata(dataNæring, rådataNæringMedVarighet);
 
@@ -112,7 +127,10 @@ public class ImporteringKvalitetssjekkService {
                 .findAny();
     }
 
-    private Optional<SykefraværRådata> finnTilsvarendeRådata(SykefraværRådata rådata, List<SykefraværRådata> rådataList) {
+    private Optional<SykefraværRådata> finnTilsvarendeRådata(
+            SykefraværRådata rådata,
+            List<SykefraværRådata> rådataList
+    ) {
         return rådataList.stream()
                 .filter(rådataListElement -> rådataListElement.årstallOgKvartal.equals(rådata.årstallOgKvartal))
                 .findAny();
@@ -160,7 +178,8 @@ public class ImporteringKvalitetssjekkService {
 
     private List<Rådata> hentRådataForNæring() {
         return namedParameterJdbcTemplate.query(
-                "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk from sykefravar_statistikk_naring5siffer order by arstall, kvartal, naring_kode",
+                "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk " +
+                        "from sykefravar_statistikk_naring5siffer order by arstall, kvartal, naring_kode",
                 new MapSqlParameterSource(),
                 (rs, rowNum) -> new Rådata(
                         rs.getString("naring_kode"),
@@ -174,7 +193,13 @@ public class ImporteringKvalitetssjekkService {
 
     private List<Rådata> hentRådataForNæringMedVarighet() {
         return namedParameterJdbcTemplate.query(
-                "select naring_kode, arstall, kvartal, sum(antall_personer) as sum_antall_personer, sum(tapte_dagsverk) as sum_tapte_dagsverk, sum(mulige_dagsverk) as sum_mulige_dagsverk from SYKEFRAVAR_STATISTIKK_NARING_MED_VARIGHET group by naring_kode, arstall, kvartal order by arstall, kvartal, naring_kode",
+                "select naring_kode, arstall, kvartal, " +
+                        "sum(antall_personer) as sum_antall_personer, " +
+                        "sum(tapte_dagsverk) as sum_tapte_dagsverk, " +
+                        "sum(mulige_dagsverk) as sum_mulige_dagsverk " +
+                        "from SYKEFRAVAR_STATISTIKK_NARING_MED_VARIGHET " +
+                        "group by naring_kode, arstall, kvartal " +
+                        "order by arstall, kvartal, naring_kode",
                 new MapSqlParameterSource(),
                 (rs, rowNum) -> new Rådata(
                         rs.getString("naring_kode"),
@@ -188,7 +213,13 @@ public class ImporteringKvalitetssjekkService {
 
     private List<Rådata> hentRådataForNæringMedGradering() {
         return namedParameterJdbcTemplate.query(
-                "select naring_kode, arstall, kvartal, sum(antall_personer) as sum_antall_personer, sum(tapte_dagsverk) as sum_tapte_dagsverk, sum(mulige_dagsverk) as sum_mulige_dagsverk from sykefravar_statistikk_virksomhet_med_gradering group by naring_kode, arstall, kvartal order by arstall, kvartal, naring_kode",
+                "select naring_kode, arstall, kvartal, " +
+                        "sum(antall_personer) as sum_antall_personer, " +
+                        "sum(tapte_dagsverk) as sum_tapte_dagsverk, " +
+                        "sum(mulige_dagsverk) as sum_mulige_dagsverk " +
+                        "from sykefravar_statistikk_virksomhet_med_gradering " +
+                        "group by naring_kode, arstall, kvartal " +
+                        "order by arstall, kvartal, naring_kode",
                 new MapSqlParameterSource(),
                 (rs, rowNum) -> new Rådata(
                         rs.getString("naring_kode"),
