@@ -1,6 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -44,6 +46,50 @@ public class GraderingRepository {
             return Collections.emptyList();
         }
     }
+
+    public List<UmaskertSykefraværForEttKvartal> hentSykefraværForEttKvartalMedGradering(Næring næring) {
+        try {
+            return namedParameterJdbcTemplate.query(
+                    "select arstall, kvartal," +
+                            " sum(tapte_dagsverk_gradert_sykemelding) as sum_tapte_dagsverk_gradert_sykemelding, " +
+                            " sum(mulige_dagsverk) as sum_mulige_dagsverk, " +
+                            " sum(antall_personer) as sum_antall_personer " +
+                            " from sykefravar_statistikk_virksomhet_med_gradering " +
+                            " where " +
+                            " naring = :naring " +
+                            " group by arstall, kvartal" +
+                            " order by arstall, kvartal",
+                    new MapSqlParameterSource()
+                            .addValue("naring", næring.getKode()),
+                    (rs, rowNum) -> mapTilKvartalsvisSykefravær(rs)
+            );
+        } catch (EmptyResultDataAccessException e) {
+            return Collections.emptyList();
+        }
+
+    }
+
+    public List<UmaskertSykefraværForEttKvartal> hentSykefraværForEttKvartalMedGradering(Bransje bransje) {
+        try {
+            return namedParameterJdbcTemplate.query(
+                    "select arstall, kvartal," +
+                            " sum(tapte_dagsverk_gradert_sykemelding) as sum_tapte_dagsverk_gradert_sykemelding, " +
+                            " sum(mulige_dagsverk) as sum_mulige_dagsverk, " +
+                            " sum(antall_personer) as sum_antall_personer " +
+                            " from sykefravar_statistikk_virksomhet_med_gradering " +
+                            " where " +
+                            " naring_kode in (:naringKoder) " +
+                            " group by arstall, kvartal" +
+                            " order by arstall, kvartal",
+                    new MapSqlParameterSource()
+                            .addValue("naringKoder", bransje.getKoderSomSpesifisererNæringer()),
+                    (rs, rowNum) -> mapTilKvartalsvisSykefravær(rs)
+            );
+        } catch (EmptyResultDataAccessException e) {
+            return Collections.emptyList();
+        }
+    }
+
 
     private UmaskertSykefraværForEttKvartal mapTilKvartalsvisSykefravær(ResultSet rs) throws SQLException {
         return new UmaskertSykefraværForEttKvartal(

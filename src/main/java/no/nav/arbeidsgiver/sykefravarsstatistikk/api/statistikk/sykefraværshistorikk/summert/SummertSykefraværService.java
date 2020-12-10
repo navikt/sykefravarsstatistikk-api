@@ -56,16 +56,19 @@ public class SummertSykefraværService {
         List<UmaskertSykefraværForEttKvartalMedVarighet> sykefraværVarighet;
         Statistikkategori type;
         String label;
+        List<UmaskertSykefraværForEttKvartal> sykefraværGradering;
 
         if (skalHenteDataPåNæring2Siffer) {
             type = Statistikkategori.NÆRING;
             Næring næring = klassifikasjonerRepository.hentNæring(underenhet.getNæringskode().hentNæringskode2Siffer());
             label = næring.getNavn();
             sykefraværVarighet = varighetRepository.hentSykefraværForEttKvartalMedVarighet(næring);
+            sykefraværGradering = graderingRepository.hentSykefraværForEttKvartalMedGradering(næring);
         } else {
             type = Statistikkategori.BRANSJE;
             label = bransje.get().getNavn();
             sykefraværVarighet = varighetRepository.hentSykefraværForEttKvartalMedVarighet(bransje.get());
+            sykefraværGradering = graderingRepository.hentSykefraværForEttKvartalMedGradering(bransje.get());
         }
 
         SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
@@ -75,10 +78,17 @@ public class SummertSykefraværService {
                         sykefraværVarighet
                 );
 
+        SummertSykefravær summertSykefraværGradering = getSummerSykefraværGradering(
+                sistePubliserteÅrstallOgKvartal,
+                antallKvartalerSomSkalSummeres,
+                sykefraværGradering
+        );
+
         return SummertSykefraværshistorikk.builder()
                 .type(type)
                 .label(label)
                 .summertKorttidsOgLangtidsfravær(summertKorttidsOgLangtidsfravær)
+                .summertGradertFravær(summertSykefraværGradering)
                 .build();
     }
 
