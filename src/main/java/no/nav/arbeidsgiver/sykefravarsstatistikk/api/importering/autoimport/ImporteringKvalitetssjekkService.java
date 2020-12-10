@@ -26,14 +26,16 @@ public class ImporteringKvalitetssjekkService {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-    public List<String> kvalitetssjekkNæringMedVarighetMotNæringstabell() {
+    public List<String> kvalitetssjekkNæringMedVarighetOgMedGraderingMotNæringstabell() {
         List<String> resultatlinjer = new ArrayList<>();
 
         List<Rådata> rådataNæring = hentRådataForNæring();
         List<Rådata> rådataNæringMedVarighet = hentRådataForNæringMedVarighet();
+        List<Rådata> rådataNæringMedGradering = hentRådataForNæringMedGradering();
 
         resultatlinjer.add("Antall linjer næring: " + rådataNæring.size());
         resultatlinjer.add("Antall linjer næring med varighet: " + rådataNæringMedVarighet.size());
+        resultatlinjer.add("Antall linjer næring med gradering: " + rådataNæringMedGradering.size());
 
         List<ÅrstallOgKvartal> årstallOgKvartal = rådataNæring
                 .stream()
@@ -47,11 +49,17 @@ public class ImporteringKvalitetssjekkService {
 
             List<Rådata> dataNæring = getRådataForKvartal(rådataNæring, kvartal);
             List<Rådata> dataNæringMedVarighet = getRådataForKvartal(rådataNæringMedVarighet, kvartal);
+            List<Rådata> dataNæringMedGradering = getRådataForKvartal(rådataNæringMedGradering, kvartal);
 
-            List<Boolean> resultat = rådataErLike(dataNæring, dataNæringMedVarighet);
+            List<Boolean> resultatForNæringMedVarighet = rådataErLike(dataNæring, dataNæringMedVarighet);
 
-            resultatlinjer.add("Antall match: " + count(resultat, true));
-            resultatlinjer.add("Antall mismatch: " + count(resultat, false));
+            resultatlinjer.add("Antall match med varighet data: " + count(resultatForNæringMedVarighet, true));
+            resultatlinjer.add("Antall mismatch med varighet data: " + count(resultatForNæringMedVarighet, false));
+
+            List<Boolean> resultatForNæringMedGradering = rådataErLike(dataNæring, dataNæringMedGradering);
+
+            resultatlinjer.add("Antall match med gradering data: " + count(resultatForNæringMedGradering, true));
+            resultatlinjer.add("Antall mismatch med gradering data: " + count(resultatForNæringMedGradering, false));
         });
 
         return resultatlinjer;
@@ -121,6 +129,20 @@ public class ImporteringKvalitetssjekkService {
     private List<Rådata> hentRådataForNæringMedVarighet() {
         return namedParameterJdbcTemplate.query(
                 "select naring_kode, arstall, kvartal, sum(antall_personer) as sum_antall_personer, sum(tapte_dagsverk) as sum_tapte_dagsverk, sum(mulige_dagsverk) as sum_mulige_dagsverk from SYKEFRAVAR_STATISTIKK_NARING_MED_VARIGHET group by naring_kode, arstall, kvartal order by arstall, kvartal, naring_kode",
+                new MapSqlParameterSource(),
+                (rs, rowNum) -> new Rådata(
+                        rs.getString("naring_kode"),
+                        new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
+                        rs.getInt("sum_antall_personer"),
+                        rs.getBigDecimal("sum_tapte_dagsverk"),
+                        rs.getBigDecimal("sum_mulige_dagsverk")
+                )
+        );
+    }
+
+    private List<Rådata> hentRådataForNæringMedGradering() {
+        return namedParameterJdbcTemplate.query(
+                "select naring_kode, arstall, kvartal, sum(antall_personer) as sum_antall_personer, sum(tapte_dagsverk) as sum_tapte_dagsverk, sum(mulige_dagsverk) as sum_mulige_dagsverk from sykefravar_statistikk_virksomhet_med_gradering group by naring_kode, arstall, kvartal order by arstall, kvartal, naring_kode",
                 new MapSqlParameterSource(),
                 (rs, rowNum) -> new Rådata(
                         rs.getString("naring_kode"),

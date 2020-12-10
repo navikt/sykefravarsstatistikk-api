@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping(value = "importering")
-@Profile({"local", "dev"})
+@Profile({"local", "dev", "prod"})
 public class ImporteringController {
 
     private final ImporteringService importeringService;
@@ -53,7 +53,7 @@ public class ImporteringController {
     }
 
     @GetMapping("/kvalitetssjekk")
-    public ResponseEntity<List<String>> testAvNæringMedVarighet() {
-        return ResponseEntity.ok(importeringTestService.kvalitetssjekkNæringMedVarighetMotNæringstabell());
+    public ResponseEntity<List<String>> testAvNæringMedVarighetOgGradering() {
+        return ResponseEntity.ok(importeringTestService.kvalitetssjekkNæringMedVarighetOgMedGraderingMotNæringstabell());
     }
 }
