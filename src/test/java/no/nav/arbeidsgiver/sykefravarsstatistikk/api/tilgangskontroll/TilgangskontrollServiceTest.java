@@ -59,7 +59,8 @@ public class TilgangskontrollServiceTest {
 
     @Test
     public void hentInnloggetBruker__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
-        værInnloggetSom(new InnloggetBruker(fnr));
+        when(tokenUtils.erInnloggetSelvbetjeningBruker()).thenReturn(true);
+        when(tokenUtils.hentInnloggetSelvbetjeningBruker()).thenReturn(new InnloggetBruker(fnr));
         when(altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(any(), eq(fnr))).thenThrow(new AltinnException(""));
 
         assertThrows(AltinnException.class, () -> tilgangskontroll.hentInnloggetBruker());
