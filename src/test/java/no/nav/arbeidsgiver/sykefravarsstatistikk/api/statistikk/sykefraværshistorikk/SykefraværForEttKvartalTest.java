@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 

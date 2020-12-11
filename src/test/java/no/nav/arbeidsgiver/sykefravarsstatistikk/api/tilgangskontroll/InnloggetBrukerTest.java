@@ -3,11 +3,12 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnOrganisasjon;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getInnloggetBruker;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class InnloggetBrukerTest {
 
@@ -21,21 +22,21 @@ public class InnloggetBrukerTest {
         bruker.sjekkTilgang(new Orgnr(organisasjon.getOrganizationNumber()));
     }
 
-    @Test(expected = TilgangskontrollException.class)
+    @Test
     public void sjekkTilgang__skal_feile_hvis_bruker_ikke_har_tilgang_til_noen_org() {
         InnloggetBruker bruker = getInnloggetBruker("12345678901");
 
-        bruker.sjekkTilgang(new Orgnr("123456789"));
+        assertThrows(TilgangskontrollException.class, () -> bruker.sjekkTilgang(new Orgnr("123456789")));
     }
 
-    @Test(expected = TilgangskontrollException.class)
+    @Test
     public void sjekkTilgang__skal_feile_hvis_bruker_ikke_har_tilgang_til_orgnr() {
         InnloggetBruker bruker = getInnloggetBruker("12345678901");
 
         AltinnOrganisasjon organisasjon = TestData.getOrganisasjon("123456789");
         bruker.setOrganisasjoner(List.of(organisasjon));
 
-        bruker.sjekkTilgang(new Orgnr("987654321"));
+        assertThrows(TilgangskontrollException.class, () -> bruker.sjekkTilgang(new Orgnr("987654321")));
     }
 
     @Test

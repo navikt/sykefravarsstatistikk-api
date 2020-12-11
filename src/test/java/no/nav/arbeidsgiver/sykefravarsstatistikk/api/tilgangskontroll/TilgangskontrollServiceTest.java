@@ -7,11 +7,13 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Fnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.sporbarhet.Loggevent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.sporbarhet.Sporbarhetslogg;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.MDC;
 
 import java.util.ArrayList;
@@ -19,12 +21,13 @@ import java.util.Arrays;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getInnloggetBruker;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getOrganisasjon;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TilgangskontrollServiceTest {
     private static final String FNR = "01082248486";
     private static final String IAWEB_SERVICE_CODE = "7834";
@@ -42,7 +45,7 @@ public class TilgangskontrollServiceTest {
     private Fnr fnr;
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         tilgangskontroll = new TilgangskontrollService(
                 altinnKlientWrapper,
@@ -54,20 +57,24 @@ public class TilgangskontrollServiceTest {
         fnr = new Fnr(FNR);
     }
 
-    @Test(expected = AltinnException.class)
+    @Test
     public void hentInnloggetBruker__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
         værInnloggetSom(new InnloggetBruker(fnr));
         when(altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(any(), eq(fnr))).thenThrow(new AltinnException(""));
 
-        tilgangskontroll.hentInnloggetBruker();
+        assertThrows(AltinnException.class, () -> tilgangskontroll.hentInnloggetBruker());
     }
 
-    @Test(expected = TilgangskontrollException.class)
+    @Test
     public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse__skal_feile_hvis_bruker_ikke_har_tilgang() {
         InnloggetBruker bruker = getInnloggetBruker(FNR);
         bruker.setOrganisasjoner(new ArrayList<>());
         værInnloggetSom(bruker);
-        tilgangskontroll.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(new Orgnr("111111111"), "", "");
+
+        assertThrows(
+                TilgangskontrollException.class,
+                () -> tilgangskontroll.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(new Orgnr("111111111"), "", "")
+        );
     }
 
     @Test

@@ -1,19 +1,19 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.besøksstatistikk;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.besøksstatistikk.sammenligning.Sammenligning;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class BesøksstatistikkEventListenerTest {
     @Mock
     private BesøksstatistikkRepository repository;
@@ -22,7 +22,7 @@ public class BesøksstatistikkEventListenerTest {
 
     private BesøksstatistikkEventListener eventListener;
 
-    @Before
+    @BeforeEach
     public void setup() {
         eventListener = new BesøksstatistikkEventListener(repository, altinnClient);
     }

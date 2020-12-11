@@ -10,9 +10,9 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværRepository;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
@@ -30,7 +30,6 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighets
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 @ActiveProfiles("db-test")
-@RunWith(SpringRunner.class)
 @DataJdbcTest
 public class SykefraværForEttKvartalRepositoryJdbcTest {
     @Autowired
@@ -38,13 +37,13 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
 
     private KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         kvartalsvisSykefraværprosentRepository = new KvartalsvisSykefraværRepository(jdbcTemplate);
         slettAllStatistikkFraDatabase(jdbcTemplate);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         slettAllStatistikkFraDatabase(jdbcTemplate);
     }
