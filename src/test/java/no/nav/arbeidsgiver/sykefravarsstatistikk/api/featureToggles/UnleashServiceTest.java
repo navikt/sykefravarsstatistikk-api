@@ -3,11 +3,13 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.featureToggles;
 import no.finn.unleash.Unleash;
 import no.finn.unleash.UnleashContext;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.UnleashService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class UnleashServiceTest {
 
     @Mock
@@ -26,7 +28,7 @@ public class UnleashServiceTest {
 
     private UnleashService unleashService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         unleashService = new UnleashService(unleash);
     }

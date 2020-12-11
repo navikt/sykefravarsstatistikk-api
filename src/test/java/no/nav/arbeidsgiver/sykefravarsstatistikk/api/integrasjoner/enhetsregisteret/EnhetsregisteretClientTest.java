@@ -7,22 +7,23 @@ import lombok.SneakyThrows;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.etOrgnr;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class EnhetsregisteretClientTest {
 
     private EnhetsregisteretClient enhetsregisteretClient;
@@ -31,7 +32,7 @@ public class EnhetsregisteretClientTest {
     @Mock
     private RestTemplate restTemplate;
 
-    @Before
+    @BeforeEach
     public void setup() {
         enhetsregisteretClient = new EnhetsregisteretClient(restTemplate, "");
     }
@@ -50,7 +51,7 @@ public class EnhetsregisteretClientTest {
         assertThat(overordnetEnhet.getAntallAnsatte()).isEqualTo(40);
     }
 
-    @Test(expected = EnhetsregisteretException.class)
+    @Test
     public void hentInformasjonOmEnhet__skal_feile_hvis_server_returnerer_5xx_server_returnerer_5xx() {
         when(
                 restTemplate.getForObject(
@@ -61,23 +62,26 @@ public class EnhetsregisteretClientTest {
                 new HttpServerErrorException(HttpStatus.BAD_GATEWAY)
         );
 
-        enhetsregisteretClient.hentInformasjonOmEnhet(etOrgnr());
+        assertThrows(EnhetsregisteretException.class, () -> enhetsregisteretClient.hentInformasjonOmEnhet(etOrgnr()));
     }
 
-    @Test(expected = EnhetsregisteretMappingException.class)
+    @Test
     public void hentInformasjonOmEnhet__skal_feile_hvis_et_felt_mangler() {
         ObjectNode responsMedManglendeFelt = gyldigEnhetRespons("999263550");
         responsMedManglendeFelt.remove("institusjonellSektorkode");
         mockRespons(responsMedManglendeFelt);
 
-        enhetsregisteretClient.hentInformasjonOmEnhet(etOrgnr());
+        assertThrows(EnhetsregisteretMappingException.class, () -> enhetsregisteretClient.hentInformasjonOmEnhet(etOrgnr()));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void hentInformasjonOmEnhet__skal_feile_hvis_returnert_orgnr_ikke_matcher_med_medsendt_orgnr() {
         ObjectNode responsMedFeilOrgnr = gyldigEnhetRespons("999263550");
         mockRespons(responsMedFeilOrgnr);
-        enhetsregisteretClient.hentInformasjonOmEnhet(new Orgnr("777777777"));
+        assertThrows(
+                IllegalStateException.class,
+                () -> enhetsregisteretClient.hentInformasjonOmEnhet(new Orgnr("777777777"))
+        );
     }
 
     @Test
@@ -93,7 +97,7 @@ public class EnhetsregisteretClientTest {
         assertThat(underenhet.getAntallAnsatte()).isEqualTo(40);
     }
 
-    @Test(expected = EnhetsregisteretIkkeTilgjengeligException.class)
+    @Test
     public void hentInformasjonOmUnderenhet__skal_feile_hvis_server_returnerer_5xx() {
         when(
                 restTemplate.getForObject(
@@ -104,22 +108,33 @@ public class EnhetsregisteretClientTest {
                 new HttpServerErrorException(HttpStatus.BAD_GATEWAY)
         );
 
-        enhetsregisteretClient.hentInformasjonOmUnderenhet(etOrgnr());
+
+        assertThrows(
+                EnhetsregisteretIkkeTilgjengeligException.class,
+                () -> enhetsregisteretClient.hentInformasjonOmUnderenhet(etOrgnr())
+        );
     }
-    @Test(expected = EnhetsregisteretMappingException.class)
+    @Test
     public void hentInformasjonOmUnderenhet__skal_feile_hvis_et_felt_mangler() {
         ObjectNode responsMedManglendeFelt = gyldigUnderenhetRespons("822565212");
         responsMedManglendeFelt.remove("navn");
         mockRespons(responsMedManglendeFelt);
 
-        enhetsregisteretClient.hentInformasjonOmUnderenhet(etOrgnr());
+        assertThrows(
+                EnhetsregisteretMappingException.class,
+                () -> enhetsregisteretClient.hentInformasjonOmUnderenhet(etOrgnr())
+        );
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void hentInformasjonOmUnderenhet__skal_feile_hvis_returnert_orgnr_ikke_matcher_med_medsendt_orgnr() {
         ObjectNode responsMedFeilOrgnr = gyldigUnderenhetRespons("822565212");
         mockRespons(responsMedFeilOrgnr);
-        enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr("777777777"));
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr("777777777"))
+        );
     }
 
     @SneakyThrows

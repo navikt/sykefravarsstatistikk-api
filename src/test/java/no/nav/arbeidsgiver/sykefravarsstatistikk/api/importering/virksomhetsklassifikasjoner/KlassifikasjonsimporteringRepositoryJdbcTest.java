@@ -2,21 +2,18 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetskla
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("db-test")
-@RunWith(SpringRunner.class)
 @DataJdbcTest
 public class KlassifikasjonsimporteringRepositoryJdbcTest {
 
@@ -25,13 +22,13 @@ public class KlassifikasjonsimporteringRepositoryJdbcTest {
 
     private KlassifikasjonerRepository repository;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         repository = new KlassifikasjonerRepository(namedParameterJdbcTemplate);
         cleanUpTestDb(namedParameterJdbcTemplate);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         cleanUpTestDb(namedParameterJdbcTemplate);
     }

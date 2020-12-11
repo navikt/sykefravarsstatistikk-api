@@ -6,9 +6,9 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværssta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.BatchCreateSykefraværsstatistikkFunction;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.DeleteSykefraværsstatistikkFunction;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
@@ -26,7 +26,6 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighets
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("db-test")
-@RunWith(SpringRunner.class)
 @DataJdbcTest
 public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
 
@@ -38,13 +37,13 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
     private static final String LABEL = "TEST";
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         utils = new SykefraværsstatistikkVirksomhetUtils(namedParameterJdbcTemplate);
         cleanUpLokalTestDb(namedParameterJdbcTemplate);
     }
 
-    @After
+    @AfterEach
     public void cleanUp() {
         cleanUpLokalTestDb(namedParameterJdbcTemplate);
     }
