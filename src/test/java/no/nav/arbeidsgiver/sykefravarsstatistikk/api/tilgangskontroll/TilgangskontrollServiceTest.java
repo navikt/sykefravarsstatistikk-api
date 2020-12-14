@@ -19,7 +19,7 @@ import java.util.Arrays;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getInnloggetBruker;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getOrganisasjon;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;

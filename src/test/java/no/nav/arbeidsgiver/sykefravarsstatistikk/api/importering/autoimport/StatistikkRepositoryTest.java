@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 public class StatistikkRepositoryTest {
@@ -49,7 +48,7 @@ public class StatistikkRepositoryTest {
                 getIntegrasjonUtils()
         );
 
-        assertEquals(resultat, SlettOgOpprettResultat.tomtResultat());
+        assertThat(resultat).isEqualTo(SlettOgOpprettResultat.tomtResultat());
     }
 
     @Test
@@ -62,7 +61,7 @@ public class StatistikkRepositoryTest {
                 2
         );
 
-        assertEquals(5, resultat);
+        assertThat(resultat).isEqualTo(5);
     }
 
     @Test
@@ -75,7 +74,7 @@ public class StatistikkRepositoryTest {
                 1000
         );
 
-        assertEquals(5, resultat);
+        assertThat(resultat).isEqualTo(5);
     }
 
 
@@ -106,8 +105,7 @@ public class StatistikkRepositoryTest {
             @Override
             public DeleteSykefraværsstatistikkFunction getDeleteFunction() {
                 return årstallOgKvartal -> {
-                    fail("Skal ikke bruke delete funksjon");
-                    return 0;
+                    throw new IllegalStateException("Skal ikke bruke delete funksjon");
                 };
             }
 
