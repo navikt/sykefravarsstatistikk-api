@@ -147,7 +147,7 @@
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
-            <version>8.20</version>
+            <version>8.20.1</version>
         </dependency>
         <!-- Det finnes 2.3-SNAPSHOT av json-smart publisert der ute i det ville,
              sørg for å aldri bruke den ved å låse til 2.3. -->
