@@ -3,18 +3,21 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.StatistikkildeDvh;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæringMedVarighet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetMedGradering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -24,14 +27,10 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimpo
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.DatavarehusRepositoryJdbcTestUtils.*;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._8_DAGER_TIL_16_DAGER;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ActiveProfiles("db-test")
-@RunWith(SpringRunner.class)
 @DataJdbcTest
 public class DatavarehusRepositoryJdbcTest {
 
@@ -40,13 +39,13 @@ public class DatavarehusRepositoryJdbcTest {
 
     private DatavarehusRepository repository;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         repository = new DatavarehusRepository(namedParameterJdbcTemplate);
         cleanUpTestDb(namedParameterJdbcTemplate);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         cleanUpTestDb(namedParameterJdbcTemplate);
     }
@@ -60,7 +59,7 @@ public class DatavarehusRepositoryJdbcTest {
         ÅrstallOgKvartal sisteÅrstallOgKvartal =
                 repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh.LAND_OG_SEKTOR);
 
-        assertEquals(new ÅrstallOgKvartal(2020, 1), sisteÅrstallOgKvartal);
+        assertThat(sisteÅrstallOgKvartal).isEqualTo(new ÅrstallOgKvartal(2020, 1));
     }
 
     @Test
@@ -89,7 +88,7 @@ public class DatavarehusRepositoryJdbcTest {
         ÅrstallOgKvartal sisteÅrstallOgKvartal =
                 repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh.NÆRING);
 
-        assertEquals(new ÅrstallOgKvartal(2020, 1), sisteÅrstallOgKvartal);
+        assertThat(sisteÅrstallOgKvartal).isEqualTo(new ÅrstallOgKvartal(2020, 1));
     }
 
     @Test
@@ -118,7 +117,7 @@ public class DatavarehusRepositoryJdbcTest {
         ÅrstallOgKvartal sisteÅrstallOgKvartal =
                 repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh.NÆRING_5_SIFFER);
 
-        assertEquals(new ÅrstallOgKvartal(2020, 2), sisteÅrstallOgKvartal);
+        assertThat(sisteÅrstallOgKvartal).isEqualTo(new ÅrstallOgKvartal(2020, 2));
     }
 
     @Test
@@ -147,7 +146,7 @@ public class DatavarehusRepositoryJdbcTest {
         ÅrstallOgKvartal sisteÅrstallOgKvartal =
                 repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh.VIRKSOMHET);
 
-        assertEquals(new ÅrstallOgKvartal(2019, 1), sisteÅrstallOgKvartal);
+        assertThat(sisteÅrstallOgKvartal).isEqualTo(new ÅrstallOgKvartal(2019, 1));
     }
 
     @Test
@@ -159,9 +158,10 @@ public class DatavarehusRepositoryJdbcTest {
         List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor =
                 repository.hentSykefraværsstatistikkSektor(new ÅrstallOgKvartal(2018, 4));
 
-        assertTrue(sykefraværsstatistikkSektor.size() == 1);
+        assertThat(sykefraværsstatistikkSektor.size()).isEqualTo(1);
         SykefraværsstatistikkSektor sykefraværsstatistikkSektorExpected = new SykefraværsstatistikkSektor(2018, 4, "1", 4, new BigDecimal(15), new BigDecimal(200));
         SykefraværsstatistikkSektor sykefraværsstatistikkSektorActual = sykefraværsstatistikkSektor.get(0);
+
         assertTrue(new ReflectionEquals(sykefraværsstatistikkSektorExpected).matches(sykefraværsstatistikkSektorActual));
     }
 
@@ -174,16 +174,14 @@ public class DatavarehusRepositoryJdbcTest {
         List<SykefraværsstatistikkLand> sykefraværsstatistikkLand =
                 repository.hentSykefraværsstatistikkLand(new ÅrstallOgKvartal(2018, 4));
 
-        assertThat(sykefraværsstatistikkLand, hasSize(1));
-        assertEquals(
-                new SykefraværsstatistikkLand(
-                        2018,
-                        4,
-                        10,
-                        new BigDecimal(15).setScale(6),
-                        new BigDecimal(200).setScale(6)
-                ),
-                sykefraværsstatistikkLand.get(0));
+        assertThat(sykefraværsstatistikkLand.size()).isEqualTo(1);
+        assertThat(sykefraværsstatistikkLand.get(0)).isEqualTo(new SykefraværsstatistikkLand(
+                2018,
+                4,
+                10,
+                new BigDecimal(15).setScale(6),
+                new BigDecimal(200).setScale(6)
+        ));
     }
 
     @Test
@@ -197,7 +195,7 @@ public class DatavarehusRepositoryJdbcTest {
         List<SykefraværsstatistikkVirksomhet> sykefraværsstatistikkVirksomhet =
                 repository.hentSykefraværsstatistikkVirksomhet(new ÅrstallOgKvartal(2018, 4));
 
-        assertThat(sykefraværsstatistikkVirksomhet, hasSize(2));
+        assertThat(sykefraværsstatistikkVirksomhet.size()).isEqualTo(2);
         SykefraværsstatistikkVirksomhet expected = new SykefraværsstatistikkVirksomhet(
                 2018,
                 4,
@@ -207,7 +205,7 @@ public class DatavarehusRepositoryJdbcTest {
                 new BigDecimal(13).setScale(6),
                 new BigDecimal(188).setScale(6)
         );
-        assertThat(sykefraværsstatistikkVirksomhet.get(0), equalTo(expected));
+        assertThat(sykefraværsstatistikkVirksomhet.get(0)).isEqualTo(expected);
     }
 
     @Test
@@ -225,7 +223,7 @@ public class DatavarehusRepositoryJdbcTest {
         List<SykefraværsstatistikkNæringMedVarighet> sykefraværsstatistikkNæringMedVarighet =
                 repository.hentSykefraværsstatistikkNæringMedVarighet(new ÅrstallOgKvartal(2018, 4));
 
-        assertThat(sykefraværsstatistikkNæringMedVarighet, hasSize(3));
+        assertThat(sykefraværsstatistikkNæringMedVarighet.size()).isEqualTo(3);
         SykefraværsstatistikkNæringMedVarighet expected = new SykefraværsstatistikkNæringMedVarighet(
                 2018,
                 4,
@@ -235,7 +233,7 @@ public class DatavarehusRepositoryJdbcTest {
                 new BigDecimal(16).setScale(6),
                 new BigDecimal(263).setScale(6)
         );
-        assertThat(sykefraværsstatistikkNæringMedVarighet.get(0), equalTo(expected));
+        assertThat(sykefraværsstatistikkNæringMedVarighet.get(0)).isEqualTo(expected);
     }
 
     @Test
@@ -280,7 +278,7 @@ public class DatavarehusRepositoryJdbcTest {
         List<SykefraværsstatistikkVirksomhetMedGradering> sykefraværsstatistikkVirksomhetMedGradering =
                 repository.hentSykefraværsstatistikkVirksomhetMedGradering(new ÅrstallOgKvartal(2018, 4));
 
-        assertThat(sykefraværsstatistikkVirksomhetMedGradering, hasSize(2));
+        assertThat(sykefraværsstatistikkVirksomhetMedGradering.size()).isEqualTo(2);
         SykefraværsstatistikkVirksomhetMedGradering expected = new SykefraværsstatistikkVirksomhetMedGradering(
                 2018,
                 4,
@@ -307,8 +305,8 @@ public class DatavarehusRepositoryJdbcTest {
                 new BigDecimal(32).setScale(6),
                 new BigDecimal(200).setScale(6)
         );
-        assertThat(sykefraværsstatistikkVirksomhetMedGradering.get(0), equalTo(expected));
-        assertThat(sykefraværsstatistikkVirksomhetMedGradering.get(1), equalTo(expectedLinje2));
+        assertThat(sykefraværsstatistikkVirksomhetMedGradering.get(0)).isEqualTo(expected);
+        assertThat(sykefraværsstatistikkVirksomhetMedGradering.get(1)).isEqualTo(expectedLinje2);
     }
 
     @Test

@@ -1,9 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class Næringskode5SifferTest {
     @Test
@@ -18,24 +19,24 @@ public class Næringskode5SifferTest {
         assertThat(kode.getKode()).isEqualTo("12345");
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void næringskode__skal_ikke_ha_mer_enn_5_siffer() {
-        new Næringskode5Siffer("123456", "");
+        assertThrows(RuntimeException.class, () -> new Næringskode5Siffer("123456", ""));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void næringskode__skal_ikke_ha_mindre_enn_5_siffer() {
-        new Næringskode5Siffer("1234", "");
+        assertThrows(RuntimeException.class, () -> new Næringskode5Siffer("1234", ""));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void næringskode__skal_ikke_være_null() {
-        new Næringskode5Siffer(null, "");
+        assertThrows(RuntimeException.class, () -> new Næringskode5Siffer(null, ""));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void næringskode__skal_kun_inneholde_tall() {
-        new Næringskode5Siffer("1234a", "");
+        assertThrows(RuntimeException.class, () -> new Næringskode5Siffer("1234a", ""));
     }
 
     @Test

@@ -13,7 +13,7 @@ spring:
 ---
 
 spring:
-  profiles: local
+  config.activate.on-profile: local
   h2.console:
     enabled: true
     path: /h2
@@ -62,7 +62,7 @@ nais.cluster.name: local
 ---
 
 spring:
-  profiles: db-test
+  config.activate.on-profile: db-test
 
   flyway:
     locations: classpath:/db/migration,classpath:/db/test-datavarehus
@@ -83,7 +83,7 @@ datavarehus.datasource:
 ---
 
 spring:
-  profiles: mvc-test
+  config.activate.on-profile: mvc-test
 
 no.nav.security.jwt.issuer.selvbetjening:
       discoveryurl: http://metadata
@@ -104,7 +104,7 @@ altinn:
 ---
 
 spring:
-  profiles: dev
+  config.activate.on-profile: dev
 
 wiremock.mock:
   port: 8081
@@ -143,7 +143,7 @@ unleash.url: https://unleash.nais.io/api/
 ---
 
 spring:
-  profiles: prod
+  config.activate.on-profile: prod
 
 enhetsregisteret:
   url: "https://data.brreg.no/enhetsregisteret/api/"

@@ -1,18 +1,18 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.SlettOgOpprettResultat;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.BatchCreateSykefraværsstatistikkFunction;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.DeleteSykefraværsstatistikkFunction;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.StatistikkRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.SykefraværsstatistikkIntegrasjonUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import java.math.BigDecimal;
@@ -22,10 +22,9 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class StatistikkRepositoryTest {
 
     @Mock
@@ -34,7 +33,7 @@ public class StatistikkRepositoryTest {
     private StatistikkRepository statistikkRepository;
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         statistikkRepository = new StatistikkRepository(jdbcTemplate);
     }
@@ -49,7 +48,7 @@ public class StatistikkRepositoryTest {
                 getIntegrasjonUtils()
         );
 
-        assertEquals(resultat, SlettOgOpprettResultat.tomtResultat());
+        assertThat(resultat).isEqualTo(SlettOgOpprettResultat.tomtResultat());
     }
 
     @Test
@@ -62,7 +61,7 @@ public class StatistikkRepositoryTest {
                 2
         );
 
-        assertEquals(5, resultat);
+        assertThat(resultat).isEqualTo(5);
     }
 
     @Test
@@ -75,7 +74,7 @@ public class StatistikkRepositoryTest {
                 1000
         );
 
-        assertEquals(5, resultat);
+        assertThat(resultat).isEqualTo(5);
     }
 
 
@@ -106,8 +105,7 @@ public class StatistikkRepositoryTest {
             @Override
             public DeleteSykefraværsstatistikkFunction getDeleteFunction() {
                 return årstallOgKvartal -> {
-                    fail("Skal ikke bruke delete funksjon");
-                    return 0;
+                    throw new IllegalStateException("Skal ikke bruke delete funksjon");
                 };
             }
 

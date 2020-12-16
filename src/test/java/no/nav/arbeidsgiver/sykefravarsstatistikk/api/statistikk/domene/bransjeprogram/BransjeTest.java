@@ -1,13 +1,14 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.bransjeprogram;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjetype;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.enNæringskode5Siffer;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.enUnderenhetBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class BransjeTest {
 
@@ -23,14 +24,20 @@ public class BransjeTest {
         assertThat(bransje.inkludererVirksomhet(underenhetMedNæringskode("46512"))).isFalse();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void bransje__skal_ikke_godta_koder_med_lengde_utenom_5_og_2() {
-        new Bransje(Bransjetype.SYKEHUS, "navn", "123");
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new Bransje(Bransjetype.SYKEHUS, "navn", "123")
+        );
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void bransje__skal_ikke_godta_koder_med_forskjellige_lengder() {
-        new Bransje(Bransjetype.SYKEHUS, "navn", "12", "12345");
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new Bransje(Bransjetype.SYKEHUS, "navn", "12", "12345")
+        );
     }
 
     @Test

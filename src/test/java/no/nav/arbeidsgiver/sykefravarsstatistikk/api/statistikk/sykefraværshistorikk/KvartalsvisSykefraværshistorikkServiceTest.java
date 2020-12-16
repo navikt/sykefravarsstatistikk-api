@@ -1,7 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.SektorMappingService;
@@ -9,11 +12,11 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikkService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.math.BigDecimal;
@@ -25,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class KvartalsvisSykefraværshistorikkServiceTest {
 
     @Mock
@@ -39,7 +42,7 @@ public class KvartalsvisSykefraværshistorikkServiceTest {
 
     KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         kvartalsvisSykefraværshistorikkService =
                 new KvartalsvisSykefraværshistorikkService(

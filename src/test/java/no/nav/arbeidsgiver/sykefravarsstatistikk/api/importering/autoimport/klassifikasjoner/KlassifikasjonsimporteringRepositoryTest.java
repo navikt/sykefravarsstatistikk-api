@@ -3,16 +3,14 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.kla
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhetsklassifikasjon;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +18,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("db-test")
-@RunWith(SpringRunner.class)
 @DataJdbcTest
 public class KlassifikasjonsimporteringRepositoryTest {
     @Autowired
@@ -28,13 +25,13 @@ public class KlassifikasjonsimporteringRepositoryTest {
 
     private KlassifikasjonsimporteringRepository repository;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         repository = new KlassifikasjonsimporteringRepository(namedParameterJdbcTemplate);
         cleanUpLokalTestDb(namedParameterJdbcTemplate);
     }
 
-    @After
+    @AfterEach
     public void cleanUp() {
         cleanUpLokalTestDb(namedParameterJdbcTemplate);
     }

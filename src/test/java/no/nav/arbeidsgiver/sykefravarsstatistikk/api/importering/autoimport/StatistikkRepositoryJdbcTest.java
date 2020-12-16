@@ -9,16 +9,16 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
 import org.assertj.core.api.Assertions;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimpo
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 @ActiveProfiles("db-test")
-@RunWith(SpringRunner.class)
+@ExtendWith(MockitoExtension.class)
 @DataJdbcTest
 public class StatistikkRepositoryJdbcTest {
 
@@ -40,13 +40,13 @@ public class StatistikkRepositoryJdbcTest {
 
     private StatistikkRepository statistikkRepository;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         statistikkRepository = new StatistikkRepository(jdbcTemplate);
         slettAllStatistikkFraDatabase(jdbcTemplate);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         slettAllStatistikkFraDatabase(jdbcTemplate);
     }

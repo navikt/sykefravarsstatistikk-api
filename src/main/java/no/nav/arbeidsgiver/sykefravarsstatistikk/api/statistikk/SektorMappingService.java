@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.InstitusjonellSektorkode;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
