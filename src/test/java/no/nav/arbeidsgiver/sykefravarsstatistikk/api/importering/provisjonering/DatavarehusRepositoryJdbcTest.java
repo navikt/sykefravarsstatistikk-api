@@ -24,6 +24,7 @@ import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_FORETAK;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.DatavarehusRepositoryJdbcTestUtils.*;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._8_DAGER_TIL_16_DAGER;
@@ -201,6 +202,7 @@ public class DatavarehusRepositoryJdbcTest {
                 4,
                 ORGNR_VIRKSOMHET_1,
                 _1_DAG_TIL_7_DAGER.kode,
+                RECTYPE_FOR_VIRKSOMHET,
                 7,
                 new BigDecimal(13).setScale(6),
                 new BigDecimal(188).setScale(6)

@@ -7,10 +7,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class AssertUtils {
 
+    public static final int SCALE = 6;
+
     public static void assertBigDecimalIsEqual(BigDecimal actual, float expected) {
-        assertThat(actual.setScale(6, RoundingMode.HALF_UP))
-                .isEqualTo(BigDecimal.valueOf(expected).setScale(6, RoundingMode.HALF_UP));
+        assertThat(actual.setScale(SCALE, RoundingMode.HALF_UP))
+                .isEqualTo(BigDecimal.valueOf(expected).setScale(SCALE, RoundingMode.HALF_UP));
     }
 
+    public static void assertBigDecimalIsEqual(BigDecimal actual, BigDecimal expected) {
+        assertThat(actual.setScale(SCALE, RoundingMode.HALF_UP))
+                .isEqualTo(expected.setScale(SCALE, RoundingMode.HALF_UP));
+    }
 
 }

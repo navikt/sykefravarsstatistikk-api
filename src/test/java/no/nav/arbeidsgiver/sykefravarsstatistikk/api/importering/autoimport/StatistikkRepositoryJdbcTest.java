@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Statistikkilde;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæringMedVarighet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetMedGradering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.StatistikkRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
@@ -24,9 +25,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils.assertBigDecimalIsEqual;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.parametreForStatistikk;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.StatistikkRepository.INSERT_BATCH_STØRRELSE;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
@@ -68,7 +71,6 @@ public class StatistikkRepositoryJdbcTest {
         ÅrstallOgKvartal årstallOgKvartal = statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.LAND);
         assertThat(årstallOgKvartal).isEqualTo(new ÅrstallOgKvartal(2019, 2));
     }
-
 
     @Test
     public void batchOpprettSykefraværsstatistikkNæringMedVarighet__skal_lagre_data_i_tabellen() {
@@ -129,6 +131,41 @@ public class StatistikkRepositoryJdbcTest {
                         new BigDecimal("3"),
                         new BigDecimal("100"),
                         13
+                )
+        );
+    }
+
+
+    @Test
+    public void batchOpprettSykefraværsstatistikkVirksomhet__skal_lagre_data_i_tabellen_med_rectype() {
+        List<SykefraværsstatistikkVirksomhet> list = new ArrayList<>();
+        SykefraværsstatistikkVirksomhet sykefraværsstatistikkVirksomhet = new SykefraværsstatistikkVirksomhet(
+                2019,
+                3,
+                ORGNR_VIRKSOMHET_1,
+                Varighetskategori._1_DAG_TIL_7_DAGER.kode,
+                RECTYPE_FOR_VIRKSOMHET,
+                1,
+                new BigDecimal(16).setScale(6),
+                new BigDecimal(100).setScale(6)
+        );
+
+        list.add(sykefraværsstatistikkVirksomhet);
+
+        statistikkRepository.importSykefraværsstatistikkVirksomhet(list, new ÅrstallOgKvartal(2019, 3));
+
+        List<RawDataStatistikkVirksomhet> resultList = hentRawDataStatistikkVirksomhet();
+        Assertions.assertThat(resultList.size()).isEqualTo(1);
+        assertIsEquals(resultList.get(0),
+                new RawDataStatistikkVirksomhet(
+                        2019,
+                        3,
+                        ORGNR_VIRKSOMHET_1,
+                        Varighetskategori._1_DAG_TIL_7_DAGER.kode,
+                        RECTYPE_FOR_VIRKSOMHET,
+                        new BigDecimal("16"),
+                        new BigDecimal("100"),
+                        1
                 )
         );
     }
@@ -198,5 +235,63 @@ public class StatistikkRepositoryJdbcTest {
         );
     }
 
+
+    private List<RawDataStatistikkVirksomhet> hentRawDataStatistikkVirksomhet() {
+        return jdbcTemplate.query(
+                "select * from sykefravar_statistikk_virksomhet",
+                new MapSqlParameterSource(),
+                (rs, rowNum) -> new RawDataStatistikkVirksomhet(
+                        rs.getInt("arstall"),
+                        rs.getInt("kvartal"),
+                        rs.getString("orgnr"),
+                        rs.getString("varighet"),
+                        rs.getString("rectype"),
+                        rs.getBigDecimal("tapte_dagsverk"),
+                        rs.getBigDecimal("mulige_dagsverk"),
+                        rs.getInt("antall_personer")
+                )
+        );
+    }
+
+    private class RawDataStatistikkVirksomhet {
+        int årstall;
+        int kvartal;
+        String orgnr;
+        String varighet;
+        String rectype;
+        BigDecimal tapteDagsverk;
+        BigDecimal muligeDagsverk;
+        int antallPersoner;
+
+        public RawDataStatistikkVirksomhet(
+                int årstall,
+                int kvartal,
+                String orgnr,
+                String varighet,
+                String rectype,
+                BigDecimal tapteDagsverk,
+                BigDecimal muligeDagsverk,
+                int antallPersoner
+        ) {
+            this.årstall = årstall;
+            this.kvartal = kvartal;
+            this.orgnr = orgnr;
+            this.varighet = varighet;
+            this.rectype = rectype;
+            this.tapteDagsverk = tapteDagsverk;
+            this.muligeDagsverk = muligeDagsverk;
+            this.antallPersoner = antallPersoner;
+        }
+    }
+
+    public static void assertIsEquals(RawDataStatistikkVirksomhet actual, RawDataStatistikkVirksomhet expected) {
+        assertThat(actual.årstall).isEqualTo(expected.årstall);
+        assertThat(actual.kvartal).isEqualTo(expected.kvartal);
+        assertThat(actual.antallPersoner).isEqualTo(expected.antallPersoner);
+        assertThat(actual.varighet).isEqualTo(expected.varighet);
+        assertThat(actual.rectype).isEqualTo(expected.rectype);
+        assertBigDecimalIsEqual(actual.muligeDagsverk, expected.muligeDagsverk);
+        assertBigDecimalIsEqual(actual.tapteDagsverk, expected.tapteDagsverk);
+    }
 
 }

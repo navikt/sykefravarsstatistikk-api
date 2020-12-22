@@ -14,11 +14,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
+
 @Component
 public class ImporteringKvalitetssjekkService {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    private final BigDecimal BIG_DECIMAL_FEILMARGIN = new BigDecimal("0.01");
+    private static final BigDecimal BIG_DECIMAL_FEILMARGIN = new BigDecimal("0.01");
 
     public ImporteringKvalitetssjekkService(
             @Qualifier("sykefravarsstatistikkJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
@@ -32,7 +34,7 @@ public class ImporteringKvalitetssjekkService {
         List<RådataMedNæringskode> rådataForNæring = hentRådataForNæring();
         List<RådataMedNæringskode> rådataForNåringMedVarighet = hentRådataForNæringMedVarighet();
         List<RådataMedNæringskode> rådataForNæringMedGradering = hentRådataForNæringMedGradering();
-        List<Rådata> rådataForVirksomhet = hentSykefraværRådataForVirksomhet();
+        List<Rådata> rådataForVirksomhet = hentSykefraværRådataForVirksomhet(RECTYPE_FOR_VIRKSOMHET);
         List<Rådata> rådataForVirksomhetMedGradering = hentSykefraværRådataForVirksomhetMedGradering();
 
         resultatlinjer.add("Antall linjer næring: " + rådataForNæring.size());
@@ -76,11 +78,11 @@ public class ImporteringKvalitetssjekkService {
 
                     resultatlinjer.add(
                             "Antall match med gradering for virksomhet: "
-                                    + (erDataForVirksomhetOgDataForVirksomhetMedGraderingLike? "1" : "0")
+                                    + (erDataForVirksomhetOgDataForVirksomhetMedGraderingLike ? "1" : "0")
                     );
                     resultatlinjer.add(
                             "Antall mismatch med gradering for virksomhet: "
-                                    + (erDataForVirksomhetOgDataForVirksomhetMedGraderingLike? "0" : "1")
+                                    + (erDataForVirksomhetOgDataForVirksomhetMedGraderingLike ? "0" : "1")
                     );
                 });
 
@@ -89,7 +91,7 @@ public class ImporteringKvalitetssjekkService {
     }
 
 
-    private boolean sykefraværRådataErLike(
+    protected static boolean sykefraværRådataErLike(
             Rådata sykefraværRådata,
             Rådata sykefraværRådataMedGradering
     ) {
@@ -150,7 +152,7 @@ public class ImporteringKvalitetssjekkService {
                 );
     }
 
-    private boolean erLike(Rådata data1, Rådata data2) {
+    private static boolean erLike(Rådata data1, Rådata data2) {
         return data1.getÅrstallOgKvartal().equals(data2.getÅrstallOgKvartal()) &&
                 data1.getAntallPersoner().equals(data2.getAntallPersoner()) &&
                 bigDecimalApproxEquals(data1.getTapteDagsverk(), data2.getTapteDagsverk()) &&
@@ -162,7 +164,7 @@ public class ImporteringKvalitetssjekkService {
                 data1.getÅrstallOgKvartal().equals(data2.getÅrstallOgKvartal());
     }
 
-    private boolean bigDecimalApproxEquals(BigDecimal number1, BigDecimal number2) {
+    private static boolean bigDecimalApproxEquals(BigDecimal number1, BigDecimal number2) {
         return number1.subtract(number2).abs().compareTo(BIG_DECIMAL_FEILMARGIN) < 0;
     }
 
@@ -237,16 +239,19 @@ public class ImporteringKvalitetssjekkService {
         );
     }
 
-    private List<Rådata> hentSykefraværRådataForVirksomhet() {
+    private List<Rådata> hentSykefraværRådataForVirksomhet(String rectype) {
+        MapSqlParameterSource parameter = new MapSqlParameterSource().
+                addValue("rectype", rectype);
         return namedParameterJdbcTemplate.query(
                 "select  arstall, kvartal, " +
                         "sum(antall_personer) as sum_antall_personer, " +
                         "sum(tapte_dagsverk) as sum_tapte_dagsverk, " +
                         "sum(mulige_dagsverk) as sum_mulige_dagsverk " +
                         "from sykefravar_statistikk_virksomhet " +
+                        "where rectype = :rectype " +
                         "group by  arstall, kvartal " +
                         "order by arstall, kvartal ",
-                new MapSqlParameterSource(),
+                parameter,
                 (rs, rowNum) -> new Rådata(
                         new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
                         rs.getInt("sum_antall_personer"),
@@ -277,7 +282,7 @@ public class ImporteringKvalitetssjekkService {
 
     @AllArgsConstructor
     @Value
-    private static class Rådata {
+    protected static class Rådata {
         private ÅrstallOgKvartal årstallOgKvartal;
         private final Integer antallPersoner;
         private final BigDecimal tapteDagsverk;
