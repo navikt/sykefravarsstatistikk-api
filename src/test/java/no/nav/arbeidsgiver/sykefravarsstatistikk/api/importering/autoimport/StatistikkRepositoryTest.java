@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -94,6 +95,7 @@ public class StatistikkRepositoryTest {
                 kvartal,
                 "987654321",
                 _1_DAG_TIL_7_DAGER.kode,
+                RECTYPE_FOR_VIRKSOMHET,
                 10,
                 new BigDecimal(15),
                 new BigDecimal(450)

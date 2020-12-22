@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -56,6 +57,7 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
                 1,
                 "987654321",
                 _1_DAG_TIL_7_DAGER.kode,
+                RECTYPE_FOR_VIRKSOMHET,
                 14,
                 new BigDecimal(55.123),
                 new BigDecimal(856.891)
@@ -107,7 +109,8 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
                                 2019,
                                 1,
                                 Integer.valueOf(987000000 + i).toString(),
-                        _1_DAG_TIL_7_DAGER.kode,
+                                _1_DAG_TIL_7_DAGER.kode,
+                                RECTYPE_FOR_VIRKSOMHET,
                                 14,
                                 new BigDecimal(55.123),
                                 new BigDecimal(856.891)

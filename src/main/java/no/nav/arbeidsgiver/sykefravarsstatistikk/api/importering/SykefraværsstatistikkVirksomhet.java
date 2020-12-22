@@ -12,6 +12,7 @@ public class SykefraværsstatistikkVirksomhet implements Sykefraværsstatistikk 
     private int kvartal;
     private String orgnr;
     private String varighet;
+    private String rectype;
     private int antallPersoner;
     private BigDecimal tapteDagsverk;
     private BigDecimal muligeDagsverk;

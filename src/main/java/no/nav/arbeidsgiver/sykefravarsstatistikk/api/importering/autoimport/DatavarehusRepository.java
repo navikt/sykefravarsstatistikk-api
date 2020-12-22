@@ -44,6 +44,7 @@ public class DatavarehusRepository {
 
     public static final String RECTYPE_FOR_FORETAK = "1";
     public static final String RECTYPE_FOR_VIRKSOMHET = "2";
+    public static final String RECTYPE_FOR_ORGANISASJONSLEDD = "3";
 
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -184,13 +185,13 @@ public class DatavarehusRepository {
                         .addValue(KVARTAL, årstallOgKvartal.getKvartal());
 
         return namedParameterJdbcTemplate.query(
-                "select arstall, kvartal, orgnr, varighet, " +
+                "select arstall, kvartal, orgnr, varighet, rectype, " +
                         "sum(antpers) as sum_antall_personer, " +
                         "sum(taptedv) as sum_tapte_dagsverk, " +
                         "sum(muligedv) as sum_mulige_dagsverk " +
                         "from dt_p.agg_ia_sykefravar_v " +
                         "where arstall = :arstall and kvartal = :kvartal " +
-                        "group by arstall, kvartal, orgnr, varighet",
+                        "group by arstall, kvartal, orgnr, varighet, rectype",
                 namedParameters,
                 (resultSet, rowNum) ->
                         new SykefraværsstatistikkVirksomhet(
@@ -198,6 +199,7 @@ public class DatavarehusRepository {
                                 resultSet.getInt(KVARTAL),
                                 resultSet.getString(ORGNR),
                                 resultSet.getString(VARIGHET),
+                                resultSet.getString(RECTYPE),
                                 resultSet.getInt(SUM_ANTALL_PERSONER),
                                 resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
                                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
