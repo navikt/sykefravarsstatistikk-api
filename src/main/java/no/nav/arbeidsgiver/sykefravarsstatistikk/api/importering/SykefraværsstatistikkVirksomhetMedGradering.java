@@ -13,6 +13,7 @@ public class SykefraværsstatistikkVirksomhetMedGradering implements Sykefravær
     private String orgnr;
     private String næring;
     private String næringkode;
+    private String rectype;
     private int antallGraderteSykemeldinger;
     private BigDecimal tapteDagsverkGradertSykemelding;
     private int antallSykemeldinger;

@@ -16,6 +16,8 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
+
 @Component
 public class GraderingRepository {
 
@@ -36,10 +38,12 @@ public class GraderingRepository {
                             " from sykefravar_statistikk_virksomhet_med_gradering " +
                             " where " +
                             " orgnr = :orgnr " +
+                            " and rectype = :rectype " +
                             " group by arstall, kvartal" +
                             " order by arstall, kvartal",
                     new MapSqlParameterSource()
-                            .addValue("orgnr", virksomhet.getOrgnr().getVerdi()),
+                            .addValue("orgnr", virksomhet.getOrgnr().getVerdi())
+                            .addValue("rectype", RECTYPE_FOR_VIRKSOMHET),
                     (rs, rowNum) -> mapTilKvartalsvisSykefravær(rs)
             );
         } catch (EmptyResultDataAccessException e) {
@@ -57,10 +61,12 @@ public class GraderingRepository {
                             " from sykefravar_statistikk_virksomhet_med_gradering " +
                             " where " +
                             " naring = :naring " +
+                            " and rectype = :rectype " +
                             " group by arstall, kvartal" +
                             " order by arstall, kvartal",
                     new MapSqlParameterSource()
-                            .addValue("naring", næring.getKode()),
+                            .addValue("naring", næring.getKode())
+                            .addValue("rectype", RECTYPE_FOR_VIRKSOMHET),
                     (rs, rowNum) -> mapTilKvartalsvisSykefravær(rs)
             );
         } catch (EmptyResultDataAccessException e) {
@@ -79,10 +85,12 @@ public class GraderingRepository {
                             " from sykefravar_statistikk_virksomhet_med_gradering " +
                             " where " +
                             " naring_kode in (:naringKoder) " +
+                            " and rectype = :rectype " +
                             " group by arstall, kvartal" +
                             " order by arstall, kvartal",
                     new MapSqlParameterSource()
-                            .addValue("naringKoder", bransje.getKoderSomSpesifisererNæringer()),
+                            .addValue("naringKoder", bransje.getKoderSomSpesifisererNæringer())
+                            .addValue("rectype", RECTYPE_FOR_VIRKSOMHET),
                     (rs, rowNum) -> mapTilKvartalsvisSykefravær(rs)
             );
         } catch (EmptyResultDataAccessException e) {

@@ -111,6 +111,7 @@ public class StatistikkRepositoryJdbcTest {
                 ORGNR_VIRKSOMHET_1,
                 NÆRINGSKODE_2SIFFER,
                 NÆRINGSKODE_5SIFFER,
+                RECTYPE_FOR_VIRKSOMHET,
                 1,
                 new BigDecimal(3).setScale(6),
                 3,

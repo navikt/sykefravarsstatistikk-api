@@ -279,12 +279,12 @@ public class StatistikkRepository {
 
         int[] results = namedParameterJdbcTemplate.batchUpdate(
                 "insert into sykefravar_statistikk_virksomhet_med_gradering " +
-                        "(arstall, kvartal, orgnr, naring, naring_kode, " +
+                        "(arstall, kvartal, orgnr, naring, naring_kode, rectype, " +
                         "antall_graderte_sykemeldinger, tapte_dagsverk_gradert_sykemelding, " +
                         "antall_sykemeldinger, " +
                         "antall_personer, tapte_dagsverk, mulige_dagsverk) " +
                         "values " +
-                        "(:årstall, :kvartal, :orgnr, :næring, :næringkode, " +
+                        "(:årstall, :kvartal, :orgnr, :næring, :næringkode, :rectype, " +
                         ":antallGraderteSykemeldinger, :tapteDagsverkGradertSykemelding, " +
                         ":antallSykemeldinger, " +
                         ":antallPersoner, :tapteDagsverk, :muligeDagsverk)",

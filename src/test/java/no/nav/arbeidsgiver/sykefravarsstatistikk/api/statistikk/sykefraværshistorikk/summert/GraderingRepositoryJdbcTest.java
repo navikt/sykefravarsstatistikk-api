@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 @ActiveProfiles("db-test")
@@ -347,6 +348,7 @@ public class GraderingRepositoryJdbcTest {
                         "orgnr, " +
                         "naring, " +
                         "naring_kode, " +
+                        "rectype, " +
                         "arstall, " +
                         "kvartal," +
                         "antall_graderte_sykemeldinger, " +
@@ -359,6 +361,7 @@ public class GraderingRepositoryJdbcTest {
                         ":orgnr, " +
                         ":naring, " +
                         ":naring_kode, " +
+                        ":rectype, " +
                         ":arstall, " +
                         ":kvartal, " +
                         ":antall_graderte_sykemeldinger, " +
@@ -371,6 +374,7 @@ public class GraderingRepositoryJdbcTest {
                         orgnr,
                         næring,
                         næringskode,
+                        RECTYPE_FOR_VIRKSOMHET,
                         årstallOgKvartal.getÅrstall(),
                         årstallOgKvartal.getKvartal(),
                         antallGraderteSykemeldinger,
@@ -387,6 +391,7 @@ public class GraderingRepositoryJdbcTest {
             String orgnr,
             String naring,
             String næringskode,
+            String rectype,
             int årstall,
             int kvartal,
             int antallGraderteSykemeldinger,
@@ -400,6 +405,7 @@ public class GraderingRepositoryJdbcTest {
                 .addValue("orgnr", orgnr)
                 .addValue("naring", naring)
                 .addValue("naring_kode", næringskode)
+                .addValue("rectype", rectype)
                 .addValue("arstall", årstall)
                 .addValue("kvartal", kvartal)
                 .addValue("antall_graderte_sykemeldinger", antallGraderteSykemeldinger)
