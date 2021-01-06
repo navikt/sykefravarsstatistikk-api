@@ -251,7 +251,7 @@ public class DatavarehusRepository {
                         "sum(mulige_dv) as sum_mulige_dagsverk " +
                         "from dt_p.agg_ia_sykefravar_v_2 " +
                         "where arstall = :arstall and kvartal = :kvartal " +
-                        "group by arstall, kvartal, orgnr, naring, naering_kode",
+                        "group by arstall, kvartal, orgnr, naring, naering_kode, rectype",
                 namedParameters,
                 (resultSet, rowNum) ->
                         new SykefraværsstatistikkVirksomhetMedGradering(
