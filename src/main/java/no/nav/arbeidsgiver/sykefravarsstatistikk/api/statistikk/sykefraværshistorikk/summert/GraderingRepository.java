@@ -110,5 +110,4 @@ public class GraderingRepository {
                 rs.getInt("sum_antall_personer")
         );
     }
-
 }
