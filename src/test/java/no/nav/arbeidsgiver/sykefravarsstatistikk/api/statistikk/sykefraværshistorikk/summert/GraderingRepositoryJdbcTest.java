@@ -1,8 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.InstitusjonellSektorkode;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjetype;
@@ -21,7 +23,9 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_FORETAK;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("db-test")
 @DataJdbcTest
@@ -30,6 +34,13 @@ public class GraderingRepositoryJdbcTest {
     private static final Næring PRODUKSJON_AV_KLÆR = new Næring("14", "Produksjon av klær");
     private static final Næring PRODUKSJON_AV_LÆR_OG_LÆRVARER = new Næring("15", "Produksjon av lær og lærvarer");
     private static final Næring HELSETJENESTER = new Næring("86", "Helsetjenester");
+    private static OverordnetEnhet OVERORDNETENHET_1_NÆRING_86 = OverordnetEnhet.builder()
+            .navn("Hospital")
+            .orgnr(new Orgnr("999999777"))
+            .næringskode(new Næringskode5Siffer("86101", "Alminnelige somatiske sykehus"))
+            .institusjonellSektorkode(new InstitusjonellSektorkode("7000", "Ideelle organisasjoner"))
+            .build();
+
     private static Underenhet UNDERENHET_1_NÆRING_14 = Underenhet.builder()
             .orgnr(new Orgnr("999999999"))
             .næringskode(new Næringskode5Siffer("14120", "Produksjon av arbeidstøy"))
@@ -67,7 +78,7 @@ public class GraderingRepositoryJdbcTest {
                 jdbcTemplate,
                 UNDERENHET_1_NÆRING_14.getOrgnr().getVerdi(),
                 PRODUKSJON_AV_KLÆR.getKode(), "14100",
-                _2019_4,
+                RECTYPE_FOR_VIRKSOMHET, _2019_4,
                 5,
                 9,
                 7,
@@ -79,7 +90,7 @@ public class GraderingRepositoryJdbcTest {
                 jdbcTemplate,
                 UNDERENHET_1_NÆRING_14.getOrgnr().getVerdi(),
                 PRODUKSJON_AV_KLÆR.getKode(), "14222",
-                _2019_4,
+                RECTYPE_FOR_VIRKSOMHET, _2019_4,
                 2,
                 9,
                 7,
@@ -91,7 +102,7 @@ public class GraderingRepositoryJdbcTest {
                 jdbcTemplate,
                 UNDERENHET_1_NÆRING_14.getOrgnr().getVerdi(),
                 PRODUKSJON_AV_KLÆR.getKode(), "14222",
-                _2020_1,
+                RECTYPE_FOR_VIRKSOMHET, _2020_1,
                 19,
                 30,
                 15,
@@ -129,7 +140,7 @@ public class GraderingRepositoryJdbcTest {
                 UNDERENHET_1_NÆRING_14.getOrgnr().getVerdi(),
                 PRODUKSJON_AV_KLÆR.getKode(),
                 UNDERENHET_1_NÆRING_14.getNæringskode().getKode(),
-                _2019_4,
+                RECTYPE_FOR_VIRKSOMHET, _2019_4,
                 5,
                 9,
                 7,
@@ -141,7 +152,7 @@ public class GraderingRepositoryJdbcTest {
                 jdbcTemplate,
                 UNDERENHET_1_NÆRING_14.getOrgnr().getVerdi(),
                 PRODUKSJON_AV_KLÆR.getKode(), "14222",
-                _2020_1,
+                RECTYPE_FOR_VIRKSOMHET, _2020_1,
                 2,
                 9,
                 7,
@@ -153,7 +164,7 @@ public class GraderingRepositoryJdbcTest {
                 jdbcTemplate,
                 UNDERENHET_3_NÆRING_14.getOrgnr().getVerdi(),
                 PRODUKSJON_AV_KLÆR.getKode(), "14222",
-                _2020_1,
+                RECTYPE_FOR_VIRKSOMHET, _2020_1,
                 19,
                 30,
                 15,
@@ -192,7 +203,7 @@ public class GraderingRepositoryJdbcTest {
                 UNDERENHET_1_NÆRING_14.getOrgnr().getVerdi(),
                 PRODUKSJON_AV_KLÆR.getKode(),
                 UNDERENHET_1_NÆRING_14.getNæringskode().getKode(),
-                _2019_4,
+                RECTYPE_FOR_VIRKSOMHET, _2019_4,
                 5,
                 9,
                 7,
@@ -205,7 +216,7 @@ public class GraderingRepositoryJdbcTest {
                 UNDERENHET_3_NÆRING_14.getOrgnr().getVerdi(),
                 PRODUKSJON_AV_KLÆR.getKode(),
                 "14222",
-                _2020_1,
+                RECTYPE_FOR_VIRKSOMHET, _2020_1,
                 2,
                 9,
                 7,
@@ -218,7 +229,7 @@ public class GraderingRepositoryJdbcTest {
                 UNDERENHET_2_NÆRING_15.getOrgnr().getVerdi(),
                 PRODUKSJON_AV_LÆR_OG_LÆRVARER.getKode(),
                 "15333",
-                _2020_1,
+                RECTYPE_FOR_VIRKSOMHET, _2020_1,
                 19,
                 30,
                 15,
@@ -259,7 +270,7 @@ public class GraderingRepositoryJdbcTest {
                 UNDERENHET_1_NÆRING_14.getOrgnr().getVerdi(),
                 HELSETJENESTER.getKode(),
                 sykehus.getKode(),
-                _2019_4,
+                RECTYPE_FOR_VIRKSOMHET, _2019_4,
                 5,
                 9,
                 7,
@@ -272,7 +283,7 @@ public class GraderingRepositoryJdbcTest {
                 UNDERENHET_3_NÆRING_14.getOrgnr().getVerdi(),
                 HELSETJENESTER.getKode(),
                 sykehus.getKode(),
-                _2020_1,
+                RECTYPE_FOR_VIRKSOMHET, _2020_1,
                 2,
                 9,
                 7,
@@ -285,7 +296,7 @@ public class GraderingRepositoryJdbcTest {
                 UNDERENHET_2_NÆRING_15.getOrgnr().getVerdi(),
                 HELSETJENESTER.getKode(),
                 legetjeneste.getKode(),
-                _2020_1,
+                RECTYPE_FOR_VIRKSOMHET, _2020_1,
                 19,
                 30,
                 15,
@@ -298,7 +309,7 @@ public class GraderingRepositoryJdbcTest {
                 UNDERENHET_2_NÆRING_15.getOrgnr().getVerdi(),
                 HELSETJENESTER.getKode(),
                 næringskodeIkkeErFraBransje.getKode(),
-                _2020_1,
+                RECTYPE_FOR_VIRKSOMHET, _2020_1,
                 35,
                 1,
                 4,
@@ -329,11 +340,60 @@ public class GraderingRepositoryJdbcTest {
         );
     }
 
+    @Test
+    public void hentSykefraværForEttKvartalMedGradering__skal_returnere_riktig_sykefravær_for_virksomheter_i_bransjen() {
+        Næringskode5Siffer sykehus = new Næringskode5Siffer("86101", "Alminnelige somatiske sykehus");
+
+        insertDataMedGradering(
+                jdbcTemplate,
+                OVERORDNETENHET_1_NÆRING_86.getOrgnr().getVerdi(),
+                HELSETJENESTER.getKode(),
+                sykehus.getKode(),
+                RECTYPE_FOR_FORETAK,
+                _2020_1,
+                5,
+                9,
+                7,
+                new BigDecimal(10),
+                new BigDecimal(20),
+                new BigDecimal(100)
+        );
+        insertDataMedGradering(
+                jdbcTemplate,
+                UNDERENHET_3_NÆRING_14.getOrgnr().getVerdi(),
+                HELSETJENESTER.getKode(),
+                sykehus.getKode(),
+                RECTYPE_FOR_VIRKSOMHET,
+                _2020_1,
+                2,
+                9,
+                7,
+                new BigDecimal(12),
+                new BigDecimal(20),
+                new BigDecimal(100)
+        );
+
+        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværForEttKvartalMedGradering(
+                new Bransje(Bransjetype.SYKEHUS, "sykehus", "86101", "86211"));
+
+        assertThat(resultat.size()).isEqualTo(1);
+        assertThat(resultat.get(0)).isEqualTo(
+                new UmaskertSykefraværForEttKvartal(
+                        new ÅrstallOgKvartal(2020, 1),
+                        new BigDecimal(12),
+                        new BigDecimal(100),
+                        7
+                )
+        );
+    }
+
+
     private void insertDataMedGradering(
             NamedParameterJdbcTemplate jdbcTemplate,
             String orgnr,
             String næring,
             String næringskode,
+            String rectype,
             ÅrstallOgKvartal årstallOgKvartal,
             int antallGraderteSykemeldinger,
             int antallSykemeldinger,
@@ -347,6 +407,7 @@ public class GraderingRepositoryJdbcTest {
                         "orgnr, " +
                         "naring, " +
                         "naring_kode, " +
+                        "rectype, " +
                         "arstall, " +
                         "kvartal," +
                         "antall_graderte_sykemeldinger, " +
@@ -359,6 +420,7 @@ public class GraderingRepositoryJdbcTest {
                         ":orgnr, " +
                         ":naring, " +
                         ":naring_kode, " +
+                        ":rectype, " +
                         ":arstall, " +
                         ":kvartal, " +
                         ":antall_graderte_sykemeldinger, " +
@@ -371,6 +433,7 @@ public class GraderingRepositoryJdbcTest {
                         orgnr,
                         næring,
                         næringskode,
+                        rectype,
                         årstallOgKvartal.getÅrstall(),
                         årstallOgKvartal.getKvartal(),
                         antallGraderteSykemeldinger,
@@ -387,6 +450,7 @@ public class GraderingRepositoryJdbcTest {
             String orgnr,
             String naring,
             String næringskode,
+            String rectype,
             int årstall,
             int kvartal,
             int antallGraderteSykemeldinger,
@@ -400,6 +464,7 @@ public class GraderingRepositoryJdbcTest {
                 .addValue("orgnr", orgnr)
                 .addValue("naring", naring)
                 .addValue("naring_kode", næringskode)
+                .addValue("rectype", rectype)
                 .addValue("arstall", årstall)
                 .addValue("kvartal", kvartal)
                 .addValue("antall_graderte_sykemeldinger", antallGraderteSykemeldinger)

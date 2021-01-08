@@ -242,7 +242,7 @@ public class DatavarehusRepository {
                         .addValue(RECTYPE, RECTYPE_FOR_VIRKSOMHET);
 
         return namedParameterJdbcTemplate.query(
-                "select arstall, kvartal, orgnr, naring, naering_kode, " +
+                "select arstall, kvartal, orgnr, naring, naering_kode, rectype, " +
                         "sum(taptedv_gs) as sum_tapte_dagsverk_gs, " +
                         "sum(antall_gs) as sum_antall_graderte_sykemeldinger, " +
                         "sum(antall) as sum_antall_sykemeldinger, " +
@@ -251,8 +251,7 @@ public class DatavarehusRepository {
                         "sum(mulige_dv) as sum_mulige_dagsverk " +
                         "from dt_p.agg_ia_sykefravar_v_2 " +
                         "where arstall = :arstall and kvartal = :kvartal " +
-                        "and rectype = :rectype " +
-                        "group by arstall, kvartal, orgnr, naring, naering_kode",
+                        "group by arstall, kvartal, orgnr, naring, naering_kode, rectype",
                 namedParameters,
                 (resultSet, rowNum) ->
                         new SykefraværsstatistikkVirksomhetMedGradering(
@@ -261,6 +260,7 @@ public class DatavarehusRepository {
                                 resultSet.getString(ORGNR),
                                 resultSet.getString(NARING),
                                 resultSet.getString(NARING_5SIFFER),
+                                resultSet.getString(RECTYPE),
                                 resultSet.getInt(SUM_ANTALL_GRADERTE_SYKEMELDINGER),
                                 resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK_GS),
                                 resultSet.getInt(SUM_ANTALL_SYKEMELDINGER),

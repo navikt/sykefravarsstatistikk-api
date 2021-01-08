@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
-
 @Component
 public class ImporteringKvalitetssjekkService {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -34,7 +32,7 @@ public class ImporteringKvalitetssjekkService {
         List<RådataMedNæringskode> rådataForNæring = hentRådataForNæring();
         List<RådataMedNæringskode> rådataForNåringMedVarighet = hentRådataForNæringMedVarighet();
         List<RådataMedNæringskode> rådataForNæringMedGradering = hentRådataForNæringMedGradering();
-        List<Rådata> rådataForVirksomhet = hentSykefraværRådataForVirksomhet(RECTYPE_FOR_VIRKSOMHET);
+        List<Rådata> rådataForVirksomhet = hentSykefraværRådataForVirksomhet();
         List<Rådata> rådataForVirksomhetMedGradering = hentSykefraværRådataForVirksomhetMedGradering();
 
         resultatlinjer.add("Antall linjer næring: " + rådataForNæring.size());
@@ -239,19 +237,16 @@ public class ImporteringKvalitetssjekkService {
         );
     }
 
-    private List<Rådata> hentSykefraværRådataForVirksomhet(String rectype) {
-        MapSqlParameterSource parameter = new MapSqlParameterSource().
-                addValue("rectype", rectype);
+    private List<Rådata> hentSykefraværRådataForVirksomhet() {
         return namedParameterJdbcTemplate.query(
                 "select  arstall, kvartal, " +
                         "sum(antall_personer) as sum_antall_personer, " +
                         "sum(tapte_dagsverk) as sum_tapte_dagsverk, " +
                         "sum(mulige_dagsverk) as sum_mulige_dagsverk " +
                         "from sykefravar_statistikk_virksomhet " +
-                        "where rectype = :rectype " +
                         "group by  arstall, kvartal " +
                         "order by arstall, kvartal ",
-                parameter,
+                new MapSqlParameterSource(),
                 (rs, rowNum) -> new Rådata(
                         new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
                         rs.getInt("sum_antall_personer"),
