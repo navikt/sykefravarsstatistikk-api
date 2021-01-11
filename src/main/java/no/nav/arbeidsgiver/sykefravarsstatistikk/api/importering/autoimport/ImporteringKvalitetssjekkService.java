@@ -228,7 +228,7 @@ public class ImporteringKvalitetssjekkService {
                         "sum(tapte_dagsverk) as sum_tapte_dagsverk, " +
                         "sum(mulige_dagsverk) as sum_mulige_dagsverk " +
                         "from sykefravar_statistikk_virksomhet_med_gradering " +
-                        "where rectype = :rectype" +
+                        "where rectype = :rectype " +
                         "group by naring_kode, arstall, kvartal " +
                         "order by arstall, kvartal, naring_kode",
                 parametre,
