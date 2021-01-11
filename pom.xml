@@ -104,7 +104,7 @@
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
-            <version>6.5</version>
+            <version>6.6</version>
         </dependency>
         <dependency>
             <groupId>com.papertrailapp</groupId>
@@ -174,12 +174,12 @@
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-spring</artifactId>
-            <version>4.19.1</version>
+            <version>4.20.0</version>
         </dependency>
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-provider-jdbc-template</artifactId>
-            <version>4.19.1</version>
+            <version>4.20.0</version>
         </dependency>
 
         <!-- Test -->
@@ -191,7 +191,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>3.6.28</version>
+            <version>3.7.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
