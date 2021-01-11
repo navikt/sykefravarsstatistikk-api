@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
+
 @Component
 public class ImporteringKvalitetssjekkService {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -31,7 +33,7 @@ public class ImporteringKvalitetssjekkService {
 
         List<RådataMedNæringskode> rådataForNæring = hentRådataForNæring();
         List<RådataMedNæringskode> rådataForNåringMedVarighet = hentRådataForNæringMedVarighet();
-        List<RådataMedNæringskode> rådataForNæringMedGradering = hentRådataForNæringMedGradering();
+        List<RådataMedNæringskode> rådataForNæringMedGradering = hentRådataForNæringMedGradering(RECTYPE_FOR_VIRKSOMHET);
         List<Rådata> rådataForVirksomhet = hentSykefraværRådataForVirksomhet();
         List<Rådata> rådataForVirksomhetMedGradering = hentSykefraværRådataForVirksomhetMedGradering();
 
@@ -217,16 +219,19 @@ public class ImporteringKvalitetssjekkService {
         );
     }
 
-    private List<RådataMedNæringskode> hentRådataForNæringMedGradering() {
+    private List<RådataMedNæringskode> hentRådataForNæringMedGradering(String rectype) {
+        MapSqlParameterSource parametre = new MapSqlParameterSource()
+                .addValue("rectype", rectype);
         return namedParameterJdbcTemplate.query(
                 "select naring_kode, arstall, kvartal, " +
                         "sum(antall_personer) as sum_antall_personer, " +
                         "sum(tapte_dagsverk) as sum_tapte_dagsverk, " +
                         "sum(mulige_dagsverk) as sum_mulige_dagsverk " +
                         "from sykefravar_statistikk_virksomhet_med_gradering " +
+                        "where rectype = :rectype" +
                         "group by naring_kode, arstall, kvartal " +
                         "order by arstall, kvartal, naring_kode",
-                new MapSqlParameterSource(),
+                parametre,
                 (rs, rowNum) -> new RådataMedNæringskode(
                         rs.getString("naring_kode"),
                         new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
