@@ -41,6 +41,8 @@ public class ApplikasjonDBConfigLocal {
         config.setPassword(password);
         config.setMaximumPoolSize(2);
         config.setDriverClassName(driverClassName);
+        config.setInitializationFailTimeout(60000);
+        config.setDriverClassName("org.postgresql.Driver");
 
         return new HikariDataSource(config);
     }
