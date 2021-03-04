@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @SpringBootTest
-@TestPropertySource(properties = {"wiremock.mock.port=8084"})
+@TestPropertySource(properties = {"wiremock.mock.port=8086"})
 public class HealthcheckControllerTest {
 
     @Autowired
