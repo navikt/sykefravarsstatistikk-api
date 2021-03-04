@@ -175,123 +175,107 @@ public class ApiTest {
 
     private static String getSummertSykefraværshistorikkResponseBody() {
         return
-                "[" +
-                        "  {" +
-                        "    \"type\": \"VIRKSOMHET\"," +
-                        "    \"label\": \"NAV ARBEID OG YTELSER AVD OSLO\"," +
-                        "    \"summertKorttidsOgLangtidsfravær\": {" +
-                        "      \"summertKorttidsfravær\": {" +
-                        "        \"prosent\": 7.5," +
-                        "        \"tapteDagsverk\": 148.9," +
-                        "        \"muligeDagsverk\": 1990.3," +
-                        "        \"erMaskert\": false," +
-                        "        \"kvartaler\": [" +
-                        "          {" +
-                        "            \"årstall\": 2020," +
-                        "            \"kvartal\": 1" +
-                        "          }" +
-                        "        ]" +
-                        "      }," +
-                        "      \"summertLangtidsfravær\": {" +
-                        "        \"prosent\": 2.8," +
-                        "        \"tapteDagsverk\": 55.6," +
-                        "        \"muligeDagsverk\": 1990.3," +
-                        "        \"erMaskert\": false," +
-                        "        \"kvartaler\": [" +
-                        "          {" +
-                        "            \"årstall\": 2020," +
-                        "            \"kvartal\": 1" +
-                        "          }" +
-                        "        ]" +
-                        "      }" +
-                        "    }," +
-                        "    \"summertGradertFravær\": {" +
-                        "      \"prosent\": 0.7," +
-                        "      \"tapteDagsverk\": 14.1," +
-                        "      \"muligeDagsverk\": 1990.3," +
-                        "      \"erMaskert\": false," +
-                        "      \"kvartaler\": [" +
-                        "        {" +
-                        "          \"årstall\": 2019," +
-                        "          \"kvartal\": 4" +
-                        "        }," +
-                        "        {" +
-                        "          \"årstall\": 2020," +
-                        "          \"kvartal\": 1" +
-                        "        }," +
-                        "        {" +
-                        "          \"årstall\": 2020," +
-                        "          \"kvartal\": 2" +
-                        "        }" +
-                        "      ]" +
-                        "    }" +
-                        "  }," +
-                        "  {" +
-                        "    \"type\": \"NÆRING\"," +
-                        "    \"label\": \"Produksjon av nærings- og nytelsesmidler\"," +
-                        "    \"summertKorttidsOgLangtidsfravær\": {" +
-                        "      \"summertKorttidsfravær\": {" +
-                        "        \"prosent\": 8.2," +
-                        "        \"tapteDagsverk\": 258.7," +
-                        "        \"muligeDagsverk\": 3153.5," +
-                        "        \"erMaskert\": false," +
-                        "        \"kvartaler\": [" +
-                        "          {" +
-                        "            \"årstall\": 2019," +
-                        "            \"kvartal\": 4" +
-                        "          }," +
-                        "          {" +
-                        "            \"årstall\": 2020," +
-                        "            \"kvartal\": 1" +
-                        "          }," +
-                        "          {" +
-                        "            \"årstall\": 2020," +
-                        "            \"kvartal\": 2" +
-                        "          }" +
-                        "        ]" +
-                        "      }," +
-                        "      \"summertLangtidsfravær\": {" +
-                        "        \"prosent\": 10.3," +
-                        "        \"tapteDagsverk\": 325.6," +
-                        "        \"muligeDagsverk\": 3153.5," +
-                        "        \"erMaskert\": false," +
-                        "        \"kvartaler\": [" +
-                        "          {" +
-                        "            \"årstall\": 2019," +
-                        "            \"kvartal\": 4" +
-                        "          }," +
-                        "          {" +
-                        "            \"årstall\": 2020," +
-                        "            \"kvartal\": 1" +
-                        "          }," +
-                        "          {" +
-                        "            \"årstall\": 2020," +
-                        "            \"kvartal\": 2" +
-                        "          }" +
-                        "        ]" +
-                        "      }" +
-                        "    }," +
-                        "    \"summertGradertFravær\": {" +
-                        "      \"prosent\": 1.3," +
-                        "      \"tapteDagsverk\": 50.1," +
-                        "      \"muligeDagsverk\": 3980.6," +
-                        "      \"erMaskert\": false," +
-                        "      \"kvartaler\": [" +
-                        "        {" +
-                        "          \"årstall\": 2019," +
-                        "          \"kvartal\": 4" +
-                        "        }," +
-                        "        {" +
-                        "          \"årstall\": 2020," +
-                        "          \"kvartal\": 1" +
-                        "        }," +
-                        "        {" +
-                        "          \"årstall\": 2020," +
-                        "          \"kvartal\": 2" +
-                        "        }" +
-                        "      ]" +
-                        "    }" +
-                        "  }" +
-                        "]";
+                "[\n" +
+                        "  {\n" +
+                        "    \"type\": \"VIRKSOMHET\",\n" +
+                        "    \"label\": \"NAV ARBEID OG YTELSER AVD OSLO\",\n" +
+                        "    \"summertKorttidsOgLangtidsfravær\": {\n" +
+                        "      \"summertKorttidsfravær\": {\n" +
+                        "        \"prosent\": 7.5,\n" +
+                        "        \"tapteDagsverk\": 148.9,\n" +
+                        "        \"muligeDagsverk\": 1990.3,\n" +
+                        "        \"erMaskert\": false,\n" +
+                        "        \"kvartaler\": [\n" +
+                        "          {\n" +
+                        "            \"årstall\": 2020,\n" +
+                        "            \"kvartal\": 1\n" +
+                        "          }\n" +
+                        "        ]\n" +
+                        "      },\n" +
+                        "      \"summertLangtidsfravær\": {\n" +
+                        "        \"prosent\": 2.8,\n" +
+                        "        \"tapteDagsverk\": 55.6,\n" +
+                        "        \"muligeDagsverk\": 1990.3,\n" +
+                        "        \"erMaskert\": false,\n" +
+                        "        \"kvartaler\": [\n" +
+                        "          {\n" +
+                        "            \"årstall\": 2020,\n" +
+                        "            \"kvartal\": 1\n" +
+                        "          }\n" +
+                        "        ]\n" +
+                        "      }\n" +
+                        "    },\n" +
+                        "    \"summertGradertFravær\": {\n" +
+                        "      \"prosent\": 0.6,\n" +
+                        "      \"tapteDagsverk\": 9.4,\n" +
+                        "      \"muligeDagsverk\": 1500.0,\n" +
+                        "      \"erMaskert\": false,\n" +
+                        "      \"kvartaler\": [\n" +
+                        "        {\n" +
+                        "          \"årstall\": 2020,\n" +
+                        "          \"kvartal\": 1\n" +
+                        "        },\n" +
+                        "        {\n" +
+                        "          \"årstall\": 2020,\n" +
+                        "          \"kvartal\": 2\n" +
+                        "        }\n" +
+                        "      ]\n" +
+                        "    }\n" +
+                        "  },\n" +
+                        "  {\n" +
+                        "    \"type\": \"NÆRING\",\n" +
+                        "    \"label\": \"Produksjon av nærings- og nytelsesmidler\",\n" +
+                        "    \"summertKorttidsOgLangtidsfravær\": {\n" +
+                        "      \"summertKorttidsfravær\": {\n" +
+                        "        \"prosent\": 5.5,\n" +
+                        "        \"tapteDagsverk\": 123.3,\n" +
+                        "        \"muligeDagsverk\": 2224.2,\n" +
+                        "        \"erMaskert\": false,\n" +
+                        "        \"kvartaler\": [\n" +
+                        "          {\n" +
+                        "            \"årstall\": 2020,\n" +
+                        "            \"kvartal\": 1\n" +
+                        "          },\n" +
+                        "          {\n" +
+                        "            \"årstall\": 2020,\n" +
+                        "            \"kvartal\": 2\n" +
+                        "          }\n" +
+                        "        ]\n" +
+                        "      },\n" +
+                        "      \"summertLangtidsfravær\": {\n" +
+                        "        \"prosent\": 10.8,\n" +
+                        "        \"tapteDagsverk\": 240.1,\n" +
+                        "        \"muligeDagsverk\": 2224.2,\n" +
+                        "        \"erMaskert\": false,\n" +
+                        "        \"kvartaler\": [\n" +
+                        "          {\n" +
+                        "            \"årstall\": 2020,\n" +
+                        "            \"kvartal\": 1\n" +
+                        "          },\n" +
+                        "          {\n" +
+                        "            \"årstall\": 2020,\n" +
+                        "            \"kvartal\": 2\n" +
+                        "          }\n" +
+                        "        ]\n" +
+                        "      }\n" +
+                        "    },\n" +
+                        "    \"summertGradertFravær\": {\n" +
+                        "      \"prosent\": 1.1,\n" +
+                        "      \"tapteDagsverk\": 34.4,\n" +
+                        "      \"muligeDagsverk\": 3000.0,\n" +
+                        "      \"erMaskert\": false,\n" +
+                        "      \"kvartaler\": [\n" +
+                        "        {\n" +
+                        "          \"årstall\": 2020,\n" +
+                        "          \"kvartal\": 1\n" +
+                        "        },\n" +
+                        "        {\n" +
+                        "          \"årstall\": 2020,\n" +
+                        "          \"kvartal\": 2\n" +
+                        "        }\n" +
+                        "      ]\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "]\n";
     }
 }
