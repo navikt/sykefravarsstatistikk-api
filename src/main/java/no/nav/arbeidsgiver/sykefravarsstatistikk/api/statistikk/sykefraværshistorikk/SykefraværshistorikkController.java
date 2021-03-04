@@ -105,14 +105,14 @@ public class SykefraværshistorikkController {
         SummertSykefraværshistorikk summertSykefraværshistorikkVirksomhet =
                 summertSykefraværService.hentSummertSykefraværshistorikk(
                         underenhet,
-                        new ÅrstallOgKvartal(2020, 3),
+                        new ÅrstallOgKvartal(2020, 4),
                         antallKvartaler
                 );
 
         SummertSykefraværshistorikk summertSykefraværshistorikkBransjeEllerNæring =
                 summertSykefraværService.hentSummertSykefraværshistorikkForBransjeEllerNæring(
                         underenhet,
-                        new ÅrstallOgKvartal(2020, 3),
+                        new ÅrstallOgKvartal(2020, 4),
                         antallKvartaler
                 );
 

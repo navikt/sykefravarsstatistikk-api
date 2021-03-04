@@ -206,15 +206,11 @@ public class ApiTest {
                         "      }" +
                         "    }," +
                         "    \"summertGradertFravær\": {" +
-                        "      \"prosent\": 0.7," +
-                        "      \"tapteDagsverk\": 14.1," +
-                        "      \"muligeDagsverk\": 1990.3," +
+                        "      \"prosent\": 0.6," +
+                        "      \"tapteDagsverk\": 9.4," +
+                        "      \"muligeDagsverk\": 1500.0," +
                         "      \"erMaskert\": false," +
                         "      \"kvartaler\": [" +
-                        "        {" +
-                        "          \"årstall\": 2019," +
-                        "          \"kvartal\": 4" +
-                        "        }," +
                         "        {" +
                         "          \"årstall\": 2020," +
                         "          \"kvartal\": 1" +
@@ -231,15 +227,11 @@ public class ApiTest {
                         "    \"label\": \"Produksjon av nærings- og nytelsesmidler\"," +
                         "    \"summertKorttidsOgLangtidsfravær\": {" +
                         "      \"summertKorttidsfravær\": {" +
-                        "        \"prosent\": 8.2," +
-                        "        \"tapteDagsverk\": 258.7," +
-                        "        \"muligeDagsverk\": 3153.5," +
+                        "        \"prosent\": 5.5," +
+                        "        \"tapteDagsverk\": 123.3," +
+                        "        \"muligeDagsverk\": 2224.2," +
                         "        \"erMaskert\": false," +
                         "        \"kvartaler\": [" +
-                        "          {" +
-                        "            \"årstall\": 2019," +
-                        "            \"kvartal\": 4" +
-                        "          }," +
                         "          {" +
                         "            \"årstall\": 2020," +
                         "            \"kvartal\": 1" +
@@ -251,15 +243,11 @@ public class ApiTest {
                         "        ]" +
                         "      }," +
                         "      \"summertLangtidsfravær\": {" +
-                        "        \"prosent\": 10.3," +
-                        "        \"tapteDagsverk\": 325.6," +
-                        "        \"muligeDagsverk\": 3153.5," +
+                        "        \"prosent\": 10.8," +
+                        "        \"tapteDagsverk\": 240.1," +
+                        "        \"muligeDagsverk\": 2224.2," +
                         "        \"erMaskert\": false," +
                         "        \"kvartaler\": [" +
-                        "          {" +
-                        "            \"årstall\": 2019," +
-                        "            \"kvartal\": 4" +
-                        "          }," +
                         "          {" +
                         "            \"årstall\": 2020," +
                         "            \"kvartal\": 1" +
@@ -272,15 +260,11 @@ public class ApiTest {
                         "      }" +
                         "    }," +
                         "    \"summertGradertFravær\": {" +
-                        "      \"prosent\": 1.3," +
-                        "      \"tapteDagsverk\": 50.1," +
-                        "      \"muligeDagsverk\": 3980.6," +
+                        "      \"prosent\": 1.1," +
+                        "      \"tapteDagsverk\": 34.4," +
+                        "      \"muligeDagsverk\": 3000.0," +
                         "      \"erMaskert\": false," +
                         "      \"kvartaler\": [" +
-                        "        {" +
-                        "          \"årstall\": 2019," +
-                        "          \"kvartal\": 4" +
-                        "        }," +
                         "        {" +
                         "          \"årstall\": 2020," +
                         "          \"kvartal\": 1" +
