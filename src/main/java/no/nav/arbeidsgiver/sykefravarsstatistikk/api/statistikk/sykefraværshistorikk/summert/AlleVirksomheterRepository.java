@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartalMedOrgNr;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -24,7 +23,7 @@ public class AlleVirksomheterRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-    public List<SykefraværForEttKvartal> hentSykefraværprosentAlleVirksomheterForEttKvartal(
+    public List<SykefraværForEttKvartalMedOrgNr> hentSykefraværprosentAlleVirksomheterForEttKvartal(
             ÅrstallOgKvartal årstallOgKvartal) {
         try {
             return namedParameterJdbcTemplate.query(
@@ -46,7 +45,7 @@ public class AlleVirksomheterRepository {
         }
     }
 
-    private SykefraværForEttKvartal mapTilSykefraværprosentForEttKvartal(ResultSet rs) throws SQLException {
+    private SykefraværForEttKvartalMedOrgNr mapTilSykefraværprosentForEttKvartal(ResultSet rs) throws SQLException {
         return new SykefraværForEttKvartalMedOrgNr(
                 new ÅrstallOgKvartal(
                         rs.getInt("arstall"),
