@@ -12,10 +12,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
 import no.nav.security.token.support.core.api.Protected;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
@@ -119,4 +116,14 @@ public class SykefraværshistorikkController {
         return Arrays.asList(summertSykefraværshistorikkVirksomhet, summertSykefraværshistorikkBransjeEllerNæring);
     }
 
+    // publiserStkforKvartal. . land, sektor,næring2 siffer, næring5siffer, virksomhet
+    // repost // select distinct orgnr from stk_virksomhet
+    @PostMapping(value = "/publiser-statistikk-for-kvartal/{arstall}/{kvartal}/")
+    public ResponseStatus publiserStatistikkForEtKvartal(
+            @PathVariable("arstall") int arstall,
+            @PathVariable("kvartal") int kvartal) {
+        // for (each virksomhet)
+        //  hentSykefraværshistorikk()
+        return null;
+    }
 }
