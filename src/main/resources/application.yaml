@@ -6,6 +6,24 @@ management.endpoints.web:
   flyway:
     locations: classpath:/db/migration
 
+kafka:
+  outbound:
+    topic: arbeidsgiver.ia-tjenester-metrikker-topic
+    bootstrapServers: ${KAFKA_BROKERS:localhost}
+    schemaRegistry: ${KAFKA_SCHEMA_REGISTRY:localhost}
+    securityProtocol: SSL
+    registryUser: ${KAFKA_SCHEMA_REGISTRY_USER:user}
+    registryPassword: ${KAFKA_SCHEMA_REGISTRY_PASSWORD:pwd}
+    certificate: ${KAFKA_CERTIFICATE:cert}
+    certificatePath: ${KAFKA_CERTIFICATE_PATH:/dev/zero}
+    privateKey: ${KAFKA_PRIVATE_KEY:key}
+    privateKeyPath: ${KAFKA_PRIVATE_KEY_PATH:/dev/zero}
+    ca: ${KAFKA_CA:ca}
+    caPath: ${KAFKA_CA_PATH}
+    keystorePath: ${KAFKA_KEYSTORE_PATH:/dev/zero}
+    truststorePath: ${KAFKA_TRUSTSTORE_PATH:/dev/zero}
+    credstorePassword: ${KAFKA_CREDSTORE_PASSWORD:pwd}
+
 spring:
   profiles:
     active: local
