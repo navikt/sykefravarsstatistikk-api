@@ -11,4 +11,8 @@ public class SykefraværForEttKvartalMedOrgNr extends SykefraværForEttKvartal {
         super(årstallOgKvartal, tapte_dagsverk, mulige_dagsverk, antall_personer);
         this.orgnr = orgnr;
     }
+
+    public String getOrgnr() {
+        return orgnr;
+    }
 }
