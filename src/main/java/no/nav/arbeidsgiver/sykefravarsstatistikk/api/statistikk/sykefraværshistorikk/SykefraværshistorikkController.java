@@ -116,6 +116,7 @@ public class SykefraværshistorikkController {
         return Arrays.asList(summertSykefraværshistorikkVirksomhet, summertSykefraværshistorikkBransjeEllerNæring);
     }
 
+    // TODO oppsummerrer at vi ikke bruker det og sletter det
     // publiserStkforKvartal. . land, sektor,næring2 siffer, næring5siffer, virksomhet
     // repost // select distinct orgnr from stk_virksomhet
     @PostMapping(value = "/publiser-statistikk-for-kvartal/{arstall}/{kvartal}/")
