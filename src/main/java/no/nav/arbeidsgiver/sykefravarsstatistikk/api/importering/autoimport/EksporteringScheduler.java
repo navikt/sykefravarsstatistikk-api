@@ -38,8 +38,6 @@ public class EksporteringScheduler {
         eksporteringService.eksporterHvisDetFinnesNyStatistikk();
         // TODO gjør samme for andre typer data.
 
-
-
     }
 
 }

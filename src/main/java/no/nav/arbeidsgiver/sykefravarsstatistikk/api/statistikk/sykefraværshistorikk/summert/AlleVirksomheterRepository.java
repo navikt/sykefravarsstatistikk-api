@@ -33,7 +33,8 @@ public class AlleVirksomheterRepository {
                             "arstall, kvartal, orgnr " +
                             "FROM sykefravar_statistikk_virksomhet " +
                             "where arstall = :arstall and " +
-                            "kvartal = :kvartal " +
+                            "kvartal = :kvartal and " +
+                            "er_ekportert = false " +
                             "GROUP BY orgnr ",
                     new MapSqlParameterSource()
                             .addValue("arstall", årstallOgKvartal.getÅrstall())
