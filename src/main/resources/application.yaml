@@ -8,7 +8,7 @@ management.endpoints.web:
 
 kafka:
   outbound:
-    topic: arbeidsgiver.ia-tjenester-metrikker-topic
+    topic: arbeidsgiver.sykefravaersstatistikk-v1
     bootstrapServers: ${KAFKA_BROKERS:localhost}
     schemaRegistry: ${KAFKA_SCHEMA_REGISTRY:localhost}
     securityProtocol: SSL

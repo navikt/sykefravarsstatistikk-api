@@ -1,8 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SslConfigs;
@@ -15,9 +16,10 @@ import java.util.Map;
 
 @ConfigurationProperties(prefix = "kafka.outbound")
 @ConstructorBinding
-@AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Setter
+@Getter
+@ToString(onlyExplicitlyIncluded = true)
 public class KafkaProperties {
 	String topic;
 	String bootstrapServers;
@@ -71,6 +73,5 @@ public class KafkaProperties {
 
 		return props;
 	}
-
 
 }
