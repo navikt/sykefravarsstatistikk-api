@@ -35,7 +35,7 @@ public class AlleVirksomheterRepository {
                             "where arstall = :arstall and " +
                             "kvartal = :kvartal and " +
                             "er_ekportert = false " +
-                            "GROUP BY orgnr ",
+                            "GROUP BY arstall, kvartal, orgnr ",
                     new MapSqlParameterSource()
                             .addValue("arstall", årstallOgKvartal.getÅrstall())
                             .addValue("kvartal", årstallOgKvartal.getKvartal()),
