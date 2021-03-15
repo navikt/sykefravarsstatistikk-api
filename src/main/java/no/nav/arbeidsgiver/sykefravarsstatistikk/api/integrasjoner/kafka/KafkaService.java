@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 public class KafkaService {
 	private final static ObjectMapper objectMapper = new ObjectMapper();
 
-	KafkaTemplate<String, String> kafkaTemplate;
-	KafkaProperties kafkaProperties;
+	private KafkaTemplate<String, String> kafkaTemplate;
+	private KafkaProperties kafkaProperties;
 
 	KafkaService(KafkaTemplate<String, String> kafkaTemplate, KafkaProperties kafkaProperties){
 		this.kafkaTemplate = kafkaTemplate;
@@ -43,6 +43,8 @@ public class KafkaService {
 						String orgnr = keyJson.hasNonNull("orgnr") ? keyJson.get("orgnr").asText() : null;
 						Integer kvartal = keyJson.hasNonNull("kvartal") ? keyJson.get("kvartal").asInt() : null;
 						Integer årstall = keyJson.hasNonNull("årstall") ? keyJson.get("årstall").asInt() : null;
+
+						log.info("Sendt melding med key={orgnr:${}, kvartal:${}, årstall:${}}", orgnr, kvartal, årstall);
 
 					} catch (JsonProcessingException e) {
 						e.printStackTrace();
