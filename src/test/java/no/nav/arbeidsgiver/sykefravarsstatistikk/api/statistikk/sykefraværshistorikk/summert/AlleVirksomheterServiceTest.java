@@ -38,8 +38,7 @@ public class AlleVirksomheterServiceTest {
 						"999999999",
 						new BigDecimal(4),
 						new BigDecimal(4),
-						10
-				))
+						10))
 		);
 
 		assertTrue(

@@ -19,7 +19,7 @@ public class AlleNaring5SifferRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     public AlleNaring5SifferRepository(@Qualifier("sykefravarsstatistikkJdbcTemplate")
-                                              NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+                                               NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
@@ -53,6 +53,7 @@ public class AlleNaring5SifferRepository {
                 rs.getBigDecimal("tapte_dagsverk"),
                 rs.getBigDecimal("mulige_dagsverk"),
                 rs.getInt("antall_personer")
+
         );
     }
 

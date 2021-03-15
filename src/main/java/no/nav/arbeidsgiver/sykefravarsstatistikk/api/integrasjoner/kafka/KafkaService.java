@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartalMedOrgNr;
 import org.springframework.util.concurrent.ListenableFuture;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaProperties;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-class KafkaService {
+public class KafkaService {
 	private final static ObjectMapper objectMapper = new ObjectMapper();
 
 	KafkaTemplate<String, String> kafkaTemplate;
@@ -23,10 +24,16 @@ class KafkaService {
 		this.kafkaProperties = kafkaProperties;
 	}
 
-	public void send(Object object) throws JsonProcessingException {
+	public void send(SykefraværForEttKvartalMedOrgNr sykefraværForEttKvartalMedOrgNr) throws JsonProcessingException {
+		KafkaTopicKey key= new KafkaTopicKey(
+				sykefraværForEttKvartalMedOrgNr.getOrgnr(),
+				sykefraværForEttKvartalMedOrgNr.getKvartal(),
+				sykefraværForEttKvartalMedOrgNr.getÅrstall()
+		);
 		ListenableFuture<SendResult<String, String>> futureResult =
 				kafkaTemplate.send(kafkaProperties.getTopic(),
-						objectMapper.writeValueAsString(object)
+						objectMapper.writeValueAsString(key),
+						objectMapper.writeValueAsString(sykefraværForEttKvartalMedOrgNr)
 				);
 		futureResult.addCallback(
 				(result) -> {

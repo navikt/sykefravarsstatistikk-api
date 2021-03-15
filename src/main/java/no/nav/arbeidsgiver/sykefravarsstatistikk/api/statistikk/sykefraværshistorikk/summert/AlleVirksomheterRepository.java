@@ -55,8 +55,7 @@ public class AlleVirksomheterRepository {
                 rs.getString("orgnr"),
                 rs.getBigDecimal("tapte_dagsverk"),
                 rs.getBigDecimal("mulige_dagsverk"),
-                rs.getInt("antall_personer")
-        );
+                rs.getInt("antall_personer"));
     }
 
 }
