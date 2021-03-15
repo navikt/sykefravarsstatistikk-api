@@ -9,7 +9,7 @@ management.endpoints.web:
 kafka:
   outbound:
     topic: arbeidsgiver.sykefravaersstatistikk-v1
-    bootstrapServers: ${KAFKA_BROKERS}
+    bootstrapServers: ${KAFKA_BROKERS:localhost}
     schemaRegistry: ${KAFKA_SCHEMA_REGISTRY:localhost}
     securityProtocol: SSL
     registryUser: ${KAFKA_SCHEMA_REGISTRY_USER:user}
