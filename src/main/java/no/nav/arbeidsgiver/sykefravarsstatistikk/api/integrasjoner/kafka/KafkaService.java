@@ -39,7 +39,7 @@ public class KafkaService {
         Næringskode5Siffer næringskode = null;
         try {
             næringskode = enhetsregisteretClient.hentInformasjonOmVirksomhet(
-                    new Orgnr(sykefraværForEttKvartalMedOrgNr.getOrgnr())
+                    new Orgnr("925028509")
             ).getNæringskode();
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
