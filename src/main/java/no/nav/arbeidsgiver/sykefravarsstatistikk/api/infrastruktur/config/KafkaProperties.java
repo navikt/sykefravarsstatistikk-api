@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.apache.kafka.clients.CommonClientConfigs;
@@ -9,34 +8,31 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConstructorBinding;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@ConfigurationProperties(prefix = "kafka.outbound")
-@ConstructorBinding
-@NoArgsConstructor
-@Setter
 @Getter
+@Setter
 @ToString(onlyExplicitlyIncluded = true)
+@ConfigurationProperties("kafka.outbound")
 public class KafkaProperties {
-	String topic;
-	String bootstrapServers;
-	String caPath;
-	String truststorePath;
-	String keystorePath;
-	String credstorePassword;
-	final String acks = "all";
-	String securityProtocol;
-	final String clientId = "sykefravarsstatistikk-api";
-	final String valueSerializerClass = StringSerializer.class.getName();
-	final String keySerializerCLass = StringSerializer.class.getName();
-	final Integer retries = Integer.MAX_VALUE;
-	final Integer deliveryTimeoutMs = 10100;
-	final Integer requestTimeoutMs = 10000;
-	final Integer lingerMs = 100;
-	final Integer batchSize = 16384*4;
+	private String topic;
+	private String bootstrapServers;
+	private String caPath;
+	private String truststorePath;
+	private String keystorePath;
+	private String credstorePassword;
+	private final String acks = "all";
+	private String securityProtocol;
+	private final String clientId = "sykefravarsstatistikk-api";
+	private final String valueSerializerClass = StringSerializer.class.getName();
+	private final String keySerializerCLass = StringSerializer.class.getName();
+	private final Integer retries = Integer.MAX_VALUE;
+	private final Integer deliveryTimeoutMs = 10100;
+	private final Integer requestTimeoutMs = 10000;
+	private final Integer lingerMs = 100;
+	private final Integer batchSize = 16384*4;
 
 	public Map<String, Object> asProperties() {
 		HashMap<String, Object> props = new HashMap<>();
