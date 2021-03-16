@@ -8,6 +8,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +16,8 @@ import java.util.Map;
 @Getter
 @Setter
 @ToString(onlyExplicitlyIncluded = true)
-@ConfigurationProperties("kafka.outbound")
+@ConfigurationProperties(prefix = "kafka.outbound")
+@Component
 public class KafkaProperties {
 	private String topic;
 	private String bootstrapServers;
@@ -23,8 +25,9 @@ public class KafkaProperties {
 	private String truststorePath;
 	private String keystorePath;
 	private String credstorePassword;
-	private final String acks = "all";
 	private String securityProtocol;
+
+	private final String acks = "all";
 	private final String clientId = "sykefravarsstatistikk-api";
 	private final String valueSerializerClass = StringSerializer.class.getName();
 	private final String keySerializerCLass = StringSerializer.class.getName();
