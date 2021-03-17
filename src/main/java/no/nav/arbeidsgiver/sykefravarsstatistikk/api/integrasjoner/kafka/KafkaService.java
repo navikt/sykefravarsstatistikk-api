@@ -36,8 +36,8 @@ public class KafkaService {
                 sykefraværForEttKvartalMedOrgNr.getKvartal(),
                 sykefraværForEttKvartalMedOrgNr.getÅrstall()
         );
-        Næringskode5Siffer næringskode = null;
-        try {
+        //Næringskode5Siffer næringskode = null;
+        /*try {
             næringskode = enhetsregisteretClient.hentInformasjonOmVirksomhet(
                     new Orgnr(sykefraværForEttKvartalMedOrgNr.getOrgnr())
             ).getNæringskode();
@@ -51,9 +51,9 @@ public class KafkaService {
         } catch (Exception ex) {
             log.error("Det skjedde en feil ved henting av informasjon av enhet", ex);
             return;
-        }
+        }*/
         KafkaTopicValue value = new KafkaTopicValue(
-                næringskode.getKode(),
+                sykefraværForEttKvartalMedOrgNr.getNæringskode5Siffer(),
                 sykefraværForEttKvartalMedOrgNr.getÅrstall(),
                 sykefraværForEttKvartalMedOrgNr.getKvartal(),
                 sykefraværForEttKvartalMedOrgNr.isErMaskert(),

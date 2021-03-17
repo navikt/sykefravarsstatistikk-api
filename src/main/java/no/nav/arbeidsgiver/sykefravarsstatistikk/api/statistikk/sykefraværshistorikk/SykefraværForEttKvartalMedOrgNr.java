@@ -22,4 +22,7 @@ public class SykefraværForEttKvartalMedOrgNr extends SykefraværForEttKvartal {
     public String getOrgnr() {
         return orgnr;
     }
+    public String getNæringskode5Siffer() {
+        return næringskode5Siffer;
+    }
 }
