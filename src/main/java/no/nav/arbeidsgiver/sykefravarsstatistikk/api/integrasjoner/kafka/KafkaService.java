@@ -4,17 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaProperties;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartalMedOrgNr;
-import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.web.client.HttpClientErrorException;
 
 @Slf4j
 @Service
@@ -23,7 +18,6 @@ public class KafkaService {
 
     private KafkaTemplate<String, String> kafkaTemplate;
     private KafkaProperties kafkaProperties;
-    private EnhetsregisteretClient enhetsregisteretClient;
 
     KafkaService(KafkaTemplate<String, String> kafkaTemplate, KafkaProperties kafkaProperties) {
         this.kafkaTemplate = kafkaTemplate;
@@ -61,6 +55,8 @@ public class KafkaService {
                 sykefraværForEttKvartalMedOrgNr.getTapteDagsverk(),
                 sykefraværForEttKvartalMedOrgNr.getMuligeDagsverk()
         );
+        log.info("prøver å sende følgende verdier i kafka topic som value", value);
+        log.info("prøver å serialisere verdier før sending", objectMapper.writeValueAsString(value));
         ListenableFuture<SendResult<String, String>> futureResult =
                 kafkaTemplate.send(kafkaProperties.getTopic(),
                         objectMapper.writeValueAsString(key),
