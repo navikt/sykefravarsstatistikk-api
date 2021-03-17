@@ -47,7 +47,6 @@ public class KafkaService {
             return;
         }*/
         KafkaTopicValue value = new KafkaTopicValue(
-                sykefraværForEttKvartalMedOrgNr.getNæringskode5Siffer(),
                 sykefraværForEttKvartalMedOrgNr.getÅrstall(),
                 sykefraværForEttKvartalMedOrgNr.getKvartal(),
                 sykefraværForEttKvartalMedOrgNr.isErMaskert(),
