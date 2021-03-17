@@ -54,12 +54,12 @@ public class KafkaService {
                 sykefraværForEttKvartalMedOrgNr.getTapteDagsverk(),
                 sykefraværForEttKvartalMedOrgNr.getMuligeDagsverk()
         );
-        log.info("prøver å sende følgende verdier i kafka topic som value", value);
-        log.info("prøver å serialisere verdier før sending", objectMapper.writeValueAsString(value));
+        log.info("prøver å sende følgende verdier i kafka topic som value"+value.toString(), value);
+        //log.info("prøver å serialisere verdier før sending", objectMapper.writeValueAsString(value));
         ListenableFuture<SendResult<String, String>> futureResult =
                 kafkaTemplate.send(kafkaProperties.getTopic(),
                         objectMapper.writeValueAsString(key),
-                        objectMapper.writeValueAsString(value)
+                        objectMapper.writeValueAsString("{testKeyData:testValueData}")
                 );
         futureResult.addCallback(
                 (result) -> {
