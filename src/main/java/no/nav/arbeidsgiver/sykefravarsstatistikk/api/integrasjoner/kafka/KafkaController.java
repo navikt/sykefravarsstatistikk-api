@@ -23,7 +23,7 @@ public class KafkaController {
             "999999999",
             new BigDecimal(10),
             new BigDecimal(100),
-            51
+            51, "08500"
     );
 
     @GetMapping(value = "/sendkafka")

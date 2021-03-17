@@ -33,24 +33,24 @@ class AlleVirksomheterRepositoryTest {
 		slettAllStatistikkFraDatabase(jdbcTemplate);
 
 		jdbcTemplate.update(
-				"insert into sykefravar_statistikk_virksomhet (arstall, kvartal, orgnr, varighet, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-						+ "VALUES (:arstall, :kvartal, :orgnr, :varighet, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-				parametre(2019, 2, "999999999", "A", 3, 4, 40)
+				"insert into sykefravar_statistikk_virksomhet_med_gradering (arstall, kvartal, orgnr, naring, naring_kode, antall_graderte_sykemeldinger, tapte_dagsverk_gradert_sykemelding,antall_sykemeldinger, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+						+ "VALUES (:arstall, :kvartal, :orgnr, :naring, :naring_kode, :antall_graderte_sykemeldinger, :tapte_dagsverk_gradert_sykemelding, :antall_sykemeldinger, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+				parametre(2019, 2, "999999999", "85","08500",0,0,0, 3, 4, 40)
 		);
 		jdbcTemplate.update(
-				"insert into sykefravar_statistikk_virksomhet (arstall, kvartal, orgnr, varighet, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-						+ "VALUES (:arstall, :kvartal, :orgnr, :varighet, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-				parametre(2019, 2, "999999999", "X", 3, 0, 60)
+				"insert into sykefravar_statistikk_virksomhet_med_gradering (arstall, kvartal, orgnr, naring, naring_kode, antall_graderte_sykemeldinger, tapte_dagsverk_gradert_sykemelding,antall_sykemeldinger, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+						+ "VALUES (:arstall, :kvartal, :orgnr, :naring, :naring_kode, :antall_graderte_sykemeldinger, :tapte_dagsverk_gradert_sykemelding, :antall_sykemeldinger, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+				parametre(2019, 2, "999999999", "85", "08500", 0, 0, 0, 3, 0, 60)
 		);
 		jdbcTemplate.update(
-				"insert into sykefravar_statistikk_virksomhet (arstall, kvartal, orgnr, varighet, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-						+ "VALUES (:arstall, :kvartal, :orgnr, :varighet, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-				parametre(2019, 2, "999999998", "X", 4, 0, 100)
+				"insert into sykefravar_statistikk_virksomhet_med_gradering (arstall, kvartal, orgnr, naring, naring_kode, antall_graderte_sykemeldinger, tapte_dagsverk_gradert_sykemelding,antall_sykemeldinger, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+						+ "VALUES (:arstall, :kvartal, :orgnr, :naring, :naring_kode, :antall_graderte_sykemeldinger, :tapte_dagsverk_gradert_sykemelding, :antall_sykemeldinger, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+				parametre(2019, 2, "999999998", "85", "08500", 0, 0, 0, 4, 0, 100)
 		);
 		jdbcTemplate.update(
-				"insert into sykefravar_statistikk_virksomhet (arstall, kvartal, orgnr, varighet, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-						+ "VALUES (:arstall, :kvartal, :orgnr, :varighet, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-				parametre(2017, 4, "999999997", "X", 40, 20, 115)
+				"insert into sykefravar_statistikk_virksomhet_med_gradering (arstall, kvartal, orgnr, naring, naring_kode, antall_graderte_sykemeldinger, tapte_dagsverk_gradert_sykemelding,antall_sykemeldinger, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+						+ "VALUES (:arstall, :kvartal, :orgnr, :naring, :naring_kode, :antall_graderte_sykemeldinger, :tapte_dagsverk_gradert_sykemelding, :antall_sykemeldinger, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+				parametre(2017, 4, "999999997", "85", "08500", 0, 0, 0, 40, 20, 115)
 		);
 	}
 
@@ -116,12 +116,16 @@ class AlleVirksomheterRepositoryTest {
 
 	}
 
-	private MapSqlParameterSource parametre(int årstall, int kvartal, String orgnr, String varighet, int antallPersoner, int tapteDagsverk, int muligeDagsverk) {
+	private MapSqlParameterSource parametre(int årstall, int kvartal, String orgnr, String næringskode2Siffer, String næringskode5Siffer, int antall_graderte_sykemeldinger, int tapte_dagsverk_gradert_sykemelding, int antall_sykemeldinger, int antallPersoner, int tapteDagsverk, int muligeDagsverk) {
 		return new MapSqlParameterSource()
 				.addValue("arstall", årstall)
 				.addValue("kvartal", kvartal)
 				.addValue("orgnr", orgnr)
-				.addValue("varighet", varighet)
+				.addValue("naring", næringskode2Siffer)
+				.addValue("naring_kode", næringskode5Siffer)
+				.addValue("antall_graderte_sykemeldinger", antall_graderte_sykemeldinger)
+				.addValue("tapte_dagsverk_gradert_sykemelding", tapte_dagsverk_gradert_sykemelding)
+				.addValue("antall_sykemeldinger", antall_sykemeldinger)
 				.addValue("antall_personer", antallPersoner)
 				.addValue("tapte_dagsverk", tapteDagsverk)
 				.addValue("mulige_dagsverk", muligeDagsverk);

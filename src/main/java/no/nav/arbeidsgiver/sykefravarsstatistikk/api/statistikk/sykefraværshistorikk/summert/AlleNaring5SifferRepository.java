@@ -42,7 +42,7 @@ public class AlleNaring5SifferRepository {
             return Collections.emptyList();
         }
     }
-
+    // TODO dette er for næring.
     private SykefraværForEttKvartalMedOrgNr mapTilSykefraværprosentForEttKvartal(ResultSet rs) throws SQLException {
         return new SykefraværForEttKvartalMedOrgNr(
                 new ÅrstallOgKvartal(
@@ -52,8 +52,8 @@ public class AlleNaring5SifferRepository {
                 rs.getString("orgnr"),
                 rs.getBigDecimal("tapte_dagsverk"),
                 rs.getBigDecimal("mulige_dagsverk"),
-                rs.getInt("antall_personer")
-
+                rs.getInt("antall_personer"),
+                rs.getString("naring_kode")
         );
     }
 

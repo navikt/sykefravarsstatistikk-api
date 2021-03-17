@@ -30,12 +30,13 @@ public class AlleVirksomheterRepository {
                     "SELECT sum(tapte_dagsverk) as tapte_dagsverk," +
                             "sum(mulige_dagsverk) as mulige_dagsverk," +
                             "sum(antall_personer) as antall_personer," +
-                            "arstall, kvartal, orgnr " +
-                            "FROM sykefravar_statistikk_virksomhet " +
+                            "arstall, kvartal, orgnr, " +
+                            "naring_kode "+
+                            "FROM sykefravar_statistikk_virksomhet_med_gradering " +
                             "where arstall = :arstall and " +
                             "kvartal = :kvartal and " +
                             "er_ekportert = false " +
-                            "GROUP BY arstall, kvartal, orgnr ",
+                            "GROUP BY arstall, kvartal, orgnr, naring_kode ",
                     new MapSqlParameterSource()
                             .addValue("arstall", årstallOgKvartal.getÅrstall())
                             .addValue("kvartal", årstallOgKvartal.getKvartal()),
@@ -55,7 +56,8 @@ public class AlleVirksomheterRepository {
                 rs.getString("orgnr"),
                 rs.getBigDecimal("tapte_dagsverk"),
                 rs.getBigDecimal("mulige_dagsverk"),
-                rs.getInt("antall_personer"));
+                rs.getInt("antall_personer"),
+                rs.getString("naring_kode"));
     }
 
 }
