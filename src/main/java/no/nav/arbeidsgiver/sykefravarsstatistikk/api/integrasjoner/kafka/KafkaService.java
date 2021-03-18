@@ -55,7 +55,12 @@ public class KafkaService {
                 sykefraværForEttKvartalMedOrgNr.getMuligeDagsverk()
         );
         log.info("prøver å sende følgende verdier i kafka topic som value"+value.toString(), value);
-        //log.info("prøver å serialisere verdier før sending", objectMapper.writeValueAsString(value));
+        try {
+            log.info("prøver å serialisere verdier før sending", objectMapper.writeValueAsString(value));
+        } catch (JsonProcessingException e) {
+            log.info(e.getMessage());
+            e.printStackTrace();
+        }
         ListenableFuture<SendResult<String, String>> futureResult =
                 kafkaTemplate.send(kafkaProperties.getTopic(),
                         objectMapper.writeValueAsString(key),
