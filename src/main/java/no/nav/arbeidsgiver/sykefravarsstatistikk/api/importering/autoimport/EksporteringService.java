@@ -38,15 +38,17 @@ public class EksporteringService {
         //Todo kalle riktig metoder
 
         List<ÅrstallOgKvartal> årstallOgKvartalForSykefraværsstatistikk
-                = statistikkRepository.hentAlleÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.VIRKSOMHET);
+                = statistikkRepository.hentAlleÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.VIRKSOMHET_MED_GRADERING);
         log.info("Fant " + årstallOgKvartalForSykefraværsstatistikk.size() + " rekord av årstall og kvartaler");
-        if (årstallOgKvartalForSykefraværsstatistikk.size() > 0) {
+        årstallOgKvartalForSykefraværsstatistikk.stream().forEach(årstallOgKvartal -> {
             if (erEksporteringAktivert) {
-                log.info("Eksportering er aktivert ");
+                log.info("Eksportering er aktivert for årstall:" +
+                        årstallOgKvartal.getÅrstall() +
+                        " og kvartal:" + årstallOgKvartal.getKvartal());
                 List<SykefraværForEttKvartalMedOrgNr> sykefraværForEttKvartalMedOrgNrs =
                         alleVirksomheterRepository.
                                 hentSykefraværprosentAlleVirksomheterForEttKvartal(
-                                        årstallOgKvartalForSykefraværsstatistikk.get(0)
+                                        årstallOgKvartal
                                 );
                 log.info("Eksporter ny statistikk:" +
                         sykefraværForEttKvartalMedOrgNrs.size() +
@@ -71,10 +73,11 @@ public class EksporteringService {
                             }
                         });
                 log.info("ending av statistikk eksportering");
+
+            } else {
+                log.info("Ikke ny statistikk for eksportering");
             }
-        } else {
-            log.info("Ikke ny statistikk for eksportering");
-        }
+        });
     }
 
 
