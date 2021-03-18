@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.EksporteringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartalMedOrgNr;
 import no.nav.security.token.support.core.api.Unprotected;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,9 +14,10 @@ import java.math.BigDecimal;
 @RestController
 public class KafkaController {
     final KafkaService kafkaService;
-
-    public KafkaController(KafkaService kafkaService) {
+    final EksporteringService eksporteringService;
+    public KafkaController(KafkaService kafkaService, EksporteringService eksporteringService) {
         this.kafkaService = kafkaService;
+        this.eksporteringService = eksporteringService;
     }
 
     SykefraværForEttKvartalMedOrgNr dummy = new SykefraværForEttKvartalMedOrgNr(
@@ -28,6 +30,7 @@ public class KafkaController {
 
     @GetMapping(value = "/sendkafka")
     public void sendKafka() throws JsonProcessingException {
+        eksporteringService.eksporterHvisDetFinnesNyStatistikk();
         kafkaService.send(dummy);
     }
 }

@@ -36,18 +36,12 @@ public class EksporteringService {
         log.info("Er ekportering aktivert? {}", erEksporteringAktivert);
         //Todo kalle riktig metoder
 
-    /*    List<ÅrstallOgKvartal> årstallOgKvartalForSykefraværsstatistikk = Arrays.asList(
-                statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.LAND),
-                statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.SEKTOR),
-                statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.NÆRING),
-                statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.NÆRING_5_SIFFER),
-                statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.VIRKSOMHET)
-        );*/
         List<ÅrstallOgKvartal> årstallOgKvartalForSykefraværsstatistikk
                 = statistikkRepository.hentAlleÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.VIRKSOMHET);
-
+        log.info("Fant " + årstallOgKvartalForSykefraværsstatistikk.size() + " rekord av årstall og kvartaler");
         if (årstallOgKvartalForSykefraværsstatistikk.size() > 0) {
             if (erEksporteringAktivert) {
+                log.info("Eksportering er aktivert ");
                 List<SykefraværForEttKvartalMedOrgNr> sykefraværForEttKvartalMedOrgNrs =
                         alleVirksomheterRepository.
                                 hentSykefraværprosentAlleVirksomheterForEttKvartal(
