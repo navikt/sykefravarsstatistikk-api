@@ -1,5 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,6 +58,7 @@ public class KafkaService {
         );
         log.info("prøver å sende følgende verdier i kafka topic som value"+value.toString(), value);
         try {
+            objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
             log.info("prøver å serialisere verdier før sending", objectMapper.writeValueAsString(value));
         } catch (JsonProcessingException e) {
             log.info(e.getMessage());
@@ -64,7 +67,7 @@ public class KafkaService {
         ListenableFuture<SendResult<String, String>> futureResult =
                 kafkaTemplate.send(kafkaProperties.getTopic(),
                         objectMapper.writeValueAsString(key),
-                        objectMapper.writeValueAsString("{testKeyData:testValueData}")
+                        objectMapper.writeValueAsString(value)
                 );
         futureResult.addCallback(
                 (result) -> {
