@@ -37,7 +37,7 @@ public class AlleVirksomheterRepository {
                             "FROM sykefravar_statistikk_virksomhet_med_gradering " +
                             "where arstall = :arstall and " +
                             "kvartal = :kvartal and " +
-                            "er_eksportert = false " +
+                            "er_ekportert = false " +
                             "GROUP BY arstall, kvartal, orgnr, naring_kode ",
                     new MapSqlParameterSource()
                             .addValue("arstall", årstallOgKvartal.getÅrstall())
@@ -61,7 +61,7 @@ public class AlleVirksomheterRepository {
                         .addValue("kvartal", årstallOgKvartal.getKvartal());
 
         return namedParameterJdbcTemplate.update(
-                "update " + tabell + " set er_eksportert =true where orgnr = :orgnr and "+
+                "update " + tabell + " set er_ekportert =true where orgnr = :orgnr and "+
                 "arstall = :årstall and kvartal = :kvartal",
                 namedParameters
         );
