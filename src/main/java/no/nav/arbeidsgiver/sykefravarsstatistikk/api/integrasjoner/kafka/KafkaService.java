@@ -32,38 +32,17 @@ public class KafkaService {
                 sykefraværForEttKvartalMedOrgNr.getKvartal(),
                 sykefraværForEttKvartalMedOrgNr.getÅrstall()
         );
-        //Næringskode5Siffer næringskode = null;
-        /*try {
-            næringskode = enhetsregisteretClient.hentInformasjonOmVirksomhet(
-                    new Orgnr(sykefraværForEttKvartalMedOrgNr.getOrgnr())
-            ).getNæringskode();
-        } catch (HttpClientErrorException e) {
-            if (e.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
-                log.error("OrgNr finnes ikke i Enhetsregisteret", e);
-            } else {
-                log.error("Det skjedde en feil ved henting av informasjon av enhet", e);
-            }
-            return;
-        } catch (Exception ex) {
-            log.error("Det skjedde en feil ved henting av informasjon av enhet", ex);
-            return;
-        }*/
         KafkaTopicValue value = new KafkaTopicValue(
                 sykefraværForEttKvartalMedOrgNr.getÅrstall(),
                 sykefraværForEttKvartalMedOrgNr.getKvartal(),
+                sykefraværForEttKvartalMedOrgNr.getNæringskode5Siffer(),
                 sykefraværForEttKvartalMedOrgNr.isErMaskert(),
                 sykefraværForEttKvartalMedOrgNr.getProsent(),
                 sykefraværForEttKvartalMedOrgNr.getTapteDagsverk(),
                 sykefraværForEttKvartalMedOrgNr.getMuligeDagsverk()
         );
-        log.info("prøver å sende følgende verdier i kafka topic som value"+value.toString(), value);
-        try {
-            objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-            log.info("prøver å serialisere verdier før sending", objectMapper.writeValueAsString(value));
-        } catch (JsonProcessingException e) {
-            log.info(e.getMessage());
-            e.printStackTrace();
-        }
+        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        log.info("prøver å serialisere verdier før sending", objectMapper.writeValueAsString(value));
         ListenableFuture<SendResult<String, String>> futureResult =
                 kafkaTemplate.send(kafkaProperties.getTopic(),
                         objectMapper.writeValueAsString(key),
