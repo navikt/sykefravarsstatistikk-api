@@ -56,7 +56,7 @@ public class EksporteringService {
                         {
                             try {
                                 kafkaService.send(sykefraværForEttKvartalMedOrgNr);
-                                log.info("Etter sending av kafka topic value, starter med å markere statististikk som eksportert");
+                                //log.info("Etter sending av kafka topic value, starter med å markere statististikk som eksportert");
                                 alleVirksomheterRepository.oppdaterOgSetErEksportertTilTrue(
                                         "sykefravar_statistikk_virksomhet_med_gradering",
                                         new Orgnr(sykefraværForEttKvartalMedOrgNr.getOrgnr()),
@@ -68,6 +68,7 @@ public class EksporteringService {
                                 e.printStackTrace();
                             }
                         });
+                log.info("ending av statistikk eksportering");
             }
         } else {
             log.info("Ikke ny statistikk for eksportering");
