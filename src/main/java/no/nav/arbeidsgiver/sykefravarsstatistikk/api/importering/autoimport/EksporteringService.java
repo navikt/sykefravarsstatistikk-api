@@ -48,7 +48,9 @@ public class EksporteringService {
                                 hentSykefraværprosentAlleVirksomheterForEttKvartal(
                                         årstallOgKvartalForSykefraværsstatistikk.get(0)
                                 );
-                log.info("Eksporter ny statistikk");
+                log.info("Eksporter ny statistikk:" +
+                        sykefraværForEttKvartalMedOrgNrs.size() +
+                        " til eksportering");
                 //TODO kalle kafkaservice
                 // new KafkaService(
                 sykefraværForEttKvartalMedOrgNrs.stream().forEach(
