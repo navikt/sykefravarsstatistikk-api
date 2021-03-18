@@ -58,7 +58,6 @@ public class KafkaService {
                         Integer årstall = keyJson.hasNonNull("årstall") ? keyJson.get("årstall").asInt() : null;
 
                         log.info("Sendt melding med key={orgnr:${}, kvartal:${}, årstall:${}}", orgnr, kvartal, årstall);
-
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }

@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Statistikkilde;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.StatistikkRepository;
@@ -55,6 +56,14 @@ public class EksporteringService {
                         {
                             try {
                                 kafkaService.send(sykefraværForEttKvartalMedOrgNr);
+                                log.info("Etter sending av kafka topic value, starter med å markere statististikk som eksportert");
+                                alleVirksomheterRepository.oppdaterOgSetErEksportertTilTrue(
+                                        "sykefravar_statistikk_virksomhet_med_gradering",
+                                        new Orgnr(sykefraværForEttKvartalMedOrgNr.getOrgnr()),
+                                        new ÅrstallOgKvartal(
+                                                sykefraværForEttKvartalMedOrgNr.getÅrstall(),
+                                                sykefraværForEttKvartalMedOrgNr.getKvartal())
+                                );
                             } catch (JsonProcessingException e) {
                                 e.printStackTrace();
                             }
