@@ -35,7 +35,6 @@ public class EksporteringService {
     public void eksporterHvisDetFinnesNyStatistikk() {
         // Todo sette opp riktig eksportering flag
         log.info("Er ekportering aktivert? {}", erEksporteringAktivert);
-        //Todo kalle riktig metoder
 
         List<ÅrstallOgKvartal> årstallOgKvartalForSykefraværsstatistikk
                 = statistikkRepository.hentAlleÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.VIRKSOMHET_MED_GRADERING);
@@ -53,14 +52,11 @@ public class EksporteringService {
                 log.info("Eksporter ny statistikk:" +
                         sykefraværForEttKvartalMedOrgNrs.size() +
                         " til eksportering");
-                //TODO kalle kafkaservice
-                // new KafkaService(
                 sykefraværForEttKvartalMedOrgNrs.stream().forEach(
                         sykefraværForEttKvartalMedOrgNr ->
                         {
                             try {
                                 kafkaService.send(sykefraværForEttKvartalMedOrgNr);
-                                //log.info("Etter sending av kafka topic value, starter med å markere statististikk som eksportert");
                                 alleVirksomheterRepository.oppdaterOgSetErEksportertTilTrue(
                                         "sykefravar_statistikk_virksomhet_med_gradering",
                                         new Orgnr(sykefraværForEttKvartalMedOrgNr.getOrgnr()),

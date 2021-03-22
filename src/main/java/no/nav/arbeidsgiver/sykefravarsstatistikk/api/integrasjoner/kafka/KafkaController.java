@@ -31,6 +31,5 @@ public class KafkaController {
     @GetMapping(value = "/sendkafka")
     public void sendKafka() {
         eksporteringService.eksporterHvisDetFinnesNyStatistikk();
-        //kafkaService.send(dummy);
     }
 }

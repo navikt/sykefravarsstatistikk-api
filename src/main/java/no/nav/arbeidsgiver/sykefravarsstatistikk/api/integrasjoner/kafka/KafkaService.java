@@ -42,7 +42,6 @@ public class KafkaService {
                 sykefraværForEttKvartalMedOrgNr.getMuligeDagsverk()
         );
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-        //log.info("prøver å serialisere verdier før sending", objectMapper.writeValueAsString(value));
         ListenableFuture<SendResult<String, String>> futureResult =
                 kafkaTemplate.send(kafkaProperties.getTopic(),
                         objectMapper.writeValueAsString(key),
@@ -50,14 +49,12 @@ public class KafkaService {
                 );
         futureResult.addCallback(
                 (result) -> {
-                    //log.info("Melding sendt på topic");
                     try {
                         JsonNode keyJson = objectMapper.readTree(result.getProducerRecord().key());
                         String orgnr = keyJson.hasNonNull("orgnr") ? keyJson.get("orgnr").asText() : null;
                         Integer kvartal = keyJson.hasNonNull("kvartal") ? keyJson.get("kvartal").asInt() : null;
                         Integer årstall = keyJson.hasNonNull("årstall") ? keyJson.get("årstall").asInt() : null;
 
-                        //log.info("Sendt melding med key={orgnr:${}, kvartal:${}, årstall:${}}", orgnr, kvartal, årstall);
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
