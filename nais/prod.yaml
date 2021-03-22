@@ -33,6 +33,8 @@ spec:
         mountPath: /var/run/secrets/nais.io/vault
       - kvPath: /apikey/apigw/prod/eksternapp.altinn.serviceowner/sykefravarsstatistikk-api
         mountPath: /var/run/secrets/nais.io/altinn
+  kafka:
+    pool: nav-prod
   resources:
     limits:
       memory: 2048Mi
