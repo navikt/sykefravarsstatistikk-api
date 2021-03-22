@@ -65,7 +65,9 @@ public class EksporteringService {
                                                 sykefraværForEttKvartalMedOrgNr.getKvartal())
                                 );
                             } catch (JsonProcessingException e) {
-                                e.printStackTrace();
+                                log.warn("En feil har skjedd ved eksportering til kafka topic: " + e.getMessage(),
+                                        e);
+                                throw new EksporteringException(e.getMessage());
                             }
                         });
                 log.info("ending av statistikk eksportering");

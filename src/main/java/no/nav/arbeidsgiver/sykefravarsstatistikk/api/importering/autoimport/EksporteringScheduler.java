@@ -24,7 +24,7 @@ public class EksporteringScheduler {
 
     @Scheduled(cron = "0 5 9 * * ?")
     public void scheduledEksportering() {
-        Duration lockAtMostFor = Duration.of(10, ChronoUnit.MINUTES);
+        Duration lockAtMostFor = Duration.of(45, ChronoUnit.MINUTES);
         Duration lockAtLeastFor = Duration.of(1, ChronoUnit.MINUTES);
 
         taskExecutor.executeWithLock(
