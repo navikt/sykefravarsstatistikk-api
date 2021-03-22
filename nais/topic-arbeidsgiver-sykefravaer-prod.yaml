@@ -23,3 +23,6 @@ spec:
     - team: teamcrm
       application: sf-sykefravaersstatistikk
       access: read
+    - team: team-dialog
+      application: sf-sykefravaersstatistikk
+      access: read
