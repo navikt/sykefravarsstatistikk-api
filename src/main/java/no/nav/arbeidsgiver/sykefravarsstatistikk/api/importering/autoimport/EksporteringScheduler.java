@@ -23,21 +23,19 @@ public class EksporteringScheduler {
     }
 
     @Scheduled(cron = "0 5 9 * * ?")
-    public void scheduledImportering() {
+    public void scheduledEksportering() {
         Duration lockAtMostFor = Duration.of(10, ChronoUnit.MINUTES);
         Duration lockAtLeastFor = Duration.of(1, ChronoUnit.MINUTES);
 
         taskExecutor.executeWithLock(
                 (Runnable) this::eksportering,
-                new LockConfiguration(Instant.now(), "importering", lockAtMostFor, lockAtLeastFor)
+                new LockConfiguration(Instant.now(), "eksportering", lockAtMostFor, lockAtLeastFor)
         );
     }
 
     private void eksportering() {
         log.info("Jobb for å ekportere sykefraværsstatistikk er startet.");
         eksporteringService.eksporterHvisDetFinnesNyStatistikk();
-        // TODO gjør samme for andre typer data.
-
     }
 
 }
