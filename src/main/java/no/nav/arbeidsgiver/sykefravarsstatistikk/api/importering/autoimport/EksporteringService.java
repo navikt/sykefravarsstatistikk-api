@@ -5,9 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Statistikkilde;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.StatistikkRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartalMedOrgNr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.AlleNaring5SifferRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.AlleVirksomheterRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,14 +24,16 @@ public class EksporteringService {
     private final StatistikkRepository statistikkRepository;
     private final KafkaService kafkaService;
     private final AlleVirksomheterRepository alleVirksomheterRepository;
+    private final AlleNaring5SifferRepository alleNæring5SifferRepository;
     private final boolean erEksporteringAktivert;
 
     public EksporteringService(
             StatistikkRepository statistikkRepository,
-            KafkaService kafkaService, AlleVirksomheterRepository alleVirksomheterRepository, @Value("${statistikk.importering.aktivert}") Boolean erEksporteringAktivert) {
+            KafkaService kafkaService, AlleVirksomheterRepository alleVirksomheterRepository, AlleNaring5SifferRepository alleNæring5SifferRepository, @Value("${statistikk.importering.aktivert}") Boolean erEksporteringAktivert) {
         this.statistikkRepository = statistikkRepository;
         this.kafkaService = kafkaService;
         this.alleVirksomheterRepository = alleVirksomheterRepository;
+        this.alleNæring5SifferRepository = alleNæring5SifferRepository;
         this.erEksporteringAktivert = erEksporteringAktivert;
     }
 
@@ -52,11 +57,20 @@ public class EksporteringService {
                 log.info("Eksporter ny statistikk:" +
                         sykefraværForEttKvartalMedOrgNrs.size() +
                         " til eksportering");
+                List<SykefraværsstatistikkNæring> sykefraværsstatistikkNærings =
+                        alleNæring5SifferRepository.hentSykefraværprosentAlleNæringerForEttKvartal(
+                                årstallOgKvartal
+                        );
                 sykefraværForEttKvartalMedOrgNrs.stream().forEach(
                         sykefraværForEttKvartalMedOrgNr ->
                         {
                             try {
-                                kafkaService.send(sykefraværForEttKvartalMedOrgNr);
+                                kafkaService.send(
+                                        sykefraværForEttKvartalMedOrgNr,
+                                        mapNæringTilSykefraværForETTKvartal(
+                                                sykefraværsstatistikkNærings.stream().filter(
+                                                        næring -> næring.getNæringkode().equals(sykefraværForEttKvartalMedOrgNr.getNæringskode5Siffer())
+                                                ).findFirst().get()));
                                 alleVirksomheterRepository.oppdaterOgSetErEksportertTilTrue(
                                         "sykefravar_statistikk_virksomhet_med_gradering",
                                         new Orgnr(sykefraværForEttKvartalMedOrgNr.getOrgnr()),
@@ -78,5 +92,10 @@ public class EksporteringService {
         });
     }
 
+    private SykefraværForEttKvartal mapNæringTilSykefraværForETTKvartal(
+            SykefraværsstatistikkNæring næringSykefravær
+    ) {
+        return null;
+    }
 
 }

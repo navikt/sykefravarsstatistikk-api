@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartalMedOrgNr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -23,38 +23,63 @@ public class AlleNaring5SifferRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-    public List<SykefraværForEttKvartalMedOrgNr> hentSykefraværprosentAlleVirksomheterForEttKvartal(
+
+    public List<SykefraværsstatistikkNæring> hentSykefraværprosentAlleNæringerForEttKvartal(
             ÅrstallOgKvartal årstallOgKvartal) {
         try {
             return namedParameterJdbcTemplate.query(
-                    "SELECT sum(tapte_dagsverk) as tapte_dagsverk, sum(mulige_dagsverk) as mulige_dagsverk, sum(antall_personer) as antall_personer, arstall, kvartal " +
-                            "FROM sykefravar_statistikk_naring5siffer " +
-                            "where arstall = :arstall and " +
-                            "kvartal = :kvartal " +
-                            "group by arstall, kvartal " +
-                            "ORDER BY arstall, kvartal ",
+                    "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk " +
+                            "from sykefravar_statistikk_naring5siffer " +
+                            "where arstall = :arstall and kvartal = :kvartal order by arstall, kvartal, naring_kode",
                     new MapSqlParameterSource()
                             .addValue("arstall", årstallOgKvartal.getÅrstall())
                             .addValue("kvartal", årstallOgKvartal.getKvartal()),
-                    (rs, rowNum) -> mapTilSykefraværprosentForEttKvartal(rs)
+                    (rs, rowNum) -> mapTilSykefraværsstatistikkNæring(rs)
             );
         } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();
         }
-    }
-    // TODO dette er for næring.
-    private SykefraværForEttKvartalMedOrgNr mapTilSykefraværprosentForEttKvartal(ResultSet rs) throws SQLException {
-        return new SykefraværForEttKvartalMedOrgNr(
-                new ÅrstallOgKvartal(
-                        rs.getInt("arstall"),
-                        rs.getInt("kvartal")
-                ),
-                rs.getString("orgnr"),
-                rs.getBigDecimal("tapte_dagsverk"),
-                rs.getBigDecimal("mulige_dagsverk"),
+    }/* public List<Map<ÅrstallOgKvartal, SykefraværsstatistikkNæring>> hentSykefraværprosentAlleNæringerForEttKvartal(
+            ÅrstallOgKvartal årstallOgKvartal) {
+        try {
+            return namedParameterJdbcTemplate.query(
+                    "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk " +
+                            "from sykefravar_statistikk_naring5siffer order by arstall, kvartal, naring_kode",
+                    new MapSqlParameterSource(),
+                    (rs, rowNum) -> mapTilSykefraværsstatistikkNæring(rs)
+            );
+        } catch (EmptyResultDataAccessException e) {
+            return Collections.emptyList();
+        }
+    }*/
+
+
+    private SykefraværsstatistikkNæring mapTilSykefraværsstatistikkNæring(ResultSet rs) throws SQLException {
+
+        return new SykefraværsstatistikkNæring(
+                rs.getInt("arstall"),
+                rs.getInt("kvartal"),
+                rs.getString("naring_kode"),
                 rs.getInt("antall_personer"),
-                rs.getString("naring_kode")
+                rs.getBigDecimal("tapte_dagsverk"),
+                rs.getBigDecimal("mulige_dagsverk")
         );
     }
+    /*private Map<ÅrstallOgKvartal, SykefraværsstatistikkNæring> mapTilSykefraværsstatistikkNæring(ResultSet rs) throws SQLException {
+        Map<ÅrstallOgKvartal, SykefraværsstatistikkNæring> årstallOgKvartalSykefraværsstatistikkNæringHashMap = new HashMap<>();
+        årstallOgKvartalSykefraværsstatistikkNæringHashMap.put(
+                new ÅrstallOgKvartal(
+                        rs.getInt("arstall"),
+                        rs.getInt("kvartal")),
+                new SykefraværsstatistikkNæring(
+                        rs.getInt("arstall"),
+                        rs.getInt("kvartal"),
+                        rs.getString("naring_kode"),
+                        rs.getInt("antall_personer"),
+                        rs.getBigDecimal("tapte_dagsverk"),
+                        rs.getBigDecimal("mulige_dagsverk")
+                ));
 
+        return årstallOgKvartalSykefraværsstatistikkNæringHashMap;
+    }*/
 }

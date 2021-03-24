@@ -80,4 +80,5 @@ public class AlleVirksomheterRepository {
                 rs.getString("naring_kode"));
     }
 
+
 }

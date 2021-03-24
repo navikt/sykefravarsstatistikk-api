@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaProperties;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartalMedOrgNr;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
@@ -26,7 +27,8 @@ public class KafkaService {
         this.kafkaProperties = kafkaProperties;
     }
 
-    public void send(SykefraværForEttKvartalMedOrgNr sykefraværForEttKvartalMedOrgNr) throws JsonProcessingException {
+    public void send(SykefraværForEttKvartalMedOrgNr sykefraværForEttKvartalMedOrgNr,
+                     SykefraværForEttKvartal næringSykefraværForEttKvartal/* næring2siffer, sektor, land*/) throws JsonProcessingException {
         KafkaTopicKey key = new KafkaTopicKey(
                 sykefraværForEttKvartalMedOrgNr.getOrgnr(),
                 sykefraværForEttKvartalMedOrgNr.getKvartal(),
