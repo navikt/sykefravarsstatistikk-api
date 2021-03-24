@@ -70,7 +70,11 @@ public class EksporteringService {
                                         mapNæringTilSykefraværForETTKvartal(
                                                 sykefraværsstatistikkNærings.stream().filter(
                                                         næring -> næring.getNæringkode().equals(sykefraværForEttKvartalMedOrgNr.getNæringskode5Siffer())
-                                                ).findFirst().get()));
+                                                )
+                                                        .findFirst()
+                                                        .get()
+                                        )
+                                );
                                 alleVirksomheterRepository.oppdaterOgSetErEksportertTilTrue(
                                         "sykefravar_statistikk_virksomhet_med_gradering",
                                         new Orgnr(sykefraværForEttKvartalMedOrgNr.getOrgnr()),
@@ -95,7 +99,15 @@ public class EksporteringService {
     private SykefraværForEttKvartal mapNæringTilSykefraværForETTKvartal(
             SykefraværsstatistikkNæring næringSykefravær
     ) {
-        return null;
+        return new SykefraværForEttKvartal(
+                new ÅrstallOgKvartal(
+                        næringSykefravær.getÅrstall(),
+                        næringSykefravær.getKvartal()
+                ),
+                næringSykefravær.getTapteDagsverk(),
+                næringSykefravær.getMuligeDagsverk(),
+                næringSykefravær.getAntallPersoner()
+        );
     }
 
 }
