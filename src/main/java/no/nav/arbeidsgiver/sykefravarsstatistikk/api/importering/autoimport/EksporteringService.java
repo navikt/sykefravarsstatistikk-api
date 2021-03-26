@@ -58,7 +58,7 @@ public class EksporteringService {
                         sykefraværForEttKvartalMedOrgNrs.size() +
                         " til eksportering");
                 List<SykefraværsstatistikkNæring> sykefraværsstatistikkNærings =
-                        alleNæring5SifferRepository.hentSykefraværprosentAlleNæringerForEttKvartal(
+                        alleNæring5SifferRepository.hentSykefraværprosentAlleNæringer5SifferForEttKvartal(
                                 årstallOgKvartal
                         );
                 sykefraværForEttKvartalMedOrgNrs.stream().forEach(

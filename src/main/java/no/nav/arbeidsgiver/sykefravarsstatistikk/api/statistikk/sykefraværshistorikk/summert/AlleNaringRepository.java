@@ -14,17 +14,17 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
-public class AlleNaring5SifferRepository {
+public class AlleNaringRepository {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public AlleNaring5SifferRepository(@Qualifier("sykefravarsstatistikkJdbcTemplate")
+    public AlleNaringRepository(@Qualifier("sykefravarsstatistikkJdbcTemplate")
                                                NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
 
-    public List<SykefraværsstatistikkNæring> hentSykefraværprosentAlleNæringer5SifferForEttKvartal(
+    public List<SykefraværsstatistikkNæring> hentSykefraværprosentAlleNæringerForEttKvartal(
             ÅrstallOgKvartal årstallOgKvartal) {
         try {
             return namedParameterJdbcTemplate.query(

@@ -63,7 +63,7 @@ class AlleNaring5SifferRepositoryTest {
 
     @Test
     void hentSykefraværprosentAlleNæringerForEttKvartal__skal_hente_alle_næringer_for_ett_kvartal() {
-        List<SykefraværsstatistikkNæring> resultat = alleNæring5SifferRepository.hentSykefraværprosentAlleNæringerForEttKvartal(new ÅrstallOgKvartal(2019, 2));
+        List<SykefraværsstatistikkNæring> resultat = alleNæring5SifferRepository.hentSykefraværprosentAlleNæringer5SifferForEttKvartal(new ÅrstallOgKvartal(2019, 2));
 
         assertThat(resultat.size()).isEqualTo(2);
 
@@ -72,7 +72,7 @@ class AlleNaring5SifferRepositoryTest {
     @Test
     void hentSykefraværprosentAlleNæringerForEttKvartal__skalMaskereVirksomheterUnderMinimumAntallPersoner() {
 
-        List<SykefraværsstatistikkNæring> resultat = alleNæring5SifferRepository.hentSykefraværprosentAlleNæringerForEttKvartal(new ÅrstallOgKvartal(2019, 2));
+        List<SykefraværsstatistikkNæring> resultat = alleNæring5SifferRepository.hentSykefraværprosentAlleNæringer5SifferForEttKvartal(new ÅrstallOgKvartal(2019, 2));
 
         assertTrue(resultat.stream().anyMatch(
                 sykefraværsstatistikkNæring ->
@@ -83,7 +83,7 @@ class AlleNaring5SifferRepositoryTest {
 
     @Test
     void hentSykefraværprosentAlleNæringerForEttKvartal__skal_returnere_data_for_riktig_ÅrstallOgKvartal() {
-        List<SykefraværsstatistikkNæring> resultat = alleNæring5SifferRepository.hentSykefraværprosentAlleNæringerForEttKvartal(new ÅrstallOgKvartal(2019, 2));
+        List<SykefraværsstatistikkNæring> resultat = alleNæring5SifferRepository.hentSykefraværprosentAlleNæringer5SifferForEttKvartal(new ÅrstallOgKvartal(2019, 2));
 
         assertTrue(resultat.stream().allMatch(
                 sykefraværsstatistikkNæring ->
@@ -93,7 +93,7 @@ class AlleNaring5SifferRepositoryTest {
 
     @Test
     void hentSykefraværprosentAlleNæringerForEttKvartal__skal_maskere_data_for_næring() {
-        List<SykefraværsstatistikkNæring> resultat = alleNæring5SifferRepository.hentSykefraværprosentAlleNæringerForEttKvartal(new ÅrstallOgKvartal(2018, 4));
+        List<SykefraværsstatistikkNæring> resultat = alleNæring5SifferRepository.hentSykefraværprosentAlleNæringer5SifferForEttKvartal(new ÅrstallOgKvartal(2018, 4));
 
         assertTrue(resultat.stream().anyMatch(sykefraværsstatistikkNæring ->
                 sykefraværsstatistikkNæring.getNæringkode().equals("86907") &&
@@ -106,7 +106,7 @@ class AlleNaring5SifferRepositoryTest {
 
     @Test
     void  hentSykefraværprosentAlleNæringerForEttKvartal__skal_returnere_riktig_data_til_alle_næringer() {
-        List<SykefraværsstatistikkNæring> resultat = alleNæring5SifferRepository.hentSykefraværprosentAlleNæringerForEttKvartal(new ÅrstallOgKvartal(2019, 2));
+        List<SykefraværsstatistikkNæring> resultat = alleNæring5SifferRepository.hentSykefraværprosentAlleNæringer5SifferForEttKvartal(new ÅrstallOgKvartal(2019, 2));
 
         assertTrue(resultat.stream().anyMatch(sykefraværsstatistikkNæring ->
                 sykefraværsstatistikkNæring.getNæringkode().equals("14190") &&
