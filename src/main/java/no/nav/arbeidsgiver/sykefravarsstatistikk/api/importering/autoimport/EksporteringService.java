@@ -39,7 +39,7 @@ public class EksporteringService {
 
     public void eksporterHvisDetFinnesNyStatistikk() {
         // Todo sette opp riktig eksportering flag
-        log.info("Er ekportering aktivert? {}", erEksporteringAktivert);
+        log.info("Er eksportering aktivert? {}", erEksporteringAktivert);
 
         List<ÅrstallOgKvartal> årstallOgKvartalForSykefraværsstatistikk
                 = statistikkRepository.hentAlleÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.VIRKSOMHET_MED_GRADERING);
