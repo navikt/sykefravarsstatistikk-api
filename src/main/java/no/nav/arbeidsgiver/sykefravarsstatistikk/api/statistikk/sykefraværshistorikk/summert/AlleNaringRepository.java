@@ -19,7 +19,7 @@ public class AlleNaringRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     public AlleNaringRepository(@Qualifier("sykefravarsstatistikkJdbcTemplate")
-                                               NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+                                        NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
@@ -29,7 +29,7 @@ public class AlleNaringRepository {
         try {
             return namedParameterJdbcTemplate.query(
                     "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk " +
-                            "from sykefravar_statistikk_naring5siffer " +
+                            "from sykefravar_statistikk_naring " +
                             "where arstall = :arstall and kvartal = :kvartal order by arstall, kvartal, naring_kode",
                     new MapSqlParameterSource()
                             .addValue("arstall", årstallOgKvartal.getÅrstall())
@@ -39,20 +39,7 @@ public class AlleNaringRepository {
         } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();
         }
-    }/* public List<Map<ÅrstallOgKvartal, SykefraværsstatistikkNæring>> hentSykefraværprosentAlleNæringerForEttKvartal(
-            ÅrstallOgKvartal årstallOgKvartal) {
-        try {
-            return namedParameterJdbcTemplate.query(
-                    "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk " +
-                            "from sykefravar_statistikk_naring5siffer order by arstall, kvartal, naring_kode",
-                    new MapSqlParameterSource(),
-                    (rs, rowNum) -> mapTilSykefraværsstatistikkNæring(rs)
-            );
-        } catch (EmptyResultDataAccessException e) {
-            return Collections.emptyList();
-        }
-    }*/
-
+    }
 
     private SykefraværsstatistikkNæring mapTilSykefraværsstatistikkNæring(ResultSet rs) throws SQLException {
 
@@ -65,21 +52,4 @@ public class AlleNaringRepository {
                 rs.getBigDecimal("mulige_dagsverk")
         );
     }
-    /*private Map<ÅrstallOgKvartal, SykefraværsstatistikkNæring> mapTilSykefraværsstatistikkNæring(ResultSet rs) throws SQLException {
-        Map<ÅrstallOgKvartal, SykefraværsstatistikkNæring> årstallOgKvartalSykefraværsstatistikkNæringHashMap = new HashMap<>();
-        årstallOgKvartalSykefraværsstatistikkNæringHashMap.put(
-                new ÅrstallOgKvartal(
-                        rs.getInt("arstall"),
-                        rs.getInt("kvartal")),
-                new SykefraværsstatistikkNæring(
-                        rs.getInt("arstall"),
-                        rs.getInt("kvartal"),
-                        rs.getString("naring_kode"),
-                        rs.getInt("antall_personer"),
-                        rs.getBigDecimal("tapte_dagsverk"),
-                        rs.getBigDecimal("mulige_dagsverk")
-                ));
-
-        return årstallOgKvartalSykefraværsstatistikkNæringHashMap;
-    }*/
 }

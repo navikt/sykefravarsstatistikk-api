@@ -15,9 +15,10 @@ public class KafkaTopicValue {
     final BigDecimal tapteDagsverk;
     final BigDecimal muligeDagsverk;
     //Pair<Statistikkategori,SykefraværForEttKvartal> vikrsomhetSykefraværForETtKvartal;
-    public final Pair<Statistikkategori,SykefraværForEttKvartal> næringSykefraværForETtKvartal;
+    public final Pair<Statistikkategori,SykefraværForEttKvartal> næring5SifferSykefraværForEttKvartal;
+    public final Pair<Statistikkategori,SykefraværForEttKvartal> næringSykefraværForEttKvartal;
 
-    public KafkaTopicValue(int årstall, int kvartal, String næringskode5Siffer, boolean erMaskert, BigDecimal prosent, BigDecimal tapteDagsverk, BigDecimal muligeDagsverk, Pair<Statistikkategori, SykefraværForEttKvartal> næringSykefraværForETtKvartal) {
+    public KafkaTopicValue(int årstall, int kvartal, String næringskode5Siffer, boolean erMaskert, BigDecimal prosent, BigDecimal tapteDagsverk, BigDecimal muligeDagsverk, Pair<Statistikkategori, SykefraværForEttKvartal> næring5SifferSykefraværForEttKvartal, Pair<Statistikkategori, SykefraværForEttKvartal> næringSykefraværForEttKvartal) {
         this.årstall = årstall;
         this.kvartal = kvartal;
         this.næringskode5Siffer = næringskode5Siffer;
@@ -25,6 +26,7 @@ public class KafkaTopicValue {
         this.prosent = prosent;
         this.tapteDagsverk = tapteDagsverk;
         this.muligeDagsverk = muligeDagsverk;
-        this.næringSykefraværForETtKvartal = næringSykefraværForETtKvartal;
+        this.næring5SifferSykefraværForEttKvartal = næring5SifferSykefraværForEttKvartal;
+        this.næringSykefraværForEttKvartal = næringSykefraværForEttKvartal;
     }
 }

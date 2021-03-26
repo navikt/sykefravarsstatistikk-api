@@ -57,6 +57,10 @@ public class EksporteringService {
                 log.info("Eksporter ny statistikk:" +
                         sykefraværForEttKvartalMedOrgNrs.size() +
                         " til eksportering");
+                List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring5Siffers =
+                        alleNæring5SifferRepository.hentSykefraværprosentAlleNæringer5SifferForEttKvartal(
+                                årstallOgKvartal
+                        );
                 List<SykefraværsstatistikkNæring> sykefraværsstatistikkNærings =
                         alleNæring5SifferRepository.hentSykefraværprosentAlleNæringer5SifferForEttKvartal(
                                 årstallOgKvartal
@@ -68,8 +72,15 @@ public class EksporteringService {
                                 kafkaService.send(
                                         sykefraværForEttKvartalMedOrgNr,
                                         mapNæringTilSykefraværForETTKvartal(
-                                                sykefraværsstatistikkNærings.stream().filter(
+                                                sykefraværsstatistikkNæring5Siffers.stream().filter(
                                                         næring -> næring.getNæringkode().equals(sykefraværForEttKvartalMedOrgNr.getNæringskode5Siffer())
+                                                )
+                                                        .findFirst()
+                                                        .get()
+                                        ),
+                                        mapNæringTilSykefraværForETTKvartal(
+                                                sykefraværsstatistikkNærings.stream().filter(//TODO hent næring på en bedre måte
+                                                        næring -> næring.getNæringkode().equals(sykefraværForEttKvartalMedOrgNr.getNæringskode5Siffer().substring(0, 1))
                                                 )
                                                         .findFirst()
                                                         .get()

@@ -30,14 +30,17 @@ public class KafkaService {
     }
 
     public void send(SykefraværForEttKvartalMedOrgNr sykefraværForEttKvartalMedOrgNr,
-                     SykefraværForEttKvartal næring5SifferSykefraværForEttKvartal/* næring2siffer, sektor, land*/) throws JsonProcessingException {
+                     SykefraværForEttKvartal næring5SifferSykefraværForEttKvartal,
+                     SykefraværForEttKvartal næringSykefraværForEttKvartal/* næring2siffer, sektor, land*/) throws JsonProcessingException {
         KafkaTopicKey key = new KafkaTopicKey(
                 sykefraværForEttKvartalMedOrgNr.getOrgnr(),
                 sykefraværForEttKvartalMedOrgNr.getKvartal(),
                 sykefraværForEttKvartalMedOrgNr.getÅrstall()
         );
-        Pair<Statistikkategori, SykefraværForEttKvartal> næringSkategoriMedSykefravaærForEttKvartal
+        Pair<Statistikkategori, SykefraværForEttKvartal> næring5SifferkategoriMedSykefravaærForEttKvartal
                 = Pair.of(Statistikkategori.NÆRING, næring5SifferSykefraværForEttKvartal);
+        Pair<Statistikkategori, SykefraværForEttKvartal> næringkategoriMedSykefravaærForEttKvartal
+                = Pair.of(Statistikkategori.NÆRING2SIFFER, næringSykefraværForEttKvartal);
         KafkaTopicValue value = new KafkaTopicValue(
                 sykefraværForEttKvartalMedOrgNr.getÅrstall(),
                 sykefraværForEttKvartalMedOrgNr.getKvartal(),
@@ -46,7 +49,9 @@ public class KafkaService {
                 sykefraværForEttKvartalMedOrgNr.getProsent(),
                 sykefraværForEttKvartalMedOrgNr.getTapteDagsverk(),
                 sykefraværForEttKvartalMedOrgNr.getMuligeDagsverk(),
-                næringSkategoriMedSykefravaærForEttKvartal);
+                næring5SifferkategoriMedSykefravaærForEttKvartal,
+                næringkategoriMedSykefravaærForEttKvartal
+        );
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         ListenableFuture<SendResult<String, String>> futureResult =
                 kafkaTemplate.send(kafkaProperties.getTopic(),
