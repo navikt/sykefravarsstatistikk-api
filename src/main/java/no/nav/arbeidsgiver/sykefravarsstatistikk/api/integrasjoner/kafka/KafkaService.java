@@ -30,14 +30,14 @@ public class KafkaService {
     }
 
     public void send(SykefraværForEttKvartalMedOrgNr sykefraværForEttKvartalMedOrgNr,
-                     SykefraværForEttKvartal næringSykefraværForEttKvartal/* næring2siffer, sektor, land*/) throws JsonProcessingException {
+                     SykefraværForEttKvartal næring5SifferSykefraværForEttKvartal/* næring2siffer, sektor, land*/) throws JsonProcessingException {
         KafkaTopicKey key = new KafkaTopicKey(
                 sykefraværForEttKvartalMedOrgNr.getOrgnr(),
                 sykefraværForEttKvartalMedOrgNr.getKvartal(),
                 sykefraværForEttKvartalMedOrgNr.getÅrstall()
         );
         Pair<Statistikkategori, SykefraværForEttKvartal> næringSkategoriMedSykefravaærForEttKvartal
-                = Pair.of(Statistikkategori.NÆRING, næringSykefraværForEttKvartal);
+                = Pair.of(Statistikkategori.NÆRING, næring5SifferSykefraværForEttKvartal);
         KafkaTopicValue value = new KafkaTopicValue(
                 sykefraværForEttKvartalMedOrgNr.getÅrstall(),
                 sykefraværForEttKvartalMedOrgNr.getKvartal(),
