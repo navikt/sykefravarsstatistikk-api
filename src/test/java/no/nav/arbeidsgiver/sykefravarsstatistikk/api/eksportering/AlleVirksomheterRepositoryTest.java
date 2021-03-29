@@ -1,11 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.AlleVirksomheterRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartalMedOrgNr;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ActiveProfiles("db-test")
 @DataJdbcTest
+@Disabled
 class AlleVirksomheterRepositoryTest {
 
     @Autowired
