@@ -1,5 +1,6 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.AlleNaring5SifferRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;

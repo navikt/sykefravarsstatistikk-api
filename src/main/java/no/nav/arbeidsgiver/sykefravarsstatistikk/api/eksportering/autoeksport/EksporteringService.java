@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
@@ -10,9 +10,9 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.stat
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartalMedOrgNr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.AlleNaring5SifferRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.AlleNaringRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.AlleVirksomheterRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.AlleNaring5SifferRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.AlleNaringRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.AlleVirksomheterRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +31,12 @@ public class EksporteringService {
 
     public EksporteringService(
             StatistikkRepository statistikkRepository,
-            KafkaService kafkaService, AlleVirksomheterRepository alleVirksomheterRepository, AlleNaring5SifferRepository alleNæring5SifferRepository, AlleNaringRepository alleNæringRepository, @Value("${statistikk.importering.aktivert}") Boolean erEksporteringAktivert) {
+            KafkaService kafkaService,
+            AlleVirksomheterRepository alleVirksomheterRepository,
+            AlleNaring5SifferRepository alleNæring5SifferRepository,
+            AlleNaringRepository alleNæringRepository,
+            @Value("${statistikk.importering.aktivert}") Boolean erEksporteringAktivert
+    ) {
         this.statistikkRepository = statistikkRepository;
         this.kafkaService = kafkaService;
         this.alleVirksomheterRepository = alleVirksomheterRepository;

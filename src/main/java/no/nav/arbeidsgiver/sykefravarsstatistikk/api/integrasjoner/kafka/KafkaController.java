@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.EksporteringService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringService;
 import no.nav.security.token.support.core.api.Protected;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
 public class EksporteringException extends RuntimeException {
 
