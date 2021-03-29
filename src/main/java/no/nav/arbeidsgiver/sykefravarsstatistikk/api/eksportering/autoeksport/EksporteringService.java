@@ -4,10 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Statistikkilde;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.StatistikkRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartalMedOrgNr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.AlleNaring5SifferRepository;
@@ -35,7 +36,7 @@ public class EksporteringService {
             AlleVirksomheterRepository alleVirksomheterRepository,
             AlleNaring5SifferRepository alleNæring5SifferRepository,
             AlleNaringRepository alleNæringRepository,
-            @Value("${statistikk.importering.aktivert}") Boolean erEksporteringAktivert
+            @Value("${statistikk.eksportering.aktivert}") Boolean erEksporteringAktivert
     ) {
         this.statistikkRepository = statistikkRepository;
         this.kafkaService = kafkaService;
@@ -45,73 +46,107 @@ public class EksporteringService {
         this.erEksporteringAktivert = erEksporteringAktivert;
     }
 
+    /*
+      #1 Hente alle ÅrstallOgKvartal som skal eksporteres: 2019/4, 2020/1, 2020/2
+
+      #2 Samle opp data og bygge et Objekt (Key/Value) som er klart til å sende til Kafka
+
+      #3 Til hvert Objekt:
+        #3.1 Send til Kafka
+        #3.2 Oppdater database med Sendt=true
+
+     */
+
     public void eksporterHvisDetFinnesNyStatistikk() {
         // Todo sette opp riktig eksportering flag
         log.info("Er eksportering aktivert? {}", erEksporteringAktivert);
 
-        List<ÅrstallOgKvartal> årstallOgKvartalForSykefraværsstatistikk
-                = statistikkRepository.hentAlleÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.VIRKSOMHET_MED_GRADERING);
-        log.info("Fant " + årstallOgKvartalForSykefraværsstatistikk.size() + " rekord av årstall og kvartaler");
-        årstallOgKvartalForSykefraværsstatistikk.stream().forEach(årstallOgKvartal -> {
-            if (erEksporteringAktivert) {
-                log.info("Eksportering er aktivert for årstall:" +
-                        årstallOgKvartal.getÅrstall() +
-                        " og kvartal:" + årstallOgKvartal.getKvartal());
-                List<SykefraværForEttKvartalMedOrgNr> sykefraværForEttKvartalMedOrgNrs =
-                        alleVirksomheterRepository.
-                                hentSykefraværprosentAlleVirksomheterForEttKvartal(
-                                        årstallOgKvartal
-                                );
-                log.info("Eksporter ny statistikk:" +
-                        sykefraværForEttKvartalMedOrgNrs.size() +
-                        " til eksportering");
-                List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring5Siffers =
-                        alleNæring5SifferRepository.hentSykefraværprosentAlleNæringer5SifferForEttKvartal(
-                                årstallOgKvartal
-                        );
-                List<SykefraværsstatistikkNæring> sykefraværsstatistikkNærings =
-                        alleNæringRepository.hentSykefraværprosentAlleNæringerForEttKvartal(
-                                årstallOgKvartal
-                        );
-                sykefraværForEttKvartalMedOrgNrs.stream().forEach(
-                        sykefraværForEttKvartalMedOrgNr ->
-                        {
-                            try {
-                                kafkaService.send(
-                                        sykefraværForEttKvartalMedOrgNr,
-                                        mapNæringTilSykefraværForETTKvartal(
-                                                sykefraværsstatistikkNæring5Siffers.stream().filter(
-                                                        næring -> næring.getNæringkode().equals(sykefraværForEttKvartalMedOrgNr.getNæringskode5Siffer())
-                                                )
-                                                        .findFirst()
-                                                        .get()
-                                        ),
-                                        mapNæringTilSykefraværForETTKvartal(
-                                                sykefraværsstatistikkNærings.stream().filter(//TODO hent næring på en bedre måte
-                                                        næring -> næring.getNæringkode().equals(sykefraværForEttKvartalMedOrgNr.getNæringskode5Siffer().substring(0, 1))
-                                                )
-                                                        .findFirst()
-                                                        .get()
-                                        )
-                                );
-                                alleVirksomheterRepository.oppdaterOgSetErEksportertTilTrue(
-                                        "sykefravar_statistikk_virksomhet_med_gradering",
-                                        new Orgnr(sykefraværForEttKvartalMedOrgNr.getOrgnr()),
-                                        new ÅrstallOgKvartal(
-                                                sykefraværForEttKvartalMedOrgNr.getÅrstall(),
-                                                sykefraværForEttKvartalMedOrgNr.getKvartal())
-                                );
-                            } catch (JsonProcessingException e) {
-                                log.warn("En feil har skjedd ved eksportering til kafka topic: " + e.getMessage(),
-                                        e);
-                                throw new EksporteringException(e.getMessage());
-                            }
-                        });
-                log.info("ending av statistikk eksportering");
+        if (!erEksporteringAktivert) {
+            log.info("Skal ikke eksportere fordi erEksporteringAktivert er {}", erEksporteringAktivert);
+            return;
+        }
 
-            } else {
-                log.info("Ikke ny statistikk for eksportering");
-            }
+        List<ÅrstallOgKvartal> årstallOgKvartalTilEksport
+                = alleVirksomheterRepository.hentAlleÅrstallOgKvartalTilEksport();
+        log.info("Fant " + årstallOgKvartalTilEksport.size() + " rekord av årstall og kvartaler");
+
+        årstallOgKvartalTilEksport.stream().forEach(årstallOgKvartal -> {
+            log.info("Eksportering er aktivert for årstall:" +
+                    årstallOgKvartal.getÅrstall() +
+                    " og kvartal:" + årstallOgKvartal.getKvartal());
+
+            List<SykefraværForEttKvartalMedOrgNr> sykefraværForEttKvartalMedOrgNrs =
+                    alleVirksomheterRepository.
+                            hentSykefraværprosentAlleVirksomheterForEttKvartal(
+                                    årstallOgKvartal
+                            );
+
+            log.info("Eksporter ny statistikk:" +
+                    sykefraværForEttKvartalMedOrgNrs.size() +
+                    " til eksportering");
+            List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring5Siffers =
+                    alleNæring5SifferRepository.hentSykefraværprosentAlleNæringer5SifferForEttKvartal(
+                            årstallOgKvartal
+                    );
+            List<SykefraværsstatistikkNæring> sykefraværsstatistikkNærings =
+                    alleNæringRepository.hentSykefraværprosentAlleNæringerForEttKvartal(
+                            årstallOgKvartal
+                    );
+
+            sykefraværForEttKvartalMedOrgNrs.stream().forEach(
+                    sykefraværForEttKvartalMedOrgNr ->
+                    {
+                        // TODO: bygg disse 5 objekter
+                        VirksomhetSykefravær virksomhetSykefravær = null;
+                        SykefraværMedKategori næring5SifferSykefravær = null;
+                        SykefraværMedKategori næringSykefravær = null;
+                        SykefraværMedKategori sektorSykefravær = null;
+                        SykefraværMedKategori landSykefravær = null;
+
+                        try {
+                            /*
+                             // Et objekt
+                                    sykefraværForEttKvartalMedOrgNr,
+                                    mapNæringTilSykefraværForETTKvartal(
+                                            sykefraværsstatistikkNæring5Siffers.stream().filter(
+                                                    næring -> næring.getNæringkode().equals(sykefraværForEttKvartalMedOrgNr.getNæringskode5Siffer())
+                                            )
+                                                    .findFirst()
+                                                    .get()
+                                    ),
+                                    mapNæringTilSykefraværForETTKvartal(
+                                            sykefraværsstatistikkNærings.stream().filter(//TODO hent næring på en bedre måte
+                                                    næring -> næring.getNæringkode().equals(sykefraværForEttKvartalMedOrgNr.getNæringskode5Siffer().substring(0, 1))
+                                            )
+                                                    .findFirst()
+                                                    .get()
+                                    )
+
+                             */
+                            kafkaService.send(
+                                    årstallOgKvartal,
+                                    virksomhetSykefravær,
+                                    næring5SifferSykefravær,
+                                    næringSykefravær,
+                                    sektorSykefravær,
+                                    landSykefravær
+                            );
+
+                            alleVirksomheterRepository.oppdaterOgSetErEksportertTilTrue( // Objekt.key
+                                    "sykefravar_statistikk_virksomhet_med_gradering",
+                                    new Orgnr(sykefraværForEttKvartalMedOrgNr.getOrgnr()),
+                                    new ÅrstallOgKvartal(
+                                            sykefraværForEttKvartalMedOrgNr.getÅrstall(),
+                                            sykefraværForEttKvartalMedOrgNr.getKvartal())
+                            );
+                        } catch (JsonProcessingException e) {
+                            log.warn("En feil har skjedd ved eksportering til kafka topic: " + e.getMessage(),
+                                    e);
+                            throw new EksporteringException(e.getMessage());
+                        }
+                    });
+            log.info("ending av statistikk eksportering");
+
         });
     }
 

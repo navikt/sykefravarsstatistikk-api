@@ -1,0 +1,33 @@
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar;
+
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
+
+import java.math.BigDecimal;
+
+public class VirksomhetSykefravær extends SykefraværForEttKvartal {
+    Statistikkategori kategori;
+
+    String orgnr;
+    String navn;
+
+    public VirksomhetSykefravær(
+            String orgnr,
+            String navn,
+            ÅrstallOgKvartal årstallOgKvartal,
+            BigDecimal tapte_dagsverk,
+            BigDecimal mulige_dagsverk,
+            int antall_personer) {
+        super(årstallOgKvartal, tapte_dagsverk, mulige_dagsverk, antall_personer);
+        this.kategori = Statistikkategori.VIRKSOMHET;
+        this.orgnr = orgnr;
+        this.navn = navn;
+    }
+
+    public String getOrgnr() {
+        return orgnr;
+    }
+
+}
+

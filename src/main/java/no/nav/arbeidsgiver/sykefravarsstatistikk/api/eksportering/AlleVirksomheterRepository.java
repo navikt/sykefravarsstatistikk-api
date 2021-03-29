@@ -25,6 +25,21 @@ public class AlleVirksomheterRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
+    public List<ÅrstallOgKvartal> hentAlleÅrstallOgKvartalTilEksport() {
+        try {
+            return namedParameterJdbcTemplate.query(
+                    "SELECT arstall, kvartal " +
+                            "FROM sykefravar_statistikk_virksomhet_med_gradering " +
+                            "where er_ekportert = false " +
+                            "GROUP BY arstall, kvartal ",
+                    new MapSqlParameterSource(),
+                    (rs, rowNum) -> mapTilÅrstallOgKvartal(rs)
+            );
+        } catch (EmptyResultDataAccessException e) {
+            return Collections.emptyList();
+        }
+    }
+
     public List<SykefraværForEttKvartalMedOrgNr> hentSykefraværprosentAlleVirksomheterForEttKvartal(
             ÅrstallOgKvartal årstallOgKvartal) {
         try {
@@ -61,8 +76,8 @@ public class AlleVirksomheterRepository {
                         .addValue("kvartal", årstallOgKvartal.getKvartal());
 
         return namedParameterJdbcTemplate.update(
-                "update " + tabell + " set er_ekportert =true where orgnr = :orgnr and "+
-                "arstall = :årstall and kvartal = :kvartal",
+                "update " + tabell + " set er_ekportert =true where orgnr = :orgnr and " +
+                        "arstall = :årstall and kvartal = :kvartal",
                 namedParameters
         );
     }
@@ -80,5 +95,7 @@ public class AlleVirksomheterRepository {
                 rs.getString("naring_kode"));
     }
 
-
+    private ÅrstallOgKvartal mapTilÅrstallOgKvartal(ResultSet rs) throws SQLException {
+        return new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal"));
+    }
 }
