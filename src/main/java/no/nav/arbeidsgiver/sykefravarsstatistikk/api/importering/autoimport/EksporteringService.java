@@ -11,6 +11,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaSe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartalMedOrgNr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.AlleNaring5SifferRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.AlleNaringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.AlleVirksomheterRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -25,15 +26,17 @@ public class EksporteringService {
     private final KafkaService kafkaService;
     private final AlleVirksomheterRepository alleVirksomheterRepository;
     private final AlleNaring5SifferRepository alleNæring5SifferRepository;
+    private final AlleNaringRepository alleNæringRepository;
     private final boolean erEksporteringAktivert;
 
     public EksporteringService(
             StatistikkRepository statistikkRepository,
-            KafkaService kafkaService, AlleVirksomheterRepository alleVirksomheterRepository, AlleNaring5SifferRepository alleNæring5SifferRepository, @Value("${statistikk.importering.aktivert}") Boolean erEksporteringAktivert) {
+            KafkaService kafkaService, AlleVirksomheterRepository alleVirksomheterRepository, AlleNaring5SifferRepository alleNæring5SifferRepository, AlleNaringRepository alleNæringRepository, @Value("${statistikk.importering.aktivert}") Boolean erEksporteringAktivert) {
         this.statistikkRepository = statistikkRepository;
         this.kafkaService = kafkaService;
         this.alleVirksomheterRepository = alleVirksomheterRepository;
         this.alleNæring5SifferRepository = alleNæring5SifferRepository;
+        this.alleNæringRepository = alleNæringRepository;
         this.erEksporteringAktivert = erEksporteringAktivert;
     }
 
@@ -62,7 +65,7 @@ public class EksporteringService {
                                 årstallOgKvartal
                         );
                 List<SykefraværsstatistikkNæring> sykefraværsstatistikkNærings =
-                        alleNæring5SifferRepository.hentSykefraværprosentAlleNæringer5SifferForEttKvartal(
+                        alleNæringRepository.hentSykefraværprosentAlleNæringerForEttKvartal(
                                 årstallOgKvartal
                         );
                 sykefraværForEttKvartalMedOrgNrs.stream().forEach(
