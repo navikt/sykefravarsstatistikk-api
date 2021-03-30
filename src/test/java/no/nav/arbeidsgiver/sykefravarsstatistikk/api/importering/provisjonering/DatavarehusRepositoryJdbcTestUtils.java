@@ -4,11 +4,11 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategor
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.SEKTOR;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 
 public class DatavarehusRepositoryJdbcTestUtils {
 
-    public static final String SEKTOR = "3";
 
     public static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
         delete(jdbcTemplate, "dt_p.v_dim_ia_naring_sn2007");

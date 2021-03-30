@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ImporteringServiceTest {
 
-    ImporteringService importeringService = new ImporteringService(null, null, true);
+    ImporteringService importeringService = new ImporteringService(null, null, null, true);
 
     @Test
     public void kanImportStartes__returnerer_TRUE_dersom_alle_årstall_og_kvartal_er_like_OG_sykefraværsstatistikk_ligger_ett_kvartal_bak_Dvh() {

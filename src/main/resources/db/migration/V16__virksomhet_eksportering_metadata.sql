@@ -1,4 +1,4 @@
-create table virksomhet_eksportering_metadata (
+create table virksomhet_metadata_til_eksportering (
   id serial primary key,
   orgnr varchar not null,
   arstall smallint not null,

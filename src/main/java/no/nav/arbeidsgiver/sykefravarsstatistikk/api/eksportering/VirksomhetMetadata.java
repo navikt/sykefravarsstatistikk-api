@@ -1,4 +1,7 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
+
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 
 public class VirksomhetMetadata {
     Orgnr orgnr;
@@ -23,6 +26,14 @@ public class VirksomhetMetadata {
         this.næringskode5Siffer = næringskode5Siffer;
         this.erEksportert = erEksportert;
     }
+
+
+    public String getOrgnr() { return orgnr.getVerdi(); }
+    public int getÅrstall() { return årstallOgKvartal.getÅrstall(); }
+    public int getKvartal() { return årstallOgKvartal.getKvartal(); }
+    public String getSektor() { return sektor; }
+    public String getNæring() { return næring; }
+    public String getNæringskode5Siffer() { return næringskode5Siffer; }
 
 
     @Override

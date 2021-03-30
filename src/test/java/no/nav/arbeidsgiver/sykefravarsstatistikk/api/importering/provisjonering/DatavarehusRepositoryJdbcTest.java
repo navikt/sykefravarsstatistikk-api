@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.VirksomhetMetadata;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.StatistikkildeDvh;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
@@ -377,7 +377,7 @@ public class DatavarehusRepositoryJdbcTest {
                 100);
 
 
-        List<VirksomhetMetadata> virksomhetMetadataList = repository.hentVirksomhetMetadataEksportering(
+        List<VirksomhetMetadata> virksomhetMetadataList = repository.hentVirksomhetMetadata(
                 new ÅrstallOgKvartal(
                         2020,
                         3

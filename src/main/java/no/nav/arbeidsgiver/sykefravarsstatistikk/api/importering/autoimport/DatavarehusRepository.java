@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.VirksomhetMetadata;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.StatistikkildeDvh;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
@@ -297,14 +297,15 @@ public class DatavarehusRepository {
                                 resultSet.getString(NARINGNAVN)));
     }
 
-    public List<VirksomhetMetadata> hentVirksomhetMetadataEksportering(ÅrstallOgKvartal årstallOgKvartal) {
+    public List<VirksomhetMetadata> hentVirksomhetMetadata(ÅrstallOgKvartal årstallOgKvartal) {
         SqlParameterSource namedParameters =
                 new MapSqlParameterSource()
                         .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
                         .addValue(KVARTAL, årstallOgKvartal.getKvartal());
 
         return namedParameterJdbcTemplate.query(
-                "select v2.arstall as arstall, v2.kvartal as kvartal, v2.orgnr as orgnr, v1.sektor as sektor, v2.naring as naring, v2.naering_kode as naering_kode " +
+                "select v2.arstall as arstall, v2.kvartal as kvartal, v2.orgnr as orgnr, v1.sektor as sektor, " +
+                        "v2.naring as naring, v2.naering_kode as naering_kode " +
                         "from dt_p.agg_ia_sykefravar_v_2 v2  " +
                         "join dt_p.agg_ia_sykefravar_v v1 on v1.orgnr = v2.orgnr " +
                         "and v1.arstall = v2.arstall and v1.kvartal = v2.kvartal " +

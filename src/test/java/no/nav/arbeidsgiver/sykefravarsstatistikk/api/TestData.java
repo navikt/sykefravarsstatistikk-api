@@ -29,6 +29,7 @@ public class TestData {
 
     public static final String NÆRINGSKODE_5SIFFER = "10062";
     public static final String NÆRINGSKODE_2SIFFER = "10";
+    public static final String SEKTOR = "3";
 
     public static InnloggetBruker getInnloggetBruker() {
         return getInnloggetBruker(getFnr().getVerdi());

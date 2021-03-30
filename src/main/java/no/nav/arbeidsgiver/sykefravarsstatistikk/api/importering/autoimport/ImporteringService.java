@@ -1,6 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.SlettOgOpprettResultat;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Statistikkilde;
@@ -25,14 +27,17 @@ public class ImporteringService {
 
     private final StatistikkRepository statistikkRepository;
     private final DatavarehusRepository datavarehusRepository;
+    private final VirksomhetMetadataRepository virksomhetMetadataRepository;
     private final boolean erImporteringAktivert;
 
     public ImporteringService(
             StatistikkRepository statistikkRepository,
             DatavarehusRepository datavarehusRepository,
+            VirksomhetMetadataRepository virksomhetMetadataRepository,
             @Value("${statistikk.importering.aktivert}") Boolean erImporteringAktivert) {
         this.statistikkRepository = statistikkRepository;
         this.datavarehusRepository = datavarehusRepository;
+        this.virksomhetMetadataRepository = virksomhetMetadataRepository;
         this.erImporteringAktivert = erImporteringAktivert;
     }
 
@@ -57,7 +62,8 @@ public class ImporteringService {
             if (erImporteringAktivert) {
                 log.info("Importerer ny statistikk");
                 importerNyStatistikk(årstallOgKvartalForDvh.get(0));
-                leggTilVirksomhetMetadataEksportering(årstallOgKvartalForDvh.get(0));
+                int antallVirksomhetMetadataOpprettet = leggTilVirksomhetMetadataEksportering(årstallOgKvartalForDvh.get(0));
+                log.info("Har lagret {} virksomheter klare til eksport", antallVirksomhetMetadataOpprettet);
             } else {
                 log.info("Statistikk er klar til importering men automatisk importering er ikke aktivert");
             }
@@ -163,8 +169,9 @@ public class ImporteringService {
         importSykefraværsstatistikkMedGradering(årstallOgKvartal);
     }
 
-    private void leggTilVirksomhetMetadataEksportering(ÅrstallOgKvartal årstallOgKvartal) {
-        datavarehusRepository.hentVirksomhetMetadataEksportering(årstallOgKvartal);
+    private int leggTilVirksomhetMetadataEksportering(ÅrstallOgKvartal årstallOgKvartal) {
+        List<VirksomhetMetadata> virksomhetMetadataList = datavarehusRepository.hentVirksomhetMetadata(årstallOgKvartal);
+        return virksomhetMetadataRepository.opprettVirksomhetMetadata(virksomhetMetadataList);
     }
 
     private SlettOgOpprettResultat importSykefraværsstatistikkLand(ÅrstallOgKvartal årstallOgKvartal) {
