@@ -8,6 +8,8 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimpo
 
 public class DatavarehusRepositoryJdbcTestUtils {
 
+    public static final String SEKTOR = "3";
+
     public static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
         delete(jdbcTemplate, "dt_p.v_dim_ia_naring_sn2007");
         delete(jdbcTemplate, "dt_p.v_dim_ia_sektor");
@@ -129,6 +131,7 @@ public class DatavarehusRepositoryJdbcTestUtils {
                         .addValue("orgnr", orgnr)
                         .addValue("varighet", varighet.kode)
                         .addValue("naering_kode", næringskode5siffer)
+                        .addValue("sektor", SEKTOR)
                         .addValue("kjonn", kjonn)
                         .addValue("taptedv", taptedagsverk)
                         .addValue("muligedv", muligedagsverk)
@@ -143,7 +146,7 @@ public class DatavarehusRepositoryJdbcTestUtils {
                         + "taptedv, muligedv, antpers, rectype) "
                         + "values ("
                         + ":arstall, :kvartal, "
-                        + ":orgnr, :naering_kode, '3', 'G', '03', "
+                        + ":orgnr, :naering_kode, :sektor, 'G', '03', "
                         + "'B', :kjonn, '02', "
                         + "'L', :varighet, "
                         + ":taptedv, :muligedv, :antpers, :rectype)",

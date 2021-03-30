@@ -1,7 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.StatistikkildeDvh;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
@@ -346,4 +348,50 @@ public class DatavarehusRepositoryJdbcTest {
         assertTrue(næringer.contains(new Næring("11", "Produksjon av drikkevarer")));
     }
 
+    @Test
+    public void hentVirksomhetMetadataEksportering__returnerer_virksomhetMetadataEksportering() {
+        insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
+                namedParameterJdbcTemplate,
+                2020,
+                3,
+                13,
+                ORGNR_VIRKSOMHET_1,
+                NÆRINGSKODE_2SIFFER,
+                NÆRINGSKODE_5SIFFER,
+                3,
+                1,
+                3,
+                16,
+                100
+        );
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(
+                namedParameterJdbcTemplate,
+                2020,
+                3,
+                4,
+                ORGNR_VIRKSOMHET_1,
+                NÆRINGSKODE_5SIFFER,
+                _1_DAG_TIL_7_DAGER,
+                "K",
+                5,
+                100);
+
+
+        List<VirksomhetMetadata> virksomhetMetadataList = repository.hentVirksomhetMetadataEksportering(
+                new ÅrstallOgKvartal(
+                        2020,
+                        3
+                )
+        );
+
+        assertTrue(virksomhetMetadataList.contains(
+                new VirksomhetMetadata(
+                        new Orgnr(ORGNR_VIRKSOMHET_1),
+                        new ÅrstallOgKvartal(2020, 3),
+                        SEKTOR,
+                        NÆRINGSKODE_2SIFFER,
+                        NÆRINGSKODE_5SIFFER,
+                        false
+                )));
+    }
 }

@@ -57,6 +57,7 @@ public class ImporteringService {
             if (erImporteringAktivert) {
                 log.info("Importerer ny statistikk");
                 importerNyStatistikk(årstallOgKvartalForDvh.get(0));
+                leggTilVirksomhetMetadataEksportering(årstallOgKvartalForDvh.get(0));
             } else {
                 log.info("Statistikk er klar til importering men automatisk importering er ikke aktivert");
             }
@@ -162,6 +163,9 @@ public class ImporteringService {
         importSykefraværsstatistikkMedGradering(årstallOgKvartal);
     }
 
+    private void leggTilVirksomhetMetadataEksportering(ÅrstallOgKvartal årstallOgKvartal) {
+        datavarehusRepository.hentVirksomhetMetadataEksportering(årstallOgKvartal);
+    }
 
     private SlettOgOpprettResultat importSykefraværsstatistikkLand(ÅrstallOgKvartal årstallOgKvartal) {
         List<SykefraværsstatistikkLand> sykefraværsstatistikkLand =

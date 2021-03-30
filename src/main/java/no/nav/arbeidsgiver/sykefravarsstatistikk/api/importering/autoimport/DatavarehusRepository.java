@@ -1,7 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.StatistikkildeDvh;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
@@ -218,7 +220,7 @@ public class DatavarehusRepository {
                         "sum(muligedv) as sum_mulige_dagsverk " +
                         "from dt_p.agg_ia_sykefravar_v " +
                         "where arstall = :arstall and kvartal = :kvartal and varighet is not null " +
-                        "and rectype='"+ RECTYPE_FOR_VIRKSOMHET + "'" +
+                        "and rectype='" + RECTYPE_FOR_VIRKSOMHET + "'" +
                         "group by arstall, kvartal, naering_kode, varighet",
                 namedParameters,
                 (resultSet, rowNum) ->
@@ -295,4 +297,30 @@ public class DatavarehusRepository {
                                 resultSet.getString(NARINGNAVN)));
     }
 
+    public List<VirksomhetMetadata> hentVirksomhetMetadataEksportering(ÅrstallOgKvartal årstallOgKvartal) {
+        SqlParameterSource namedParameters =
+                new MapSqlParameterSource()
+                        .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+                        .addValue(KVARTAL, årstallOgKvartal.getKvartal());
+
+        return namedParameterJdbcTemplate.query(
+                "select v2.arstall as arstall, v2.kvartal as kvartal, v2.orgnr as orgnr, v1.sektor as sektor, v2.naring as naring, v2.naering_kode as naering_kode " +
+                        "from dt_p.agg_ia_sykefravar_v_2 v2  " +
+                        "join dt_p.agg_ia_sykefravar_v v1 on v1.orgnr = v2.orgnr " +
+                        "and v1.arstall = v2.arstall and v1.kvartal = v2.kvartal " +
+                        "where v2.arstall = :arstall and v2.kvartal = :kvartal " +
+                        "and length(trim(v2.orgnr)) = 9 " +
+                        "group by v2.arstall, v2.kvartal, v2.orgnr, v1.sektor, v2.naring, v2.naering_kode " +
+                        "order by v2.arstall, v2.kvartal, v2.orgnr",
+                namedParameters,
+                ((resultSet, i) ->
+                        new VirksomhetMetadata(
+                                new Orgnr(resultSet.getString(ORGNR)),
+                                new ÅrstallOgKvartal(resultSet.getInt(ARSTALL), resultSet.getInt(KVARTAL)),
+                                resultSet.getString(SEKTOR),
+                                resultSet.getString(NARING),
+                                resultSet.getString(NARING_5SIFFER),
+                                false
+                        )));
+    }
 }
