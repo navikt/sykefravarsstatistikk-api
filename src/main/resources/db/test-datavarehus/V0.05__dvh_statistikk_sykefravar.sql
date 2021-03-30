@@ -55,3 +55,19 @@ values
     'X', 'X',
     34.876, 386.123, 6, '2'
 );
+insert into dt_p.agg_ia_sykefravar_v
+(
+    arstall, kvartal,
+    orgnr, naering_kode, sektor, storrelse, fylkarb,
+    alder, kjonn,  fylkbo,
+    sftype, varighet,
+    taptedv, muligedv, antpers, rectype
+)
+values
+(
+    '2020','1',
+    '987654321', '62', '3', 'G', '03',
+    'B', 'K', '02',
+    'X', 'X',
+    34.876, 386.123, 6, '2'
+);

@@ -7,11 +7,7 @@ import no.nav.security.token.support.core.api.Protected;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -54,6 +50,20 @@ public class ImporteringController {
             );
         }
         return ResponseEntity.ok(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/forbredtVirksomhetMetaData")
+    public ResponseEntity<HttpStatus> forbredtVirksomhetMetdata(
+            @RequestParam int årstall,
+            @RequestParam int kvartal
+    ) {
+        if (importeringService.leggTilVirksomhetMetadataEksportering(
+                new ÅrstallOgKvartal(årstall, kvartal)
+        ) >= 0) {
+            return ResponseEntity.ok(HttpStatus.CREATED);
+        } else {
+            return ResponseEntity.ok(HttpStatus.OK);
+        }
     }
 
     @GetMapping("/kvalitetssjekk")

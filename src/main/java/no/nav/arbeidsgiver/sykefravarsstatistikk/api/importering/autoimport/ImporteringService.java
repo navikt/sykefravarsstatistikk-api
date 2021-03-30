@@ -5,14 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMeta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.SlettOgOpprettResultat;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Statistikkilde;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.StatistikkildeDvh;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæringMedVarighet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetMedGradering;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.Importeringsobjekt;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.StatistikkRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -169,9 +162,17 @@ public class ImporteringService {
         importSykefraværsstatistikkMedGradering(årstallOgKvartal);
     }
 
-    private int leggTilVirksomhetMetadataEksportering(ÅrstallOgKvartal årstallOgKvartal) {
-        List<VirksomhetMetadata> virksomhetMetadataList = datavarehusRepository.hentVirksomhetMetadata(årstallOgKvartal);
-        return virksomhetMetadataRepository.opprettVirksomhetMetadata(virksomhetMetadataList);
+    protected int leggTilVirksomhetMetadataEksportering(ÅrstallOgKvartal årstallOgKvartal) {
+        List<VirksomhetMetadata> eksisterendeVirksomhetMetadataList = virksomhetMetadataRepository.hentVirksomhetMetadata(
+                årstallOgKvartal
+        );
+        if (eksisterendeVirksomhetMetadataList.size() == 0) {
+            List<VirksomhetMetadata> virksomhetMetadataList = datavarehusRepository.hentVirksomhetMetadata(årstallOgKvartal);
+            return virksomhetMetadataRepository.opprettVirksomhetMetadata(virksomhetMetadataList);
+        } else {
+            log.info("Det fins allerede virksomhet metdata for gjelende kvartal {}", årstallOgKvartal.toString());
+            return 0;
+        }
     }
 
     private SlettOgOpprettResultat importSykefraværsstatistikkLand(ÅrstallOgKvartal årstallOgKvartal) {

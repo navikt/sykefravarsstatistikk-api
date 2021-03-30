@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
@@ -28,6 +29,7 @@ public class EksporteringService {
     private final AlleVirksomheterRepository alleVirksomheterRepository;
     private final AlleNaring5SifferRepository alleNæring5SifferRepository;
     private final AlleNaringRepository alleNæringRepository;
+    private final VirksomhetMetadataRepository virksomhetMetadataRepository;
     private final boolean erEksporteringAktivert;
 
     public EksporteringService(
@@ -36,13 +38,14 @@ public class EksporteringService {
             AlleVirksomheterRepository alleVirksomheterRepository,
             AlleNaring5SifferRepository alleNæring5SifferRepository,
             AlleNaringRepository alleNæringRepository,
-            @Value("${statistikk.eksportering.aktivert}") Boolean erEksporteringAktivert
+            VirksomhetMetadataRepository virksomhetMetadataRepository, @Value("${statistikk.eksportering.aktivert}") Boolean erEksporteringAktivert
     ) {
         this.statistikkRepository = statistikkRepository;
         this.kafkaService = kafkaService;
         this.alleVirksomheterRepository = alleVirksomheterRepository;
         this.alleNæring5SifferRepository = alleNæring5SifferRepository;
         this.alleNæringRepository = alleNæringRepository;
+        this.virksomhetMetadataRepository = virksomhetMetadataRepository;
         this.erEksporteringAktivert = erEksporteringAktivert;
     }
 
@@ -65,6 +68,7 @@ public class EksporteringService {
             log.info("Skal ikke eksportere fordi erEksporteringAktivert er {}", erEksporteringAktivert);
             return;
         }
+
 
         List<ÅrstallOgKvartal> årstallOgKvartalTilEksport
                 = alleVirksomheterRepository.hentAlleÅrstallOgKvartalTilEksport();
