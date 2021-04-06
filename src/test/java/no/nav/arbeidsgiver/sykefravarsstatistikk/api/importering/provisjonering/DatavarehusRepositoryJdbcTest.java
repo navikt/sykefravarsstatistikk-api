@@ -12,6 +12,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværssta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetMedGradering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner.Orgenhet;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -350,48 +351,29 @@ public class DatavarehusRepositoryJdbcTest {
 
     @Test
     public void hentVirksomhetMetadataEksportering__returnerer_virksomhetMetadataEksportering() {
-        insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
-                namedParameterJdbcTemplate,
-                2020,
-                3,
-                13,
-                ORGNR_VIRKSOMHET_1,
-                NÆRINGSKODE_2SIFFER,
-                NÆRINGSKODE_5SIFFER,
-                3,
-                1,
-                3,
-                16,
-                100
-        );
-        insertSykefraværsstatistikkVirksomhetInDvhTabell(
-                namedParameterJdbcTemplate,
-                2020,
-                3,
-                4,
-                ORGNR_VIRKSOMHET_1,
-                NÆRINGSKODE_5SIFFER,
-                _1_DAG_TIL_7_DAGER,
-                "K",
-                5,
-                100);
+        insertOrgenhetInDvhTabell(namedParameterJdbcTemplate, ORGNR_VIRKSOMHET_1, SEKTOR, NÆRINGSKODE_2SIFFER, "Virksomhet 1", 2020, 3);
 
-
-        List<VirksomhetMetadata> virksomhetMetadataList = repository.hentVirksomhetMetadata(
+        List<Orgenhet> orgenhetList = repository.hentOrgenhet(
                 new ÅrstallOgKvartal(
                         2020,
                         3
                 )
         );
 
-        assertTrue(virksomhetMetadataList.contains(
-                new VirksomhetMetadata(
-                        new Orgnr(ORGNR_VIRKSOMHET_1),
-                        new ÅrstallOgKvartal(2020, 3),
-                        SEKTOR,
-                        NÆRINGSKODE_2SIFFER,
-                        NÆRINGSKODE_5SIFFER,
-                        false
-                )));
+        assertTrue(
+                orgenhetList.contains(
+                        new Orgenhet(
+                                new Orgnr(ORGNR_VIRKSOMHET_1),
+                                "Virksomhet 1",
+                                RECTYPE_FOR_VIRKSOMHET,
+                                SEKTOR,
+                                NÆRINGSKODE_2SIFFER,
+                                new ÅrstallOgKvartal(
+                                        2020,
+                                        3
+                                )
+                        )
+                )
+        );
     }
 }

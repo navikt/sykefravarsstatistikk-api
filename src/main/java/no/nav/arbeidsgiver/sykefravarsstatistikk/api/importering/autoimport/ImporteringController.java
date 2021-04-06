@@ -52,12 +52,12 @@ public class ImporteringController {
         return ResponseEntity.ok(HttpStatus.CREATED);
     }
 
-    @PostMapping("/forbredtVirksomhetMetaData")
-    public ResponseEntity<HttpStatus> forbredtVirksomhetMetdata(
+    @PostMapping("/reimportVirksomhetMetaData")
+    public ResponseEntity<HttpStatus> reimportVirksomhetMetdata(
             @RequestParam int årstall,
             @RequestParam int kvartal
     ) {
-        if (importeringService.leggTilVirksomhetMetadataEksportering(
+        if (importeringService.importVirksomhetMetadata(
                 new ÅrstallOgKvartal(årstall, kvartal)
         ) >= 0) {
             return ResponseEntity.ok(HttpStatus.CREATED);
@@ -65,6 +65,21 @@ public class ImporteringController {
             return ResponseEntity.ok(HttpStatus.OK);
         }
     }
+
+    @PostMapping("/forberedNesteEksport")
+    public ResponseEntity<HttpStatus> forberedNesteEksport(
+            @RequestParam int årstall,
+            @RequestParam int kvartal
+    ) {
+        if (importeringService.importVirksomhetMetadata(
+                new ÅrstallOgKvartal(årstall, kvartal)
+        ) >= 0) {
+            return ResponseEntity.ok(HttpStatus.CREATED);
+        } else {
+            return ResponseEntity.ok(HttpStatus.OK);
+        }
+    }
+
 
     @GetMapping("/kvalitetssjekk")
     public ResponseEntity<List<String>> testAvNæringMedVarighetOgGradering() {

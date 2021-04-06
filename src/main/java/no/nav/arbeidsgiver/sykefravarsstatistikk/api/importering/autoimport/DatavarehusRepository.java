@@ -12,6 +12,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværssta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetMedGradering;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner.Orgenhet;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -35,6 +36,7 @@ public class DatavarehusRepository {
     public static final String NARING = "naring";
     public static final String NARING_5SIFFER = "naering_kode";
     public static final String ORGNR = "orgnr";
+    public static final String OFFNAVN = "offnavn";
     public static final String VARIGHET = "varighet";
     public static final String SUM_TAPTE_DAGSVERK_GS = "sum_tapte_dagsverk_gs";
     public static final String SUM_ANTALL_PERSONER = "sum_antall_personer";
@@ -297,31 +299,32 @@ public class DatavarehusRepository {
                                 resultSet.getString(NARINGNAVN)));
     }
 
-    public List<VirksomhetMetadata> hentVirksomhetMetadata(ÅrstallOgKvartal årstallOgKvartal) {
+    public List<Orgenhet> hentOrgenhet(ÅrstallOgKvartal årstallOgKvartal) {
         SqlParameterSource namedParameters =
                 new MapSqlParameterSource()
                         .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
                         .addValue(KVARTAL, årstallOgKvartal.getKvartal());
 
         return namedParameterJdbcTemplate.query(
-                "select v2.arstall as arstall, v2.kvartal as kvartal, v2.orgnr as orgnr, v1.sektor as sektor, " +
-                        "v2.naring as naring, v2.naering_kode as naering_kode " +
-                        "from dt_p.agg_ia_sykefravar_v_2 v2  " +
-                        "join dt_p.agg_ia_sykefravar_v v1 on v1.orgnr = v2.orgnr " +
-                        "and v1.arstall = v2.arstall and v1.kvartal = v2.kvartal " +
-                        "where v2.arstall = :arstall and v2.kvartal = :kvartal " +
-                        "and length(trim(v2.orgnr)) = 9 " +
-                        "group by v2.arstall, v2.kvartal, v2.orgnr, v1.sektor, v2.naring, v2.naering_kode " +
-                        "order by v2.arstall, v2.kvartal, v2.orgnr",
+                "select orgnr, offnavn, rectype, sektor, naring, arstall, kvartal  " +
+                        "from dt_p.v_dim_ia_orgenhet " +
+                        "where length(trim(orgnr)) = 9 " +
+                        "and arstall = :arstall " +
+                        "and kvartal = :kvartal",
                 namedParameters,
                 ((resultSet, i) ->
-                        new VirksomhetMetadata(
+                        new Orgenhet(
                                 new Orgnr(resultSet.getString(ORGNR)),
-                                new ÅrstallOgKvartal(resultSet.getInt(ARSTALL), resultSet.getInt(KVARTAL)),
+                                resultSet.getString(OFFNAVN),
+                                resultSet.getString(RECTYPE),
                                 resultSet.getString(SEKTOR),
                                 resultSet.getString(NARING),
-                                resultSet.getString(NARING_5SIFFER),
-                                false
-                        )));
+                                new ÅrstallOgKvartal(
+                                        resultSet.getInt(ARSTALL),
+                                        resultSet.getInt(KVARTAL)
+                                )
+                        )
+                )
+        );
     }
 }

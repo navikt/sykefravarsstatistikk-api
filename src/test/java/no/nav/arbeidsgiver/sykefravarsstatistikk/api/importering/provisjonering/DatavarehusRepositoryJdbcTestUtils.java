@@ -11,6 +11,7 @@ public class DatavarehusRepositoryJdbcTestUtils {
 
 
     public static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
+        delete(jdbcTemplate, "dt_p.v_dim_ia_orgenhet");
         delete(jdbcTemplate, "dt_p.v_dim_ia_naring_sn2007");
         delete(jdbcTemplate, "dt_p.v_dim_ia_sektor");
         delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_land_v");
@@ -49,6 +50,31 @@ public class DatavarehusRepositoryJdbcTestUtils {
         jdbcTemplate.update(
                 "insert into dt_p.v_dim_ia_naring_sn2007 (naringkode, nargrpkode, naringnavn) "
                         + "values (:naringkode, :nargrpkode, :naringnavn)",
+                naringParams);
+    }
+
+    public static void insertOrgenhetInDvhTabell(
+            NamedParameterJdbcTemplate jdbcTemplate,
+            String orgnr,
+            String sektor,
+            String næring,
+            String offnavn,
+            int årstall,
+            int kvartal
+    ) {
+        MapSqlParameterSource naringParams =
+                new MapSqlParameterSource()
+                        .addValue("orgnr", orgnr)
+                        .addValue("sektor", sektor)
+                        .addValue("naring", næring)
+                        .addValue("offnavn", offnavn)
+                        .addValue("årstall", årstall)
+                        .addValue("kvartal", kvartal)
+                ;
+
+        jdbcTemplate.update(
+                "insert into dt_p.v_dim_ia_orgenhet (orgnr, offnavn, rectype, sektor, naring, arstall, kvartal) "
+                        + "values (:orgnr, :offnavn, '2', :sektor, :naring, :årstall, :kvartal)",
                 naringParams);
     }
 

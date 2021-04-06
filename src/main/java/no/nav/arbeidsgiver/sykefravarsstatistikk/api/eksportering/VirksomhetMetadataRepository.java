@@ -3,14 +3,19 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.util.Pair;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Component
 public class VirksomhetMetadataRepository {
@@ -28,35 +33,77 @@ public class VirksomhetMetadataRepository {
         SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(virksomhetMetadata.toArray());
 
         int[] results = namedParameterJdbcTemplate.batchUpdate(
-                "insert into virksomhet_metadata_til_eksportering " +
-                        "(orgnr, arstall, kvartal, sektor, naring_kode, naring_kode_5siffer) " +
+                "insert into virksomhet_metadata " +
+                        "(orgnr, navn, rectype, sektor, naring_kode, arstall, kvartal) " +
                         "values " +
-                        "(:orgnr, :årstall, :kvartal, :sektor, :næring, :næringskode5Siffer)",
+                        "(:orgnr, :navn, :rectype, :sektor, :næring, :årstall, :kvartal)",
                 batch
         );
         return Arrays.stream(results).sum();
     }
 
     public List<VirksomhetMetadata> hentVirksomhetMetadata(ÅrstallOgKvartal årstallOgKvartal) {
-        SqlParameterSource namedParameters =
-                new MapSqlParameterSource()
-                        .addValue("arstall", årstallOgKvartal.getÅrstall())
-                        .addValue("kvartal", årstallOgKvartal.getKvartal());
+        MapSqlParameterSource paramSource = new MapSqlParameterSource()
+                .addValue("årstall", årstallOgKvartal.getÅrstall())
+                .addValue("kvartal", årstallOgKvartal.getKvartal());
 
-        return namedParameterJdbcTemplate.query(
-                "SELECT orgnr, arstall, kvartal, sektor, naring_kode, naring_kode_5siffer, eksportert " +
-                        "FROM virksomhet_metadata_til_eksportering " +
-                        "where arstall = :arstall and " +
-                        "kvartal = :kvartal ",
-                namedParameters,
+        List<VirksomhetMetadata> virksomhetMetadata = namedParameterJdbcTemplate.query(
+                "SELECT orgnr, navn, rectype, sektor, naring_kode, arstall, kvartal " +
+                        "FROM virksomhet_metadata " +
+                        "WHERE arstall = :årstall AND kvartal = :kvartal",
+                paramSource,
                 ((resultSet, i) ->
                         new VirksomhetMetadata(
                                 new Orgnr(resultSet.getString("orgnr")),
-                                new ÅrstallOgKvartal(resultSet.getInt("arstall"), resultSet.getInt("kvartal")),
+                                resultSet.getString("navn"),
+                                resultSet.getString("rectype"),
                                 resultSet.getString("sektor"),
                                 resultSet.getString("naring_kode"),
-                                resultSet.getString("naring_kode_5siffer"),
-                                "true".equals(resultSet.getString("eksportert"))
-                        )));
+                                new ÅrstallOgKvartal(
+                                        resultSet.getInt("arstall"),
+                                        resultSet.getInt("kvartal")
+                                )
+                        )
+                )
+        );
+
+        List<Pair<Orgnr, NæringOgNæringskode5siffer>> næringOgNæringskode5siffer = namedParameterJdbcTemplate.query(
+                "SELECT orgnr, naring_kode, naring_kode_5siffer " +
+                        "FROM virksomhet_metadata_naring_kode_5siffer " +
+                        "WHERE arstall = :årstall AND kvartal = :kvartal",
+                paramSource,
+                ((resultSet, i) ->
+                        Pair.of(
+                                new Orgnr(resultSet.getString("orgnr")),
+                                new NæringOgNæringskode5siffer(
+                                        resultSet.getString("naring_kode"),
+                                        resultSet.getString("naring_kode_5siffer")
+                                )
+                        )
+                )
+        );
+
+        return assemble(virksomhetMetadata, næringOgNæringskode5siffer);
+    }
+
+    protected List<VirksomhetMetadata> assemble(
+            List<VirksomhetMetadata> virksomhetMetadata,
+            List<Pair<Orgnr, NæringOgNæringskode5siffer>> næringOgNæringskode5siffer
+    ) {
+
+        Map<Orgnr, List<NæringOgNæringskode5siffer>> map = næringOgNæringskode5siffer
+                .stream()
+                .collect(
+                        Collectors.groupingBy(
+                                Pair::getFirst,
+                                Collectors.mapping(Pair::getSecond, Collectors.toList())
+                        )
+                );
+
+        virksomhetMetadata.forEach(
+                vm -> vm.leggTilNæringOgNæringskode5siffer(map.get(new Orgnr(vm.getOrgnr())))
+        );
+
+        return virksomhetMetadata;
     }
 }

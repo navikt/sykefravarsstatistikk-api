@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("db-test")
@@ -42,19 +43,19 @@ class VirksomhetMetadataRepositoryJdbcTest {
     public void opprettVirksomhetMetadata__oppretter_riktig_metadata() {
         VirksomhetMetadata virksomhetMetadataVirksomhet1 = new VirksomhetMetadata(
                 new Orgnr(ORGNR_VIRKSOMHET_1),
-                new ÅrstallOgKvartal(2020, 3),
+                "Virksomhet 1",
+                RECTYPE_FOR_VIRKSOMHET,
                 SEKTOR,
-                NÆRINGSKODE_5SIFFER,
                 NÆRINGSKODE_2SIFFER,
-                false
+                new ÅrstallOgKvartal(2020, 3)
         );
         VirksomhetMetadata virksomhetMetadataVirksomhet2 = new VirksomhetMetadata(
                 new Orgnr(ORGNR_VIRKSOMHET_2),
-                new ÅrstallOgKvartal(2020, 3),
+                "Virksomhet 2",
+                RECTYPE_FOR_VIRKSOMHET,
                 SEKTOR,
-                NÆRINGSKODE_5SIFFER,
                 NÆRINGSKODE_2SIFFER,
-                false
+                new ÅrstallOgKvartal(2020, 3)
         );
 
         repository.opprettVirksomhetMetadata(Arrays.asList(
@@ -68,62 +69,136 @@ class VirksomhetMetadataRepositoryJdbcTest {
     }
 
     @Test
+    public void hentVirksomhetMetadata_returnerer_riktige_metdata_for_en_gitt_årstall_og_kvartal() {
+        opprettTestVirksomhetMetaData(2020, 2);
+
+        List<VirksomhetMetadata> results = repository.hentVirksomhetMetadata(
+                new ÅrstallOgKvartal(
+                        2019,
+                        2)
+        );
+
+        assertThat(results.size()).isEqualTo(0);
+    }
+
+    @Test
     public void hentVirksomhetMetadata_returnerer_riktige_metdata() {
-        opprettTestVirksomhetMetaData();
+        opprettTestVirksomhetMetaData(2020, 3);
 
-        List<VirksomhetMetadata> results = repository.hentVirksomhetMetadata (new ÅrstallOgKvartal(2019,2));
+        List<VirksomhetMetadata> results = repository.hentVirksomhetMetadata(
+                new ÅrstallOgKvartal(
+                        2020,
+                        3)
+        );
 
-        assertThat(results.size()).isEqualTo(2);
-        assertThat(results.get(0).årstallOgKvartal.getÅrstall()).isEqualTo(2019);
-        assertThat(results.get(0).årstallOgKvartal.getKvartal()).isEqualTo(2);
+        assertThat(results.size()).isEqualTo(3);
+        VirksomhetMetadata virksomhetMetadataVirksomhet1 = results.
+                stream()
+                .filter(r -> ORGNR_VIRKSOMHET_1.equals(r.getOrgnr()))
+                .findFirst()
+                .get();
+        List<NæringOgNæringskode5siffer> næringOgNæringskode5siffer = virksomhetMetadataVirksomhet1.getNæringOgNæringskode5siffer();
+        assertThat(næringOgNæringskode5siffer.contains(
+                new NæringOgNæringskode5siffer(
+                        "71",
+                        "71001"
+                )
+        )).isTrue();
+        assertThat(næringOgNæringskode5siffer.contains(
+                new NæringOgNæringskode5siffer(
+                        "71",
+                        "71002"
+                )
+        )).isTrue();
     }
 
 
     private List<VirksomhetMetadata> hentAlleVirksomhetMetadata(NamedParameterJdbcTemplate jdbcTemplate) {
         return jdbcTemplate.query(
-                "select * from virksomhet_metadata_til_eksportering",
+                "select * from virksomhet_metadata",
                 new MapSqlParameterSource(),
                 (rs, rowNum) -> new VirksomhetMetadata(
                         new Orgnr(rs.getString("orgnr")),
-                        new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
+                        rs.getString("navn"),
+                        rs.getString("rectype"),
                         rs.getString("sektor"),
                         rs.getString("naring_kode"),
-                        rs.getString("naring_kode_5siffer"),
-                        rs.getString("eksportert").equals("true")
+                        new ÅrstallOgKvartal(
+                                rs.getInt("arstall"),
+                                rs.getInt("kvartal")
+                        )
                 )
         );
     }
 
-    private int opprettTestVirksomhetMetaData() {
+    private int opprettTestVirksomhetMetaData(int årstall, int kvartal) {
         namedParameterJdbcTemplate.update(
-                "insert into virksomhet_metadata_til_eksportering (orgnr,arstall,kvartal,sektor,naring_kode,naring_kode_5siffer) "
-                        + "VALUES (:orgnr, :arstall, :kvartal, :sektor, :naring_kode, :naring_kode_5siffer)",
-                parametre(ORGNR_VIRKSOMHET_1, 2019, 2, "3", "71", "71215")
+                "insert into virksomhet_metadata (orgnr, navn, rectype, sektor, naring_kode, arstall, kvartal) "
+                        + "VALUES (:orgnr, :navn, :rectype, :sektor, :naring_kode, :årstall, :kvartal)",
+                parametreViksomhetMetadata(ORGNR_VIRKSOMHET_1, "Virksomhet 1", "2", "3", "71", årstall, kvartal)
+        );
+
+        namedParameterJdbcTemplate.update(
+                "insert into virksomhet_metadata_naring_kode_5siffer (orgnr, naring_kode, naring_kode_5siffer, arstall, kvartal) "
+                        + "VALUES (:orgnr, :naring_kode, :naring_kode_5siffer, :årstall, :kvartal)",
+                parametreViksomhetMetadataNæring5Siffer(ORGNR_VIRKSOMHET_1, "71", "71001", årstall, kvartal)
+        );
+
+        namedParameterJdbcTemplate.update(
+                "insert into virksomhet_metadata_naring_kode_5siffer (orgnr, naring_kode, naring_kode_5siffer, arstall, kvartal) "
+                        + "VALUES (:orgnr, :naring_kode, :naring_kode_5siffer, :årstall, :kvartal)",
+                parametreViksomhetMetadataNæring5Siffer(ORGNR_VIRKSOMHET_1, "71", "71002", årstall, kvartal)
+        );
+
+        namedParameterJdbcTemplate.update(
+                "insert into virksomhet_metadata (orgnr, navn, rectype, sektor, naring_kode, arstall, kvartal) "
+                        + "VALUES (:orgnr, :navn, :rectype, :sektor, :naring_kode, :årstall, :kvartal)",
+                parametreViksomhetMetadata(ORGNR_VIRKSOMHET_2, "Virksomhet 2", "2", "3", "10", årstall, kvartal)
         );
         namedParameterJdbcTemplate.update(
-                "insert into virksomhet_metadata_til_eksportering (orgnr,arstall,kvartal,sektor,naring_kode,naring_kode_5siffer) "
-                        + "VALUES (:orgnr, :arstall, :kvartal, :sektor, :naring_kode, :naring_kode_5siffer)",
-                parametre(ORGNR_VIRKSOMHET_2, 2020, 2, "3", "10", "41000")
-        );
-        namedParameterJdbcTemplate.update(
-                "insert into virksomhet_metadata_til_eksportering (orgnr,arstall,kvartal,sektor,naring_kode,naring_kode_5siffer) "
-                        + "VALUES (:orgnr, :arstall, :kvartal, :sektor, :naring_kode, :naring_kode_5siffer)",
-                parametre(ORGNR_VIRKSOMHET_2, 2019, 2, "3", "10", "41000")
+                "insert into virksomhet_metadata (orgnr, navn, rectype, sektor, naring_kode, arstall, kvartal) "
+                        + "VALUES (:orgnr, :navn, :rectype, :sektor, :naring_kode, :årstall, :kvartal)",
+                parametreViksomhetMetadata(ORGNR_VIRKSOMHET_3, "Virksomhet 3", "2", "3", "10", årstall, kvartal)
         );
         return 0;
     }
 
     private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
-        jdbcTemplate.update("delete from virksomhet_metadata_til_eksportering", new MapSqlParameterSource());
+        jdbcTemplate.update("delete from virksomhet_metadata", new MapSqlParameterSource());
     }
 
-    private MapSqlParameterSource parametre(String orgnr, int årstall, int kvartal, String sektor, String næringskode2Siffer, String næringskode5Siffer) {
+    private MapSqlParameterSource parametreViksomhetMetadata(
+            String orgnr,
+            String navn,
+            String rectype,
+            String sektor,
+            String næringskode2Siffer,
+            int årstall,
+            int kvartal
+    ) {
         return new MapSqlParameterSource()
                 .addValue("orgnr", orgnr)
-                .addValue("arstall", årstall)
-                .addValue("kvartal", kvartal)
+                .addValue("navn", navn)
+                .addValue("rectype", rectype)
                 .addValue("sektor", sektor)
                 .addValue("naring_kode", næringskode2Siffer)
-                .addValue("naring_kode_5siffer", næringskode5Siffer);
+                .addValue("årstall", årstall)
+                .addValue("kvartal", kvartal);
+    }
+
+    private MapSqlParameterSource parametreViksomhetMetadataNæring5Siffer(
+            String orgnr,
+            String næringskode2Siffer,
+            String næringskode5Siffer,
+            int årstall,
+            int kvartal
+    ) {
+        return new MapSqlParameterSource()
+                .addValue("orgnr", orgnr)
+                .addValue("naring_kode", næringskode2Siffer)
+                .addValue("naring_kode_5siffer", næringskode5Siffer)
+                .addValue("årstall", årstall)
+                .addValue("kvartal", kvartal);
     }
 }
+
