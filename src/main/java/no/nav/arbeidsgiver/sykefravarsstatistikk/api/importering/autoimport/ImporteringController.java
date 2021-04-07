@@ -20,13 +20,16 @@ public class ImporteringController {
 
     private final ImporteringService importeringService;
     private final ImporteringKvalitetssjekkService importeringTestService;
+    private final PostImporteringService postImporteringService;
 
     public ImporteringController(
             ImporteringService importeringService,
-            ImporteringKvalitetssjekkService importeringTestService
+            ImporteringKvalitetssjekkService importeringTestService,
+            PostImporteringService postImporteringService
     ) {
         this.importeringService = importeringService;
         this.importeringTestService = importeringTestService;
+        this.postImporteringService = postImporteringService;
     }
 
     @PostMapping("/reimport")
@@ -57,9 +60,14 @@ public class ImporteringController {
             @RequestParam int årstall,
             @RequestParam int kvartal
     ) {
-        if (importeringService.importVirksomhetMetadata(
-                new ÅrstallOgKvartal(årstall, kvartal)
-        ) >= 0) {
+
+        ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
+        int antallVirksomhetMetadataOpprettet = postImporteringService.importVirksomhetMetadata(årstallOgKvartal);
+
+        int antallVirksomhetNæringskode5sifferMapping =
+                postImporteringService.importVirksomhetNæringskode5sifferMapping(årstallOgKvartal);
+
+        if (antallVirksomhetMetadataOpprettet >= 0 || antallVirksomhetNæringskode5sifferMapping >= 0) {
             return ResponseEntity.ok(HttpStatus.CREATED);
         } else {
             return ResponseEntity.ok(HttpStatus.OK);
@@ -71,7 +79,7 @@ public class ImporteringController {
             @RequestParam int årstall,
             @RequestParam int kvartal
     ) {
-        if (importeringService.importVirksomhetMetadata(
+        if (postImporteringService.forberedNesteEksport(
                 new ÅrstallOgKvartal(årstall, kvartal)
         ) >= 0) {
             return ResponseEntity.ok(HttpStatus.CREATED);

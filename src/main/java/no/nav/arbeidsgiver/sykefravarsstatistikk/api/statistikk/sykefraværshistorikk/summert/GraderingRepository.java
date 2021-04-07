@@ -1,6 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.NæringOgNæringskode5siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataNæringskode5siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
@@ -27,6 +30,43 @@ public class GraderingRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
+    /*
+      orgnr varchar(20) not null,
+  naring varchar not null,
+  naring_kode varchar not null,
+  arstall smallint not null,
+  kvartal smallint not null,
+
+     */
+
+    public List<VirksomhetMetadataNæringskode5siffer> hentVirksomhetMetadataNæringskode5siffer(
+            ÅrstallOgKvartal årstallOgKvartal
+    ) {
+        try {
+            return namedParameterJdbcTemplate.query(
+                    "select arstall, kvartal, orgnr, naring, naring_kode" +
+                            " from sykefravar_statistikk_virksomhet_med_gradering " +
+                            " where " +
+                            " arstall = :årstall " +
+                            " and kvartal = :kvartal " +
+                            " group by arstall, kvartal, orgnr, naring, naring_kode" +
+                            " order by arstall, kvartal, orgnr, naring, naring_kode",
+                    new MapSqlParameterSource()
+                            .addValue("årstall", årstallOgKvartal.getÅrstall())
+                            .addValue("kvartal", årstallOgKvartal.getKvartal()),
+                    (rs, rowNum) -> new VirksomhetMetadataNæringskode5siffer(
+                            new Orgnr(rs.getString("orgnr")),
+                            new ÅrstallOgKvartal(
+                                    rs.getInt("arstall"),
+                                    rs.getInt("kvartal")
+                            ),
+                            new NæringOgNæringskode5siffer(rs.getString("naring"), rs.getString("naring_kode"))
+                    )
+            );
+        } catch (EmptyResultDataAccessException e) {
+            return Collections.emptyList();
+        }
+    }
 
     public List<UmaskertSykefraværForEttKvartal> hentSykefraværForEttKvartalMedGradering(Virksomhet virksomhet) {
         try {

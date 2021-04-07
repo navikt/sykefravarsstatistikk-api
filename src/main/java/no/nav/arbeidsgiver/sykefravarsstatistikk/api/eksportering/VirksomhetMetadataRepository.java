@@ -42,6 +42,21 @@ public class VirksomhetMetadataRepository {
         return Arrays.stream(results).sum();
     }
 
+    public int opprettVirksomhetMetadataNæringskode5siffer(
+            List<VirksomhetMetadataNæringskode5siffer> virksomhetMetadataNæringskode5siffer
+    ) {
+        SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(virksomhetMetadataNæringskode5siffer.toArray());
+
+        int[] results = namedParameterJdbcTemplate.batchUpdate(
+                "insert into virksomhet_metadata_naring_kode_5siffer " +
+                        "(orgnr, naring, naring_kode, arstall, kvartal) " +
+                        "values " +
+                        "(:orgnr, :næring, :næringskode5siffer, :årstall, :kvartal)",
+                batch
+        );
+        return Arrays.stream(results).sum();
+    }
+
     public List<VirksomhetMetadata> hentVirksomhetMetadata(ÅrstallOgKvartal årstallOgKvartal) {
         MapSqlParameterSource paramSource = new MapSqlParameterSource()
                 .addValue("årstall", årstallOgKvartal.getÅrstall())

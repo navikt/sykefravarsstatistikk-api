@@ -1,20 +1,23 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.SlettOgOpprettResultat;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Statistikkilde;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.StatistikkildeDvh;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæringMedVarighet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetMedGradering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.Importeringsobjekt;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.StatistikkRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner.Orgenhet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -22,17 +25,14 @@ public class ImporteringService {
 
     private final StatistikkRepository statistikkRepository;
     private final DatavarehusRepository datavarehusRepository;
-    private final VirksomhetMetadataRepository virksomhetMetadataRepository;
     private final boolean erImporteringAktivert;
 
     public ImporteringService(
             StatistikkRepository statistikkRepository,
             DatavarehusRepository datavarehusRepository,
-            VirksomhetMetadataRepository virksomhetMetadataRepository,
             @Value("${statistikk.importering.aktivert}") Boolean erImporteringAktivert) {
         this.statistikkRepository = statistikkRepository;
         this.datavarehusRepository = datavarehusRepository;
-        this.virksomhetMetadataRepository = virksomhetMetadataRepository;
         this.erImporteringAktivert = erImporteringAktivert;
     }
 
@@ -57,8 +57,6 @@ public class ImporteringService {
             if (erImporteringAktivert) {
                 log.info("Importerer ny statistikk");
                 importerNyStatistikk(årstallOgKvartalForDvh.get(0));
-                int antallVirksomhetMetadataOpprettet = importVirksomhetMetadata(årstallOgKvartalForDvh.get(0));
-                log.info("Har lagret {} virksomheter klare til eksport", antallVirksomhetMetadataOpprettet);
             } else {
                 log.info("Statistikk er klar til importering men automatisk importering er ikke aktivert");
             }
@@ -162,44 +160,6 @@ public class ImporteringService {
         importSykefraværsstatistikkVirksomhet(årstallOgKvartal);
         importSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal);
         importSykefraværsstatistikkMedGradering(årstallOgKvartal);
-    }
-
-    // #1: Hente ut alle virksomheter fra dt_p.v_dim_ia_orgenhet (i DATAVAREHUS)
-    // #2: Hente ut alle næring/næringskode5siffer fra sykefravar_statistikk_virksomhet_med_gradering
-    protected int importVirksomhetMetadata(ÅrstallOgKvartal årstallOgKvartal) {
-        return 0;
-    }
-
-    // #3: Fra virksomhet_metadata opprett tilsvarende rader i eksport_per_kvartal for en vis ÅrstallOgKvartal
-    protected int forberedNesteEksport(ÅrstallOgKvartal årstallOgKvartal) {
-        List<VirksomhetMetadata> eksisterendeVirksomhetMetadataList =
-                virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal);
-
-        if (eksisterendeVirksomhetMetadataList.size() == 0) {
-            List<Orgenhet> orgenhetList =
-                    datavarehusRepository.hentOrgenhet(årstallOgKvartal);
-            return virksomhetMetadataRepository.opprettVirksomhetMetadata(mapToVirksomhetMetadata(orgenhetList));
-        } else {
-            log.info(
-                    "Det fins allerede virksomhet metdata for gjelende kvartal {}. Skal ikke legge til nye.",
-                    årstallOgKvartal.toString()
-            );
-            return 0;
-        }
-    }
-
-
-    private static List<VirksomhetMetadata> mapToVirksomhetMetadata(List<Orgenhet> orgenhetList) {
-        return orgenhetList.stream().map(
-                orgenhet -> new VirksomhetMetadata(
-                        orgenhet.getOrgnr(),
-                        orgenhet.getNavn(),
-                        orgenhet.getRectype(),
-                        orgenhet.getSektor(),
-                        orgenhet.getNæring(),
-                        orgenhet.getÅrstallOgKvartal()
-                )
-        ).collect(Collectors.toList());
     }
 
     private SlettOgOpprettResultat importSykefraværsstatistikkLand(ÅrstallOgKvartal årstallOgKvartal) {
