@@ -57,6 +57,7 @@ public class ImporteringService {
             if (erImporteringAktivert) {
                 log.info("Importerer ny statistikk");
                 importerNyStatistikk(årstallOgKvartalForDvh.get(0));
+
             } else {
                 log.info("Statistikk er klar til importering men automatisk importering er ikke aktivert");
             }

@@ -20,19 +20,19 @@ public class PostImporteringService {
     private final VirksomhetMetadataRepository virksomhetMetadataRepository;
     private final GraderingRepository graderingRepository;
     private final EksporteringRepository eksporteringRepository;
-    private final boolean erImporteringAktivert;
+    private final boolean erEksporteringAktivert;
 
     public PostImporteringService(
             DatavarehusRepository datavarehusRepository,
             VirksomhetMetadataRepository virksomhetMetadataRepository,
             GraderingRepository graderingRepository,
             EksporteringRepository eksporteringRepository,
-            @Value("${statistikk.importering.aktivert}") Boolean erImporteringAktivert) {
+            @Value("${statistikk.eksportering.aktivert}") Boolean erEksporteringAktivert) {
         this.datavarehusRepository = datavarehusRepository;
         this.virksomhetMetadataRepository = virksomhetMetadataRepository;
         this.graderingRepository = graderingRepository;
         this.eksporteringRepository = eksporteringRepository;
-        this.erImporteringAktivert = erImporteringAktivert;
+        this.erEksporteringAktivert = erEksporteringAktivert;
     }
 
     public int importVirksomhetMetadata(ÅrstallOgKvartal årstallOgKvartal) {
@@ -50,6 +50,9 @@ public class PostImporteringService {
 
     public int forberedNesteEksport(ÅrstallOgKvartal årstallOgKvartal) {
         // TODO: sjekk at eksport er ferdig for årstallOgKvartal ---> ingen rad for årstallOgKvartal
+        if (!erEksporteringAktivert) {
+            return 0;
+        }
         List<VirksomhetMetadata> virksomhetMetadata =
                 virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal);
 
