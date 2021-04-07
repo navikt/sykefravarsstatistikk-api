@@ -1,21 +1,14 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksportRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataNæringskode5siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.SlettOgOpprettResultat;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.*;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.Importeringsobjekt;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.StatistikkRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner.Orgenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.GraderingRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,19 +19,19 @@ public class PostImporteringService {
     private final DatavarehusRepository datavarehusRepository;
     private final VirksomhetMetadataRepository virksomhetMetadataRepository;
     private final GraderingRepository graderingRepository;
-    private final EksportRepository eksportRepository;
+    private final EksporteringRepository eksporteringRepository;
     private final boolean erImporteringAktivert;
 
     public PostImporteringService(
             DatavarehusRepository datavarehusRepository,
             VirksomhetMetadataRepository virksomhetMetadataRepository,
             GraderingRepository graderingRepository,
-            EksportRepository eksportRepository,
+            EksporteringRepository eksporteringRepository,
             @Value("${statistikk.importering.aktivert}") Boolean erImporteringAktivert) {
         this.datavarehusRepository = datavarehusRepository;
         this.virksomhetMetadataRepository = virksomhetMetadataRepository;
         this.graderingRepository = graderingRepository;
-        this.eksportRepository = eksportRepository;
+        this.eksporteringRepository = eksporteringRepository;
         this.erImporteringAktivert = erImporteringAktivert;
     }
 
@@ -60,7 +53,9 @@ public class PostImporteringService {
         List<VirksomhetMetadata> virksomhetMetadata =
                 virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal);
 
-        return eksportRepository.opprettEksport(virksomhetMetadata);
+        return eksporteringRepository.opprettEksport(
+                mapToVirksomhetEksportPerKvartal(virksomhetMetadata)
+        );
     }
 
 
@@ -73,6 +68,18 @@ public class PostImporteringService {
                         orgenhet.getSektor(),
                         orgenhet.getNæring(),
                         orgenhet.getÅrstallOgKvartal()
+                )
+        ).collect(Collectors.toList());
+    }
+
+    private static List<VirksomhetEksportPerKvartal> mapToVirksomhetEksportPerKvartal(List<VirksomhetMetadata> virksomhetMetadataList) {
+        return virksomhetMetadataList.stream().map(
+                virksomhetMetadata -> new VirksomhetEksportPerKvartal(
+                        new Orgnr(virksomhetMetadata.getOrgnr()),
+                        new ÅrstallOgKvartal(
+                                virksomhetMetadata.getÅrstall(),
+                                virksomhetMetadata.getKvartal()),
+                        false
                 )
         ).collect(Collectors.toList());
     }
