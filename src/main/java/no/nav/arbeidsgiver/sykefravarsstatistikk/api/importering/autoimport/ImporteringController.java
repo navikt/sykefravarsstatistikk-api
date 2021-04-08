@@ -5,6 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.Importeringsobjekt;
 import no.nav.security.token.support.core.api.Protected;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,14 +61,11 @@ public class ImporteringController {
             @RequestParam int årstall,
             @RequestParam int kvartal
     ) {
-
         ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
-        int antallVirksomhetMetadataOpprettet = postImporteringService.importVirksomhetMetadata(årstallOgKvartal);
+        Pair<Integer, Integer> antallImportert =
+                postImporteringService.importVirksomhetMetadataOgVirksomhetNæringskode5sifferMapping(årstallOgKvartal);
 
-        int antallVirksomhetNæringskode5sifferMapping =
-                postImporteringService.importVirksomhetNæringskode5sifferMapping(årstallOgKvartal);
-
-        if (antallVirksomhetMetadataOpprettet >= 0 || antallVirksomhetNæringskode5sifferMapping >= 0) {
+        if (antallImportert.getFirst() >= 0) {
             return ResponseEntity.ok(HttpStatus.CREATED);
         } else {
             return ResponseEntity.ok(HttpStatus.OK);
@@ -79,9 +77,10 @@ public class ImporteringController {
             @RequestParam int årstall,
             @RequestParam int kvartal
     ) {
-        if (postImporteringService.forberedNesteEksport(
-                new ÅrstallOgKvartal(årstall, kvartal)
-        ) >= 0) {
+        ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
+        int antallOpprettet = postImporteringService.forberedNesteEksport(årstallOgKvartal);
+
+        if (antallOpprettet >= 0) {
             return ResponseEntity.ok(HttpStatus.CREATED);
         } else {
             return ResponseEntity.ok(HttpStatus.OK);
