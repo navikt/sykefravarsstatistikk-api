@@ -35,7 +35,8 @@ public class EksporteringScheduler {
 
     private void eksportering() {
         log.info("Jobb for å ekportere sykefraværsstatistikk er startet.");
-        eksporteringService.eksporterHvisDetFinnesNyStatistikk();
+        log.info("Jobb er ikke aktivert enda");
+        //eksporteringService.eksporterHvisDetFinnesNyStatistikk();
     }
 
 }
