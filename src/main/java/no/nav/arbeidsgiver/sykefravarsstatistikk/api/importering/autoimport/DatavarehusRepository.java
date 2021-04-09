@@ -308,7 +308,8 @@ public class DatavarehusRepository {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource();
         StringBuffer query = new StringBuffer("select orgnr, offnavn, rectype, sektor, naring, arstall, kvartal " +
                 "from dt_p.v_dim_ia_orgenhet " +
-                "where length(trim(orgnr)) = 9 ");
+                "where length(trim(orgnr)) = 9 " +
+                "and offnavn is not null ");
 
         if (filtrerPåÅrstallOgKvartal) {
             namedParameters.addValue(ARSTALL, årstallOgKvartal.getÅrstall())
