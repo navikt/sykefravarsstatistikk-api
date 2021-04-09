@@ -90,7 +90,7 @@ class PostImporteringServiceTest {
             List<Orgenhet> orgenhetSomSkalTilVirksomhetMetadata
     ) {
         when(
-                datavarehusRepository.hentOrgenhet(årstallOgKvartal))
+                datavarehusRepository.hentOrgenhet(årstallOgKvartal, true))
                 .thenReturn(orgenhetSomSkalTilVirksomhetMetadata);
         when(
                 virksomhetMetadataRepository.opprettVirksomhetMetadata(any()))

@@ -77,7 +77,9 @@ public class PostImporteringService {
 
 
     // Kall fra Controller / backdoor
-    protected Pair<Integer, Integer> importVirksomhetMetadataOgVirksomhetNæringskode5sifferMapping(ÅrstallOgKvartal årstallOgKvartal) {
+    protected Pair<Integer, Integer> importVirksomhetMetadataOgVirksomhetNæringskode5sifferMapping(
+            ÅrstallOgKvartal årstallOgKvartal
+    ) {
         if (!erImporteringAktivert) {
             return Pair.of(0, 0);
         }
@@ -121,7 +123,34 @@ public class PostImporteringService {
 
 
     private int importVirksomhetMetadata(ÅrstallOgKvartal årstallOgKvartal) {
-        List<Orgenhet> orgenhetList = datavarehusRepository.hentOrgenhet(årstallOgKvartal);
+        List<Orgenhet> orgenhetList = datavarehusRepository.hentOrgenhet(årstallOgKvartal, true);
+
+        if (orgenhetList.isEmpty()) {
+            List<ÅrstallOgKvartal> sisteTilgjengeligKvartal = datavarehusRepository.hentSisteKvartalForOrgenhet();
+
+            if (sisteTilgjengeligKvartal == null || sisteTilgjengeligKvartal.size() != 1) {
+                log.warn(
+                        "Har ikke funnet Orgenhet for årstall '{}' og kvartal '{}'. " +
+                        "Flere årstal og kvartal funnet i DVH for Orgenhet, antall: '{}' . Stopper import av metadata.",
+                        årstallOgKvartal.getÅrstall(),
+                        årstallOgKvartal.getKvartal(),
+                        sisteTilgjengeligKvartal.size()
+                );
+                return 0;
+            }
+
+            ÅrstallOgKvartal tilgjengeligÅrstallOgKvartal = sisteTilgjengeligKvartal.get(0);
+            log.warn(
+                    "Har ikke funnet Orgenhet for årstall '{}' og kvartal '{}'. Importerer VirksomhetMetadata " +
+                            "med det årstall og kvartal som er tilgjengelig i datavarehus: '{} {}'",
+                    årstallOgKvartal.getÅrstall(),
+                    årstallOgKvartal.getKvartal(),
+                    tilgjengeligÅrstallOgKvartal.getÅrstall(),
+                    tilgjengeligÅrstallOgKvartal.getKvartal()
+            );
+
+            orgenhetList = datavarehusRepository.hentOrgenhet(årstallOgKvartal);
+        }
         int antallOpprettet =
                 virksomhetMetadataRepository.opprettVirksomhetMetadata(mapToVirksomhetMetadata(orgenhetList));
 

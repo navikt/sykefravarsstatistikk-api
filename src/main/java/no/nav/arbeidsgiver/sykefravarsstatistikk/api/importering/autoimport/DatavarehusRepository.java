@@ -300,17 +300,25 @@ public class DatavarehusRepository {
     }
 
     public List<Orgenhet> hentOrgenhet(ÅrstallOgKvartal årstallOgKvartal) {
-        SqlParameterSource namedParameters =
-                new MapSqlParameterSource()
-                        .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
-                        .addValue(KVARTAL, årstallOgKvartal.getKvartal());
+        return hentOrgenhet(årstallOgKvartal, false);
+    }
 
-        return namedParameterJdbcTemplate.query(
-                "select orgnr, offnavn, rectype, sektor, naring, arstall, kvartal  " +
-                        "from dt_p.v_dim_ia_orgenhet " +
-                        "where length(trim(orgnr)) = 9 " +
-                        "and arstall = :arstall " +
-                        "and kvartal = :kvartal",
+    public List<Orgenhet> hentOrgenhet(ÅrstallOgKvartal årstallOgKvartal, boolean filtrerPåÅrstallOgKvartal) {
+
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource();
+        StringBuffer query = new StringBuffer("select orgnr, offnavn, rectype, sektor, naring, arstall, kvartal " +
+                "from dt_p.v_dim_ia_orgenhet " +
+                "where length(trim(orgnr)) = 9 ");
+
+        if (filtrerPåÅrstallOgKvartal) {
+            namedParameters.addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+                    .addValue(KVARTAL, årstallOgKvartal.getKvartal());
+            query.append("and arstall = :arstall ");
+            query.append("and kvartal = :kvartal");
+        }
+
+
+        return namedParameterJdbcTemplate.query(query.toString(),
                 namedParameters,
                 ((resultSet, i) ->
                         new Orgenhet(
@@ -319,10 +327,23 @@ public class DatavarehusRepository {
                                 resultSet.getString(RECTYPE),
                                 resultSet.getString(SEKTOR),
                                 resultSet.getString(NARING),
-                                new ÅrstallOgKvartal(
+                                filtrerPåÅrstallOgKvartal? new ÅrstallOgKvartal(
                                         resultSet.getInt(ARSTALL),
                                         resultSet.getInt(KVARTAL)
-                                )
+                                ) : årstallOgKvartal
+                        )
+                )
+        );
+    }
+
+    public List<ÅrstallOgKvartal> hentSisteKvartalForOrgenhet() {
+        return namedParameterJdbcTemplate.query(
+                "select distinct arstall, kvartal from dt_p.v_dim_ia_orgenhet order by arstall, kvartal desc",
+                new MapSqlParameterSource(),
+                ((resultSet, i) ->
+                        new ÅrstallOgKvartal(
+                                resultSet.getInt(ARSTALL),
+                                resultSet.getInt(KVARTAL)
                         )
                 )
         );
