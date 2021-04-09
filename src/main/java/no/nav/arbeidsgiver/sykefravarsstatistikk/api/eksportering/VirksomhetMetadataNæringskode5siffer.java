@@ -19,4 +19,24 @@ public class VirksomhetMetadataNæringskode5siffer {
     public int getKvartal() { return årstallOgKvartal.getKvartal(); }
     public String getNæring() { return næringOgNæringskode5siffer.getNæring(); }
     public String getNæringskode5siffer() { return næringOgNæringskode5siffer.getNæringskode5Siffer(); }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        VirksomhetMetadataNæringskode5siffer that = (VirksomhetMetadataNæringskode5siffer) o;
+
+        if (!orgnr.equals(that.orgnr)) return false;
+        if (!årstallOgKvartal.equals(that.årstallOgKvartal)) return false;
+        return næringOgNæringskode5siffer.equals(that.næringOgNæringskode5siffer);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = orgnr.hashCode();
+        result = 31 * result + årstallOgKvartal.hashCode();
+        result = 31 * result + næringOgNæringskode5siffer.hashCode();
+        return result;
+    }
 }

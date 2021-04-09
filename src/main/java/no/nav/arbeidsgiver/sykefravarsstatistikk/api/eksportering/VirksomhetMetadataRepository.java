@@ -49,7 +49,7 @@ public class VirksomhetMetadataRepository {
 
         int[] results = namedParameterJdbcTemplate.batchUpdate(
                 "insert into virksomhet_metadata_naring_kode_5siffer " +
-                        "(orgnr, naring, naring_kode, arstall, kvartal) " +
+                        "(orgnr, naring_kode, naring_kode_5siffer, arstall, kvartal) " +
                         "values " +
                         "(:orgnr, :næring, :næringskode5siffer, :årstall, :kvartal)",
                 batch

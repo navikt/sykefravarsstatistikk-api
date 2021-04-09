@@ -40,6 +40,29 @@ class VirksomhetMetadataRepositoryJdbcTest {
 
 
     @Test
+    public void opprettVirksomhetMetadataNæringskode5siffer__oppretter_riktig_metadataNæringskode5siffer() {
+        VirksomhetMetadataNæringskode5siffer virksomhetMetadataNæringskode5siffer1 = new VirksomhetMetadataNæringskode5siffer(
+                new Orgnr(ORGNR_VIRKSOMHET_1),
+                new ÅrstallOgKvartal(2020, 3),
+                new NæringOgNæringskode5siffer(NÆRINGSKODE_2SIFFER, "10001")
+        );
+        VirksomhetMetadataNæringskode5siffer virksomhetMetadataNæringskode5siffer2 = new VirksomhetMetadataNæringskode5siffer(
+                new Orgnr(ORGNR_VIRKSOMHET_1),
+                new ÅrstallOgKvartal(2020, 3),
+                new NæringOgNæringskode5siffer(NÆRINGSKODE_2SIFFER, "10002")
+        );
+
+        repository.opprettVirksomhetMetadataNæringskode5siffer(Arrays.asList(
+                virksomhetMetadataNæringskode5siffer1,
+                virksomhetMetadataNæringskode5siffer2
+        ));
+
+        List<VirksomhetMetadataNæringskode5siffer> results = hentAlleVirksomhetMetadataNæringskode5siffer(namedParameterJdbcTemplate);
+        assertThat(results.get(0)).isEqualTo(virksomhetMetadataNæringskode5siffer1);
+        assertThat(results.get(1)).isEqualTo(virksomhetMetadataNæringskode5siffer2);
+    }
+
+    @Test
     public void opprettVirksomhetMetadata__oppretter_riktig_metadata() {
         VirksomhetMetadata virksomhetMetadataVirksomhet1 = new VirksomhetMetadata(
                 new Orgnr(ORGNR_VIRKSOMHET_1),
@@ -126,6 +149,24 @@ class VirksomhetMetadataRepositoryJdbcTest {
                         new ÅrstallOgKvartal(
                                 rs.getInt("arstall"),
                                 rs.getInt("kvartal")
+                        )
+                )
+        );
+    }
+
+    private List<VirksomhetMetadataNæringskode5siffer> hentAlleVirksomhetMetadataNæringskode5siffer(NamedParameterJdbcTemplate jdbcTemplate) {
+        return jdbcTemplate.query(
+                "select * from virksomhet_metadata_naring_kode_5siffer",
+                new MapSqlParameterSource(),
+                (rs, rowNum) -> new VirksomhetMetadataNæringskode5siffer(
+                        new Orgnr(rs.getString("orgnr")),
+                        new ÅrstallOgKvartal(
+                                rs.getInt("arstall"),
+                                rs.getInt("kvartal")
+                        ),
+                        new NæringOgNæringskode5siffer(
+                                rs.getString("naring_kode"),
+                                rs.getString("naring_kode_5siffer")
                         )
                 )
         );
