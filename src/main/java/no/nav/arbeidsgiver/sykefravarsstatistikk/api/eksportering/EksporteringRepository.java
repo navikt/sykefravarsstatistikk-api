@@ -41,26 +41,28 @@ public class EksporteringRepository {
     }
 
     public List<VirksomhetEksportPerKvartal> hentVirksomhetEksportPerKvartal(ÅrstallOgKvartal årstallOgKvartal) {
-        SqlParameterSource namedParameters =
+        SqlParameterSource parametre =
                 new MapSqlParameterSource()
                         .addValue("årstall", årstallOgKvartal.getÅrstall())
                         .addValue("kvartal", årstallOgKvartal.getKvartal());
 
         return namedParameterJdbcTemplate.query(
-                "select orgnr, arstall, kvartal, eksportert" +
-                        " from eksport_per_kvartal" +
-                        " where arstall = :årstall and kvartal = :kvartal ",
-                namedParameters,
+                "select orgnr, arstall, kvartal, eksportert " +
+                        "from eksport_per_kvartal " +
+                        "where arstall = :årstall " +
+                        "and kvartal = :kvartal",
+                parametre,
                 (resultSet, rowNum) ->
                         new VirksomhetEksportPerKvartal(
                                 new Orgnr(resultSet.getString("orgnr")),
-                                new ÅrstallOgKvartal(resultSet.getInt("arstall"),
-                                        resultSet.getInt("kvartal")),
-                                "true".equals(resultSet.getString("eksportert")
-                                )
+                                new ÅrstallOgKvartal(
+                                        resultSet.getInt("arstall"),
+                                        resultSet.getInt("kvartal")
+                                ),
+                                "true".equals(resultSet.getString("eksportert"))
                         )
         );
     }
-    // hent()
+
     // oppdater()
 }

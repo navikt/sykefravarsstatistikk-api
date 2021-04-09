@@ -40,6 +40,50 @@ class VirksomhetMetadataRepositoryJdbcTest {
 
 
     @Test
+    public void slettNæringOgNæringskode5siffer__sletter_VirksomhetMetaData_for_en_vis_ÅrstallOgKvartal() {
+        opprettTestVirksomhetMetaData(2020, 3);
+
+        int antallSlettet2Kvartal2020 = repository.slettNæringOgNæringskode5siffer(new ÅrstallOgKvartal(2020, 2));
+        int antallSlettet3Kvartal2020 = repository.slettNæringOgNæringskode5siffer(new ÅrstallOgKvartal(2020, 3));
+
+        assertThat(antallSlettet2Kvartal2020).isEqualTo(0);
+        assertThat(antallSlettet3Kvartal2020).isEqualTo(2);
+    }
+
+    @Test
+    public void hentAntallNæringOgNæringskode5siffer__returnerer_antall_rader_funnet_for_en_vis_ÅrstallOgKvartal() {
+        opprettTestVirksomhetMetaData(2020, 3);
+
+        int antallI2Kvartal2020 = repository.hentAntallNæringOgNæringskode5siffer(new ÅrstallOgKvartal(2020, 2));
+        int antallI3Kvartal2020 = repository.hentAntallNæringOgNæringskode5siffer(new ÅrstallOgKvartal(2020, 3));
+
+        assertThat(antallI2Kvartal2020).isEqualTo(0);
+        assertThat(antallI3Kvartal2020).isEqualTo(2);
+    }
+
+    @Test
+    public void slettVirksomhetMetadata__sletter_VirksomhetMetaData_for_en_vis_ÅrstallOgKvartal() {
+        opprettTestVirksomhetMetaData(2020, 3);
+
+        int antallSlettet2Kvartal2020 = repository.slettVirksomhetMetadata(new ÅrstallOgKvartal(2020, 2));
+        int antallSlettet3Kvartal2020 = repository.slettVirksomhetMetadata(new ÅrstallOgKvartal(2020, 3));
+
+        assertThat(antallSlettet2Kvartal2020).isEqualTo(0);
+        assertThat(antallSlettet3Kvartal2020).isEqualTo(3);
+    }
+
+    @Test
+    public void hentAntallVirksomhetMetadata__returnerer_antall_rader_funnet_for_en_vis_ÅrstallOgKvartal() {
+        opprettTestVirksomhetMetaData(2020, 3);
+
+        int antallI2Kvartal2020 = repository.hentAntallVirksomhetMetadata(new ÅrstallOgKvartal(2020, 2));
+        int antallI3Kvartal2020 = repository.hentAntallVirksomhetMetadata(new ÅrstallOgKvartal(2020, 3));
+
+        assertThat(antallI2Kvartal2020).isEqualTo(0);
+        assertThat(antallI3Kvartal2020).isEqualTo(3);
+    }
+
+    @Test
     public void opprettVirksomhetMetadataNæringskode5siffer__oppretter_riktig_metadataNæringskode5siffer() {
         VirksomhetMetadataNæringskode5siffer virksomhetMetadataNæringskode5siffer1 = new VirksomhetMetadataNæringskode5siffer(
                 new Orgnr(ORGNR_VIRKSOMHET_1),

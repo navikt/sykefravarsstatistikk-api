@@ -63,9 +63,10 @@ public class VirksomhetMetadataRepository {
                 .addValue("kvartal", årstallOgKvartal.getKvartal());
 
         List<VirksomhetMetadata> virksomhetMetadata = namedParameterJdbcTemplate.query(
-                "SELECT orgnr, navn, rectype, sektor, naring_kode, arstall, kvartal " +
-                        "FROM virksomhet_metadata " +
-                        "WHERE arstall = :årstall AND kvartal = :kvartal",
+                "select orgnr, navn, rectype, sektor, naring_kode, arstall, kvartal " +
+                        "from virksomhet_metadata " +
+                        "where arstall = :årstall " +
+                        "and kvartal = :kvartal ",
                 paramSource,
                 ((resultSet, i) ->
                         new VirksomhetMetadata(
@@ -120,5 +121,67 @@ public class VirksomhetMetadataRepository {
         );
 
         return virksomhetMetadata;
+    }
+
+    public int hentAntallVirksomhetMetadata(ÅrstallOgKvartal årstallOgKvartal) {
+        MapSqlParameterSource parametre = new MapSqlParameterSource()
+                .addValue("årstall", årstallOgKvartal.getÅrstall())
+                .addValue("kvartal", årstallOgKvartal.getKvartal());
+
+        Integer result = namedParameterJdbcTemplate.queryForObject(
+                "select count(*) " +
+                        "from virksomhet_metadata " +
+                        "where arstall = :årstall " +
+                        "and kvartal = :kvartal",
+                parametre,
+                Integer.class
+        );
+
+        return result == null? 0 : result;
+    }
+
+    public int slettVirksomhetMetadata(ÅrstallOgKvartal årstallOgKvartal) {
+        MapSqlParameterSource parametre = new MapSqlParameterSource()
+                .addValue("årstall", årstallOgKvartal.getÅrstall())
+                .addValue("kvartal", årstallOgKvartal.getKvartal());
+
+        return namedParameterJdbcTemplate.update(
+                "delete " +
+                        "from virksomhet_metadata " +
+                        "where arstall = :årstall " +
+                        "and kvartal = :kvartal",
+                parametre
+        );
+    }
+
+    public int hentAntallNæringOgNæringskode5siffer(ÅrstallOgKvartal årstallOgKvartal) {
+        MapSqlParameterSource parametre = new MapSqlParameterSource()
+                .addValue("årstall", årstallOgKvartal.getÅrstall())
+                .addValue("kvartal", årstallOgKvartal.getKvartal());
+
+        Integer result = namedParameterJdbcTemplate.queryForObject(
+                "select count(*) " +
+                        "from virksomhet_metadata_naring_kode_5siffer " +
+                        "where arstall = :årstall " +
+                        "and kvartal = :kvartal",
+                parametre,
+                Integer.class
+        );
+
+        return result == null? 0 : result;
+    }
+
+    public int slettNæringOgNæringskode5siffer(ÅrstallOgKvartal årstallOgKvartal) {
+        MapSqlParameterSource parametre = new MapSqlParameterSource()
+                .addValue("årstall", årstallOgKvartal.getÅrstall())
+                .addValue("kvartal", årstallOgKvartal.getKvartal());
+
+        return namedParameterJdbcTemplate.update(
+                "delete " +
+                        "from virksomhet_metadata_naring_kode_5siffer " +
+                        "where arstall = :årstall " +
+                        "and kvartal = :kvartal",
+                parametre
+        );
     }
 }

@@ -41,7 +41,7 @@ class EksporteringRepositoryTest {
 
 
     @Test
-    void oppdaterOgSetErEksportertTilTrue__skal_returnere_1() {
+    void hentVirksomhetEksportPerKvartal__returnerer_antall_VirksomhetEksportPerKvartal_funnet() {
         int oppdaterteRader = eksporteringRepository.opprettEksport(
                 Arrays.asList(
                         new VirksomhetEksportPerKvartal(
@@ -56,7 +56,9 @@ class EksporteringRepositoryTest {
                         )
                 ));
         assertEquals(2, oppdaterteRader);
-        List<VirksomhetEksportPerKvartal> resultat = eksporteringRepository.hentVirksomhetEksportPerKvartal(new ÅrstallOgKvartal(2019, 2));
+
+        List<VirksomhetEksportPerKvartal> resultat =
+                eksporteringRepository.hentVirksomhetEksportPerKvartal(new ÅrstallOgKvartal(2019, 2));
 
         assertTrue(resultat.stream().anyMatch(virksomhetEksportPerKvartal ->
                 virksomhetEksportPerKvartal.getOrgnr().equals("999999998") &&
