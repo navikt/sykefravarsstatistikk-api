@@ -151,6 +151,8 @@ public class PostImporteringService {
 
             orgenhetList = datavarehusRepository.hentOrgenhet(årstallOgKvartal);
         }
+
+        log.info("Antall orgenhet fra DVH: {}", orgenhetList.size());
         int antallOpprettet =
                 virksomhetMetadataRepository.opprettVirksomhetMetadata(mapToVirksomhetMetadata(orgenhetList));
 
