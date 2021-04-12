@@ -254,7 +254,9 @@ public class PostImporteringService {
         ).collect(Collectors.toList());
     }
 
-    private static List<VirksomhetEksportPerKvartal> mapToVirksomhetEksportPerKvartal(List<VirksomhetMetadata> virksomhetMetadataList) {
+    private static List<VirksomhetEksportPerKvartal> mapToVirksomhetEksportPerKvartal(
+            List<VirksomhetMetadata> virksomhetMetadataList
+    ) {
         return virksomhetMetadataList.stream().map(
                 virksomhetMetadata -> new VirksomhetEksportPerKvartal(
                         new Orgnr(virksomhetMetadata.getOrgnr()),
