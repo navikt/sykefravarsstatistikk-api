@@ -20,16 +20,16 @@ import java.util.List;
 public class ImporteringController {
 
     private final ImporteringService importeringService;
-    private final ImporteringKvalitetssjekkService importeringTestService;
+    private final ImporteringKvalitetssjekkService importeringKvalitetssjekkService;
     private final PostImporteringService postImporteringService;
 
     public ImporteringController(
             ImporteringService importeringService,
-            ImporteringKvalitetssjekkService importeringTestService,
+            ImporteringKvalitetssjekkService importeringKvalitetssjekkService,
             PostImporteringService postImporteringService
     ) {
         this.importeringService = importeringService;
-        this.importeringTestService = importeringTestService;
+        this.importeringKvalitetssjekkService = importeringKvalitetssjekkService;
         this.postImporteringService = postImporteringService;
     }
 
@@ -90,6 +90,8 @@ public class ImporteringController {
 
     @GetMapping("/kvalitetssjekk")
     public ResponseEntity<List<String>> testAvNæringMedVarighetOgGradering() {
-        return ResponseEntity.ok(importeringTestService.kvalitetssjekkNæringMedVarighetOgMedGraderingMotNæringstabell());
+        return ResponseEntity.ok(
+                importeringKvalitetssjekkService.kvalitetssjekkNæringMedVarighetOgMedGraderingMotNæringstabell()
+        );
     }
 }

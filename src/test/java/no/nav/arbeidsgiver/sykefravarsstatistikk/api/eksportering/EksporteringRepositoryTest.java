@@ -66,18 +66,14 @@ class EksporteringRepositoryTest {
                         virksomhetEksportPerKvartal.getÅrstallOgKvartal().getÅrstall() == 2019 &&
                         virksomhetEksportPerKvartal.getÅrstallOgKvartal().getKvartal() == 2
         ));
-
     }
 
     @Test
     void oppdaterOgSetErEksportertTilTrue__skal_returnere_0_hvis_data_ikke_finnes() {
         int oppdaterteRader = eksporteringRepository.opprettEksport(null);
-
         assertEquals(0, oppdaterteRader);
+
         oppdaterteRader = eksporteringRepository.opprettEksport(Collections.emptyList());
-
         assertEquals(0, oppdaterteRader);
-
     }
-
 }
