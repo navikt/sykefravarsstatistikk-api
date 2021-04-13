@@ -15,6 +15,11 @@ public class AssertUtils {
     }
 
     public static void assertBigDecimalIsEqual(BigDecimal actual, BigDecimal expected) {
+        if (actual == null || expected == null) {
+            assertThat(actual).isEqualTo(expected);
+            return;
+        }
+
         assertThat(actual.setScale(SCALE, RoundingMode.HALF_UP))
                 .isEqualTo(expected.setScale(SCALE, RoundingMode.HALF_UP));
     }
