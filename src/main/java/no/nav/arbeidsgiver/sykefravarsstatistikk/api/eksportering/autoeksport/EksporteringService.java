@@ -3,16 +3,28 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.StatistikkRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -20,21 +32,21 @@ import java.util.stream.Collectors;
 public class EksporteringService {
 
     private final EksporteringRepository eksporteringRepository;
-    private final StatistikkRepository statistikkRepository;
     private final VirksomhetMetadataRepository virksomhetMetadataRepository;
+    private final SykefraværsstatistikkTilEksporteringRepository sykefraværsstatistikkTilEksporteringRepository;
     private final KafkaService kafkaService;
     private final boolean erEksporteringAktivert;
 
     public EksporteringService(
             EksporteringRepository eksporteringRepository,
-            StatistikkRepository statistikkRepository,
             VirksomhetMetadataRepository virksomhetMetadataRepository,
+            SykefraværsstatistikkTilEksporteringRepository sykefraværsstatistikkTilEksporteringRepository,
             KafkaService kafkaService,
             @Value("${statistikk.eksportering.aktivert}") Boolean erEksporteringAktivert
     ) {
         this.eksporteringRepository = eksporteringRepository;
-        this.statistikkRepository = statistikkRepository;
         this.virksomhetMetadataRepository = virksomhetMetadataRepository;
+        this.sykefraværsstatistikkTilEksporteringRepository = sykefraværsstatistikkTilEksporteringRepository;
         this.kafkaService = kafkaService;
         this.erEksporteringAktivert = erEksporteringAktivert;
     }
@@ -82,36 +94,212 @@ public class EksporteringService {
             ÅrstallOgKvartal årstallOgKvartal
     ) {
 
-        // Hent SF Land
-        // Hent SF alle sektorer
-        // Hent SF alle næringskoder 2 siffer
-        // Hent SF alle virksomheter
+        List<VirksomhetMetadata> virksomhetMetadataListe =
+                virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal);
+        SykefraværsstatistikkLand sykefraværsstatistikkLand =
+                sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentLand(årstallOgKvartal);
+        List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor =
+                sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(årstallOgKvartal);
+        List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring =
+                sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(årstallOgKvartal);
+        List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer = Collections.emptyList();
+        List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet =
+                sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(årstallOgKvartal);
 
+
+        SykefraværMedKategori landSykefravær = getSykefraværMedKategoriForLand(
+                årstallOgKvartal,
+                sykefraværsstatistikkLand
+        );
         AtomicInteger antallEksportert = new AtomicInteger();
-        virksomheterTilEksport.stream().forEach( v -> {
-                        System.out.println("Eksport for " + v.getOrgnr());
 
-            try {
-                kafkaService.send(
-                        årstallOgKvartal,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null
-                );
-            } catch (JsonProcessingException e) { // TODO: bruk en typed Exception og en counter som får prosessen til å stoppe etter X antall feil
-                log.warn("Exception");
-            }
+        virksomheterTilEksport.stream().forEach(virksomhetTilEksport -> {
+                    System.out.println("Eksport for " + virksomhetTilEksport.getOrgnr());
+                    VirksomhetMetadata virksomhetMetadata = getVirksomhetMetada(
+                            new Orgnr(virksomhetTilEksport.getOrgnr()),
+                            virksomhetTilEksport.getÅrstallOgKvartal(),
+                            virksomhetMetadataListe
+                    );
 
-            // update eksportert=true
-            antallEksportert.getAndIncrement();
-                });
+                    if (virksomhetMetadata != null) {
+                        try {
+                            kafkaService.send(
+                                    årstallOgKvartal,
+                                    getVirksomhetSykefravær(
+                                            virksomhetMetadata,
+                                            sykefraværsstatistikkVirksomhetUtenVarighet
+                                    ),
+                                    getSykefraværMedKategoriForNæring5Siffer(
+                                            virksomhetMetadata,
+                                            sykefraværsstatistikkNæring5Siffer
+                                    ),
+                                    getSykefraværMedKategoriForNæring(
+                                            virksomhetMetadata,
+                                            sykefraværsstatistikkNæring
+                                    ),
+                                    getSykefraværMedKategoriForSektor(
+                                            virksomhetMetadata,
+                                            sykefraværsstatistikkSektor
+                                    ),
+                                    landSykefravær
+                            );
+                        } catch (JsonProcessingException e) { // TODO: bruk en typed Exception og en counter som får prosessen til å stoppe etter X antall feil
+                            log.warn("Exception");
+                        }
+
+                        eksporteringRepository.oppdaterTilEksportert(virksomhetTilEksport);
+                        antallEksportert.getAndIncrement();
+                    }
+                }
+        );
 
         return antallEksportert.get();
     }
 
-    protected long getAntallSomKanEksporteres(List<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartal) {
-        return virksomhetEksportPerKvartal.stream().filter(VirksomhetEksportPerKvartal::eksportert).count();
+
+    protected static long getAntallSomKanEksporteres(List<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartal) {
+        return virksomhetEksportPerKvartal.stream().filter( v -> !v.eksportert()).count();
+    }
+
+    protected static VirksomhetMetadata getVirksomhetMetada(
+            Orgnr orgnr,
+            ÅrstallOgKvartal årstallOgKvartal,
+            List<VirksomhetMetadata> virksomhetMetadataListe
+    ) {
+        List<VirksomhetMetadata> virksomhetMetadataFunnet =
+                virksomhetMetadataListe.stream().filter(
+                        v -> v.getOrgnr().equals(orgnr.getVerdi())
+                                && v.getÅrstall() == årstallOgKvartal.getÅrstall()
+                                && v.getKvartal() == årstallOgKvartal.getKvartal()
+                ).collect(Collectors.toList());
+
+        if (virksomhetMetadataFunnet == null || virksomhetMetadataFunnet.size() != 1) {
+            return null;
+        } else {
+            return virksomhetMetadataFunnet.get(0);
+        }
+    }
+
+    protected static VirksomhetSykefravær getVirksomhetSykefravær(
+            VirksomhetMetadata virksomhetMetadata,
+            List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet
+    ) {
+        SykefraværsstatistikkVirksomhetUtenVarighet sfStatistikk =
+                sykefraværsstatistikkVirksomhetUtenVarighet.stream().filter(
+                        v -> v.getOrgnr().equals(virksomhetMetadata.getOrgnr())
+                                && v.getÅrstall() == virksomhetMetadata.getÅrstall()
+                                && v.getKvartal() == virksomhetMetadata.getKvartal()
+                ).collect(toSingleton(
+                        new SykefraværsstatistikkVirksomhetUtenVarighet(
+                                virksomhetMetadata.getÅrstall(),
+                                virksomhetMetadata.getKvartal(),
+                                virksomhetMetadata.getOrgnr(),
+                                0,
+                                null,
+                                null
+                        )
+                ));
+
+        return new VirksomhetSykefravær(
+                virksomhetMetadata.getOrgnr(),
+                "",
+                new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
+                sfStatistikk.getTapteDagsverk(),
+                sfStatistikk.getMuligeDagsverk(),
+                sfStatistikk.getAntallPersoner()
+        );
+    }
+
+    protected static SykefraværMedKategori getSykefraværMedKategoriForLand(
+            ÅrstallOgKvartal årstallOgKvartal,
+            SykefraværsstatistikkLand sykefraværsstatistikkLand
+    ) {
+        return new SykefraværMedKategori(
+                Statistikkategori.LAND,
+                "NO",
+                årstallOgKvartal,
+                sykefraværsstatistikkLand.getTapteDagsverk(),
+                sykefraværsstatistikkLand.getMuligeDagsverk(),
+                sykefraværsstatistikkLand.getAntallPersoner()
+        );
+    }
+
+    protected static SykefraværMedKategori getSykefraværMedKategoriForSektor(
+            VirksomhetMetadata virksomhetMetadata,
+            List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor
+    ) {
+        SykefraværsstatistikkSektor sfSektor =
+                sykefraværsstatistikkSektor.stream().filter(
+                        v -> v.getSektorkode().equals(virksomhetMetadata.getSektor())
+                                && v.getÅrstall() == virksomhetMetadata.getÅrstall()
+                                && v.getKvartal() == virksomhetMetadata.getKvartal()
+                ).collect(toSingleton(
+                        new SykefraværsstatistikkSektor(
+                                virksomhetMetadata.getÅrstall(),
+                                virksomhetMetadata.getKvartal(),
+                                virksomhetMetadata.getSektor(),
+                                0,
+                                null,
+                                null
+                        )
+                ));
+
+        return new SykefraværMedKategori(
+                Statistikkategori.SEKTOR,
+                sfSektor.getSektorkode(),
+                new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
+                sfSektor.getTapteDagsverk(),
+                sfSektor.getMuligeDagsverk(),
+                sfSektor.getAntallPersoner()
+        );
+    }
+
+    protected SykefraværMedKategori getSykefraværMedKategoriForNæring5Siffer(
+            VirksomhetMetadata virksomheterTilEksport,
+            List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer
+    ) {
+        return null;
+    }
+
+    private SykefraværMedKategori getSykefraværMedKategoriForNæring(
+            VirksomhetMetadata virksomhetMetadata,
+            List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring
+    ) {
+        SykefraværsstatistikkNæring sfNæring =
+                sykefraværsstatistikkNæring.stream().filter(
+                        v -> v.getNæringkode().equals(virksomhetMetadata.getNæring())
+                                && v.getÅrstall() == virksomhetMetadata.getÅrstall()
+                                && v.getKvartal() == virksomhetMetadata.getKvartal()
+                ).collect(toSingleton(
+                        new SykefraværsstatistikkNæring(
+                                virksomhetMetadata.getÅrstall(),
+                                virksomhetMetadata.getKvartal(),
+                                virksomhetMetadata.getNæring(),
+                                0,
+                                null,
+                                null
+                        )
+                ));
+
+        return new SykefraværMedKategori(
+                Statistikkategori.NÆRING,
+                sfNæring.getNæringkode(),
+                new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
+                sfNæring.getTapteDagsverk(),
+                sfNæring.getMuligeDagsverk(),
+                sfNæring.getAntallPersoner()
+        );
+    }
+
+    private static <T> Collector<T, ?, T> toSingleton(T emptySykefraværsstatistikk) {
+        return Collectors.collectingAndThen(
+                Collectors.toList(),
+                list -> {
+                    if (list.size() != 1) {
+                        return emptySykefraværsstatistikk;
+                    }
+                    return list.get(0);
+                }
+        );
     }
 }

@@ -64,5 +64,19 @@ public class EksporteringRepository {
         );
     }
 
-    // oppdater()
+    public void oppdaterTilEksportert(VirksomhetEksportPerKvartal virksomhetTilEksport) {
+        SqlParameterSource parametre =
+                new MapSqlParameterSource()
+                        .addValue("årstall", virksomhetTilEksport.getÅrstall())
+                        .addValue("kvartal", virksomhetTilEksport.getKvartal())
+                        .addValue("orgnr", virksomhetTilEksport.getOrgnr());
+
+        namedParameterJdbcTemplate.update(
+                "update eksport_per_kvartal set eksportert='true' " +
+                        "where arstall = :årstall " +
+                        "and kvartal = :kvartal " +
+                        "and orgnr = :orgnr ",
+                parametre
+        );
+    }
 }
