@@ -2,10 +2,14 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +26,7 @@ import java.util.stream.Collectors;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils.assertBigDecimalIsEqual;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ActiveProfiles("db-test")
 @DataJdbcTest
@@ -35,30 +40,17 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     private Næringskode5Siffer produksjonAvKlær = new Næringskode5Siffer("14190", "Produksjon av klær");
     private Næringskode5Siffer undervisning = new Næringskode5Siffer("86907", "Undervisning");
     private Næring utdanning = new Næring("86", "Utdanning");
-    private Næring _2SifferKode = new Næring("85", "Vilkårlig 2 siffer kode");
-    private Næringskode5Siffer _5SifferKode = new Næringskode5Siffer("08500", "Vilkårlig 5 siffer kode");
     private Næring produksjon = new Næring("14", "Produksjon");
+    private Sektor kommunalForvaltning = new Sektor("1", "Kommunal forvaltning");
+    private Sektor næringsvirksomhet = new Sektor("3", "Privat og offentlig næringsvirksomhet");
+    private String VIRKSOMHET_1 = "999999999";
+    private String VIRKSOMHET_2 = "999999998";
 
     @BeforeEach
     void setUp() {
         slettAllStatistikkFraDatabase(jdbcTemplate);
         repository = new SykefraværsstatistikkTilEksporteringRepository(jdbcTemplate);
-
-        createStatistikkNæring5Siffer(produksjonAvKlær, 2019, 2, 10, 2, 100);
-        createStatistikkNæring5Siffer(produksjonAvKlær, 2019, 1, 10, 3, 100);
-        createStatistikkNæring5Siffer(undervisning, 2019, 2, 10, 5, 100);
-        createStatistikkNæring5Siffer(undervisning, 2019, 1, 10, 8, 100);
-
-        createStatistikkNæring(produksjon, 2019, 2, 10, 2, 100);
-        createStatistikkNæring(produksjon, 2019, 1, 10, 3, 100);
-        createStatistikkNæring(utdanning, 2019, 2, 10, 5, 100);
-        createStatistikkNæring(utdanning, 2019, 1, 10, 8, 100);
-
-        createStatistikkVirksomhet("999999999", _2SifferKode, _5SifferKode, 2019, 2, 3, 0, 60);
-        createStatistikkVirksomhet("999999998", _2SifferKode, _5SifferKode, 2019, 2, 4, 0, 100);
-        createStatistikkVirksomhet("999999999", _2SifferKode, _5SifferKode, 2019, 2, 40, 20, 115);
     }
-
 
     @AfterEach
     void tearDown() {
@@ -67,45 +59,172 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
 
     @Test
-    void  hentSykefraværprosentAlleNæringer5SifferForEttKvartal__skal_returnere_riktig_data_til_alle_næringer() {
-        List<SykefraværsstatistikkNæring5Siffer> resultat =
-                repository.hentSykefraværprosentAlleNæringer5Siffer(new ÅrstallOgKvartal(2019, 2));
+    void hentSykefraværprosentLand__returnerer_NULL_dersom_ingen_statistikk_er_funnet_for_kvartal() {
+        opprettStatistikkLandTestData();
+        assertNull(repository.hentSykefraværprosentLand(new ÅrstallOgKvartal(2019, 4)));
+    }
 
-        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat, 2019, 2, produksjonAvKlær, 2, 100);
-        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat, 2019, 2, undervisning, 5, 100);
+    @Test
+    void hentSykefraværprosentLand__skal_hente_sykefravær_land_for_ett_kvartal() {
+        opprettStatistikkLandTestData();
+        assertNull(repository.hentSykefraværprosentLand(new ÅrstallOgKvartal(2019, 4)));
 
-        List<SykefraværsstatistikkNæring5Siffer> resultat_2019_1 =
-                repository.hentSykefraværprosentAlleNæringer5Siffer(new ÅrstallOgKvartal(2019, 1));
+        SykefraværsstatistikkLand resultat =
+                repository.hentSykefraværprosentLand(new ÅrstallOgKvartal(2019, 2));
+        assertSykefraværsstatistikkIsEqual(resultat, 2019, 2, 2500000, 256800, 60000000);
+
+        SykefraværsstatistikkLand resultat_2019_1 =
+                repository.hentSykefraværprosentLand(new ÅrstallOgKvartal(2019, 1));
+        assertSykefraværsstatistikkIsEqual(resultat_2019_1, 2019, 1, 2750000, 350000, 71000000);
+    }
+
+    @Test
+    void hentSykefraværprosentAlleSektorer__skal_hente_alle_sektorer_for_ett_kvartal() {
+        opprettStatistikkSektorTestData();
+
+        List<SykefraværsstatistikkSektor> resultat =
+                repository.hentSykefraværprosentAlleSektorer(new ÅrstallOgKvartal(2019, 2));
+
+        assertThat(resultat.size()).isEqualTo(2);
+        assertSykefraværsstatistikkForSektorIsEqual(resultat, 2019, 2, 3, kommunalForvaltning, 1, 60);
+        assertSykefraværsstatistikkForSektorIsEqual(resultat, 2019, 2, 4, næringsvirksomhet, 9, 100);
+
+        List<SykefraværsstatistikkSektor> resultat_2019_1 =
+                repository.hentSykefraværprosentAlleSektorer(new ÅrstallOgKvartal(2019, 1));
 
         assertThat(resultat_2019_1.size()).isEqualTo(2);
-        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat_2019_1, 2019, 1, produksjonAvKlær, 3, 100);
-        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat_2019_1, 2019, 1, undervisning, 8, 100);
+        assertSykefraværsstatistikkForSektorIsEqual(resultat_2019_1, 2019, 1, 40, kommunalForvaltning, 20, 115);
+        assertSykefraværsstatistikkForSektorIsEqual(resultat_2019_1, 2019, 1, 7, næringsvirksomhet, 12, 100);
     }
 
     @Test
     void hentSykefraværprosentAlleNæringer__skal_hente_alle_næringer_for_ett_kvartal() {
+        opprettStatistikkNæringTestData();
+
         List<SykefraværsstatistikkNæring> resultat =
                 repository.hentSykefraværprosentAlleNæringer(new ÅrstallOgKvartal(2019, 2));
 
         assertThat(resultat.size()).isEqualTo(2);
-        assertSykefraværsstatistikkForNæringIsEqual(resultat, 2019, 2, produksjon, 2, 100);
-        assertSykefraværsstatistikkForNæringIsEqual(resultat, 2019, 2, utdanning, 5, 100);
+        assertSykefraværsstatistikkForNæringIsEqual(resultat, 2019, 2, 10, produksjon, 2, 100);
+        assertSykefraværsstatistikkForNæringIsEqual(resultat, 2019, 2, 10, utdanning, 5, 100);
 
         List<SykefraværsstatistikkNæring> resultat_2019_1 =
                 repository.hentSykefraværprosentAlleNæringer(new ÅrstallOgKvartal(2019, 1));
 
         assertThat(resultat_2019_1.size()).isEqualTo(2);
-        assertSykefraværsstatistikkForNæringIsEqual(resultat_2019_1, 2019, 1, produksjon, 3, 100);
-        assertSykefraværsstatistikkForNæringIsEqual(resultat_2019_1, 2019, 1, utdanning, 8, 100);
+        assertSykefraværsstatistikkForNæringIsEqual(resultat_2019_1, 2019, 1, 10, produksjon, 3, 100);
+        assertSykefraværsstatistikkForNæringIsEqual(resultat_2019_1, 2019, 1, 10, utdanning, 8, 100);
+    }
+
+    @Test
+    void  hentSykefraværprosentAlleNæringer5SifferForEttKvartal__skal_returnere_riktig_data_til_alle_næringer() {
+        opprettStatistikkNæring5SifferTestData();
+
+        List<SykefraværsstatistikkNæring5Siffer> resultat =
+                repository.hentSykefraværprosentAlleNæringer5Siffer(new ÅrstallOgKvartal(2019, 2));
+
+        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat, 2019, 2, 10,produksjonAvKlær, 2, 100);
+        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat, 2019, 2, 10, undervisning, 5, 100);
+
+        List<SykefraværsstatistikkNæring5Siffer> resultat_2019_1 =
+                repository.hentSykefraværprosentAlleNæringer5Siffer(new ÅrstallOgKvartal(2019, 1));
+
+        assertThat(resultat_2019_1.size()).isEqualTo(2);
+        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat_2019_1, 2019, 1, 10, produksjonAvKlær, 3, 100);
+        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat_2019_1, 2019, 1, 10, undervisning, 8, 100);
+    }
+
+    @Test
+    void hentSykefraværprosentAlleVirksomheter__skal_hente_alle_virksomheter_for_ett_kvartal() {
+        opprettStatistikkVirksomhetTestData();
+
+        List<SykefraværsstatistikkVirksomhetUtenVarighet> resultat =
+                repository.hentSykefraværprosentAlleVirksomheter(new ÅrstallOgKvartal(2019, 2));
+
+        assertThat(resultat.size()).isEqualTo(2);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat, 2019, 2, 3, VIRKSOMHET_1, 1, 60);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat, 2019, 2, 4, VIRKSOMHET_2, 9, 100);
+
+        List<SykefraværsstatistikkVirksomhetUtenVarighet> resultat_2019_1 =
+                repository.hentSykefraværprosentAlleVirksomheter(new ÅrstallOgKvartal(2019, 1));
+
+        assertThat(resultat_2019_1.size()).isEqualTo(2);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2019_1, 2019, 1, 40, VIRKSOMHET_1, 20, 115);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2019_1, 2019, 1, 7, VIRKSOMHET_2, 12, 100);
     }
 
 
     // Metoder for assert/verifikasjon
+    private void assertSykefraværsstatistikkForLandIsEqual(
+            SykefraværsstatistikkLand actual,
+            int årstall,
+            int kvartal,
+            int antallPersoner,
+            Sektor sektor,
+            int tapteDagsverk,
+            int muligeDagsverk
+    ) {
+        assertSykefraværsstatistikkIsEqual(
+                actual,
+                årstall,
+                kvartal,
+                antallPersoner,
+                tapteDagsverk,
+                muligeDagsverk
+        );
+    }
+
+    private void assertSykefraværsstatistikkForSektorIsEqual(
+            List<SykefraværsstatistikkSektor> actual,
+            int årstall,
+            int kvartal,
+            int antallPersoner,
+            Sektor sektor,
+            int tapteDagsverk,
+            int muligeDagsverk
+    ) {
+        List<SykefraværsstatistikkSektor> statistikkForSektor = actual.stream()
+                .filter(sfSektor ->
+                        sfSektor.getSektorkode().equals(sektor.getKode())).collect(Collectors.toList());
+        assertThat(statistikkForSektor.size()).isEqualTo(1);
+        assertSykefraværsstatistikkIsEqual(
+                statistikkForSektor.get(0),
+                årstall,
+                kvartal,
+                antallPersoner,
+                tapteDagsverk,
+                muligeDagsverk
+        );
+    }
+
+    private void assertSykefraværsstatistikkForVirksomhetIsEqual(
+            List<SykefraværsstatistikkVirksomhetUtenVarighet> actual,
+            int årstall,
+            int kvartal,
+            int antallPersoner,
+            String orgnr,
+            int tapteDagsverk,
+            int muligeDagsverk
+    ) {
+        List<SykefraværsstatistikkVirksomhetUtenVarighet> statistikkForVirksomhet = actual.stream()
+                .filter(sfVirksomhet ->
+                        sfVirksomhet.getOrgnr().equals(orgnr)).collect(Collectors.toList());
+        assertThat(statistikkForVirksomhet.size()).isEqualTo(1);
+        assertSykefraværsstatistikkIsEqual(
+                statistikkForVirksomhet.get(0),
+                årstall,
+                kvartal,
+                antallPersoner,
+                tapteDagsverk,
+                muligeDagsverk
+        );
+    }
 
     private void assertSykefraværsstatistikkForNæringIsEqual(
             List<SykefraværsstatistikkNæring> actual,
             int årstall,
             int kvartal,
+            int antallPersoner,
             Næring næring,
             int tapteDagsverk,
             int muligeDagsverk
@@ -118,6 +237,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 statistikkForNæring.get(0),
                 årstall,
                 kvartal,
+                antallPersoner,
                 tapteDagsverk,
                 muligeDagsverk
         );
@@ -127,6 +247,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
             List<SykefraværsstatistikkNæring5Siffer> actual,
             int årstall,
             int kvartal,
+            int antallPersoner,
             Næringskode5Siffer næringskode5Siffer,
             int tapteDagsverk,
             int muligeDagsverk
@@ -139,6 +260,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 statistikkForNæring5Siffer.get(0),
                 årstall,
                 kvartal,
+                antallPersoner,
                 tapteDagsverk,
                 muligeDagsverk
         );
@@ -148,19 +270,52 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
             Sykefraværsstatistikk actual,
             int årstall,
             int kvartal,
+            int antallPersoner,
             int tapteDagsverk,
             int muligeDagsverk
     ) {
         assertThat(actual.getÅrstall()).isEqualTo(årstall);
         assertThat(actual.getKvartal()).isEqualTo(kvartal);
+        assertThat(actual.getAntallPersoner()).isEqualTo(antallPersoner);
         assertBigDecimalIsEqual(actual.getTapteDagsverk(), new BigDecimal(tapteDagsverk));
         assertBigDecimalIsEqual(actual.getMuligeDagsverk(), new BigDecimal(muligeDagsverk));
     }
 
     // Metoder for å opprette testdata
+    private void opprettStatistikkLandTestData() {
+        createStatistikkLand(2019, 2, 2500000, 256800, 60000000);
+        createStatistikkLand(2019, 1, 2750000, 350000, 71000000);
+    }
 
-    private void createStatistikkNæring5Siffer(
-            Næringskode5Siffer næring5Siffer,
+    private void opprettStatistikkSektorTestData() {
+        createStatistikkSektor(kommunalForvaltning,2019, 2, 3, 1, 60);
+        createStatistikkSektor(kommunalForvaltning, 2019, 1, 40, 20, 115);
+        createStatistikkSektor(næringsvirksomhet, 2019, 2, 4, 9, 100);
+        createStatistikkSektor(næringsvirksomhet, 2019, 1, 7, 12, 100);
+    }
+
+    private void opprettStatistikkVirksomhetTestData() {
+        createStatistikkVirksomhet(VIRKSOMHET_1, 2019, 2, 3, 1, 60);
+        createStatistikkVirksomhet(VIRKSOMHET_1, 2019, 1, 40, 20, 115);
+        createStatistikkVirksomhet(VIRKSOMHET_2, 2019, 2, 4, 9, 100);
+        createStatistikkVirksomhet(VIRKSOMHET_2, 2019, 1, 7, 12, 100);
+    }
+
+    private void opprettStatistikkNæringTestData() {
+        createStatistikkNæring(produksjon, 2019, 2, 10, 2, 100);
+        createStatistikkNæring(produksjon, 2019, 1, 10, 3, 100);
+        createStatistikkNæring(utdanning, 2019, 2, 10, 5, 100);
+        createStatistikkNæring(utdanning, 2019, 1, 10, 8, 100);
+    }
+
+    private void opprettStatistikkNæring5SifferTestData() {
+        createStatistikkNæring5Siffer(produksjonAvKlær, 2019, 2, 10, 2, 100);
+        createStatistikkNæring5Siffer(produksjonAvKlær, 2019, 1, 10, 3, 100);
+        createStatistikkNæring5Siffer(undervisning, 2019, 2, 10, 5, 100);
+        createStatistikkNæring5Siffer(undervisning, 2019, 1, 10, 8, 100);
+    }
+
+    private void createStatistikkLand(
             int årstall,
             int kvartal,
             int antallPersoner,
@@ -168,24 +323,24 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
             int muligeDagsverk
     ) {
         jdbcTemplate.update(
-                "insert into sykefravar_statistikk_naring5siffer " +
-                        "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                        + "values (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(
-                        næring5Siffer,
-                        årstall,
-                        kvartal,
-                        antallPersoner,
-                        new BigDecimal(tapteDagsverk),
-                        new BigDecimal(muligeDagsverk)
+                "insert into sykefravar_statistikk_land " +
+                        "(arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "values (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                leggTilParametreForSykefraværsstatistikk(
+                        new MapSqlParameterSource(),
+                        new SykefraværsstatistikkLand(
+                                årstall,
+                                kvartal,
+                                antallPersoner,
+                                new BigDecimal(tapteDagsverk),
+                                new BigDecimal(muligeDagsverk)
+                        )
                 )
         );
     }
 
-    private void createStatistikkVirksomhet(
-            String orgnr,
-            Næring næring,
-            Næringskode5Siffer næringskode5Siffer,
+    private void createStatistikkSektor(
+            Sektor sektor,
             int årstall,
             int kvartal,
             int antallPersoner,
@@ -193,25 +348,18 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
             int muligeDagsverk
     ) {
         jdbcTemplate.update(
-                "insert into sykefravar_statistikk_virksomhet_med_gradering " +
-                        "(arstall, kvartal, orgnr, naring, naring_kode, antall_graderte_sykemeldinger, " +
-                        "tapte_dagsverk_gradert_sykemelding, antall_sykemeldinger, antall_personer, " +
-                        "tapte_dagsverk, mulige_dagsverk) "
-                        + "values (:arstall, :kvartal, :orgnr, :naring, :naring_kode, :antall_graderte_sykemeldinger, " +
-                        ":tapte_dagsverk_gradert_sykemelding, :antall_sykemeldinger, :antall_personer, " +
-                        ":tapte_dagsverk, :mulige_dagsverk)",
+                "insert into sykefravar_statistikk_sektor " +
+                        "(sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "values (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
                 parametre(
-                        årstall,
-                        kvartal,
-                        orgnr,
-                        næring.getKode(),
-                        næringskode5Siffer.getKode(),
-                        0,
-                        0,
-                        0,
-                        antallPersoner,
-                        tapteDagsverk,
-                        muligeDagsverk
+                        new SykefraværsstatistikkSektor(
+                                årstall,
+                                kvartal,
+                                sektor.getKode(),
+                                antallPersoner,
+                                new BigDecimal(tapteDagsverk),
+                                new BigDecimal(muligeDagsverk)
+                        )
                 )
         );
     }
@@ -228,75 +376,105 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 "insert into sykefravar_statistikk_naring (naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "values (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
                 parametre(
-                        næring,
-                        årstall,
-                        kvartal,
-                        antallPersoner,
-                        new BigDecimal(tapteDagsverk),
-                        new BigDecimal(muligeDagsverk)
+                        new SykefraværsstatistikkNæring(
+                                årstall,
+                                kvartal,
+                                næring.getKode(),
+                                antallPersoner,
+                                new BigDecimal(tapteDagsverk),
+                                new BigDecimal(muligeDagsverk)
+                        )
                 )
         );
     }
 
-
-    private MapSqlParameterSource parametre(
-            Næring næring,
+    private void createStatistikkNæring5Siffer(
+            Næringskode5Siffer næring5Siffer,
             int årstall,
             int kvartal,
-            int antallPersoner,
-            BigDecimal tapteDagsverk,
-            BigDecimal muligeDagsverk
-    ) {
-        return new MapSqlParameterSource()
-                .addValue("naring_kode", næring.getKode())
-                .addValue("arstall", årstall)
-                .addValue("kvartal", kvartal)
-                .addValue("antall_personer", antallPersoner)
-                .addValue("tapte_dagsverk", tapteDagsverk)
-                .addValue("mulige_dagsverk", muligeDagsverk);
-    }
-
-    private MapSqlParameterSource parametre(
-            Næringskode5Siffer næring,
-            int årstall,
-            int kvartal,
-            int antallPersoner,
-            BigDecimal tapteDagsverk,
-            BigDecimal muligeDagsverk
-    ) {
-        return new MapSqlParameterSource()
-                .addValue("naring_kode", næring.getKode())
-                .addValue("arstall", årstall)
-                .addValue("kvartal", kvartal)
-                .addValue("antall_personer", antallPersoner)
-                .addValue("tapte_dagsverk", tapteDagsverk)
-                .addValue("mulige_dagsverk", muligeDagsverk);
-    }
-
-    private MapSqlParameterSource parametre(
-            int årstall,
-            int kvartal,
-            String orgnr,
-            String næringskode2Siffer,
-            String næringskode5Siffer,
-            int antall_graderte_sykemeldinger,
-            int tapte_dagsverk_gradert_sykemelding,
-            int antall_sykemeldinger,
             int antallPersoner,
             int tapteDagsverk,
             int muligeDagsverk
     ) {
-        return new MapSqlParameterSource()
-                .addValue("arstall", årstall)
-                .addValue("kvartal", kvartal)
-                .addValue("orgnr", orgnr)
-                .addValue("naring", næringskode2Siffer)
-                .addValue("naring_kode", næringskode5Siffer)
-                .addValue("antall_graderte_sykemeldinger", antall_graderte_sykemeldinger)
-                .addValue("tapte_dagsverk_gradert_sykemelding", tapte_dagsverk_gradert_sykemelding)
-                .addValue("antall_sykemeldinger", antall_sykemeldinger)
-                .addValue("antall_personer", antallPersoner)
-                .addValue("tapte_dagsverk", tapteDagsverk)
-                .addValue("mulige_dagsverk", muligeDagsverk);
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_naring5siffer " +
+                        "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "values (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(
+                        new SykefraværsstatistikkNæring5Siffer(
+                                årstall,
+                                kvartal,
+                                næring5Siffer.getKode(),
+                                antallPersoner,
+                                new BigDecimal(tapteDagsverk),
+                                new BigDecimal(muligeDagsverk)
+                        )
+                )
+        );
+    }
+
+    private void createStatistikkVirksomhet(
+            String orgnr,
+            int årstall,
+            int kvartal,
+            int antallPersoner,
+            int tapteDagsverk,
+            int muligeDagsverk
+    ) {
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_virksomhet " +
+                        "(arstall, kvartal, orgnr, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "values (:arstall, :kvartal, :orgnr, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(
+                        new SykefraværsstatistikkVirksomhetUtenVarighet(
+                                årstall,
+                                kvartal,
+                                orgnr,
+                                antallPersoner,
+                                new BigDecimal(tapteDagsverk),
+                                new BigDecimal(muligeDagsverk)
+                        )
+                )
+        );
+    }
+
+    private MapSqlParameterSource parametre(SykefraværsstatistikkSektor sykefraværsstatistikkSektor) {
+        MapSqlParameterSource parametre = new MapSqlParameterSource()
+                .addValue("sektor_kode", sykefraværsstatistikkSektor.getSektorkode());
+
+        return leggTilParametreForSykefraværsstatistikk(parametre, sykefraværsstatistikkSektor);
+    }
+
+    private MapSqlParameterSource parametre(SykefraværsstatistikkNæring sykefraværsstatistikkNæring) {
+        MapSqlParameterSource parametre = new MapSqlParameterSource()
+                .addValue("naring_kode", sykefraværsstatistikkNæring.getNæringkode());
+
+        return leggTilParametreForSykefraværsstatistikk(parametre, sykefraværsstatistikkNæring);
+    }
+
+    private MapSqlParameterSource parametre(SykefraværsstatistikkNæring5Siffer sykefraværsstatistikkNæring5Siffer) {
+        MapSqlParameterSource parametre = new MapSqlParameterSource()
+                .addValue("naring_kode", sykefraværsstatistikkNæring5Siffer.getNæringkode5siffer());
+
+        return leggTilParametreForSykefraværsstatistikk(parametre, sykefraværsstatistikkNæring5Siffer);
+    }
+
+    private MapSqlParameterSource parametre(SykefraværsstatistikkVirksomhetUtenVarighet sykefraværsstatistikkVirksomhet) {
+        MapSqlParameterSource parametre = new MapSqlParameterSource()
+                .addValue("orgnr", sykefraværsstatistikkVirksomhet.getOrgnr());
+
+        return leggTilParametreForSykefraværsstatistikk(parametre, sykefraværsstatistikkVirksomhet);
+    }
+
+    private MapSqlParameterSource leggTilParametreForSykefraværsstatistikk(
+            MapSqlParameterSource parametre,
+            Sykefraværsstatistikk sykefraværsstatistikk
+    ) {
+        return parametre
+                .addValue("arstall", sykefraværsstatistikk.getÅrstall())
+                .addValue("kvartal", sykefraværsstatistikk.getKvartal())
+                .addValue("antall_personer", sykefraværsstatistikk.getAntallPersoner())
+                .addValue("tapte_dagsverk", sykefraværsstatistikk.getTapteDagsverk())
+                .addValue("mulige_dagsverk", sykefraværsstatistikk.getMuligeDagsverk());
     }
 }
