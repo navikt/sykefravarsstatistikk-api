@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -33,7 +34,7 @@ public class SykefraværsstatistikkTilEksporteringRepository {
        - SykefraværsstatistikkVirksomhet
      */
 
-    public List<SykefraværsstatistikkNæring> hentSykefraværprosentAlleNæringer5Siffer(
+    public List<SykefraværsstatistikkNæring5Siffer> hentSykefraværprosentAlleNæringer5Siffer(
             ÅrstallOgKvartal årstallOgKvartal) {
         try {
             return namedParameterJdbcTemplate.query(
@@ -43,7 +44,7 @@ public class SykefraværsstatistikkTilEksporteringRepository {
                     new MapSqlParameterSource()
                             .addValue("arstall", årstallOgKvartal.getÅrstall())
                             .addValue("kvartal", årstallOgKvartal.getKvartal()),
-                    (rs, rowNum) -> mapTilSykefraværsstatistikkNæring(rs)
+                    (rs, rowNum) -> mapTilSykefraværsstatistikkNæring5Siffer(rs)
             );
         } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();
@@ -89,7 +90,9 @@ public class SykefraværsstatistikkTilEksporteringRepository {
 
 
     // Utilities
-    private SykefraværsstatistikkVirksomhetUtenVarighet mapTilSykefraværsstatistikkVirksomhet(ResultSet rs) throws SQLException {
+    private SykefraværsstatistikkVirksomhetUtenVarighet mapTilSykefraværsstatistikkVirksomhet(
+            ResultSet rs
+    ) throws SQLException {
         return new SykefraværsstatistikkVirksomhetUtenVarighet(
                 rs.getInt("arstall"),
                 rs.getInt("kvartal"),
@@ -99,8 +102,20 @@ public class SykefraværsstatistikkTilEksporteringRepository {
                 rs.getBigDecimal("mulige_dagsverk")
         );
     }
+
     private SykefraværsstatistikkNæring mapTilSykefraværsstatistikkNæring(ResultSet rs) throws SQLException {
         return new SykefraværsstatistikkNæring(
+                rs.getInt("arstall"),
+                rs.getInt("kvartal"),
+                rs.getString("naring_kode"),
+                rs.getInt("antall_personer"),
+                rs.getBigDecimal("tapte_dagsverk"),
+                rs.getBigDecimal("mulige_dagsverk")
+        );
+    }
+
+    private SykefraværsstatistikkNæring5Siffer mapTilSykefraværsstatistikkNæring5Siffer(ResultSet rs) throws SQLException {
+        return new SykefraværsstatistikkNæring5Siffer(
                 rs.getInt("arstall"),
                 rs.getInt("kvartal"),
                 rs.getString("naring_kode"),
