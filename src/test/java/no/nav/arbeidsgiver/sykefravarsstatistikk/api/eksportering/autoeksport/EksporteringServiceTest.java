@@ -4,6 +4,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksp
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
@@ -124,6 +126,23 @@ public class EksporteringServiceTest {
         );
     }
 
+    @Test
+    public void getSykefraværMedKategoriForNæring__returnerer_SykefraværMedKategori__med_sykefraværsstatistikk_for_næring() {
+        SykefraværMedKategori resultat = EksporteringService.getSykefraværMedKategoriForNæring(
+                virksomhet1Metadata_2020_4,
+                Arrays.asList(
+                        byggSykefraværStatistikkNæring(virksomhet1Metadata_2020_4, 10, 156, 22233),
+                        byggSykefraværStatistikkNæring(virksomhet2Metadata_2020_4)
+                )
+        );
+
+        assertEqualsSykefraværMedKategori(
+                resultat,
+                byggSykefraværStatistikkNæring(virksomhet1Metadata_2020_4, 10, 156, 22233),
+                Statistikkategori.NÆRING2SIFFER,
+                virksomhet1Metadata_2020_4.getNæring()
+        );
+    }
 
     // Assertions
     private static void assertEqualsVirksomhetSykefravær(VirksomhetSykefravær actual, VirksomhetSykefravær expected) {
@@ -136,15 +155,14 @@ public class EksporteringServiceTest {
 
     private void assertEqualsSykefraværMedKategori(
             SykefraværMedKategori actual,
-            SykefraværsstatistikkSektor expected,
+            Sykefraværsstatistikk expected,
             Statistikkategori expectedKategori,
             String expectedKode
     ) {
-        assertThat(actual.getKategori()).isEqualTo(expectedKategori);
-        assertThat(actual.getKode()).isEqualTo(expectedKode);
-        assertThat(actual.getÅrstall()).isEqualTo(expected.getÅrstall());
-        assertThat(actual.getÅrstall()).isEqualTo(expected.getÅrstall());
-        assertThat(actual.getKvartal()).isEqualTo(expected.getKvartal());
+        assertThat(actual.getKategori()).as("Sjekk Statistikkategori").isEqualTo(expectedKategori);
+        assertThat(actual.getKode()).as("Sjekk kode").isEqualTo(expectedKode);
+        assertThat(actual.getÅrstall()).as("Sjekk årstall").isEqualTo(expected.getÅrstall());
+        assertThat(actual.getKvartal()).as("Sjekk kvartal").isEqualTo(expected.getKvartal());
         assertBigDecimalIsEqual(actual.getMuligeDagsverk(), expected.getMuligeDagsverk());
         assertBigDecimalIsEqual(actual.getTapteDagsverk(), expected.getTapteDagsverk());
     }
@@ -232,6 +250,32 @@ public class EksporteringServiceTest {
         );
     }
 
+    private static SykefraværsstatistikkNæring byggSykefraværStatistikkNæring(
+            VirksomhetMetadata virksomhetMetadata,
+            int antallPersoner,
+            int tapteDagsverk,
+            int muligeDagsverk
+    ) {
+        return new SykefraværsstatistikkNæring(
+                virksomhetMetadata.getÅrstall(),
+                virksomhetMetadata.getKvartal(),
+                virksomhetMetadata.getNæring(),
+                antallPersoner,
+                new BigDecimal(tapteDagsverk),
+                new BigDecimal(muligeDagsverk)
+        );
+    }
+
+    private static SykefraværsstatistikkNæring byggSykefraværStatistikkNæring(VirksomhetMetadata virksomhetMetadata) {
+        return new SykefraværsstatistikkNæring(
+                virksomhetMetadata.getÅrstall(),
+                virksomhetMetadata.getKvartal(),
+                virksomhetMetadata.getNæring(),
+                156,
+                new BigDecimal(3678),
+                new BigDecimal(188000)
+        );
+    }
 
     private static SykefraværsstatistikkSektor byggSykefraværStatistikkSektor(
             VirksomhetMetadata virksomhetMetadata,

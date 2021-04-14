@@ -14,10 +14,10 @@ public class SykefraværMedKategori extends SykefraværForEttKvartal {
             Statistikkategori statistikkategori,
             String kode,
             ÅrstallOgKvartal årstallOgKvartal,
-            BigDecimal tapte_dagsverk,
-            BigDecimal mulige_dagsverk,
-            int antall_personer) {
-        super(årstallOgKvartal, tapte_dagsverk, mulige_dagsverk, antall_personer);
+            BigDecimal tapteDagsverk,
+            BigDecimal muligeDagsverk,
+            int antallPersoner) {
+        super(årstallOgKvartal, tapteDagsverk, muligeDagsverk, antallPersoner);
         this.kategori = statistikkategori;
         this.kode = kode;
     }

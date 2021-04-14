@@ -93,7 +93,6 @@ public class EksporteringService {
             List<VirksomhetEksportPerKvartal> virksomheterTilEksport,
             ÅrstallOgKvartal årstallOgKvartal
     ) {
-
         List<VirksomhetMetadata> virksomhetMetadataListe =
                 virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal);
         SykefraværsstatistikkLand sykefraværsstatistikkLand =
@@ -102,10 +101,8 @@ public class EksporteringService {
                 sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(årstallOgKvartal);
         List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring =
                 sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(årstallOgKvartal);
-        List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer = Collections.emptyList();
         List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet =
                 sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(årstallOgKvartal);
-
 
         SykefraværMedKategori landSykefravær = getSykefraværMedKategoriForLand(
                 årstallOgKvartal,
@@ -129,10 +126,7 @@ public class EksporteringService {
                                             virksomhetMetadata,
                                             sykefraværsstatistikkVirksomhetUtenVarighet
                                     ),
-                                    getSykefraværMedKategoriForNæring5Siffer(
-                                            virksomhetMetadata,
-                                            sykefraværsstatistikkNæring5Siffer
-                                    ),
+                                    null,
                                     getSykefraværMedKategoriForNæring(
                                             virksomhetMetadata,
                                             sykefraværsstatistikkNæring
@@ -158,7 +152,7 @@ public class EksporteringService {
 
 
     protected static long getAntallSomKanEksporteres(List<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartal) {
-        return virksomhetEksportPerKvartal.stream().filter( v -> !v.eksportert()).count();
+        return virksomhetEksportPerKvartal.stream().filter(v -> !v.eksportert()).count();
     }
 
     protected static VirksomhetMetadata getVirksomhetMetada(
@@ -254,14 +248,7 @@ public class EksporteringService {
         );
     }
 
-    protected SykefraværMedKategori getSykefraværMedKategoriForNæring5Siffer(
-            VirksomhetMetadata virksomheterTilEksport,
-            List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer
-    ) {
-        return null;
-    }
-
-    private SykefraværMedKategori getSykefraværMedKategoriForNæring(
+    protected static SykefraværMedKategori getSykefraværMedKategoriForNæring(
             VirksomhetMetadata virksomhetMetadata,
             List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring
     ) {
@@ -282,7 +269,7 @@ public class EksporteringService {
                 ));
 
         return new SykefraværMedKategori(
-                Statistikkategori.NÆRING,
+                Statistikkategori.NÆRING2SIFFER,
                 sfNæring.getNæringkode(),
                 new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
                 sfNæring.getTapteDagsverk(),
