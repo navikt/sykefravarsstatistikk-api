@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository;
@@ -11,7 +10,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
@@ -21,7 +19,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.Virks
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collector;
@@ -108,7 +105,9 @@ public class EksporteringService {
                 årstallOgKvartal,
                 sykefraværsstatistikkLand
         );
-        AtomicInteger antallEksportert = new AtomicInteger();
+
+        AtomicInteger antallOppdatertSomEksportert = new AtomicInteger();
+        kafkaService.nullstillUtsendingRapport();
 
         virksomheterTilEksport.stream().forEach(virksomhetTilEksport -> {
                     System.out.println("Eksport for " + virksomhetTilEksport.getOrgnr());
@@ -119,35 +118,37 @@ public class EksporteringService {
                     );
 
                     if (virksomhetMetadata != null) {
-                        try {
-                            kafkaService.send(
-                                    årstallOgKvartal,
-                                    getVirksomhetSykefravær(
-                                            virksomhetMetadata,
-                                            sykefraværsstatistikkVirksomhetUtenVarighet
-                                    ),
-                                    null,
-                                    getSykefraværMedKategoriForNæring(
-                                            virksomhetMetadata,
-                                            sykefraværsstatistikkNæring
-                                    ),
-                                    getSykefraværMedKategoriForSektor(
-                                            virksomhetMetadata,
-                                            sykefraværsstatistikkSektor
-                                    ),
-                                    landSykefravær
-                            );
-                        } catch (JsonProcessingException e) { // TODO: bruk en typed Exception og en counter som får prosessen til å stoppe etter X antall feil
-                            log.warn("Exception");
-                        }
+                        kafkaService.send(
+                                årstallOgKvartal,
+                                getVirksomhetSykefravær(
+                                        virksomhetMetadata,
+                                        sykefraværsstatistikkVirksomhetUtenVarighet
+                                ),
+                                null,
+                                getSykefraværMedKategoriForNæring(
+                                        virksomhetMetadata,
+                                        sykefraværsstatistikkNæring
+                                ),
+                                getSykefraværMedKategoriForSektor(
+                                        virksomhetMetadata,
+                                        sykefraværsstatistikkSektor
+                                ),
+                                landSykefravær
+                        );
 
                         eksporteringRepository.oppdaterTilEksportert(virksomhetTilEksport);
-                        antallEksportert.getAndIncrement();
+                        antallOppdatertSomEksportert.getAndIncrement();
                     }
                 }
         );
 
-        return antallEksportert.get();
+
+        log.info("Eksport er ferdig med: antall prosessert='{}', antall bekreftet eksportert='{}' og antall error='{}'",
+                kafkaService.getAntallMeldingerMottattForUtsending(),
+                kafkaService.getAntallMeldingerSent(),
+                kafkaService.getAntallMeldingerIError()
+        );
+        return antallOppdatertSomEksportert.get();
     }
 
 

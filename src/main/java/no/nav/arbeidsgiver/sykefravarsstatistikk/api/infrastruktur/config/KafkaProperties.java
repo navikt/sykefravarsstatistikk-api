@@ -3,11 +3,15 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUtsendingRapport;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -71,6 +75,12 @@ public class KafkaProperties {
 		props.put(ProducerConfig.ACKS_CONFIG, acks);
 
 		return props;
+	}
+
+	@Bean
+	@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+	public KafkaUtsendingRapport getKafkaUtsendingReport() {
+		return new KafkaUtsendingRapport();
 	}
 
 }
