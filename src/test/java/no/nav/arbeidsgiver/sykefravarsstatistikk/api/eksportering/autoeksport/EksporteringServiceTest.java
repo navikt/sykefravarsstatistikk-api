@@ -2,23 +2,17 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils.assertBigDecimalIsEqual;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -167,167 +161,4 @@ public class EksporteringServiceTest {
         assertBigDecimalIsEqual(actual.getTapteDagsverk(), expected.getTapteDagsverk());
     }
 
-
-
-    // Data for testing & Utilities
-    private static ÅrstallOgKvartal __2020_4 = new ÅrstallOgKvartal(2020, 4);
-    private static ÅrstallOgKvartal __2021_1 = new ÅrstallOgKvartal(2021, 1);
-    private static ÅrstallOgKvartal __2021_2 = new ÅrstallOgKvartal(2021, 2);
-    private static Orgnr ORGNR_VIRKSOMHET_1 = new Orgnr("987654321");
-    private static Orgnr ORGNR_VIRKSOMHET_2 = new Orgnr("912345678");
-
-    private static VirksomhetMetadata virksomhet1Metadata_2020_4 = new VirksomhetMetadata(
-            ORGNR_VIRKSOMHET_1,
-            "Virksomhet 1",
-            RECTYPE_FOR_VIRKSOMHET,
-            "1",
-            "11",
-            __2020_4
-    );
-
-    private static VirksomhetMetadata virksomhet2Metadata_2020_4 = new VirksomhetMetadata(
-            ORGNR_VIRKSOMHET_2,
-            "Virksomhet 2",
-            RECTYPE_FOR_VIRKSOMHET,
-            "2",
-            "22",
-            __2020_4
-    );
-
-    private static VirksomhetMetadata virksomhet1Metadata_2021_1 = new VirksomhetMetadata(
-            ORGNR_VIRKSOMHET_1,
-            "Virksomhet 1",
-            RECTYPE_FOR_VIRKSOMHET,
-            "1",
-            "11",
-            __2021_1
-    );
-
-    private static VirksomhetMetadata virksomhet1Metadata_2021_2 = new VirksomhetMetadata(
-            ORGNR_VIRKSOMHET_1,
-            "Virksomhet 1",
-            RECTYPE_FOR_VIRKSOMHET,
-            "1",
-            "11",
-            __2021_2
-    );
-
-    private SykefraværsstatistikkVirksomhetUtenVarighet byggSykefraværsstatistikkVirksomhet(
-            VirksomhetMetadata virksomhetMetadata
-    ) {
-        return byggSykefraværsstatistikkVirksomhet(
-                virksomhetMetadata,
-                156,
-                3678,
-                188000
-        );
-    }
-
-    private static SykefraværsstatistikkVirksomhetUtenVarighet byggSykefraværsstatistikkVirksomhet(
-            VirksomhetMetadata virksomhetMetadata,
-            int antallPersoner,
-            int tapteDagsverk,
-            int muligeDagsverk
-    ) {
-        return new SykefraværsstatistikkVirksomhetUtenVarighet(
-                virksomhetMetadata.getÅrstall(),
-                virksomhetMetadata.getKvartal(),
-                virksomhetMetadata.getOrgnr(),
-                antallPersoner,
-                new BigDecimal(tapteDagsverk),
-                new BigDecimal(muligeDagsverk)
-        );
-    }
-
-    private static VirksomhetSykefravær tomVirksomhetSykefravær(VirksomhetMetadata virksomhetMetadata) {
-        return new VirksomhetSykefravær(
-                virksomhetMetadata.getOrgnr(),
-                virksomhetMetadata.getNavn(),
-                new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
-                null,
-                null,
-                0
-        );
-    }
-
-    private static SykefraværsstatistikkNæring byggSykefraværStatistikkNæring(
-            VirksomhetMetadata virksomhetMetadata,
-            int antallPersoner,
-            int tapteDagsverk,
-            int muligeDagsverk
-    ) {
-        return new SykefraværsstatistikkNæring(
-                virksomhetMetadata.getÅrstall(),
-                virksomhetMetadata.getKvartal(),
-                virksomhetMetadata.getNæring(),
-                antallPersoner,
-                new BigDecimal(tapteDagsverk),
-                new BigDecimal(muligeDagsverk)
-        );
-    }
-
-    private static SykefraværsstatistikkNæring byggSykefraværStatistikkNæring(VirksomhetMetadata virksomhetMetadata) {
-        return new SykefraværsstatistikkNæring(
-                virksomhetMetadata.getÅrstall(),
-                virksomhetMetadata.getKvartal(),
-                virksomhetMetadata.getNæring(),
-                156,
-                new BigDecimal(3678),
-                new BigDecimal(188000)
-        );
-    }
-
-    private static SykefraværsstatistikkSektor byggSykefraværStatistikkSektor(
-            VirksomhetMetadata virksomhetMetadata,
-            int antallPersoner,
-            int tapteDagsverk,
-            int muligeDagsverk
-    ) {
-        return new SykefraværsstatistikkSektor(
-                virksomhetMetadata.getÅrstall(),
-                virksomhetMetadata.getKvartal(),
-                virksomhetMetadata.getSektor(),
-                antallPersoner,
-                new BigDecimal(tapteDagsverk),
-                new BigDecimal(muligeDagsverk)
-        );
-    }
-
-    private static SykefraværsstatistikkSektor byggSykefraværStatistikkSektor(VirksomhetMetadata virksomhetMetadata) {
-        return new SykefraværsstatistikkSektor(
-                virksomhetMetadata.getÅrstall(),
-                virksomhetMetadata.getKvartal(),
-                virksomhetMetadata.getSektor(),
-                156,
-                new BigDecimal(3678),
-                new BigDecimal(188000)
-        );
-    }
-
-    private static VirksomhetSykefravær byggVirksomhetSykefravær(
-            VirksomhetMetadata virksomhetMetadata,
-            int antallPersoner,
-            int tapteDagsverk,
-            int muligeDagsverk
-    ) {
-        return new VirksomhetSykefravær(
-                virksomhetMetadata.getOrgnr(),
-                virksomhetMetadata.getNavn(),
-                new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
-                new BigDecimal(tapteDagsverk),
-                new BigDecimal(muligeDagsverk),
-                antallPersoner
-                );
-    }
-
-    private static VirksomhetSykefravær byggVirksomhetSykefravær(VirksomhetMetadata virksomhetMetadata) {
-        return new VirksomhetSykefravær(
-                virksomhetMetadata.getOrgnr(),
-                virksomhetMetadata.getNavn(),
-                new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
-                new BigDecimal(3678),
-                new BigDecimal(188000),
-                156
-        );
-    }
 }

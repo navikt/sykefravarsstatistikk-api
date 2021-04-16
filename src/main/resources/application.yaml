@@ -9,8 +9,8 @@ management.endpoints.web:
 kafka:
   outbound:
     topic: arbeidsgiver.sykefravarsstatistikk-v1
-    bootstrapServers: ${KAFKA_BROKERS:localhost}
-    schemaRegistry: ${KAFKA_SCHEMA_REGISTRY:localhost}
+    bootstrapServers: ${KAFKA_BROKERS:localhost:9092}
+    schemaRegistry: ${KAFKA_SCHEMA_REGISTRY:localhost:9092}
     securityProtocol: SSL
     registryUser: ${KAFKA_SCHEMA_REGISTRY_USER:user}
     registryPassword: ${KAFKA_SCHEMA_REGISTRY_PASSWORD:pwd}
@@ -77,6 +77,12 @@ datavarehus.datasource:
 unleash.url: http://unleash.herokuapp.com/api/
 
 nais.cluster.name: local
+
+kafka:
+  outbound:
+    topic: arbeidsgiver.sykefravarsstatistikk-v1
+    bootstrapServers: localhost:9092
+    securityProtocol: PLAINTEXT
 
 ---
 

@@ -56,10 +56,15 @@ public class EksporteringService {
         }
         List<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartal =
                 eksporteringRepository.hentVirksomhetEksportPerKvartal(årstallOgKvartal);
-        int antallStatistikkSomSkalEksporteres =
-                virksomhetEksportPerKvartal == null || virksomhetEksportPerKvartal.isEmpty() ?
+
+        List<VirksomhetEksportPerKvartal> virksomheterTilEksport =
+                virksomhetEksportPerKvartal.stream()
+                        .filter(v -> !v.eksportert())
+                        .collect(Collectors.toList());
+
+        int antallStatistikkSomSkalEksporteres = virksomheterTilEksport.isEmpty() ?
                         0 :
-                        (int) getAntallSomKanEksporteres(virksomhetEksportPerKvartal);
+                        virksomheterTilEksport.size();
 
         if (antallStatistikkSomSkalEksporteres == 0) {
             log.info("Ingen statistikk å eksportere for årstall '{}' og kvartal '{}'.",
@@ -76,14 +81,7 @@ public class EksporteringService {
                 antallStatistikkSomSkalEksporteres
         );
 
-        List<VirksomhetEksportPerKvartal> virksomheterTilEksport =
-                virksomhetEksportPerKvartal.stream()
-                        .filter(VirksomhetEksportPerKvartal::eksportert)
-                        .collect(Collectors.toList());
-
-        int antallEksportert = eksporter(virksomheterTilEksport, årstallOgKvartal);
-
-        return antallEksportert;
+        return eksporter(virksomheterTilEksport, årstallOgKvartal);
     }
 
     protected int eksporter(
