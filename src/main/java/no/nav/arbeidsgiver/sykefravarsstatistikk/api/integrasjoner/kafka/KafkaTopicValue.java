@@ -33,21 +33,30 @@ public class KafkaTopicValue {
         if (!virksomhetSykefravær.getOrgnr().equals(that.virksomhetSykefravær.getOrgnr())) return false;
         if (
                 (!virksomhetSykefravær.getÅrstallOgKvartal().equals(that.virksomhetSykefravær.getÅrstallOgKvartal()))
-                ||(!virksomhetSykefravær.getProsent().equals(that.virksomhetSykefravær.getProsent()))
-                ||(!næringSykefravær.getProsent().equals(that.næringSykefravær.getProsent()))
-                ||(!sektorSykefravær.getProsent().equals(that.sektorSykefravær.getProsent()))
-                ||(!landSykefravær.getProsent().equals(that.landSykefravær.getProsent()))
-               // ||(!virksomhetSykefravær.getTapteDagsverk().equals(that.virksomhetSykefravær.getTapteDagsverk()))
+                        || (!virksomhetSykefravær.getProsent().equals(that.virksomhetSykefravær.getProsent()))
+                        || (!virksomhetSykefravær.getTapteDagsverk().equals(that.virksomhetSykefravær.getTapteDagsverk()))
+                        || (!virksomhetSykefravær.getMuligeDagsverk().equals(that.virksomhetSykefravær.getMuligeDagsverk()))
+                        || (!næringSykefravær.getKategori().equals(that.næringSykefravær.getKategori()))
+                        || (!næringSykefravær.getProsent().equals(that.næringSykefravær.getProsent()))
+                        || (!næringSykefravær.getMuligeDagsverk().equals(that.næringSykefravær.getMuligeDagsverk()))
+                        || (!næringSykefravær.getTapteDagsverk().equals(that.næringSykefravær.getTapteDagsverk()))
+                        || (!sektorSykefravær.getKategori().equals(that.sektorSykefravær.getKategori()))
+                        || (!sektorSykefravær.getProsent().equals(that.sektorSykefravær.getProsent()))
+                        || (!sektorSykefravær.getTapteDagsverk().equals(that.sektorSykefravær.getTapteDagsverk()))
+                        || (!sektorSykefravær.getMuligeDagsverk().equals(that.sektorSykefravær.getMuligeDagsverk()))
+                        || (!landSykefravær.getKategori().equals(that.landSykefravær.getKategori()))
+                        || (!landSykefravær.getProsent().equals(that.landSykefravær.getProsent()))
+                        || (!landSykefravær.getTapteDagsverk().equals(that.landSykefravær.getTapteDagsverk()))
+                        || (!landSykefravær.getMuligeDagsverk().equals(that.landSykefravær.getMuligeDagsverk()))
 
-                        //TODO sjekk om vi bør teste næring eller nei
-                        // (!næring5SifferSykefravær.getProsent().equals(that.næring5SifferSykefravær.getProsent()))
         )
             return false;
+
         //if (!virksomhetSykefravær.get().equals(that.virksomhetSykefravær.getÅrstallOgKvartal())) return false;
         return (
-                landSykefravær.getÅrstall()==that.landSykefravær.getÅrstall()
-                &&
-                landSykefravær.getKvartal()==that.landSykefravær.getKvartal()
+                landSykefravær.getÅrstall() == that.landSykefravær.getÅrstall()
+                        &&
+                        landSykefravær.getKvartal() == that.landSykefravær.getKvartal()
         );
     }
 }
