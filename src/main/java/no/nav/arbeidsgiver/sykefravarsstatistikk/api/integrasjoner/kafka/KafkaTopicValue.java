@@ -23,4 +23,31 @@ public class KafkaTopicValue {
         this.sektorSykefravær = sektorSykefravær;
         this.landSykefravær = landSykefravær;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        KafkaTopicValue that = (KafkaTopicValue) o;
+
+        if (!virksomhetSykefravær.getOrgnr().equals(that.virksomhetSykefravær.getOrgnr())) return false;
+        if (
+                (!virksomhetSykefravær.getÅrstallOgKvartal().equals(that.virksomhetSykefravær.getÅrstallOgKvartal()))
+                ||(!virksomhetSykefravær.getProsent().equals(that.virksomhetSykefravær.getProsent()))
+                ||(!næringSykefravær.getProsent().equals(that.næringSykefravær.getProsent()))
+                ||(!sektorSykefravær.getProsent().equals(that.sektorSykefravær.getProsent()))
+                ||(!landSykefravær.getProsent().equals(that.landSykefravær.getProsent()))
+               // ||(!virksomhetSykefravær.getTapteDagsverk().equals(that.virksomhetSykefravær.getTapteDagsverk()))
+
+                        //TODO sjekk om vi bør teste næring eller nei
+                        // (!næring5SifferSykefravær.getProsent().equals(that.næring5SifferSykefravær.getProsent()))
+        )
+            return false;
+        //if (!virksomhetSykefravær.get().equals(that.virksomhetSykefravær.getÅrstallOgKvartal())) return false;
+        return (
+                landSykefravær.getÅrstall()==that.landSykefravær.getÅrstall()
+                &&
+                landSykefravær.getKvartal()==that.landSykefravær.getKvartal()
+        );
+    }
 }
