@@ -36,7 +36,8 @@ public class EksporteringScheduler {
     private void eksportering() {
         log.info("Jobb for å ekportere sykefraværsstatistikk er startet.");
         log.info("Jobb er ikke aktivert enda");
-        //eksporteringService.eksporterHvisDetFinnesNyStatistikk();
+        // Hent ÅrstallOgKvartal som MÅ være unik --> Error ellers
+        //eksporteringService.eksporter(årstallOgKvartal);
     }
 
 }

@@ -14,7 +14,7 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
     private final int kvartal;
 
     public ÅrstallOgKvartal(int årstall, int kvartal){
-        if(kvartal > 4 || kvartal < 1){
+        if (kvartal > 4 || kvartal < 1){
             throw new IllegalArgumentException("Kvartal må være 1, 2, 3 eller 4");
         }
         this.årstall = årstall;

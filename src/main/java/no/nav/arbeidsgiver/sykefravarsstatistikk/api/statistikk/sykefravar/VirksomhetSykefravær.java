@@ -10,12 +10,13 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 public class VirksomhetSykefravær extends SykefraværForEttKvartal {
-    @JsonProperty("kategori")
-    Statistikkategori kategori;
 
+    @JsonProperty("kategori")
+    private final Statistikkategori kategori;
     private final String orgnr;
     private final String navn;
     private final int antallPersoner;
+
 
     public VirksomhetSykefravær(
             String orgnr,
@@ -23,7 +24,8 @@ public class VirksomhetSykefravær extends SykefraværForEttKvartal {
             ÅrstallOgKvartal årstallOgKvartal,
             BigDecimal tapteDagsverk,
             BigDecimal mulige_dagsverk,
-            int antallPersoner) {
+            int antallPersoner
+    ) {
         super(årstallOgKvartal, tapteDagsverk, mulige_dagsverk, antallPersoner);
         this.kategori = Statistikkategori.VIRKSOMHET;
         this.orgnr = orgnr;
@@ -46,10 +48,8 @@ public class VirksomhetSykefravær extends SykefraværForEttKvartal {
             @JsonProperty("muligeDagsverk")
                     BigDecimal muligeDagsverk,
             @JsonProperty("antallPersoner")
-                    int antallPersoner) {
-        //TODO finne ut hvordan kan vi kvitte oss å bruke antall personer
-        // for den gjør at vi mister tapte og mulige-dagsverk, AntallPersoner fins ikke i Message fra Kafka
-        // Dette medfører at testen ikke funker som det skal.
+                    int antallPersoner
+    ) {
         super(new ÅrstallOgKvartal(årstall, kvartal), tapteDagsverk, muligeDagsverk, antallPersoner);
         this.kategori = Statistikkategori.VIRKSOMHET;
         this.orgnr = orgnr;
@@ -57,11 +57,9 @@ public class VirksomhetSykefravær extends SykefraværForEttKvartal {
         this.antallPersoner=antallPersoner;
     }
 
-    public String getOrgnr() {
-        return orgnr;
-    }
-    public String getNavn(){return navn;}
-    public int getAntallPersoner(){return antallPersoner;}
+    public String getOrgnr() { return orgnr; }
+    public String getNavn() { return navn; }
+    public int getAntallPersoner() { return antallPersoner; }
 
 
     @Override
@@ -70,7 +68,11 @@ public class VirksomhetSykefravær extends SykefraværForEttKvartal {
         if (!(o instanceof VirksomhetSykefravær)) return false;
         if (!super.equals(o)) return false;
         VirksomhetSykefravær that = (VirksomhetSykefravær) o;
-        return super.equals(that)&& antallPersoner == that.antallPersoner && kategori == that.kategori && orgnr.equals(that.orgnr) && navn.equals(that.navn);
+        return super.equals(that)
+                && antallPersoner == that.antallPersoner
+                && kategori == that.kategori
+                && orgnr.equals(that.orgnr)
+                && navn.equals(that.navn);
     }
 
     @Override
