@@ -8,10 +8,12 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class SykefraværMedKategori extends SykefraværForEttKvartal {
     private final Statistikkategori kategori;
     private final String kode;
+    private final int antallPersoner;
 
     public SykefraværMedKategori(
             Statistikkategori statistikkategori,
@@ -23,6 +25,7 @@ public class SykefraværMedKategori extends SykefraværForEttKvartal {
         super(årstallOgKvartal, tapteDagsverk, muligeDagsverk, antallPersoner);
         this.kategori = statistikkategori;
         this.kode = kode;
+        this.antallPersoner = antallPersoner;
     }
 
     @JsonCreator
@@ -39,9 +42,10 @@ public class SykefraværMedKategori extends SykefraværForEttKvartal {
         //TODO finne ut hvordan kan vi kvitte oss å bruke antall personer
         // for den gjør at vi mister tapte og mulige-dagsverk, AntallPersoner fins ikke i Message fra Kafka
         // Dette medfører at testen ikke funker som det skal.
-        super(new ÅrstallOgKvartal(årstall, kvartal), tapteDagsverk, muligeDagsverk, 100);
+        super(new ÅrstallOgKvartal(årstall, kvartal), tapteDagsverk, muligeDagsverk, antallPersoner);
         this.kategori = kategori;
         this.kode = kode;
+        this.antallPersoner = antallPersoner;
     }
 
 
@@ -51,6 +55,24 @@ public class SykefraværMedKategori extends SykefraværForEttKvartal {
 
     public String getKode() {
         return kode;
+    }
+
+    public int getAntallPersoner() {
+        return antallPersoner;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SykefraværMedKategori)) return false;
+        if (!super.equals(o)) return false;
+        SykefraværMedKategori that = (SykefraværMedKategori) o;
+        return super.equals(that) && antallPersoner == that.antallPersoner && kategori == that.kategori && kode.equals(that.kode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), kategori, kode, antallPersoner);
     }
 }
 

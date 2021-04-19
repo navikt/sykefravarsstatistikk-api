@@ -5,6 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
+import java.util.Objects;
 
 public class SykefraværForEttKvartal extends MaskerbartSykefravær implements Comparable<SykefraværForEttKvartal> {
 
@@ -44,5 +45,23 @@ public class SykefraværForEttKvartal extends MaskerbartSykefravær implements C
 
     public ÅrstallOgKvartal getÅrstallOgKvartal() {
         return årstallOgKvartal;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SykefraværForEttKvartal)) return false;
+        if (!super.equals(o)) return false;
+        SykefraværForEttKvartal that = (SykefraværForEttKvartal) o;
+        return (årstallOgKvartal.equals(that.årstallOgKvartal)
+                && getProsent().equals(that.getProsent())
+                && getTapteDagsverk().equals(that.getTapteDagsverk())
+                && getMuligeDagsverk().equals(that.getMuligeDagsverk())
+        );
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), årstallOgKvartal);
     }
 }

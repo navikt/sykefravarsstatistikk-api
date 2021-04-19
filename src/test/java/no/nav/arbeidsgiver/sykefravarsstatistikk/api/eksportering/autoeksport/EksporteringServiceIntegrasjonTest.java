@@ -155,6 +155,7 @@ public class EksporteringServiceIntegrasjonTest {
                 "    \"kategori\": \"VIRKSOMHET\"," +
                 "    \"orgnr\": \"987654321\"," +
                 "    \"navn\": \"\"," +
+                "    \"antallPersoner\": 6," +
                 "    \"årstall\": 2020," +
                 "    \"kvartal\": 2" +
                 "  }," +
@@ -166,6 +167,7 @@ public class EksporteringServiceIntegrasjonTest {
                 "    \"erMaskert\": false," +
                 "    \"kategori\": \"NÆRING2SIFFER\"," +
                 "    \"kode\": \"11\"," +
+                "    \"antallPersoner\": 150," +
                 "    \"årstall\": 2020," +
                 "    \"kvartal\": 2" +
                 "  }," +
@@ -176,6 +178,7 @@ public class EksporteringServiceIntegrasjonTest {
                 "    \"erMaskert\": false," +
                 "    \"kategori\": \"SEKTOR\"," +
                 "    \"kode\": \"1\"," +
+                "    \"antallPersoner\": 33000," +
                 "    \"årstall\": 2020," +
                 "    \"kvartal\": 2" +
                 "  }," +
@@ -186,6 +189,7 @@ public class EksporteringServiceIntegrasjonTest {
                 "    \"erMaskert\": false," +
                 "    \"kategori\": \"LAND\"," +
                 "    \"kode\": \"NO\"," +
+                "    \"antallPersoner\": 2500000," +
                 "    \"årstall\": 2020," +
                 "    \"kvartal\": 2" +
                 "  }" +

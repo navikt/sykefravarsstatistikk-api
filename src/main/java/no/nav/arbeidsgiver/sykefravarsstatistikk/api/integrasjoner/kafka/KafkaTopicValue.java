@@ -29,8 +29,19 @@ public class KafkaTopicValue {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         KafkaTopicValue that = (KafkaTopicValue) o;
-
-        if (!virksomhetSykefravær.getOrgnr().equals(that.virksomhetSykefravær.getOrgnr())) return false;
+        if ((virksomhetSykefravær == null && that.virksomhetSykefravær != null)
+                || (that.virksomhetSykefravær == null && virksomhetSykefravær != null))
+            return false;
+        if ((næring5SifferSykefravær == null && that.næring5SifferSykefravær != null)
+                || (that.næring5SifferSykefravær == null && næring5SifferSykefravær != null))
+            return false;
+        if ((næringSykefravær == null && that.næringSykefravær != null)
+                || (that.næringSykefravær == null && næringSykefravær != null)) return false;
+        if ((sektorSykefravær == null && that.sektorSykefravær != null)
+                || (that.sektorSykefravær == null && sektorSykefravær != null)) return false;
+        if ((landSykefravær == null && that.landSykefravær != null)
+                || (that.landSykefravær == null && landSykefravær != null)) return false;
+      /*  if (!virksomhetSykefravær.getOrgnr().equals(that.virksomhetSykefravær.getOrgnr())) return false;
         if (
                 (!virksomhetSykefravær.getÅrstallOgKvartal().equals(that.virksomhetSykefravær.getÅrstallOgKvartal()))
                         || (!virksomhetSykefravær.getProsent().equals(that.virksomhetSykefravær.getProsent()))
@@ -50,13 +61,15 @@ public class KafkaTopicValue {
                         || (!landSykefravær.getMuligeDagsverk().equals(that.landSykefravær.getMuligeDagsverk()))
 
         )
-            return false;
+            return false;*/
 
         //if (!virksomhetSykefravær.get().equals(that.virksomhetSykefravær.getÅrstallOgKvartal())) return false;
-        return (
-                landSykefravær.getÅrstall() == that.landSykefravær.getÅrstall()
-                        &&
-                        landSykefravær.getKvartal() == that.landSykefravær.getKvartal()
-        );
+        //TODO fjerne unødvendige ekstra sjekk
+        // jeg vet ikke hvorfor IntelliJ mener at vi kan fjerne that... de er 2 forskjellige objekter, mener jeg.
+        return ((virksomhetSykefravær == null && that.virksomhetSykefravær == null) || virksomhetSykefravær.equals(that.virksomhetSykefravær))
+                && ((næring5SifferSykefravær == null && that.næring5SifferSykefravær == null) || næring5SifferSykefravær.equals(that.næring5SifferSykefravær))
+                && ((næringSykefravær == null && that.næringSykefravær == null) || næringSykefravær.equals(that.næringSykefravær))
+                && ((sektorSykefravær == null && that.sektorSykefravær == null) || sektorSykefravær.equals(that.sektorSykefravær))
+                && ((landSykefravær == null && that.landSykefravær == null) || landSykefravær.equals(that.landSykefravær));
     }
 }

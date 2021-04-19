@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
@@ -71,5 +72,18 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
         return Comparator.comparing(ÅrstallOgKvartal::getÅrstall)
                 .thenComparing(ÅrstallOgKvartal::getKvartal)
                 .compare(this, årstallOgKvartal);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ÅrstallOgKvartal)) return false;
+        ÅrstallOgKvartal that = (ÅrstallOgKvartal) o;
+        return årstall == that.årstall && kvartal == that.kvartal;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(årstall, kvartal);
     }
 }
