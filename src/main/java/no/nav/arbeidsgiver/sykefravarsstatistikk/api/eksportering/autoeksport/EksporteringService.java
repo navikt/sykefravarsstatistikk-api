@@ -91,7 +91,6 @@ public class EksporteringService {
                 sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(årstallOgKvartal);
         List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring =
                 sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(årstallOgKvartal);
-        // TODO: sjekk om det henter det vi trenger
         List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer =
                 sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5Siffer(årstallOgKvartal);
         List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet =
@@ -106,7 +105,6 @@ public class EksporteringService {
         kafkaService.nullstillUtsendingRapport();
 
         virksomheterTilEksport.stream().forEach(virksomhetTilEksport -> {
-                    System.out.println("Eksport for " + virksomhetTilEksport.getOrgnr());
                     VirksomhetMetadata virksomhetMetadata = getVirksomhetMetada(
                             new Orgnr(virksomhetTilEksport.getOrgnr()),
                             virksomhetTilEksport.getÅrstallOgKvartal(),

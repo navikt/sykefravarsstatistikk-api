@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.NæringOgNæringskode5siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
@@ -11,7 +10,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.Sykef
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
