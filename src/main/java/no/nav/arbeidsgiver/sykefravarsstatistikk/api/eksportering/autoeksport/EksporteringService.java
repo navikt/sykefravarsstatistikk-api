@@ -9,9 +9,11 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaSe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collector;
@@ -89,7 +91,7 @@ public class EksporteringService {
                 sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(årstallOgKvartal);
         List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring =
                 sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(årstallOgKvartal);
-        // TODO: hent alle ststistikk til 5siffer næringskode
+        // TODO: sjekk om det henter det vi trenger
         List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer =
                 sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5Siffer(årstallOgKvartal);
         List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet =
@@ -118,7 +120,10 @@ public class EksporteringService {
                                         virksomhetMetadata,
                                         sykefraværsstatistikkVirksomhetUtenVarighet
                                 ),
-                                null,
+                                getSykefraværMedKategoriForNæring5Siffer(
+                                        virksomhetMetadata,
+                                        sykefraværsstatistikkNæring5Siffer
+                                ),
                                 getSykefraværMedKategoriForNæring(
                                         virksomhetMetadata,
                                         sykefraværsstatistikkNæring
@@ -272,53 +277,48 @@ public class EksporteringService {
                 sfNæring.getAntallPersoner()
         );
     }
+
     protected static List<SykefraværMedKategori> getSykefraværMedKategoriForNæring5Siffer(
             VirksomhetMetadata virksomhetMetadata,
             List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5SifferList
     ) {
-        // 2 list list av næring5siffer(alle)
-        // list av næring5siffer i virksomhet
-        // filterering og oppretter en ny liste av SykefraværMedKategori
 
-        //populate(emplList, deptList);
+        List<SykefraværsstatistikkNæring5Siffer> filteredList =
+                getSykefraværsstatistikkNæring5Siffers(virksomhetMetadata, sykefraværsstatistikkNæring5SifferList);
 
+        List<SykefraværMedKategori> resultatList = new ArrayList();
+
+        filteredList.stream().forEach(
+                sfNæring5Siffer -> {
+                    resultatList.add(
+                            new SykefraværMedKategori(
+                                    Statistikkategori.NÆRING5SIFFER,
+                                    sfNæring5Siffer.getNæringkode5siffer(),
+                                    new ÅrstallOgKvartal(
+                                            virksomhetMetadata.getÅrstall(),
+                                            virksomhetMetadata.getKvartal()
+                                    ),
+                                    sfNæring5Siffer.getTapteDagsverk(),
+                                    sfNæring5Siffer.getMuligeDagsverk(),
+                                    sfNæring5Siffer.getAntallPersoner()
+                            )
+                    );
+                }
+        );
+
+        return resultatList;
+    }
+
+    @NotNull
+    protected static List<SykefraværsstatistikkNæring5Siffer> getSykefraværsstatistikkNæring5Siffers(
+            VirksomhetMetadata virksomhetMetadata,
+            List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5SifferList) {
         List<SykefraværsstatistikkNæring5Siffer> filteredList = sykefraværsstatistikkNæring5SifferList.stream()
-                .filter(empl -> virksomhetMetadata.getNæringOgNæringskode5siffer().stream()
-                        .anyMatch(dept ->
-                                //dept.getDepartment().equals("sales") &&
-                                        empl.getNæringkode5siffer().equals(dept.getNæringskode5Siffer())))
+                .filter(næring5Siffer -> virksomhetMetadata.getNæringOgNæringskode5siffer().stream()
+                        .anyMatch(virksomhetNæring5Siffer ->
+                                næring5Siffer.getNæringkode5siffer().equals(virksomhetNæring5Siffer.getNæringskode5Siffer())))
                 .collect(Collectors.toList());
-
-        /*assertEquals(1, filteredList.size());
-        assertEquals(expectedId, filteredList.get(0)
-                .getEmployeeId());*/
-        //TODO opprett en List av sykefraværMedKAtegori fra filteredliste and return den.
-        return  null;
-        // TODO delete me når kode funker(gammel kode)
-       /* SykefraværsstatistikkNæring sfNæring5Siffer =
-                sykefraværsstatistikkNæring5SifferList.stream().filter(
-                        v -> v.getNæringkode5siffer().equals(virksomhetMetadata.getNæringOgNæringskode5siffer().stream().anyMatch(v.))
-                                && v.getÅrstall() == virksomhetMetadata.getÅrstall()
-                                && v.getKvartal() == virksomhetMetadata.getKvartal()
-                ).collect(toSingleton(
-                        new SykefraværsstatistikkNæring(
-                                virksomhetMetadata.getÅrstall(),
-                                virksomhetMetadata.getKvartal(),
-                                virksomhetMetadata.getNæring(),
-                                0,
-                                null,
-                                null
-                        )
-                ));
-
-        return new SykefraværMedKategori(
-                Statistikkategori.NÆRING2SIFFER,
-                sfNæring.getNæringkode(),
-                new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
-                sfNæring.getTapteDagsverk(),
-                sfNæring.getMuligeDagsverk(),
-                sfNæring.getAntallPersoner()
-        );*/
+        return filteredList;
     }
 
     private static <T> Collector<T, ?, T> toSingleton(T emptySykefraværsstatistikk) {

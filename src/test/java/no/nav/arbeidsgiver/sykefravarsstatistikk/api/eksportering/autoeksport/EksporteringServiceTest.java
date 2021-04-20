@@ -1,15 +1,20 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.NæringOgNæringskode5siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils.assertBigDecimalIsEqual;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.*;
@@ -136,6 +141,73 @@ public class EksporteringServiceTest {
                 Statistikkategori.NÆRING2SIFFER,
                 virksomhet1Metadata_2020_4.getNæring()
         );
+    }
+@Test
+    public void getSykefraværMedKategoriForNæring5Siffer__returnerer_SykefraværMedKategori__med_sykefraværsstatistikk_for_næring_5_siffer() {
+        virksomhet1Metadata_2020_4.leggTilNæringOgNæringskode5siffer(Arrays.asList(
+                new NæringOgNæringskode5siffer("85","85000"),
+                new NæringOgNæringskode5siffer("11","11000")
+        ));
+        List<SykefraværMedKategori> resultat = EksporteringService.getSykefraværMedKategoriForNæring5Siffer(
+                virksomhet1Metadata_2020_4,
+                Arrays.asList(
+                        byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "11000"),
+                        byggSykefraværStatistikkNæring5Siffer(virksomhet2Metadata_2020_4,"85000")
+                )
+        );
+
+        assertThat(resultat.size()).isEqualTo(2);
+        SykefraværMedKategori sykefraværMedKategori85000 = resultat.stream().
+                filter(r -> "85000".equals(r.getKode()))
+                . findFirst().get();
+
+        assertEqualsSykefraværMedKategori(
+                sykefraværMedKategori85000,
+                byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4,"85000"),
+                Statistikkategori.NÆRING5SIFFER,
+                virksomhet1Metadata_2020_4.getNæringOgNæringskode5siffer().get(0).getNæringskode5Siffer()
+        );
+        SykefraværMedKategori sykefraværMedKategori11000 = resultat.stream().
+                filter(r -> "11000".equals(r.getKode()))
+                . findFirst().get();
+
+        assertEqualsSykefraværMedKategori(
+                sykefraværMedKategori11000,
+                byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4,"11000"),
+                Statistikkategori.NÆRING5SIFFER,
+                virksomhet1Metadata_2020_4.getNæringOgNæringskode5siffer().get(1).getNæringskode5Siffer()
+        );
+    }
+
+    @Test
+    public void getSykefraværsstatistikkNæring5Siffers__skal_returnere_riktig_liste() {
+        VirksomhetMetadata virksomhetMetadata_2020_4_med_næring5siffer = virksomhet1Metadata_2020_4;
+        virksomhetMetadata_2020_4_med_næring5siffer.leggTilNæringOgNæringskode5siffer(
+                Arrays.asList(
+                        new NæringOgNæringskode5siffer("11", "11000"),
+                        new NæringOgNæringskode5siffer("85", "85000")
+                )
+        );
+        List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5SifferList = Arrays.asList(
+                byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "11000"),
+                byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "45210"),
+                byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "85000")
+        );
+        List<SykefraværsstatistikkNæring5Siffer> resultat = EksporteringService.getSykefraværsstatistikkNæring5Siffers(
+                virksomhetMetadata_2020_4_med_næring5siffer,
+                sykefraværsstatistikkNæring5SifferList
+        );
+
+        assertThat(resultat.size()).isEqualTo(2);
+        assertThat(resultat.contains(
+                byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "11000")
+        ));
+        assertThat(resultat.contains(
+                byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "85000")
+        ));
+        assertThat(!resultat.contains(
+                byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "45210")
+        ));
     }
 
     // Assertions

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.NæringOgNæringskode5siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
@@ -12,11 +13,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -37,13 +34,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2020_2;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.sykefraværsstatistikkLand;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.sykefraværsstatistikkNæring;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.sykefraværsstatistikkSektor;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.virksomhetEksportPerKvartal;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.virksomhetMetadata;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
@@ -117,6 +108,10 @@ public class EksporteringServiceIntegrasjonTest {
     public void eksporter_sender_melding_til_kafka_og_returnerer_antall_meldinger_sendt() throws Exception {
         when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2))
                 .thenReturn(Arrays.asList(virksomhetEksportPerKvartal));
+        virksomhetMetadata.leggTilNæringOgNæringskode5siffer(Arrays.asList(
+                new NæringOgNæringskode5siffer("11", "11000"),
+                new NæringOgNæringskode5siffer("85", "85000")
+        ));
         when(virksomhetMetadataRepository.hentVirksomhetMetadata(__2020_2))
                 .thenReturn(Arrays.asList(virksomhetMetadata));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentLand(__2020_2))
@@ -125,6 +120,8 @@ public class EksporteringServiceIntegrasjonTest {
                 .thenReturn(Arrays.asList(sykefraværsstatistikkSektor));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(__2020_2))
                 .thenReturn(Arrays.asList(sykefraværsstatistikkNæring));
+        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5Siffer(__2020_2))
+                .thenReturn(Arrays.asList(sykefraværsstatistikkNæring5Siffer));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(__2020_2))
                 .thenReturn(Arrays.asList(sykefraværsstatistikkVirksomhet));
 
@@ -170,7 +167,17 @@ public class EksporteringServiceIntegrasjonTest {
                 "    \"årstall\": 2020," +
                 "    \"kvartal\": 2" +
                 "  }," +
-                "  \"næring5SifferSykefravær\": null," +
+                "  \"næring5SifferSykefravær\": [{" +
+                "    \"prosent\": 1.0," +
+                "    \"tapteDagsverk\": 40.0," +
+                "    \"muligeDagsverk\": 4000.0," +
+                "    \"erMaskert\": false," +
+                "    \"kategori\": \"NÆRING5SIFFER\"," +
+                "    \"kode\": \"11000\"," +
+                "    \"antallPersoner\": 1250," +
+                "    \"årstall\": 2020," +
+                "    \"kvartal\": 2" +
+                "   }]," +
                 "  \"næringSykefravær\": {" +
                 "    \"prosent\": 2.0," +
                 "    \"tapteDagsverk\": 100.0," +

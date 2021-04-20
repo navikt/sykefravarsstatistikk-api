@@ -4,10 +4,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksp
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
 
 import java.math.BigDecimal;
@@ -124,6 +121,17 @@ public class EksporteringServiceTestUtils {
                 new BigDecimal(188000)
         );
     }
+public static SykefraværsstatistikkNæring5Siffer byggSykefraværStatistikkNæring5Siffer(VirksomhetMetadata virksomhetMetadata,
+String næringskode5Siffer) {
+        return new SykefraværsstatistikkNæring5Siffer(
+                virksomhetMetadata.getÅrstall(),
+                virksomhetMetadata.getKvartal(),
+                næringskode5Siffer,
+                100,
+                new BigDecimal(250),
+                new BigDecimal(25000)
+        );
+    }
 
     public static SykefraværsstatistikkSektor byggSykefraværStatistikkSektor(
             VirksomhetMetadata virksomhetMetadata,
@@ -178,7 +186,7 @@ public class EksporteringServiceTestUtils {
                 156
         );
     }
-    
+
     public static SykefraværsstatistikkVirksomhetUtenVarighet sykefraværsstatistikkVirksomhet =
             new SykefraværsstatistikkVirksomhetUtenVarighet(
                     __2020_2.getÅrstall(),
@@ -188,6 +196,7 @@ public class EksporteringServiceTestUtils {
                     new BigDecimal(10),
                     new BigDecimal(500)
             );
+
     public static VirksomhetEksportPerKvartal virksomhetEksportPerKvartal = new VirksomhetEksportPerKvartal(
             new Orgnr("987654321"),
             __2020_2,
@@ -223,5 +232,13 @@ public class EksporteringServiceTestUtils {
             150,
             new BigDecimal(100),
             new BigDecimal(5000)
+    );
+    public static SykefraværsstatistikkNæring5Siffer sykefraværsstatistikkNæring5Siffer = new SykefraværsstatistikkNæring5Siffer(
+            __2020_2.getÅrstall(),
+            __2020_2.getKvartal(),
+            "11000",
+            1250,
+            new BigDecimal(40),
+            new BigDecimal(4000)
     );
 }
