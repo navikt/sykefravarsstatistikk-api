@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class KafkaService {
@@ -54,7 +56,7 @@ public class KafkaService {
     public void send(
             ÅrstallOgKvartal årstallOgKvartal,
             VirksomhetSykefravær virksomhetSykefravær,
-            SykefraværMedKategori næring5SifferSykefravær,
+            List<SykefraværMedKategori> næring5SifferSykefravær,
             SykefraværMedKategori næringSykefravær,
             SykefraværMedKategori sektorSykefravær,
             SykefraværMedKategori landSykefravær
