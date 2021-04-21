@@ -6,6 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUtsendingException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
@@ -75,14 +76,21 @@ public class EksporteringService {
                 årstallOgKvartal.getKvartal(),
                 antallStatistikkSomSkalEksporteres
         );
+        int antallEksporterteVirksomheter = 0;
 
-        return eksporter(virksomheterTilEksport, årstallOgKvartal);
+        try {
+            antallEksporterteVirksomheter = eksporter(virksomheterTilEksport, årstallOgKvartal);
+        } catch (KafkaUtsendingException e) {
+            log.warn("Fikk KafkaUtsendingException med melding:'{}'. Avbryter prosess.", e.getMessage());
+        }
+
+        return antallEksporterteVirksomheter;
     }
 
     protected int eksporter(
             List<VirksomhetEksportPerKvartal> virksomheterTilEksport,
             ÅrstallOgKvartal årstallOgKvartal
-    ) {
+    ) throws KafkaUtsendingException {
         List<VirksomhetMetadata> virksomhetMetadataListe =
                 virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal);
         SykefraværsstatistikkLand sykefraværsstatistikkLand =

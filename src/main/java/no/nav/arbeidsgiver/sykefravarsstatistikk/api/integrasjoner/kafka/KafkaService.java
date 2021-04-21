@@ -61,6 +61,18 @@ public class KafkaService {
             SykefraværMedKategori sektorSykefravær,
             SykefraværMedKategori landSykefravær
     ) {
+        if(kafkaUtsendingRapport.getAntallMeldingerIError()>5)
+        {
+            throw new KafkaUtsendingException(
+                    String.format(
+                            "Antall error:'%d' avbryter eksportering. totalt meldinger som er klar for sending er: '%d'." +
+                                    " Antall meldinger som har egentlig blitt sendt: '%d'",
+                            kafkaUtsendingRapport.getAntallMeldingerIError(),
+                            kafkaUtsendingRapport.getAntallMeldingerSent(),
+                            kafkaUtsendingRapport.getAntallMeldingerMottattForUtsending()
+                    )
+            );
+        }
         kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
 
         KafkaTopicKey key = new KafkaTopicKey(
