@@ -61,11 +61,11 @@ public class KafkaService {
             SykefraværMedKategori sektorSykefravær,
             SykefraværMedKategori landSykefravær
     ) {
-        if(kafkaUtsendingRapport.getAntallMeldingerIError()>5)
+        if(kafkaUtsendingRapport.getAntallMeldingerIError() > 5)
         {
             throw new KafkaUtsendingException(
                     String.format(
-                            "Antall error:'%d' avbryter eksportering. totalt meldinger som er klar for sending er: '%d'." +
+                            "Antall error:'%d'. Avbryter eksportering. Totalt meldinger som var klar for sending er: '%d'." +
                                     " Antall meldinger som har egentlig blitt sendt: '%d'",
                             kafkaUtsendingRapport.getAntallMeldingerIError(),
                             kafkaUtsendingRapport.getAntallMeldingerSent(),
@@ -128,11 +128,18 @@ public class KafkaService {
             public void onSuccess(SendResult<String, String> res) {
                 kafkaUtsendingRapport.leggTilUtsending(new Orgnr(virksomhetSykefravær.getOrgnr()));
                 log.debug(
-                        "Melding sendt på topic {}. Record.key: {}. Record.offset: {}",
+                        "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
                         kafkaProperties.getTopic(),
                         res.getProducerRecord().key(),
                         res.getRecordMetadata().offset()
                 );
+
+                //
+                if (73 == kafkaUtsendingRapport.getAntallMeldingerMottattForUtsending() && kafkaUtsendingRapport.getAntallMeldingerMottattForUtsending() == kafkaUtsendingRapport.getAntallMeldingerSent()) {
+                    log.info("Alle meldinger er sent");
+                }
+
+                res.getRecordMetadata().offset();
             }
         });
     }

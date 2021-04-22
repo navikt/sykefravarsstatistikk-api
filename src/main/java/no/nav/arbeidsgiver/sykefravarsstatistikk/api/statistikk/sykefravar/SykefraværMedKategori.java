@@ -28,6 +28,7 @@ public class SykefraværMedKategori extends SykefraværForEttKvartal {
         this.antallPersoner = antallPersoner;
     }
 
+    // OBS: Constructor bruk i testene (objectMapper)
     @JsonCreator
     public SykefraværMedKategori(
             @JsonProperty("kategori") Statistikkategori kategori,
@@ -38,25 +39,20 @@ public class SykefraværMedKategori extends SykefraværForEttKvartal {
             @JsonFormat(shape = JsonFormat.Shape.STRING)
                     BigDecimal tapteDagsverk,
             @JsonProperty("muligeDagsverk") BigDecimal muligeDagsverk,
-            @JsonProperty("antallPersoner") int antallPersoner) {
-        //TODO finne ut hvordan kan vi kvitte oss å bruke antall personer
-        // for den gjør at vi mister tapte og mulige-dagsverk, AntallPersoner fins ikke i Message fra Kafka
-        // Dette medfører at testen ikke funker som det skal.
+            @JsonProperty("antallPersoner") int antallPersoner
+    ){
         super(new ÅrstallOgKvartal(årstall, kvartal), tapteDagsverk, muligeDagsverk, antallPersoner);
         this.kategori = kategori;
         this.kode = kode;
         this.antallPersoner = antallPersoner;
     }
 
-
     public Statistikkategori getKategori() {
         return kategori;
     }
-
     public String getKode() {
         return kode;
     }
-
     public int getAntallPersoner() {
         return antallPersoner;
     }

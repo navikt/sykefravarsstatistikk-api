@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.NæringOgNæringskode5siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
@@ -63,7 +62,7 @@ public class EksporteringServiceTest {
                 Collections.emptyList()
         );
 
-        assertEqualsVirksomhetSykefravær(resultat, tomVirksomhetSykefravær(virksomhet1Metadata_2020_4));
+        assertEqualsVirksomhetSykefravær(tomVirksomhetSykefravær(virksomhet1Metadata_2020_4), resultat);
     }
 
     @Test
@@ -76,7 +75,7 @@ public class EksporteringServiceTest {
                 )
         );
 
-        assertEqualsVirksomhetSykefravær(resultat, tomVirksomhetSykefravær(virksomhet1Metadata_2021_2));
+        assertEqualsVirksomhetSykefravær(tomVirksomhetSykefravær(virksomhet1Metadata_2021_2), resultat);
     }
 
     @Test
@@ -89,7 +88,7 @@ public class EksporteringServiceTest {
                 )
         );
 
-        assertEqualsVirksomhetSykefravær(resultat, byggVirksomhetSykefravær(virksomhet1Metadata_2020_4, 10, 156, 22233));
+        assertEqualsVirksomhetSykefravær(byggVirksomhetSykefravær(virksomhet1Metadata_2020_4, 10, 156, 22233), resultat);
     }
 
     @Test
@@ -102,7 +101,7 @@ public class EksporteringServiceTest {
                 )
         );
 
-        assertEqualsVirksomhetSykefravær(resultat, byggVirksomhetSykefravær(virksomhet1Metadata_2020_4));
+        assertEqualsVirksomhetSykefravær(byggVirksomhetSykefravær(virksomhet1Metadata_2020_4), resultat);
     }
 
     @Test
@@ -116,8 +115,7 @@ public class EksporteringServiceTest {
         );
 
         assertEqualsSykefraværMedKategori(
-                resultat,
-                byggSykefraværStatistikkSektor(virksomhet1Metadata_2020_4, 10, 156, 22233),
+                byggSykefraværStatistikkSektor(virksomhet1Metadata_2020_4, 10, 156, 22233), resultat,
                 Statistikkategori.SEKTOR,
                 virksomhet1Metadata_2020_4.getSektor()
         );
@@ -134,8 +132,7 @@ public class EksporteringServiceTest {
         );
 
         assertEqualsSykefraværMedKategori(
-                resultat,
-                byggSykefraværStatistikkNæring(virksomhet1Metadata_2020_4, 10, 156, 22233),
+                byggSykefraværStatistikkNæring(virksomhet1Metadata_2020_4, 10, 156, 22233), resultat,
                 Statistikkategori.NÆRING2SIFFER,
                 virksomhet1Metadata_2020_4.getNæring()
         );
@@ -160,8 +157,7 @@ public class EksporteringServiceTest {
                 . findFirst().get();
 
         assertEqualsSykefraværMedKategori(
-                sykefraværMedKategori85000,
-                byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4,"85000"),
+                byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4,"85000"), sykefraværMedKategori85000,
                 Statistikkategori.NÆRING5SIFFER,
                 virksomhet1Metadata_2020_4.getNæringOgNæringskode5siffer().get(0).getNæringskode5Siffer()
         );
@@ -170,8 +166,7 @@ public class EksporteringServiceTest {
                 . findFirst().get();
 
         assertEqualsSykefraværMedKategori(
-                sykefraværMedKategori11000,
-                byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4,"11000"),
+                byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4,"11000"), sykefraværMedKategori11000,
                 Statistikkategori.NÆRING5SIFFER,
                 virksomhet1Metadata_2020_4.getNæringOgNæringskode5siffer().get(1).getNæringskode5Siffer()
         );
@@ -206,29 +201,6 @@ public class EksporteringServiceTest {
         assertThat(!resultat.contains(
                 byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "45210")
         ));
-    }
-
-    // Assertions
-    private static void assertEqualsVirksomhetSykefravær(VirksomhetSykefravær actual, VirksomhetSykefravær expected) {
-        assertThat(actual.getÅrstall()).isEqualTo(expected.getÅrstall());
-        assertThat(actual.getKvartal()).isEqualTo(expected.getKvartal());
-        assertThat(actual.getOrgnr()).isEqualTo(expected.getOrgnr());
-        assertBigDecimalIsEqual(actual.getMuligeDagsverk(), expected.getMuligeDagsverk());
-        assertBigDecimalIsEqual(actual.getTapteDagsverk(), expected.getTapteDagsverk());
-    }
-
-    private void assertEqualsSykefraværMedKategori(
-            SykefraværMedKategori actual,
-            Sykefraværsstatistikk expected,
-            Statistikkategori expectedKategori,
-            String expectedKode
-    ) {
-        assertThat(actual.getKategori()).as("Sjekk Statistikkategori").isEqualTo(expectedKategori);
-        assertThat(actual.getKode()).as("Sjekk kode").isEqualTo(expectedKode);
-        assertThat(actual.getÅrstall()).as("Sjekk årstall").isEqualTo(expected.getÅrstall());
-        assertThat(actual.getKvartal()).as("Sjekk kvartal").isEqualTo(expected.getKvartal());
-        assertBigDecimalIsEqual(actual.getMuligeDagsverk(), expected.getMuligeDagsverk());
-        assertBigDecimalIsEqual(actual.getTapteDagsverk(), expected.getTapteDagsverk());
     }
 
 }
