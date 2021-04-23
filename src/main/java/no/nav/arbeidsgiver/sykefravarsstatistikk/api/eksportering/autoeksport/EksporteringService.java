@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Component
@@ -44,19 +45,14 @@ public class EksporteringService {
         this.erEksporteringAktivert = erEksporteringAktivert;
     }
 
-    public int eksporter(ÅrstallOgKvartal årstallOgKvartal) {
+    public int eksporter(ÅrstallOgKvartal årstallOgKvartal, EksporteringBegrensning eksporteringBegrensning) {
 
         if (!erEksporteringAktivert) {
             log.info("Eksportering er ikke aktivert.");
             return 0;
         }
-        List<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartal =
-                eksporteringRepository.hentVirksomhetEksportPerKvartal(årstallOgKvartal);
-
         List<VirksomhetEksportPerKvartal> virksomheterTilEksport =
-                virksomhetEksportPerKvartal.stream()
-                        .filter(v -> !v.eksportert())
-                        .collect(Collectors.toList());
+                getListeAvVirksomhetEksportPerKvartal(årstallOgKvartal, eksporteringBegrensning);
 
         int antallStatistikkSomSkalEksporteres = virksomheterTilEksport.isEmpty() ?
                 0 :
@@ -86,6 +82,7 @@ public class EksporteringService {
 
         return antallEksporterteVirksomheter;
     }
+
 
     protected int eksporter(
             List<VirksomhetEksportPerKvartal> virksomheterTilEksport,
@@ -156,6 +153,25 @@ public class EksporteringService {
         return antallOppdatertSomEksportert.get();
     }
 
+
+    @NotNull
+    protected List<VirksomhetEksportPerKvartal> getListeAvVirksomhetEksportPerKvartal(
+            ÅrstallOgKvartal årstallOgKvartal,
+            EksporteringBegrensning eksporteringBegrensning
+    ) {
+        List<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartal =
+                eksporteringRepository.hentVirksomhetEksportPerKvartal(årstallOgKvartal);
+
+        Stream<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartalStream = virksomhetEksportPerKvartal
+                .stream()
+                .filter(v -> !v.eksportert());
+
+        return eksporteringBegrensning.erBegrenset() ?
+                virksomhetEksportPerKvartalStream.
+                        limit(eksporteringBegrensning.getAntallSomSkalEksporteres())
+                        .collect(Collectors.toList()) :
+                virksomhetEksportPerKvartalStream.collect(Collectors.toList());
+    }
 
     protected static long getAntallSomKanEksporteres(List<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartal) {
         return virksomhetEksportPerKvartal.stream().filter(v -> !v.eksportert()).count();
