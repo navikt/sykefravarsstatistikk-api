@@ -133,13 +133,6 @@ public class KafkaService {
                         res.getProducerRecord().key(),
                         res.getRecordMetadata().offset()
                 );
-
-                //
-                if (73 == kafkaUtsendingRapport.getAntallMeldingerMottattForUtsending() && kafkaUtsendingRapport.getAntallMeldingerMottattForUtsending() == kafkaUtsendingRapport.getAntallMeldingerSent()) {
-                    log.info("Alle meldinger er sent");
-                }
-
-                res.getRecordMetadata().offset();
             }
         });
     }
