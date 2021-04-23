@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
@@ -30,6 +31,8 @@ public class EksporteringService {
     private final SykefraværsstatistikkTilEksporteringRepository sykefraværsstatistikkTilEksporteringRepository;
     private final KafkaService kafkaService;
     private final boolean erEksporteringAktivert;
+
+    public static final int EKSPORT_BATCH_STØRRELSE = 10000;
 
     public EksporteringService(
             EksporteringRepository eksporteringRepository,
@@ -106,8 +109,49 @@ public class EksporteringService {
                 sykefraværsstatistikkLand
         );
 
-        AtomicInteger antallOppdatertSomEksportert = new AtomicInteger();
         kafkaService.nullstillUtsendingRapport();
+
+        List<? extends List<VirksomhetEksportPerKvartal>> subsets =
+                Lists.partition(virksomheterTilEksport, EKSPORT_BATCH_STØRRELSE);
+        AtomicInteger antallEksportert = new AtomicInteger();
+
+        subsets.forEach(subset -> {
+                    int antallSentTilEksportOgOppdatertIDatabaseIDenneSubset = 0;
+
+                    antallSentTilEksportOgOppdatertIDatabaseIDenneSubset = sendIBatch(
+                            subset,
+                            årstallOgKvartal,
+                            virksomhetMetadataListe,
+                            sykefraværsstatistikkSektor,
+                            sykefraværsstatistikkNæring,
+                            sykefraværsstatistikkNæring5Siffer,
+                            sykefraværsstatistikkVirksomhetUtenVarighet,
+                            landSykefravær
+                    );
+                    int eksportertHittilNå = antallEksportert.addAndGet(antallSentTilEksportOgOppdatertIDatabaseIDenneSubset);
+                    log.info(String.format("Eksportert %d rader", eksportertHittilNå));
+                }
+        );
+
+        log.info("Eksport er ferdig med: antall prosessert='{}', antall bekreftet eksportert='{}' og antall error='{}'",
+                kafkaService.getAntallMeldingerMottattForUtsending(),
+                kafkaService.getAntallMeldingerSent(),
+                kafkaService.getAntallMeldingerIError()
+        );
+        return antallEksportert.get();
+    }
+
+    private int sendIBatch(
+            List<VirksomhetEksportPerKvartal> virksomheterTilEksport,
+            ÅrstallOgKvartal årstallOgKvartal,
+            List<VirksomhetMetadata> virksomhetMetadataListe,
+            List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor,
+            List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring,
+            List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer,
+            List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet,
+            SykefraværMedKategori landSykefravær
+    ) {
+        AtomicInteger antallSentTilEksportOgOppdatertIDatabase = new AtomicInteger();
 
         virksomheterTilEksport.stream().forEach(virksomhetTilEksport -> {
                     VirksomhetMetadata virksomhetMetadata = getVirksomhetMetada(
@@ -139,18 +183,11 @@ public class EksporteringService {
                         );
 
                         eksporteringRepository.oppdaterTilEksportert(virksomhetTilEksport);
-                        antallOppdatertSomEksportert.getAndIncrement();
+                        antallSentTilEksportOgOppdatertIDatabase.getAndIncrement();
                     }
                 }
         );
-
-
-        log.info("Eksport er ferdig med: antall prosessert='{}', antall bekreftet eksportert='{}' og antall error='{}'",
-                kafkaService.getAntallMeldingerMottattForUtsending(),
-                kafkaService.getAntallMeldingerSent(),
-                kafkaService.getAntallMeldingerIError()
-        );
-        return antallOppdatertSomEksportert.get();
+        return antallSentTilEksportOgOppdatertIDatabase.get();
     }
 
 
