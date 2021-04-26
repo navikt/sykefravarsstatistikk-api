@@ -24,7 +24,6 @@ kafka:
     keystorePath: ${KAFKA_KEYSTORE_PATH:/dev/zero}
     truststorePath: ${KAFKA_TRUSTSTORE_PATH:/dev/zero}
     credstorePassword: ${KAFKA_CREDSTORE_PASSWORD:pwd}
-    batchSize: 100
 
 spring:
   profiles:
