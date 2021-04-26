@@ -117,7 +117,7 @@ public class EksporteringService {
 
         subsets.forEach(subset -> {
                     int antallSentTilEksportOgOppdatertIDatabaseIDenneSubset = 0;
-
+                    log.info("Starter utsending av {} meldinger", subset.size());
                     antallSentTilEksportOgOppdatertIDatabaseIDenneSubset = sendIBatch(
                             subset,
                             årstallOgKvartal,
@@ -129,7 +129,13 @@ public class EksporteringService {
                             landSykefravær
                     );
                     int eksportertHittilNå = antallEksportert.addAndGet(antallSentTilEksportOgOppdatertIDatabaseIDenneSubset);
-                    log.info(String.format("Eksportert %d rader", eksportertHittilNå));
+                    log.info(
+                            String.format(
+                                    "Eksportert '%d' rader av '%d' totalt",
+                                    eksportertHittilNå,
+                                    virksomheterTilEksport.size()
+                            )
+                    );
                 }
         );
 
