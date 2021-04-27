@@ -32,7 +32,7 @@ public class EksporteringService {
     private final KafkaService kafkaService;
     private final boolean erEksporteringAktivert;
 
-    public static final int EKSPORT_BATCH_STØRRELSE = 10000;
+    public static final int EKSPORT_BATCH_STØRRELSE = 1000;
 
     public EksporteringService(
             EksporteringRepository eksporteringRepository,
