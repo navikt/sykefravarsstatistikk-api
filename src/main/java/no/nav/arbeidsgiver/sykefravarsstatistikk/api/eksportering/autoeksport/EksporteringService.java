@@ -76,8 +76,10 @@ public class EksporteringService {
         }
         List<VirksomhetEksportPerKvartal> virksomheterTilEksport =
                 getListeAvVirksomhetEksportPerKvartal(årstallOgKvartal, eksporteringBegrensning);
+
         log.info(
-                "[TEMP_LOG] Antall virksopmheter til eksport er '{}'. Liste av de virksomhetene som skal eksporteres er: '{}'",
+                "[TEMP_LOG][ETTER filtrering] Antall virksomheter til eksport er '{}'. " +
+                        "Liste av de virksomhetene som skal eksporteres er: '{}'",
                 virksomheterTilEksport.size(),
                 listeAvVirksomheterSomString(virksomheterTilEksport)
         );
@@ -243,6 +245,14 @@ public class EksporteringService {
     ) {
         List<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartal =
                 eksporteringRepository.hentVirksomhetEksportPerKvartal(årstallOgKvartal);
+
+        log.info(
+                "[TEMP_LOG][FØR filtrering] Antall virksomheter uthentet er '{}'. " +
+                        "Liste av de virksomhetene er: '{}'",
+                virksomhetEksportPerKvartal.size(),
+                listeAvVirksomheterSomString(virksomhetEksportPerKvartal)
+        );
+
 
         Stream<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartalStream = virksomhetEksportPerKvartal
                 .stream()
