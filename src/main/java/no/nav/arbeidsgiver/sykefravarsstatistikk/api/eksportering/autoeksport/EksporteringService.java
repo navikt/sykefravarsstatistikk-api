@@ -159,6 +159,8 @@ public class EksporteringService {
     ) {
         AtomicInteger antallSentTilEksportOgOppdatertIDatabase = new AtomicInteger();
 
+        log.info("[TEMP_LOG] antall virksomheterTilEksport er '{}'", virksomheterTilEksport.size());
+
         virksomheterTilEksport.stream().forEach(virksomhetTilEksport -> {
                     VirksomhetMetadata virksomhetMetadata = getVirksomhetMetada(
                             new Orgnr(virksomhetTilEksport.getOrgnr()),
@@ -167,6 +169,13 @@ public class EksporteringService {
                     );
 
                     if (virksomhetMetadata != null) {
+                        log.info("[TEMP_LOG] sender statistikk om virksomhet '{}' til Kafka " +
+                                "(virksomhetTilEksport er '{}', for årstall '{}' og kvartal '{}') ",
+                                virksomhetMetadata.getOrgnr(),
+                                virksomhetTilEksport.getOrgnr(),
+                                virksomhetTilEksport.getÅrstall(),
+                                virksomhetTilEksport.getKvartal()
+                        );
                         kafkaService.send(
                                 årstallOgKvartal,
                                 getVirksomhetSykefravær(
@@ -188,8 +197,13 @@ public class EksporteringService {
                                 landSykefravær
                         );
 
+                        log.info("[TEMP_LOG] Oppdaterer til 'eksportert' for orgnr '{}'", virksomhetTilEksport.getOrgnr());
                         eksporteringRepository.oppdaterTilEksportert(virksomhetTilEksport);
                         antallSentTilEksportOgOppdatertIDatabase.getAndIncrement();
+                    } else {
+                        log.info("[TEMP_LOG] Fant ingen virksomhetdata for orgnr '{}'",
+                                virksomhetTilEksport.getOrgnr()
+                        );
                     }
                 }
         );
