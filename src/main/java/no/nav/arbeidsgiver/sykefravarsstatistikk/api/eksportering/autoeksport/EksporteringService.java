@@ -48,6 +48,26 @@ public class EksporteringService {
         this.erEksporteringAktivert = erEksporteringAktivert;
     }
 
+    protected static String listeAvVirksomheterSomString(List<VirksomhetEksportPerKvartal> virksomheterTilEksport) {
+        StringBuffer buffer = new StringBuffer();
+        AtomicInteger counter = new AtomicInteger(0);
+
+        virksomheterTilEksport.stream().forEach(v -> {
+            if (counter.get() != 0) {
+                buffer.append("; ");
+            }
+            buffer.append(v.getOrgnr());
+            buffer.append(":");
+            buffer.append(v.getÅrstall());
+            buffer.append("/");
+            buffer.append(v.getKvartal());
+            buffer.append(":");
+            buffer.append(v.eksportert());
+            counter.incrementAndGet();
+        });
+        return buffer.toString();
+    }
+
     public int eksporter(ÅrstallOgKvartal årstallOgKvartal, EksporteringBegrensning eksporteringBegrensning) {
 
         if (!erEksporteringAktivert) {
@@ -56,6 +76,11 @@ public class EksporteringService {
         }
         List<VirksomhetEksportPerKvartal> virksomheterTilEksport =
                 getListeAvVirksomhetEksportPerKvartal(årstallOgKvartal, eksporteringBegrensning);
+        log.info(
+                "[TEMP_LOG] Antall virksopmheter til eksport er '{}'. Liste av de virksomhetene som skal eksporteres er: '{}'",
+                virksomheterTilEksport.size(),
+                listeAvVirksomheterSomString(virksomheterTilEksport)
+        );
 
         int antallStatistikkSomSkalEksporteres = virksomheterTilEksport.isEmpty() ?
                 0 :
@@ -170,7 +195,7 @@ public class EksporteringService {
 
                     if (virksomhetMetadata != null) {
                         log.info("[TEMP_LOG] sender statistikk om virksomhet '{}' til Kafka " +
-                                "(virksomhetTilEksport er '{}', for årstall '{}' og kvartal '{}') ",
+                                        "(virksomhetTilEksport er '{}', for årstall '{}' og kvartal '{}') ",
                                 virksomhetMetadata.getOrgnr(),
                                 virksomhetTilEksport.getOrgnr(),
                                 virksomhetTilEksport.getÅrstall(),

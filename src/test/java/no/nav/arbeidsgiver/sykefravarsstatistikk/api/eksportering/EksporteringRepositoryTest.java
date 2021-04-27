@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringBegrensning;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import org.junit.jupiter.api.AfterEach;
@@ -48,30 +49,45 @@ class EksporteringRepositoryTest {
 
     @Test
     void hentVirksomhetEksportPerKvartal__returnerer_antall_VirksomhetEksportPerKvartal_funnet() {
-        int oppdaterteRader = eksporteringRepository.opprettEksport(
-                Arrays.asList(
-                        new VirksomhetEksportPerKvartal(
-                                new Orgnr("999999998"),
-                                new ÅrstallOgKvartal(2019, 2),
-                                false
-                        ),
-                        new VirksomhetEksportPerKvartal(
-                                new Orgnr("999999998"),
-                                new ÅrstallOgKvartal(2019, 2),
-                                false
-                        )
-                ));
-        assertEquals(2, oppdaterteRader);
+        createVirksomhetEksportPerKvartal(new VirksomhetEksportPerKvartalMedDatoer(
+                new Orgnr("999999999"),
+                new ÅrstallOgKvartal(2019, 2),
+                true,
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        ));
+        createVirksomhetEksportPerKvartal(new VirksomhetEksportPerKvartalMedDatoer(
+                new Orgnr("999999998"),
+                new ÅrstallOgKvartal(2019, 2),
+                false,
+                LocalDateTime.now(),
+                null
+        ));
+        createVirksomhetEksportPerKvartal(new VirksomhetEksportPerKvartalMedDatoer(
+                new Orgnr("999999998"),
+                new ÅrstallOgKvartal(2019, 3),
+                true,
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        ));
 
         List<VirksomhetEksportPerKvartal> resultat =
                 eksporteringRepository.hentVirksomhetEksportPerKvartal(new ÅrstallOgKvartal(2019, 2));
 
+        assertEquals(2, resultat.size());
         assertTrue(resultat.stream().anyMatch(virksomhetEksportPerKvartal ->
                 virksomhetEksportPerKvartal.getOrgnr().equals("999999998") &&
                         !virksomhetEksportPerKvartal.eksportert() &&
                         virksomhetEksportPerKvartal.getÅrstallOgKvartal().getÅrstall() == 2019 &&
                         virksomhetEksportPerKvartal.getÅrstallOgKvartal().getKvartal() == 2
         ));
+        assertTrue(resultat.stream().anyMatch(virksomhetEksportPerKvartal ->
+                virksomhetEksportPerKvartal.getOrgnr().equals("999999999") &&
+                        virksomhetEksportPerKvartal.eksportert() &&
+                        virksomhetEksportPerKvartal.getÅrstallOgKvartal().getÅrstall() == 2019 &&
+                        virksomhetEksportPerKvartal.getÅrstallOgKvartal().getKvartal() == 2
+        ));
+
     }
 
     @Test
@@ -120,7 +136,21 @@ class EksporteringRepositoryTest {
         );
     }
 
-    public List<VirksomhetEksportPerKvartalMedDatoer> hentAlleVirksomhetEksportPerKvartal() {
+    private int createVirksomhetEksportPerKvartal(VirksomhetEksportPerKvartalMedDatoer virksomhet) {
+        MapSqlParameterSource parametre = new MapSqlParameterSource()
+                .addValue("orgnr", virksomhet.orgnr.getVerdi())
+                .addValue("årstall", virksomhet.årstallOgKvartal.getÅrstall())
+                .addValue("kvartal", virksomhet.årstallOgKvartal.getKvartal())
+                .addValue("eksportert", virksomhet.eksportert)
+                .addValue("oppdatert", virksomhet.oppdatert);
+
+        return jdbcTemplate.update(
+                "insert into eksport_per_kvartal (orgnr, arstall, kvartal, eksportert, oppdatert) " +
+                        "values (:orgnr, :årstall, :kvartal, :eksportert, :oppdatert)",
+                parametre);
+    }
+
+    private List<VirksomhetEksportPerKvartalMedDatoer> hentAlleVirksomhetEksportPerKvartal() {
         return jdbcTemplate.query(
                 "select orgnr, arstall, kvartal, eksportert, opprettet, oppdatert " +
                         "from eksport_per_kvartal ",

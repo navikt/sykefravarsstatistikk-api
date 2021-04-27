@@ -13,13 +13,27 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils.assertBigDecimalIsEqual;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class EksporteringServiceTest {
+
+    @Test
+    public void listeAvVirksomheterSomString__formater_en_liste_til_logging() {
+        String resultat = EksporteringService.listeAvVirksomheterSomString(
+                Arrays.asList(
+                        new VirksomhetEksportPerKvartal(ORGNR_VIRKSOMHET_1, __2020_4, true),
+                        new VirksomhetEksportPerKvartal(ORGNR_VIRKSOMHET_1, __2021_1, false),
+                        new VirksomhetEksportPerKvartal(ORGNR_VIRKSOMHET_1, __2021_2, true),
+                        new VirksomhetEksportPerKvartal(ORGNR_VIRKSOMHET_2, __2021_2, false)
+                )
+        );
+
+        assertNotNull(resultat);
+    }
 
     @Test
     public void getAntallSomKanEksporteres__returnerer_antall_virksomheter_som_ikke_har_blitt_eksportert_enda__uavhengig_av_kvartal() {

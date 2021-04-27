@@ -18,9 +18,12 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.IntStream;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -134,6 +137,26 @@ public class EksporteringServiceMockTest {
     }
 
     @Test
+    public void getListeAvVirksomhetEksportPerKvartal_tar_hensyn_til_begrensning_i_eksportering_og_eksportert_flag__med_mye_data() {
+        when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2))
+                .thenReturn(bigList(90000, 430000));
+
+        List<VirksomhetEksportPerKvartal> ikkeBegrenset =
+                service.getListeAvVirksomhetEksportPerKvartal(
+                        __2020_2,
+                        EksporteringBegrensning.build().utenBegrensning()
+                );
+        assertThat(ikkeBegrenset.size()).isEqualTo(430000);
+
+        List<VirksomhetEksportPerKvartal> begrensetTil10 =
+                service.getListeAvVirksomhetEksportPerKvartal(
+                        __2020_2,
+                        EksporteringBegrensning.build().medBegrensning(10)
+                );
+        assertThat(begrensetTil10.size()).isEqualTo(10);
+    }
+
+    @Test
     public void getListeAvVirksomhetEksportPerKvartal_tar_hensyn_til_begrensning_i_eksportering_og_eksportert_flag() {
         when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2))
                 .thenReturn(
@@ -154,25 +177,25 @@ public class EksporteringServiceMockTest {
                                         true
                                 )));
 
-        List<VirksomhetEksportPerKvartal> list1 =
+        List<VirksomhetEksportPerKvartal> ikkeBegrenset =
                 service.getListeAvVirksomhetEksportPerKvartal(
                         __2020_2,
                         EksporteringBegrensning.build().utenBegrensning()
                 );
-        List<VirksomhetEksportPerKvartal> list2 =
+        List<VirksomhetEksportPerKvartal> begrensetMed1 =
                 service.getListeAvVirksomhetEksportPerKvartal(
                         __2020_2,
                         EksporteringBegrensning.build().medBegrensning(1)
                 );
-        List<VirksomhetEksportPerKvartal> list3 =
+        List<VirksomhetEksportPerKvartal> begrensetMed100 =
                 service.getListeAvVirksomhetEksportPerKvartal(
                         __2020_2,
                         EksporteringBegrensning.build().medBegrensning(100)
                 );
 
-        assertThat(list1.size()).isEqualTo(2);
-        assertThat(list2.size()).isEqualTo(1);
-        assertThat(list3.size()).isEqualTo(2);
+        assertThat(ikkeBegrenset.size()).isEqualTo(2);
+        assertThat(begrensetMed1.size()).isEqualTo(1);
+        assertThat(begrensetMed100.size()).isEqualTo(2);
     }
 
     @Test
@@ -227,4 +250,26 @@ public class EksporteringServiceMockTest {
         assertEqualsSykefraværMedKategori(landSykefravær, landSykefraværArgumentCaptor.getValue());
         assertThat(antallEksporterte).isEqualTo(1);
     }
+
+
+    private List<VirksomhetEksportPerKvartal> bigList(int antallEksportertIsTrue, int antallEksportertIsFalse) {
+        List<VirksomhetEksportPerKvartal> list = new ArrayList<>();
+
+        IntStream.range(0, antallEksportertIsTrue).forEach( i ->
+                list.add(new VirksomhetEksportPerKvartal(
+                        new Orgnr(UUID.randomUUID().toString().substring(0, 9)),
+                        __2020_2,
+                        true
+                )));
+
+        IntStream.range(0, antallEksportertIsFalse).forEach( i ->
+                list.add(new VirksomhetEksportPerKvartal(
+                        new Orgnr(UUID.randomUUID().toString().substring(0, 9)),
+                        __2020_2,
+                        false
+                )));
+
+        return list;
+    }
+
 }
