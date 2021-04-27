@@ -104,7 +104,6 @@ public class KafkaService {
             return;
         }
 
-        log.info("[TEMP_LOG] sender følgende til Kafka: '{}'", keyAsJsonString);
         ListenableFuture<SendResult<String, String>> futureResult = kafkaTemplate.send(
                 kafkaProperties.getTopic(),
                 keyAsJsonString,
@@ -127,8 +126,8 @@ public class KafkaService {
             @Override
             public void onSuccess(SendResult<String, String> res) {
                 kafkaUtsendingRapport.leggTilUtsending(new Orgnr(virksomhetSykefravær.getOrgnr()));
-                log.info(
-                        "[TEMP_LOG] Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
+                log.debug(
+                        "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
                         kafkaProperties.getTopic(),
                         res.getProducerRecord().key(),
                         res.getRecordMetadata().offset()
