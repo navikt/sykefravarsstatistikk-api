@@ -225,7 +225,7 @@ public class EksporteringService {
                         );
 
                         log.info("[TEMP_LOG] Oppdaterer til 'eksportert' for orgnr '{}'", virksomhetTilEksport.getOrgnr());
-                        eksporteringRepository.oppdaterTilEksportert(virksomhetTilEksport);
+                        //eksporteringRepository.oppdaterTilEksportert(virksomhetTilEksport);
                         antallSentTilEksportOgOppdatertIDatabase.getAndIncrement();
                     } else {
                         log.info("[TEMP_LOG] Fant ingen virksomhetdata for orgnr '{}'",
@@ -245,13 +245,6 @@ public class EksporteringService {
     ) {
         List<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartal =
                 eksporteringRepository.hentVirksomhetEksportPerKvartal(årstallOgKvartal);
-
-        log.info(
-                "[TEMP_LOG][FØR filtrering] Antall virksomheter uthentet er '{}'. " +
-                        "Liste av de virksomhetene er: '{}'",
-                virksomhetEksportPerKvartal.size(),
-                listeAvVirksomheterSomString(virksomhetEksportPerKvartal)
-        );
 
 
         Stream<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartalStream = virksomhetEksportPerKvartal
