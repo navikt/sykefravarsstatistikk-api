@@ -60,7 +60,7 @@ public class EksporteringRepository {
                                         resultSet.getInt("arstall"),
                                         resultSet.getInt("kvartal")
                                 ),
-                                "true".equalsIgnoreCase(resultSet.getString("eksportert"))
+                                resultSet.getBoolean("eksportert")
                         )
         );
     }

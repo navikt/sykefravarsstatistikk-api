@@ -225,7 +225,7 @@ public class EksporteringService {
                         );
 
                         log.info("[TEMP_LOG] Oppdaterer til 'eksportert' for orgnr '{}'", virksomhetTilEksport.getOrgnr());
-                        //eksporteringRepository.oppdaterTilEksportert(virksomhetTilEksport);
+                        eksporteringRepository.oppdaterTilEksportert(virksomhetTilEksport);
                         antallSentTilEksportOgOppdatertIDatabase.getAndIncrement();
                     } else {
                         log.info("[TEMP_LOG] Fant ingen virksomhetdata for orgnr '{}'",
