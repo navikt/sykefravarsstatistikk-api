@@ -38,7 +38,7 @@ public class KafkaProperties {
 	private final Integer retries = Integer.MAX_VALUE;
 	private final Integer deliveryTimeoutMs = 10100;
 	private final Integer requestTimeoutMs = 10000;
-	private final Integer lingerMs = 10;
+	private final Integer lingerMs = 1;
 	private final Integer batchSize = 16384*4;
 
 	public Map<String, Object> asProperties() {
