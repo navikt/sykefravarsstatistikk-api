@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -59,20 +60,22 @@ public class EksporteringRepository {
                                         resultSet.getInt("arstall"),
                                         resultSet.getInt("kvartal")
                                 ),
-                                "true".equals(resultSet.getString("eksportert"))
+                                "true".equalsIgnoreCase(resultSet.getString("eksportert"))
                         )
         );
     }
 
-    public void oppdaterTilEksportert(VirksomhetEksportPerKvartal virksomhetTilEksport) {
+    public int oppdaterTilEksportert(VirksomhetEksportPerKvartal virksomhetTilEksport) {
         SqlParameterSource parametre =
                 new MapSqlParameterSource()
                         .addValue("årstall", virksomhetTilEksport.getÅrstall())
                         .addValue("kvartal", virksomhetTilEksport.getKvartal())
-                        .addValue("orgnr", virksomhetTilEksport.getOrgnr());
+                        .addValue("orgnr", virksomhetTilEksport.getOrgnr())
+                        .addValue("eksportert", true)
+                        .addValue("oppdatert", LocalDateTime.now());
 
-        namedParameterJdbcTemplate.update(
-                "update eksport_per_kvartal set eksportert='true' " +
+        return namedParameterJdbcTemplate.update(
+                "update eksport_per_kvartal set eksportert = :eksportert, oppdatert = :oppdatert " +
                         "where arstall = :årstall " +
                         "and kvartal = :kvartal " +
                         "and orgnr = :orgnr ",
