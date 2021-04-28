@@ -31,15 +31,16 @@ public class KafkaProperties {
 	private String credstorePassword;
 	private String securityProtocol;
 
-	private final String acks = "all";
+	private final String acks = "1";
 	private final String clientId = "sykefravarsstatistikk-api";
 	private final String valueSerializerClass = StringSerializer.class.getName();
 	private final String keySerializerCLass = StringSerializer.class.getName();
 	private final Integer retries = Integer.MAX_VALUE;
 	private final Integer deliveryTimeoutMs = 10100;
 	private final Integer requestTimeoutMs = 10000;
-	private final Integer lingerMs = 100;
-	private final Integer batchSize = 16384*40;
+	private final Integer lingerMs = 1000;
+	private final Integer batchSize = 16384*100;
+	private final Integer maxInFlightRequestsPerConnection = 10;
 
 	public Map<String, Object> asProperties() {
 		HashMap<String, Object> props = new HashMap<>();
@@ -73,6 +74,7 @@ public class KafkaProperties {
 		props.put(ProducerConfig.LINGER_MS_CONFIG, lingerMs);
 		props.put(ProducerConfig.BATCH_SIZE_CONFIG, batchSize);
 		props.put(ProducerConfig.ACKS_CONFIG, acks);
+		props.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, maxInFlightRequestsPerConnection);
 
 		return props;
 	}
