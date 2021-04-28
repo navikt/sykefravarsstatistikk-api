@@ -23,4 +23,9 @@ public class OrganisasjonerController {
         InnloggetBruker innloggetBruker = tilgangskontrollService.hentInnloggetBruker();
         return innloggetBruker.getOrganisasjoner();
     }
+    @GetMapping("/organisasjoner")
+    public List<AltinnOrganisasjon> hentOrganisasjonerMedAlleTilganger() {
+        InnloggetBruker innloggetBruker = tilgangskontrollService.hentInnloggetBrukerForAlleRettigheter();
+        return innloggetBruker.getOrganisasjoner();
+    }
 }
