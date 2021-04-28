@@ -38,9 +38,9 @@ public class KafkaProperties {
 	private final Integer retries = Integer.MAX_VALUE;
 	private final Integer deliveryTimeoutMs = 11100;
 	private final Integer requestTimeoutMs = 10000;
-	private final Integer lingerMs = 1000;
-	private final Integer batchSize = 16384*100;
-	private final Integer maxInFlightRequestsPerConnection = 10;
+	private final Integer lingerMs = 100;
+	private final Integer batchSize = 16384*10;
+	private final Integer maxInFlightRequestsPerConnection = 5; // default
 
 	public Map<String, Object> asProperties() {
 		HashMap<String, Object> props = new HashMap<>();
