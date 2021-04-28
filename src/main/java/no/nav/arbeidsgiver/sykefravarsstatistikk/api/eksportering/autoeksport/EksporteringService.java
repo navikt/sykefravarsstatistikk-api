@@ -160,10 +160,12 @@ public class EksporteringService {
                 }
         );
 
-        log.info("Eksport er ferdig med: antall prosessert='{}', antall bekreftet eksportert='{}' og antall error='{}'",
+        log.info("Eksport er ferdig med: antall prosessert='{}', antall bekreftet eksportert='{}' og antall error='{}'. " +
+                        "Snitt prossessering tid ved utsending til Kafka er: '{}'",
                 kafkaService.getAntallMeldingerMottattForUtsending(),
                 kafkaService.getAntallMeldingerSent(),
-                kafkaService.getAntallMeldingerIError()
+                kafkaService.getAntallMeldingerIError(),
+                kafkaService.getSnittTidUtsendingTilKafka()
         );
         return antallEksportert.get();
     }
@@ -182,6 +184,8 @@ public class EksporteringService {
 
 
         virksomheterTilEksport.stream().forEach(virksomhetTilEksport -> {
+                    boolean sendtTilKafka = false;
+                    long startUtsendingProcess = System.nanoTime();
                     VirksomhetMetadata virksomhetMetadata = getVirksomhetMetada(
                             new Orgnr(virksomhetTilEksport.getOrgnr()),
                             virksomhetTilEksport.getÅrstallOgKvartal(),
@@ -210,9 +214,15 @@ public class EksporteringService {
                                 landSykefravær
                         );
 
+                        sendtTilKafka = true;
                         eksporteringRepository.oppdaterTilEksportert(virksomhetTilEksport);
                         antallSentTilEksportOgOppdatertIDatabase.getAndIncrement();
                     }
+                    long stopUtsendingProcess = System.nanoTime();
+                    if (sendtTilKafka) {
+                        kafkaService.addProcessingTime(startUtsendingProcess, stopUtsendingProcess);
+                    }
+
                 }
         );
         return antallSentTilEksportOgOppdatertIDatabase.get();
