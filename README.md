@@ -25,7 +25,7 @@ Kjør container
 ## Grafisk fremstilling av API-ene (swagger-ui)
 API-et kan sees og testes på `http://localhost:8080/sykefravarsstatistikk-api/swagger-ui.html`
 
----
+---------
 
 # Henvendelser
 

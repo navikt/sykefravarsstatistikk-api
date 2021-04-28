@@ -49,6 +49,20 @@ public class TilgangskontrollService {
             throw new TilgangskontrollException("Innlogget bruker er ikke selvbetjeningsbruker");
         }
     }
+    public InnloggetBruker hentInnloggetBrukerForAlleRettigheter() {
+        if (tokenUtils.erInnloggetSelvbetjeningBruker()) {
+            InnloggetBruker innloggetSelvbetjeningBruker = tokenUtils.hentInnloggetSelvbetjeningBruker();
+            innloggetSelvbetjeningBruker.setOrganisasjoner(
+                    altinnKlientWrapper.hentOrgnumreDerBrukerHarTilgangTil(
+                            tokenUtils.getSelvbetjeningToken(),
+                            innloggetSelvbetjeningBruker.getFnr()
+                    )
+            );
+            return innloggetSelvbetjeningBruker;
+        } else {
+            throw new TilgangskontrollException("Innlogget bruker er ikke selvbetjeningsbruker");
+        }
+    }
 
     public boolean hentTilgangTilOverordnetEnhetOgLoggSikkerhetshendelse(
             InnloggetBruker bruker,
