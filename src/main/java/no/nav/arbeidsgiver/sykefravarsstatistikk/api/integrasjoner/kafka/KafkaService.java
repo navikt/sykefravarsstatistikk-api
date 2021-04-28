@@ -28,6 +28,7 @@ public class KafkaService {
     private KafkaUtsendingRapport kafkaUtsendingRapport;
     private int antallMålet;
     private long totaltTidUtsendingTilKafka;
+    private long totaltTidOppdaterDB;
 
     KafkaService(
             KafkaTemplate<String, String> kafkaTemplate,
@@ -146,8 +147,17 @@ public class KafkaService {
         return totaltTidUtsendingTilKafka / antallMålet;
     }
 
-    public void addProcessingTime(long startUtsendingProcess, long stopUtsendingProcess) {
+    public long getSnittTidOppdateringIDB() {
+        if (antallMålet == 0) {
+            return 0;
+        }
+
+        return totaltTidOppdaterDB / antallMålet;
+    }
+
+    public void addProcessingTime(long startUtsendingProcess, long stopUtsendingProcess, long startWriteToDb, long stoptWriteToDb) {
         antallMålet++;
         totaltTidUtsendingTilKafka = totaltTidUtsendingTilKafka + (stopUtsendingProcess - startUtsendingProcess);
+        totaltTidOppdaterDB = totaltTidOppdaterDB + (stoptWriteToDb - startWriteToDb);
     }
 }

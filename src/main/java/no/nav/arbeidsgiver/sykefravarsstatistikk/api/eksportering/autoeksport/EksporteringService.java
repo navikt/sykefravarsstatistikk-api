@@ -161,11 +161,12 @@ public class EksporteringService {
         );
 
         log.info("Eksport er ferdig med: antall prosessert='{}', antall bekreftet eksportert='{}' og antall error='{}'. " +
-                        "Snitt prossessering tid ved utsending til Kafka er: '{}'",
+                        "Snitt prossessering tid ved utsending til Kafka er: '{}'. Snitt tid for å oppdater DB er: '{}'",
                 kafkaService.getAntallMeldingerMottattForUtsending(),
                 kafkaService.getAntallMeldingerSent(),
                 kafkaService.getAntallMeldingerIError(),
-                kafkaService.getSnittTidUtsendingTilKafka()
+                kafkaService.getSnittTidUtsendingTilKafka(),
+                kafkaService.getSnittTidOppdateringIDB()
         );
         return antallEksportert.get();
     }
@@ -184,7 +185,6 @@ public class EksporteringService {
 
 
         virksomheterTilEksport.stream().forEach(virksomhetTilEksport -> {
-                    boolean sendtTilKafka = false;
                     long startUtsendingProcess = System.nanoTime();
                     VirksomhetMetadata virksomhetMetadata = getVirksomhetMetada(
                             new Orgnr(virksomhetTilEksport.getOrgnr()),
@@ -214,15 +214,18 @@ public class EksporteringService {
                                 landSykefravær
                         );
 
-                        sendtTilKafka = true;
-                        eksporteringRepository.oppdaterTilEksportert(virksomhetTilEksport);
+                        long stopUtsendingProcess = System.nanoTime();
+                        long startWriteToDB = System.nanoTime();
+                        eksporteringRepository.oppdaterTilEksportert(virksomhetTilEksport); // dette er ikke gratis ;)
+                        long stopWriteToDB = System.nanoTime();
                         antallSentTilEksportOgOppdatertIDatabase.getAndIncrement();
+                        kafkaService.addProcessingTime(
+                                startUtsendingProcess,
+                                stopUtsendingProcess,
+                                startWriteToDB,
+                                stopWriteToDB
+                        );
                     }
-                    long stopUtsendingProcess = System.nanoTime();
-                    if (sendtTilKafka) {
-                        kafkaService.addProcessingTime(startUtsendingProcess, stopUtsendingProcess);
-                    }
-
                 }
         );
         return antallSentTilEksportOgOppdatertIDatabase.get();
