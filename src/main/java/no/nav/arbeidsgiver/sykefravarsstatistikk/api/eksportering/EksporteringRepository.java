@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -65,7 +66,8 @@ public class EksporteringRepository {
         );
     }
 
-    public int oppdaterTilEksportert(VirksomhetEksportPerKvartal virksomhetTilEksport) {
+    @Async
+    public void oppdaterTilEksportert(VirksomhetEksportPerKvartal virksomhetTilEksport) {
         SqlParameterSource parametre =
                 new MapSqlParameterSource()
                         .addValue("årstall", virksomhetTilEksport.getÅrstall())
@@ -74,7 +76,7 @@ public class EksporteringRepository {
                         .addValue("eksportert", true)
                         .addValue("oppdatert", LocalDateTime.now());
 
-        return namedParameterJdbcTemplate.update(
+        namedParameterJdbcTemplate.update(
                 "update eksport_per_kvartal set eksportert = :eksportert, oppdatert = :oppdatert " +
                         "where arstall = :årstall " +
                         "and kvartal = :kvartal " +

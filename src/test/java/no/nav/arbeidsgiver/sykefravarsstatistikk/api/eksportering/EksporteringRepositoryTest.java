@@ -111,9 +111,8 @@ class EksporteringRepositoryTest {
         List<VirksomhetEksportPerKvartalMedDatoer> resultsBefore = hentAlleVirksomhetEksportPerKvartal();
         assertEquals(false, resultsBefore.get(0).eksportert);
 
-        int antallOppdatert = eksporteringRepository.oppdaterTilEksportert(virksomhetTilEksport);
+        eksporteringRepository.oppdaterTilEksportert(virksomhetTilEksport);
 
-        assertEquals(1, antallOppdatert);
         List<VirksomhetEksportPerKvartalMedDatoer> results = hentAlleVirksomhetEksportPerKvartal();
         assertEquals(1, results.size());
         VirksomhetEksportPerKvartalMedDatoer actual = results.get(0);
