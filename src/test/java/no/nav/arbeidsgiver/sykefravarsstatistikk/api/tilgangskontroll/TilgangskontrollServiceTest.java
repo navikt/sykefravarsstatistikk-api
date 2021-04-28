@@ -63,6 +63,14 @@ public class TilgangskontrollServiceTest {
 
         assertThrows(AltinnException.class, () -> tilgangskontroll.hentInnloggetBruker());
     }
+    @Test
+    public void hentInnloggetBrukerForAlleTilganger__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
+        when(tokenUtils.erInnloggetSelvbetjeningBruker()).thenReturn(true);
+        when(tokenUtils.hentInnloggetSelvbetjeningBruker()).thenReturn(new InnloggetBruker(fnr));
+        when(altinnKlientWrapper.hentOrgnumreDerBrukerHarTilgangTil(any(), eq(fnr))).thenThrow(new AltinnException(""));
+
+        assertThrows(AltinnException.class, () -> tilgangskontroll.hentInnloggetBrukerForAlleRettigheter());
+    }
 
     @Test
     public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse__skal_feile_hvis_bruker_ikke_har_tilgang() {

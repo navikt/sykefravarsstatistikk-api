@@ -5,11 +5,7 @@ import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.AltinnConfig;
 import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.AltinnrettigheterProxyKlient;
 import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.AltinnrettigheterProxyKlientConfig;
 import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.ProxyConfig;
-import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.model.AltinnReportee;
-import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.model.SelvbetjeningToken;
-import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.model.ServiceCode;
-import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.model.ServiceEdition;
-import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.model.Subject;
+import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.model.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Fnr;
 import no.nav.security.token.support.core.jwt.JwtToken;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,13 +45,23 @@ public class AltinnKlientWrapper {
     }
 
 
-    public List<AltinnOrganisasjon> hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(JwtToken idToken, Fnr fnr){
+    public List<AltinnOrganisasjon> hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(JwtToken idToken, Fnr fnr) {
         return mapTo(
                 klient.hentOrganisasjoner(
                         new SelvbetjeningToken(idToken.getTokenAsString()),
                         new Subject(fnr.getVerdi()),
                         new ServiceCode(serviceCode),
                         new ServiceEdition(serviceEdition),
+                        true
+                )
+        );
+    }
+
+    public List<AltinnOrganisasjon> hentOrgnumreDerBrukerHarTilgangTil(JwtToken idToken, Fnr fnr) {
+        return mapTo(
+                klient.hentOrganisasjoner(
+                        new SelvbetjeningToken(idToken.getTokenAsString()),
+                        new Subject(fnr.getVerdi()),
                         true
                 )
         );
