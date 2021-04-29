@@ -176,7 +176,7 @@ public class EksporteringService {
             List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer,
             List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet,
             SykefraværMedKategori landSykefravær,
-            AtomicInteger antallEksportert, int size) {
+            AtomicInteger antallEksportert, int antallTotaltStatistikk) {
         AtomicInteger antallSentTilEksportOgOppdatertIDatabase = new AtomicInteger();
 
 
@@ -229,7 +229,7 @@ public class EksporteringService {
                 String.format(
                         "Eksportert '%d' rader av '%d' totalt",
                         eksportertHittilNå,
-                        virksomheterTilEksport.size()
+                        antallTotaltStatistikk
                 )
         );
     }
