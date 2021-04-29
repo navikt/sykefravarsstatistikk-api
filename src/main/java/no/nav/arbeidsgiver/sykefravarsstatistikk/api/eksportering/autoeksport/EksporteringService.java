@@ -138,7 +138,7 @@ public class EksporteringService {
                 Lists.partition(virksomheterTilEksport, EKSPORT_BATCH_STØRRELSE);
         AtomicInteger antallEksportert = new AtomicInteger();
 
-        subsets.parallelStream().forEach(subset -> {
+        subsets.forEach(subset -> {
                     log.info("Starter utsending av {} meldinger", subset.size());
                     sendIBatch(
                             subset,
@@ -166,7 +166,6 @@ public class EksporteringService {
         return antallEksportert.get();
     }
 
-    @Async
     protected void sendIBatch(
             List<VirksomhetEksportPerKvartal> virksomheterTilEksport,
             ÅrstallOgKvartal årstallOgKvartal,
