@@ -34,11 +34,13 @@ class KafkaConfig {
 
 			@Override
 			public void onError(ProducerRecord<String, String> producerRecord, RecordMetadata recordMetadata, Exception exception) {
-				log.debug(
+				String topicNavn = recordMetadata != null ? recordMetadata.topic() : "Ingen topic funnet (recordMetadat er null)";
+				long offset = recordMetadata != null ? recordMetadata.offset() : 0;
+				log.info(
 						"ProducerListener mottok en exception med melding '{}' for record med offset '{}' på topic '{}'",
 						exception.getMessage(),
-						recordMetadata.topic(),
-						recordMetadata.offset()
+						topicNavn,
+						offset
 				);
 			}
 		};
