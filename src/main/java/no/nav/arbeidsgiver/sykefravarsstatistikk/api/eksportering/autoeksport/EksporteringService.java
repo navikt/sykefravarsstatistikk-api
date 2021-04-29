@@ -11,9 +11,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUt
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
-import org.springframework.kafka.KafkaException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.KafkaException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -138,9 +139,8 @@ public class EksporteringService {
         AtomicInteger antallEksportert = new AtomicInteger();
 
         subsets.forEach(subset -> {
-                    int antallSentTilEksportOgOppdatertIDatabaseIDenneSubset = 0;
                     log.info("Starter utsending av {} meldinger", subset.size());
-                    antallSentTilEksportOgOppdatertIDatabaseIDenneSubset = sendIBatch(
+                    sendIBatch(
                             subset,
                             årstallOgKvartal,
                             virksomhetMetadataListe,
@@ -148,15 +148,9 @@ public class EksporteringService {
                             sykefraværsstatistikkNæring,
                             sykefraværsstatistikkNæring5Siffer,
                             sykefraværsstatistikkVirksomhetUtenVarighet,
-                            landSykefravær
-                    );
-                    int eksportertHittilNå = antallEksportert.addAndGet(antallSentTilEksportOgOppdatertIDatabaseIDenneSubset);
-                    log.info(
-                            String.format(
-                                    "Eksportert '%d' rader av '%d' totalt",
-                                    eksportertHittilNå,
-                                    virksomheterTilEksport.size()
-                            )
+                            landSykefravær,
+                            antallEksportert,
+                            virksomheterTilEksport.size()
                     );
                 }
         );
@@ -172,7 +166,8 @@ public class EksporteringService {
         return antallEksportert.get();
     }
 
-    private int sendIBatch(
+    @Async
+    protected void sendIBatch(
             List<VirksomhetEksportPerKvartal> virksomheterTilEksport,
             ÅrstallOgKvartal årstallOgKvartal,
             List<VirksomhetMetadata> virksomhetMetadataListe,
@@ -180,8 +175,8 @@ public class EksporteringService {
             List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring,
             List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer,
             List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet,
-            SykefraværMedKategori landSykefravær
-    ) {
+            SykefraværMedKategori landSykefravær,
+            AtomicInteger antallEksportert, int size) {
         AtomicInteger antallSentTilEksportOgOppdatertIDatabase = new AtomicInteger();
 
 
@@ -229,7 +224,14 @@ public class EksporteringService {
                     }
                 }
         );
-        return antallSentTilEksportOgOppdatertIDatabase.get();
+        int eksportertHittilNå = antallEksportert.addAndGet(antallSentTilEksportOgOppdatertIDatabase.get());
+        log.info(
+                String.format(
+                        "Eksportert '%d' rader av '%d' totalt",
+                        eksportertHittilNå,
+                        virksomheterTilEksport.size()
+                )
+        );
     }
 
 
