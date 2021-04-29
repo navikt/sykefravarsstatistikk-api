@@ -11,6 +11,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUt
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
+import org.apache.kafka.common.KafkaException;
+import org.apache.kafka.common.errors.TimeoutException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -100,8 +102,8 @@ public class EksporteringService {
 
         try {
             antallEksporterteVirksomheter = eksporter(virksomheterTilEksport, årstallOgKvartal);
-        } catch (KafkaUtsendingException e) {
-            log.warn("Fikk KafkaUtsendingException med melding:'{}'. Avbryter prosess.", e.getMessage());
+        } catch (KafkaUtsendingException | KafkaException e) {
+            log.warn("Fikk Exception fra Kafka med melding:'{}'. Avbryter prosess.", e.getMessage(), e);
         }
 
         return antallEksporterteVirksomheter;
