@@ -64,7 +64,8 @@ public class KafkaService {
             SykefraværMedKategori sektorSykefravær,
             SykefraværMedKategori landSykefravær
     ) {
-        if (kafkaUtsendingRapport.getAntallMeldingerIError() > 5) {
+        // TODO sjek om den gir effekt
+       /* if (kafkaUtsendingRapport.getAntallMeldingerIError() > 5) {
             throw new KafkaUtsendingException(
                     String.format(
                             "Antall error:'%d'. Avbryter eksportering. Totalt meldinger som var klar for sending er: '%d'." +
@@ -74,8 +75,10 @@ public class KafkaService {
                             kafkaUtsendingRapport.getAntallMeldingerMottattForUtsending()
                     )
             );
-        }
-        kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
+        }*/
+        // TODO prøve å bruke Prometheus eller droppe den--
+        //  sett den tilbake hvis den ikke gir effekt.
+        //kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
 
         KafkaTopicKey key = new KafkaTopicKey(
                 virksomhetSykefravær.getOrgnr(),
@@ -89,6 +92,8 @@ public class KafkaService {
                 sektorSykefravær,
                 landSykefravær);
 
+        //TODO vurdere om vikan gå vekk fra å bruke en STATIC object mapper til hele klassen,--
+        // Lage en ny objectMapper for å ha flere samtidig.
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
         String keyAsJsonString;
@@ -106,7 +111,7 @@ public class KafkaService {
             );
             return;
         }
-
+        // TODO vurdere å sende Object og la Kafka tolke det til JSON??
         ListenableFuture<SendResult<String, String>> futureResult = kafkaTemplate.send(
                 kafkaProperties.getTopic(),
                 keyAsJsonString,
@@ -128,13 +133,13 @@ public class KafkaService {
 
             @Override
             public void onSuccess(SendResult<String, String> res) {
-                kafkaUtsendingRapport.leggTilUtsending(new Orgnr(virksomhetSykefravær.getOrgnr()));
-                log.debug(
+                //kafkaUtsendingRapport.leggTilUtsending(new Orgnr(virksomhetSykefravær.getOrgnr()));
+                /*log.debug(
                         "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
                         kafkaProperties.getTopic(),
                         res.getProducerRecord().key(),
                         res.getRecordMetadata().offset()
-                );
+                );*/
             }
         });
     }

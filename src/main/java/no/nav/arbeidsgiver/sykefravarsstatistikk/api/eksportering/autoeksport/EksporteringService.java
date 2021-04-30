@@ -14,7 +14,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.Virks
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.KafkaException;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -138,8 +137,8 @@ public class EksporteringService {
                 Lists.partition(virksomheterTilEksport, EKSPORT_BATCH_STØRRELSE);
         AtomicInteger antallEksportert = new AtomicInteger();
 
+        log.info("Starter utsending av {} meldinger", subsets.size());
         subsets.forEach(subset -> {
-                    log.info("Starter utsending av {} meldinger", subset.size());
                     sendIBatch(
                             subset,
                             årstallOgKvartal,
