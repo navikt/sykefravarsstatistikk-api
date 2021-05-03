@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.*;
@@ -48,22 +49,20 @@ public class EksporteringServiceTest {
     }
 
     @Test
-    public void getVirksomhetMetada__returnerer_VirksomhetMetada_som_matcher_VirksomhetEksportPerKvartal() {
+    public void getVirksomhetMetada__returnerer_VirksomhetMetada_som_matcher_Virksomhet() {
         VirksomhetMetadata resultat = EksporteringService.getVirksomhetMetada(
                 ORGNR_VIRKSOMHET_1,
-                __2020_4,
-                Arrays.asList(virksomhet1Metadata_2020_4, virksomhet1Metadata_2021_1)
+                new HashSet<>(Arrays.asList(virksomhet1Metadata_2020_4, virksomhet2Metadata_2020_4))
         );
 
         assertEquals(virksomhet1Metadata_2020_4, resultat);
     }
 
     @Test
-    public void getVirksomhetMetada__returnerer_NULL__dersom_ingen_entry_matcher_VirksomhetEksportPerKvartal() {
+    public void getVirksomhetMetada__returnerer_NULL__dersom_ingen_entry_matcher_Virksomhet() {
         VirksomhetMetadata result = EksporteringService.getVirksomhetMetada(
-                ORGNR_VIRKSOMHET_1,
-                __2021_2,
-                Arrays.asList(virksomhet1Metadata_2020_4, virksomhet1Metadata_2021_1)
+                ORGNR_VIRKSOMHET_2,
+                new HashSet<>(Arrays.asList(virksomhet1Metadata_2020_4))
         );
 
         assertNull(result);

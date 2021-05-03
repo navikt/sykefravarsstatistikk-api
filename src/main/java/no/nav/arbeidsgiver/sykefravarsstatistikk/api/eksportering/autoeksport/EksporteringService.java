@@ -2,10 +2,18 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.*;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUtsendingException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
@@ -17,6 +25,7 @@ import org.springframework.kafka.KafkaException;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collector;
@@ -132,6 +141,7 @@ public class EksporteringService {
         );
 
         kafkaService.nullstillUtsendingRapport();
+        HashSet<VirksomhetMetadata> virksomhetMetadataSet = new HashSet<>(virksomhetMetadataListe);
 
         List<? extends List<VirksomhetEksportPerKvartal>> subsets =
                 Lists.partition(virksomheterTilEksport, EKSPORT_BATCH_STØRRELSE);
@@ -142,7 +152,7 @@ public class EksporteringService {
                     sendIBatch(
                             subset,
                             årstallOgKvartal,
-                            virksomhetMetadataListe,
+                            virksomhetMetadataSet,
                             sykefraværsstatistikkSektor,
                             sykefraværsstatistikkNæring,
                             sykefraværsstatistikkNæring5Siffer,
@@ -176,7 +186,7 @@ public class EksporteringService {
     protected void sendIBatch(
             List<VirksomhetEksportPerKvartal> virksomheterTilEksport,
             ÅrstallOgKvartal årstallOgKvartal,
-            List<VirksomhetMetadata> virksomhetMetadataListe,
+            HashSet<VirksomhetMetadata> virksomhetMetadataSet,
             List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor,
             List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring,
             List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer,
@@ -189,8 +199,7 @@ public class EksporteringService {
                     long startUthentingAvVirksomhetMetadata = System.nanoTime();
                     VirksomhetMetadata virksomhetMetadata = getVirksomhetMetada(
                             new Orgnr(virksomhetTilEksport.getOrgnr()),
-                            virksomhetTilEksport.getÅrstallOgKvartal(),
-                            virksomhetMetadataListe
+                            virksomhetMetadataSet
                     );
                     long stopUthentingAvVirksomhetMetadata = System.nanoTime();
                     long startUtsendingProcess = System.nanoTime();
@@ -218,7 +227,7 @@ public class EksporteringService {
 
                         long stopUtsendingProcess = System.nanoTime();
                         long startWriteToDB = System.nanoTime();
-                        eksporteringRepository.oppdaterTilEksportert(virksomhetTilEksport); // dette er ikke gratis ;)
+                        eksporteringRepository.oppdaterTilEksportert(virksomhetTilEksport);
                         long stopWriteToDB = System.nanoTime();
                         antallSentTilEksportOgOppdatertIDatabase.getAndIncrement();
                         kafkaService.addProcessingTime(
@@ -269,17 +278,14 @@ public class EksporteringService {
 
     protected static VirksomhetMetadata getVirksomhetMetada(
             Orgnr orgnr,
-            ÅrstallOgKvartal årstallOgKvartal,
-            List<VirksomhetMetadata> virksomhetMetadataListe
+            HashSet<VirksomhetMetadata> virksomhetMetadataSet
     ) {
         List<VirksomhetMetadata> virksomhetMetadataFunnet =
-                virksomhetMetadataListe.stream().filter(
+                virksomhetMetadataSet.stream().filter(
                         v -> v.getOrgnr().equals(orgnr.getVerdi())
-                                && v.getÅrstall() == årstallOgKvartal.getÅrstall()
-                                && v.getKvartal() == årstallOgKvartal.getKvartal()
                 ).collect(Collectors.toList());
 
-        if (virksomhetMetadataFunnet == null || virksomhetMetadataFunnet.size() != 1) {
+        if (virksomhetMetadataFunnet.size() != 1) {
             return null;
         } else {
             return virksomhetMetadataFunnet.get(0);
