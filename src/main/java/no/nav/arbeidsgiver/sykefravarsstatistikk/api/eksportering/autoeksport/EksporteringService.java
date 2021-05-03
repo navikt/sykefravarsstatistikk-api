@@ -25,8 +25,9 @@ import org.springframework.kafka.KafkaException;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -141,18 +142,24 @@ public class EksporteringService {
         );
 
         kafkaService.nullstillUtsendingRapport();
-        HashSet<VirksomhetMetadata> virksomhetMetadataSet = new HashSet<>(virksomhetMetadataListe);
+        Map<String, VirksomhetMetadata> virksomhetMetadataMap = getVirksomhetMetadataHashMap(virksomhetMetadataListe);
 
         List<? extends List<VirksomhetEksportPerKvartal>> subsets =
                 Lists.partition(virksomheterTilEksport, EKSPORT_BATCH_STØRRELSE);
         AtomicInteger antallEksportert = new AtomicInteger();
 
         subsets.forEach(subset -> {
-                    log.info("Starter utsending av {} meldinger", subset.size());
+                    List<VirksomhetMetadata> virksomheterMetadataIDenneSubset =
+                            getVirksomheterMetadataFraSubset(virksomhetMetadataMap, subset);
+
+                    log.info("Starter utsending av '{}' statistikk meldinger (fra '{}' virksomheter)",
+                            virksomhetMetadataMap.size(),
+                            subset.size()
+                    );
+
                     sendIBatch(
-                            subset,
+                            virksomheterMetadataIDenneSubset,
                             årstallOgKvartal,
-                            virksomhetMetadataSet,
                             sykefraværsstatistikkSektor,
                             sykefraværsstatistikkNæring,
                             sykefraværsstatistikkNæring5Siffer,
@@ -165,14 +172,12 @@ public class EksporteringService {
         );
 
         log.info("Eksport er ferdig med: antall prosessert='{}', antall bekreftet eksportert='{}' og antall error='{}'. " +
-                        "Snitt prossessering tid ved utsending til Kafka er: '{}'. Snitt tid for å oppdater DB er: '{}'." +
-                        " Snitt tid for uthenting av virksomhet Metadata er: {}",
+                        "Snitt prossessering tid ved utsending til Kafka er: '{}'. Snitt tid for å oppdater DB er: '{}'.",
                 kafkaService.getAntallMeldingerMottattForUtsending(),
                 kafkaService.getAntallMeldingerSent(),
                 kafkaService.getAntallMeldingerIError(),
                 kafkaService.getSnittTidUtsendingTilKafka(),
-                kafkaService.getSnittTidOppdateringIDB(),
-                kafkaService.getSnittTidUthentingVirksomhetMetaData()
+                kafkaService.getSnittTidOppdateringIDB()
         );
 
         log.info("[Måling] Rå data ved måling: {}",
@@ -184,9 +189,8 @@ public class EksporteringService {
 
     //TODO test med sending av REN liste uten prosessering av data og sjekk om prosessering tar tid eller kafkasending som tar tid.
     protected void sendIBatch(
-            List<VirksomhetEksportPerKvartal> virksomheterTilEksport,
+            List<VirksomhetMetadata> virksomheterMetadata,
             ÅrstallOgKvartal årstallOgKvartal,
-            HashSet<VirksomhetMetadata> virksomhetMetadataSet,
             List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor,
             List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring,
             List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer,
@@ -195,14 +199,10 @@ public class EksporteringService {
             AtomicInteger antallEksportert, int antallTotaltStatistikk) {
         AtomicInteger antallSentTilEksportOgOppdatertIDatabase = new AtomicInteger();
 
-        virksomheterTilEksport.stream().forEach(virksomhetTilEksport -> {
-                    long startUthentingAvVirksomhetMetadata = System.nanoTime();
-                    VirksomhetMetadata virksomhetMetadata = getVirksomhetMetada(
-                            new Orgnr(virksomhetTilEksport.getOrgnr()),
-                            virksomhetMetadataSet
-                    );
-                    long stopUthentingAvVirksomhetMetadata = System.nanoTime();
+        virksomheterMetadata.stream().forEach(
+                virksomhetMetadata -> {
                     long startUtsendingProcess = System.nanoTime();
+
                     if (virksomhetMetadata != null) {
                         kafkaService.send(
                                 årstallOgKvartal,
@@ -227,16 +227,24 @@ public class EksporteringService {
 
                         long stopUtsendingProcess = System.nanoTime();
                         long startWriteToDB = System.nanoTime();
-                        eksporteringRepository.oppdaterTilEksportert(virksomhetTilEksport);
+                        eksporteringRepository.oppdaterTilEksportert(
+                                new VirksomhetEksportPerKvartal(
+                                        new Orgnr(virksomhetMetadata.getOrgnr()),
+                                        new ÅrstallOgKvartal(
+                                                virksomhetMetadata.getÅrstall(),
+                                                virksomhetMetadata.getKvartal()
+                                        ),
+                                        false
+                                )
+                        );
                         long stopWriteToDB = System.nanoTime();
                         antallSentTilEksportOgOppdatertIDatabase.getAndIncrement();
+
                         kafkaService.addProcessingTime(
                                 startUtsendingProcess,
                                 stopUtsendingProcess,
                                 startWriteToDB,
-                                stopWriteToDB,
-                                startUthentingAvVirksomhetMetadata,
-                                stopUthentingAvVirksomhetMetadata
+                                stopWriteToDB
                         );
                     }
                 }
@@ -251,6 +259,29 @@ public class EksporteringService {
         );
     }
 
+    @NotNull
+    protected HashMap<String, VirksomhetMetadata> getVirksomhetMetadataHashMap(
+            List<VirksomhetMetadata> virksomhetMetadataListe
+    ) {
+        HashMap<String, VirksomhetMetadata> hasMap = new HashMap<>();
+        virksomhetMetadataListe.stream().forEach(v -> {
+            hasMap.put(v.getOrgnr(), v);
+        });
+        return hasMap;
+    }
+
+    protected List<VirksomhetMetadata> getVirksomheterMetadataFraSubset(
+            Map<String, VirksomhetMetadata> virksomhetMetadataHashMap,
+            List<VirksomhetEksportPerKvartal> subset
+    ) {
+        List<VirksomhetMetadata> list = new ArrayList<>();
+        subset.stream().forEach(v -> {
+            if (virksomhetMetadataHashMap.containsKey(v.getOrgnr())) {
+                list.add(virksomhetMetadataHashMap.get(v.getOrgnr()));
+            }
+        });
+        return list;
+    }
 
     @NotNull
     protected List<VirksomhetEksportPerKvartal> getListeAvVirksomhetEksportPerKvartal(
@@ -278,7 +309,7 @@ public class EksporteringService {
 
     protected static VirksomhetMetadata getVirksomhetMetada(
             Orgnr orgnr,
-            HashSet<VirksomhetMetadata> virksomhetMetadataSet
+            List<VirksomhetMetadata> virksomhetMetadataSet
     ) {
         List<VirksomhetMetadata> virksomhetMetadataFunnet =
                 virksomhetMetadataSet.stream().filter(

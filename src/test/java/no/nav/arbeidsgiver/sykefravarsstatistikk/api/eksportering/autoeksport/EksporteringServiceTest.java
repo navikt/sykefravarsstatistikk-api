@@ -52,7 +52,7 @@ public class EksporteringServiceTest {
     public void getVirksomhetMetada__returnerer_VirksomhetMetada_som_matcher_Virksomhet() {
         VirksomhetMetadata resultat = EksporteringService.getVirksomhetMetada(
                 ORGNR_VIRKSOMHET_1,
-                new HashSet<>(Arrays.asList(virksomhet1Metadata_2020_4, virksomhet2Metadata_2020_4))
+                Arrays.asList(virksomhet1Metadata_2020_4, virksomhet2Metadata_2020_4)
         );
 
         assertEquals(virksomhet1Metadata_2020_4, resultat);
@@ -62,7 +62,7 @@ public class EksporteringServiceTest {
     public void getVirksomhetMetada__returnerer_NULL__dersom_ingen_entry_matcher_Virksomhet() {
         VirksomhetMetadata result = EksporteringService.getVirksomhetMetada(
                 ORGNR_VIRKSOMHET_2,
-                new HashSet<>(Arrays.asList(virksomhet1Metadata_2020_4))
+                Arrays.asList(virksomhet1Metadata_2020_4)
         );
 
         assertNull(result);

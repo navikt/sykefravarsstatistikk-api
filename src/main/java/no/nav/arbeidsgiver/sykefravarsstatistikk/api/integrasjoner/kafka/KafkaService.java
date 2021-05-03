@@ -29,7 +29,6 @@ public class KafkaService {
     private int antallMålet;
     private long totaltTidUtsendingTilKafka;
     private long totaltTidOppdaterDB;
-    private long totaltTidUthentingVirksomhetMetaData;
 
     KafkaService(
             KafkaTemplate<String, String> kafkaTemplate,
@@ -163,21 +162,12 @@ public class KafkaService {
         return totaltTidOppdaterDB / antallMålet;
     }
 
-    public long getSnittTidUthentingVirksomhetMetaData() {
-        if (antallMålet == 0) {
-            return 0;
-        }
-        return totaltTidUthentingVirksomhetMetaData / antallMålet;
-    }
-
     public String getRåDataVedDetaljertMåling() {
         return String.format(
-                "Antall målet er: '%d', totaltTidUtsendingTilKafka er '%d', totaltTidOppdaterDB er '%d' " +
-                        "og  totaltTidUthentingVirksomhetMetaData er '%d'",
+                "Antall målet er: '%d', totaltTidUtsendingTilKafka er '%d', totaltTidOppdaterDB er '%d'",
                 antallMålet,
                 totaltTidUtsendingTilKafka,
-                totaltTidOppdaterDB,
-                totaltTidUthentingVirksomhetMetaData
+                totaltTidOppdaterDB
         );
     }
 
@@ -185,13 +175,10 @@ public class KafkaService {
             long startUtsendingProcess,
             long stopUtsendingProcess,
             long startWriteToDb,
-            long stoptWriteToDb,
-            long startUthentingAvVirksomhetMetadata,
-            long stopUthentingAvVirksomhetMetadata
+            long stoptWriteToDb
     ) {
         antallMålet++;
         totaltTidUtsendingTilKafka = totaltTidUtsendingTilKafka + (stopUtsendingProcess - startUtsendingProcess);
         totaltTidOppdaterDB = totaltTidOppdaterDB + (stoptWriteToDb - startWriteToDb);
-        totaltTidUthentingVirksomhetMetaData = totaltTidUthentingVirksomhetMetaData + (stopUthentingAvVirksomhetMetadata - startUthentingAvVirksomhetMetadata);
     }
 }
