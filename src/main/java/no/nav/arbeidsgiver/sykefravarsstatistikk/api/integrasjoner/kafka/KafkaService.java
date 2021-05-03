@@ -64,8 +64,8 @@ public class KafkaService {
             SykefraværMedKategori sektorSykefravær,
             SykefraværMedKategori landSykefravær
     ) {
-        // TODO sjek om den gir effekt
-       /* if (kafkaUtsendingRapport.getAntallMeldingerIError() > 5) {
+        // TODO sjek om den gir effekt--testet ikke stor gevinst
+        if (kafkaUtsendingRapport.getAntallMeldingerIError() > 5) {
             throw new KafkaUtsendingException(
                     String.format(
                             "Antall error:'%d'. Avbryter eksportering. Totalt meldinger som var klar for sending er: '%d'." +
@@ -75,10 +75,10 @@ public class KafkaService {
                             kafkaUtsendingRapport.getAntallMeldingerMottattForUtsending()
                     )
             );
-        }*/
+        }
         // TODO prøve å bruke Prometheus eller droppe den--
-        //  sett den tilbake hvis den ikke gir effekt.
-        //kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
+        //  sett den tilbake hvis den ikke gir effekt.-- vi testet den, var ikke stor gevinst
+        kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
 
         KafkaTopicKey key = new KafkaTopicKey(
                 virksomhetSykefravær.getOrgnr(),

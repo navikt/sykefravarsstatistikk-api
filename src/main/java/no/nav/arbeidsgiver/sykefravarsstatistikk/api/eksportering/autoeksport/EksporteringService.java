@@ -165,6 +165,7 @@ public class EksporteringService {
         return antallEksportert.get();
     }
 
+    //TODO test med sending av REN liste uten prosessering av data og sjekk om prosessering tar tid eller kafkasending som tar tid.
     protected void sendIBatch(
             List<VirksomhetEksportPerKvartal> virksomheterTilEksport,
             ÅrstallOgKvartal årstallOgKvartal,
