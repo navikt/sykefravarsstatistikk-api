@@ -170,7 +170,25 @@ public class KafkaService {
         return totaltTidUthentingVirksomhetMetaData / antallMålet;
     }
 
-    public void addProcessingTime(long startUtsendingProcess, long stopUtsendingProcess, long startWriteToDb, long stoptWriteToDb, long startUthentingAvVirksomhetMetadata, long stopUthentingAvVirksomhetMetadata) {
+    public String getRåDataVedDetaljertMåling() {
+        return String.format(
+                "Antall målet er: '%d', totaltTidUtsendingTilKafka er '%d', totaltTidOppdaterDB er '%d' " +
+                        "og  totaltTidUthentingVirksomhetMetaData er '%d'",
+                antallMålet,
+                totaltTidUtsendingTilKafka,
+                totaltTidOppdaterDB,
+                totaltTidUthentingVirksomhetMetaData
+        );
+    }
+
+    public void addProcessingTime(
+            long startUtsendingProcess,
+            long stopUtsendingProcess,
+            long startWriteToDb,
+            long stoptWriteToDb,
+            long startUthentingAvVirksomhetMetadata,
+            long stopUthentingAvVirksomhetMetadata
+    ) {
         antallMålet++;
         totaltTidUtsendingTilKafka = totaltTidUtsendingTilKafka + (stopUtsendingProcess - startUtsendingProcess);
         totaltTidOppdaterDB = totaltTidOppdaterDB + (stoptWriteToDb - startWriteToDb);

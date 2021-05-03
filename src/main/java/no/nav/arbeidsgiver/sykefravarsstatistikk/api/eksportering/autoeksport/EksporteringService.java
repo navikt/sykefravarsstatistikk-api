@@ -164,6 +164,11 @@ public class EksporteringService {
                 kafkaService.getSnittTidOppdateringIDB(),
                 kafkaService.getSnittTidUthentingVirksomhetMetaData()
         );
+
+        log.info("[Måling] Rå data ved måling: {}",
+                kafkaService.getRåDataVedDetaljertMåling()
+        );
+
         return antallEksportert.get();
     }
 
@@ -179,7 +184,6 @@ public class EksporteringService {
             SykefraværMedKategori landSykefravær,
             AtomicInteger antallEksportert, int antallTotaltStatistikk) {
         AtomicInteger antallSentTilEksportOgOppdatertIDatabase = new AtomicInteger();
-
 
         virksomheterTilEksport.stream().forEach(virksomhetTilEksport -> {
                     long startUthentingAvVirksomhetMetadata = System.nanoTime();
