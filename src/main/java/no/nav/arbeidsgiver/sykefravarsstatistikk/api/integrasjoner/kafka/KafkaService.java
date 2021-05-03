@@ -23,9 +23,10 @@ import java.util.List;
 public class KafkaService {
     private final static ObjectMapper objectMapper = new ObjectMapper();
 
-    private KafkaTemplate<String, String> kafkaTemplate;
-    private KafkaProperties kafkaProperties;
-    private KafkaUtsendingRapport kafkaUtsendingRapport;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaProperties kafkaProperties;
+    private final KafkaUtsendingRapport kafkaUtsendingRapport;
+
     private int antallMålet;
     private long totaltTidUtsendingTilKafka;
     private long totaltTidOppdaterDB;
@@ -66,7 +67,6 @@ public class KafkaService {
             SykefraværMedKategori sektorSykefravær,
             SykefraværMedKategori landSykefravær
     ) {
-        // TODO sjek om den gir effekt--testet ikke stor gevinst
         if (kafkaUtsendingRapport.getAntallMeldingerIError() > 5) {
             throw new KafkaUtsendingException(
                     String.format(
@@ -78,8 +78,7 @@ public class KafkaService {
                     )
             );
         }
-        // TODO prøve å bruke Prometheus eller droppe den--
-        //  sett den tilbake hvis den ikke gir effekt.-- vi testet den, var ikke stor gevinst
+        // TODO bytt til Prometheus
         kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
 
         KafkaTopicKey key = new KafkaTopicKey(
@@ -94,8 +93,6 @@ public class KafkaService {
                 sektorSykefravær,
                 landSykefravær);
 
-        //TODO vurdere om vikan gå vekk fra å bruke en STATIC object mapper til hele klassen,--
-        // Lage en ny objectMapper for å ha flere samtidig.
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
         String keyAsJsonString;
@@ -113,7 +110,7 @@ public class KafkaService {
             );
             return;
         }
-        // TODO vurdere å sende Object og la Kafka tolke det til JSON??
+
         ListenableFuture<SendResult<String, String>> futureResult = kafkaTemplate.send(
                 kafkaProperties.getTopic(),
                 keyAsJsonString,

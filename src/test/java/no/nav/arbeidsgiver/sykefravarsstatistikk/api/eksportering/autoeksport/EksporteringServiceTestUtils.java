@@ -31,6 +31,7 @@ public class EksporteringServiceTestUtils {
     public static ÅrstallOgKvartal __2021_2 = new ÅrstallOgKvartal(2021, 2);
     public static Orgnr ORGNR_VIRKSOMHET_1 = new Orgnr("987654321");
     public static Orgnr ORGNR_VIRKSOMHET_2 = new Orgnr("912345678");
+    public static Orgnr ORGNR_VIRKSOMHET_3 = new Orgnr("999966633");
     public static VirksomhetSykefravær virksomhetSykefravær = new VirksomhetSykefravær(
             "987654321",
             "Virksomhet 1",
@@ -87,6 +88,15 @@ public class EksporteringServiceTestUtils {
             RECTYPE_FOR_VIRKSOMHET,
             "2",
             "22",
+            __2020_4
+    );
+
+    public static VirksomhetMetadata virksomhet3Metadata_2020_4 = new VirksomhetMetadata(
+            ORGNR_VIRKSOMHET_3,
+            "Virksomhet 3",
+            RECTYPE_FOR_VIRKSOMHET,
+            "3",
+            "33",
             __2020_4
     );
 

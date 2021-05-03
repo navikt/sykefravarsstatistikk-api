@@ -59,30 +59,11 @@ public class EksporteringService {
         this.erEksporteringAktivert = erEksporteringAktivert;
     }
 
-    protected static String listeAvVirksomheterSomString(List<VirksomhetEksportPerKvartal> virksomheterTilEksport) {
-        StringBuffer buffer = new StringBuffer();
-        AtomicInteger counter = new AtomicInteger(0);
-
-        virksomheterTilEksport.stream().forEach(v -> {
-            if (counter.get() != 0) {
-                buffer.append("; ");
-            }
-            buffer.append(v.getOrgnr());
-            buffer.append(":");
-            buffer.append(v.getÅrstall());
-            buffer.append("/");
-            buffer.append(v.getKvartal());
-            buffer.append(":");
-            buffer.append(v.eksportert());
-            counter.incrementAndGet();
-        });
-        return buffer.toString();
-    }
 
     public int eksporter(ÅrstallOgKvartal årstallOgKvartal, EksporteringBegrensning eksporteringBegrensning) {
 
         if (!erEksporteringAktivert) {
-            log.info("Eksportering er ikke aktivert.");
+            log.info("Eksportering er ikke aktivert. Avbrytter. ");
             return 0;
         }
         List<VirksomhetEksportPerKvartal> virksomheterTilEksport =
@@ -123,6 +104,8 @@ public class EksporteringService {
             List<VirksomhetEksportPerKvartal> virksomheterTilEksport,
             ÅrstallOgKvartal årstallOgKvartal
     ) throws KafkaUtsendingException {
+        long startEksportering = System.currentTimeMillis();
+
         List<VirksomhetMetadata> virksomhetMetadataListe =
                 virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal);
         SykefraværsstatistikkLand sykefraværsstatistikkLand =
@@ -132,7 +115,9 @@ public class EksporteringService {
         List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring =
                 sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(årstallOgKvartal);
         List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer =
-                sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5Siffer(årstallOgKvartal);
+                sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5Siffer(
+                        årstallOgKvartal
+                );
         List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet =
                 sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(årstallOgKvartal);
 
@@ -153,7 +138,7 @@ public class EksporteringService {
                             getVirksomheterMetadataFraSubset(virksomhetMetadataMap, subset);
 
                     log.info("Starter utsending av '{}' statistikk meldinger (fra '{}' virksomheter)",
-                            virksomhetMetadataMap.size(),
+                            virksomheterMetadataIDenneSubset.size(),
                             subset.size()
                     );
 
@@ -171,11 +156,17 @@ public class EksporteringService {
                 }
         );
 
-        log.info("Eksport er ferdig med: antall prosessert='{}', antall bekreftet eksportert='{}' og antall error='{}'. " +
-                        "Snitt prossessering tid ved utsending til Kafka er: '{}'. Snitt tid for å oppdater DB er: '{}'.",
+        long stoptEksportering = System.currentTimeMillis();
+        long totalProsesseringTidISekunder = (stoptEksportering - startEksportering) / 1000;
+        log.info("Eksportering er ferdig med: antall prosessert='{}', " +
+                        "antall bekreftet eksportert='{}' og antall error='{}'. " +
+                        "Eksportering tok '{}' sekunder totalt. " +
+                        "Snitt prossesseringstid ved utsending til Kafka er: '{}'. " +
+                        "Snitt prossesseringstid for å oppdatere DB er: '{}'.",
                 kafkaService.getAntallMeldingerMottattForUtsending(),
                 kafkaService.getAntallMeldingerSent(),
                 kafkaService.getAntallMeldingerIError(),
+                totalProsesseringTidISekunder,
                 kafkaService.getSnittTidUtsendingTilKafka(),
                 kafkaService.getSnittTidOppdateringIDB()
         );
@@ -187,7 +178,6 @@ public class EksporteringService {
         return antallEksportert.get();
     }
 
-    //TODO test med sending av REN liste uten prosessering av data og sjekk om prosessering tar tid eller kafkasending som tar tid.
     protected void sendIBatch(
             List<VirksomhetMetadata> virksomheterMetadata,
             ÅrstallOgKvartal årstallOgKvartal,
@@ -196,7 +186,9 @@ public class EksporteringService {
             List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer,
             List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet,
             SykefraværMedKategori landSykefravær,
-            AtomicInteger antallEksportert, int antallTotaltStatistikk) {
+            AtomicInteger antallEksportert,
+            int antallTotaltStatistikk
+    ) {
         AtomicInteger antallSentTilEksportOgOppdatertIDatabase = new AtomicInteger();
 
         virksomheterMetadata.stream().forEach(
@@ -260,27 +252,30 @@ public class EksporteringService {
     }
 
     @NotNull
-    protected HashMap<String, VirksomhetMetadata> getVirksomhetMetadataHashMap(
+    protected static Map<String, VirksomhetMetadata> getVirksomhetMetadataHashMap(
             List<VirksomhetMetadata> virksomhetMetadataListe
     ) {
-        HashMap<String, VirksomhetMetadata> hasMap = new HashMap<>();
-        virksomhetMetadataListe.stream().forEach(v -> {
-            hasMap.put(v.getOrgnr(), v);
-        });
-        return hasMap;
+        HashMap<String, VirksomhetMetadata> virksomhetMetadataHashMap = new HashMap<>();
+        virksomhetMetadataListe.stream().forEach(
+                v -> virksomhetMetadataHashMap.put(v.getOrgnr(), v)
+        );
+
+        return virksomhetMetadataHashMap;
     }
 
-    protected List<VirksomhetMetadata> getVirksomheterMetadataFraSubset(
+    @NotNull
+    protected static List<VirksomhetMetadata> getVirksomheterMetadataFraSubset(
             Map<String, VirksomhetMetadata> virksomhetMetadataHashMap,
             List<VirksomhetEksportPerKvartal> subset
     ) {
-        List<VirksomhetMetadata> list = new ArrayList<>();
+        List<VirksomhetMetadata> virksomheterMetadata = new ArrayList<>();
         subset.stream().forEach(v -> {
             if (virksomhetMetadataHashMap.containsKey(v.getOrgnr())) {
-                list.add(virksomhetMetadataHashMap.get(v.getOrgnr()));
+                virksomheterMetadata.add(virksomhetMetadataHashMap.get(v.getOrgnr()));
             }
         });
-        return list;
+
+        return virksomheterMetadata;
     }
 
     @NotNull
@@ -465,7 +460,11 @@ public class EksporteringService {
         List<SykefraværsstatistikkNæring5Siffer> filteredList = sykefraværsstatistikkNæring5SifferList.stream()
                 .filter(næring5Siffer -> virksomhetMetadata.getNæringOgNæringskode5siffer().stream()
                         .anyMatch(virksomhetNæring5Siffer ->
-                                næring5Siffer.getNæringkode5siffer().equals(virksomhetNæring5Siffer.getNæringskode5Siffer())))
+                                næring5Siffer.getNæringkode5siffer().equals(
+                                        virksomhetNæring5Siffer.getNæringskode5Siffer()
+                                )
+                        )
+                )
                 .collect(Collectors.toList());
         return filteredList;
     }

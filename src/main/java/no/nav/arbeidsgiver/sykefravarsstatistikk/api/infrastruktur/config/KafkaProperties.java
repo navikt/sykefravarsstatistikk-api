@@ -79,8 +79,6 @@ public class KafkaProperties {
 		return props;
 	}
 
-
-	// TODO SingleTOn hindrer paralelsiring ??
 	@Bean
 	@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 	public KafkaUtsendingRapport getKafkaUtsendingReport() {
