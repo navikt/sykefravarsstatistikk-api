@@ -180,13 +180,13 @@ public class EksporteringService {
 
 
         virksomheterTilEksport.stream().forEach(virksomhetTilEksport -> {
-                    long startUtsendingProcess = System.nanoTime();
                     VirksomhetMetadata virksomhetMetadata = getVirksomhetMetada(
                             new Orgnr(virksomhetTilEksport.getOrgnr()),
                             virksomhetTilEksport.getÅrstallOgKvartal(),
                             virksomhetMetadataListe
                     );
 
+                    long startUtsendingProcess = System.nanoTime();
                     if (virksomhetMetadata != null) {
                         kafkaService.send(
                                 årstallOgKvartal,
