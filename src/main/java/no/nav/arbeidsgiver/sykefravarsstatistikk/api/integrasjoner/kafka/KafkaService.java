@@ -192,6 +192,6 @@ public class KafkaService {
         antallMålet++;
         totaltTidUtsendingTilKafka = totaltTidUtsendingTilKafka + (stopUtsendingProcess - startUtsendingProcess);
         totaltTidOppdaterDB = totaltTidOppdaterDB + (stoptWriteToDb - startWriteToDb);
-        totaltTidUthentingVirksomhetMetaData = stopUthentingAvVirksomhetMetadata - startUthentingAvVirksomhetMetadata;
+        totaltTidUthentingVirksomhetMetaData = totaltTidUthentingVirksomhetMetaData + (stopUthentingAvVirksomhetMetadata - startUthentingAvVirksomhetMetadata);
     }
 }
