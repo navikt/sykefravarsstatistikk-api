@@ -1,11 +1,13 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Slf4j
 public class KafkaUtsendingRapport {
 
     private final AtomicInteger antallMeldingerMottattForUtsending;
@@ -37,16 +39,33 @@ public class KafkaUtsendingRapport {
         antallMeldingerMottattForUtsending.incrementAndGet();
     }
 
-    public void leggTilUtsending(Orgnr orgnr) {
+    public void leggTilUtsendingSuksess(Orgnr orgnr) {
         antallMeldingerSent.incrementAndGet();
         sentVirksomheter.add(orgnr);
+
+        loggVedSisteMelding();
     }
 
     public void leggTilError(String errorMelding, Orgnr orgnr) {
         antallMeldingerIError.incrementAndGet();
         ikkeSentVirksomheter.add(orgnr);
         meldinger.add(errorMelding);
+
+        loggVedSisteMelding();
     }
+
+    private void loggVedSisteMelding() {
+        boolean erSisteMelding =
+                (antallMeldingerSent.get() + antallMeldingerIError.get()) == antallMeldingerMottattForUtsending.get();
+
+        if (erSisteMelding) {
+            log.info("Siste meldingen er sent. '{}' meldinger er bekreftet sent. '{}' meldinger i error. ",
+                    antallMeldingerSent.get(),
+                    antallMeldingerIError.get()
+            );
+        }
+    }
+
 
     public int getAntallMeldingerMottattForUtsending() {
         return antallMeldingerMottattForUtsending.get();

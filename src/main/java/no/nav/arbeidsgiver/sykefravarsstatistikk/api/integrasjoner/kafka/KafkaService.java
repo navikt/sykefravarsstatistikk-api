@@ -67,6 +67,9 @@ public class KafkaService {
             SykefraværMedKategori sektorSykefravær,
             SykefraværMedKategori landSykefravær
     ) {
+        // TODO bytt til Prometheus
+        kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
+
         if (kafkaUtsendingRapport.getAntallMeldingerIError() > 5) {
             throw new KafkaUtsendingException(
                     String.format(
@@ -78,8 +81,6 @@ public class KafkaService {
                     )
             );
         }
-        // TODO bytt til Prometheus
-        kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
 
         KafkaTopicKey key = new KafkaTopicKey(
                 virksomhetSykefravær.getOrgnr(),
@@ -132,7 +133,7 @@ public class KafkaService {
 
             @Override
             public void onSuccess(SendResult<String, String> res) {
-                kafkaUtsendingRapport.leggTilUtsending(new Orgnr(virksomhetSykefravær.getOrgnr()));
+                kafkaUtsendingRapport.leggTilUtsendingSuksess(new Orgnr(virksomhetSykefravær.getOrgnr()));
                 log.debug(
                         "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
                         kafkaProperties.getTopic(),

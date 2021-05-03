@@ -43,7 +43,7 @@ public class EksporteringService {
     private final KafkaService kafkaService;
     private final boolean erEksporteringAktivert;
 
-    public static final int EKSPORT_BATCH_STØRRELSE = 1000;
+    public static final int EKSPORT_BATCH_STØRRELSE = 10000;
 
     public EksporteringService(
             EksporteringRepository eksporteringRepository,
@@ -105,6 +105,7 @@ public class EksporteringService {
             ÅrstallOgKvartal årstallOgKvartal
     ) throws KafkaUtsendingException {
         long startEksportering = System.currentTimeMillis();
+        kafkaService.nullstillUtsendingRapport();
 
         List<VirksomhetMetadata> virksomhetMetadataListe =
                 virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal);
@@ -126,7 +127,6 @@ public class EksporteringService {
                 sykefraværsstatistikkLand
         );
 
-        kafkaService.nullstillUtsendingRapport();
         Map<String, VirksomhetMetadata> virksomhetMetadataMap = getVirksomhetMetadataHashMap(virksomhetMetadataListe);
 
         List<? extends List<VirksomhetEksportPerKvartal>> subsets =
@@ -158,19 +158,15 @@ public class EksporteringService {
 
         long stoptEksportering = System.currentTimeMillis();
         long totalProsesseringTidISekunder = (stoptEksportering - startEksportering) / 1000;
-        log.info("Eksportering er ferdig med: antall prosessert='{}', " +
-                        "antall bekreftet eksportert='{}' og antall error='{}'. " +
+        log.info("Eksportering er ferdig med: antall statistikk for virksomhet prosessert='{}', " +
                         "Eksportering tok '{}' sekunder totalt. " +
                         "Snitt prossesseringstid ved utsending til Kafka er: '{}'. " +
                         "Snitt prossesseringstid for å oppdatere DB er: '{}'.",
                 kafkaService.getAntallMeldingerMottattForUtsending(),
-                kafkaService.getAntallMeldingerSent(),
-                kafkaService.getAntallMeldingerIError(),
                 totalProsesseringTidISekunder,
                 kafkaService.getSnittTidUtsendingTilKafka(),
                 kafkaService.getSnittTidOppdateringIDB()
         );
-
         log.info("[Måling] Rå data ved måling: {}",
                 kafkaService.getRåDataVedDetaljertMåling()
         );
