@@ -29,6 +29,7 @@ public class KafkaService {
     private int antallMålet;
     private long totaltTidUtsendingTilKafka;
     private long totaltTidOppdaterDB;
+    private long totaltTidUthentingVirksomhetMetaData;
 
     KafkaService(
             KafkaTemplate<String, String> kafkaTemplate,
@@ -48,9 +49,11 @@ public class KafkaService {
     public int getAntallMeldingerMottattForUtsending() {
         return kafkaUtsendingRapport.getAntallMeldingerMottattForUtsending();
     }
+
     public int getAntallMeldingerSent() {
         return kafkaUtsendingRapport.getAntallMeldingerSent();
     }
+
     public int getAntallMeldingerIError() {
         return kafkaUtsendingRapport.getAntallMeldingerIError();
     }
@@ -133,13 +136,13 @@ public class KafkaService {
 
             @Override
             public void onSuccess(SendResult<String, String> res) {
-                //kafkaUtsendingRapport.leggTilUtsending(new Orgnr(virksomhetSykefravær.getOrgnr()));
-                /*log.debug(
+                kafkaUtsendingRapport.leggTilUtsending(new Orgnr(virksomhetSykefravær.getOrgnr()));
+                log.debug(
                         "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
                         kafkaProperties.getTopic(),
                         res.getProducerRecord().key(),
                         res.getRecordMetadata().offset()
-                );*/
+                );
             }
         });
     }
@@ -160,9 +163,17 @@ public class KafkaService {
         return totaltTidOppdaterDB / antallMålet;
     }
 
-    public void addProcessingTime(long startUtsendingProcess, long stopUtsendingProcess, long startWriteToDb, long stoptWriteToDb) {
+    public long getSnittTidUthentingVirksomhetMetaData() {
+        if (antallMålet == 0) {
+            return 0;
+        }
+        return totaltTidUthentingVirksomhetMetaData / antallMålet;
+    }
+
+    public void addProcessingTime(long startUtsendingProcess, long stopUtsendingProcess, long startWriteToDb, long stoptWriteToDb, long startUthentingAvVirksomhetMetadata, long stopUthentingAvVirksomhetMetadata) {
         antallMålet++;
         totaltTidUtsendingTilKafka = totaltTidUtsendingTilKafka + (stopUtsendingProcess - startUtsendingProcess);
         totaltTidOppdaterDB = totaltTidOppdaterDB + (stoptWriteToDb - startWriteToDb);
+        totaltTidUthentingVirksomhetMetaData = stopUthentingAvVirksomhetMetadata - startUthentingAvVirksomhetMetadata;
     }
 }

@@ -137,8 +137,8 @@ public class EksporteringService {
                 Lists.partition(virksomheterTilEksport, EKSPORT_BATCH_STØRRELSE);
         AtomicInteger antallEksportert = new AtomicInteger();
 
-        log.info("Starter utsending av {} meldinger", subsets.size());
         subsets.forEach(subset -> {
+                    log.info("Starter utsending av {} meldinger", subset.size());
                     sendIBatch(
                             subset,
                             årstallOgKvartal,
@@ -155,12 +155,14 @@ public class EksporteringService {
         );
 
         log.info("Eksport er ferdig med: antall prosessert='{}', antall bekreftet eksportert='{}' og antall error='{}'. " +
-                        "Snitt prossessering tid ved utsending til Kafka er: '{}'. Snitt tid for å oppdater DB er: '{}'",
+                        "Snitt prossessering tid ved utsending til Kafka er: '{}'. Snitt tid for å oppdater DB er: '{}'." +
+                        " Snitt tid for uthenting av virksomhet Metadata er: {}",
                 kafkaService.getAntallMeldingerMottattForUtsending(),
                 kafkaService.getAntallMeldingerSent(),
                 kafkaService.getAntallMeldingerIError(),
                 kafkaService.getSnittTidUtsendingTilKafka(),
-                kafkaService.getSnittTidOppdateringIDB()
+                kafkaService.getSnittTidOppdateringIDB(),
+                kafkaService.getSnittTidUthentingVirksomhetMetaData()
         );
         return antallEksportert.get();
     }
@@ -180,12 +182,13 @@ public class EksporteringService {
 
 
         virksomheterTilEksport.stream().forEach(virksomhetTilEksport -> {
+                    long startUthentingAvVirksomhetMetadata = System.nanoTime();
                     VirksomhetMetadata virksomhetMetadata = getVirksomhetMetada(
                             new Orgnr(virksomhetTilEksport.getOrgnr()),
                             virksomhetTilEksport.getÅrstallOgKvartal(),
                             virksomhetMetadataListe
                     );
-
+                    long stopUthentingAvVirksomhetMetadata = System.nanoTime();
                     long startUtsendingProcess = System.nanoTime();
                     if (virksomhetMetadata != null) {
                         kafkaService.send(
@@ -218,7 +221,9 @@ public class EksporteringService {
                                 startUtsendingProcess,
                                 stopUtsendingProcess,
                                 startWriteToDB,
-                                stopWriteToDB
+                                stopWriteToDB,
+                                startUthentingAvVirksomhetMetadata,
+                                stopUthentingAvVirksomhetMetadata
                         );
                     }
                 }
