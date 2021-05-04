@@ -30,6 +30,9 @@ public class KafkaUtsendingRapport {
         meldinger = new ArrayList<>();
         sentVirksomheter = new ArrayList<>();
         ikkeSentVirksomheter = new ArrayList<>();
+        antallMålet = new AtomicInteger();
+        totaltTidUtsendingTilKafka = new AtomicLong();
+        totaltTidOppdaterDB = new AtomicLong();
     }
 
     public void reset() {
