@@ -183,7 +183,7 @@ no.nav.security.jwt.issuer.selvbetjening:
     cookiename: selvbetjening-idtoken
 
 statistikk.importering.aktivert: true
-statistikk.eksportering.aktivert: false
+statistikk.eksportering.aktivert: true
 
 database.navn: sykefravarsstatistikk
 vault.mount-path: postgresql/prod-fss
