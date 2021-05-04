@@ -4,11 +4,14 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategor
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.SEKTOR;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 
 public class DatavarehusRepositoryJdbcTestUtils {
 
+
     public static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
+        delete(jdbcTemplate, "dt_p.v_dim_ia_orgenhet");
         delete(jdbcTemplate, "dt_p.v_dim_ia_naring_sn2007");
         delete(jdbcTemplate, "dt_p.v_dim_ia_sektor");
         delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_land_v");
@@ -47,6 +50,31 @@ public class DatavarehusRepositoryJdbcTestUtils {
         jdbcTemplate.update(
                 "insert into dt_p.v_dim_ia_naring_sn2007 (naringkode, nargrpkode, naringnavn) "
                         + "values (:naringkode, :nargrpkode, :naringnavn)",
+                naringParams);
+    }
+
+    public static void insertOrgenhetInDvhTabell(
+            NamedParameterJdbcTemplate jdbcTemplate,
+            String orgnr,
+            String sektor,
+            String næring,
+            String offnavn,
+            int årstall,
+            int kvartal
+    ) {
+        MapSqlParameterSource naringParams =
+                new MapSqlParameterSource()
+                        .addValue("orgnr", orgnr)
+                        .addValue("sektor", sektor)
+                        .addValue("naring", næring)
+                        .addValue("offnavn", offnavn)
+                        .addValue("årstall", årstall)
+                        .addValue("kvartal", kvartal)
+                ;
+
+        jdbcTemplate.update(
+                "insert into dt_p.v_dim_ia_orgenhet (orgnr, offnavn, rectype, sektor, naring, arstall, kvartal) "
+                        + "values (:orgnr, :offnavn, '2', :sektor, :naring, :årstall, :kvartal)",
                 naringParams);
     }
 
@@ -129,6 +157,7 @@ public class DatavarehusRepositoryJdbcTestUtils {
                         .addValue("orgnr", orgnr)
                         .addValue("varighet", varighet.kode)
                         .addValue("naering_kode", næringskode5siffer)
+                        .addValue("sektor", SEKTOR)
                         .addValue("kjonn", kjonn)
                         .addValue("taptedv", taptedagsverk)
                         .addValue("muligedv", muligedagsverk)
@@ -143,7 +172,7 @@ public class DatavarehusRepositoryJdbcTestUtils {
                         + "taptedv, muligedv, antpers, rectype) "
                         + "values ("
                         + ":arstall, :kvartal, "
-                        + ":orgnr, :naering_kode, '3', 'G', '03', "
+                        + ":orgnr, :naering_kode, :sektor, 'G', '03', "
                         + "'B', :kjonn, '02', "
                         + "'L', :varighet, "
                         + ":taptedv, :muligedv, :antpers, :rectype)",

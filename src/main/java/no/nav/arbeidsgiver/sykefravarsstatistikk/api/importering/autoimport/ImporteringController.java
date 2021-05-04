@@ -5,13 +5,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.Importeringsobjekt;
 import no.nav.security.token.support.core.api.Protected;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,14 +20,17 @@ import java.util.List;
 public class ImporteringController {
 
     private final ImporteringService importeringService;
-    private final ImporteringKvalitetssjekkService importeringTestService;
+    private final ImporteringKvalitetssjekkService importeringKvalitetssjekkService;
+    private final PostImporteringService postImporteringService;
 
     public ImporteringController(
             ImporteringService importeringService,
-            ImporteringKvalitetssjekkService importeringTestService
+            ImporteringKvalitetssjekkService importeringKvalitetssjekkService,
+            PostImporteringService postImporteringService
     ) {
         this.importeringService = importeringService;
-        this.importeringTestService = importeringTestService;
+        this.importeringKvalitetssjekkService = importeringKvalitetssjekkService;
+        this.postImporteringService = postImporteringService;
     }
 
     @PostMapping("/reimport")
@@ -56,8 +56,42 @@ public class ImporteringController {
         return ResponseEntity.ok(HttpStatus.CREATED);
     }
 
+    @PostMapping("/reimportVirksomhetMetaData")
+    public ResponseEntity<HttpStatus> reimportVirksomhetMetdata(
+            @RequestParam int årstall,
+            @RequestParam int kvartal
+    ) {
+        ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
+        Pair<Integer, Integer> antallImportert =
+                postImporteringService.importVirksomhetMetadataOgVirksomhetNæringskode5sifferMapping(årstallOgKvartal);
+
+        if (antallImportert.getFirst() >= 0) {
+            return ResponseEntity.ok(HttpStatus.CREATED);
+        } else {
+            return ResponseEntity.ok(HttpStatus.OK);
+        }
+    }
+
+    @PostMapping("/forberedNesteEksport")
+    public ResponseEntity<HttpStatus> forberedNesteEksport(
+            @RequestParam int årstall,
+            @RequestParam int kvartal
+    ) {
+        ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
+        int antallOpprettet = postImporteringService.forberedNesteEksport(årstallOgKvartal);
+
+        if (antallOpprettet >= 0) {
+            return ResponseEntity.ok(HttpStatus.CREATED);
+        } else {
+            return ResponseEntity.ok(HttpStatus.OK);
+        }
+    }
+
+
     @GetMapping("/kvalitetssjekk")
     public ResponseEntity<List<String>> testAvNæringMedVarighetOgGradering() {
-        return ResponseEntity.ok(importeringTestService.kvalitetssjekkNæringMedVarighetOgMedGraderingMotNæringstabell());
+        return ResponseEntity.ok(
+                importeringKvalitetssjekkService.kvalitetssjekkNæringMedVarighetOgMedGraderingMotNæringstabell()
+        );
     }
 }

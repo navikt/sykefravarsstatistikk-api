@@ -23,6 +23,8 @@
             <appender-ref ref="sporbarhetsloggAppender"/>
         </logger>
 
+        <logger name="org.apache.kafka.clients.NetworkClient" level="ERROR"/>
+
         <root level="INFO">
             <appender-ref ref="maskedJsonConsoleAppender"/>
         </root>

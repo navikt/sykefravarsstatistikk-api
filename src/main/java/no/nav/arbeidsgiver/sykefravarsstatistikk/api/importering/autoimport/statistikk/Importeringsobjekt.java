@@ -7,5 +7,6 @@ public enum Importeringsobjekt {
     NÆRING_5_SIFFER,
     VIRKSOMHET,
     NÆRING_MED_VARIGHET,
-    GRADERING
+    GRADERING,
+    VIKSOMHET_METADATA
 }

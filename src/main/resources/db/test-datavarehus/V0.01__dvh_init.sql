@@ -15,6 +15,18 @@ create table dt_p.v_dim_ia_naring_sn2007
     constraint r1_naring_sn2007_pk primary key (naringkode)
 );
 
+create table dt_p.v_dim_ia_orgenhet
+(
+    orgnr char(9) not null,
+    orgnrkn char(9),
+    rectype char(1),
+    sektor char(1),
+    naring char(2),
+    offnavn varchar(172),
+    arstall char(4) not null,
+    kvartal char(1) not null
+);
+
 create table dt_p.agg_ia_sykefravar_land_v
 (
      arstall char(4) not null,

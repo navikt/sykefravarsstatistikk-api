@@ -57,6 +57,7 @@ public class ImporteringService {
             if (erImporteringAktivert) {
                 log.info("Importerer ny statistikk");
                 importerNyStatistikk(årstallOgKvartalForDvh.get(0));
+                //TODO: kall postImport
             } else {
                 log.info("Statistikk er klar til importering men automatisk importering er ikke aktivert");
             }
@@ -161,7 +162,6 @@ public class ImporteringService {
         importSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal);
         importSykefraværsstatistikkMedGradering(årstallOgKvartal);
     }
-
 
     private SlettOgOpprettResultat importSykefraværsstatistikkLand(ÅrstallOgKvartal årstallOgKvartal) {
         List<SykefraværsstatistikkLand> sykefraværsstatistikkLand =

@@ -6,6 +6,17 @@ management.endpoints.web:
   flyway:
     locations: classpath:/db/migration
 
+
+kafka:
+  outbound:
+    topic: arbeidsgiver.sykefravarsstatistikk-v1
+    bootstrapServers: ${KAFKA_BROKERS:localhost:9092}
+    securityProtocol: SSL
+    caPath: ${KAFKA_CA_PATH}
+    keystorePath: ${KAFKA_KEYSTORE_PATH:/dev/zero}
+    truststorePath: ${KAFKA_TRUSTSTORE_PATH:/dev/zero}
+    credstorePassword: ${KAFKA_CREDSTORE_PASSWORD:pwd}
+
 spring:
   profiles:
     active: local
@@ -42,6 +53,7 @@ no.nav.security.jwt:
       cookiename: selvbetjening-idtoken
 
 statistikk.importering.aktivert: true
+statistikk.eksportering.aktivert: true
 
 applikasjon.datasource:
   url: jdbc:h2:mem:test
@@ -58,6 +70,12 @@ datavarehus.datasource:
 unleash.url: http://unleash.herokuapp.com/api/
 
 nais.cluster.name: local
+
+kafka:
+  outbound:
+    topic: arbeidsgiver.sykefravarsstatistikk-v1
+    bootstrapServers: localhost:9092
+    securityProtocol: PLAINTEXT
 
 ---
 
@@ -128,6 +146,7 @@ no.nav.security.jwt.issuer.selvbetjening:
     cookiename: selvbetjening-idtoken
 
 statistikk.importering.aktivert: true
+statistikk.eksportering.aktivert: true
 
 database.navn: sykefravarsstatistikk
 vault.mount-path: postgresql/preprod-fss
@@ -164,6 +183,7 @@ no.nav.security.jwt.issuer.selvbetjening:
     cookiename: selvbetjening-idtoken
 
 statistikk.importering.aktivert: true
+statistikk.eksportering.aktivert: false
 
 database.navn: sykefravarsstatistikk
 vault.mount-path: postgresql/prod-fss

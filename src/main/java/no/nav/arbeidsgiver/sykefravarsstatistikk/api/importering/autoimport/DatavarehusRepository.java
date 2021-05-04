@@ -1,7 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.StatistikkildeDvh;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
@@ -10,6 +12,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværssta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetMedGradering;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner.Orgenhet;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -33,6 +36,7 @@ public class DatavarehusRepository {
     public static final String NARING = "naring";
     public static final String NARING_5SIFFER = "naering_kode";
     public static final String ORGNR = "orgnr";
+    public static final String OFFNAVN = "offnavn";
     public static final String VARIGHET = "varighet";
     public static final String SUM_TAPTE_DAGSVERK_GS = "sum_tapte_dagsverk_gs";
     public static final String SUM_ANTALL_PERSONER = "sum_antall_personer";
@@ -218,7 +222,7 @@ public class DatavarehusRepository {
                         "sum(muligedv) as sum_mulige_dagsverk " +
                         "from dt_p.agg_ia_sykefravar_v " +
                         "where arstall = :arstall and kvartal = :kvartal and varighet is not null " +
-                        "and rectype='"+ RECTYPE_FOR_VIRKSOMHET + "'" +
+                        "and rectype='" + RECTYPE_FOR_VIRKSOMHET + "'" +
                         "group by arstall, kvartal, naering_kode, varighet",
                 namedParameters,
                 (resultSet, rowNum) ->
@@ -295,4 +299,54 @@ public class DatavarehusRepository {
                                 resultSet.getString(NARINGNAVN)));
     }
 
+    public List<Orgenhet> hentOrgenhet(ÅrstallOgKvartal årstallOgKvartal) {
+        return hentOrgenhet(årstallOgKvartal, false);
+    }
+
+    public List<Orgenhet> hentOrgenhet(ÅrstallOgKvartal årstallOgKvartal, boolean filtrerPåÅrstallOgKvartal) {
+
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource();
+        StringBuffer query = new StringBuffer("select orgnr, offnavn, rectype, sektor, naring, arstall, kvartal " +
+                "from dt_p.v_dim_ia_orgenhet " +
+                "where length(trim(orgnr)) = 9 " +
+                "and offnavn is not null ");
+
+        if (filtrerPåÅrstallOgKvartal) {
+            namedParameters.addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+                    .addValue(KVARTAL, årstallOgKvartal.getKvartal());
+            query.append("and arstall = :arstall ");
+            query.append("and kvartal = :kvartal");
+        }
+
+
+        return namedParameterJdbcTemplate.query(query.toString(),
+                namedParameters,
+                ((resultSet, i) ->
+                        new Orgenhet(
+                                new Orgnr(resultSet.getString(ORGNR)),
+                                resultSet.getString(OFFNAVN),
+                                resultSet.getString(RECTYPE),
+                                resultSet.getString(SEKTOR),
+                                resultSet.getString(NARING),
+                                filtrerPåÅrstallOgKvartal? new ÅrstallOgKvartal(
+                                        resultSet.getInt(ARSTALL),
+                                        resultSet.getInt(KVARTAL)
+                                ) : årstallOgKvartal
+                        )
+                )
+        );
+    }
+
+    public List<ÅrstallOgKvartal> hentSisteKvartalForOrgenhet() {
+        return namedParameterJdbcTemplate.query(
+                "select distinct arstall, kvartal from dt_p.v_dim_ia_orgenhet order by arstall, kvartal desc",
+                new MapSqlParameterSource(),
+                ((resultSet, i) ->
+                        new ÅrstallOgKvartal(
+                                resultSet.getInt(ARSTALL),
+                                resultSet.getInt(KVARTAL)
+                        )
+                )
+        );
+    }
 }

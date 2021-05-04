@@ -1,7 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.StatistikkildeDvh;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
@@ -10,6 +12,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværssta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetMedGradering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner.Orgenhet;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -346,4 +349,31 @@ public class DatavarehusRepositoryJdbcTest {
         assertTrue(næringer.contains(new Næring("11", "Produksjon av drikkevarer")));
     }
 
+    @Test
+    public void hentVirksomhetMetadataEksportering__returnerer_virksomhetMetadataEksportering() {
+        insertOrgenhetInDvhTabell(namedParameterJdbcTemplate, ORGNR_VIRKSOMHET_1, SEKTOR, NÆRINGSKODE_2SIFFER, "Virksomhet 1", 2020, 3);
+
+        List<Orgenhet> orgenhetList = repository.hentOrgenhet(
+                new ÅrstallOgKvartal(
+                        2020,
+                        3
+                )
+        );
+
+        assertTrue(
+                orgenhetList.contains(
+                        new Orgenhet(
+                                new Orgnr(ORGNR_VIRKSOMHET_1),
+                                "Virksomhet 1",
+                                RECTYPE_FOR_VIRKSOMHET,
+                                SEKTOR,
+                                NÆRINGSKODE_2SIFFER,
+                                new ÅrstallOgKvartal(
+                                        2020,
+                                        3
+                                )
+                        )
+                )
+        );
+    }
 }

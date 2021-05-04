@@ -4,14 +4,8 @@ import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.SlettOgOpprettResultat;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Statistikkilde;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæringMedVarighet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetMedGradering;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -39,8 +33,16 @@ public class StatistikkRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
+
     public ÅrstallOgKvartal hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde type) {
-        List<ÅrstallOgKvartal> alleÅrstallOgKvartal = namedParameterJdbcTemplate.query(
+        List<ÅrstallOgKvartal> alleÅrstallOgKvartal =
+                hentAlleÅrstallOgKvartalForSykefraværsstatistikk(type);
+        return alleÅrstallOgKvartal.get(0);
+    }
+
+    @NotNull
+    public List<ÅrstallOgKvartal> hentAlleÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde type) {
+        return namedParameterJdbcTemplate.query(
                 String.format("select distinct arstall, kvartal " +
                         "from %s " +
                         "order by arstall desc, kvartal desc", type.tabell),
@@ -51,7 +53,6 @@ public class StatistikkRepository {
                                 resultSet.getInt("kvartal")
                         )
         );
-        return alleÅrstallOgKvartal.get(0);
     }
 
 

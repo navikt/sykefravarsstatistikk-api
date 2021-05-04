@@ -1,19 +1,25 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Data
-@AllArgsConstructor
 public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
     private final int årstall;
     private final int kvartal;
 
+    public ÅrstallOgKvartal(int årstall, int kvartal){
+        if (kvartal > 4 || kvartal < 1){
+            throw new IllegalArgumentException("Kvartal må være 1, 2, 3 eller 4");
+        }
+        this.årstall = årstall;
+        this.kvartal = kvartal;
+    }
 
     public ÅrstallOgKvartal minusKvartaler(int antallKvartaler) {
         if (antallKvartaler < 0) {
@@ -66,5 +72,18 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
         return Comparator.comparing(ÅrstallOgKvartal::getÅrstall)
                 .thenComparing(ÅrstallOgKvartal::getKvartal)
                 .compare(this, årstallOgKvartal);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ÅrstallOgKvartal)) return false;
+        ÅrstallOgKvartal that = (ÅrstallOgKvartal) o;
+        return årstall == that.årstall && kvartal == that.kvartal;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(årstall, kvartal);
     }
 }
