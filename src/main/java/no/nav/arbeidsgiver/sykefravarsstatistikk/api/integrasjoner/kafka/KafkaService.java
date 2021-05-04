@@ -27,10 +27,6 @@ public class KafkaService {
     private final KafkaProperties kafkaProperties;
     private final KafkaUtsendingRapport kafkaUtsendingRapport;
 
-    private int antallMålet;
-    private long totaltTidUtsendingTilKafka;
-    private long totaltTidOppdaterDB;
-
     KafkaService(
             KafkaTemplate<String, String> kafkaTemplate,
             KafkaProperties kafkaProperties,
@@ -49,15 +45,6 @@ public class KafkaService {
     public int getAntallMeldingerMottattForUtsending() {
         return kafkaUtsendingRapport.getAntallMeldingerMottattForUtsending();
     }
-
-    public int getAntallMeldingerSent() {
-        return kafkaUtsendingRapport.getAntallMeldingerSent();
-    }
-
-    public int getAntallMeldingerIError() {
-        return kafkaUtsendingRapport.getAntallMeldingerIError();
-    }
-
 
     public void send(
             ÅrstallOgKvartal årstallOgKvartal,
@@ -145,38 +132,23 @@ public class KafkaService {
     }
 
     public long getSnittTidUtsendingTilKafka() {
-        if (antallMålet == 0) {
-            return 0;
-        }
-
-        return totaltTidUtsendingTilKafka / antallMålet;
+        return kafkaUtsendingRapport.getSnittTidUtsendingTilKafka();
     }
 
     public long getSnittTidOppdateringIDB() {
-        if (antallMålet == 0) {
-            return 0;
-        }
-
-        return totaltTidOppdaterDB / antallMålet;
+        return kafkaUtsendingRapport.getSnittTidOppdateringIDB();
     }
 
     public String getRåDataVedDetaljertMåling() {
-        return String.format(
-                "Antall målet er: '%d', totaltTidUtsendingTilKafka er '%d', totaltTidOppdaterDB er '%d'",
-                antallMålet,
-                totaltTidUtsendingTilKafka,
-                totaltTidOppdaterDB
-        );
+        return kafkaUtsendingRapport.getRåDataVedDetaljertMåling();
     }
 
     public void addProcessingTime(
             long startUtsendingProcess,
             long stopUtsendingProcess,
-            long startWriteToDb,
-            long stoptWriteToDb
+            long startWriteToDB,
+            long stopWriteToDB
     ) {
-        antallMålet++;
-        totaltTidUtsendingTilKafka = totaltTidUtsendingTilKafka + (stopUtsendingProcess - startUtsendingProcess);
-        totaltTidOppdaterDB = totaltTidOppdaterDB + (stoptWriteToDb - startWriteToDb);
+        kafkaUtsendingRapport.addProcessingTime(startUtsendingProcess, stopUtsendingProcess, startWriteToDB, stopWriteToDB);
     }
 }

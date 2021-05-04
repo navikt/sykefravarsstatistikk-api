@@ -6,6 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 public class KafkaUtsendingRapport {
@@ -16,6 +17,11 @@ public class KafkaUtsendingRapport {
     private final List<String> meldinger;
     private final List<Orgnr> sentVirksomheter;
     private final List<Orgnr> ikkeSentVirksomheter;
+    private AtomicInteger antallMålet;
+    private AtomicLong totaltTidUtsendingTilKafka;
+    private AtomicLong totaltTidOppdaterDB;
+
+
 
     public KafkaUtsendingRapport() {
         antallMeldingerMottattForUtsending = new AtomicInteger();
@@ -33,6 +39,9 @@ public class KafkaUtsendingRapport {
         meldinger.clear();
         sentVirksomheter.clear();
         ikkeSentVirksomheter.clear();
+        antallMålet.set(0);
+        totaltTidUtsendingTilKafka.set(0);
+        totaltTidOppdaterDB.set(0);
     }
 
     public void leggTilMeldingMottattForUtsending() {
@@ -77,5 +86,41 @@ public class KafkaUtsendingRapport {
 
     public int getAntallMeldingerIError() {
         return antallMeldingerIError.get();
+    }
+
+    public long getSnittTidUtsendingTilKafka() {
+        if (antallMålet.get() == 0) {
+            return 0;
+        }
+
+        return totaltTidUtsendingTilKafka.get() / antallMålet.get();
+    }
+
+    public long getSnittTidOppdateringIDB() {
+        if (antallMålet.get() == 0) {
+            return 0;
+        }
+
+        return totaltTidOppdaterDB.get() / antallMålet.get();
+    }
+
+    public String getRåDataVedDetaljertMåling() {
+        return String.format(
+                "Antall målet er: '%d', totaltTidUtsendingTilKafka er '%d', totaltTidOppdaterDB er '%d'",
+                antallMålet.get(),
+                totaltTidUtsendingTilKafka.get(),
+                totaltTidOppdaterDB.get()
+        );
+    }
+
+    public void addProcessingTime(
+            long startUtsendingProcess,
+            long stopUtsendingProcess,
+            long startWriteToDb,
+            long stoptWriteToDb
+    ) {
+        antallMålet.incrementAndGet();
+        totaltTidUtsendingTilKafka.addAndGet(stopUtsendingProcess - startUtsendingProcess);
+        totaltTidOppdaterDB.addAndGet(stoptWriteToDb - startWriteToDb);
     }
 }
