@@ -336,7 +336,7 @@ public class EksporteringService {
 
         return new VirksomhetSykefravær(
                 virksomhetMetadata.getOrgnr(),
-                "",
+                virksomhetMetadata.getNavn(),
                 new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
                 sfStatistikk.getTapteDagsverk(),
                 sfStatistikk.getMuligeDagsverk(),
