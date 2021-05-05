@@ -26,15 +26,17 @@ public class KafkaService {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final KafkaProperties kafkaProperties;
     private final KafkaUtsendingRapport kafkaUtsendingRapport;
+    private final KafkaUtsendingHistorikkRepository kafkaUtsendingHistorikkRepository;
 
     KafkaService(
             KafkaTemplate<String, String> kafkaTemplate,
             KafkaProperties kafkaProperties,
-            KafkaUtsendingRapport kafkaUtsendingRapport
-    ) {
+            KafkaUtsendingRapport kafkaUtsendingRapport,
+            KafkaUtsendingHistorikkRepository kafkaUtsendingHistorikkRepository) {
         this.kafkaTemplate = kafkaTemplate;
         this.kafkaProperties = kafkaProperties;
         this.kafkaUtsendingRapport = kafkaUtsendingRapport;
+        this.kafkaUtsendingHistorikkRepository = kafkaUtsendingHistorikkRepository;
     }
 
     public void nullstillUtsendingRapport() {
@@ -126,6 +128,11 @@ public class KafkaService {
                         kafkaProperties.getTopic(),
                         res.getProducerRecord().key(),
                         res.getRecordMetadata().offset()
+                );
+                kafkaUtsendingHistorikkRepository.opprettHistorikk(
+                        virksomhetSykefravær.getOrgnr(),
+                        keyAsJsonString,
+                        dataAsJsonString
                 );
             }
         });
