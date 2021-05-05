@@ -1,11 +1,12 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class KafkaUtsendingHistorikkRepository {
@@ -20,13 +21,14 @@ public class KafkaUtsendingHistorikkRepository {
 
     @Async
     public void opprettHistorikk(String orgnr, String key, String value) {
-        SqlParameterSource parametre =
-                new MapSqlParameterSource();
+        Map<String, String> parametre = new HashMap<>();
+        parametre.put("orgnr", orgnr);
+        parametre.put("key", key);
+        parametre.put("value", value);
 
         namedParameterJdbcTemplate.update(
                 "insert into kafka_utsending_historikk (orgnr, key_json, value_json) " +
-                        "values " +
-                        "(:orgnr, :key, :value) ",
+                        "values (:orgnr, :key, :value) ",
                 parametre
         );
     }
