@@ -60,7 +60,6 @@ class PostImporteringServiceTest {
         mockImportVirksomhetNæringskode5sifferMapping(__2020_4, getVirksomhetMetadataNæringskode5sifferListe(__2020_4));
         mockForberedNesteEksport(
                 __2020_4,
-                Collections.emptyList(),
                 getVirksomhetMetadataListe(__2020_4)
         );
 
@@ -71,12 +70,8 @@ class PostImporteringServiceTest {
 
     private void mockForberedNesteEksport(
             ÅrstallOgKvartal årstallOgKvartal,
-            List<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartalListe,
             List<VirksomhetMetadata> virksomhetMetadataListe
     ) {
-        when(
-                eksporteringRepository.hentVirksomhetEksportPerKvartal(årstallOgKvartal))
-                .thenReturn(virksomhetEksportPerKvartalListe);
         when(
                 virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal))
                 .thenReturn(virksomhetMetadataListe);

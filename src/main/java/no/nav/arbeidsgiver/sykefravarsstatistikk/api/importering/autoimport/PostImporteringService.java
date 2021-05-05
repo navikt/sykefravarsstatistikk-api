@@ -111,20 +111,18 @@ public class PostImporteringService {
             );
             return 0;
         }
-        List<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartal =
-                eksporteringRepository.hentVirksomhetEksportPerKvartal(årstallOgKvartal);
 
-        if (!virksomhetEksportPerKvartal.isEmpty()) {
+        int antallIkkeEksportertSykefaværsstatistikk = eksporteringRepository.hentAntallIkkeFerdigEksportert();
+        if (antallIkkeEksportertSykefaværsstatistikk > 0) {
             log.warn(
-                    "Det finnes allerede '{}' rader til eksportering for årstall '{}' og kvartal '{}'. " +
+                    "Det finnes '{}' rader  som IKKE er ferdig eksportert. " +
                             "Skal ikke importerer på nytt (slett eksisterende data manuelt før ny import)",
-                    virksomhetEksportPerKvartal.size(),
-                    årstallOgKvartal.getÅrstall(),
-                    årstallOgKvartal.getKvartal()
+                    antallIkkeEksportertSykefaværsstatistikk
             );
             return 0;
         }
-
+        int antallSlettetEksportertPerKvartal = eksporteringRepository.slettEksportertPerKvartal();
+        log.info("Slettet '{}' rader fra forrige eksportering.", antallSlettetEksportertPerKvartal);
         List<VirksomhetMetadata> virksomhetMetadata =
                 virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal);
 
