@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.security.token.support.core.api.Protected;
-import no.nav.security.token.support.core.api.Unprotected;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +28,7 @@ public class EksporteringController {
     public ResponseEntity<HttpStatus> reeksportMedKafka(
             @RequestParam int årstall,
             @RequestParam int kvartal,
-            @RequestParam(required = false) int begrensningTil
+            @RequestParam(required = false, defaultValue = "0") int begrensningTil
     ) {
         EksporteringBegrensning eksporteringBegrensning = begrensningTil == 0 ?
                 EksporteringBegrensning.build().utenBegrensning() :
