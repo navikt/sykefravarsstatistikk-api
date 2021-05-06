@@ -132,11 +132,12 @@ public class KafkaService {
                         res.getProducerRecord().key(),
                         res.getRecordMetadata().offset()
                 );
+                /*
                 kafkaUtsendingHistorikkRepository.opprettHistorikk(
                         virksomhetSykefravær.getOrgnr(),
                         keyAsJsonString,
                         dataAsJsonString
-                );
+                );*/
             }
         });
     }
