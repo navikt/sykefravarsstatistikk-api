@@ -48,7 +48,7 @@ public class ApplikasjonDBConfig {
         HikariConfig config = new HikariConfig();
         config.setPoolName("Sykefraværsstatistikk-connection-pool");
         config.setJdbcUrl(databaseUrl);
-        config.setMaximumPoolSize(12);
+        config.setMaximumPoolSize(8);
         config.setMinimumIdle(1);
         return HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(config, mountPath, dbRole(user));
     }
