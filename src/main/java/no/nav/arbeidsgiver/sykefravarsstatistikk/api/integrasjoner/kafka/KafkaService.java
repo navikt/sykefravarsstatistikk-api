@@ -39,9 +39,12 @@ public class KafkaService {
         this.kafkaUtsendingHistorikkRepository = kafkaUtsendingHistorikkRepository;
     }
 
-    public void nullstillUtsendingRapport() {
-        log.info("Gjør utsendingrapport klar før utsending på Kafka topic {}", kafkaProperties.getTopic());
-        kafkaUtsendingRapport.reset();
+    public void nullstillUtsendingRapport(int totalMeldingerTilUtsending) {
+        log.info("Gjør utsendingrapport klar før utsending på Kafka topic '{}'. '{}' meldinger vil bli sendt.",
+                kafkaProperties.getTopic(),
+                totalMeldingerTilUtsending
+        );
+        kafkaUtsendingRapport.reset(totalMeldingerTilUtsending);
     }
 
     public int getAntallMeldingerMottattForUtsending() {

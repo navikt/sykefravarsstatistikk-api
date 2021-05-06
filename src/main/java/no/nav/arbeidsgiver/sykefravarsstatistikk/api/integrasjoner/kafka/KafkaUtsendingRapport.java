@@ -20,6 +20,7 @@ public class KafkaUtsendingRapport {
     private AtomicInteger antallMålet;
     private AtomicLong totaltTidUtsendingTilKafka;
     private AtomicLong totaltTidOppdaterDB;
+    private int totalMeldingerTilUtsending;
 
 
 
@@ -35,7 +36,8 @@ public class KafkaUtsendingRapport {
         totaltTidOppdaterDB = new AtomicLong();
     }
 
-    public void reset() {
+    public void reset(int totalMeldingerTilUtsending) {
+        this.totalMeldingerTilUtsending = totalMeldingerTilUtsending;
         antallMeldingerMottattForUtsending.set(0);
         antallMeldingerIError.set(0);
         antallMeldingerSent.set(0);
@@ -68,7 +70,7 @@ public class KafkaUtsendingRapport {
 
     private void loggVedSisteMelding() {
         boolean erSisteMelding =
-                (antallMeldingerSent.get() + antallMeldingerIError.get()) == antallMeldingerMottattForUtsending.get();
+                (antallMeldingerSent.get() + antallMeldingerIError.get()) == totalMeldingerTilUtsending;
 
         if (erSisteMelding) {
             log.info("Siste meldingen er sent. '{}' meldinger er bekreftet sent. '{}' meldinger i error. ",
