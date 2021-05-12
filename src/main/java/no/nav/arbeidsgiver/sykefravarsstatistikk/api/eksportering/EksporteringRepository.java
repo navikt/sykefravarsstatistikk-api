@@ -84,4 +84,27 @@ public class EksporteringRepository {
                 parametre
         );
     }
+
+    public int hentAntallIkkeFerdigEksportert() {
+        SqlParameterSource parametre =
+                new MapSqlParameterSource()
+                        .addValue("eksportert", false);
+
+        return namedParameterJdbcTemplate.queryForObject(
+                "select count(*) from eksport_per_kvartal " +
+                        "where eksportert = :eksportert ",
+                parametre,
+                Integer.class
+        );
+    }
+
+    public int slettEksportertPerKvartal() {
+        SqlParameterSource parametre =
+                new MapSqlParameterSource();
+
+        return namedParameterJdbcTemplate.update(
+                "delete from eksport_per_kvartal",
+                parametre);
+
+    }
 }

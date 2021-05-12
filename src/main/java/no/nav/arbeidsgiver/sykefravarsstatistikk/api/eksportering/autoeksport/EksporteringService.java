@@ -105,7 +105,7 @@ public class EksporteringService {
             ÅrstallOgKvartal årstallOgKvartal
     ) throws KafkaUtsendingException {
         long startEksportering = System.currentTimeMillis();
-        kafkaService.nullstillUtsendingRapport();
+        kafkaService.nullstillUtsendingRapport(virksomheterTilEksport.size());
 
         List<VirksomhetMetadata> virksomhetMetadataListe =
                 virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal);
@@ -336,7 +336,7 @@ public class EksporteringService {
 
         return new VirksomhetSykefravær(
                 virksomhetMetadata.getOrgnr(),
-                "",
+                virksomhetMetadata.getNavn(),
                 new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
                 sfStatistikk.getTapteDagsverk(),
                 sfStatistikk.getMuligeDagsverk(),

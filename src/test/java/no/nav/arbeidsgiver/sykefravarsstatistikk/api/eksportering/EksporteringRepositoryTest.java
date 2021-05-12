@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringBegrensning;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import org.junit.jupiter.api.AfterEach;
@@ -13,14 +12,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.sql.Date;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_1;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -120,17 +116,47 @@ class EksporteringRepositoryTest {
         assertEquals(true, actual.oppdatert.isAfter(testStartDato));
     }
 
-    private int opprettTestVirksomhetMetaData(int årstall, int kvartal, String orgnr) {
+    @Test
+    void hentAntallIkkeEksportertRader__skal_retunere_riktig_tall() {
+
+        opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_1);
+        opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_2);
+        opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_3, true);
+
+        int antallIkkeFerdigEksportert = eksporteringRepository.hentAntallIkkeFerdigEksportert();
+        assertEquals(2, antallIkkeFerdigEksportert);
+    }
+
+    @Test
+    void slettEksportertPerKvartal__skal_slette_alt() {
+
+        opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_1);
+        opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_2);
+        opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_3, true);
+
+        int antallSlettet = eksporteringRepository.slettEksportertPerKvartal();
+        assertEquals(3, antallSlettet);
+        List<VirksomhetEksportPerKvartalMedDatoer> results = hentAlleVirksomhetEksportPerKvartal();
+        assertEquals(0, results.size());
+
+    }
+
+    private void opprettTestVirksomhetMetaData(int årstall, int kvartal, String orgnr) {
+        opprettTestVirksomhetMetaData(årstall, kvartal, orgnr, false);
+    }
+
+    private int opprettTestVirksomhetMetaData(int årstall, int kvartal, String orgnr, boolean eksportert) {
         SqlParameterSource parametre =
                 new MapSqlParameterSource()
                         .addValue("orgnr", orgnr)
                         .addValue("årstall", årstall)
-                        .addValue("kvartal", kvartal);
+                        .addValue("kvartal", kvartal)
+                        .addValue("eksportert", eksportert);
         return jdbcTemplate.update(
                 "insert into eksport_per_kvartal " +
-                        "(orgnr, arstall, kvartal) " +
+                        "(orgnr, arstall, kvartal, eksportert) " +
                         "values " +
-                        "(:orgnr, :årstall, :kvartal)",
+                        "(:orgnr, :årstall, :kvartal, :eksportert)",
                 parametre
         );
     }
