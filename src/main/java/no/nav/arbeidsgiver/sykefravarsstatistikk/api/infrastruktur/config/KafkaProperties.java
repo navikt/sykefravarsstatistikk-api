@@ -35,8 +35,8 @@ public class KafkaProperties {
 	private final String clientId = "sykefravarsstatistikk-api";
 	private final String valueSerializerClass = StringSerializer.class.getName();
 	private final String keySerializerCLass = StringSerializer.class.getName();
-	private final Integer retries = Integer.MAX_VALUE;
-	private final Integer deliveryTimeoutMs = 11100;
+	private final Integer retries = 10;
+	private final Integer deliveryTimeoutMs = 60000;
 	private final Integer requestTimeoutMs = 10000;
 	private final Integer lingerMs = 100;
 	private final Integer batchSize = 16384*10;
