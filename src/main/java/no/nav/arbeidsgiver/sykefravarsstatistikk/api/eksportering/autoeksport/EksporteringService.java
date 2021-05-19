@@ -122,6 +122,9 @@ public class EksporteringService {
         List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet =
                 sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(årstallOgKvartal);
 
+        Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighetMap =
+                toMap(sykefraværsstatistikkVirksomhetUtenVarighet);
+
         SykefraværMedKategori landSykefravær = getSykefraværMedKategoriForLand(
                 årstallOgKvartal,
                 sykefraværsstatistikkLand
@@ -148,7 +151,7 @@ public class EksporteringService {
                             sykefraværsstatistikkSektor,
                             sykefraværsstatistikkNæring,
                             sykefraværsstatistikkNæring5Siffer,
-                            sykefraværsstatistikkVirksomhetUtenVarighet,
+                            sykefraværsstatistikkVirksomhetUtenVarighetMap,
                             landSykefravær,
                             antallEksportert,
                             virksomheterTilEksport.size()
@@ -174,13 +177,22 @@ public class EksporteringService {
         return antallEksportert.get();
     }
 
+    private Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> toMap(List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet) {
+        Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> map = new HashMap<>();
+        sykefraværsstatistikkVirksomhetUtenVarighet.forEach( sf -> {
+            map.put(sf.getOrgnr(), sf);
+        });
+
+        return map;
+    }
+
     protected void sendIBatch(
             List<VirksomhetMetadata> virksomheterMetadata,
             ÅrstallOgKvartal årstallOgKvartal,
             List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor,
             List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring,
             List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer,
-            List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet,
+            Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet,
             SykefraværMedKategori landSykefravær,
             AtomicInteger antallEksportert,
             int antallTotaltStatistikk
@@ -341,6 +353,23 @@ public class EksporteringService {
                 sfStatistikk.getTapteDagsverk(),
                 sfStatistikk.getMuligeDagsverk(),
                 sfStatistikk.getAntallPersoner()
+        );
+    }
+
+    protected static VirksomhetSykefravær getVirksomhetSykefravær(
+            VirksomhetMetadata virksomhetMetadata,
+            Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet
+    ) {
+        SykefraværsstatistikkVirksomhetUtenVarighet sfStatistikk =
+                sykefraværsstatistikkVirksomhetUtenVarighet.get(virksomhetMetadata.getOrgnr());
+
+        return new VirksomhetSykefravær(
+                virksomhetMetadata.getOrgnr(),
+                virksomhetMetadata.getNavn(),
+                new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
+                sfStatistikk != null? sfStatistikk.getTapteDagsverk() : null,
+                sfStatistikk != null? sfStatistikk.getMuligeDagsverk() : null,
+                sfStatistikk != null? sfStatistikk.getAntallPersoner() : 0
         );
     }
 
