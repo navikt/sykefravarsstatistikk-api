@@ -39,7 +39,7 @@ public class KafkaProperties {
 	private final Integer deliveryTimeoutMs = 120000; // 2 min (default)
 	private final Integer requestTimeoutMs = 10000;
 	private final Integer lingerMs = 100;
-	private final Integer batchSize = 16384*100;
+	private final Integer batchSize = 16384*10; // størrelse av en melding er mellom 1000 bytes og 20K bytes (virksomhet med 70+ 5siffer næringskoder)
 	private final Integer maxInFlightRequestsPerConnection = 5; // default
 
 	public Map<String, Object> asProperties() {
