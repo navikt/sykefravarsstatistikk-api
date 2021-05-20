@@ -66,6 +66,27 @@ public class EksporteringRepository {
         );
     }
 
+    public void batchOppdaterTilEksportert(
+            List<String> virksomheterSomSkalFlaggesSomEksportert,
+            ÅrstallOgKvartal årstallOgKvartal
+    ) {
+        SqlParameterSource parametre =
+                new MapSqlParameterSource()
+                        .addValue("årstall", årstallOgKvartal.getÅrstall())
+                        .addValue("kvartal", årstallOgKvartal.getKvartal())
+                        .addValue("orgnrListe", virksomheterSomSkalFlaggesSomEksportert)
+                        .addValue("eksportert", true)
+                        .addValue("oppdatert", LocalDateTime.now());
+
+        namedParameterJdbcTemplate.update(
+                "update eksport_per_kvartal set eksportert = :eksportert, oppdatert = :oppdatert " +
+                        "where arstall = :årstall " +
+                        "and kvartal = :kvartal " +
+                        "and orgnr in (:orgnrListe) ",
+                parametre
+        );
+    }
+
     @Async
     public void oppdaterTilEksportert(VirksomhetEksportPerKvartal virksomhetTilEksport) {
         SqlParameterSource parametre =

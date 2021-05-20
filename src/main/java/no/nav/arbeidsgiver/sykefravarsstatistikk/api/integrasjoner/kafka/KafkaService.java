@@ -153,12 +153,12 @@ public class KafkaService {
         return kafkaUtsendingRapport.getRåDataVedDetaljertMåling();
     }
 
-    public void addProcessingTime(
-            long startUtsendingProcess,
-            long stopUtsendingProcess,
-            long startWriteToDB,
-            long stopWriteToDB
-    ) {
-        kafkaUtsendingRapport.addProcessingTime(startUtsendingProcess, stopUtsendingProcess, startWriteToDB, stopWriteToDB);
+    public void addUtsendingTilKafkaProcessingTime(long startUtsendingProcess, long stopUtsendingProcess) {
+        kafkaUtsendingRapport.addUtsendingTilKafkaProcessingTime(startUtsendingProcess, stopUtsendingProcess);
     }
+
+    public void addDBOppdateringProcessingTime(long startDBOppdateringProcess, long stopDBOppdateringProcess) {
+        kafkaUtsendingRapport.addDBOppdateringProcessingTime(startDBOppdateringProcess, stopDBOppdateringProcess);
+    }
+
 }

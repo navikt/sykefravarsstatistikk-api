@@ -179,7 +179,7 @@ public class EksporteringService {
 
     private Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> toMap(List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet) {
         Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> map = new HashMap<>();
-        sykefraværsstatistikkVirksomhetUtenVarighet.forEach( sf -> {
+        sykefraværsstatistikkVirksomhetUtenVarighet.forEach(sf -> {
             map.put(sf.getOrgnr(), sf);
         });
 
@@ -197,7 +197,9 @@ public class EksporteringService {
             AtomicInteger antallEksportert,
             int antallTotaltStatistikk
     ) {
-        AtomicInteger antallSentTilEksportOgOppdatertIDatabase = new AtomicInteger();
+        AtomicInteger antallSentTilEksport = new AtomicInteger();
+        AtomicInteger antallOppdatertIDB = new AtomicInteger();
+        List<String> virksomheterSomSkalFlaggesSomEksportert = new ArrayList<>();
 
         virksomheterMetadata.stream().forEach(
                 virksomhetMetadata -> {
@@ -226,42 +228,73 @@ public class EksporteringService {
                         );
 
                         long stopUtsendingProcess = System.nanoTime();
-                        long startWriteToDB = System.nanoTime();
-                        eksporteringRepository.oppdaterTilEksportert(
-                                new VirksomhetEksportPerKvartal(
-                                        new Orgnr(virksomhetMetadata.getOrgnr()),
-                                        new ÅrstallOgKvartal(
-                                                virksomhetMetadata.getÅrstall(),
-                                                virksomhetMetadata.getKvartal()
-                                        ),
-                                        false
-                                )
+                        antallSentTilEksport.getAndIncrement();
+                        kafkaService.addUtsendingTilKafkaProcessingTime(startUtsendingProcess, stopUtsendingProcess);
+                        // synkrone kall til DB hver 1000 virksomheter prosessert
+                        int antallOppdatert = leggTilVirksomheterSomSkalFlaggesSomEksportertListaOgOppdaterDBIBatch(
+                                virksomhetMetadata.getOrgnr(),
+                                årstallOgKvartal,
+                                virksomheterSomSkalFlaggesSomEksportert
                         );
-                        long stopWriteToDB = System.nanoTime();
-                        antallSentTilEksportOgOppdatertIDatabase.getAndIncrement();
-
-                        kafkaService.addProcessingTime(
-                                startUtsendingProcess,
-                                stopUtsendingProcess,
-                                startWriteToDB,
-                                stopWriteToDB
-                        );
+                        antallOppdatertIDB.addAndGet(antallOppdatert);
                     }
                 }
         );
-        int eksportertHittilNå = antallEksportert.addAndGet(antallSentTilEksportOgOppdatertIDatabase.get());
+
+        int antallRestendeOppdatert = oppdaterTilEksportertOgNullstillLista(
+                årstallOgKvartal,
+                virksomheterSomSkalFlaggesSomEksportert
+        );
+        antallOppdatertIDB.addAndGet(antallRestendeOppdatert);
+        int eksportertHittilNå = antallEksportert.addAndGet(antallSentTilEksport.get());
+
         log.info(
                 String.format(
-                        "Eksportert '%d' rader av '%d' totalt",
+                        "Eksportert '%d' rader av '%d' totalt ('%d' oppdatert i DB)",
                         eksportertHittilNå,
-                        antallTotaltStatistikk
+                        antallTotaltStatistikk,
+                        antallOppdatertIDB.get()
                 )
         );
     }
 
+    private int leggTilVirksomheterSomSkalFlaggesSomEksportertListaOgOppdaterDBIBatch(
+            String orgnr,
+            ÅrstallOgKvartal årstallOgKvartal,
+            @NotNull List<String> virksomheterSomSkalFlaggesSomEksportert
+    ) {
+        virksomheterSomSkalFlaggesSomEksportert.add(orgnr);
+
+        if (virksomheterSomSkalFlaggesSomEksportert.size() == 1000) {
+            return oppdaterTilEksportertOgNullstillLista(årstallOgKvartal, virksomheterSomSkalFlaggesSomEksportert);
+        } else {
+            return 0;
+        }
+    }
+
+    private int oppdaterTilEksportertOgNullstillLista(
+            ÅrstallOgKvartal årstallOgKvartal,
+            List<String> virksomheterSomSkalFlaggesSomEksportert
+    ) {
+        int antallSomSkalOppdateres = virksomheterSomSkalFlaggesSomEksportert.size();
+        long startWriteToDB = System.nanoTime();
+        eksporteringRepository.batchOppdaterTilEksportert(
+                virksomheterSomSkalFlaggesSomEksportert,
+                årstallOgKvartal
+        );
+        virksomheterSomSkalFlaggesSomEksportert.clear();
+        long stopWriteToDB = System.nanoTime();
+
+        kafkaService.addDBOppdateringProcessingTime(startWriteToDB, stopWriteToDB);
+
+        return antallSomSkalOppdateres;
+    }
+
+
+
     @NotNull
     protected static Map<String, VirksomhetMetadata> getVirksomhetMetadataHashMap(
-            List<VirksomhetMetadata> virksomhetMetadataListe
+            @NotNull List<VirksomhetMetadata> virksomhetMetadataListe
     ) {
         HashMap<String, VirksomhetMetadata> virksomhetMetadataHashMap = new HashMap<>();
         virksomhetMetadataListe.stream().forEach(
@@ -367,9 +400,9 @@ public class EksporteringService {
                 virksomhetMetadata.getOrgnr(),
                 virksomhetMetadata.getNavn(),
                 new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
-                sfStatistikk != null? sfStatistikk.getTapteDagsverk() : null,
-                sfStatistikk != null? sfStatistikk.getMuligeDagsverk() : null,
-                sfStatistikk != null? sfStatistikk.getAntallPersoner() : 0
+                sfStatistikk != null ? sfStatistikk.getTapteDagsverk() : null,
+                sfStatistikk != null ? sfStatistikk.getMuligeDagsverk() : null,
+                sfStatistikk != null ? sfStatistikk.getAntallPersoner() : 0
         );
     }
 

@@ -13,12 +13,14 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ActiveProfiles("db-test")
@@ -117,6 +119,32 @@ class EksporteringRepositoryTest {
     }
 
     @Test
+    void batchOppdater_med_oppdatert_dato() {
+        LocalDateTime testStartDato = LocalDateTime.now();
+        List<String> virksomheterSomSkalOppdateres = new ArrayList<>();
+        virksomheterSomSkalOppdateres.add(ORGNR_VIRKSOMHET_1);
+        virksomheterSomSkalOppdateres.add(ORGNR_VIRKSOMHET_2);
+        opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_1);
+        opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_2);
+        opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_3);
+        List<VirksomhetEksportPerKvartalMedDatoer> resultsBefore = hentAlleVirksomhetEksportPerKvartal();
+        assertEquals(false, resultsBefore.get(0).eksportert);
+        assertEquals(false, resultsBefore.get(1).eksportert);
+        assertEquals(false, resultsBefore.get(2).eksportert);
+
+        eksporteringRepository.batchOppdaterTilEksportert(
+                virksomheterSomSkalOppdateres,
+                new ÅrstallOgKvartal(2020, 2)
+        );
+
+        List<VirksomhetEksportPerKvartalMedDatoer> results = hentAlleVirksomhetEksportPerKvartal();
+        assertEquals(3, results.size());
+        assertVirksomhetEksportPerKvartal(results, ORGNR_VIRKSOMHET_1, true, testStartDato);
+        assertVirksomhetEksportPerKvartal(results, ORGNR_VIRKSOMHET_2, true, testStartDato);
+        assertVirksomhetEksportPerKvartal(results, ORGNR_VIRKSOMHET_3, false, null);
+    }
+
+    @Test
     void hentAntallIkkeEksportertRader__skal_retunere_riktig_tall() {
 
         opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_1);
@@ -138,6 +166,29 @@ class EksporteringRepositoryTest {
         assertEquals(3, antallSlettet);
         List<VirksomhetEksportPerKvartalMedDatoer> results = hentAlleVirksomhetEksportPerKvartal();
         assertEquals(0, results.size());
+
+    }
+
+    private void assertVirksomhetEksportPerKvartal(
+            List<VirksomhetEksportPerKvartalMedDatoer> results,
+            String orgnr,
+            boolean expectedEksportert,
+            LocalDateTime oppdatertEtterDato
+    ) {
+        VirksomhetEksportPerKvartalMedDatoer actual = results
+                .stream()
+                .filter(
+                        v -> v.orgnr.getVerdi().equals(orgnr)
+                )
+                .findFirst()
+                .get();
+        assertEquals(expectedEksportert, actual.eksportert);
+
+        if (expectedEksportert) {
+            assertEquals(true, actual.oppdatert.isAfter(oppdatertEtterDato));
+        } else {
+            assertNull(actual.oppdatert);
+        }
 
     }
 
