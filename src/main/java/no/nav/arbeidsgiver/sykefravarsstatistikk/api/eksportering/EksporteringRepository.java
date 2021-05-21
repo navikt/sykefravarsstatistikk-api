@@ -11,8 +11,10 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class EksporteringRepository {
@@ -70,21 +72,27 @@ public class EksporteringRepository {
             List<String> virksomheterSomSkalFlaggesSomEksportert,
             ÅrstallOgKvartal årstallOgKvartal
     ) {
-        SqlParameterSource parametre =
-                new MapSqlParameterSource()
-                        .addValue("årstall", årstallOgKvartal.getÅrstall())
-                        .addValue("kvartal", årstallOgKvartal.getKvartal())
-                        .addValue("orgnrListe", virksomheterSomSkalFlaggesSomEksportert)
-                        .addValue("eksportert", true)
-                        .addValue("oppdatert", LocalDateTime.now());
+        List<BatchUpdateVirksomhetTilEksport> batchliste = virksomheterSomSkalFlaggesSomEksportert
+                .stream()
+                .map(
+                        orgnr -> new BatchUpdateVirksomhetTilEksport(
+                                orgnr,
+                                årstallOgKvartal.getÅrstall(),
+                                årstallOgKvartal.getKvartal(),
+                                true,
+                                LocalDateTime.now()
+                        )
+                )
+                .collect(Collectors.toList());
 
-        namedParameterJdbcTemplate.update(
+        SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(batchliste.toArray());
+
+        namedParameterJdbcTemplate.batchUpdate(
                 "update eksport_per_kvartal set eksportert = :eksportert, oppdatert = :oppdatert " +
                         "where arstall = :årstall " +
                         "and kvartal = :kvartal " +
-                        "and orgnr in (:orgnrListe) ",
-                parametre
-        );
+                        "and orgnr =:orgnr ",
+                batch);
     }
 
     @Async
@@ -127,5 +135,27 @@ public class EksporteringRepository {
                 "delete from eksport_per_kvartal",
                 parametre);
 
+    }
+
+    private static class BatchUpdateVirksomhetTilEksport {
+        String orgnr;
+        int årstall;
+        int kvartal;
+        boolean eksportert;
+        LocalDateTime oppdatert;
+
+        public BatchUpdateVirksomhetTilEksport(String orgnr, int årstall, int kvartal, boolean eksportert, LocalDateTime oppdatert) {
+            this.orgnr = orgnr;
+            this.årstall = årstall;
+            this.kvartal = kvartal;
+            this.eksportert = eksportert;
+            this.oppdatert = oppdatert;
+        }
+
+        public String getOrgnr() { return orgnr; }
+        public int getÅrstall() { return årstall; }
+        public int getKvartal() { return kvartal; }
+        public boolean isEksportert() { return eksportert; }
+        public LocalDateTime getOppdatert() { return oppdatert; }
     }
 }
