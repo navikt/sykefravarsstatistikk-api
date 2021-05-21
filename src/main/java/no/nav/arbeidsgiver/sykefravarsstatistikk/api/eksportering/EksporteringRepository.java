@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -10,12 +11,15 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class EksporteringRepository {
 
@@ -72,27 +76,35 @@ public class EksporteringRepository {
             List<String> virksomheterSomSkalFlaggesSomEksportert,
             ÅrstallOgKvartal årstallOgKvartal
     ) {
-        List<BatchUpdateVirksomhetTilEksport> batchliste = virksomheterSomSkalFlaggesSomEksportert
-                .stream()
-                .map(
-                        orgnr -> new BatchUpdateVirksomhetTilEksport(
-                                orgnr,
-                                årstallOgKvartal.getÅrstall(),
-                                årstallOgKvartal.getKvartal(),
-                                true,
-                                LocalDateTime.now()
-                        )
-                )
-                .collect(Collectors.toList());
+        try {
+            Connection connection = namedParameterJdbcTemplate.getJdbcTemplate().getDataSource().getConnection();
+            connection.setAutoCommit(false);
 
-        SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(batchliste.toArray());
+            List<BatchUpdateVirksomhetTilEksport> batchliste = virksomheterSomSkalFlaggesSomEksportert
+                    .stream()
+                    .map(
+                            orgnr -> new BatchUpdateVirksomhetTilEksport(
+                                    orgnr,
+                                    årstallOgKvartal.getÅrstall(),
+                                    årstallOgKvartal.getKvartal(),
+                                    true,
+                                    LocalDateTime.now()
+                            )
+                    )
+                    .collect(Collectors.toList());
 
-        namedParameterJdbcTemplate.batchUpdate(
-                "update eksport_per_kvartal set eksportert = :eksportert, oppdatert = :oppdatert " +
-                        "where arstall = :årstall " +
-                        "and kvartal = :kvartal " +
-                        "and orgnr =:orgnr ",
-                batch);
+            SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(batchliste.toArray());
+
+            namedParameterJdbcTemplate.batchUpdate(
+                    "update eksport_per_kvartal set eksportert = :eksportert, oppdatert = :oppdatert " +
+                            "where arstall = :årstall " +
+                            "and kvartal = :kvartal " +
+                            "and orgnr =:orgnr ",
+                    batch);
+            connection.commit();
+        } catch (SQLException throwables) {
+            log.warn("Fikk Exception i forsøk for å oppdatere eksport_per_kvartal", throwables);
+        }
     }
 
     @Async
@@ -152,10 +164,24 @@ public class EksporteringRepository {
             this.oppdatert = oppdatert;
         }
 
-        public String getOrgnr() { return orgnr; }
-        public int getÅrstall() { return årstall; }
-        public int getKvartal() { return kvartal; }
-        public boolean isEksportert() { return eksportert; }
-        public LocalDateTime getOppdatert() { return oppdatert; }
+        public String getOrgnr() {
+            return orgnr;
+        }
+
+        public int getÅrstall() {
+            return årstall;
+        }
+
+        public int getKvartal() {
+            return kvartal;
+        }
+
+        public boolean isEksportert() {
+            return eksportert;
+        }
+
+        public LocalDateTime getOppdatert() {
+            return oppdatert;
+        }
     }
 }
