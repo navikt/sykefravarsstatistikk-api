@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class VirksomhetMetadata {
     private final Orgnr orgnr;
-    private final String navn; // TODO: delete me
+    private final String navn; 
     private final String rectype;
     private final String sektor;
     private final String næring;
