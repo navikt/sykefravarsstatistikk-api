@@ -198,8 +198,8 @@ public class EksporteringService {
             int antallTotaltStatistikk
     ) {
         AtomicInteger antallSentTilEksport = new AtomicInteger();
-        AtomicInteger antallOppdatertIDB = new AtomicInteger();
-        List<String> virksomheterSomSkalFlaggesSomEksportert = new ArrayList<>();
+        AtomicInteger antallVirksomheterLagretSomEksportertIDb = new AtomicInteger();
+        List<String> eksporterteVirksomheterListe = new ArrayList<>();
 
         virksomheterMetadata.stream().forEach(
                 virksomhetMetadata -> {
@@ -231,21 +231,22 @@ public class EksporteringService {
                         antallSentTilEksport.getAndIncrement();
                         kafkaService.addUtsendingTilKafkaProcessingTime(startUtsendingProcess, stopUtsendingProcess);
                         // synkrone kall til DB hver 1000 virksomheter prosessert
-                        int antallOppdatert = leggTilVirksomheterSomSkalFlaggesSomEksportertListaOgOppdaterDBIBatch(
-                                virksomhetMetadata.getOrgnr(),
-                                årstallOgKvartal,
-                                virksomheterSomSkalFlaggesSomEksportert
-                        );
-                        antallOppdatertIDB.addAndGet(antallOppdatert);
+                        int antallVirksomhetertLagretSomEksportert =
+                                leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
+                                        virksomhetMetadata.getOrgnr(),
+                                        årstallOgKvartal,
+                                        eksporterteVirksomheterListe
+                                );
+                        antallVirksomheterLagretSomEksportertIDb.addAndGet(antallVirksomhetertLagretSomEksportert);
                     }
                 }
         );
 
-        int antallRestendeOppdatert = oppdaterTilEksportertOgNullstillLista(
+        int antallRestendeOppdatert = lagreEksporterteVirksomheterOgNullstillLista(
                 årstallOgKvartal,
-                virksomheterSomSkalFlaggesSomEksportert
+                eksporterteVirksomheterListe
         );
-        antallOppdatertIDB.addAndGet(antallRestendeOppdatert);
+        antallVirksomheterLagretSomEksportertIDb.addAndGet(antallRestendeOppdatert);
         int eksportertHittilNå = antallEksportert.addAndGet(antallSentTilEksport.get());
 
         log.info(
@@ -253,12 +254,12 @@ public class EksporteringService {
                         "Eksportert '%d' rader av '%d' totalt ('%d' oppdatert i DB)",
                         eksportertHittilNå,
                         antallTotaltStatistikk,
-                        antallOppdatertIDB.get()
+                        antallVirksomheterLagretSomEksportertIDb.get()
                 )
         );
     }
 
-    private int leggTilVirksomheterSomSkalFlaggesSomEksportertListaOgOppdaterDBIBatch(
+    private int leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
             String orgnr,
             ÅrstallOgKvartal årstallOgKvartal,
             @NotNull List<String> virksomheterSomSkalFlaggesSomEksportert
@@ -266,19 +267,19 @@ public class EksporteringService {
         virksomheterSomSkalFlaggesSomEksportert.add(orgnr);
 
         if (virksomheterSomSkalFlaggesSomEksportert.size() == 1000) {
-            return oppdaterTilEksportertOgNullstillLista(årstallOgKvartal, virksomheterSomSkalFlaggesSomEksportert);
+            return lagreEksporterteVirksomheterOgNullstillLista(årstallOgKvartal, virksomheterSomSkalFlaggesSomEksportert);
         } else {
             return 0;
         }
     }
 
-    private int oppdaterTilEksportertOgNullstillLista(
+    private int lagreEksporterteVirksomheterOgNullstillLista(
             ÅrstallOgKvartal årstallOgKvartal,
             List<String> virksomheterSomSkalFlaggesSomEksportert
     ) {
         int antallSomSkalOppdateres = virksomheterSomSkalFlaggesSomEksportert.size();
         long startWriteToDB = System.nanoTime();
-        eksporteringRepository.batchOppdaterTilEksportert(
+        eksporteringRepository.batchOpprettVirksomheterBekreftetEksportert(
                 virksomheterSomSkalFlaggesSomEksportert,
                 årstallOgKvartal
         );

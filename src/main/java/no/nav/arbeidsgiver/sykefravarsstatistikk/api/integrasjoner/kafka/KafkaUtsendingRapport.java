@@ -114,10 +114,11 @@ public class KafkaUtsendingRapport {
 
     public String getRåDataVedDetaljertMåling() {
         return String.format(
-                "Antall målet er: '%d', totaltTidUtsendingTilKafka er '%d', totaltTidOppdaterDB er '%d'",
+                "Antall målet er: '%d', totaltTidUtsendingTilKafka er '%d' (in millis), " +
+                        "totaltTidOppdaterDB er '%d' (in millis)",
                 antallUtsendigerMålet.get(),
-                totaltTidUtsendingTilKafka.get(),
-                totaltTidOppdaterDB.get()
+                totaltTidUtsendingTilKafka.get() / 1000,
+                totaltTidOppdaterDB.get() / 1000
         );
     }
 

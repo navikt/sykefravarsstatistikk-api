@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -70,6 +69,37 @@ public class EksporteringRepository {
                                 resultSet.getBoolean("eksportert")
                         )
         );
+    }
+
+    public int batchOpprettVirksomheterBekreftetEksportert(
+            List<String> virksomheterSomErBekreftetEksportert,
+            ÅrstallOgKvartal årstallOgKvartal
+
+    ) {
+
+        List<BatchUpdateVirksomhetTilEksport> virksomheter = virksomheterSomErBekreftetEksportert
+                .stream()
+                .map(
+                        orgnr -> new BatchUpdateVirksomhetTilEksport(
+                                orgnr,
+                                årstallOgKvartal.getÅrstall(),
+                                årstallOgKvartal.getKvartal(),
+                                true,
+                                LocalDateTime.now()
+                        )
+                )
+                .collect(Collectors.toList());
+
+        SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(virksomheter.toArray());
+
+        int[] results = namedParameterJdbcTemplate.batchUpdate(
+                "insert into virksomheter_bekreftet_eksportert " +
+                        "(orgnr, arstall, kvartal) " +
+                        "values " +
+                        "(:orgnr, :årstall, :kvartal)",
+                batch
+        );
+        return Arrays.stream(results).sum();
     }
 
     public void batchOppdaterTilEksportert(
