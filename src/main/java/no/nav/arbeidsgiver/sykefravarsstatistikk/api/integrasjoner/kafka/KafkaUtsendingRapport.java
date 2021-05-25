@@ -117,8 +117,8 @@ public class KafkaUtsendingRapport {
                 "Antall målet er: '%d', totaltTidUtsendingTilKafka er '%d' (in millis), " +
                         "totaltTidOppdaterDB er '%d' (in millis)",
                 antallUtsendigerMålet.get(),
-                totaltTidUtsendingTilKafka.get() / 1000,
-                totaltTidOppdaterDB.get() / 1000
+                totaltTidUtsendingTilKafka.get() / 1000000,
+                totaltTidOppdaterDB.get() / 1000000
         );
     }
 
