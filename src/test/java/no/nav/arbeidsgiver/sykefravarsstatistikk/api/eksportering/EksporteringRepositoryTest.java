@@ -27,6 +27,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DataJdbcTest
 class EksporteringRepositoryTest {
 
+    public static final Orgnr ORGNR_1 = new Orgnr(ORGNR_VIRKSOMHET_1);
+    public static final Orgnr ORGNR_2 = new Orgnr(ORGNR_VIRKSOMHET_2);
+    public static final Orgnr ORGNR_3 = new Orgnr(ORGNR_VIRKSOMHET_3);
+    public static final ÅrstallOgKvartal _2021_1 = new ÅrstallOgKvartal(2021, 1);
+
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -98,27 +103,6 @@ class EksporteringRepositoryTest {
     }
 
     @Test
-    void oppdater_med_oppdatert_dato() {
-        LocalDateTime testStartDato = LocalDateTime.now();
-        VirksomhetEksportPerKvartal virksomhetTilEksport = new VirksomhetEksportPerKvartal(
-                new Orgnr(ORGNR_VIRKSOMHET_1),
-                new ÅrstallOgKvartal(2020, 2),
-                false
-        );
-        opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_1);
-        List<VirksomhetEksportPerKvartalMedDatoer> resultsBefore = hentAlleVirksomhetEksportPerKvartal();
-        assertEquals(false, resultsBefore.get(0).eksportert);
-
-        eksporteringRepository.oppdaterTilEksportert(virksomhetTilEksport);
-
-        List<VirksomhetEksportPerKvartalMedDatoer> results = hentAlleVirksomhetEksportPerKvartal();
-        assertEquals(1, results.size());
-        VirksomhetEksportPerKvartalMedDatoer actual = results.get(0);
-        assertEquals(true, actual.eksportert);
-        assertEquals(true, actual.oppdatert.isAfter(testStartDato));
-    }
-
-    @Test
     void batchOpprettVirksomheterBekreftetEksportert__opprett_i_batch() {
         List<String> virksomheterBekreftetEksportert = new ArrayList<>();
         virksomheterBekreftetEksportert.add(ORGNR_VIRKSOMHET_1);
@@ -138,30 +122,54 @@ class EksporteringRepositoryTest {
     }
 
     @Test
-    void batchOppdater_med_oppdatert_dato() {
+    void oppdaterVirksomheterIEksportTabell__oppdater_virksomheter_som_er_bekreftet_eksportert_og_returnerer_antall_oppdatert() {
         LocalDateTime testStartDato = LocalDateTime.now();
-        List<String> virksomheterSomSkalOppdateres = new ArrayList<>();
-        virksomheterSomSkalOppdateres.add(ORGNR_VIRKSOMHET_1);
-        virksomheterSomSkalOppdateres.add(ORGNR_VIRKSOMHET_2);
-        opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_1);
-        opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_2);
-        opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_3);
-        List<VirksomhetEksportPerKvartalMedDatoer> resultsBefore = hentAlleVirksomhetEksportPerKvartal();
-        assertEquals(false, resultsBefore.get(0).eksportert);
-        assertEquals(false, resultsBefore.get(1).eksportert);
-        assertEquals(false, resultsBefore.get(2).eksportert);
+        createVirksomhetBekreftetEksportert(new VirksomhetBekreftetEksportert(ORGNR_1, _2021_1, testStartDato));
+        createVirksomhetBekreftetEksportert(new VirksomhetBekreftetEksportert(ORGNR_2, _2021_1, testStartDato));
 
-        eksporteringRepository.batchOppdaterTilEksportert(
-                virksomheterSomSkalOppdateres,
-                new ÅrstallOgKvartal(2020, 2)
+        createVirksomhetEksportPerKvartal(
+                new VirksomhetEksportPerKvartalMedDatoer(ORGNR_1, _2021_1, true, testStartDato, testStartDato)
+        );
+        createVirksomhetEksportPerKvartal(
+                new VirksomhetEksportPerKvartalMedDatoer(ORGNR_2, _2021_1, false, testStartDato, null)
+        );
+        createVirksomhetEksportPerKvartal(
+                new VirksomhetEksportPerKvartalMedDatoer(ORGNR_3, _2021_1, false, testStartDato, null)
         );
 
+        int antallOppdatert = eksporteringRepository.oppdaterAlleVirksomheterIEksportTabellSomErBekrreftetEksportert();
+
+        assertEquals(1, antallOppdatert);
         List<VirksomhetEksportPerKvartalMedDatoer> results = hentAlleVirksomhetEksportPerKvartal();
-        assertEquals(3, results.size());
-        assertVirksomhetEksportPerKvartal(results, ORGNR_VIRKSOMHET_1, true, testStartDato);
-        assertVirksomhetEksportPerKvartal(results, ORGNR_VIRKSOMHET_2, true, testStartDato);
-        assertVirksomhetEksportPerKvartal(results, ORGNR_VIRKSOMHET_3, false, null);
+        assertVirksomhetEksportPerKvartal(results, ORGNR_1.getVerdi(), true, testStartDato);
+        assertVirksomhetEksportPerKvartal(results, ORGNR_2.getVerdi(), true, testStartDato, true);
+        assertVirksomhetEksportPerKvartal(results, ORGNR_3.getVerdi(), false, testStartDato);
     }
+
+    @Test
+    void slettVirksomheterBekreftetEksportert__sletter_alle_rader_i_tabellen_og_returnerer_antall_slettet() {
+        createVirksomhetBekreftetEksportert(
+                new VirksomhetBekreftetEksportert(
+                        new Orgnr(ORGNR_VIRKSOMHET_1),
+                        new ÅrstallOgKvartal(2020, 1),
+                        LocalDateTime.now()
+                )
+        );
+        createVirksomhetBekreftetEksportert(
+                new VirksomhetBekreftetEksportert(
+                        new Orgnr(ORGNR_VIRKSOMHET_2),
+                        new ÅrstallOgKvartal(2020, 1),
+                        LocalDateTime.now()
+                )
+        );
+
+        int antallSlettet = eksporteringRepository.slettVirksomheterBekreftetEksportert();
+
+        assertEquals(2, antallSlettet);
+        List<VirksomhetEksportPerKvartalMedDatoer> results = hentAlleVirksomhetEksportPerKvartal();
+        assertEquals(0, hentAlleVirksomhetBekreftetEksportert().size());
+    }
+
 
     @Test
     void hentAntallIkkeEksportertRader__skal_retunere_riktig_tall() {
@@ -192,7 +200,17 @@ class EksporteringRepositoryTest {
             List<VirksomhetEksportPerKvartalMedDatoer> results,
             String orgnr,
             boolean expectedEksportert,
-            LocalDateTime oppdatertEtterDato
+            LocalDateTime oppdatertEtterDato) {
+
+        assertVirksomhetEksportPerKvartal(results, orgnr, expectedEksportert, oppdatertEtterDato, false);
+    }
+
+    private void assertVirksomhetEksportPerKvartal(
+            List<VirksomhetEksportPerKvartalMedDatoer> results,
+            String orgnr,
+            boolean expectedEksportert,
+            LocalDateTime oppdatertEtterDato,
+            boolean sjekkOppdatertDatoErEndret
     ) {
         VirksomhetEksportPerKvartalMedDatoer actual = results
                 .stream()
@@ -203,12 +221,13 @@ class EksporteringRepositoryTest {
                 .get();
         assertEquals(expectedEksportert, actual.eksportert);
 
-        if (expectedEksportert) {
-            assertEquals(true, actual.oppdatert.isAfter(oppdatertEtterDato));
-        } else {
+        if (!expectedEksportert) {
             assertNull(actual.oppdatert);
         }
 
+        if (sjekkOppdatertDatoErEndret) {
+            assertEquals(true, actual.oppdatert.isAfter(oppdatertEtterDato));
+        }
     }
 
     private void assertVirksomhetBekreftetEksportert(
@@ -256,6 +275,19 @@ class EksporteringRepositoryTest {
         return jdbcTemplate.update(
                 "insert into eksport_per_kvartal (orgnr, arstall, kvartal, eksportert, oppdatert) " +
                         "values (:orgnr, :årstall, :kvartal, :eksportert, :oppdatert)",
+                parametre);
+    }
+
+    private int createVirksomhetBekreftetEksportert(VirksomhetBekreftetEksportert virksomhet) {
+        MapSqlParameterSource parametre = new MapSqlParameterSource()
+                .addValue("orgnr", virksomhet.orgnr.getVerdi())
+                .addValue("årstall", virksomhet.årstallOgKvartal.getÅrstall())
+                .addValue("kvartal", virksomhet.årstallOgKvartal.getKvartal())
+                .addValue("opprettet", virksomhet.opprettet);
+
+        return jdbcTemplate.update(
+                "insert into virksomheter_bekreftet_eksportert (orgnr, arstall, kvartal, opprettet) " +
+                        "values (:orgnr, :årstall, :kvartal, :opprettet)",
                 parametre);
     }
 

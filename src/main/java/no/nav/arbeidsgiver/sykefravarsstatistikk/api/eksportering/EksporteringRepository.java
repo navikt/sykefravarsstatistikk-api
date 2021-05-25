@@ -102,56 +102,15 @@ public class EksporteringRepository {
         return Arrays.stream(results).sum();
     }
 
-    public void batchOppdaterTilEksportert(
-            List<String> virksomheterSomSkalFlaggesSomEksportert,
-            ÅrstallOgKvartal årstallOgKvartal
-    ) {
-        try {
-            Connection connection = namedParameterJdbcTemplate.getJdbcTemplate().getDataSource().getConnection();
-            connection.setAutoCommit(false);
-
-            List<BatchUpdateVirksomhetTilEksport> batchliste = virksomheterSomSkalFlaggesSomEksportert
-                    .stream()
-                    .map(
-                            orgnr -> new BatchUpdateVirksomhetTilEksport(
-                                    orgnr,
-                                    årstallOgKvartal.getÅrstall(),
-                                    årstallOgKvartal.getKvartal(),
-                                    true,
-                                    LocalDateTime.now()
-                            )
-                    )
-                    .collect(Collectors.toList());
-
-            SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(batchliste.toArray());
-
-            namedParameterJdbcTemplate.batchUpdate(
-                    "update eksport_per_kvartal set eksportert = :eksportert, oppdatert = :oppdatert " +
-                            "where arstall = :årstall " +
-                            "and kvartal = :kvartal " +
-                            "and orgnr =:orgnr ",
-                    batch);
-            connection.commit();
-        } catch (SQLException throwables) {
-            log.warn("Fikk Exception i forsøk for å oppdatere eksport_per_kvartal", throwables);
-        }
-    }
-
-    @Async
-    public void oppdaterTilEksportert(VirksomhetEksportPerKvartal virksomhetTilEksport) {
+    public int oppdaterAlleVirksomheterIEksportTabellSomErBekrreftetEksportert() {
         SqlParameterSource parametre =
                 new MapSqlParameterSource()
-                        .addValue("årstall", virksomhetTilEksport.getÅrstall())
-                        .addValue("kvartal", virksomhetTilEksport.getKvartal())
-                        .addValue("orgnr", virksomhetTilEksport.getOrgnr())
-                        .addValue("eksportert", true)
                         .addValue("oppdatert", LocalDateTime.now());
 
-        namedParameterJdbcTemplate.update(
-                "update eksport_per_kvartal set eksportert = :eksportert, oppdatert = :oppdatert " +
-                        "where arstall = :årstall " +
-                        "and kvartal = :kvartal " +
-                        "and orgnr = :orgnr ",
+        return namedParameterJdbcTemplate.update(
+                "update eksport_per_kvartal set eksportert = true, oppdatert = :oppdatert " +
+                        "where orgnr in (select orgnr from virksomheter_bekreftet_eksportert) " +
+                        "and eksportert = false ",
                 parametre
         );
     }
@@ -178,6 +137,16 @@ public class EksporteringRepository {
                 parametre);
 
     }
+
+    public int slettVirksomheterBekreftetEksportert() {
+        SqlParameterSource parametre =
+                new MapSqlParameterSource();
+
+        return namedParameterJdbcTemplate.update(
+                "delete from virksomheter_bekreftet_eksportert",
+                parametre);
+    }
+
 
     private static class BatchUpdateVirksomhetTilEksport {
         String orgnr;

@@ -249,6 +249,8 @@ public class EksporteringService {
         antallVirksomheterLagretSomEksportertIDb.addAndGet(antallRestendeOppdatert);
         int eksportertHittilNå = antallEksportert.addAndGet(antallSentTilEksport.get());
 
+        cleanUpEtterBatch();
+
         log.info(
                 String.format(
                         "Eksportert '%d' rader av '%d' totalt ('%d' oppdatert i DB)",
@@ -257,6 +259,11 @@ public class EksporteringService {
                         antallVirksomheterLagretSomEksportertIDb.get()
                 )
         );
+    }
+
+    private void cleanUpEtterBatch() {
+        eksporteringRepository.oppdaterAlleVirksomheterIEksportTabellSomErBekrreftetEksportert();
+        eksporteringRepository.slettVirksomheterBekreftetEksportert();
     }
 
     private int leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
