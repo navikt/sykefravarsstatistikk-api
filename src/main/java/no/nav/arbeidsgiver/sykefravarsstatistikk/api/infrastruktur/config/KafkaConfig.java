@@ -15,14 +15,14 @@ class KafkaConfig {
 	@Bean
 	KafkaTemplate<String, String> kafkaTemplate(KafkaProperties kafkaProperties) {
 		KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>(
-				new DefaultKafkaProducerFactory<String, String>(kafkaProperties.asProperties())
+				new DefaultKafkaProducerFactory<>(kafkaProperties.asProperties())
 		);
 		kafkaTemplate.setProducerListener(getProducerListener());
 		return kafkaTemplate;
 	}
 
 	ProducerListener<String, String> getProducerListener() {
-		return new ProducerListener<String, String>() {
+		return new ProducerListener<>() {
 			@Override
 			public void onSuccess(ProducerRecord<String, String> producerRecord, RecordMetadata recordMetadata) {
 				log.debug(

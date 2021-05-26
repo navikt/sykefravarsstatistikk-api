@@ -43,6 +43,7 @@ public class EksporteringService {
     private final KafkaService kafkaService;
     private final boolean erEksporteringAktivert;
 
+    public static final int OPPDATER_VIRKSOMHETER_SOM_ER_EKSPORTERT_BATCH_STØRRELSE = 1000;
     public static final int EKSPORT_BATCH_STØRRELSE = 10000;
 
     public EksporteringService(
@@ -122,6 +123,9 @@ public class EksporteringService {
         List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet =
                 sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(årstallOgKvartal);
 
+        Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighetMap =
+                toMap(sykefraværsstatistikkVirksomhetUtenVarighet);
+
         SykefraværMedKategori landSykefravær = getSykefraværMedKategoriForLand(
                 årstallOgKvartal,
                 sykefraværsstatistikkLand
@@ -148,7 +152,7 @@ public class EksporteringService {
                             sykefraværsstatistikkSektor,
                             sykefraværsstatistikkNæring,
                             sykefraværsstatistikkNæring5Siffer,
-                            sykefraværsstatistikkVirksomhetUtenVarighet,
+                            sykefraværsstatistikkVirksomhetUtenVarighetMap,
                             landSykefravær,
                             antallEksportert,
                             virksomheterTilEksport.size()
@@ -174,18 +178,29 @@ public class EksporteringService {
         return antallEksportert.get();
     }
 
+    private Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> toMap(List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet) {
+        Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> map = new HashMap<>();
+        sykefraværsstatistikkVirksomhetUtenVarighet.forEach(sf -> {
+            map.put(sf.getOrgnr(), sf);
+        });
+
+        return map;
+    }
+
     protected void sendIBatch(
             List<VirksomhetMetadata> virksomheterMetadata,
             ÅrstallOgKvartal årstallOgKvartal,
             List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor,
             List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring,
             List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer,
-            List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet,
+            Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet,
             SykefraværMedKategori landSykefravær,
             AtomicInteger antallEksportert,
             int antallTotaltStatistikk
     ) {
-        AtomicInteger antallSentTilEksportOgOppdatertIDatabase = new AtomicInteger();
+        AtomicInteger antallSentTilEksport = new AtomicInteger();
+        AtomicInteger antallVirksomheterLagretSomEksportertIDb = new AtomicInteger();
+        List<String> eksporterteVirksomheterListe = new ArrayList<>();
 
         virksomheterMetadata.stream().forEach(
                 virksomhetMetadata -> {
@@ -214,42 +229,81 @@ public class EksporteringService {
                         );
 
                         long stopUtsendingProcess = System.nanoTime();
-                        long startWriteToDB = System.nanoTime();
-                        eksporteringRepository.oppdaterTilEksportert(
-                                new VirksomhetEksportPerKvartal(
-                                        new Orgnr(virksomhetMetadata.getOrgnr()),
-                                        new ÅrstallOgKvartal(
-                                                virksomhetMetadata.getÅrstall(),
-                                                virksomhetMetadata.getKvartal()
-                                        ),
-                                        false
-                                )
-                        );
-                        long stopWriteToDB = System.nanoTime();
-                        antallSentTilEksportOgOppdatertIDatabase.getAndIncrement();
+                        antallSentTilEksport.getAndIncrement();
+                        kafkaService.addUtsendingTilKafkaProcessingTime(startUtsendingProcess, stopUtsendingProcess);
 
-                        kafkaService.addProcessingTime(
-                                startUtsendingProcess,
-                                stopUtsendingProcess,
-                                startWriteToDB,
-                                stopWriteToDB
-                        );
+                        int antallVirksomhetertLagretSomEksportert =
+                                leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
+                                        virksomhetMetadata.getOrgnr(),
+                                        årstallOgKvartal,
+                                        eksporterteVirksomheterListe
+                                );
+                        antallVirksomheterLagretSomEksportertIDb.addAndGet(antallVirksomhetertLagretSomEksportert);
                     }
                 }
         );
-        int eksportertHittilNå = antallEksportert.addAndGet(antallSentTilEksportOgOppdatertIDatabase.get());
+
+        int antallRestendeOppdatert = lagreEksporterteVirksomheterOgNullstillLista(
+                årstallOgKvartal,
+                eksporterteVirksomheterListe
+        );
+        antallVirksomheterLagretSomEksportertIDb.addAndGet(antallRestendeOppdatert);
+        int eksportertHittilNå = antallEksportert.addAndGet(antallSentTilEksport.get());
+
+        cleanUpEtterBatch();
+
         log.info(
                 String.format(
-                        "Eksportert '%d' rader av '%d' totalt",
+                        "Eksportert '%d' rader av '%d' totalt ('%d' oppdatert i DB)",
                         eksportertHittilNå,
-                        antallTotaltStatistikk
+                        antallTotaltStatistikk,
+                        antallVirksomheterLagretSomEksportertIDb.get()
                 )
         );
     }
 
+    private void cleanUpEtterBatch() {
+        eksporteringRepository.oppdaterAlleVirksomheterIEksportTabellSomErBekrreftetEksportert();
+        eksporteringRepository.slettVirksomheterBekreftetEksportert();
+    }
+
+    private int leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
+            String orgnr,
+            ÅrstallOgKvartal årstallOgKvartal,
+            @NotNull List<String> virksomheterSomSkalFlaggesSomEksportert
+    ) {
+        virksomheterSomSkalFlaggesSomEksportert.add(orgnr);
+
+        if (virksomheterSomSkalFlaggesSomEksportert.size() == OPPDATER_VIRKSOMHETER_SOM_ER_EKSPORTERT_BATCH_STØRRELSE) {
+            return lagreEksporterteVirksomheterOgNullstillLista(årstallOgKvartal, virksomheterSomSkalFlaggesSomEksportert);
+        } else {
+            return 0;
+        }
+    }
+
+    private int lagreEksporterteVirksomheterOgNullstillLista(
+            ÅrstallOgKvartal årstallOgKvartal,
+            List<String> virksomheterSomSkalFlaggesSomEksportert
+    ) {
+        int antallSomSkalOppdateres = virksomheterSomSkalFlaggesSomEksportert.size();
+        long startWriteToDB = System.nanoTime();
+        eksporteringRepository.batchOpprettVirksomheterBekreftetEksportert(
+                virksomheterSomSkalFlaggesSomEksportert,
+                årstallOgKvartal
+        );
+        virksomheterSomSkalFlaggesSomEksportert.clear();
+        long stopWriteToDB = System.nanoTime();
+
+        kafkaService.addDBOppdateringProcessingTime(startWriteToDB, stopWriteToDB);
+
+        return antallSomSkalOppdateres;
+    }
+
+
+
     @NotNull
     protected static Map<String, VirksomhetMetadata> getVirksomhetMetadataHashMap(
-            List<VirksomhetMetadata> virksomhetMetadataListe
+            @NotNull List<VirksomhetMetadata> virksomhetMetadataListe
     ) {
         HashMap<String, VirksomhetMetadata> virksomhetMetadataHashMap = new HashMap<>();
         virksomhetMetadataListe.stream().forEach(
@@ -341,6 +395,23 @@ public class EksporteringService {
                 sfStatistikk.getTapteDagsverk(),
                 sfStatistikk.getMuligeDagsverk(),
                 sfStatistikk.getAntallPersoner()
+        );
+    }
+
+    protected static VirksomhetSykefravær getVirksomhetSykefravær(
+            VirksomhetMetadata virksomhetMetadata,
+            Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet
+    ) {
+        SykefraværsstatistikkVirksomhetUtenVarighet sfStatistikk =
+                sykefraværsstatistikkVirksomhetUtenVarighet.get(virksomhetMetadata.getOrgnr());
+
+        return new VirksomhetSykefravær(
+                virksomhetMetadata.getOrgnr(),
+                virksomhetMetadata.getNavn(),
+                new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
+                sfStatistikk != null ? sfStatistikk.getTapteDagsverk() : null,
+                sfStatistikk != null ? sfStatistikk.getMuligeDagsverk() : null,
+                sfStatistikk != null ? sfStatistikk.getAntallPersoner() : 0
         );
     }
 

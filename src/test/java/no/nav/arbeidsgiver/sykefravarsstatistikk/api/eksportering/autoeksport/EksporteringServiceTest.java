@@ -3,12 +3,15 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.NæringOgNæringskode5siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.*;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -88,6 +92,58 @@ public class EksporteringServiceTest {
         );
 
         assertNull(result);
+    }
+
+    @Test
+    public void getVirksomhetSykefravær__returnerer_VirksomhetSykefravær_uten_statistikk__dersom_ingen_entry_matcher_Virksomhet() {
+        VirksomhetSykefravær actualVirksomhetSykefravær = EksporteringService.getVirksomhetSykefravær(
+                virksomhet1Metadata_2020_4,
+                buildMapAvSykefraværsstatistikkPerVirksomhet(10)
+        );
+
+        VirksomhetSykefravær expectedVirksomhetSykefravær = new VirksomhetSykefravær(
+                virksomhet1Metadata_2020_4.getOrgnr(),
+                virksomhet1Metadata_2020_4.getNavn(),
+                2020,
+                4,
+                null,
+                null,
+                0
+        );
+        assertEqualsVirksomhetSykefravær(expectedVirksomhetSykefravær, actualVirksomhetSykefravær);
+    }
+
+        @Test
+    public void getVirksomhetSykefravær__returnerer_VirksomhetSykefravær_som_matcher_Virksomhet() {
+        VirksomhetMetadata virksomhetToBeFound = new VirksomhetMetadata(
+                new Orgnr("399000"),
+                "Virksomhet 1",
+                RECTYPE_FOR_VIRKSOMHET,
+                "1",
+                "11",
+                __2020_4
+        );
+        Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> bigMap =
+                buildMapAvSykefraværsstatistikkPerVirksomhet(500000);
+
+        long startWithMap = System.nanoTime();
+        VirksomhetSykefravær actualVirksomhetSykefravær = EksporteringService.getVirksomhetSykefravær(
+                virksomhetToBeFound,
+                bigMap
+        );
+        long stopWithMap = System.nanoTime();
+
+        VirksomhetSykefravær expectedVirksomhetSykefravær = new VirksomhetSykefravær(
+                virksomhetToBeFound.getOrgnr(),
+                virksomhetToBeFound.getNavn(),
+                2020,
+                4,
+                new BigDecimal(100),
+                new BigDecimal(1000),
+                10
+        );
+        assertEqualsVirksomhetSykefravær(expectedVirksomhetSykefravær, actualVirksomhetSykefravær);
+        System.out.println("Elapsed time in nanoseconds (With Map) = " + (stopWithMap - startWithMap));
     }
 
     @Test
@@ -239,4 +295,29 @@ public class EksporteringServiceTest {
         ));
     }
 
+
+    private static Map<String, SykefraværsstatistikkVirksomhetUtenVarighet>
+    buildMapAvSykefraværsstatistikkPerVirksomhet(
+            int size
+    ) {
+        Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighetMap =
+                new HashMap<>();
+
+        int count = 1;
+        do {
+            sykefraværsstatistikkVirksomhetUtenVarighetMap.put(
+                    Integer.toString(count),
+                    new SykefraværsstatistikkVirksomhetUtenVarighet(
+                            2020,
+                            4,
+                            Integer.toString(count),
+                            10,
+                            new BigDecimal(100),
+                            new BigDecimal(1000)
+                    )
+            );
+            count++;
+        } while (count < size);
+        return sykefraværsstatistikkVirksomhetUtenVarighetMap;
+    }
 }

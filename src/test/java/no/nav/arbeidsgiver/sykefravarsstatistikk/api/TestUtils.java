@@ -22,4 +22,11 @@ public class TestUtils {
         jdbcTemplate.update("delete from sykefravar_statistikk_land", new MapSqlParameterSource());
         jdbcTemplate.update("delete from naring", new MapSqlParameterSource());
     }
+
+    public static void slettAllEksportDataFraDatabase(NamedParameterJdbcTemplate jdbcTemplate) {
+        jdbcTemplate.update("delete from virksomhet_metadata", new MapSqlParameterSource());
+        jdbcTemplate.update("delete from eksport_per_kvartal", new MapSqlParameterSource());
+        jdbcTemplate.update("delete from kafka_utsending_historikk", new MapSqlParameterSource());
+        jdbcTemplate.update("delete from virksomheter_bekreftet_eksportert", new MapSqlParameterSource());
+    }
 }

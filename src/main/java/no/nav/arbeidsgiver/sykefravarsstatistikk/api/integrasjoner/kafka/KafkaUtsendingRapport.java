@@ -17,7 +17,8 @@ public class KafkaUtsendingRapport {
     private final List<String> meldinger;
     private final List<Orgnr> sentVirksomheter;
     private final List<Orgnr> ikkeSentVirksomheter;
-    private AtomicInteger antallMålet;
+    private AtomicInteger antallUtsendigerMålet;
+    private AtomicInteger antallDBOppdateringerMålet;
     private AtomicLong totaltTidUtsendingTilKafka;
     private AtomicLong totaltTidOppdaterDB;
     private int totalMeldingerTilUtsending;
@@ -31,7 +32,8 @@ public class KafkaUtsendingRapport {
         meldinger = new ArrayList<>();
         sentVirksomheter = new ArrayList<>();
         ikkeSentVirksomheter = new ArrayList<>();
-        antallMålet = new AtomicInteger();
+        antallUtsendigerMålet = new AtomicInteger();
+        antallDBOppdateringerMålet = new AtomicInteger();
         totaltTidUtsendingTilKafka = new AtomicLong();
         totaltTidOppdaterDB = new AtomicLong();
     }
@@ -44,7 +46,8 @@ public class KafkaUtsendingRapport {
         meldinger.clear();
         sentVirksomheter.clear();
         ikkeSentVirksomheter.clear();
-        antallMålet.set(0);
+        antallUtsendigerMålet.set(0);
+        antallDBOppdateringerMålet.set(0);
         totaltTidUtsendingTilKafka.set(0);
         totaltTidOppdaterDB.set(0);
     }
@@ -94,38 +97,44 @@ public class KafkaUtsendingRapport {
     }
 
     public long getSnittTidUtsendingTilKafka() {
-        if (antallMålet.get() == 0) {
+        if (antallUtsendigerMålet.get() == 0) {
             return 0;
         }
 
-        return totaltTidUtsendingTilKafka.get() / antallMålet.get();
+        return totaltTidUtsendingTilKafka.get() / antallUtsendigerMålet.get();
     }
 
     public long getSnittTidOppdateringIDB() {
-        if (antallMålet.get() == 0) {
+        if (antallDBOppdateringerMålet.get() == 0) {
             return 0;
         }
 
-        return totaltTidOppdaterDB.get() / antallMålet.get();
+        return totaltTidOppdaterDB.get() / antallDBOppdateringerMålet.get();
     }
 
     public String getRåDataVedDetaljertMåling() {
         return String.format(
-                "Antall målet er: '%d', totaltTidUtsendingTilKafka er '%d', totaltTidOppdaterDB er '%d'",
-                antallMålet.get(),
-                totaltTidUtsendingTilKafka.get(),
-                totaltTidOppdaterDB.get()
+                "Antall målet er: '%d', totaltTidUtsendingTilKafka er '%d' (in millis), " +
+                        "totaltTidOppdaterDB er '%d' (in millis)",
+                antallUtsendigerMålet.get(),
+                totaltTidUtsendingTilKafka.get() / 1000000,
+                totaltTidOppdaterDB.get() / 1000000
         );
     }
 
-    public void addProcessingTime(
+    public void addUtsendingTilKafkaProcessingTime(
             long startUtsendingProcess,
-            long stopUtsendingProcess,
-            long startWriteToDb,
-            long stoptWriteToDb
+            long stopUtsendingProcess
     ) {
-        antallMålet.incrementAndGet();
+        antallUtsendigerMålet.incrementAndGet();
         totaltTidUtsendingTilKafka.addAndGet(stopUtsendingProcess - startUtsendingProcess);
-        totaltTidOppdaterDB.addAndGet(stoptWriteToDb - startWriteToDb);
+    }
+
+    public void addDBOppdateringProcessingTime(
+            long startDBOppdateringProcess,
+            long stopDBOppdateringProcess
+            ) {
+        antallDBOppdateringerMålet.incrementAndGet();
+        totaltTidOppdaterDB.addAndGet(stopDBOppdateringProcess - startDBOppdateringProcess);
     }
 }
