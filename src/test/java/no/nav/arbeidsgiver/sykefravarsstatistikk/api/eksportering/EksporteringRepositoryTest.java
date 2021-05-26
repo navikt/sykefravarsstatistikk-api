@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllEksportDataFraDatabase;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -40,13 +41,13 @@ class EksporteringRepositoryTest {
     @BeforeEach
     void setUp() {
         eksporteringRepository = new EksporteringRepository(jdbcTemplate);
-        slettAllStatistikkFraDatabase(jdbcTemplate);
+        slettAllEksportDataFraDatabase(jdbcTemplate);
 
     }
 
     @AfterEach
     void tearDown() {
-        slettAllStatistikkFraDatabase(jdbcTemplate);
+        slettAllEksportDataFraDatabase(jdbcTemplate);
     }
 
 
@@ -100,6 +101,19 @@ class EksporteringRepositoryTest {
 
         oppdaterteRader = eksporteringRepository.opprettEksport(Collections.emptyList());
         assertEquals(0, oppdaterteRader);
+    }
+
+    @Test
+    void batchOpprettVirksomheterBekreftetEksportert__oppretter_ingenting_hvis_lista_er_tom() {
+        List<String> virksomheterBekreftetEksportert = new ArrayList<>();
+
+        eksporteringRepository.batchOpprettVirksomheterBekreftetEksportert(
+                virksomheterBekreftetEksportert,
+                new ÅrstallOgKvartal(2020, 2)
+        );
+
+        List<VirksomhetBekreftetEksportert> results = hentAlleVirksomhetBekreftetEksportert();
+        assertEquals(0, results.size());
     }
 
     @Test

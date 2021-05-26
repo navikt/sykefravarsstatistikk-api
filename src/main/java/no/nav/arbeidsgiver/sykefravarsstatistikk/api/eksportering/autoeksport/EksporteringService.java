@@ -43,6 +43,7 @@ public class EksporteringService {
     private final KafkaService kafkaService;
     private final boolean erEksporteringAktivert;
 
+    public static final int OPPDATER_VIRKSOMHETER_SOM_ER_EKSPORTERT_BATCH_STØRRELSE = 1000;
     public static final int EKSPORT_BATCH_STØRRELSE = 10000;
 
     public EksporteringService(
@@ -231,7 +232,6 @@ public class EksporteringService {
                         antallSentTilEksport.getAndIncrement();
                         kafkaService.addUtsendingTilKafkaProcessingTime(startUtsendingProcess, stopUtsendingProcess);
 
-                        // synkrone kall til DB hver 1000 virksomheter prosessert
                         int antallVirksomhetertLagretSomEksportert =
                                 leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
                                         virksomhetMetadata.getOrgnr(),
@@ -274,7 +274,7 @@ public class EksporteringService {
     ) {
         virksomheterSomSkalFlaggesSomEksportert.add(orgnr);
 
-        if (virksomheterSomSkalFlaggesSomEksportert.size() == 1000) {
+        if (virksomheterSomSkalFlaggesSomEksportert.size() == OPPDATER_VIRKSOMHETER_SOM_ER_EKSPORTERT_BATCH_STØRRELSE) {
             return lagreEksporterteVirksomheterOgNullstillLista(årstallOgKvartal, virksomheterSomSkalFlaggesSomEksportert);
         } else {
             return 0;
