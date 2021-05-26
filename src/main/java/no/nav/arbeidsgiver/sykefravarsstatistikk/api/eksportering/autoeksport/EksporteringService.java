@@ -230,6 +230,7 @@ public class EksporteringService {
                         long stopUtsendingProcess = System.nanoTime();
                         antallSentTilEksport.getAndIncrement();
                         kafkaService.addUtsendingTilKafkaProcessingTime(startUtsendingProcess, stopUtsendingProcess);
+
                         // synkrone kall til DB hver 1000 virksomheter prosessert
                         int antallVirksomhetertLagretSomEksportert =
                                 leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
