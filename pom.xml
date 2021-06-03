@@ -124,7 +124,7 @@
         <dependency>
             <groupId>no.nav.common</groupId>
             <artifactId>log</artifactId>
-            <version>2.2021.05.03_09.21-91f2fc8f059e</version>
+            <version>2.2021.05.11_12.29-3d27c78d42c9</version>
         </dependency>
 
         <!-- Prometheus -->
