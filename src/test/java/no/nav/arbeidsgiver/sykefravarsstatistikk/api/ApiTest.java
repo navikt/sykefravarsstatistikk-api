@@ -181,14 +181,14 @@ public class ApiTest {
                         "    \"label\": \"NAV ARBEID OG YTELSER AVD OSLO\"," +
                         "    \"summertKorttidsOgLangtidsfravær\": {" +
                         "      \"summertKorttidsfravær\": {" +
-                        "        \"prosent\": 7.5," +
-                        "        \"tapteDagsverk\": 148.9," +
+                        "        \"prosent\": 5.5," +
+                        "        \"tapteDagsverk\": 110.3," +
                         "        \"muligeDagsverk\": 1990.3," +
                         "        \"erMaskert\": false," +
                         "        \"kvartaler\": [" +
                         "          {" +
                         "            \"årstall\": 2020," +
-                        "            \"kvartal\": 1" +
+                        "            \"kvartal\": 2" +
                         "          }" +
                         "        ]" +
                         "      }," +
@@ -200,25 +200,21 @@ public class ApiTest {
                         "        \"kvartaler\": [" +
                         "          {" +
                         "            \"årstall\": 2020," +
-                        "            \"kvartal\": 1" +
+                        "            \"kvartal\": 2" +
                         "          }" +
                         "        ]" +
                         "      }" +
                         "    }," +
                         "    \"summertGradertFravær\": {" +
-                        "      \"prosent\": 0.6," +
-                        "      \"tapteDagsverk\": 9.4," +
-                        "      \"muligeDagsverk\": 1500.0," +
+                        "      \"prosent\": 0.8," +
+                        "      \"tapteDagsverk\": 4.7," +
+                        "      \"muligeDagsverk\": 574.8," +
                         "      \"erMaskert\": false," +
                         "      \"kvartaler\": [" +
                         "        {" +
                         "          \"årstall\": 2020," +
-                        "          \"kvartal\": 1" +
-                        "        }," +
-                        "        {" +
-                        "          \"årstall\": 2020," +
                         "          \"kvartal\": 2" +
-                        "        }" +
+                        "        }"+
                         "      ]" +
                         "    }" +
                         "  }," +
@@ -227,15 +223,11 @@ public class ApiTest {
                         "    \"label\": \"Produksjon av nærings- og nytelsesmidler\"," +
                         "    \"summertKorttidsOgLangtidsfravær\": {" +
                         "      \"summertKorttidsfravær\": {" +
-                        "        \"prosent\": 5.5," +
-                        "        \"tapteDagsverk\": 123.3," +
-                        "        \"muligeDagsverk\": 2224.2," +
+                        "        \"prosent\": 3.3," +
+                        "        \"tapteDagsverk\": 33.2," +
+                        "        \"muligeDagsverk\": 999.1," +
                         "        \"erMaskert\": false," +
                         "        \"kvartaler\": [" +
-                        "          {" +
-                        "            \"årstall\": 2020," +
-                        "            \"kvartal\": 1" +
-                        "          }," +
                         "          {" +
                         "            \"årstall\": 2020," +
                         "            \"kvartal\": 2" +
@@ -243,15 +235,11 @@ public class ApiTest {
                         "        ]" +
                         "      }," +
                         "      \"summertLangtidsfravær\": {" +
-                        "        \"prosent\": 10.8," +
-                        "        \"tapteDagsverk\": 240.1," +
-                        "        \"muligeDagsverk\": 2224.2," +
+                        "        \"prosent\": 13.8," +
+                        "        \"tapteDagsverk\": 137.8," +
+                        "        \"muligeDagsverk\": 999.1," +
                         "        \"erMaskert\": false," +
                         "        \"kvartaler\": [" +
-                        "          {" +
-                        "            \"årstall\": 2020," +
-                        "            \"kvartal\": 1" +
-                        "          }," +
                         "          {" +
                         "            \"årstall\": 2020," +
                         "            \"kvartal\": 2" +
@@ -260,15 +248,11 @@ public class ApiTest {
                         "      }" +
                         "    }," +
                         "    \"summertGradertFravær\": {" +
-                        "      \"prosent\": 1.1," +
-                        "      \"tapteDagsverk\": 34.4," +
-                        "      \"muligeDagsverk\": 3000.0," +
+                        "      \"prosent\": 1.5," +
+                        "      \"tapteDagsverk\": 17.7," +
+                        "      \"muligeDagsverk\": 1149.6," +
                         "      \"erMaskert\": false," +
                         "      \"kvartaler\": [" +
-                        "        {" +
-                        "          \"årstall\": 2020," +
-                        "          \"kvartal\": 1" +
-                        "        }," +
                         "        {" +
                         "          \"årstall\": 2020," +
                         "          \"kvartal\": 2" +
