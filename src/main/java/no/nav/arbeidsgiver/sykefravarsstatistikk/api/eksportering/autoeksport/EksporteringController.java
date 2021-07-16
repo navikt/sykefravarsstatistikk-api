@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequestMapping(value = "eksportering")
-@Profile({"local", "dev"})
+@Profile({"local", "dev", "prod"})
 public class EksporteringController {
 
     private final EksporteringService eksporteringService;
