@@ -22,7 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>11</java.version>
-        <!-- dependencies -->
+        <!-- versjon til avhengigheter -->
         <oidc-support.version>1.3.8</oidc-support.version>
         <altinn-rettigheter-proxy-klient.version>2.0.2</altinn-rettigheter-proxy-klient.version>
         <micrometer.version>1.7.2</micrometer.version>
