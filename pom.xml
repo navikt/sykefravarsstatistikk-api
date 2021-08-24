@@ -31,7 +31,7 @@
         <wiremock.version>2.27.2</wiremock.version>
         <shedlock.version>4.25.0</shedlock.version>
         <unleash.version>4.4.0</unleash.version>
-        <no.nav.common-log.version>2.2021.07.01_07.04-4e699536ceb1</no.nav.common-log.version>
+        <no.nav.common-log.version>2.2021.08.02_06.51-3ab58c9d7b57</no.nav.common-log.version>
         <net.minidev.json-smart.version>2.4.7</net.minidev.json-smart.version>
         <com.nimbusds.nimbus-jose-jwt.version>8.22.1</com.nimbusds.nimbus-jose-jwt.version>
         <com.papertrailapp.logback-syslog4j.version>1.0.0</com.papertrailapp.logback-syslog4j.version>
