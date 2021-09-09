@@ -188,7 +188,7 @@ public class ApiTest {
                         "        \"kvartaler\": [" +
                         "          {" +
                         "            \"årstall\": 2020," +
-                        "            \"kvartal\": 2" +
+                        "            \"kvartal\": 3" +
                         "          }" +
                         "        ]" +
                         "      }," +
@@ -200,7 +200,7 @@ public class ApiTest {
                         "        \"kvartaler\": [" +
                         "          {" +
                         "            \"årstall\": 2020," +
-                        "            \"kvartal\": 2" +
+                        "            \"kvartal\": 3" +
                         "          }" +
                         "        ]" +
                         "      }" +
@@ -213,7 +213,7 @@ public class ApiTest {
                         "      \"kvartaler\": [" +
                         "        {" +
                         "          \"årstall\": 2020," +
-                        "          \"kvartal\": 2" +
+                        "          \"kvartal\": 3" +
                         "        }"+
                         "      ]" +
                         "    }" +
@@ -230,7 +230,7 @@ public class ApiTest {
                         "        \"kvartaler\": [" +
                         "          {" +
                         "            \"årstall\": 2020," +
-                        "            \"kvartal\": 2" +
+                        "            \"kvartal\": 3" +
                         "          }" +
                         "        ]" +
                         "      }," +
@@ -242,7 +242,7 @@ public class ApiTest {
                         "        \"kvartaler\": [" +
                         "          {" +
                         "            \"årstall\": 2020," +
-                        "            \"kvartal\": 2" +
+                        "            \"kvartal\": 3" +
                         "          }" +
                         "        ]" +
                         "      }" +
@@ -255,7 +255,7 @@ public class ApiTest {
                         "      \"kvartaler\": [" +
                         "        {" +
                         "          \"årstall\": 2020," +
-                        "          \"kvartal\": 2" +
+                        "          \"kvartal\": 3" +
                         "        }" +
                         "      ]" +
                         "    }" +
