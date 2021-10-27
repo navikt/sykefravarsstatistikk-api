@@ -24,23 +24,22 @@
         <java.version>11</java.version>
         <!-- versjon til avhengigheter -->
         <oidc-support.version>1.3.8</oidc-support.version>
-        <altinn-rettigheter-proxy-klient.version>2.0.2</altinn-rettigheter-proxy-klient.version>
-        <micrometer.version>1.7.2</micrometer.version>
-        <prometheus.version>0.11.0</prometheus.version>
+        <altinn-rettigheter-proxy-klient.version>2.0.3</altinn-rettigheter-proxy-klient.version>
+        <micrometer.version>1.7.4</micrometer.version>
+        <prometheus.version>0.12.0</prometheus.version>
         <mockito-junit-jupiter.version>3.11.2</mockito-junit-jupiter.version>
         <wiremock.version>2.27.2</wiremock.version>
-        <shedlock.version>4.25.0</shedlock.version>
+        <shedlock.version>4.27.0</shedlock.version>
         <unleash.version>4.4.0</unleash.version>
-        <no.nav.common-log.version>2.2021.07.01_07.04-4e699536ceb1</no.nav.common-log.version>
+        <no.nav.common-log.version>2.2021.08.02_06.51-3ab58c9d7b57</no.nav.common-log.version>
         <net.minidev.json-smart.version>2.4.7</net.minidev.json-smart.version>
         <com.nimbusds.nimbus-jose-jwt.version>8.22.1</com.nimbusds.nimbus-jose-jwt.version>
         <com.papertrailapp.logback-syslog4j.version>1.0.0</com.papertrailapp.logback-syslog4j.version>
-        <org.springdoc.springdoc-openapi-ui.version>1.5.10</org.springdoc.springdoc-openapi-ui.version>
-        <no.nav.vault-jdbc.version>1.3.7</no.nav.vault-jdbc.version>
+        <org.springdoc.springdoc-openapi-ui.version>1.5.11</org.springdoc.springdoc-openapi-ui.version>
+        <no.nav.vault-jdbc.version>1.3.9</no.nav.vault-jdbc.version>
         <com.oracle.ojdbc.ojdbc8.version>19.3.0.0</com.oracle.ojdbc.ojdbc8.version>
         <com.h2database.h2.version>1.4.200</com.h2database.h2.version>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
