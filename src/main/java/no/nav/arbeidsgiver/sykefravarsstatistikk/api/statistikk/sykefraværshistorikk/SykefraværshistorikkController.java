@@ -5,6 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikkService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertSykefraværService;
@@ -12,11 +13,17 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
 import no.nav.security.token.support.core.api.Protected;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 @Protected
 @RestController
@@ -114,5 +121,30 @@ public class SykefraværshistorikkController {
                 );
 
         return Arrays.asList(summertSykefraværshistorikkVirksomhet, summertSykefraværshistorikkBransjeEllerNæring);
+    }
+
+    @GetMapping(value = "/{orgnr}/sykefravarshistorikk/legemeldtsykefravarsprosent")
+    public LegemeldtSykefraværsprosent hentLegemeldtSykefraværsprosent(
+            @PathVariable("orgnr") String orgnrStr,
+            HttpServletRequest request
+    ) {
+        InnloggetBruker bruker = tilgangskontrollService.hentInnloggetBruker();
+
+        tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
+                new Orgnr(orgnrStr),
+                bruker,
+                request.getMethod(),
+                "" + request.getRequestURL()
+        );
+
+        return new LegemeldtSykefraværsprosent(
+                Statistikkategori.VIRKSOMHET,
+                "virksomhetsnavn",
+                BigDecimal.valueOf(getRandomNumber(0.5, 12.5)).setScale(1, RoundingMode.CEILING));
+    }
+
+    private double getRandomNumber(double min, double max) {
+        Random random = new Random();
+        return random.doubles(min, max).findFirst().getAsDouble();
     }
 }
