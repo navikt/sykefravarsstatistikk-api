@@ -1,11 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjetype;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,11 +16,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 @ActiveProfiles("db-test")
@@ -49,24 +47,15 @@ public class SykefraværRepositoryJdbcTest {
                 .næringskode(new Næringskode5Siffer("88911", "Barnehage"))
                 .antallAnsatte(10)
                 .overordnetEnhetOrgnr(new Orgnr("1111111111")).build();
-        lagDataset(barnehage);
+        persisterDatasetIDb(barnehage);
 
         List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(
                 barnehage,
                 new ÅrstallOgKvartal(2018,3));
+
         assertThat(resultat.size()).isEqualTo(4);
-        assertThat(resultat.get(0)).isEqualTo(new UmaskertSykefraværForEttKvartal(
-                new ÅrstallOgKvartal(2018, 3),
-                new BigDecimal(6),
-                new BigDecimal(100),
-                10
-        ));
-        assertThat(resultat.get(3)).isEqualTo(new UmaskertSykefraværForEttKvartal(
-                new ÅrstallOgKvartal(2019, 2),
-                new BigDecimal(2),
-                new BigDecimal(100),
-                10
-        ));
+        assertThat(resultat.get(0)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2018, 3, 6));
+        assertThat(resultat.get(3)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2));
     }
 
     @Test
@@ -76,26 +65,18 @@ public class SykefraværRepositoryJdbcTest {
                 .næringskode(new Næringskode5Siffer("88911", "Barnehage"))
                 .antallAnsatte(10)
                 .overordnetEnhetOrgnr(new Orgnr("1111111111")).build();
-        lagDataset(barnehage);
+        persisterDatasetIDb(barnehage);
 
         List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(
                 barnehage,
                 new ÅrstallOgKvartal(2019,1));
         assertThat(resultat.size()).isEqualTo(2);
-        assertThat(resultat.get(0)).isEqualTo(new UmaskertSykefraværForEttKvartal(
-                new ÅrstallOgKvartal(2019, 1),
-                new BigDecimal(3),
-                new BigDecimal(100),
-                10
-        ));
-        assertThat(resultat.get(1)).isEqualTo(new UmaskertSykefraværForEttKvartal(
-                new ÅrstallOgKvartal(2019, 2),
-                new BigDecimal(2),
-                new BigDecimal(100),
-                10
-        ));
+        assertThat(resultat.get(0)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 1, 3));
+        assertThat(resultat.get(1)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2));
     }
-    private void lagDataset(Underenhet barnehage) {
+
+
+    private void persisterDatasetIDb(Underenhet barnehage) {
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
@@ -132,11 +113,6 @@ public class SykefraværRepositoryJdbcTest {
                 .addValue("mulige_dagsverk", muligeDagsverk);
     }
 
-/*    private MapSqlParameterSource parametre(Næring næring, int årstall, int kvartal, int antallPersoner, int tapteDagsverk, int muligeDagsverk) {
-        return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
-                .addValue("naring_kode", næring.getKode());
-    }
-*/
     private MapSqlParameterSource parametre(
             Orgnr orgnr,
             int årstall,
@@ -148,4 +124,26 @@ public class SykefraværRepositoryJdbcTest {
         return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
                 .addValue("orgnr", orgnr.getVerdi());
     }
+
+    @NotNull
+    private static UmaskertSykefraværForEttKvartal sykefraværForEtÅrstallOgKvartal(int årstall, int kvartal, int totalTapteDagsverk) {
+        return sykefraværForEtÅrstallOgKvartal(årstall, kvartal, totalTapteDagsverk, 100, 10);
+    }
+
+    private static UmaskertSykefraværForEttKvartal sykefraværForEtÅrstallOgKvartal(
+            int årstall, 
+            int kvartal,
+            int totalTapteDagsverk,
+            int totalMuligeDagsverk,
+            int totalAntallPersoner
+    ) {
+        return new UmaskertSykefraværForEttKvartal(
+                new ÅrstallOgKvartal(årstall, kvartal),
+                new BigDecimal(totalTapteDagsverk),
+                new BigDecimal(totalMuligeDagsverk),
+                totalAntallPersoner
+        );
+    }
+
+
 }
