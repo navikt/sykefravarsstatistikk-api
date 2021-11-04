@@ -29,6 +29,13 @@ public class SykefraværRepositoryJdbcTest {
 
     private SykefraværRepository sykefraværRepository;
 
+    public static final Underenhet BARNEHAGE = Underenhet.builder().orgnr(new Orgnr("999999999"))
+            .navn("test Barnehage")
+            .næringskode(new Næringskode5Siffer("88911", "Barnehage"))
+            .antallAnsatte(10)
+            .overordnetEnhetOrgnr(new Orgnr("1111111111")).build();
+
+
     @BeforeEach
     public void setUp() {
         sykefraværRepository = new SykefraværRepository(jdbcTemplate);
@@ -40,18 +47,25 @@ public class SykefraværRepositoryJdbcTest {
         slettAllStatistikkFraDatabase(jdbcTemplate);
     }
 
+
     @Test
-    public void hentSykefraværprosentVirksomhet__skal_returnere_riktig_sykefravær() {
-        Underenhet barnehage = Underenhet.builder().orgnr(new Orgnr("999999999"))
-                .navn("test Barnehage")
-                .næringskode(new Næringskode5Siffer("88911", "Barnehage"))
-                .antallAnsatte(10)
-                .overordnetEnhetOrgnr(new Orgnr("1111111111")).build();
-        persisterDatasetIDb(barnehage);
+    public void hentSykefraværprosentVirksomhet__skal_returnerer_empty_list_dersom_ingen_data_funnet_for_årstall_og_kvartal() {
+        persisterDatasetIDb(BARNEHAGE);
 
         List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(
-                barnehage,
-                new ÅrstallOgKvartal(2018,3));
+                BARNEHAGE,
+                new ÅrstallOgKvartal(2021, 4));
+
+        assertThat(resultat.size()).isEqualTo(0);
+    }
+
+    @Test
+    public void hentSykefraværprosentVirksomhet__skal_returnere_riktig_sykefravær() {
+        persisterDatasetIDb(BARNEHAGE);
+
+        List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(
+                BARNEHAGE,
+                new ÅrstallOgKvartal(2018, 3));
 
         assertThat(resultat.size()).isEqualTo(4);
         assertThat(resultat.get(0)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2018, 3, 6));
@@ -60,16 +74,11 @@ public class SykefraværRepositoryJdbcTest {
 
     @Test
     public void hentSykefraværprosentVirksomhet__skal_returnere_riktig_sykefravær_for_ønskede_kvartaler() {
-        Underenhet barnehage = Underenhet.builder().orgnr(new Orgnr("999999999"))
-                .navn("test Barnehage")
-                .næringskode(new Næringskode5Siffer("88911", "Barnehage"))
-                .antallAnsatte(10)
-                .overordnetEnhetOrgnr(new Orgnr("1111111111")).build();
-        persisterDatasetIDb(barnehage);
+        persisterDatasetIDb(BARNEHAGE);
 
         List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(
-                barnehage,
-                new ÅrstallOgKvartal(2019,1));
+                BARNEHAGE,
+                new ÅrstallOgKvartal(2019, 1));
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 1, 3));
         assertThat(resultat.get(1)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2));
@@ -131,7 +140,7 @@ public class SykefraværRepositoryJdbcTest {
     }
 
     private static UmaskertSykefraværForEttKvartal sykefraværForEtÅrstallOgKvartal(
-            int årstall, 
+            int årstall,
             int kvartal,
             int totalTapteDagsverk,
             int totalMuligeDagsverk,

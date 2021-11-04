@@ -8,6 +8,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregiste
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikkService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertLegemeldtSykefraværService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertSykefraværService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertSykefraværshistorikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetBruker;
@@ -32,16 +33,23 @@ public class SykefraværshistorikkController {
     private final TilgangskontrollService tilgangskontrollService;
     private final EnhetsregisteretClient enhetsregisteretClient;
     private final SummertSykefraværService summertSykefraværService;
+    private final SummertLegemeldtSykefraværService summertLegemeldtSykefraværService;
+
+    public static final ÅrstallOgKvartal SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL = new ÅrstallOgKvartal(2021, 2);
+
 
     public SykefraværshistorikkController(
             KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService,
             TilgangskontrollService tilgangskontrollService,
             EnhetsregisteretClient enhetsregisteretClient,
-            SummertSykefraværService summertSykefraværService) {
+            SummertSykefraværService summertSykefraværService,
+            SummertLegemeldtSykefraværService summertLegemeldtSykefraværService
+    ) {
         this.kvartalsvisSykefraværshistorikkService = kvartalsvisSykefraværshistorikkService;
         this.tilgangskontrollService = tilgangskontrollService;
         this.enhetsregisteretClient = enhetsregisteretClient;
         this.summertSykefraværService = summertSykefraværService;
+        this.summertLegemeldtSykefraværService = summertLegemeldtSykefraværService;
     }
 
     @GetMapping(value = "/{orgnr}/sykefravarshistorikk/kvartalsvis")
@@ -109,14 +117,14 @@ public class SykefraværshistorikkController {
         SummertSykefraværshistorikk summertSykefraværshistorikkVirksomhet =
                 summertSykefraværService.hentSummertSykefraværshistorikk(
                         underenhet,
-                        new ÅrstallOgKvartal(2021, 2),
+                        SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL,
                         antallKvartaler
                 );
 
         SummertSykefraværshistorikk summertSykefraværshistorikkBransjeEllerNæring =
                 summertSykefraværService.hentSummertSykefraværshistorikkForBransjeEllerNæring(
                         underenhet,
-                        new ÅrstallOgKvartal(2021, 2),
+                        SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL,
                         antallKvartaler
                 );
 
@@ -136,15 +144,18 @@ public class SykefraværshistorikkController {
                 request.getMethod(),
                 "" + request.getRequestURL()
         );
+        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr(orgnrStr));
+
+        LegemeldtSykefraværsprosent legemeldtSykefraværsprosent =
+                summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
+                        underenhet,
+                        SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL
+                );
 
         return new LegemeldtSykefraværsprosent(
                 Statistikkategori.VIRKSOMHET,
                 "virksomhetsnavn",
-                BigDecimal.valueOf(getRandomNumber(0.5, 12.5)).setScale(1, RoundingMode.CEILING));
-    }
-
-    private double getRandomNumber(double min, double max) {
-        Random random = new Random();
-        return random.doubles(min, max).findFirst().getAsDouble();
+                legemeldtSykefraværsprosent.getProsent()
+        );
     }
 }
