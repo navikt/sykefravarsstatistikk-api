@@ -75,7 +75,7 @@ public class GraderingRepository {
                     new MapSqlParameterSource()
                             .addValue("orgnr", virksomhet.getOrgnr().getVerdi())
                             .addValue("rectype", RECTYPE_FOR_VIRKSOMHET),
-                    (rs, rowNum) -> mapTilKvartalsvisSykefravær(rs)
+                    (rs, rowNum) -> mapTilUmaskertSykefraværForEttKvartal(rs)
             );
         } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();
@@ -98,7 +98,7 @@ public class GraderingRepository {
                     new MapSqlParameterSource()
                             .addValue("naring", næring.getKode())
                             .addValue("rectype", RECTYPE_FOR_VIRKSOMHET),
-                    (rs, rowNum) -> mapTilKvartalsvisSykefravær(rs)
+                    (rs, rowNum) -> mapTilUmaskertSykefraværForEttKvartal(rs)
             );
         } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();
@@ -122,7 +122,7 @@ public class GraderingRepository {
                     new MapSqlParameterSource()
                             .addValue("naringKoder", bransje.getKoderSomSpesifisererNæringer())
                             .addValue("rectype", RECTYPE_FOR_VIRKSOMHET),
-                    (rs, rowNum) -> mapTilKvartalsvisSykefravær(rs)
+                    (rs, rowNum) -> mapTilUmaskertSykefraværForEttKvartal(rs)
             );
         } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();
@@ -130,7 +130,7 @@ public class GraderingRepository {
     }
 
 
-    private UmaskertSykefraværForEttKvartal mapTilKvartalsvisSykefravær(ResultSet rs) throws SQLException {
+    private UmaskertSykefraværForEttKvartal mapTilUmaskertSykefraværForEttKvartal(ResultSet rs) throws SQLException {
         return new UmaskertSykefraværForEttKvartal(
                 new ÅrstallOgKvartal(
                         rs.getInt("arstall"),
