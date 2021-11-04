@@ -22,12 +22,8 @@ public class SummertLegemeldtSykefraværService {
     ) {
         int antallKvartalerSomSkalSummeres = 4;
 
-        List<ÅrstallOgKvartal> kvartalerSomSkalSummeres = ÅrstallOgKvartal.range(
-                sistePubliserteÅrstallOgKvartal.minusKvartaler(antallKvartalerSomSkalSummeres - 1),
-                sistePubliserteÅrstallOgKvartal
-        );
-
-        ÅrstallOgKvartal elsdteÅrstallOgKvartal = kvartalerSomSkalSummeres.get(0);
+        ÅrstallOgKvartal elsdteÅrstallOgKvartal =
+                sistePubliserteÅrstallOgKvartal.minusKvartaler(antallKvartalerSomSkalSummeres - 1);
 
 
         List<UmaskertSykefraværForEttKvartal> sykefraværForEttKvartalListe =
@@ -36,7 +32,8 @@ public class SummertLegemeldtSykefraværService {
                         elsdteÅrstallOgKvartal
                 );
 
-        SummertSykefravær summertSykefravær = SummertSykefravær.getSummertSykefravær(sykefraværForEttKvartalListe);
+        SummertSykefravær summertSykefravær =
+                SummertSykefravær.getSummertSykefravær(sykefraværForEttKvartalListe);
 
         return new LegemeldtSykefraværsprosent(
                 Statistikkategori.VIRKSOMHET,

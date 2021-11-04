@@ -100,9 +100,9 @@ public class SykefraværRepository {
                         rs.getInt("arstall"),
                         rs.getInt("kvartal")
                 ),
-                rs.getBigDecimal("sum_tapte_dagsverk_gradert_sykemelding"),
-                rs.getBigDecimal("sum_mulige_dagsverk"),
-                rs.getInt("sum_antall_personer")
+                rs.getBigDecimal("tapte_dagsverk"),
+                rs.getBigDecimal("mulige_dagsverk"),
+                rs.getInt("antall_personer")
         );
     }
 }
