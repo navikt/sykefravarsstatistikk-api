@@ -152,10 +152,13 @@ public class SykefraværshistorikkController {
                         SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL
                 );
 
-        return new LegemeldtSykefraværsprosent(
-                Statistikkategori.VIRKSOMHET,
-                "virksomhetsnavn",
-                legemeldtSykefraværsprosent.getProsent()
-        );
+        // TODO: null er ikke robust nok
+        // LegemeldtSykefraværsprosent ---> til klient app (= front-end)
+        // eller trenger vi ett nytt/annet objekt?
+
+        if (legemeldtSykefraværsprosent.getProsent() == null) {
+
+        }
+        return legemeldtSykefraværsprosent;
     }
 }

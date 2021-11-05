@@ -60,6 +60,32 @@ public class SykefraværRepository {
         }
     }
 
+    public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefraværForEttKvartalListe(
+            Bransje bransje,
+            ÅrstallOgKvartal fraÅrstallOgKvartal
+    ) {
+        try {
+            return namedParameterJdbcTemplate.query(
+                    "SELECT sum(tapte_dagsverk) as tapte_dagsverk, sum(mulige_dagsverk) as mulige_dagsverk, sum(antall_personer) as antall_personer, arstall, kvartal " +
+                            "FROM sykefravar_statistikk_naring5siffer " +
+                            "where naring_kode in (:naringKoder) " +
+                            "and (" +
+                            "  (arstall = :arstall and kvartal >= :kvartal) " +
+                            "  or " +
+                            "  (arstall > :arstall)" +
+                            ") " +
+                            "group by arstall, kvartal " +
+                            "ORDER BY arstall, kvartal ",
+                    new MapSqlParameterSource()
+                            .addValue("naringKoder", bransje.getKoderSomSpesifisererNæringer())
+                            .addValue("arstall", fraÅrstallOgKvartal.getÅrstall())
+                            .addValue("kvartal", fraÅrstallOgKvartal.getKvartal()),
+                    (rs, rowNum) -> mapTilUmaskertSykefraværForEttKvartal(rs)
+            );
+        } catch (EmptyResultDataAccessException e) {
+            return Collections.emptyList();
+        }
+    }
     /*
     public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefraværForEttKvartalListe(Næring næring) {
         try {
@@ -77,21 +103,7 @@ public class SykefraværRepository {
         }
     }
 
-    public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefraværForEttKvartalListe(Bransje bransje) {
-        try {
-            return namedParameterJdbcTemplate.query(
-                    "SELECT sum(tapte_dagsverk) as tapte_dagsverk, sum(mulige_dagsverk) as mulige_dagsverk, sum(antall_personer) as antall_personer, arstall, kvartal " +
-                            "FROM sykefravar_statistikk_naring5siffer " +
-                            "where naring_kode in (:naringKoder) " +
-                            "group by arstall, kvartal " +
-                            "ORDER BY arstall, kvartal ",
-                    new MapSqlParameterSource()
-                            .addValue("naringKoder", bransje.getKoderSomSpesifisererNæringer()),
-                    (rs, rowNum) -> mapTilUmaskertSykefraværForEttKvartal(rs)
-            );
-        } catch (EmptyResultDataAccessException e) {
-            return Collections.emptyList();
-        }
+
     }*/
 
     private UmaskertSykefraværForEttKvartal mapTilUmaskertSykefraværForEttKvartal(ResultSet rs) throws SQLException {

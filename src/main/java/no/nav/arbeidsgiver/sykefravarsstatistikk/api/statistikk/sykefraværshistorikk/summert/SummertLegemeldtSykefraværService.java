@@ -39,10 +39,15 @@ public class SummertLegemeldtSykefraværService {
         SummertSykefravær summertSykefravær =
                 SummertSykefravær.getSummertSykefravær(sykefraværForEttKvartalListe);
 
-        return new LegemeldtSykefraværsprosent(
-                Statistikkategori.VIRKSOMHET,
-                underenhet.getNavn(),
-                summertSykefravær.getProsent()
-        );
+        // TODO: hva skjer hvis bedriften ikke har data i vår DB?
+        if (!summertSykefravær.isErMaskert()) {
+            return new LegemeldtSykefraværsprosent(
+                    Statistikkategori.VIRKSOMHET,
+                    underenhet.getNavn(),
+                    summertSykefravær.getProsent()
+            );
+        }
+
+        return null;
     }
 }
