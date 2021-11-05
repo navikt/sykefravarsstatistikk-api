@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +42,12 @@ public class Bransjeprogram {
     public Optional<Bransje> finnBransje(Underenhet underenhet) {
         return bransjer.stream()
                 .filter(bransje -> bransje.inkludererVirksomhet(underenhet))
+                .findAny();
+    }
+
+    public Optional<Bransje> finnBransje(Næringskode5Siffer næringskode5Siffer) {
+        return bransjer.stream()
+                .filter(bransje -> bransje.inkludererNæringskode(næringskode5Siffer))
                 .findAny();
     }
 }

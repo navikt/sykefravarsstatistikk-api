@@ -2,7 +2,9 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.LegemeldtSykefraværsprosent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
@@ -27,15 +29,17 @@ public class SummertLegemeldtSykefraværServiceTest {
     @Mock
     private SykefraværRepository sykefraværRepository;
 
-    @InjectMocks
+    @Mock
+    private KlassifikasjonerRepository klassifikasjonerRepository;
+
     private SummertLegemeldtSykefraværService summertLegemeldtSykefraværService;
 
-    // TODO sjekk om det er bedre å flytte summertLegemeldtSykefraværService hit og fjerne @InjectMocks
     @BeforeEach
     public void setUp() {
         summertLegemeldtSykefraværService = new SummertLegemeldtSykefraværService(
                 sykefraværRepository,
-                new Bransjeprogram()
+                new Bransjeprogram(),
+                new BransjeEllerNæringService(new Bransjeprogram(), klassifikasjonerRepository)
         );
 
     }
@@ -83,7 +87,6 @@ public class SummertLegemeldtSykefraværServiceTest {
         assertThat(legemeldtSykefraværsprosent.getType()).isEqualTo(Statistikkategori.BRANSJE);
         assertThat(legemeldtSykefraværsprosent.getLabel()).isEqualTo("Barnehager");
         assertThat(legemeldtSykefraværsprosent.getProsent()).isEqualTo(new BigDecimal(10.5));
-
     }
 
 

@@ -1,11 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 @Component
@@ -86,16 +83,26 @@ public class SykefraværRepository {
             return Collections.emptyList();
         }
     }
-    /*
-    public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefraværForEttKvartalListe(Næring næring) {
+
+    public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefraværForEttKvartalListe(
+            Næring næring,
+            ÅrstallOgKvartal fraÅrstallOgKvartal
+    ) {
         try {
             return namedParameterJdbcTemplate.query(
                     "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal " +
                             "FROM sykefravar_statistikk_naring " +
                             "where naring_kode = :naringKode " +
+                            "and (" +
+                            "  (arstall = :arstall and kvartal >= :kvartal) " +
+                            "  or " +
+                            "  (arstall > :arstall)" +
+                            ") " +
                             "ORDER BY arstall, kvartal ",
                     new MapSqlParameterSource()
-                            .addValue("naringKode", næring.getKode()),
+                            .addValue("naringKode", næring.getKode())
+                            .addValue("arstall", fraÅrstallOgKvartal.getÅrstall())
+                            .addValue("kvartal", fraÅrstallOgKvartal.getKvartal()),
                     (rs, rowNum) -> mapTilUmaskertSykefraværForEttKvartal(rs)
             );
         } catch (EmptyResultDataAccessException e) {
@@ -103,8 +110,6 @@ public class SykefraværRepository {
         }
     }
 
-
-    }*/
 
     private UmaskertSykefraværForEttKvartal mapTilUmaskertSykefraværForEttKvartal(ResultSet rs) throws SQLException {
         return new UmaskertSykefraværForEttKvartal(
