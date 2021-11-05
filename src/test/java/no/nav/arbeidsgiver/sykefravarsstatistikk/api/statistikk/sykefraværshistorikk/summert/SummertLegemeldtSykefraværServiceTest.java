@@ -1,15 +1,12 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.LegemeldtSykefraværsprosent;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +30,15 @@ public class SummertLegemeldtSykefraværServiceTest {
     @InjectMocks
     private SummertLegemeldtSykefraværService summertLegemeldtSykefraværService;
 
+    // TODO sjekk om det er bedre å flytte summertLegemeldtSykefraværService hit og fjerne @InjectMocks
+    @BeforeEach
+    public void setUp() {
+        summertLegemeldtSykefraværService = new SummertLegemeldtSykefraværService(
+                sykefraværRepository,
+                new Bransjeprogram()
+        );
+
+    }
 
     @Test
     public void legemeldtSykefraværsprosent_utleddes_fra_siste_4_kvartaler() {
@@ -57,7 +63,6 @@ public class SummertLegemeldtSykefraværServiceTest {
     }
 
 
-    @Disabled("Not implemented yet")
     @Test
     public void legemeldtSykefraværsprosent_henter_bransje_sykefraværssprosent_dersom_prosent_er_masker_for_bedriften() {
         lagTestDataTilRepository(4);
