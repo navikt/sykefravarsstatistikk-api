@@ -9,15 +9,14 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.LegemeldtSykefraværsprosent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,10 +37,11 @@ public class SummertLegemeldtSykefraværServiceTest {
     public void setUp() {
         summertLegemeldtSykefraværService = new SummertLegemeldtSykefraværService(
                 sykefraværRepository,
-                new Bransjeprogram(),
-                new BransjeEllerNæringService(new Bransjeprogram(), klassifikasjonerRepository)
+                new BransjeEllerNæringService(
+                        new Bransjeprogram(),
+                        klassifikasjonerRepository
+                )
         );
-
     }
 
     @Test
@@ -89,6 +89,47 @@ public class SummertLegemeldtSykefraværServiceTest {
         assertThat(legemeldtSykefraværsprosent.getProsent()).isEqualTo(new BigDecimal(10.5));
     }
 
+    @Test
+    public void legemeldtSykefraværsprosent_for_virksomheter_som_ikke_har_data_skal_returnere_bransje__dersom_virksomhet_er_i_bransjeprogram() {
+        lagTestDataTilRepositoryForBransje();
+        LegemeldtSykefraværsprosent legemeldtSykefraværsprosent =
+                summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
+                        new Underenhet(
+                                new Orgnr("456456456"),
+                                new Orgnr("654654654"),
+                                "Underenhet uten data i DB",
+                                new Næringskode5Siffer("88911", "Barnehager"),
+                                0
+                        ),
+                        new ÅrstallOgKvartal(2021, 2)
+                );
+
+        assertThat(legemeldtSykefraværsprosent).isNotNull();
+        assertThat(legemeldtSykefraværsprosent.getType()).isEqualTo(Statistikkategori.BRANSJE);
+        assertThat(legemeldtSykefraværsprosent.getLabel()).isEqualTo("Barnehager");
+        assertThat(legemeldtSykefraværsprosent.getProsent()).isEqualTo(new BigDecimal(8.5));
+    }
+
+    @Test
+    public void legemeldtSykefraværsprosent_for_virksomheter_som_ikke_har_data_skal_returnere_næring__dersom_virksomhet_ikke_er_i_bransjeprogram() {
+        lagTestDataTilRepositoryForNæring();
+        LegemeldtSykefraværsprosent legemeldtSykefraværsprosent =
+                summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
+                        new Underenhet(
+                                new Orgnr("456456456"),
+                                new Orgnr("654654654"),
+                                "Underenhet uten data i DB",
+                                new Næringskode5Siffer("88913", "Skolefritidsordninger"),
+                                0
+                        ),
+                        new ÅrstallOgKvartal(2021, 2)
+                );
+
+        assertThat(legemeldtSykefraværsprosent).isNotNull();
+        assertThat(legemeldtSykefraværsprosent.getType()).isEqualTo(Statistikkategori.NÆRING);
+        assertThat(legemeldtSykefraværsprosent.getLabel()).isEqualTo("Skolefritidsordninger");
+        assertThat(legemeldtSykefraværsprosent.getProsent()).isEqualTo(new BigDecimal(5.5));
+    }
 
     private void lagTestDataTilRepository() {
         when(sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(any(Virksomhet.class), any(ÅrstallOgKvartal.class)))
@@ -116,6 +157,35 @@ public class SummertLegemeldtSykefraværServiceTest {
                                 umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 1), 10)
                         )
                 );
+    }
+
+    private void lagTestDataTilRepositoryForBransje() {
+        when(sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(any(Virksomhet.class), any(ÅrstallOgKvartal.class)))
+                .thenReturn(Collections.emptyList());
+
+        when(sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(any(Bransje.class), any(ÅrstallOgKvartal.class)))
+                .thenReturn(
+                        Arrays.asList(
+                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 8),
+                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 1), 9)
+                        )
+                );
+    }
+
+    private void lagTestDataTilRepositoryForNæring() {
+        when(sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(any(Virksomhet.class), any(ÅrstallOgKvartal.class)))
+                .thenReturn(Collections.emptyList());
+
+        when(sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(any(Næring.class), any(ÅrstallOgKvartal.class)))
+                .thenReturn(
+                        Arrays.asList(
+                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 5),
+                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 1), 6)
+                        )
+                );
+        when(klassifikasjonerRepository.hentNæring(any())).thenReturn(
+                new Næring("88913", "Skolefritidsordninger")
+        );
     }
 
     private static UmaskertSykefraværForEttKvartal umaskertSykefraværprosent(

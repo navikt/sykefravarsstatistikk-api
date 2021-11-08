@@ -6,7 +6,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.LegemeldtSykefraværsprosent;
@@ -22,15 +21,12 @@ public class SummertLegemeldtSykefraværService {
     private final SykefraværRepository sykefraværprosentRepository;
     private final BransjeEllerNæringService bransjeEllerNæringService;
 
-    private final Bransjeprogram bransjeprogram;
 
     public SummertLegemeldtSykefraværService(
             SykefraværRepository sykefraværprosentRepository,
-            Bransjeprogram bransjeprogram,
             BransjeEllerNæringService bransjeEllerNæringService
     ) {
         this.sykefraværprosentRepository = sykefraværprosentRepository;
-        this.bransjeprogram = bransjeprogram;
         this.bransjeEllerNæringService = bransjeEllerNæringService;
     }
 
@@ -54,7 +50,6 @@ public class SummertLegemeldtSykefraværService {
         SummertSykefravær summertSykefravær =
                 SummertSykefravær.getSummertSykefravær(sykefraværForEttKvartalListe);
 
-        // TODO: hva skjer hvis bedriften ikke har data i vår DB?
         boolean erMaskert = summertSykefravær.isErMaskert();
         boolean harData = !(summertSykefravær.getKvartaler() == null || summertSykefravær.getKvartaler().isEmpty());
 
@@ -86,13 +81,14 @@ public class SummertLegemeldtSykefraværService {
             Næring næring = bransjeEllerNæring.getNæring();
             List<UmaskertSykefraværForEttKvartal> sykefraværForEttKvartalNæring =
                     sykefraværprosentRepository.hentUmaskertSykefraværForEttKvartalListe(
-                            næring, elsdteÅrstallOgKvartal
+                            næring,
+                            elsdteÅrstallOgKvartal
                     );
             SummertSykefravær summertSykefraværNæring =
                     SummertSykefravær.getSummertSykefravær(sykefraværForEttKvartalNæring);
 
             return new LegemeldtSykefraværsprosent(
-                    Statistikkategori.BRANSJE,
+                    Statistikkategori.NÆRING,
                     næring.getNavn(),
                     summertSykefraværNæring.getProsent()
             );
