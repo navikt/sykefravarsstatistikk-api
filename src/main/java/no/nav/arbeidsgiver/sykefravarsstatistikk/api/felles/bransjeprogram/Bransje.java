@@ -3,11 +3,9 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram;
 import lombok.Data;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Data
 public class Bransje {
@@ -49,13 +47,5 @@ public class Bransje {
     public boolean inkludererNæringskode(Næringskode5Siffer næringskode5Siffer) {
         String næringskode = næringskode5Siffer.getKode();
         return koderSomSpesifisererNæringer.stream().anyMatch(næringskode::startsWith);
-    }
-
-    public Statistikkategori getStatistikkategori() {
-        if (lengdePåNæringskoder() != 5) {
-            return Statistikkategori.NÆRING;
-        } else {
-            return Statistikkategori.BRANSJE;
-        }
     }
 }

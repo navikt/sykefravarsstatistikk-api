@@ -73,7 +73,7 @@ public class SummertLegemeldtSykefraværService {
                     SummertSykefravær.getSummertSykefravær(sykefraværForEttKvartalBransje);
 
             return new LegemeldtSykefraværsprosent(
-                    Statistikkategori.BRANSJE,
+                    bransjeEllerNæring.getStatistikkategori(),
                     bransje.getNavn(),
                     summertSykefraværBransje.getProsent()
             );
@@ -88,7 +88,7 @@ public class SummertLegemeldtSykefraværService {
                     SummertSykefravær.getSummertSykefravær(sykefraværForEttKvartalNæring);
 
             return new LegemeldtSykefraværsprosent(
-                    Statistikkategori.NÆRING,
+                    bransjeEllerNæring.getStatistikkategori(),
                     næring.getNavn(),
                     summertSykefraværNæring.getProsent()
             );
