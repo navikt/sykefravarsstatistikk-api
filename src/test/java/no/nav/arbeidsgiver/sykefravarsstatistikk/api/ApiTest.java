@@ -215,6 +215,24 @@ public class ApiTest {
         assertThat(responseBody).isEqualTo(objectMapper.readTree(getSummertSykefraværshistorikkResponseBody()));
     }
 
+    @Test
+    public void legemeldtSykefraværsprosent__når_virksomhet_ikke_har_næring_returnerer_204() throws Exception {
+        HttpResponse<String> response = newBuilder().build().send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + "555555555" +
+                                "/sykefravarshistorikk/legemeldtsykefravarsprosent")
+                        )
+                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .GET()
+                        .build(),
+                ofString()
+        );
+
+        assertThat(response.statusCode()).isEqualTo(204);
+        JsonNode body = objectMapper.readTree(response.body());
+
+        assertThat(body).isNullOrEmpty();
+    }
 
     private static String getSummertSykefraværshistorikkResponseBody() {
         return

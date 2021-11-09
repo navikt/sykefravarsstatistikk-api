@@ -1,10 +1,12 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.IngenNæringException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikkService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertLegemeldtSykefraværService;
@@ -24,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Protected
 @RestController
 public class SykefraværshistorikkController {
@@ -142,7 +145,16 @@ public class SykefraværshistorikkController {
                 request.getMethod(),
                 "" + request.getRequestURL()
         );
-        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr(orgnrStr));
+
+        Underenhet underenhet = null;
+        try {
+            underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr(orgnrStr));
+        } catch (IngenNæringException e) {
+            log.info("Underenhet har ingen næring. Returnerer 204 - No Content");
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .body(null);
+        }
 
         LegemeldtSykefraværsprosent legemeldtSykefraværsprosent =
                 summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
@@ -150,13 +162,12 @@ public class SykefraværshistorikkController {
                         SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL
                 );
 
-        // TODO sjekk repsonse med status no_content er bra nok for virksomheter uten verken data enten næring
-
         if (legemeldtSykefraværsprosent.getProsent() == null) {
             return ResponseEntity
                     .status(HttpStatus.NO_CONTENT)
                     .body(null);
         }
+
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(legemeldtSykefraværsprosent);
