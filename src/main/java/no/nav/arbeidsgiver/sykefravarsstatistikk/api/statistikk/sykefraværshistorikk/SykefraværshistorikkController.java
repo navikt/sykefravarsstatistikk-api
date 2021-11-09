@@ -3,10 +3,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikkService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertLegemeldtSykefraværService;
@@ -15,17 +13,16 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
 import no.nav.security.token.support.core.api.Protected;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 @Protected
 @RestController
@@ -133,7 +130,7 @@ public class SykefraværshistorikkController {
     }
 
     @GetMapping(value = "/{orgnr}/sykefravarshistorikk/legemeldtsykefravarsprosent")
-    public LegemeldtSykefraværsprosent hentLegemeldtSykefraværsprosent(
+    public ResponseEntity<LegemeldtSykefraværsprosent> hentLegemeldtSykefraværsprosent(
             @PathVariable("orgnr") String orgnrStr,
             HttpServletRequest request
     ) {
@@ -153,13 +150,15 @@ public class SykefraværshistorikkController {
                         SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL
                 );
 
-        // TODO: null er ikke robust nok
-        // LegemeldtSykefraværsprosent ---> til klient app (= front-end)
-        // eller trenger vi ett nytt/annet objekt?
+        // TODO sjekk repsonse med status no_content er bra nok for virksomheter uten verken data enten næring
 
         if (legemeldtSykefraværsprosent.getProsent() == null) {
-
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .body(null);
         }
-        return legemeldtSykefraværsprosent;
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(legemeldtSykefraværsprosent);
     }
 }
