@@ -146,7 +146,7 @@ public class SykefraværshistorikkController {
                 "" + request.getRequestURL()
         );
 
-        Underenhet underenhet = null;
+        Underenhet underenhet;
         try {
             underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr(orgnrStr));
         } catch (IngenNæringException e) {
@@ -163,6 +163,7 @@ public class SykefraværshistorikkController {
                 );
 
         if (legemeldtSykefraværsprosent.getProsent() == null) {
+            log.info("Underenhet har ingen sykefraværsprosent tilgjengelig. Returnerer 204 - No Content");
             return ResponseEntity
                     .status(HttpStatus.NO_CONTENT)
                     .body(null);

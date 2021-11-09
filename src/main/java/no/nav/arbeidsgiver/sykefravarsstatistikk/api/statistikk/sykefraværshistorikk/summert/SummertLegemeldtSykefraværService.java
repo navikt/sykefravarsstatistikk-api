@@ -36,10 +36,8 @@ public class SummertLegemeldtSykefraværService {
             Underenhet underenhet,
             ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal
     ) {
-
         ÅrstallOgKvartal eldsteÅrstallOgKvartal =
                 sistePubliserteÅrstallOgKvartal.minusKvartaler(antallKvartalerSomSkalSummeres - 1);
-
 
         List<UmaskertSykefraværForEttKvartal> sykefraværForEttKvartalListe =
                 sykefraværprosentRepository.hentUmaskertSykefraværForEttKvartalListe(
@@ -65,12 +63,12 @@ public class SummertLegemeldtSykefraværService {
 
         if (bransjeEllerNæring.isBransje()) {
             Bransje bransje = bransjeEllerNæring.getBransje();
-            List<UmaskertSykefraværForEttKvartal> sykefraværForEttKvartalBransje =
+            List<UmaskertSykefraværForEttKvartal> listeAvSykefraværForEttKvartalForBransje =
                     sykefraværprosentRepository.hentUmaskertSykefraværForEttKvartalListe(
                             bransje, eldsteÅrstallOgKvartal
                     );
             SummertSykefravær summertSykefraværBransje =
-                    SummertSykefravær.getSummertSykefravær(sykefraværForEttKvartalBransje);
+                    SummertSykefravær.getSummertSykefravær(listeAvSykefraværForEttKvartalForBransje);
 
             return new LegemeldtSykefraværsprosent(
                     bransjeEllerNæring.getStatistikkategori(),
@@ -79,13 +77,13 @@ public class SummertLegemeldtSykefraværService {
             );
         } else {
             Næring næring = bransjeEllerNæring.getNæring();
-            List<UmaskertSykefraværForEttKvartal> sykefraværForEttKvartalNæring =
+            List<UmaskertSykefraværForEttKvartal> listeAvSykefraværForEttKvartalForNæring =
                     sykefraværprosentRepository.hentUmaskertSykefraværForEttKvartalListe(
                             næring,
                             eldsteÅrstallOgKvartal
                     );
             SummertSykefravær summertSykefraværNæring =
-                    SummertSykefravær.getSummertSykefravær(sykefraværForEttKvartalNæring);
+                    SummertSykefravær.getSummertSykefravær(listeAvSykefraværForEttKvartalForNæring);
 
             return new LegemeldtSykefraværsprosent(
                     bransjeEllerNæring.getStatistikkategori(),
