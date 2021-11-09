@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
@@ -23,20 +25,15 @@ public class SummertSykefraværService {
 
     private final VarighetRepository varighetRepository;
     private final GraderingRepository graderingRepository;
-    private final Bransjeprogram bransjeprogram;
-    private final KlassifikasjonerRepository klassifikasjonerRepository;
-
+    private final BransjeEllerNæringService bransjeEllerNæringService;
 
     public SummertSykefraværService(
             VarighetRepository varighetRepository,
             GraderingRepository graderingRepository,
-            Bransjeprogram bransjeprogram,
-            KlassifikasjonerRepository klassifikasjonerRepository
-    ) {
+            BransjeEllerNæringService bransjeEllerNæringService) {
         this.varighetRepository = varighetRepository;
         this.graderingRepository = graderingRepository;
-        this.bransjeprogram = bransjeprogram;
-        this.klassifikasjonerRepository = klassifikasjonerRepository;
+        this.bransjeEllerNæringService = bransjeEllerNæringService;
     }
 
     public SummertSykefraværshistorikk hentSummertSykefraværshistorikkForBransjeEllerNæring(
@@ -48,27 +45,26 @@ public class SummertSykefraværService {
             throw new IllegalArgumentException("Kan ikke summere færre enn ett kvartal");
         }
 
-        Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
-        boolean skalHenteDataPåNæring2Siffer =
-                bransje.isEmpty()
-                        || bransje.get().lengdePåNæringskoder() == 2;
-
         List<UmaskertSykefraværForEttKvartalMedVarighet> sykefraværVarighet;
         Statistikkategori type;
         String label;
         List<UmaskertSykefraværForEttKvartal> sykefraværGradering;
 
-        if (skalHenteDataPåNæring2Siffer) {
+        BransjeEllerNæring bransjeEllerNæring =
+                bransjeEllerNæringService.getBransjeEllerNæring(underenhet.getNæringskode());
+
+        if (!bransjeEllerNæring.isBransje()) {
             type = Statistikkategori.NÆRING;
-            Næring næring = klassifikasjonerRepository.hentNæring(underenhet.getNæringskode().hentNæringskode2Siffer());
+            Næring næring = bransjeEllerNæring.getNæring();
             label = næring.getNavn();
             sykefraværVarighet = varighetRepository.hentSykefraværForEttKvartalMedVarighet(næring);
             sykefraværGradering = graderingRepository.hentSykefraværForEttKvartalMedGradering(næring);
         } else {
             type = Statistikkategori.BRANSJE;
-            label = bransje.get().getNavn();
-            sykefraværVarighet = varighetRepository.hentSykefraværForEttKvartalMedVarighet(bransje.get());
-            sykefraværGradering = graderingRepository.hentSykefraværForEttKvartalMedGradering(bransje.get());
+            Bransje bransje = bransjeEllerNæring.getBransje();
+            label = bransjeEllerNæring.getBransje().getNavn();
+            sykefraværVarighet = varighetRepository.hentSykefraværForEttKvartalMedVarighet(bransje);
+            sykefraværGradering = graderingRepository.hentSykefraværForEttKvartalMedGradering(bransje);
         }
 
         SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =

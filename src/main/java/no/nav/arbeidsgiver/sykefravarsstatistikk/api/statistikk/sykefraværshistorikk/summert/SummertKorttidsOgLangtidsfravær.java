@@ -74,6 +74,7 @@ public class SummertKorttidsOgLangtidsfravær {
         );
     }
 
+    // TODO: bruk SummertSykefravær.getSummertSykefravær() i stedet
     @Deprecated
     private static SummertSykefravær getSummertSykefravær(
             List<UmaskertSykefraværForEttKvartal> kvartalsvisSykefravær

@@ -4,6 +4,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
@@ -41,6 +42,12 @@ public class SummertSykefraværServiceTest {
 
     private SummertSykefraværService summertSykefraværService;
 
+    private BransjeEllerNæringService bransjeEllerNæringService =
+            new BransjeEllerNæringService(
+                    new Bransjeprogram(),
+                    klassifikasjonerRepository
+            );
+
     private Underenhet barnehage;
     private static final ÅrstallOgKvartal _2020_3 = new ÅrstallOgKvartal(2020, 3);
     private static final ÅrstallOgKvartal _2020_2 = new ÅrstallOgKvartal(2020, 2);
@@ -54,8 +61,7 @@ public class SummertSykefraværServiceTest {
         summertSykefraværService = new SummertSykefraværService(
                 varighetRepository,
                 graderingRepository,
-                new Bransjeprogram(),
-                klassifikasjonerRepository
+                bransjeEllerNæringService
         );
         barnehage = Underenhet.builder().orgnr(new Orgnr("999999999"))
                 .navn("test Barnehage")
