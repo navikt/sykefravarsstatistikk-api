@@ -1,22 +1,23 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram;
 
+import io.vavr.control.Either;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 
-import java.util.Optional;
-
 public class BransjeEllerNæring {
-    private final Optional<Bransje> bransje;
-    private final Optional<Næring> næring;
+    public final Either<Bransje, Næring> verdi;
 
 
-    public BransjeEllerNæring(Optional<Bransje> bransje, Optional<Næring> næring) {
-        this.næring = næring;
-        this.bransje = bransje;
+    public BransjeEllerNæring(Bransje bransje) {
+        this.verdi = Either.left(bransje);
+    }
+
+    public BransjeEllerNæring(Næring næring) {
+        this.verdi = Either.right(næring);
     }
 
     public Statistikkategori getStatistikkategori() {
-        if (bransje.isPresent()) {
+        if (verdi.isLeft()) {
             return Statistikkategori.BRANSJE;
         } else {
             return Statistikkategori.NÆRING;
@@ -24,14 +25,14 @@ public class BransjeEllerNæring {
     }
 
     public boolean isBransje() {
-        return bransje.isPresent();
+        return verdi.isLeft();
     }
 
     public Bransje getBransje() {
-        return bransje.orElseThrow();
+        return verdi.getLeft();
     }
 
     public Næring getNæring() {
-        return næring.orElseThrow();
+        return verdi.get();
     }
 }

@@ -27,9 +27,9 @@ public class BransjeEllerNæringService {
 
         if (skalHenteDataPåNæring2Siffer) {
             Næring næring = klassifikasjonerRepository.hentNæring(næringskode5Siffer.hentNæringskode2Siffer());
-            return new BransjeEllerNæring(Optional.empty(), Optional.of(næring));
+            return new BransjeEllerNæring(næring);
+        } else {
+            return new BransjeEllerNæring(bransje.get());
         }
-
-        return new BransjeEllerNæring(bransje, Optional.empty());
     }
 }
