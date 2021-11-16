@@ -9,11 +9,11 @@ import java.util.List;
 
 @Data
 public class Bransje {
-    private final Bransjetype type;
+    private final ArbeidsmiljøportalenBransje type;
     private final String navn;
     private final List<String> koderSomSpesifisererNæringer;
 
-    public Bransje(Bransjetype type, String navn, String... koderSomSpesifisererNæringer) {
+    public Bransje(ArbeidsmiljøportalenBransje type, String navn, String... koderSomSpesifisererNæringer) {
         this.type = type;
         this.navn = navn;
         this.koderSomSpesifisererNæringer = Arrays.asList(koderSomSpesifisererNæringer);

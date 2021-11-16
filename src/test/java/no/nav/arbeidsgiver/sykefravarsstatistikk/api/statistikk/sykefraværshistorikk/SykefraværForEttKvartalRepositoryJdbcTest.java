@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjetype;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -165,7 +165,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
                 parametre(new Næring("87301", "Aldershjem"), 2018, 4, 10, 6, 100)
         );
 
-        Bransje sykehjem = new Bransje(Bransjetype.SYKEHUS, "Sykehjem", "87101", "87102");
+        Bransje sykehjem = new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "Sykehjem", "87101", "87102");
         List<SykefraværForEttKvartal> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentBransje(sykehjem);
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(new SykefraværForEttKvartal(
