@@ -1,8 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.bransjeprogram;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
 import org.junit.jupiter.api.Test;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.enNæringskode5Siffer;
@@ -11,6 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class BransjeTest {
+    Bransjeprogram bransjeprogram = new Bransjeprogram();
 
     @Test
     public void virksomhetTilhørerBransjeprogram__skal_gi_true_hvis_næringskode_starter_med_de_definerte_sifrene() {
@@ -22,6 +25,61 @@ public class BransjeTest {
     public void virksomhetTilhørerBransjeprogram__skal_gi_false_hvis_næringskode_ikke_starter_med_de_definerte_sifrene() {
         Bransje bransje = new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "test", "12", "45");
         assertThat(bransje.inkludererVirksomhet(underenhetMedNæringskode("46512"))).isFalse();
+    }
+
+    @Test
+    public void finnBransje__mapperBarnehageTilBarnehagebransjen() {
+        Næringskode5Siffer enBarnehage = new Næringskode5Siffer("88911", "");
+        Bransje barnehageBransjen = bransjeprogram.finnBransje(enBarnehage).orElseThrow();
+
+        assertThat(barnehageBransjen.getNavn()).isEqualTo("Barnehager");
+    }
+
+    @Test
+    public void finnBransje__mapperBoligbyggelagTilByggebransjen() {
+        Næringskode5Siffer etBoligbyggerlag = new Næringskode5Siffer("41101", "");
+        Bransje byggebranasjen = bransjeprogram.finnBransje(etBoligbyggerlag).orElseThrow();
+
+        assertThat(byggebranasjen.getNavn()).isEqualTo("Bygg");
+    }
+
+    @Test
+    public void finnBransje__mapperBroOgTunellbyggerTilAnleggsbransjen() {
+        Næringskode5Siffer enByggerAvBroOgTunnel = new Næringskode5Siffer("42130", "");
+
+        Bransje byggebransjen = bransjeprogram.finnBransje(enByggerAvBroOgTunnel).orElseThrow();
+        assertThat(byggebransjen.getNavn()).isEqualTo("Anlegg");
+    }
+
+    @Test
+    public void finnBransje__mapperProdusentAvIskremTilNæringsmiddelindustrien() {
+        Næringskode5Siffer enProdusentAvIskrem = new Næringskode5Siffer("10520", "");
+
+        Bransje næringsmiddelindustrien = bransjeprogram.finnBransje(enProdusentAvIskrem).orElseThrow();
+        assertThat(næringsmiddelindustrien.getNavn()).isEqualTo("Næringsmiddelsindustrien");
+    }
+
+    @Test
+    public void finnBransje__mapperSomatiskeSpesialsykehusTilSykehusbransjen() {
+        Næringskode5Siffer etSomatiskSpesialsykehus = new Næringskode5Siffer("86102", "");
+
+        Bransje sykehusbransjen = bransjeprogram.finnBransje(etSomatiskSpesialsykehus).orElseThrow();
+        assertThat(sykehusbransjen.getNavn()).isEqualTo("Sykehus");
+    }
+
+    @Test
+    public void finnBransje__mapperSykehjemTilSykehjemsbransjen() {
+        Næringskode5Siffer etSomatiskSykehjem = new Næringskode5Siffer("87102", "");
+
+        Bransje sykehjemsbransjen = bransjeprogram.finnBransje(etSomatiskSykehjem).orElseThrow();
+        assertThat(sykehjemsbransjen.getNavn()).isEqualTo("Sykehjem");
+    }
+    @Test
+    public void finnBransje__mapperTurbiltransportTilTransportbransjen() {
+        Næringskode5Siffer enturbiltransportør = new Næringskode5Siffer("49392", "");
+
+        Bransje sykehjemsbransjen = bransjeprogram.finnBransje(enturbiltransportør).orElseThrow();
+        assertThat(sykehjemsbransjen.getNavn()).isEqualTo("Rutebuss og persontrafikk (transport)");
     }
 
     @Test
