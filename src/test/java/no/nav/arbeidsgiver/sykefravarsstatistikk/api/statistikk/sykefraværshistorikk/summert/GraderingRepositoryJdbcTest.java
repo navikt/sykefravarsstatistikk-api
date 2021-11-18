@@ -7,7 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjetype;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import org.junit.jupiter.api.AfterEach;
@@ -319,7 +319,7 @@ public class GraderingRepositoryJdbcTest {
         );
 
         List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværForEttKvartalMedGradering(
-                new Bransje(Bransjetype.SYKEHUS, "sykehus", "86101", "86211"));
+                new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "sykehus", "86101", "86211"));
 
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(
@@ -374,7 +374,7 @@ public class GraderingRepositoryJdbcTest {
         );
 
         List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværForEttKvartalMedGradering(
-                new Bransje(Bransjetype.SYKEHUS, "sykehus", "86101", "86211"));
+                new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "sykehus", "86101", "86211"));
 
         assertThat(resultat.size()).isEqualTo(1);
         assertThat(resultat.get(0)).isEqualTo(
