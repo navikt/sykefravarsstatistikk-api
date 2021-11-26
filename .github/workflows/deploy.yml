@@ -5,6 +5,10 @@ on: [push]
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/sykefravarsstatistikk-api:${{ github.sha }}
 
+concurrency:
+  group: deploy-on-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: Run tests
