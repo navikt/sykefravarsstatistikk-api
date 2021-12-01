@@ -34,4 +34,8 @@
         <logger name="org.springframework.web" level="info"/>
         <logger name="no.nav.security.token.support.spring.test" level="debug"/>
     </springProfile>
+    <springProfile name="mvc-test">
+        <include resource="org/springframework/boot/logging/logback/base.xml"/>
+        <logger name="org.springframework.web" level="info"/>
+    </springProfile>
 </configuration>

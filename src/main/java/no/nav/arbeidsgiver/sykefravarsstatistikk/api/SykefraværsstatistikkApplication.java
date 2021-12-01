@@ -1,17 +1,16 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaProperties;
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Profile;
 
 @SpringBootApplication
 @EnableJwtTokenValidation(ignore = {
         "org.springdoc",
         "org.springframework"
 })
-@EnableConfigurationProperties(value = KafkaProperties.class)
+@Profile(value = "prod")
 public class SykefraværsstatistikkApplication {
     public static void main(String[] args) {
         SpringApplication.run(SykefraværsstatistikkApplication.class, args);

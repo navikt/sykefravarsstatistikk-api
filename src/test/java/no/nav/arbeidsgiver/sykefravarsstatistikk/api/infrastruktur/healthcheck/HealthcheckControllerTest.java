@@ -1,32 +1,45 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.healthcheck;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.SykefraværsstatistikkLocalApplication;
+import no.nav.security.token.support.spring.test.EnableMockOAuth2Server;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
-@AutoConfigureMockMvc
-@SpringBootTest
+import static java.net.http.HttpClient.newBuilder;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
+import static org.assertj.core.api.Assertions.assertThat;
+
+@ActiveProfiles("mvc-test")
+@EnableMockOAuth2Server
+@SpringBootTest(
+        classes = SykefraværsstatistikkLocalApplication.class,
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
 @TestPropertySource(properties = {"wiremock.mock.port=8086"})
 public class HealthcheckControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @LocalServerPort
+    private String port;
 
     @Test
-    public void returnerer_OK() throws Exception {
+    public void healthcheck_returnerer_OK__når_applikasjon_kjører() throws Exception {
+        HttpResponse<String> response = newBuilder().build().send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/internal/healthcheck"))
+                        .GET()
+                        .build(),
+                ofString()
+        );
 
-        this.mockMvc.perform(get("/internal/healthcheck"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().string("ok"));
+        assertThat(response.statusCode()).isEqualTo(200);
+
     }
 
 }

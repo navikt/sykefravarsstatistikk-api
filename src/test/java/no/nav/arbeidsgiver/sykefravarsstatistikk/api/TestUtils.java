@@ -17,6 +17,8 @@ public class TestUtils {
     public static void slettAllStatistikkFraDatabase(NamedParameterJdbcTemplate jdbcTemplate) {
         jdbcTemplate.update("delete from sykefravar_statistikk_virksomhet", new MapSqlParameterSource());
         jdbcTemplate.update("delete from sykefravar_statistikk_naring", new MapSqlParameterSource());
+        jdbcTemplate.update("delete from sykefravar_statistikk_naring_med_varighet", new MapSqlParameterSource());
+        jdbcTemplate.update("delete from sykefravar_statistikk_virksomhet_med_gradering", new MapSqlParameterSource());
         jdbcTemplate.update("delete from sykefravar_statistikk_naring5siffer", new MapSqlParameterSource());
         jdbcTemplate.update("delete from sykefravar_statistikk_sektor", new MapSqlParameterSource());
         jdbcTemplate.update("delete from sykefravar_statistikk_land", new MapSqlParameterSource());

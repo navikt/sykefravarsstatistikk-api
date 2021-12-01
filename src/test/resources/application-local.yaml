@@ -1,0 +1,57 @@
+spring:
+  config.activate.on-profile: local
+  h2.console:
+    enabled: true
+    path: /h2
+
+wiremock.mock:
+  port: 8081
+
+altinn:
+  url: "http://localhost:${wiremock.mock.port}/altinn/"
+  apikey: "test"
+  apigw.apikey: "test"
+  proxy:
+    url: "http://localhost:${wiremock.mock.port}/altinn-rettigheter-proxy/"
+  iaweb.service:
+    code: 3403
+    edition: 1
+
+enhetsregisteret:
+  url: "http://localhost:${wiremock.mock.port}/enhetsregisteret/"
+
+
+statistikk.importering.aktivert: true
+statistikk.eksportering.aktivert: true
+
+applikasjon.datasource:
+  url: jdbc:h2:mem:test
+  username: SA
+  password:
+  driver-class-name: org.h2.Driver
+
+datavarehus.datasource:
+  url: jdbc:h2:mem:test
+  username: SA
+  password:
+  driver-class-name: org.h2.Driver
+
+unleash.url: http://localhost:${wiremock.mock.port}/unleash/
+
+nais.cluster.name: local
+
+kafka:
+  outbound:
+    topic: arbeidsgiver.sykefravarsstatistikk-v1
+    bootstrapServers: localhost:9092
+    securityProtocol: PLAINTEXT
+
+no.nav.security.jwt:
+  issuer:
+    tokenx:
+      discoveryurl: http://localhost:${mock-oauth2-server.port}/tokenx/.well-known/openid-configuration
+      accepted_audience: someaudience
+    selvbetjening:
+      discoveryurl: http://localhost:${mock-oauth2-server.port}/selvbetjening/.well-known/openid-configuration
+      accepted_audience: someaudience
+      cookie_name: selvbetjening-idtoken

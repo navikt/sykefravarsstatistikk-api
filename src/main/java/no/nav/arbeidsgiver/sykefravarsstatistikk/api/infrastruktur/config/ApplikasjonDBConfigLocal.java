@@ -15,7 +15,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import javax.sql.DataSource;
 
 @Configuration
-@Profile({"local"})
+@Profile({"local", "mvc-test", "db-test"})
 public class ApplikasjonDBConfigLocal {
 
     @Value("${applikasjon.datasource.url}")

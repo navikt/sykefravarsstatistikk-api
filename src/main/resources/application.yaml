@@ -24,62 +24,6 @@ spring:
 ---
 
 spring:
-  config.activate.on-profile: local
-  h2.console:
-    enabled: true
-    path: /h2
-
-wiremock.mock:
-  port: 8081
-
-altinn:
-  url: "http://localhost:${wiremock.mock.port}/altinn/"
-  apikey: "test"
-  apigw.apikey: "test"
-  proxy:
-    url: "http://localhost:${wiremock.mock.port}/altinn-rettigheter-proxy/"
-  iaweb.service:
-    code: 3403
-    edition: 1
-
-enhetsregisteret:
-  url: "http://localhost:${wiremock.mock.port}/enhetsregisteret/"
-
-no.nav.security.jwt:
-  issuer:
-    selvbetjening:
-      discoveryurl: http://metadata
-      accepted_audience: aud-localhost
-      cookiename: selvbetjening-idtoken
-
-statistikk.importering.aktivert: true
-statistikk.eksportering.aktivert: true
-
-applikasjon.datasource:
-  url: jdbc:h2:mem:test
-  username: SA
-  password:
-  driver-class-name: org.h2.Driver
-
-datavarehus.datasource:
-  url: jdbc:h2:mem:test
-  username: SA
-  password:
-  driver-class-name: org.h2.Driver
-
-unleash.url: http://unleash.herokuapp.com/api/
-
-nais.cluster.name: local
-
-kafka:
-  outbound:
-    topic: arbeidsgiver.sykefravarsstatistikk-v1
-    bootstrapServers: localhost:9092
-    securityProtocol: PLAINTEXT
-
----
-
-spring:
   config.activate.on-profile: db-test
 
   flyway:
@@ -97,27 +41,6 @@ datavarehus.datasource:
   password:
   driver-class-name: org.h2.Driver
 
-
----
-
-spring:
-  config.activate.on-profile: mvc-test
-
-no.nav.security.jwt.issuer.selvbetjening:
-      discoveryurl: http://metadata
-      accepted_audience: aud-localhost
-      cookiename: selvbetjening-idtoken
-
-enhetsregisteret:
-  url: "http://localhost:1331/enhetsregisteret/"
-
-altinn:
-  url: "http://localhost:1331/altinn/"
-  apikey: "test"
-  apigw.apikey: "test"
-  iaweb.service:
-    code: 3403
-    edition: 1
 
 ---
 
