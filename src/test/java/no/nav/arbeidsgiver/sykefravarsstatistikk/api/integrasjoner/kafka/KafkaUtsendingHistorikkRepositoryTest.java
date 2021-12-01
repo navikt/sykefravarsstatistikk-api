@@ -18,7 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllEksportDataFraDatabase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -36,12 +36,12 @@ class KafkaUtsendingHistorikkRepositoryTest {
     @BeforeEach
     void setUp() {
         kafkaUtsendingHistorikkRepository = new KafkaUtsendingHistorikkRepository(jdbcTemplate);
-        slettAllStatistikkFraDatabase(jdbcTemplate);
+        slettAllEksportDataFraDatabase(jdbcTemplate);
     }
 
     @AfterEach
     void tearDown() {
-        slettAllStatistikkFraDatabase(jdbcTemplate);
+        slettAllEksportDataFraDatabase(jdbcTemplate);
     }
 
 
