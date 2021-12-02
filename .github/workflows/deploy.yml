@@ -46,7 +46,7 @@ jobs:
     #########################
     ### DEVELOPERS: Insert your feature branch name below (in addition to master) if you want to deploy it to dev
     #########################
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/fixbug-fjerne-masse-feil-alert'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/endringer-etter-publisering-3-kvartal-2021'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
