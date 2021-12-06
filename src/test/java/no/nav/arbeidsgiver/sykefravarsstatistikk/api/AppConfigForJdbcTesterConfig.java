@@ -66,19 +66,4 @@ import java.util.Collections;
                         })
         })
 public class AppConfigForJdbcTesterConfig extends JdbcRepositoryConfigExtension {
-
-    @Bean
-    public TokenValidationContextHolder tokenValidationContextHolder() {
-        return new TokenValidationContextHolder() {
-            @Override
-            public TokenValidationContext getTokenValidationContext() {
-                return new TokenValidationContext(Collections.emptyMap());
-            }
-
-            @Override
-            public void setTokenValidationContext(TokenValidationContext tokenValidationContext) {
-
-            }
-        };
-    }
 }
