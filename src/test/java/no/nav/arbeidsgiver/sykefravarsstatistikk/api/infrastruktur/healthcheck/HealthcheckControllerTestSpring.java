@@ -1,12 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.healthcheck;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.SykefraværsstatistikkLocalApplication;
-import no.nav.security.token.support.spring.test.EnableMockOAuth2Server;
+import common.SpringIntegrationTestbase;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -16,14 +12,7 @@ import static java.net.http.HttpClient.newBuilder;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ActiveProfiles("mvc-test")
-@EnableMockOAuth2Server
-@SpringBootTest(
-        classes = SykefraværsstatistikkLocalApplication.class,
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
-)
-@TestPropertySource(properties = {"wiremock.mock.port=8086"})
-public class HealthcheckControllerTest {
+public class HealthcheckControllerTestSpring extends SpringIntegrationTestbase {
 
     @LocalServerPort
     private String port;

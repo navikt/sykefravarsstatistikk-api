@@ -2,16 +2,13 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import common.SpringIntegrationTestbase;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.security.mock.oauth2.MockOAuth2Server;
-import no.nav.security.token.support.spring.test.EnableMockOAuth2Server;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.io.IOException;
@@ -28,14 +25,7 @@ import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.SELVBETJENING_TOKEN_ISSUER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ActiveProfiles("mvc-test")
-@EnableMockOAuth2Server
-@SpringBootTest(
-        classes = SykefraværsstatistikkLocalApplication.class,
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
-)
-@TestPropertySource(properties = {"wiremock.mock.port=8083"})
-public class ApiTest {
+public class ApiTestSpring extends SpringIntegrationTestbase {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
