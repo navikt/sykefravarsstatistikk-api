@@ -11,6 +11,17 @@ spec:
   port: 8080
   ingresses:
     - https://arbeidsgiver.nais.preprod.local/sykefravarsstatistikk-api/
+  tokenx:
+    enabled: true
+  accessPolicy:
+    inbound:
+      rules:
+        - application: sykefravarsstatistikk
+          namespace: arbeidsgiver
+  idporten:
+    enabled: true
+    sidecar:
+      enabled: true
   liveness:
     path: /sykefravarsstatistikk-api/internal/healthcheck
     initialDelay: 30
