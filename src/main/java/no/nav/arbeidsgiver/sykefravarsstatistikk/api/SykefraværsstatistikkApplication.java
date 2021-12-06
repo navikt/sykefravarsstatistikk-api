@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Profile;
         "org.springdoc",
         "org.springframework"
 })
-@Profile(value = "prod")
 public class SykefraværsstatistikkApplication {
     public static void main(String[] args) {
         SpringApplication.run(SykefraværsstatistikkApplication.class, args);

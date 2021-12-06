@@ -40,7 +40,7 @@ import org.springframework.context.annotation.PropertySource;
                                 AppConfigForJdbcTesterConfig.class,
                         })
         })
-@EnableJwtTokenValidation
+@EnableJwtTokenValidation(ignore = {"org.springframework", "org.springdoc"})
 @EnableConfigurationProperties
 @PropertySource("application-local.yaml")
 public class SykefraværsstatistikkLocalApplication {
