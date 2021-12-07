@@ -69,9 +69,8 @@ no.nav.security.jwt.issuer:
     accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
     cookiename: selvbetjening-idtoken
   tokenx:
-    discoveryurl: ${TOKEN_X_CLIENT_ID}
-    accepted_audience: someaudience
-    cookie_name: tokenx-token
+    discoveryurl: ${TOKEN_X_WELL_KNOWN_URL}
+    accepted_audience: ${TOKEN_X_CLIENT_ID}
 
 statistikk.importering.aktivert: true
 statistikk.eksportering.aktivert: true
