@@ -9,7 +9,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.Impo
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.PostImporteringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.klassifikasjoner.KlassifikasjonsimporteringController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.MockServer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.LocalOgUnitTestOidcConfiguration;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.featuretoggling.FeatureToggleController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.UnleashFeatureToggleConfig;
@@ -20,16 +19,11 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.organisasjoner.Or
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværshistorikkController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollUtils;
-import no.nav.security.token.support.core.context.TokenValidationContext;
-import no.nav.security.token.support.core.context.TokenValidationContextHolder;
 import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExtension;
-
-import java.util.Collections;
 
 /**
  *  Med denne config filen skal Spring kunne sette opp en applikasjon som bare inneholder de nødvendige beans for Jdbc testing
@@ -43,7 +37,6 @@ import java.util.Collections;
                 @ComponentScan.Filter(
                         type = FilterType.ASSIGNABLE_TYPE,
                         value = {
-                                LocalOgUnitTestOidcConfiguration.class,
                                 MockServer.class,
                                 AltinnClient.class,
                                 BesøksstatistikkEventListener.class,

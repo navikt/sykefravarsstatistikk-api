@@ -7,7 +7,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværssta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetMedGradering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.StatistikkRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.LocalOgUnitTestOidcConfiguration;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
@@ -43,7 +42,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 //@ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {AppConfigForJdbcTesterConfig.class})
-@DataJdbcTest(excludeAutoConfiguration = {TestDatabaseAutoConfiguration.class, LocalOgUnitTestOidcConfiguration.class})
+@DataJdbcTest(excludeAutoConfiguration = {TestDatabaseAutoConfiguration.class})
 public class StatistikkRepositoryJdbcTest {
 
     @Autowired

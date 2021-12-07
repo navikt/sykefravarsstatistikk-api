@@ -4,7 +4,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfi
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.LocalOgUnitTestOidcConfiguration;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -31,7 +30,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {AppConfigForJdbcTesterConfig.class})
-@DataJdbcTest(excludeAutoConfiguration = {TestDatabaseAutoConfiguration.class, LocalOgUnitTestOidcConfiguration.class})
+@DataJdbcTest(excludeAutoConfiguration = {TestDatabaseAutoConfiguration.class})
 public class SykefraværForEttKvartalRepositoryJdbcTest {
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;

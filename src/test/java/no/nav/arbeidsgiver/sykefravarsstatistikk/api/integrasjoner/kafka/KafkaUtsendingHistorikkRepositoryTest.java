@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.LocalOgUnitTestOidcConfiguration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {AppConfigForJdbcTesterConfig.class})
-@DataJdbcTest(excludeAutoConfiguration = {TestDatabaseAutoConfiguration.class, LocalOgUnitTestOidcConfiguration.class})
+@DataJdbcTest(excludeAutoConfiguration = {TestDatabaseAutoConfiguration.class})
 class KafkaUtsendingHistorikkRepositoryTest {
 
     @Autowired

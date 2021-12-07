@@ -41,20 +41,6 @@ public class ApiTestSpring extends SpringIntegrationTestbase {
     private final static String ORGNR_UNDERENHET = "910969439";
     private final static String ORGNR_UNDERENHET_INGEN_TILGANG = "777777777";
 
-    /*
-    @BeforeEach
-    void initialiseRestAssuredMockMvcWebApplicationContext() {
-        Collection<Filter> filterCollection = webApplicationContext.getBeansOfType(Filter.class).values();
-        Filter[] filters = filterCollection.toArray(new Filter[0]);
-        MockMvcConfigurer mockMvcConfigurer = new MockMvcConfigurer() {
-            @Override
-            public void afterConfigurerAdded(ConfigurableMockMvcBuilder<?> builder) {
-                builder.addFilters(filters);
-            }
-        };
-        RestAssuredMockMvc.webAppContextSetup(webApplicationContext, mockMvcConfigurer);
-    }*/
-
 
     @Test
     public void bedriftsmetrikker__skal_returnere_riktig_objekt() throws Exception {
