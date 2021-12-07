@@ -1,6 +1,6 @@
 package common;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.SykefraværsstatistikkLocalApplication;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.SykefraværsstatistikkLocalTestApplication;
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -12,7 +12,7 @@ import org.springframework.test.context.TestPropertySource;
 @ActiveProfiles("mvc-test")
 @EnableMockOAuth2Server
 @SpringBootTest(
-        classes = SykefraværsstatistikkLocalApplication.class,
+        classes = SykefraværsstatistikkLocalTestApplication.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )@TestPropertySource(properties = {"wiremock.mock.port=8082", "spring.h2.console.enabled=false"})
 public class SpringIntegrationTestbase {

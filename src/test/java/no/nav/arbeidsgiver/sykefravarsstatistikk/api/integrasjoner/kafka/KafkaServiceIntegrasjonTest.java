@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.SykefraværsstatistikkLocalApplication;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.SykefraværsstatistikkLocalTestApplication;
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -21,7 +21,6 @@ import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Arrays;
@@ -43,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ActiveProfiles("mvc-test")
 @SpringBootTest(
-        classes = SykefraværsstatistikkLocalApplication.class,
+        classes = SykefraværsstatistikkLocalTestApplication.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
 @EnableMockOAuth2Server
