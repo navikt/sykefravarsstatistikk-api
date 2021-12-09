@@ -57,16 +57,14 @@ public class TilgangskontrollServiceTest {
 
     @Test
     public void hentInnloggetBruker__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
-        when(tokenUtils.erInnloggetSelvbetjeningBruker()).thenReturn(true);
-        when(tokenUtils.hentInnloggetSelvbetjeningBruker()).thenReturn(new InnloggetBruker(fnr));
+        when(tokenUtils.hentInnloggetBruker()).thenReturn(new InnloggetBruker(fnr));
         when(altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(any(), eq(fnr))).thenThrow(new AltinnException(""));
 
         assertThrows(AltinnException.class, () -> tilgangskontroll.hentInnloggetBruker());
     }
     @Test
     public void hentInnloggetBrukerForAlleTilganger__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
-        when(tokenUtils.erInnloggetSelvbetjeningBruker()).thenReturn(true);
-        when(tokenUtils.hentInnloggetSelvbetjeningBruker()).thenReturn(new InnloggetBruker(fnr));
+        when(tokenUtils.hentInnloggetBruker()).thenReturn(new InnloggetBruker(fnr));
         when(altinnKlientWrapper.hentOrgnumreDerBrukerHarTilgangTil(any(), eq(fnr))).thenThrow(new AltinnException(""));
 
         assertThrows(AltinnException.class, () -> tilgangskontroll.hentInnloggetBrukerForAlleRettigheter());
@@ -121,8 +119,7 @@ public class TilgangskontrollServiceTest {
     }
 
     private void værInnloggetSom(InnloggetBruker bruker) {
-        when(tokenUtils.erInnloggetSelvbetjeningBruker()).thenReturn(true);
-        when(tokenUtils.hentInnloggetSelvbetjeningBruker()).thenReturn(bruker);
+        when(tokenUtils.hentInnloggetBruker()).thenReturn(bruker);
         when(altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(any(), eq(bruker.getFnr()))).thenReturn(bruker.getOrganisasjoner());
     }
 

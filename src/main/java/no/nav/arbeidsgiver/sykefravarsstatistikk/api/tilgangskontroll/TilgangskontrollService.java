@@ -36,32 +36,25 @@ public class TilgangskontrollService {
     }
 
     public InnloggetBruker hentInnloggetBruker() {
-        if (tokenUtils.erInnloggetSelvbetjeningBruker()) {
-            InnloggetBruker innloggetSelvbetjeningBruker = tokenUtils.hentInnloggetSelvbetjeningBruker();
-            innloggetSelvbetjeningBruker.setOrganisasjoner(
-                    altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
-                            tokenUtils.getSelvbetjeningToken(),
-                            innloggetSelvbetjeningBruker.getFnr()
-                    )
-            );
-            return innloggetSelvbetjeningBruker;
-        } else {
-            throw new TilgangskontrollException("Innlogget bruker er ikke selvbetjeningsbruker");
-        }
+        InnloggetBruker innloggetBruker = tokenUtils.hentInnloggetBruker();
+        innloggetBruker.setOrganisasjoner(
+                altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
+                        tokenUtils.getIDPortenToken(),
+                        innloggetBruker.getFnr()
+                )
+        );
+        return innloggetBruker;
     }
+
     public InnloggetBruker hentInnloggetBrukerForAlleRettigheter() {
-        if (tokenUtils.erInnloggetSelvbetjeningBruker()) {
-            InnloggetBruker innloggetSelvbetjeningBruker = tokenUtils.hentInnloggetSelvbetjeningBruker();
-            innloggetSelvbetjeningBruker.setOrganisasjoner(
-                    altinnKlientWrapper.hentOrgnumreDerBrukerHarTilgangTil(
-                            tokenUtils.getSelvbetjeningToken(),
-                            innloggetSelvbetjeningBruker.getFnr()
-                    )
-            );
-            return innloggetSelvbetjeningBruker;
-        } else {
-            throw new TilgangskontrollException("Innlogget bruker er ikke selvbetjeningsbruker");
-        }
+        InnloggetBruker innloggetBruker = tokenUtils.hentInnloggetBruker();
+        innloggetBruker.setOrganisasjoner(
+                altinnKlientWrapper.hentOrgnumreDerBrukerHarTilgangTil(
+                        tokenUtils.getIDPortenToken(),
+                        innloggetBruker.getFnr()
+                )
+        );
+        return innloggetBruker;
     }
 
     public boolean hentTilgangTilOverordnetEnhetOgLoggSikkerhetshendelse(

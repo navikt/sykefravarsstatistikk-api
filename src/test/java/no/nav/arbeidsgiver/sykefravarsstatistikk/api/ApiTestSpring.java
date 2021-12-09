@@ -22,7 +22,8 @@ import java.util.stream.Stream;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static java.net.http.HttpClient.newBuilder;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.SELVBETJENING_TOKEN_ISSUER_ID;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.SELVBETJENING_ISSUER_ID;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.TOKENX_ISSUER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ApiTestSpring extends SpringIntegrationTestbase {
@@ -70,7 +71,44 @@ public class ApiTestSpring extends SpringIntegrationTestbase {
     }
 
     @Test
-    public void sykefraværshistorikk__skal_returnere_riktig_objekt() throws Exception {
+    public void sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_selvbetjening_token() throws Exception {
+        String jwtTokenIssuedByLoginservice = TestTokenUtil.createToken(
+                mockOAuth2Server,
+                "15008462396",
+                SELVBETJENING_ISSUER_ID
+        );
+
+        sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtTokenIssuedByLoginservice);
+    }
+
+    @Test
+    public void sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_idporten() throws Exception {
+        String jwtToken = TestTokenUtil.createToken(
+                mockOAuth2Server,
+                "dette-er-ikke-et-fnr",
+                TOKENX_ISSUER_ID,
+                "https://oidc.difi.no/idporten-oidc-provider/",
+                "15008462396"
+        );
+
+        sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtToken);
+    }
+
+    @Test
+    public void sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_loginservice() throws Exception {
+        String jwtToken = TestTokenUtil.createToken(
+                mockOAuth2Server,
+                "15008462396",
+                TOKENX_ISSUER_ID,
+                "https://navnob2c.b2clogin.com/something-unique-and-long/v2.0/",
+                null
+        );
+
+        sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtToken);
+    }
+
+
+    private void sjekkAtSykefraværshistorikkReturnereRiktigObjekt(String jwtToken) throws Exception {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET +
@@ -78,7 +116,7 @@ public class ApiTestSpring extends SpringIntegrationTestbase {
                         )
                         .header(
                                 AUTHORIZATION,
-                                getBearerMedJwt("15008462396")
+                                "Bearer " + jwtToken
                         )
                         .GET()
                         .build(),
@@ -271,7 +309,7 @@ public class ApiTestSpring extends SpringIntegrationTestbase {
                 + TestTokenUtil.createToken(
                 mockOAuth2Server,
                 subject,
-                SELVBETJENING_TOKEN_ISSUER_ID,
+                SELVBETJENING_ISSUER_ID,
                 "",
                 ""
         );

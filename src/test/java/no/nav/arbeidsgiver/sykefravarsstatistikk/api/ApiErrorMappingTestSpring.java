@@ -13,7 +13,7 @@ import java.net.http.HttpResponse;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static java.net.http.HttpClient.newBuilder;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.SELVBETJENING_TOKEN_ISSUER_ID;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.SELVBETJENING_ISSUER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ApiErrorMappingTestSpring extends SpringIntegrationTestbase {
@@ -45,7 +45,7 @@ public class ApiErrorMappingTestSpring extends SpringIntegrationTestbase {
                                         + TestTokenUtil.createToken(
                                         mockOAuth2Server,
                                         "15008462396",
-                                        SELVBETJENING_TOKEN_ISSUER_ID,
+                                        SELVBETJENING_ISSUER_ID,
                                         "",
                                         ""
                                 )
