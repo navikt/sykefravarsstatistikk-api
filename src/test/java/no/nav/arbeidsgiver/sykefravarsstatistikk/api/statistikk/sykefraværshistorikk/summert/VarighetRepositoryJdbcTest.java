@@ -5,7 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjetype;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
@@ -120,7 +120,7 @@ public class VarighetRepositoryJdbcTest {
         leggTilStatisitkkNæringMedVarighetForVarighetskategori(legetjeneste, 2019, 2, Varighetskategori._1_DAG_TIL_7_DAGER, 8);
 
         List<UmaskertSykefraværForEttKvartalMedVarighet> resultat = varighetRepository.hentSykefraværForEttKvartalMedVarighet(new Bransje(
-                Bransjetype.SYKEHUS,
+                ArbeidsmiljøportalenBransje.SYKEHUS,
                 "Sykehus",
                 "86101", "86102", "86104", "86105", "86106", "86107"
         ));

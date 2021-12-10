@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import org.junit.jupiter.api.Test;
 
 import java.util.NoSuchElementException;
@@ -15,7 +14,7 @@ class BransjeEllerNæringTest {
 
     @Test
     public void BransjeEllerNæring_kan_opprettes_for_en_bransje_og_returnerer_en_bransje() {
-        Bransje bransje = new Bransje(Bransjetype.BARNEHAGER, "Barnehager", "88911");
+        Bransje bransje = new Bransje(ArbeidsmiljøportalenBransje.BARNEHAGER, "Barnehager", "88911");
         BransjeEllerNæring bransjeEllerNæring = new BransjeEllerNæring(bransje);
 
         assertThat(bransjeEllerNæring.isBransje()).isEqualTo(true);

@@ -36,7 +36,7 @@ public class SykefraværshistorikkController {
     private final SummertSykefraværService summertSykefraværService;
     private final SummertLegemeldtSykefraværService summertLegemeldtSykefraværService;
 
-    public static final ÅrstallOgKvartal SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL = new ÅrstallOgKvartal(2021, 2);
+    public static final ÅrstallOgKvartal SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL = new ÅrstallOgKvartal(2021, 3);
 
 
     public SykefraværshistorikkController(
