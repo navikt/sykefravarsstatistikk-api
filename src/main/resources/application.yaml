@@ -104,10 +104,14 @@ altinn:
     code: 3403
     edition: 2
 
-no.nav.security.jwt.issuer.selvbetjening:
+no.nav.security.jwt.issuer:
+  selvbetjening:
     discoveryurl: ${LOGINSERVICE_IDPORTEN_DISCOVERY_URL}
     accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
     cookiename: selvbetjening-idtoken
+  tokenx:
+    discoveryurl: ${TOKEN_X_WELL_KNOWN_URL}
+    accepted_audience: ${TOKEN_X_CLIENT_ID}
 
 statistikk.importering.aktivert: true
 statistikk.eksportering.aktivert: true
