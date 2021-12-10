@@ -11,6 +11,7 @@ spec:
   port: 8080
   ingresses:
     - https://arbeidsgiver.nais.preprod.local/sykefravarsstatistikk-api/
+    - https://sykefravarsstatistikk-api.dev-fss-pub.nais.io/
   tokenx:
     enabled: true
   accessPolicy:
