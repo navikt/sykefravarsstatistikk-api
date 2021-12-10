@@ -7,8 +7,10 @@ import no.nav.security.token.support.core.context.TokenValidationContextHolder;
 import no.nav.security.token.support.core.jwt.JwtToken;
 import no.nav.security.token.support.core.jwt.JwtTokenClaims;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
@@ -23,10 +25,12 @@ public class TilgangskontrollUtils {
 
     private final static Set<String> VALID_ISSUERS = ImmutableSet.of(ISSUER_TOKENX, ISSUER_SELVBETJENING);
     private final TokenValidationContextHolder contextHolder;
+    private final Environment environment;
 
     @Autowired
-    public TilgangskontrollUtils(TokenValidationContextHolder contextHolder) {
+    public TilgangskontrollUtils(TokenValidationContextHolder contextHolder, Environment environment) {
         this.contextHolder = contextHolder;
+        this.environment = environment;
     }
 
 
@@ -86,9 +90,10 @@ public class TilgangskontrollUtils {
             return claims.getStringClaim("pid");
         } else if (idp.matches("^https://nav(no|test)b2c\\.b2clogin\\.com/.*$")) {
             return claims.getSubject();
+        } else if (idp.matches("https://fakedings.dev-gcp.nais.io/fake/idporten") && Arrays.stream(environment.getActiveProfiles()).noneMatch(profile -> profile.equals("prod"))) {
+            return claims.getStringClaim("pid");
         } else {
             throw new TilgangskontrollException("Ukjent idp fra tokendings");
         }
     }
-
 }
