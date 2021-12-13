@@ -64,14 +64,18 @@ public class ApplikasjonDBConfig {
         try {
             hikariDataSourceWithVaultIntegration = HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(config, mountPath, dbRole(user));
         } catch (VaultError vaultError) {
-            logger.warn("Kunne ikke opprette DS. Returnerer null. ", vaultError);
+            logger.warn("[GCP-migrering] Kunne ikke opprette DS. Returnerer null. ", vaultError);
             return null;
         }
 
-        logger.info(String.format("Er HikariDataSource klar? %b", hikariDataSourceWithVaultIntegration != null));
+        logger.info(String.format("[GCP-migrering] Er HikariDataSource klar? %b", hikariDataSourceWithVaultIntegration != null));
 
         if (hikariDataSourceWithVaultIntegration != null) {
-            logger.info(String.format("Har vi en HikariDataSource? %b", hikariDataSourceWithVaultIntegration.getDataSource() != null));
+            logger.info(String.format("[GCP-migrering] Har vi en HikariDataSource? %b", hikariDataSourceWithVaultIntegration.getDataSource() != null));
+            logger.info(String.format("[GCP-migrering] Har vi HikariConfigMXBean? %s", hikariDataSourceWithVaultIntegration.getHikariConfigMXBean() != null));
+            if (hikariDataSourceWithVaultIntegration.getHikariConfigMXBean() != null) {
+                logger.info(String.format("[GCP-migrering] Har vi HikariConfigMXBean? %s", hikariDataSourceWithVaultIntegration.getHikariConfigMXBean().getPoolName()));
+            }
         }
 
         return hikariDataSourceWithVaultIntegration;
@@ -79,6 +83,7 @@ public class ApplikasjonDBConfig {
 
     @Bean
     public FlywayMigrationStrategy flywayMigrationStrategy() {
+        logger.info("[GCP-migrering] oppretter FlywayMigrationStrategy");
         return flyway -> Flyway.configure()
                 .dataSource(dataSource("admin"))
                 .initSql(String.format("SET ROLE \"%s\"", dbRole("admin")))
