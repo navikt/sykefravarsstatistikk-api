@@ -4,7 +4,10 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.SneakyThrows;
 import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil;
+import no.nav.vault.jdbc.hikaricp.VaultError;
 import org.flywaydb.core.Flyway;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
@@ -12,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.sql.DataSource;
 
@@ -29,6 +33,8 @@ public class ApplikasjonDBConfig {
     @Value("${vault.mount-path}")
     private String mountPath;
 
+    private static Logger logger = LoggerFactory.getLogger(ApplikasjonDBConfig.class);
+
 
     @Bean(name = "sykefravarsstatistikkDataSource")
     public DataSource userDataSource() {
@@ -43,14 +49,32 @@ public class ApplikasjonDBConfig {
     }
 
 
-    @SneakyThrows
+    //@SneakyThrows
     private HikariDataSource dataSource(String user) {
+        logger.info(String.format("Vmp? '%s'", mountPath));
+        logger.info(String.format("Hikari DS URL? '%s'", databaseUrl));
+        logger.info(String.format("Hikari DS navn? '%s'", databaseNavn));
+
         HikariConfig config = new HikariConfig();
         config.setPoolName("Sykefraværsstatistikk-connection-pool");
         config.setJdbcUrl(databaseUrl);
         config.setMaximumPoolSize(8);
         config.setMinimumIdle(1);
-        return HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(config, mountPath, dbRole(user));
+        HikariDataSource hikariDataSourceWithVaultIntegration = null;
+        try {
+            hikariDataSourceWithVaultIntegration = HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(config, mountPath, dbRole(user));
+        } catch (VaultError vaultError) {
+            logger.warn("Kunne ikke opprette DS. Returnerer null. ", vaultError);
+            return null;
+        }
+
+        logger.info(String.format("Er HikariDataSource klar? %b", hikariDataSourceWithVaultIntegration != null));
+
+        if (hikariDataSourceWithVaultIntegration != null) {
+            logger.info(String.format("Har vi en HikariDataSource? %b", hikariDataSourceWithVaultIntegration.getDataSource() != null));
+        }
+
+        return hikariDataSourceWithVaultIntegration;
     }
 
     @Bean
