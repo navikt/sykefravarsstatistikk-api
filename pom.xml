@@ -32,7 +32,7 @@
         <wiremock.version>2.27.2</wiremock.version>
         <shedlock.version>4.27.0</shedlock.version>
         <unleash.version>4.4.0</unleash.version>
-        <no.nav.common-log.version>2.2021.08.02_06.51-3ab58c9d7b57</no.nav.common-log.version>
+        <no.nav.common-log.version>2.2021.09.17_07.09-67428a6422cc</no.nav.common-log.version>
         <net.minidev.json-smart.version>2.4.7</net.minidev.json-smart.version>
         <com.nimbusds.nimbus-jose-jwt.version>9.15.2</com.nimbusds.nimbus-jose-jwt.version>
         <com.papertrailapp.logback-syslog4j.version>1.0.0</com.papertrailapp.logback-syslog4j.version>
@@ -152,6 +152,22 @@
             <artifactId>log</artifactId>
             <version>${no.nav.common-log.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-to-slf4j</artifactId>
+            <version>2.15.0</version>
+        </dependency>
+
 
         <!-- Prometheus -->
         <dependency>
