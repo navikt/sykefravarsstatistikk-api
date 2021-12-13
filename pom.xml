@@ -40,7 +40,7 @@
         <no.nav.vault-jdbc.version>1.3.9</no.nav.vault-jdbc.version>
         <com.oracle.ojdbc.ojdbc8.version>19.3.0.0</com.oracle.ojdbc.ojdbc8.version>
         <com.h2database.h2.version>1.4.200</com.h2database.h2.version>
-        <org.flywaydb.version>8.1.0</org.flywaydb.version> <!-- versjon 7.3 som kommer med spring logger alt for mye -->
+        <org.flywaydb.version>7.15.0</org.flywaydb.version> <!-- versjon 7.3 som kommer med spring logger alt for mye  og versjon 8.1 feiler ved oppstart-->
     </properties>
     <dependencies>
         <dependency>
