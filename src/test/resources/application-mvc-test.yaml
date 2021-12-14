@@ -59,24 +59,4 @@ no.nav.security.jwt:
       accepted_audience: someaudience
       cookie_name: selvbetjening-idtoken
 
-#---
-#
-#spring:
-#  config.activate.on-profile: mvc-test
-#
-#no.nav.security.jwt.issuer.selvbetjening:
-#      discoveryurl: http://metadata
-#      accepted_audience: aud-localhost
-#      cookiename: selvbetjening-idtoken
-#
-#enhetsregisteret:
-#  url: "http://localhost:1331/enhetsregisteret/"
-#
-#altinn:
-#  url: "http://localhost:1331/altinn/"
-#  apikey: "test"
-#  apigw.apikey: "test"
-#  iaweb.service:
-#    code: 3403
-#    edition: 1
 

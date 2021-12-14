@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import lombok.SneakyThrows;
 import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil;
 import no.nav.vault.jdbc.hikaricp.VaultError;
 import org.flywaydb.core.Flyway;
@@ -15,7 +14,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.sql.DataSource;
 
@@ -49,11 +47,7 @@ public class ApplikasjonDBConfig {
     }
 
 
-    //@SneakyThrows
     private HikariDataSource dataSource(String user) {
-        logger.info(String.format("Vmp? '%s'", mountPath));
-        logger.info(String.format("Hikari DS URL? '%s'", databaseUrl));
-        logger.info(String.format("Hikari DS navn? '%s'", databaseNavn));
 
         HikariConfig config = new HikariConfig();
         config.setPoolName("Sykefraværsstatistikk-connection-pool");
@@ -68,22 +62,11 @@ public class ApplikasjonDBConfig {
             return null;
         }
 
-        logger.info(String.format("[GCP-migrering] Er HikariDataSource klar? %b", hikariDataSourceWithVaultIntegration != null));
-
-        if (hikariDataSourceWithVaultIntegration != null) {
-            logger.info(String.format("[GCP-migrering] Har vi en HikariDataSource? %b", hikariDataSourceWithVaultIntegration.getDataSource() != null));
-            logger.info(String.format("[GCP-migrering] Har vi HikariConfigMXBean? %s", hikariDataSourceWithVaultIntegration.getHikariConfigMXBean() != null));
-            if (hikariDataSourceWithVaultIntegration.getHikariConfigMXBean() != null) {
-                logger.info(String.format("[GCP-migrering] Har vi HikariConfigMXBean? %s", hikariDataSourceWithVaultIntegration.getHikariConfigMXBean().getPoolName()));
-            }
-        }
-
         return hikariDataSourceWithVaultIntegration;
     }
 
     @Bean
     public FlywayMigrationStrategy flywayMigrationStrategy() {
-        logger.info("[GCP-migrering] oppretter FlywayMigrationStrategy");
         return flyway -> Flyway.configure()
                 .dataSource(dataSource("admin"))
                 .initSql(String.format("SET ROLE \"%s\"", dbRole("admin")))

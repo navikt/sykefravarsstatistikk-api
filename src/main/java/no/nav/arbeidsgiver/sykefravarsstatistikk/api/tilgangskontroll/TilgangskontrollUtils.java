@@ -34,7 +34,7 @@ public class TilgangskontrollUtils {
     }
 
 
-    public JwtToken getIDPortenToken() {
+    public JwtToken hentInnloggetJwtToken() {
         return VALID_ISSUERS.stream()
                 .map(issuer -> getJwtTokenFor(contextHolder.getTokenValidationContext(), issuer))
                 .flatMap(Optional::stream)

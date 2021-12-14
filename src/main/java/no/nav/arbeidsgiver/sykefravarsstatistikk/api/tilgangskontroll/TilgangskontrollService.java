@@ -39,7 +39,7 @@ public class TilgangskontrollService {
         InnloggetBruker innloggetBruker = tokenUtils.hentInnloggetBruker();
         innloggetBruker.setOrganisasjoner(
                 altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
-                        tokenUtils.getIDPortenToken(),
+                        tokenUtils.hentInnloggetJwtToken(),
                         innloggetBruker.getFnr()
                 )
         );
@@ -50,7 +50,7 @@ public class TilgangskontrollService {
         InnloggetBruker innloggetBruker = tokenUtils.hentInnloggetBruker();
         innloggetBruker.setOrganisasjoner(
                 altinnKlientWrapper.hentOrgnumreDerBrukerHarTilgangTil(
-                        tokenUtils.getIDPortenToken(),
+                        tokenUtils.hentInnloggetJwtToken(),
                         innloggetBruker.getFnr()
                 )
         );

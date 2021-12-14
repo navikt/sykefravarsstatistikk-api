@@ -31,7 +31,7 @@ public class TestTokenUtil {
          a given client will always get the same value, whilst different clients do not get equal values for the same
          user.
        aud: The indended audience for token. Normally the Oauth2 ‘issuer’ URL of the Resource Server / API.
-       acr: sikkerhetsnivå
+       acr: Level4
        pid: “Personidentifikator” - the Norwegian national ID number (fødselsnummer/d-nummer) of the autenticated
          end user.
        idp: Identity Provider, f.eks "https://oidc.difi.no/idporten-oidc-provider/" | https://nav(no|test)b2c\\.b2clogin\\.com/

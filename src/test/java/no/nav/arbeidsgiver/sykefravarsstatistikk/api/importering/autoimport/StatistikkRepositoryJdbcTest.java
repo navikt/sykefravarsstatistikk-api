@@ -39,7 +39,6 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimpo
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 @ActiveProfiles("db-test")
-//@ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {AppConfigForJdbcTesterConfig.class})
 @DataJdbcTest(excludeAutoConfiguration = {TestDatabaseAutoConfiguration.class})
