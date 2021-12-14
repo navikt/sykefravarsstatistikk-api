@@ -30,7 +30,7 @@
         <prometheus.version>0.12.0</prometheus.version>
         <mockito-junit-jupiter.version>3.11.2</mockito-junit-jupiter.version>
         <wiremock.version>2.27.2</wiremock.version>
-        <shedlock.version>4.28.0</shedlock.version>
+        <shedlock.version>4.30.0</shedlock.version>
         <unleash.version>4.4.0</unleash.version>
         <no.nav.common-log.version>2.2021.09.17_07.09-67428a6422cc</no.nav.common-log.version>
         <net.minidev.json-smart.version>2.4.7</net.minidev.json-smart.version>
