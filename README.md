@@ -25,7 +25,9 @@ Kjør container
 ## Grafisk fremstilling av API-ene (swagger-ui)
 API-et kan sees og testes på: 
  * Lokalt: `http://localhost:8080/sykefravarsstatistikk-api/swagger-ui/index.html` 
- * På server: `{host}/sykefravarsstatistikk-api/swagger-ui/index.html?url=/v3/api-docs/`
+ * På server:
+   - `{host}/sykefravarsstatistikk-api/swagger-ui/index.html?configUrl=/sykefravarsstatistikk-api/v3/api-docs/swagger-config#/`
+   - `{host}/sykefravarsstatistikk-api/swagger-ui/index.html` og lim inn `/sykefravarsstatistikk-api/v3/api-docs` i __Explore__ søkefelt
 
 ---------
 
