@@ -22,7 +22,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 
-@Slf4j
 @Component
 public class EnhetsregisteretClient {
     private final RestTemplate restTemplate;
@@ -62,7 +61,6 @@ public class EnhetsregisteretClient {
     public Underenhet hentInformasjonOmUnderenhet(Orgnr orgnrTilUnderenhet) {
         try {
             String url = enhetsregisteretUrl + "underenheter/" + orgnrTilUnderenhet.getVerdi();
-            log.info("Url til enhetsregisteret: " + url);
             String respons = restTemplate.getForObject(url, String.class);
             Underenhet underenhet = mapTilUnderenhet(respons);
             validerReturnertOrgnr(orgnrTilUnderenhet, underenhet.getOrgnr());
