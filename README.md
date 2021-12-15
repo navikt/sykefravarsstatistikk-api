@@ -23,7 +23,9 @@ Kjør container
 Åpne H2-konsollen på `http://localhost:8080/sykefravarsstatistikk-api/h2` og fyll inn det som står under `applikasjon.datasource` i `application.yaml`.
 
 ## Grafisk fremstilling av API-ene (swagger-ui)
-API-et kan sees og testes på `http://localhost:8080/sykefravarsstatistikk-api/swagger-ui.html`
+API-et kan sees og testes på: 
+ * Lokalt: `http://localhost:8080/sykefravarsstatistikk-api/swagger-ui/index.html` 
+ * På server: `{host}/sykefravarsstatistikk-api/swagger-ui/index.html?url=/v3/api-docs/`
 
 ---------
 
