@@ -2,6 +2,7 @@ server.servlet.context-path: /sykefravarsstatistikk-api
 springdoc:
   swagger-ui:
     disable-swagger-default-url: true
+    validatorUrl: none
 
 management.endpoints.web:
   exposure.include: info, health, metrics, prometheus
