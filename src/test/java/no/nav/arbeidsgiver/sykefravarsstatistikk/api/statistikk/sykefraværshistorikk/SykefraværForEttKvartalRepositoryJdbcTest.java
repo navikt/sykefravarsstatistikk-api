@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AmendPrimaryKeyForH2Extension;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
@@ -13,6 +14,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -23,13 +25,13 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.setAutoincrementPrimaryKeyForH2Db;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 @ActiveProfiles("db-test")
 @DataJdbcTest
+@ExtendWith(AmendPrimaryKeyForH2Extension.class)
 public class SykefraværForEttKvartalRepositoryJdbcTest {
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
@@ -40,11 +42,6 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
     public void setUp() {
         kvartalsvisSykefraværprosentRepository = new KvartalsvisSykefraværRepository(jdbcTemplate);
         slettAllStatistikkFraDatabase(jdbcTemplate);
-        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_land");
-        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_virksomhet");
-        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_naring5siffer");
-        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_sektor");
-        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_naring");
     }
 
     @AfterEach

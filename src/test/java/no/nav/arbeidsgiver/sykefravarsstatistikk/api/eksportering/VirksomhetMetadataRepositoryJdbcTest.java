@@ -1,10 +1,12 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AmendPrimaryKeyForH2Extension;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -14,13 +16,17 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.Arrays;
 import java.util.List;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.setAutoincrementPrimaryKeyForH2Db;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.NÆRINGSKODE_2SIFFER;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_1;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_2;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_3;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.SEKTOR;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("db-test")
 @DataJdbcTest
+@ExtendWith(AmendPrimaryKeyForH2Extension.class)
 class VirksomhetMetadataRepositoryJdbcTest {
 
     @Autowired
@@ -32,8 +38,6 @@ class VirksomhetMetadataRepositoryJdbcTest {
     public void setUp() {
         repository = new VirksomhetMetadataRepository(namedParameterJdbcTemplate);
         cleanUpTestDb(namedParameterJdbcTemplate);
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "virksomhet_metadata");
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "virksomhet_metadata_naring_kode_5siffer");
     }
 
     @AfterEach

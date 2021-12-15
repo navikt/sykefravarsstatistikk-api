@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.importering.integrasjon.utils;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AmendPrimaryKeyForH2Extension;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.BatchCreateSykefraværsstatistikkFunction;
@@ -9,6 +10,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.besøksstatistikk
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -20,13 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.setAutoincrementPrimaryKeyForH2Db;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("db-test")
 @DataJdbcTest
+@ExtendWith(AmendPrimaryKeyForH2Extension.class)
 public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
 
     @Autowired
@@ -41,7 +43,6 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
     public void setUp() {
         utils = new SykefraværsstatistikkVirksomhetUtils(namedParameterJdbcTemplate);
         cleanUpLokalTestDb(namedParameterJdbcTemplate);
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "sykefravar_statistikk_virksomhet");
     }
 
     @AfterEach

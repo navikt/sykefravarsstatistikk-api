@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AmendPrimaryKeyForH2Extension;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
@@ -13,6 +14,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværssta
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -24,13 +26,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils.assertBigDecimalIsEqual;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.setAutoincrementPrimaryKeyForH2Db;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ActiveProfiles("db-test")
 @DataJdbcTest
+@ExtendWith(AmendPrimaryKeyForH2Extension.class)
 class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
     @Autowired
@@ -51,11 +53,6 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     void setUp() {
         slettAllStatistikkFraDatabase(jdbcTemplate);
         repository = new SykefraværsstatistikkTilEksporteringRepository(jdbcTemplate);
-        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_land");
-        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_naring");
-        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_sektor");
-        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_naring5siffer");
-        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_virksomhet");
     }
 
     @AfterEach
