@@ -21,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.setAutoincrementPrimaryKeyForH2Db;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
@@ -36,6 +37,8 @@ public class VarighetRepositoryJdbcTest {
     public void setUp() {
         varighetRepository = new VarighetRepository(jdbcTemplate);
         slettAllStatistikkFraDatabase(jdbcTemplate);
+        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_virksomhet");
+        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_naring_med_varighet");
     }
 
     @AfterEach

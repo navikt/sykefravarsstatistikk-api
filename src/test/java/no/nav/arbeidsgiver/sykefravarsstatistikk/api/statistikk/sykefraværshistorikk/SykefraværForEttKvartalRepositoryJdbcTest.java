@@ -1,8 +1,13 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -18,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.setAutoincrementPrimaryKeyForH2Db;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -34,6 +40,11 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
     public void setUp() {
         kvartalsvisSykefraværprosentRepository = new KvartalsvisSykefraværRepository(jdbcTemplate);
         slettAllStatistikkFraDatabase(jdbcTemplate);
+        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_land");
+        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_virksomhet");
+        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_naring5siffer");
+        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_sektor");
+        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_naring");
     }
 
     @AfterEach

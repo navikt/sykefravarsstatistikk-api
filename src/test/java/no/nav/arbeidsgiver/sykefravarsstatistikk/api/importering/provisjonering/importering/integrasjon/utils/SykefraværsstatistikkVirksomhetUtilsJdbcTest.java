@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.setAutoincrementPrimaryKeyForH2Db;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,6 +41,7 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
     public void setUp() {
         utils = new SykefraværsstatistikkVirksomhetUtils(namedParameterJdbcTemplate);
         cleanUpLokalTestDb(namedParameterJdbcTemplate);
+        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "sykefravar_statistikk_virksomhet");
     }
 
     @AfterEach
@@ -163,5 +165,4 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
                 new MapSqlParameterSource()
         );
     }
-
 }

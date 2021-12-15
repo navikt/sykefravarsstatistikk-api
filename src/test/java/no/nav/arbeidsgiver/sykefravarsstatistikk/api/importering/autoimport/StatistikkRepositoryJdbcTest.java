@@ -30,6 +30,7 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.NÆRINGSKOD
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.NÆRINGSKODE_5SIFFER;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_1;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.parametreForStatistikk;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.setAutoincrementPrimaryKeyForH2Db;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.StatistikkRepository.INSERT_BATCH_STØRRELSE;
@@ -49,6 +50,10 @@ public class StatistikkRepositoryJdbcTest {
     public void setUp() {
         statistikkRepository = new StatistikkRepository(jdbcTemplate);
         slettAllStatistikkFraDatabase(jdbcTemplate);
+        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_virksomhet_med_gradering");
+        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_land");
+        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_virksomhet");
+        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_naring_med_varighet");
     }
 
     @AfterEach

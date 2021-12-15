@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.setAutoincrementPrimaryKeyForH2Db;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,6 +32,8 @@ class VirksomhetMetadataRepositoryJdbcTest {
     public void setUp() {
         repository = new VirksomhetMetadataRepository(namedParameterJdbcTemplate);
         cleanUpTestDb(namedParameterJdbcTemplate);
+        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "virksomhet_metadata");
+        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "virksomhet_metadata_naring_kode_5siffer");
     }
 
     @AfterEach

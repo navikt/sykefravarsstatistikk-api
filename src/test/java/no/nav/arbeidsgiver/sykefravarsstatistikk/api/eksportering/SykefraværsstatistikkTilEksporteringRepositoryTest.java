@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils.assertBigDecimalIsEqual;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.setAutoincrementPrimaryKeyForH2Db;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -50,6 +51,11 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     void setUp() {
         slettAllStatistikkFraDatabase(jdbcTemplate);
         repository = new SykefraværsstatistikkTilEksporteringRepository(jdbcTemplate);
+        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_land");
+        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_naring");
+        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_sektor");
+        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_naring5siffer");
+        setAutoincrementPrimaryKeyForH2Db(jdbcTemplate, "sykefravar_statistikk_virksomhet");
     }
 
     @AfterEach
