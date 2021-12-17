@@ -170,5 +170,4 @@ public class SykefraværsstatistikkVirksomhetUtilsJdbcTest {
                 new MapSqlParameterSource()
         );
     }
-
 }
