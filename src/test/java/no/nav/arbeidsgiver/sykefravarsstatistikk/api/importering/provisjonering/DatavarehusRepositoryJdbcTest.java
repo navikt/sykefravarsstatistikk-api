@@ -202,8 +202,8 @@ public class DatavarehusRepositoryJdbcTest {
                 2018,
                 4,
                 10,
-                new BigDecimal(15).setScale(6),
-                new BigDecimal(200).setScale(6)
+                new BigDecimal(15),
+                new BigDecimal(200)
         ));
     }
 
@@ -226,8 +226,8 @@ public class DatavarehusRepositoryJdbcTest {
                 _1_DAG_TIL_7_DAGER.kode,
                 RECTYPE_FOR_VIRKSOMHET,
                 7,
-                new BigDecimal(13).setScale(6),
-                new BigDecimal(188).setScale(6)
+                new BigDecimal(13),
+                new BigDecimal(188)
         );
         assertThat(sykefraværsstatistikkVirksomhet.get(0)).isEqualTo(expected);
     }
@@ -254,8 +254,8 @@ public class DatavarehusRepositoryJdbcTest {
                 NÆRINGSKODE_5SIFFER,
                 _1_DAG_TIL_7_DAGER.kode,
                 13,
-                new BigDecimal(16).setScale(6),
-                new BigDecimal(263).setScale(6)
+                new BigDecimal(16),
+                new BigDecimal(263)
         );
         assertThat(sykefraværsstatistikkNæringMedVarighet.get(0)).isEqualTo(expected);
     }
@@ -311,11 +311,11 @@ public class DatavarehusRepositoryJdbcTest {
                 NÆRINGSKODE_5SIFFER,
                 RECTYPE_FOR_VIRKSOMHET,
                 1,
-                new BigDecimal(3).setScale(6),
+                new BigDecimal(3),
                 3,
                 13,
-                new BigDecimal(16).setScale(6),
-                new BigDecimal(100).setScale(6)
+                new BigDecimal(16),
+                new BigDecimal(100)
         );
         SykefraværsstatistikkVirksomhetMedGradering expectedLinje2 = new SykefraværsstatistikkVirksomhetMedGradering(
                 2018,
@@ -325,12 +325,13 @@ public class DatavarehusRepositoryJdbcTest {
                 NÆRINGSKODE_5SIFFER,
                 RECTYPE_FOR_VIRKSOMHET,
                 2,
-                new BigDecimal(6).setScale(6),
+                new BigDecimal(6),
                 2,
                 26,
-                new BigDecimal(32).setScale(6),
-                new BigDecimal(200).setScale(6)
+                new BigDecimal(32),
+                new BigDecimal(200)
         );
+
         assertThat(sykefraværsstatistikkVirksomhetMedGradering.get(0)).isEqualTo(expected);
         assertThat(sykefraværsstatistikkVirksomhetMedGradering.get(1)).isEqualTo(expectedLinje2);
     }

@@ -29,27 +29,6 @@ spring:
 ---
 
 spring:
-  config.activate.on-profile: db-test
-
-  flyway:
-    locations: classpath:/db/migration,classpath:/db/test-datavarehus
-
-applikasjon.datasource:
-  url: jdbc:h2:mem:test
-  username: SA
-  password:
-  driver-class-name: org.h2.Driver
-
-datavarehus.datasource:
-  url: jdbc:h2:mem:test
-  username: SA
-  password:
-  driver-class-name: org.h2.Driver
-
-
----
-
-spring:
   config.activate.on-profile: dev
 
 wiremock.mock:

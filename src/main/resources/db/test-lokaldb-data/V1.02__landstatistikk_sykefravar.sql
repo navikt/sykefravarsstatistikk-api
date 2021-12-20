@@ -1,7 +1,3 @@
--- Enable auto-increment for H2 database
-alter table sykefravar_statistikk_land drop column id;
-alter table sykefravar_statistikk_land add id bigint auto_increment;
-
 insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values(2014, 2, 10, 5884917.287819, 112525690.888394);
 insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values(2014, 3, 10, 5880571.66224 , 107409308.353228);
 insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values(2014, 4, 10, 6742042.862711, 124694740.804175);

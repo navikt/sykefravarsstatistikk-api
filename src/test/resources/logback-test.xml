@@ -38,4 +38,9 @@
         <include resource="org/springframework/boot/logging/logback/base.xml"/>
         <logger name="org.springframework.web" level="info"/>
     </springProfile>
+    <springProfile name="db-test">
+        <include resource="org/springframework/boot/logging/logback/base.xml"/>
+        <logger name="org.springframework.web" level="info"/>
+    </springProfile>
+
 </configuration>

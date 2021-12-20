@@ -21,8 +21,10 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static java.lang.String.format;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.setAutoincrementPrimaryKeyForH2Db;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.enSammenligningBuilder;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.enSammenligningEventBuilder;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.enUnderenhet;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.etOrgnr;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 @ActiveProfiles("db-test")
@@ -40,10 +42,6 @@ public class BesøksstatistikkRepositoryJdbcTest {
     public void setUp() {
         repository = new BesøksstatistikkRepository(namedParameterJdbcTemplate);
         cleanUpTestDb(namedParameterJdbcTemplate);
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "besoksstatistikk_altinn_roller");
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "besoksstatistikk_smaa_virksomheter");
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "besoksstatistikk_unikt_besok");
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "besoksstatistikk_virksomhet");
     }
 
     @AfterEach

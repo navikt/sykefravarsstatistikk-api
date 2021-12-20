@@ -1,9 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
-import org.junit.jupiter.api.extension.ExtensionContext;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 public class TestUtils {
 

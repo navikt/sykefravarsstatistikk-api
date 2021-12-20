@@ -30,6 +30,7 @@ import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._8_UKER_TIL_20_UKER;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 @ActiveProfiles("db-test")
@@ -220,6 +221,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
                 10
         ));
     }
+
     @Test
     public void hentSykefraværprosentVirksomhet__skal_summere_sykefravær_på_varighet() {
         Underenhet barnehage = Underenhet.builder().orgnr(new Orgnr("999999999"))
@@ -228,14 +230,14 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
                 .antallAnsatte(10)
                 .overordnetEnhetOrgnr(new Orgnr("1111111111")).build();
         jdbcTemplate.update(
-                "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                        + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk, varighet) "
+                        + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk, :varighet)",
                 parametre(barnehage.getOrgnr(), 2019, 2, 10, 2, 100, _1_DAG_TIL_7_DAGER)
         );
         jdbcTemplate.update(
-                "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                        + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(barnehage.getOrgnr(), 2019, 2, 10, 5, 100, _1_DAG_TIL_7_DAGER)
+                "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk, varighet) "
+                        + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk, :varighet)",
+                parametre(barnehage.getOrgnr(), 2019, 2, 10, 5, 100, _8_UKER_TIL_20_UKER)
         );
         List<SykefraværForEttKvartal> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(barnehage);
         assertThat(resultat).isEqualTo(Arrays.asList(new SykefraværForEttKvartal(
