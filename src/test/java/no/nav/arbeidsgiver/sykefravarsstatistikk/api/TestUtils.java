@@ -5,41 +5,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 public class TestUtils {
 
-    public static final String ID = "id";
-
-    /**
-     * H2 DB og PostgreSQL har forskjellige syntax for ID (primary key)
-     * H2 DB bruker 'bigint auto_increment' hvor PostgreSQL bruker 'serial'
-     * Denne metoden endrer feltet ID ut i fra migreringsscript slik at H2 klarer å auto-increment feltet ID ved 'insert'
-     * OBS: dette gjelder kun tester og ikke applikasjon når den kjører lokalt: da er H2 DB startet med dialect PostgreSQL
-     */
-    public static void setAutoincrementPrimaryKeyForH2Db(
-            NamedParameterJdbcTemplate namedParameterJdbcTemplate,
-            String tabell
-    ) {
-
-        namedParameterJdbcTemplate.getJdbcTemplate().execute(String.format("alter table %s drop column %s", tabell, ID));
-        namedParameterJdbcTemplate.getJdbcTemplate().execute(
-                String.format(
-                        "alter table %s add %s bigint auto_increment",
-                        tabell,
-                        ID
-                )
-        );
-    }
-
-    public static void setAutoincrementPrimaryKeyForH2Db(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "sykefravar_statistikk_land");
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "sykefravar_statistikk_naring");
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "sykefravar_statistikk_naring5siffer");
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "sykefravar_statistikk_naring_med_varighet");
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "sykefravar_statistikk_sektor");
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "sykefravar_statistikk_virksomhet");
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "sykefravar_statistikk_virksomhet_med_gradering");
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "virksomhet_metadata");
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "virksomhet_metadata_naring_kode_5siffer");
-    }
-
     public static MapSqlParameterSource parametreForStatistikk(int årstall, int kvartal, int antallPersoner, int tapteDagsverk, int muligeDagsverk) {
         return new MapSqlParameterSource()
                 .addValue("arstall", årstall)
