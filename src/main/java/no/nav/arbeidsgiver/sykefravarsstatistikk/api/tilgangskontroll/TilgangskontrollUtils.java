@@ -19,7 +19,6 @@ import static java.lang.String.format;
 @Component
 public class TilgangskontrollUtils {
 
-    // vi kunne egentlig kalle issuer for 'loginservice', det hadde vært mer riktig
     final static String ISSUER_SELVBETJENING = "selvbetjening";
     final static String ISSUER_TOKENX = "tokenx";
 
