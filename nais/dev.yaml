@@ -20,6 +20,11 @@ spec:
         - application: sykefravarsstatistikk
           namespace: arbeidsgiver
           cluster: dev-gcp
+    outbound:
+      rules:
+        - application: altinn-rettigheter-proxy
+          namespace: arbeidsgiver
+          cluster: dev-gcp
   liveness:
     path: /sykefravarsstatistikk-api/internal/healthcheck
     initialDelay: 30
