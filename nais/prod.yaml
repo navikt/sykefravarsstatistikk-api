@@ -1,5 +1,5 @@
-apiVersion: "nais.io/v1alpha1"
-kind: "Application"
+apiVersion: nais.io/v1alpha1
+kind: Application
 metadata:
   name: sykefravarsstatistikk-api
   namespace: arbeidsgiver
@@ -18,6 +18,11 @@ spec:
       inbound:
         rules:
           - application: sykefravarsstatistikk
+            namespace: arbeidsgiver
+            cluster: prod-gcp
+      outbound:
+        rules:
+          - application: altinn-rettigheter-proxy
             namespace: arbeidsgiver
             cluster: prod-gcp
   liveness:

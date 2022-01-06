@@ -96,7 +96,7 @@ public class TokenXClient {
 
     public MultiValueMap<String, String> byggParameterMap(String assertionToken, JwtToken token) {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("audience", altinnRettigheterProxyAudience); // FIXME
+        map.add("audience", altinnRettigheterProxyAudience);
         map.add("client_assertion", assertionToken);
         map.add("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
         map.add("subject_token", token.getTokenAsString());
@@ -117,5 +117,4 @@ public class TokenXClient {
         public String token_type;
         public String expires_in;
     }
-
 }

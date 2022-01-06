@@ -15,7 +15,6 @@ class TokenXClientTest {
         assertThat(
                 TokenXClient.trimUrl("https://tokendings.dev-gcp.nais.io/.well-known/oauth-authorization-server")
         ).isEqualTo("https://tokendings.dev-gcp.nais.io");
-
     }
 
 }
