@@ -13,6 +13,7 @@ import com.nimbusds.oauth2.sdk.GeneralException;
 import com.nimbusds.oauth2.sdk.as.AuthorizationServerMetadata;
 import com.nimbusds.oauth2.sdk.id.Issuer;
 import no.nav.security.token.support.core.jwt.JwtToken;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -40,7 +41,9 @@ public class TokenXClient {
     public TokenXClient(@Value("${tokenxclient.jwk}") String tokenxJwk,
                         @Value("${tokenxclient.clientId}") String tokenxClientId,
                         @Value("${tokenxclient.altinn_rettigheter_proxy_audience}") String altinnRettigheterProxyAudience,
-                        @Value("${no.nav.security.jwt.issuer.tokenx.discoveryurl}") String tokenxWellKnownUrl, RestTemplate restTemplate) {
+                        @Value("${no.nav.security.jwt.issuer.tokenx.discoveryurl}") String tokenxWellKnownUrl,
+                        RestTemplate restTemplate
+    ) {
         this.tokenxJwk = tokenxJwk;
         this.tokenxClientId = tokenxClientId;
         this.altinnRettigheterProxyAudience = altinnRettigheterProxyAudience;
@@ -51,7 +54,7 @@ public class TokenXClient {
     // TODO: Burde implementere caching av token fra tokenx
     public JwtToken exchangeTokenToAltinnProxy(JwtToken token) throws ParseException, JOSEException, GeneralException, IOException {
         // Henter metadata
-        String trimmetUrl = tokenxWellKnownUrl.replace(".well-known/oauth-authorization-server/", "");
+        String trimmetUrl = trimUrl(tokenxWellKnownUrl);
         AuthorizationServerMetadata authorizationServerMetadata = AuthorizationServerMetadata.resolve(new Issuer(trimmetUrl));
 
         // Lag assertion token
@@ -103,6 +106,10 @@ public class TokenXClient {
         return map;
     }
 
+    @NotNull
+    protected static String trimUrl(String tokenxWellKnownUrl) {
+        return tokenxWellKnownUrl.replace("/.well-known/oauth-authorization-server", "");
+    }
 
     private static class TokenExchangeResponse {
         public String access_token;
