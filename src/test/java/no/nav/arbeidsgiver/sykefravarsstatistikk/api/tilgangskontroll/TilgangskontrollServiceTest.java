@@ -40,6 +40,9 @@ public class TilgangskontrollServiceTest {
     @Mock
     private Sporbarhetslogg sporbarhetslogg;
 
+    @Mock
+    private TokenXClient tokenXClient;
+
     private Fnr fnr;
 
 
@@ -50,8 +53,8 @@ public class TilgangskontrollServiceTest {
                 tokenUtils,
                 sporbarhetslogg,
                 IAWEB_SERVICE_CODE,
-                IAWEB_SERVICE_EDITION
-        );
+                IAWEB_SERVICE_EDITION,
+                tokenXClient);
         fnr = new Fnr(FNR);
     }
 

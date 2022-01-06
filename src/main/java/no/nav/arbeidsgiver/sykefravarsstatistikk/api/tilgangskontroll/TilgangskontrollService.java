@@ -1,5 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.oauth2.sdk.GeneralException;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
@@ -9,6 +11,9 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.sporbarhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.sporbarhet.Sporbarhetslogg;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.text.ParseException;
 
 @Slf4j
 @Component
@@ -20,40 +25,50 @@ public class TilgangskontrollService {
 
     private final String iawebServiceCode;
     private final String iawebServiceEdition;
+    private final TokenXClient tokenXClient;
 
     public TilgangskontrollService(
             AltinnKlientWrapper altinnKlientWrapper,
             TilgangskontrollUtils tokenUtils,
             Sporbarhetslogg sporbarhetslogg,
             @Value("${altinn.iaweb.service.code}") String iawebServiceCode,
-            @Value("${altinn.iaweb.service.edition}") String iawebServiceEdition
-    ) {
+            @Value("${altinn.iaweb.service.edition}") String iawebServiceEdition,
+            TokenXClient tokenXClient) {
         this.altinnKlientWrapper = altinnKlientWrapper;
         this.tokenUtils = tokenUtils;
         this.sporbarhetslogg = sporbarhetslogg;
         this.iawebServiceCode = iawebServiceCode;
         this.iawebServiceEdition = iawebServiceEdition;
+        this.tokenXClient = tokenXClient;
     }
 
     public InnloggetBruker hentInnloggetBruker() {
         InnloggetBruker innloggetBruker = tokenUtils.hentInnloggetBruker();
-        innloggetBruker.setOrganisasjoner(
-                altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
-                        tokenUtils.hentInnloggetJwtToken(),
-                        innloggetBruker.getFnr()
-                )
-        );
+        try {
+            innloggetBruker.setOrganisasjoner(
+                    altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
+                            tokenXClient.exchangeTokenToAltinnProxy(tokenUtils.hentInnloggetJwtToken()),
+                            innloggetBruker.getFnr()
+                    )
+            );
+        } catch (ParseException | JOSEException | GeneralException | IOException e) {
+            throw new TilgangskontrollException(e.getMessage());
+        }
         return innloggetBruker;
     }
 
     public InnloggetBruker hentInnloggetBrukerForAlleRettigheter() {
         InnloggetBruker innloggetBruker = tokenUtils.hentInnloggetBruker();
-        innloggetBruker.setOrganisasjoner(
-                altinnKlientWrapper.hentOrgnumreDerBrukerHarTilgangTil(
-                        tokenUtils.hentInnloggetJwtToken(),
-                        innloggetBruker.getFnr()
-                )
-        );
+        try {
+            innloggetBruker.setOrganisasjoner(
+                    altinnKlientWrapper.hentOrgnumreDerBrukerHarTilgangTil(
+                            tokenXClient.exchangeTokenToAltinnProxy(tokenUtils.hentInnloggetJwtToken()),
+                            innloggetBruker.getFnr()
+                    )
+            );
+        } catch (ParseException | JOSEException | GeneralException | IOException e) {
+           throw new TilgangskontrollException(e.getMessage());
+        }
         return innloggetBruker;
     }
 

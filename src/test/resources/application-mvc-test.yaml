@@ -59,4 +59,6 @@ no.nav.security.jwt:
       accepted_audience: someaudience
       cookie_name: selvbetjening-idtoken
 
-
+tokenxclient:
+  jwk: abc
+  clientId: someaudience

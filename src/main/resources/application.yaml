@@ -56,6 +56,11 @@ no.nav.security.jwt.issuer:
     discoveryurl: ${TOKEN_X_WELL_KNOWN_URL}
     accepted_audience: ${TOKEN_X_CLIENT_ID}
 
+tokenxclient:
+  jwk: ${TOKEN_X_WELL_PRIVATE_JWK}
+  clientId: ${TOKEN_X_CLIENT_ID}
+
+
 statistikk.importering.aktivert: true
 statistikk.eksportering.aktivert: true
 
