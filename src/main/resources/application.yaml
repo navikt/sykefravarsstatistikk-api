@@ -57,7 +57,7 @@ no.nav.security.jwt.issuer:
     accepted_audience: ${TOKEN_X_CLIENT_ID}
 
 tokenxclient:
-  jwk: ${TOKEN_X_WELL_PRIVATE_JWK}
+  jwk: ${TOKEN_X_PRIVATE_JWK}
   clientId: ${TOKEN_X_CLIENT_ID}
 
 
