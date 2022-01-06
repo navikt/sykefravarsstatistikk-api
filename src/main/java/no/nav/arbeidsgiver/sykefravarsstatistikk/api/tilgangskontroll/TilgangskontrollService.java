@@ -9,6 +9,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnKlientWrapper;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.sporbarhet.Loggevent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.sporbarhet.Sporbarhetslogg;
+import no.nav.security.token.support.core.jwt.JwtToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,6 @@ public class TilgangskontrollService {
     private final AltinnKlientWrapper altinnKlientWrapper;
     private final TilgangskontrollUtils tokenUtils;
     private final Sporbarhetslogg sporbarhetslogg;
-
     private final String iawebServiceCode;
     private final String iawebServiceEdition;
     private final TokenXClient tokenXClient;
@@ -45,9 +45,11 @@ public class TilgangskontrollService {
     public InnloggetBruker hentInnloggetBruker() {
         InnloggetBruker innloggetBruker = tokenUtils.hentInnloggetBruker();
         try {
+            JwtToken exchangedTokenToAltinnProxy =
+                    tokenXClient.exchangeTokenToAltinnProxy(tokenUtils.hentInnloggetJwtToken());
             innloggetBruker.setOrganisasjoner(
                     altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
-                            tokenXClient.exchangeTokenToAltinnProxy(tokenUtils.hentInnloggetJwtToken()),
+                            exchangedTokenToAltinnProxy,
                             innloggetBruker.getFnr()
                     )
             );
@@ -60,9 +62,12 @@ public class TilgangskontrollService {
     public InnloggetBruker hentInnloggetBrukerForAlleRettigheter() {
         InnloggetBruker innloggetBruker = tokenUtils.hentInnloggetBruker();
         try {
+            JwtToken exchangedTokenToAltinnProxy =
+                    tokenXClient.exchangeTokenToAltinnProxy(tokenUtils.hentInnloggetJwtToken());
+
             innloggetBruker.setOrganisasjoner(
                     altinnKlientWrapper.hentOrgnumreDerBrukerHarTilgangTil(
-                            tokenXClient.exchangeTokenToAltinnProxy(tokenUtils.hentInnloggetJwtToken()),
+                            exchangedTokenToAltinnProxy,
                             innloggetBruker.getFnr()
                     )
             );

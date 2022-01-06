@@ -16,7 +16,7 @@ import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.SELVBETJENING_ISSUER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ApiErrorMappingTestSpring extends SpringIntegrationTestbase {
+public class ApiErrorMappingTest extends SpringIntegrationTestbase {
 
     @Autowired
     private MockOAuth2Server mockOAuth2Server;

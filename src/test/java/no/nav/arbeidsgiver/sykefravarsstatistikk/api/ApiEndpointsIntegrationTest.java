@@ -26,7 +26,7 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.SELVBE
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.TOKENX_ISSUER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ApiTestSpring extends SpringIntegrationTestbase {
+public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
