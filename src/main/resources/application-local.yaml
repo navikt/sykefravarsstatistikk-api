@@ -67,4 +67,5 @@ tokenxclient:
       "n": "ssXDjDMHXWxvnAFXwJiKqgyf6tn_zHGbkSiWNgHZ2xsQgxo-gzv5JssbJxLCDZCdC5zX7nXIHOC5fid_fxMXGNAYh6xaJzxSLGGAJHSp_uCh5zSPAGFigihxLNwwWaDxYDcLFC9QHzaV__BaB_JUaHyD7aFDUEyQiB4MXAqTkCEUmPj-RTiUbcnicD5Q32zByJ8gzG3ufxuCGnP-xcc5QJQ8TmrlLgNzgiHHdkpRjeXCHovP_gYGXujJkhQ0dvgYtVpgoHeGcH1FC9ZRd6IiFtanJ1MPwg2i6sR_HlE2l3Ua_Knj4FZY3F0cM3P4AgXI8TyEhQgM2GWwPGf6YNrHyQ"
     }'
   clientId: dev-fss:arbeidsgiver:sykefravarsstatistikk-api
+  altinn_rettigheter_proxy_audience: dev-gcp:arbeidsgiver:altinn-rettigheter-proxy
 

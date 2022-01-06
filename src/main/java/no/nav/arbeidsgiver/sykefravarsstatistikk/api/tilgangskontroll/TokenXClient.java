@@ -35,12 +35,15 @@ public class TokenXClient {
     private final String tokenxClientId;
     private final String tokenxWellKnownUrl;
     private final RestTemplate restTemplate;
+    private final String altinnRettigheterProxyAudience;
 
     public TokenXClient(@Value("${tokenxclient.jwk}") String tokenxJwk,
                         @Value("${tokenxclient.clientId}") String tokenxClientId,
+                        @Value("${tokenxclient.altinn_rettigheter_proxy_audience}") String altinnRettigheterProxyAudience,
                         @Value("${no.nav.security.jwt.issuer.tokenx.discoveryurl}") String tokenxWellKnownUrl, RestTemplate restTemplate) {
         this.tokenxJwk = tokenxJwk;
         this.tokenxClientId = tokenxClientId;
+        this.altinnRettigheterProxyAudience = altinnRettigheterProxyAudience;
         this.tokenxWellKnownUrl = tokenxWellKnownUrl;
         this.restTemplate = restTemplate;
     }
@@ -48,7 +51,8 @@ public class TokenXClient {
     // TODO: Burde implementere caching av token fra tokenx
     public JwtToken exchangeTokenToAltinnProxy(JwtToken token) throws ParseException, JOSEException, GeneralException, IOException {
         // Henter metadata
-        AuthorizationServerMetadata authorizationServerMetadata = AuthorizationServerMetadata.resolve(new Issuer(tokenxWellKnownUrl));
+        String trimmetUrl = tokenxWellKnownUrl.replace(".well-known/oauth-authorization-server/", "");
+        AuthorizationServerMetadata authorizationServerMetadata = AuthorizationServerMetadata.resolve(new Issuer(trimmetUrl));
 
         // Lag assertion token
         RSAKey jwk = RSAKey.parse(tokenxJwk);
@@ -59,7 +63,7 @@ public class TokenXClient {
                 .build();
 
         JWTClaimsSet claims = new JWTClaimsSet.Builder()
-                .audience(authorizationServerMetadata.getTokenEndpointURI().toString()) //FIXME
+                .audience(authorizationServerMetadata.getTokenEndpointURI().toString())
                 .jwtID(UUID.randomUUID().toString())
                 .subject(tokenxClientId)
                 .issuer(tokenxClientId)
@@ -89,7 +93,7 @@ public class TokenXClient {
 
     public MultiValueMap<String, String> byggParameterMap(String assertionToken, JwtToken token) {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("audience", "dev-gcp:arbeidsgiver:altinn-rettigheter-proxy"); // FIXME
+        map.add("audience", altinnRettigheterProxyAudience); // FIXME
         map.add("client_assertion", assertionToken);
         map.add("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
         map.add("subject_token", token.getTokenAsString());
