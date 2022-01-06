@@ -5,29 +5,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 public class TestUtils {
 
-    public static final String ID = "id";
-
-    /**
-     * H2 DB og PostgreSQL har forskjellige syntax for ID (primary key)
-     * H2 DB bruker 'bigint auto_increment' hvor PostgreSQL bruker 'serial'
-     * Denne metoden endrer feltet ID ut i fra migreringsscript slik at H2 klarer å auto-increment feltet ID ved 'insert'
-     * OBS: dette gjelder kun tester og ikke applikasjon når den kjører lokalt: da er H2 DB startet med dialect PostgreSQL
-     */
-    public static void setAutoincrementPrimaryKeyForH2Db(
-            NamedParameterJdbcTemplate namedParameterJdbcTemplate,
-            String tabell
-    ) {
-
-        namedParameterJdbcTemplate.getJdbcTemplate().execute(String.format("alter table %s drop column %s", tabell, ID));
-        namedParameterJdbcTemplate.getJdbcTemplate().execute(
-                String.format(
-                        "alter table %s add %s bigint auto_increment",
-                        tabell,
-                        ID
-                )
-        );
-    }
-
     public static MapSqlParameterSource parametreForStatistikk(int årstall, int kvartal, int antallPersoner, int tapteDagsverk, int muligeDagsverk) {
         return new MapSqlParameterSource()
                 .addValue("arstall", årstall)
@@ -40,6 +17,8 @@ public class TestUtils {
     public static void slettAllStatistikkFraDatabase(NamedParameterJdbcTemplate jdbcTemplate) {
         jdbcTemplate.update("delete from sykefravar_statistikk_virksomhet", new MapSqlParameterSource());
         jdbcTemplate.update("delete from sykefravar_statistikk_naring", new MapSqlParameterSource());
+        jdbcTemplate.update("delete from sykefravar_statistikk_naring_med_varighet", new MapSqlParameterSource());
+        jdbcTemplate.update("delete from sykefravar_statistikk_virksomhet_med_gradering", new MapSqlParameterSource());
         jdbcTemplate.update("delete from sykefravar_statistikk_naring5siffer", new MapSqlParameterSource());
         jdbcTemplate.update("delete from sykefravar_statistikk_sektor", new MapSqlParameterSource());
         jdbcTemplate.update("delete from sykefravar_statistikk_land", new MapSqlParameterSource());

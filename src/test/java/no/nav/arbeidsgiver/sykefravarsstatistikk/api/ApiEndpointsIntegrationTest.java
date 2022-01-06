@@ -2,12 +2,14 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import common.SpringIntegrationTestbase;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
-import no.nav.security.token.support.test.JwtTokenGenerator;
+import no.nav.security.mock.oauth2.MockOAuth2Server;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.io.IOException;
 import java.net.URI;
@@ -20,11 +22,17 @@ import java.util.stream.Stream;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static java.net.http.HttpClient.newBuilder;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.SELVBETJENING_ISSUER_ID;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.TOKENX_ISSUER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties = {"wiremock.mock.port=8083"})
-public class ApiTest {
+public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    @Autowired
+    MockOAuth2Server mockOAuth2Server;
 
     @LocalServerPort
     private String port;
@@ -40,7 +48,10 @@ public class ApiTest {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET + "/bedriftsmetrikker"))
-                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .header(
+                                AUTHORIZATION,
+                                getBearerMedJwt("15008462396")
+                        )
                         .GET()
                         .build(),
                 ofString()
@@ -60,13 +71,53 @@ public class ApiTest {
     }
 
     @Test
-    public void sykefraværshistorikk__skal_returnere_riktig_objekt() throws Exception {
+    public void sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_selvbetjening_token() throws Exception {
+        String jwtTokenIssuedByLoginservice = TestTokenUtil.createToken(
+                mockOAuth2Server,
+                "15008462396",
+                SELVBETJENING_ISSUER_ID
+        );
+
+        sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtTokenIssuedByLoginservice);
+    }
+
+    @Test
+    public void sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_idporten() throws Exception {
+        String jwtToken = TestTokenUtil.createToken(
+                mockOAuth2Server,
+                "dette-er-ikke-et-fnr",
+                TOKENX_ISSUER_ID,
+                "https://oidc.difi.no/idporten-oidc-provider/",
+                "15008462396"
+        );
+
+        sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtToken);
+    }
+
+    @Test
+    public void sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_loginservice() throws Exception {
+        String jwtToken = TestTokenUtil.createToken(
+                mockOAuth2Server,
+                "15008462396",
+                TOKENX_ISSUER_ID,
+                "https://navnob2c.b2clogin.com/something-unique-and-long/v2.0/",
+                null
+        );
+
+        sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtToken);
+    }
+
+
+    private void sjekkAtSykefraværshistorikkReturnereRiktigObjekt(String jwtToken) throws Exception {
         HttpResponse<String> response = newBuilder().build().send(
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET +
                                 "/sykefravarshistorikk/kvartalsvis")
                         )
-                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .header(
+                                AUTHORIZATION,
+                                "Bearer " + jwtToken
+                        )
                         .GET()
                         .build(),
                 ofString()
@@ -129,7 +180,10 @@ public class ApiTest {
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/"
                                 + ORGNR_UNDERENHET_INGEN_TILGANG + "/sykefravarshistorikk/kvartalsvis"))
-                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .header(
+                                AUTHORIZATION,
+                                getBearerMedJwt("15008462396")
+                        )
                         .GET()
                         .build(),
                 ofString()
@@ -145,7 +199,10 @@ public class ApiTest {
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/"
                                 + ORGNR_UNDERENHET_INGEN_TILGANG + "/sykefravarshistorikk/summert?antallKvartaler=4"))
-                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .header(
+                                AUTHORIZATION,
+                                getBearerMedJwt("15008462396")
+                        )
                         .GET()
                         .build(),
                 ofString()
@@ -161,7 +218,10 @@ public class ApiTest {
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET +
                                 "/sykefravarshistorikk/legemeldtsykefravarsprosent")
                         )
-                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .header(
+                                AUTHORIZATION,
+                                getBearerMedJwt("15008462396")
+                        )
                         .GET()
                         .build(),
                 ofString()
@@ -177,7 +237,7 @@ public class ApiTest {
                         Statistikkategori.NÆRING.toString()
                 ).anyMatch(alleSykefraværshistorikk.findValue("type").asText()::contains)
         );
-        assertThat( alleSykefraværshistorikk.findValue("label").isTextual());
+        assertThat(alleSykefraværshistorikk.findValue("label").isTextual());
         assertThat(alleSykefraværshistorikk.findValue("prosent").isNumber());
     }
 
@@ -187,7 +247,10 @@ public class ApiTest {
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/"
                                 + ORGNR_UNDERENHET_INGEN_TILGANG + "/sykefravarshistorikk/legemeldtsykefravarsprosent"))
-                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .header(
+                                AUTHORIZATION,
+                                getBearerMedJwt("15008462396")
+                        )
                         .GET()
                         .build(),
                 ofString()
@@ -202,7 +265,10 @@ public class ApiTest {
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET
                                 + "/sykefravarshistorikk/summert?antallKvartaler=4"))
-                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .header(
+                                AUTHORIZATION,
+                                getBearerMedJwt("15008462396")
+                        )
                         .GET()
                         .build(),
                 ofString()
@@ -222,7 +288,10 @@ public class ApiTest {
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + "555555555" +
                                 "/sykefravarshistorikk/legemeldtsykefravarsprosent")
                         )
-                        .header(AUTHORIZATION, "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396"))
+                        .header(
+                                AUTHORIZATION,
+                                getBearerMedJwt("15008462396")
+                        )
                         .GET()
                         .build(),
                 ofString()
@@ -232,6 +301,18 @@ public class ApiTest {
         JsonNode body = objectMapper.readTree(response.body());
 
         assertThat(body).isNullOrEmpty();
+    }
+
+    @NotNull
+    private String getBearerMedJwt(String subject) {
+        return "Bearer "
+                + TestTokenUtil.createToken(
+                mockOAuth2Server,
+                subject,
+                SELVBETJENING_ISSUER_ID,
+                "",
+                ""
+        );
     }
 
     private static String getSummertSykefraværshistorikkResponseBody() {

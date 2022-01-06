@@ -1,26 +1,36 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.besøksstatistikk;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.LocalOgUnitTestOidcConfiguration;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnRolle;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
+import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
 import java.util.Collections;
 
 import static java.lang.String.format;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.setAutoincrementPrimaryKeyForH2Db;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.enSammenligningBuilder;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.enSammenligningEventBuilder;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.enUnderenhet;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.etOrgnr;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 @ActiveProfiles("db-test")
-@DataJdbcTest
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {AppConfigForJdbcTesterConfig.class})
+@DataJdbcTest(excludeAutoConfiguration = {TestDatabaseAutoConfiguration.class, LocalOgUnitTestOidcConfiguration.class})
 public class BesøksstatistikkRepositoryJdbcTest {
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -32,10 +42,6 @@ public class BesøksstatistikkRepositoryJdbcTest {
     public void setUp() {
         repository = new BesøksstatistikkRepository(namedParameterJdbcTemplate);
         cleanUpTestDb(namedParameterJdbcTemplate);
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "besoksstatistikk_altinn_roller");
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "besoksstatistikk_smaa_virksomheter");
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "besoksstatistikk_unikt_besok");
-        setAutoincrementPrimaryKeyForH2Db(namedParameterJdbcTemplate, "besoksstatistikk_virksomhet");
     }
 
     @AfterEach

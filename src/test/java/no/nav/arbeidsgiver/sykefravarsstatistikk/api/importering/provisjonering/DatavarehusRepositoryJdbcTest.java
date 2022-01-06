@@ -1,9 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.StatistikkildeDvh;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
@@ -16,26 +16,45 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklas
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
+import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.NÆRINGSKODE_2SIFFER;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.NÆRINGSKODE_5SIFFER;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_1;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_2;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_3;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.SEKTOR;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_FORETAK;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.DatavarehusRepositoryJdbcTestUtils.*;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.DatavarehusRepositoryJdbcTestUtils.cleanUpTestDb;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.DatavarehusRepositoryJdbcTestUtils.insertNæringInDvhTabell;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.DatavarehusRepositoryJdbcTestUtils.insertOrgenhetInDvhTabell;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.DatavarehusRepositoryJdbcTestUtils.insertSektorInDvhTabell;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkLandInDvhTabell;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkNærin5SiffergInDvhTabell;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkNæringInDvhTabell;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkVirksomhetInDvhTabell;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._8_DAGER_TIL_16_DAGER;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ActiveProfiles("db-test")
-@DataJdbcTest
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {AppConfigForJdbcTesterConfig.class})
+@DataJdbcTest(excludeAutoConfiguration = {TestDatabaseAutoConfiguration.class})
 public class DatavarehusRepositoryJdbcTest {
 
     @Autowired
@@ -183,8 +202,8 @@ public class DatavarehusRepositoryJdbcTest {
                 2018,
                 4,
                 10,
-                new BigDecimal(15).setScale(6),
-                new BigDecimal(200).setScale(6)
+                new BigDecimal(15),
+                new BigDecimal(200)
         ));
     }
 
@@ -207,8 +226,8 @@ public class DatavarehusRepositoryJdbcTest {
                 _1_DAG_TIL_7_DAGER.kode,
                 RECTYPE_FOR_VIRKSOMHET,
                 7,
-                new BigDecimal(13).setScale(6),
-                new BigDecimal(188).setScale(6)
+                new BigDecimal(13),
+                new BigDecimal(188)
         );
         assertThat(sykefraværsstatistikkVirksomhet.get(0)).isEqualTo(expected);
     }
@@ -235,8 +254,8 @@ public class DatavarehusRepositoryJdbcTest {
                 NÆRINGSKODE_5SIFFER,
                 _1_DAG_TIL_7_DAGER.kode,
                 13,
-                new BigDecimal(16).setScale(6),
-                new BigDecimal(263).setScale(6)
+                new BigDecimal(16),
+                new BigDecimal(263)
         );
         assertThat(sykefraværsstatistikkNæringMedVarighet.get(0)).isEqualTo(expected);
     }
@@ -292,11 +311,11 @@ public class DatavarehusRepositoryJdbcTest {
                 NÆRINGSKODE_5SIFFER,
                 RECTYPE_FOR_VIRKSOMHET,
                 1,
-                new BigDecimal(3).setScale(6),
+                new BigDecimal(3),
                 3,
                 13,
-                new BigDecimal(16).setScale(6),
-                new BigDecimal(100).setScale(6)
+                new BigDecimal(16),
+                new BigDecimal(100)
         );
         SykefraværsstatistikkVirksomhetMedGradering expectedLinje2 = new SykefraværsstatistikkVirksomhetMedGradering(
                 2018,
@@ -306,12 +325,13 @@ public class DatavarehusRepositoryJdbcTest {
                 NÆRINGSKODE_5SIFFER,
                 RECTYPE_FOR_VIRKSOMHET,
                 2,
-                new BigDecimal(6).setScale(6),
+                new BigDecimal(6),
                 2,
                 26,
-                new BigDecimal(32).setScale(6),
-                new BigDecimal(200).setScale(6)
+                new BigDecimal(32),
+                new BigDecimal(200)
         );
+
         assertThat(sykefraværsstatistikkVirksomhetMedGradering.get(0)).isEqualTo(expected);
         assertThat(sykefraværsstatistikkVirksomhetMedGradering.get(1)).isEqualTo(expectedLinje2);
     }

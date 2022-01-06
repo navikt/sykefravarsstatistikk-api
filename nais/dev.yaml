@@ -11,6 +11,20 @@ spec:
   port: 8080
   ingresses:
     - https://arbeidsgiver.nais.preprod.local/sykefravarsstatistikk-api/
+    - https://sykefravarsstatistikk-api.dev-fss-pub.nais.io/
+  tokenx:
+    enabled: true
+  accessPolicy:
+    inbound:
+      rules:
+        - application: sykefravarsstatistikk
+          namespace: arbeidsgiver
+          cluster: dev-gcp
+    outbound:
+      rules:
+        - application: altinn-rettigheter-proxy
+          namespace: arbeidsgiver
+          cluster: dev-gcp
   liveness:
     path: /sykefravarsstatistikk-api/internal/healthcheck
     initialDelay: 30

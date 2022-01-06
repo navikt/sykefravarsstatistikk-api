@@ -17,12 +17,13 @@ import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Slf4j
 @Component
-@Profile({"local", "dev"})
+@Profile({"local", "dev", "mvc-test"})
 public class MockServer {
     public static final boolean AKTIVER_VERBOSE_LOGGING_I_KONSOLEN = false;
     private final WireMockServer server;
@@ -32,6 +33,7 @@ public class MockServer {
             @Value("${altinn.url}") String altinnUrl,
             @Value("${altinn.proxy.url}") String altinnProxyUrl,
             @Value("${enhetsregisteret.url}") String enhetsregisteretUrl,
+            @Value("${unleash.url}") String unleashUrl,
             Environment environment
     ) {
         log.info("Starter mock-server på port " + port);
@@ -44,7 +46,9 @@ public class MockServer {
                         )
         );
 
-        if (Arrays.asList(environment.getActiveProfiles()).contains("local")) {
+        if (Arrays.asList(environment.getActiveProfiles()).contains("local")
+                || Arrays.asList(environment.getActiveProfiles()).contains("mvc-test")
+        ) {
             log.info("Mocker kall fra Altinn");
             mockKallFraFil(altinnUrl + "ekstern/altinn/api/serviceowner/reportees", "altinnReportees.json");
             mockKallFraFil(
@@ -52,13 +56,43 @@ public class MockServer {
                     "altinnAuthorization-roles.json"
             );
             mockKall(altinnProxyUrl + "organisasjoner", HttpStatus.NOT_FOUND);
-
         }
 
         log.info("Mocker kall fra Enhetsregisteret");
         mockKallFraEnhetsregisteret(enhetsregisteretUrl);
 
+        log.info("Mocker kall fra Unleash");
+        mockKallFraUnleash(unleashUrl);
+
         server.start();
+    }
+
+    @SneakyThrows
+    private void mockKallFraUnleash(String unleashUrl) {
+        String path = new URL(unleashUrl).getPath();
+        server.stubFor(
+                WireMock.post(path + "client/register").willReturn(WireMock.aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withStatus(HttpStatus.OK.value())
+                        .withBody("[]")
+                )
+        );
+        server.stubFor(
+                WireMock.get(path + "client/features").willReturn(WireMock.aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withStatus(HttpStatus.OK.value())
+                        .withBody("[]")
+                )
+        );
+        server.stubFor(
+                WireMock.post(path + "client/metrics").willReturn(WireMock.aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withStatus(HttpStatus.OK.value())
+                        .withBody("[]")
+                )
+        );
+
+        mockKall(WireMock.urlPathMatching(path + "/unleash/client/features"), "[]");
     }
 
     @SneakyThrows
