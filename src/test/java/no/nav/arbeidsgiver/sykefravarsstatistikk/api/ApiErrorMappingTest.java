@@ -1,10 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
-import no.nav.security.token.support.test.JwtTokenGenerator;
+import common.SpringIntegrationTestbase;
+import no.nav.security.mock.oauth2.MockOAuth2Server;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.context.TestPropertySource;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -13,11 +13,13 @@ import java.net.http.HttpResponse;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static java.net.http.HttpClient.newBuilder;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.SELVBETJENING_ISSUER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties = {"wiremock.mock.port=8083"})
-public class ApiErrorMappingTest {
+public class ApiErrorMappingTest extends SpringIntegrationTestbase {
+
+    @Autowired
+    private MockOAuth2Server mockOAuth2Server;
 
     @LocalServerPort
     private String port;
@@ -39,7 +41,14 @@ public class ApiErrorMappingTest {
                         )
                         .header(
                                 AUTHORIZATION,
-                                "Bearer " + JwtTokenGenerator.signedJWTAsString("15008462396")
+                                "Bearer "
+                                        + TestTokenUtil.createToken(
+                                        mockOAuth2Server,
+                                        "15008462396",
+                                        SELVBETJENING_ISSUER_ID,
+                                        "",
+                                        ""
+                                )
                         )
                         .GET()
                         .build(),

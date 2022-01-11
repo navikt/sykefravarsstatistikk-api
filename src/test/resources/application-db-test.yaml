@@ -1,0 +1,14 @@
+spring:
+  config.activate.on-profile: db-test
+
+applikasjon.datasource:
+  url: jdbc:h2:mem:db-test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+  username: SA
+  password:
+  driver-class-name: org.h2.Driver
+
+datavarehus.datasource:
+  url: jdbc:h2:mem:db-test;MODE=Oracle;DB_CLOSE_DELAY=-1
+  username: SA
+  password:
+  driver-class-name: org.h2.Driver

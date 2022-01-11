@@ -1,18 +1,28 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
+import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -20,10 +30,13 @@ import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._8_UKER_TIL_20_UKER;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 @ActiveProfiles("db-test")
-@DataJdbcTest
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {AppConfigForJdbcTesterConfig.class})
+@DataJdbcTest(excludeAutoConfiguration = {TestDatabaseAutoConfiguration.class})
 public class SykefraværForEttKvartalRepositoryJdbcTest {
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
@@ -208,6 +221,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
                 10
         ));
     }
+
     @Test
     public void hentSykefraværprosentVirksomhet__skal_summere_sykefravær_på_varighet() {
         Underenhet barnehage = Underenhet.builder().orgnr(new Orgnr("999999999"))
@@ -216,14 +230,14 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
                 .antallAnsatte(10)
                 .overordnetEnhetOrgnr(new Orgnr("1111111111")).build();
         jdbcTemplate.update(
-                "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                        + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk, varighet) "
+                        + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk, :varighet)",
                 parametre(barnehage.getOrgnr(), 2019, 2, 10, 2, 100, _1_DAG_TIL_7_DAGER)
         );
         jdbcTemplate.update(
-                "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                        + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(barnehage.getOrgnr(), 2019, 2, 10, 5, 100, _1_DAG_TIL_7_DAGER)
+                "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk, varighet) "
+                        + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk, :varighet)",
+                parametre(barnehage.getOrgnr(), 2019, 2, 10, 5, 100, _8_UKER_TIL_20_UKER)
         );
         List<SykefraværForEttKvartal> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(barnehage);
         assertThat(resultat).isEqualTo(Arrays.asList(new SykefraværForEttKvartal(

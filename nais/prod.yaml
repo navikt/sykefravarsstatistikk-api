@@ -1,5 +1,5 @@
-apiVersion: "nais.io/v1alpha1"
-kind: "Application"
+apiVersion: nais.io/v1alpha1
+kind: Application
 metadata:
   name: sykefravarsstatistikk-api
   namespace: arbeidsgiver
@@ -11,6 +11,20 @@ spec:
   port: 8080
   ingresses:
     - https://arbeidsgiver.nais.adeo.no/sykefravarsstatistikk-api/
+    - https://sykefravarsstatistikk-api.prod-fss-pub.nais.io/
+  tokenx:
+    enabled: true
+    accessPolicy:
+      inbound:
+        rules:
+          - application: sykefravarsstatistikk
+            namespace: arbeidsgiver
+            cluster: prod-gcp
+      outbound:
+        rules:
+          - application: altinn-rettigheter-proxy
+            namespace: arbeidsgiver
+            cluster: prod-gcp
   liveness:
     path: /sykefravarsstatistikk-api/internal/healthcheck
     initialDelay: 30

@@ -1,4 +1,9 @@
 server.servlet.context-path: /sykefravarsstatistikk-api
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+    validatorUrl: none
+    url: /swagger-ui/index.html?url=/v3/api-docs/
 
 management.endpoints.web:
   exposure.include: info, health, metrics, prometheus
@@ -24,104 +29,6 @@ spring:
 ---
 
 spring:
-  config.activate.on-profile: local
-  h2.console:
-    enabled: true
-    path: /h2
-
-wiremock.mock:
-  port: 8081
-
-altinn:
-  url: "http://localhost:${wiremock.mock.port}/altinn/"
-  apikey: "test"
-  apigw.apikey: "test"
-  proxy:
-    url: "http://localhost:${wiremock.mock.port}/altinn-rettigheter-proxy/"
-  iaweb.service:
-    code: 3403
-    edition: 1
-
-enhetsregisteret:
-  url: "http://localhost:${wiremock.mock.port}/enhetsregisteret/"
-
-no.nav.security.jwt:
-  issuer:
-    selvbetjening:
-      discoveryurl: http://metadata
-      accepted_audience: aud-localhost
-      cookiename: selvbetjening-idtoken
-
-statistikk.importering.aktivert: true
-statistikk.eksportering.aktivert: true
-
-applikasjon.datasource:
-  url: jdbc:h2:mem:test
-  username: SA
-  password:
-  driver-class-name: org.h2.Driver
-
-datavarehus.datasource:
-  url: jdbc:h2:mem:test
-  username: SA
-  password:
-  driver-class-name: org.h2.Driver
-
-unleash.url: http://unleash.herokuapp.com/api/
-
-nais.cluster.name: local
-
-kafka:
-  outbound:
-    topic: arbeidsgiver.sykefravarsstatistikk-v1
-    bootstrapServers: localhost:9092
-    securityProtocol: PLAINTEXT
-
----
-
-spring:
-  config.activate.on-profile: db-test
-
-  flyway:
-    locations: classpath:/db/migration,classpath:/db/test-datavarehus
-
-applikasjon.datasource:
-  url: jdbc:h2:mem:test
-  username: SA
-  password:
-  driver-class-name: org.h2.Driver
-
-datavarehus.datasource:
-  url: jdbc:h2:mem:test
-  username: SA
-  password:
-  driver-class-name: org.h2.Driver
-
-
----
-
-spring:
-  config.activate.on-profile: mvc-test
-
-no.nav.security.jwt.issuer.selvbetjening:
-      discoveryurl: http://metadata
-      accepted_audience: aud-localhost
-      cookiename: selvbetjening-idtoken
-
-enhetsregisteret:
-  url: "http://localhost:1331/enhetsregisteret/"
-
-altinn:
-  url: "http://localhost:1331/altinn/"
-  apikey: "test"
-  apigw.apikey: "test"
-  iaweb.service:
-    code: 3403
-    edition: 1
-
----
-
-spring:
   config.activate.on-profile: dev
 
 wiremock.mock:
@@ -135,15 +42,25 @@ altinn:
   apikey: ${ALTINN_APIKEY}
   apigw.apikey: ${ALTINN_APIGW_APIKEY}
   proxy:
-    url: https://arbeidsgiver.dev.intern.nav.no/altinn-rettigheter-proxy
+    url: https://altinn-rettigheter-proxy.dev.intern.nav.no/altinn-rettigheter-proxy
   iaweb.service:
     code: 3403
     edition: 1
 
-no.nav.security.jwt.issuer.selvbetjening:
+no.nav.security.jwt.issuer:
+  selvbetjening:
     discoveryurl: ${LOGINSERVICE_IDPORTEN_DISCOVERY_URL}
     accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
     cookiename: selvbetjening-idtoken
+  tokenx:
+    discoveryurl: ${TOKEN_X_WELL_KNOWN_URL}
+    accepted_audience: ${TOKEN_X_CLIENT_ID}
+
+tokenxclient:
+  jwk: ${TOKEN_X_PRIVATE_JWK}
+  clientId: ${TOKEN_X_CLIENT_ID}
+  altinn_rettigheter_proxy_audience: dev-gcp:arbeidsgiver:altinn-rettigheter-proxy
+
 
 statistikk.importering.aktivert: true
 statistikk.eksportering.aktivert: true
@@ -172,15 +89,24 @@ altinn:
   apikey: ${ALTINN_APIKEY}
   apigw.apikey: ${ALTINN_APIGW_APIKEY}
   proxy:
-    url: https://arbeidsgiver.intern.nav.no/altinn-rettigheter-proxy/
+    url: https://altinn-rettigheter-proxy.intern.nav.no/altinn-rettigheter-proxy/
   iaweb.service:
     code: 3403
     edition: 2
 
-no.nav.security.jwt.issuer.selvbetjening:
+no.nav.security.jwt.issuer:
+  selvbetjening:
     discoveryurl: ${LOGINSERVICE_IDPORTEN_DISCOVERY_URL}
     accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
     cookiename: selvbetjening-idtoken
+  tokenx:
+    discoveryurl: ${TOKEN_X_WELL_KNOWN_URL}
+    accepted_audience: ${TOKEN_X_CLIENT_ID}
+
+tokenxclient:
+  jwk: ${TOKEN_X_PRIVATE_JWK}
+  clientId: ${TOKEN_X_CLIENT_ID}
+  altinn_rettigheter_proxy_audience: prod-gcp:arbeidsgiver:altinn-rettigheter-proxy
 
 statistikk.importering.aktivert: true
 statistikk.eksportering.aktivert: true
