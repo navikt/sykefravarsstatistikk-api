@@ -7,17 +7,11 @@ Denne appen eksponerer statistikk om sykefravær.
 
 # Komme i gang
 
-Koden kan kjøres som en vanlig Spring Boot-applikasjon fra SykefraværsstatistikkApplication.
- Åpnes i browser: [http://localhost:8080/sykefravarsstatistikk-api/internal/healthcheck](http://localhost:8080/sykefravarsstatistikk-api/internal/healthcheck)
+Koden kan kjøres som en vanlig Spring Boot-applikasjon fra SykefraværsstatistikkApplication. Du må ha kjørende [naisdevice](https://doc.nais.io/device/) for at appen skal fungere.
 
- Default spring-profil er local, og da er alle avhengigheter mocket på localhost:8081. 
+Helsesjekk (åpnes i browser): [http://localhost:8080/sykefravarsstatistikk-api/internal/healthcheck](http://localhost:8080/sykefravarsstatistikk-api/internal/healthcheck)
 
-## Docker
-Bygg image
-`docker build -t sykefravarsstatistikk-api .`
-
-Kjør container
-`docker run -d -p 8080:8080 sykefravarsstatistikk-api`
+Default spring-profil er local, og da er alle avhengigheter mocket på localhost:8081.
 
 ## Koble til H2-database lokalt
 Åpne H2-konsollen på `http://localhost:8080/sykefravarsstatistikk-api/h2` og fyll inn det som står under `applikasjon.datasource` i `application.yaml`.
@@ -29,6 +23,12 @@ API-et kan sees og testes på:
    - `{host}/sykefravarsstatistikk-api/swagger-ui/index.html?configUrl=/sykefravarsstatistikk-api/v3/api-docs/swagger-config#/`
    - `{host}/sykefravarsstatistikk-api/swagger-ui/index.html` og lim inn `/sykefravarsstatistikk-api/v3/api-docs` i __Explore__ søkefelt
 
+## Docker
+Bygg image
+`docker build -t sykefravarsstatistikk-api .`
+
+Kjør container
+`docker run -d -p 8080:8080 sykefravarsstatistikk-api`
 ---------
 
 # Henvendelser
@@ -37,8 +37,8 @@ API-et kan sees og testes på:
 * Dette Git-repositoriet eies av [Team IA i Produktområde arbeidsgiver](https://navno.sharepoint.com/sites/intranett-prosjekter-og-utvikling/SitePages/Produktomr%C3%A5de-arbeidsgiver.aspx).
 * Slack-kanaler:
  * [#arbeidsgiver-teamia-utvikling](https://nav-it.slack.com/archives/C016KJA7CFK)
- * [#arbeidsgiver-utvikling](https://nav-it.slack.com/archives/CD4MES6BB)
  * [#arbeidsgiver-general](https://nav-it.slack.com/archives/CCM649PDH)
+ * [#arbeidsgiver-utvikling](https://nav-it.slack.com/archives/CD4MES6BB)
 
 ## For folk utenfor Nav
 * Opprett gjerne en issue i Github for alle typer spørsmål
