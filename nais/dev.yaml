@@ -20,6 +20,9 @@ spec:
         - application: sykefravarsstatistikk
           namespace: arbeidsgiver
           cluster: dev-gcp
+        - application: min-side-arbeidsgiver
+          namespace: fager
+          cluster: dev-gcp
     outbound:
       rules:
         - application: altinn-rettigheter-proxy
