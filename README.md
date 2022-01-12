@@ -23,6 +23,16 @@ API-et kan sees og testes på:
    - `{host}/sykefravarsstatistikk-api/swagger-ui/index.html?configUrl=/sykefravarsstatistikk-api/v3/api-docs/swagger-config#/`
    - `{host}/sykefravarsstatistikk-api/swagger-ui/index.html` og lim inn `/sykefravarsstatistikk-api/v3/api-docs` i __Explore__ søkefelt
 
+## Local Auth
+`GET` request som la deg hente en Cookie som kan brukes lokalt finner du i swagger `mock-login-controller`
+
+Bruk `try it out` og fyll ut følgende parametre i GUI: 
+ * `issuerId: selvbetjening` 
+ * `audience: someaudience`
+ * `cookiename: selvbetjening-idtoken`
+
+Kjør `execute`. Etter det blir cookie `selvbetjening-idtoken` satt opp og du kan kjøre andre requests i Swagger GUI. 
+
 ## Docker
 Bygg image
 `docker build -t sykefravarsstatistikk-api .`
