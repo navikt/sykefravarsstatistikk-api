@@ -23,6 +23,9 @@ spec:
           - application: min-side-arbeidsgiver
             namespace: fager
             cluster: prod-gcp
+          - application: min-ia
+            namespace: teamia
+            cluster: prod-gcp
       outbound:
         rules:
           - application: altinn-rettigheter-proxy
