@@ -26,3 +26,6 @@ spec:
     - team: team-dialog
       application: sf-sykefravaersstatistikk
       access: read
+    - team: pia
+      application: lydia-api
+      access: read
