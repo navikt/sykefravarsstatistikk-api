@@ -37,7 +37,7 @@
         <unleash.version>4.4.1</unleash.version>
         <no.nav.common-log.version>2.2021.12.09_11.47-999457edc68f</no.nav.common-log.version>
         <net.minidev.json-smart.version>2.4.7</net.minidev.json-smart.version>
-        <com.nimbusds.nimbus-jose-jwt.version>9.15.2</com.nimbusds.nimbus-jose-jwt.version>
+        <com.nimbusds.nimbus-jose-jwt.version>9.16</com.nimbusds.nimbus-jose-jwt.version>
         <com.papertrailapp.logback-syslog4j.version>1.0.0</com.papertrailapp.logback-syslog4j.version>
         <com.squareup.okhttp3.version>4.9.3</com.squareup.okhttp3.version>
         <org.springdoc.springdoc-openapi-ui.version>1.6.3</org.springdoc.springdoc-openapi-ui.version>
