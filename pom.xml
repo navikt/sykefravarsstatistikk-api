@@ -32,8 +32,8 @@
         <prometheus.version>0.14.1</prometheus.version>
         <mockito-junit-jupiter.version>3.11.2</mockito-junit-jupiter.version>
         <wiremock.version>2.27.2</wiremock.version>
-        <shedlock.shedlock-provider-jdbc-template.version>4.31.0</shedlock.shedlock-provider-jdbc-template.version>
-        <shedlock.version>4.31.0</shedlock.version>
+        <shedlock.shedlock-provider-jdbc-template.version>4.32.0</shedlock.shedlock-provider-jdbc-template.version>
+        <shedlock.version>4.32.0</shedlock.version>
         <unleash.version>4.4.1</unleash.version>
         <no.nav.common-log.version>2.2021.12.09_11.47-999457edc68f</no.nav.common-log.version>
         <net.minidev.json-smart.version>2.4.7</net.minidev.json-smart.version>
