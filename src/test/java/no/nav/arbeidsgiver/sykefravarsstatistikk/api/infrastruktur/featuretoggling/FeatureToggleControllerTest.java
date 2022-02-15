@@ -1,14 +1,15 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.featureToggles;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.featuretoggling;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.featuretoggling.FeatureToggleController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.UnleashService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,7 +18,10 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class FeatureToggleControllerTest {
@@ -37,7 +41,15 @@ public class FeatureToggleControllerTest {
     @Test
     public void feature__skal_sette_cookie_hvis_ingen_cookie() {
         featureToggleController.feature(null, null, response);
-        verify(response).addCookie(any());
+        Cookie unleashCookie = new Cookie(featureToggleController.UNLEASH_SESSION_COOKIE_NAME, "unleashSession");
+        unleashCookie.setSecure(true);
+
+        ArgumentCaptor<Cookie> argumentCaptor = ArgumentCaptor.forClass(Cookie.class);
+        verify(response).addCookie(argumentCaptor.capture());
+        Cookie capturedArgument = argumentCaptor.getValue();
+
+        assertThat(capturedArgument.getName()).isEqualTo(featureToggleController.UNLEASH_SESSION_COOKIE_NAME);
+        assertThat(capturedArgument.getSecure()).isTrue();
     }
 
     @Test
@@ -48,7 +60,10 @@ public class FeatureToggleControllerTest {
 
     @Test
     public void feature__skal_returnere_status_200_ved_get() {
-        assertThat(featureToggleController.feature(Arrays.asList("darkMode", "nightMode"), null, response).getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(
+                featureToggleController.feature(
+                        Arrays.asList("darkMode", "nightMode"), null, response).getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
     }
 
     @Test
