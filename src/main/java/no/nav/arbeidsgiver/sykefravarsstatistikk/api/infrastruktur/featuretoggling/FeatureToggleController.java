@@ -21,7 +21,7 @@ import java.util.UUID;
 @RestController
 public class FeatureToggleController {
     private final UnleashService unleashService;
-    private final String UNLEASH_SESSION_COOKIE_NAME = "unleash-session";
+    protected final String UNLEASH_SESSION_COOKIE_NAME = "unleash-session";
 
 
     @Autowired
@@ -39,7 +39,9 @@ public class FeatureToggleController {
 
         if (sessionId == null) {
             sessionId = UUID.randomUUID().toString();
-            response.addCookie(new Cookie(UNLEASH_SESSION_COOKIE_NAME, sessionId));
+            Cookie cookie = new Cookie(UNLEASH_SESSION_COOKIE_NAME, sessionId);
+            cookie.setSecure(true);
+            response.addCookie(cookie);
         }
 
         Map<String, Boolean> toggles = unleashService.hentFeatureToggles(features, sessionId);
