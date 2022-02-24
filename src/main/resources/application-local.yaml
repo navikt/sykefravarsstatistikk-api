@@ -49,7 +49,7 @@ kafka:
 no.nav.security.jwt:
   issuer:
     tokenx:
-      discoveryurl: https://fakedings.dev-gcp.nais.io/fake/.well-known/openid-configuration
+      discoveryurl: https://fakedings.dev-gcp.nais.io/fake/.well-known/oauth-authorization-server
       accepted_audience: dev-fss:arbeidsgiver:sykefravarsstatistikk-api
     selvbetjening:
       discoveryurl: http://localhost:${mock-oauth2-server.port}/selvbetjening/.well-known/openid-configuration
