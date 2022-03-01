@@ -15,7 +15,7 @@ spec:
     partitions: 1
     replication: 3  # see min/max requirements
     retentionBytes: -1
-    retentionHours: 168 # one week
+    retentionHours: 32 # temporary setting
   acl:
     - team: arbeidsgiver
       application: sykefravarsstatistikk-api
