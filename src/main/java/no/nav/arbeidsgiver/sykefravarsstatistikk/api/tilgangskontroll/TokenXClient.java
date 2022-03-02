@@ -14,14 +14,18 @@ import com.nimbusds.oauth2.sdk.as.AuthorizationServerMetadata;
 import com.nimbusds.oauth2.sdk.id.Issuer;
 import no.nav.security.token.support.core.jwt.JwtToken;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -37,6 +41,7 @@ public class TokenXClient {
     private final String tokenxWellKnownUrl;
     private final RestTemplate restTemplate;
     private final String altinnRettigheterProxyAudience;
+    private static Logger logger = LoggerFactory.getLogger(TokenXClient.class);
 
     public TokenXClient(@Value("${tokenxclient.jwk}") String tokenxJwk,
                         @Value("${tokenxclient.clientId}") String tokenxClientId,
@@ -84,10 +89,18 @@ public class TokenXClient {
         MultiValueMap<String, String> parametre = byggParameterMap(assertionToken, token);
         HttpEntity<MultiValueMap<String, String>> tokenExchangeRequestHttpEntity = new HttpEntity<>(parametre, httpHeaders);
 
-        ResponseEntity<TokenExchangeResponse> responseEntity = restTemplate.postForEntity(
-                authorizationServerMetadata.getTokenEndpointURI(),
-                tokenExchangeRequestHttpEntity,
-                TokenExchangeResponse.class);
+        ResponseEntity<TokenExchangeResponse> responseEntity = null;
+        try {
+            responseEntity = restTemplate.postForEntity(
+                    authorizationServerMetadata.getTokenEndpointURI(),
+                    tokenExchangeRequestHttpEntity,
+                    TokenExchangeResponse.class);
+        } catch (HttpClientErrorException httpClientErrorException) {
+            if (httpClientErrorException.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                logger.warn("Mottok en BAD REQUEST response fra TokenX", httpClientErrorException);
+            }
+            throw httpClientErrorException;
+        }
 
         TokenExchangeResponse body = responseEntity
                 .getBody();
