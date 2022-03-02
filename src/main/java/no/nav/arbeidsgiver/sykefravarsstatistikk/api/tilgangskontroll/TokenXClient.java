@@ -57,12 +57,54 @@ public class TokenXClient {
     }
 
     // TODO: Burde implementere caching av token fra tokenx
-    public JwtToken exchangeTokenToAltinnProxy(JwtToken token) throws ParseException, JOSEException, GeneralException, IOException {
-        // Henter metadata
-        String trimmetUrl = trimUrl(tokenxWellKnownUrl);
-        AuthorizationServerMetadata authorizationServerMetadata = AuthorizationServerMetadata.resolve(new Issuer(trimmetUrl));
+    public JwtToken exchangeTokenToAltinnProxy(JwtToken token)
+            throws ParseException, JOSEException, GeneralException, IOException, TokenXException {
+        AuthorizationServerMetadata authorizationServerMetadata = resolveUrlAndGetAuthorizationServerMetadata(
+                tokenxWellKnownUrl
+        );
+        String assertionToken = getAssertionToken(authorizationServerMetadata);
 
-        // Lag assertion token
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        MultiValueMap<String, String> parametre = byggParameterMap(assertionToken, token);
+        HttpEntity<MultiValueMap<String, String>> tokenExchangeRequestHttpEntity = new HttpEntity<>(
+                parametre,
+                httpHeaders
+        );
+
+        ResponseEntity<TokenExchangeResponse> responseEntity;
+        try {
+            responseEntity = restTemplate.postForEntity(
+                    authorizationServerMetadata.getTokenEndpointURI(),
+                    tokenExchangeRequestHttpEntity,
+                    TokenExchangeResponse.class);
+        } catch (HttpClientErrorException httpClientErrorException) {
+            if (httpClientErrorException.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                logger.warn("Mottok en BAD REQUEST response fra TokenX", httpClientErrorException);
+                throw new TokenXException(httpClientErrorException.getMessage());
+            }
+            throw httpClientErrorException;
+        }
+
+        TokenExchangeResponse body = responseEntity.getBody();
+        return new JwtToken(body.access_token);
+    }
+
+
+    @NotNull
+    protected AuthorizationServerMetadata resolveUrlAndGetAuthorizationServerMetadata(
+            String wellKnownUrl
+    ) throws GeneralException, IOException {
+        String trimmetUrl = trimUrl(wellKnownUrl);
+        AuthorizationServerMetadata authorizationServerMetadata = AuthorizationServerMetadata.resolve(
+                new Issuer(
+                        trimmetUrl
+                )
+        );
+        return authorizationServerMetadata;
+    }
+
+    protected String getAssertionToken(AuthorizationServerMetadata authorizationServerMetadata) throws ParseException, JOSEException {
         RSAKey jwk = RSAKey.parse(tokenxJwk);
         JWSHeader header = new JWSHeader
                 .Builder(JWSAlgorithm.RS256)
@@ -82,32 +124,16 @@ public class TokenXClient {
         SignedJWT signedJWT = new SignedJWT(header, claims);
         signedJWT.sign(new RSASSASigner(jwk));
         String assertionToken = signedJWT.serialize();
-
-        // Send request til tokenX
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        MultiValueMap<String, String> parametre = byggParameterMap(assertionToken, token);
-        HttpEntity<MultiValueMap<String, String>> tokenExchangeRequestHttpEntity = new HttpEntity<>(parametre, httpHeaders);
-
-        ResponseEntity<TokenExchangeResponse> responseEntity = null;
-        try {
-            responseEntity = restTemplate.postForEntity(
-                    authorizationServerMetadata.getTokenEndpointURI(),
-                    tokenExchangeRequestHttpEntity,
-                    TokenExchangeResponse.class);
-        } catch (HttpClientErrorException httpClientErrorException) {
-            if (httpClientErrorException.getStatusCode() == HttpStatus.BAD_REQUEST) {
-                logger.warn("Mottok en BAD REQUEST response fra TokenX", httpClientErrorException);
-            }
-            throw httpClientErrorException;
-        }
-
-        TokenExchangeResponse body = responseEntity
-                .getBody();
-        return new JwtToken(body.access_token);
+        return assertionToken;
     }
 
-    public MultiValueMap<String, String> byggParameterMap(String assertionToken, JwtToken token) {
+    @NotNull
+    protected static String trimUrl(String tokenxWellKnownUrl) {
+        return tokenxWellKnownUrl.replace("/.well-known/oauth-authorization-server", "");
+    }
+
+
+    private MultiValueMap<String, String> byggParameterMap(String assertionToken, JwtToken token) {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("audience", altinnRettigheterProxyAudience);
         map.add("client_assertion", assertionToken);
@@ -117,11 +143,6 @@ public class TokenXClient {
         map.add("grant_type", "urn:ietf:params:oauth:grant-type:token-exchange");
 
         return map;
-    }
-
-    @NotNull
-    protected static String trimUrl(String tokenxWellKnownUrl) {
-        return tokenxWellKnownUrl.replace("/.well-known/oauth-authorization-server", "");
     }
 
     private static class TokenExchangeResponse {

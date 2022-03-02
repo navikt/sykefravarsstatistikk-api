@@ -54,7 +54,7 @@ public class TilgangskontrollService {
                             innloggetBruker.getFnr()
                     )
             );
-        } catch (ParseException | JOSEException | GeneralException | IOException | HttpClientErrorException e) {
+        } catch (ParseException | JOSEException | GeneralException | IOException | TokenXException e) {
             throw new TilgangskontrollException(e.getMessage());
         }
         return innloggetBruker;
@@ -72,8 +72,8 @@ public class TilgangskontrollService {
                             innloggetBruker.getFnr()
                     )
             );
-        } catch (ParseException | JOSEException | GeneralException | IOException | HttpClientErrorException e) {
-           throw new TilgangskontrollException(e.getMessage());
+        } catch (ParseException | JOSEException | GeneralException | IOException | TokenXException e) {
+            throw new TilgangskontrollException(e.getMessage());
         }
         return innloggetBruker;
     }
@@ -92,14 +92,14 @@ public class TilgangskontrollService {
                 underenhet.getOrgnr().getVerdi()
         );
         sporbarhetslogg.loggHendelse(new Loggevent(
-                bruker,
-                overordnetEnhet.getOrgnr(),
-                harTilgang,
-                httpMetode,
-                requestUrl,
-                iawebServiceCode,
-                iawebServiceEdition
-        ),
+                        bruker,
+                        overordnetEnhet.getOrgnr(),
+                        harTilgang,
+                        httpMetode,
+                        requestUrl,
+                        iawebServiceCode,
+                        iawebServiceEdition
+                ),
                 kommentar);
 
         return harTilgang;
