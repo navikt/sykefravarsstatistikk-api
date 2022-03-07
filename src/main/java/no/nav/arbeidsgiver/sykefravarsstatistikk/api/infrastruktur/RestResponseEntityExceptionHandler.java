@@ -48,7 +48,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler(value = {IngenNæringException.class})
     @ResponseBody
     protected ResponseEntity<Object> handleIngenNæringException(RuntimeException e, WebRequest webRequest) {
-        logger.warn("Kunne ikke lese informasjon om enheten fra Enhetsregisteret fordi enheten ikke har næring", e);
+        logger.info("Kunne ikke lese informasjon om enheten fra Enhetsregisteret fordi enheten ikke har næring", e);
         return getResponseEntity(
                 e,
                 "Internal error",
