@@ -37,7 +37,7 @@
         <shedlock.shedlock-provider-jdbc-template.version>4.33.0</shedlock.shedlock-provider-jdbc-template.version>
         <unleash.version>4.4.1</unleash.version>
         <no.nav.common-log.version>2.2022.02.18_14.38-8d8bb494bd41</no.nav.common-log.version>
-        <net.minidev.json-smart.version>2.4.7</net.minidev.json-smart.version>
+        <net.minidev.json-smart.version>2.4.8</net.minidev.json-smart.version>
         <com.nimbusds.nimbus-jose-jwt.version>9.20</com.nimbusds.nimbus-jose-jwt.version>
         <com.papertrailapp.logback-syslog4j.version>1.0.0</com.papertrailapp.logback-syslog4j.version>
         <com.squareup.okhttp3.version>4.9.3</com.squareup.okhttp3.version>
