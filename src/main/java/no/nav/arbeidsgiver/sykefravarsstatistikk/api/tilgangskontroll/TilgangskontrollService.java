@@ -12,6 +12,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.sporbarhet
 import no.nav.security.token.support.core.jwt.JwtToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -53,7 +54,7 @@ public class TilgangskontrollService {
                             innloggetBruker.getFnr()
                     )
             );
-        } catch (ParseException | JOSEException | GeneralException | IOException e) {
+        } catch (ParseException | JOSEException | GeneralException | IOException | TokenXException e) {
             throw new TilgangskontrollException(e.getMessage());
         }
         return innloggetBruker;
@@ -71,8 +72,8 @@ public class TilgangskontrollService {
                             innloggetBruker.getFnr()
                     )
             );
-        } catch (ParseException | JOSEException | GeneralException | IOException e) {
-           throw new TilgangskontrollException(e.getMessage());
+        } catch (ParseException | JOSEException | GeneralException | IOException | TokenXException e) {
+            throw new TilgangskontrollException(e.getMessage());
         }
         return innloggetBruker;
     }
@@ -91,14 +92,14 @@ public class TilgangskontrollService {
                 underenhet.getOrgnr().getVerdi()
         );
         sporbarhetslogg.loggHendelse(new Loggevent(
-                bruker,
-                overordnetEnhet.getOrgnr(),
-                harTilgang,
-                httpMetode,
-                requestUrl,
-                iawebServiceCode,
-                iawebServiceEdition
-        ),
+                        bruker,
+                        overordnetEnhet.getOrgnr(),
+                        harTilgang,
+                        httpMetode,
+                        requestUrl,
+                        iawebServiceCode,
+                        iawebServiceEdition
+                ),
                 kommentar);
 
         return harTilgang;

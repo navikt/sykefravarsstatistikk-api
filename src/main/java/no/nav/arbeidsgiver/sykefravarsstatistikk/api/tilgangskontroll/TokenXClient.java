@@ -14,14 +14,18 @@ import com.nimbusds.oauth2.sdk.as.AuthorizationServerMetadata;
 import com.nimbusds.oauth2.sdk.id.Issuer;
 import no.nav.security.token.support.core.jwt.JwtToken;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -37,6 +41,7 @@ public class TokenXClient {
     private final String tokenxWellKnownUrl;
     private final RestTemplate restTemplate;
     private final String altinnRettigheterProxyAudience;
+    private static Logger logger = LoggerFactory.getLogger(TokenXClient.class);
 
     public TokenXClient(@Value("${tokenxclient.jwk}") String tokenxJwk,
                         @Value("${tokenxclient.clientId}") String tokenxClientId,
@@ -52,12 +57,54 @@ public class TokenXClient {
     }
 
     // TODO: Burde implementere caching av token fra tokenx
-    public JwtToken exchangeTokenToAltinnProxy(JwtToken token) throws ParseException, JOSEException, GeneralException, IOException {
-        // Henter metadata
-        String trimmetUrl = trimUrl(tokenxWellKnownUrl);
-        AuthorizationServerMetadata authorizationServerMetadata = AuthorizationServerMetadata.resolve(new Issuer(trimmetUrl));
+    public JwtToken exchangeTokenToAltinnProxy(JwtToken token)
+            throws ParseException, JOSEException, GeneralException, IOException, TokenXException {
+        AuthorizationServerMetadata authorizationServerMetadata = resolveUrlAndGetAuthorizationServerMetadata(
+                tokenxWellKnownUrl
+        );
+        String assertionToken = getAssertionToken(authorizationServerMetadata);
 
-        // Lag assertion token
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        MultiValueMap<String, String> parametre = byggParameterMap(assertionToken, token);
+        HttpEntity<MultiValueMap<String, String>> tokenExchangeRequestHttpEntity = new HttpEntity<>(
+                parametre,
+                httpHeaders
+        );
+
+        ResponseEntity<TokenExchangeResponse> responseEntity;
+        try {
+            responseEntity = restTemplate.postForEntity(
+                    authorizationServerMetadata.getTokenEndpointURI(),
+                    tokenExchangeRequestHttpEntity,
+                    TokenExchangeResponse.class);
+        } catch (HttpClientErrorException httpClientErrorException) {
+            if (httpClientErrorException.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                logger.warn("Mottok en BAD REQUEST response fra TokenX", httpClientErrorException);
+                throw new TokenXException(httpClientErrorException.getMessage());
+            }
+            throw httpClientErrorException;
+        }
+
+        TokenExchangeResponse body = responseEntity.getBody();
+        return new JwtToken(body.access_token);
+    }
+
+
+    @NotNull
+    protected AuthorizationServerMetadata resolveUrlAndGetAuthorizationServerMetadata(
+            String wellKnownUrl
+    ) throws GeneralException, IOException {
+        String trimmetUrl = trimUrl(wellKnownUrl);
+        AuthorizationServerMetadata authorizationServerMetadata = AuthorizationServerMetadata.resolve(
+                new Issuer(
+                        trimmetUrl
+                )
+        );
+        return authorizationServerMetadata;
+    }
+
+    protected String getAssertionToken(AuthorizationServerMetadata authorizationServerMetadata) throws ParseException, JOSEException {
         RSAKey jwk = RSAKey.parse(tokenxJwk);
         JWSHeader header = new JWSHeader
                 .Builder(JWSAlgorithm.RS256)
@@ -77,24 +124,16 @@ public class TokenXClient {
         SignedJWT signedJWT = new SignedJWT(header, claims);
         signedJWT.sign(new RSASSASigner(jwk));
         String assertionToken = signedJWT.serialize();
-
-        // Send request til tokenX
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        MultiValueMap<String, String> parametre = byggParameterMap(assertionToken, token);
-        HttpEntity<MultiValueMap<String, String>> tokenExchangeRequestHttpEntity = new HttpEntity<>(parametre, httpHeaders);
-
-        ResponseEntity<TokenExchangeResponse> responseEntity = restTemplate.postForEntity(
-                authorizationServerMetadata.getTokenEndpointURI(),
-                tokenExchangeRequestHttpEntity,
-                TokenExchangeResponse.class);
-
-        TokenExchangeResponse body = responseEntity
-                .getBody();
-        return new JwtToken(body.access_token);
+        return assertionToken;
     }
 
-    public MultiValueMap<String, String> byggParameterMap(String assertionToken, JwtToken token) {
+    @NotNull
+    protected static String trimUrl(String tokenxWellKnownUrl) {
+        return tokenxWellKnownUrl.replace("/.well-known/oauth-authorization-server", "");
+    }
+
+
+    private MultiValueMap<String, String> byggParameterMap(String assertionToken, JwtToken token) {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("audience", altinnRettigheterProxyAudience);
         map.add("client_assertion", assertionToken);
@@ -104,11 +143,6 @@ public class TokenXClient {
         map.add("grant_type", "urn:ietf:params:oauth:grant-type:token-exchange");
 
         return map;
-    }
-
-    @NotNull
-    protected static String trimUrl(String tokenxWellKnownUrl) {
-        return tokenxWellKnownUrl.replace("/.well-known/oauth-authorization-server", "");
     }
 
     private static class TokenExchangeResponse {
