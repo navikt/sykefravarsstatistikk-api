@@ -14,23 +14,23 @@ spec:
     - https://sykefravarsstatistikk-api.prod-fss-pub.nais.io/
   tokenx:
     enabled: true
-    accessPolicy:
-      inbound:
-        rules:
-          - application: sykefravarsstatistikk
-            namespace: arbeidsgiver
-            cluster: prod-gcp
-          - application: min-side-arbeidsgiver
-            namespace: fager
-            cluster: prod-gcp
-          - application: min-ia
-            namespace: teamia
-            cluster: prod-gcp
-      outbound:
-        rules:
-          - application: altinn-rettigheter-proxy
-            namespace: arbeidsgiver
-            cluster: prod-gcp
+  accessPolicy:
+    inbound:
+      rules:
+        - application: sykefravarsstatistikk
+          namespace: arbeidsgiver
+          cluster: prod-gcp
+        - application: min-side-arbeidsgiver
+          namespace: fager
+          cluster: prod-gcp
+        - application: min-ia
+          namespace: teamia
+          cluster: prod-gcp
+    outbound:
+      rules:
+        - application: altinn-rettigheter-proxy
+          namespace: arbeidsgiver
+          cluster: prod-gcp
   liveness:
     path: /sykefravarsstatistikk-api/internal/healthcheck
     initialDelay: 30
