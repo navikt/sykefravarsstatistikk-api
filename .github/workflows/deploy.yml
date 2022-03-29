@@ -46,7 +46,7 @@ jobs:
     #########################
     ### DEVELOPERS: Insert your feature branch name below (in addition to master) if you want to deploy it to dev
     #########################
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/håndtere-400-bad-request-response-ved-tokenexchange'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/Vise-statistikk-til-alle-innloggede-brukere-på-Forebyge-fravær'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1

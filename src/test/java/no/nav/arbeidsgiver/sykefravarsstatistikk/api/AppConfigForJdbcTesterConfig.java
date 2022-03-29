@@ -16,6 +16,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.Unlea
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.BedriftsmetrikkerController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.besøksstatistikk.BesøksstatistikkEventListener;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.organisasjoner.OrganisasjonerController;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.OffentligSykefraværshistorikkController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværshistorikkController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollUtils;
@@ -55,7 +56,8 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
                                 SykefraværshistorikkController.class,
                                 BedriftsmetrikkerController.class,
                                 OrganisasjonerController.class,
-                                TilgangskontrollService.class
+                                TilgangskontrollService.class,
+                                OffentligSykefraværshistorikkController.class
                         })
         })
 public class AppConfigForJdbcTesterConfig extends JdbcRepositoryConfigExtension {
