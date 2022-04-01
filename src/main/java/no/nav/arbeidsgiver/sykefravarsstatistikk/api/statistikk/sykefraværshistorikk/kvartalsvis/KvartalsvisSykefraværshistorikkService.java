@@ -212,7 +212,7 @@ public class KvartalsvisSykefraværshistorikkService {
                             return byggSykefraværshistorikk(
                                     statistikkategori,
                                     sykefraværshistorikkLabel,
-                                    Collections.EMPTY_LIST
+                                    Collections.emptyList()
                             );
                         });
     }
