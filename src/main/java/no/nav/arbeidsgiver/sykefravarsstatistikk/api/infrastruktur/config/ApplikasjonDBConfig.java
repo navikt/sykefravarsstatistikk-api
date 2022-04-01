@@ -12,10 +12,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;
+
+import static java.lang.String.format;
 
 @Configuration
 @Profile({"dev", "prod"})
@@ -34,21 +37,23 @@ public class ApplikasjonDBConfig {
     private static Logger logger = LoggerFactory.getLogger(ApplikasjonDBConfig.class);
 
 
+    @Primary
     @Bean(name = "sykefravarsstatistikkDataSource")
     public DataSource userDataSource() {
         return dataSource("admin");
     }
 
+    @Primary
     @Bean(name = "sykefravarsstatistikkJdbcTemplate")
     public NamedParameterJdbcTemplate sykefravarsstatistikkJdbcTemplate(
             @Qualifier("sykefravarsstatistikkDataSource") DataSource dataSource
     ) {
+
         return new NamedParameterJdbcTemplate(dataSource);
     }
 
 
     private HikariDataSource dataSource(String user) {
-
         HikariConfig config = new HikariConfig();
         config.setPoolName("Sykefraværsstatistikk-connection-pool");
         config.setJdbcUrl(databaseUrl);
@@ -69,7 +74,7 @@ public class ApplikasjonDBConfig {
     public FlywayMigrationStrategy flywayMigrationStrategy() {
         return flyway -> Flyway.configure()
                 .dataSource(dataSource("admin"))
-                .initSql(String.format("SET ROLE \"%s\"", dbRole("admin")))
+                .initSql(format("SET ROLE \"%s\"", dbRole("admin")))
                 .load()
                 .migrate();
     }
