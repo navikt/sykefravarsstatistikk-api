@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
@@ -36,6 +37,7 @@ public class ApplikasjonDBConfig {
     private static Logger logger = LoggerFactory.getLogger(ApplikasjonDBConfig.class);
 
 
+    @Primary
     @Bean(name = "sykefravarsstatistikkDataSource")
     public DataSource userDataSource() {
         logger.info(format("userDataSource() - Oppretter datasource, URL er: '%s'", databaseUrl));
@@ -44,6 +46,7 @@ public class ApplikasjonDBConfig {
         return dataSource("admin");
     }
 
+    @Primary
     @Bean(name = "sykefravarsstatistikkJdbcTemplate")
     public NamedParameterJdbcTemplate sykefravarsstatistikkJdbcTemplate(
             @Qualifier("sykefravarsstatistikkDataSource") DataSource dataSource
