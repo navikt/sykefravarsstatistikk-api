@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -18,7 +17,6 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-@DependsOn({"sykefravarsstatistikkJdbcTemplate"})
 public class EksporteringRepository {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;

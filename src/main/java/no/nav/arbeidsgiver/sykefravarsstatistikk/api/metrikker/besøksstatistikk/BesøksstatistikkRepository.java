@@ -11,7 +11,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.Altinn
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.besøksstatistikk.sammenligning.Sammenligning;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.besøksstatistikk.sammenligning.Sykefraværprosent;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -24,7 +23,6 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-@DependsOn({"sykefravarsstatistikkJdbcTemplate"})
 public class BesøksstatistikkRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 

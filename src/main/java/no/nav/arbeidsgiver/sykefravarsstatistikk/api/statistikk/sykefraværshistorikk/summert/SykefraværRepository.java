@@ -6,7 +6,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Brans
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -18,7 +17,6 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
-@DependsOn({"sykefravarsstatistikkJdbcTemplate"})
 public class SykefraværRepository {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;

@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -13,7 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Component
-@DependsOn({"sykefravarsstatistikkJdbcTemplate"})
 public class KlassifikasjonerRepository {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;

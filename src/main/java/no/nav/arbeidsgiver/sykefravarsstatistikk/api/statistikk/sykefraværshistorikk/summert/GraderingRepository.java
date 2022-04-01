@@ -9,7 +9,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Brans
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -23,7 +22,6 @@ import java.util.List;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 
 @Component
-@DependsOn({"sykefravarsstatistikkJdbcTemplate"})
 public class GraderingRepository {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
