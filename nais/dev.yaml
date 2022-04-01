@@ -22,7 +22,7 @@ spec:
           cluster: dev-gcp
         - application: min-side-arbeidsgiver
           namespace: fager
-          cluster: dev-gcp
+          cluster: dev-gcp  
         - application: min-ia
           namespace: teamia
           cluster: dev-gcp
@@ -40,8 +40,6 @@ spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: dev
-    - name: SPRING_DATASOURCE_URL
-      value: {{ SPRING_DATASOURCE_URL }}
   envFrom:
     - configmap: loginservice-idporten
   prometheus:
