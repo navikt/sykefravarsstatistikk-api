@@ -48,7 +48,7 @@ public class ApplikasjonDBConfig {
 
 
     private HikariDataSource dataSource(String user) {
-
+        System.out.println("[DEBUG] ----> oppretter datasource");
         HikariConfig config = new HikariConfig();
         config.setPoolName("Sykefraværsstatistikk-connection-pool");
         config.setJdbcUrl(databaseUrl);

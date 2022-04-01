@@ -8,6 +8,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -19,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
+@DependsOn({"sykefravarsstatistikkJdbcTemplate"})
 public class VarighetRepository {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;

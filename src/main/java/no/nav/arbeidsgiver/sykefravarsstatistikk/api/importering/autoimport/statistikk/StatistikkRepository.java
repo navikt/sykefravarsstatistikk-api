@@ -7,6 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -22,6 +23,7 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimpo
 
 @Slf4j
 @Component
+@DependsOn({"sykefravarsstatistikkJdbcTemplate"})
 public class StatistikkRepository {
 
     public static final int INSERT_BATCH_STØRRELSE = 10000;

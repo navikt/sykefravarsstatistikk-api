@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@DependsOn({"sykefravarsstatistikkJdbcTemplate"})
 public class KafkaUtsendingHistorikkRepository {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;

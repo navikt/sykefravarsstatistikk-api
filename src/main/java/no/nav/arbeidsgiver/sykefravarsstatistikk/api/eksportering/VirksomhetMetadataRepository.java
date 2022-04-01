@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.util.Pair;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
+@DependsOn({"sykefravarsstatistikkJdbcTemplate"})
 public class VirksomhetMetadataRepository {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
