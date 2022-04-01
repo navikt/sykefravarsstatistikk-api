@@ -107,7 +107,7 @@ public class KvartalsvisSykefraværshistorikkService {
     }
 
 
-    private KvartalsvisSykefraværshistorikk hentSykefraværshistorikkLand() {
+    protected KvartalsvisSykefraværshistorikk hentSykefraværshistorikkLand() {
         return byggSykefraværshistorikk(
                 Statistikkategori.LAND,
                 SYKEFRAVÆRPROSENT_LAND_LABEL,
@@ -131,7 +131,7 @@ public class KvartalsvisSykefraværshistorikkService {
         );
     }
 
-    private KvartalsvisSykefraværshistorikk hentSykefraværshistorikkBransje(Bransje bransje) {
+    protected KvartalsvisSykefraværshistorikk hentSykefraværshistorikkBransje(Bransje bransje) {
         return byggSykefraværshistorikk(
                 Statistikkategori.BRANSJE,
                 bransje.getNavn(),
@@ -150,7 +150,7 @@ public class KvartalsvisSykefraværshistorikkService {
         );
     }
 
-    private CompletableFuture<KvartalsvisSykefraværshistorikk> uthentingAvSykefraværshistorikkNæring(Underenhet underenhet) {
+    protected CompletableFuture<KvartalsvisSykefraværshistorikk> uthentingAvSykefraværshistorikkNæring(Underenhet underenhet) {
         Næringskode5Siffer næring5siffer = underenhet.getNæringskode();
         return uthentingMedTimeout(
                 () -> klassifikasjonerRepository.hentNæring(næring5siffer.hentNæringskode2Siffer())
@@ -191,7 +191,7 @@ public class KvartalsvisSykefraværshistorikkService {
                 .orTimeout(TIMEOUT_UTHENTING_FRA_DB_I_SEKUNDER, TimeUnit.SECONDS);
     }
 
-    private static CompletableFuture<KvartalsvisSykefraværshistorikk> uthentingMedFeilhåndteringOgTimeout(
+    protected static CompletableFuture<KvartalsvisSykefraværshistorikk> uthentingMedFeilhåndteringOgTimeout(
             Supplier<KvartalsvisSykefraværshistorikk> sykefraværshistorikkSupplier,
             Statistikkategori statistikkategori,
             String sykefraværshistorikkLabel
@@ -212,7 +212,7 @@ public class KvartalsvisSykefraværshistorikkService {
                             return byggSykefraværshistorikk(
                                     statistikkategori,
                                     sykefraværshistorikkLabel,
-                                    Collections.EMPTY_LIST
+                                    Collections.emptyList()
                             );
                         });
     }
