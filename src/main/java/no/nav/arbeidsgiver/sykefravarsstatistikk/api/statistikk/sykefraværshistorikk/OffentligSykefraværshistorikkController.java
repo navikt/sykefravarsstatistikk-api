@@ -34,7 +34,7 @@ public class OffentligSykefraværshistorikkController {
 
 
     @GetMapping(value = "/{orgnr}/v1/offentlig/sykefravarshistorikk/kvartalsvis")
-    public List<KvartalsvisSykefraværshistorikk> hentGenerelleSykefraværsprosenter(
+    public List<KvartalsvisSykefraværshistorikk> hentOffentligeSykefraværsprosenter(
             @PathVariable("orgnr") String orgnrStr,
             HttpServletRequest request
     ) {

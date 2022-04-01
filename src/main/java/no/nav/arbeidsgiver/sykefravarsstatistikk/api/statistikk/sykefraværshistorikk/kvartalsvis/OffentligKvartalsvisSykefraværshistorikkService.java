@@ -34,32 +34,39 @@ public class OffentligKvartalsvisSykefraværshistorikkService {
 
     public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikkV1Offentlig(
             Underenhet underenhet) {
-        Optional<Bransje> bransje =bransjeprogram.finnBransje(underenhet);
+        Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
         boolean skalHenteDataPåNæring2Siffer =
                 bransje.isEmpty()
                         || bransje.get().lengdePåNæringskoder() == 2;
 
-        List<KvartalsvisSykefraværshistorikk> kvartalsvisSykefraværshistorikkListe =
-                Stream.of(
-                                uthentingMedFeilhåndteringOgTimeout(
-                                        () -> kvartalsvisSykefraværshistorikkService
-                                                .hentSykefraværshistorikkLand(),
-                                        Statistikkategori.LAND,
-                                        SYKEFRAVÆRPROSENT_LAND_LABEL),
-                                skalHenteDataPåNæring2Siffer ?
-                                        kvartalsvisSykefraværshistorikkService
-                                                .uthentingAvSykefraværshistorikkNæring(underenhet)
-                                        : uthentingMedFeilhåndteringOgTimeout(
-                                        () -> kvartalsvisSykefraværshistorikkService
-                                                .hentSykefraværshistorikkBransje(bransje.get()),
-                                        Statistikkategori.BRANSJE,
-                                        bransje.get().getNavn()
-                                )
-                        )
-                        .map(CompletableFuture::join)
-                        .collect(Collectors.toList());
+        return Stream.of(
+                        hentUtForNorge(),
+                        skalHenteDataPåNæring2Siffer ?
+                                hentUtForNæring(underenhet) :
+                                hentUtForBransje(bransje.get())
+                )
+                .map(CompletableFuture::join)
+                .collect(Collectors.toList());
+    }
 
-        return kvartalsvisSykefraværshistorikkListe;
+    private CompletableFuture<KvartalsvisSykefraværshistorikk> hentUtForNæring(Underenhet underenhet) {
+        return kvartalsvisSykefraværshistorikkService
+                .uthentingAvSykefraværshistorikkNæring(underenhet);
+    }
 
+    private CompletableFuture<KvartalsvisSykefraværshistorikk> hentUtForBransje(Bransje bransje) {
+        return uthentingMedFeilhåndteringOgTimeout(
+                () -> kvartalsvisSykefraværshistorikkService
+                        .hentSykefraværshistorikkBransje(bransje),
+                Statistikkategori.BRANSJE,
+                bransje.getNavn()
+        );
+    }
+
+    private CompletableFuture<KvartalsvisSykefraværshistorikk> hentUtForNorge() {
+        return uthentingMedFeilhåndteringOgTimeout(
+                kvartalsvisSykefraværshistorikkService::hentSykefraværshistorikkLand,
+                Statistikkategori.LAND,
+                SYKEFRAVÆRPROSENT_LAND_LABEL);
     }
 }
