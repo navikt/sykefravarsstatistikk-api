@@ -40,9 +40,6 @@ public class ApplikasjonDBConfig {
     @Primary
     @Bean(name = "sykefravarsstatistikkDataSource")
     public DataSource userDataSource() {
-        logger.info(format("userDataSource() - Oppretter datasource, URL er: '%s'", databaseUrl));
-        logger.info(format("userDataSource() - Oppretter datasource, URL er: '%s'", databaseNavn));
-
         return dataSource("admin");
     }
 
@@ -51,18 +48,12 @@ public class ApplikasjonDBConfig {
     public NamedParameterJdbcTemplate sykefravarsstatistikkJdbcTemplate(
             @Qualifier("sykefravarsstatistikkDataSource") DataSource dataSource
     ) {
-        logger.info(format("sykefravarsstatistikkJdbcTemplate() - Oppretter datasource, URL er: '%s'", databaseUrl));
-        logger.info(format("sykefravarsstatistikkJdbcTemplate() - Oppretter datasource, URL er: '%s'", databaseNavn));
 
         return new NamedParameterJdbcTemplate(dataSource);
     }
 
 
     private HikariDataSource dataSource(String user) {
-        System.out.println("[DEBUG] ----> oppretter datasource");
-        logger.info(format("dataSource() - Oppretter datasource, URL er: '%s'", databaseUrl));
-        logger.info(format("dataSource() - Oppretter datasource, URL er: '%s'", databaseNavn));
-
         HikariConfig config = new HikariConfig();
         config.setPoolName("Sykefraværsstatistikk-connection-pool");
         config.setJdbcUrl(databaseUrl);
