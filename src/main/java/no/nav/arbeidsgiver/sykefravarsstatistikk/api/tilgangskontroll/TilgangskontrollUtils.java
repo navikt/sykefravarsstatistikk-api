@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 
 import com.google.common.collect.ImmutableSet;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Fnr;
 import no.nav.security.token.support.core.context.TokenValidationContext;
 import no.nav.security.token.support.core.context.TokenValidationContextHolder;
@@ -16,6 +17,7 @@ import java.util.Set;
 
 import static java.lang.String.format;
 
+@Slf4j
 @Component
 public class TilgangskontrollUtils {
 
@@ -46,6 +48,7 @@ public class TilgangskontrollUtils {
 
         Optional<JwtTokenClaims> claimsForIssuerSelvbetjening = getClaimsFor(context, ISSUER_SELVBETJENING);
         if (claimsForIssuerSelvbetjening.isPresent()) {
+            log.info("[DEBUG][Test miljø] subject er: ", claimsForIssuerSelvbetjening.get().getSubject());
             return new InnloggetBruker(
                     new Fnr(claimsForIssuerSelvbetjening.get().getSubject()));
         }
