@@ -45,7 +45,6 @@ public class TilgangskontrollUtils {
 
     public InnloggetBruker hentInnloggetBruker() {
         TokenValidationContext context = contextHolder.getTokenValidationContext();
-        log.info(format("[DEBUG][Test miljø] tokenValidationContext er: '%s'", context.toString()));
 
         Optional<JwtTokenClaims> claimsForIssuerSelvbetjening = getClaimsFor(context, ISSUER_SELVBETJENING);
 
