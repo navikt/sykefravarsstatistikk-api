@@ -48,7 +48,7 @@ public class TilgangskontrollUtils {
 
         Optional<JwtTokenClaims> claimsForIssuerSelvbetjening = getClaimsFor(context, ISSUER_SELVBETJENING);
         if (claimsForIssuerSelvbetjening.isPresent()) {
-            log.info("[DEBUG][Test miljø] subject er: ", claimsForIssuerSelvbetjening.get().getSubject());
+            log.info(format("[DEBUG][Test miljø] subject er: '%s'", claimsForIssuerSelvbetjening.get().getSubject()));
             return new InnloggetBruker(
                     new Fnr(claimsForIssuerSelvbetjening.get().getSubject()));
         }
