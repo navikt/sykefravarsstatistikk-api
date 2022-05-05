@@ -49,7 +49,7 @@ public class TilgangskontrollUtils {
         Optional<JwtTokenClaims> claimsForIssuerSelvbetjening = getClaimsFor(context, ISSUER_SELVBETJENING);
 
         if (claimsForIssuerSelvbetjening.isPresent()) {
-            log.info("Claims kommer fra issuer Selvbetjening (loginservice)");
+            log.debug("Claims kommer fra issuer Selvbetjening (loginservice)");
 
             return new InnloggetBruker(
                     new Fnr(getFnrFraClaims(claimsForIssuerSelvbetjening.get()))
@@ -58,7 +58,7 @@ public class TilgangskontrollUtils {
 
         Optional<JwtTokenClaims> claimsForIssuerTokenX = getClaimsFor(context, ISSUER_TOKENX);
         if (claimsForIssuerTokenX.isPresent()) {
-            log.info("Claims kommer fra issuer TokenX");
+            log.debug("Claims kommer fra issuer TokenX");
             String fnrString = getTokenXFnr(claimsForIssuerTokenX.get());
             return new InnloggetBruker(
                     new Fnr(fnrString)
@@ -77,10 +77,10 @@ public class TilgangskontrollUtils {
     private String getFnrFraClaims(JwtTokenClaims claimsForIssuerSelvbetjening) {
         String fnrFromClaim = "";
         if (claimsForIssuerSelvbetjening.getStringClaim("pid") != null) {
-            log.info("Fnr hentet fra claims 'pid'");
+            log.debug("Fnr hentet fra claims 'pid'");
             fnrFromClaim = claimsForIssuerSelvbetjening.getStringClaim("pid");
         } else if (claimsForIssuerSelvbetjening.getStringClaim("sub") != null) {
-            log.info("Fnr hentet fra claims 'sub' skal snart fases ut");
+            log.debug("Fnr hentet fra claims 'sub' skal snart fases ut");
             fnrFromClaim = claimsForIssuerSelvbetjening.getStringClaim("sub");
         }
         return fnrFromClaim;
