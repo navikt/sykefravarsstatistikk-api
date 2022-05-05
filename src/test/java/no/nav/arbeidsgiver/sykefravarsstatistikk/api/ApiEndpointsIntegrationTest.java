@@ -75,7 +75,21 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         String jwtTokenIssuedByLoginservice = TestTokenUtil.createToken(
                 mockOAuth2Server,
                 "15008462396",
-                SELVBETJENING_ISSUER_ID
+                SELVBETJENING_ISSUER_ID,
+                ""
+        );
+
+        sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtTokenIssuedByLoginservice);
+    }
+
+    @Test
+    public void sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_selvbetjening_token__issued_med_sub() throws Exception {
+        String jwtTokenIssuedByLoginservice = TestTokenUtil.createToken(
+                mockOAuth2Server,
+                "",
+                "15008462396",
+                SELVBETJENING_ISSUER_ID,
+                ""
         );
 
         sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtTokenIssuedByLoginservice);
@@ -85,10 +99,9 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
     public void sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_idporten() throws Exception {
         String jwtToken = TestTokenUtil.createToken(
                 mockOAuth2Server,
-                "dette-er-ikke-et-fnr",
+                "15008462396",
                 TOKENX_ISSUER_ID,
-                "https://oidc.difi.no/idporten-oidc-provider/",
-                "15008462396"
+                "https://oidc.difi.no/idporten-oidc-provider/"
         );
 
         sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtToken);
@@ -100,8 +113,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
                 mockOAuth2Server,
                 "15008462396",
                 TOKENX_ISSUER_ID,
-                "https://navnob2c.b2clogin.com/something-unique-and-long/v2.0/",
-                null
+                "https://navnob2c.b2clogin.com/something-unique-and-long/v2.0/"
         );
 
         sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtToken);
@@ -172,6 +184,32 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
                         )
                 );
 
+    }
+
+    @Test
+    public void sykefraværshistorikk__skal_IKKE_godkjenne_en_token_uten_sub_eller_pid() throws Exception {
+        String jwtTokenIssuedByLoginservice = TestTokenUtil.createToken(
+                mockOAuth2Server,
+                "",
+                "",
+                SELVBETJENING_ISSUER_ID,
+                ""
+        );
+
+        HttpResponse<String> response = newBuilder().build().send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/"
+                                + ORGNR_UNDERENHET_INGEN_TILGANG + "/sykefravarshistorikk/kvartalsvis"))
+                        .header(
+                                AUTHORIZATION,
+                                jwtTokenIssuedByLoginservice
+                        )
+                        .GET()
+                        .build(),
+                ofString()
+        );
+        assertThat(response.statusCode()).isEqualTo(401);
+        assertThat(response.body()).isEqualTo("{\"message\":\"You are not authorized to access this ressource\"}");
     }
 
     @Test
@@ -304,13 +342,12 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
     }
 
     @NotNull
-    private String getBearerMedJwt(String subject) {
+    private String getBearerMedJwt(String fnr) {
         return "Bearer "
                 + TestTokenUtil.createToken(
                 mockOAuth2Server,
-                subject,
+                fnr,
                 SELVBETJENING_ISSUER_ID,
-                "",
                 ""
         );
     }

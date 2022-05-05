@@ -46,7 +46,6 @@ public class ApiErrorMappingTest extends SpringIntegrationTestbase {
                                         mockOAuth2Server,
                                         "15008462396",
                                         SELVBETJENING_ISSUER_ID,
-                                        "",
                                         ""
                                 )
                         )

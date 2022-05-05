@@ -12,28 +12,31 @@ public class TestTokenUtil {
     public static String SELVBETJENING_ISSUER_ID = "selvbetjening";
     public static String TOKENX_ISSUER_ID = "tokenx";
 
+
     public static String createToken(
             MockOAuth2Server oAuth2Server,
-            String sub,
-            String issuerId
+            String pid,
+            String issuerId,
+            String idp
     ) {
-        return createToken(oAuth2Server, sub, issuerId, null, null);
+
+        return createToken(oAuth2Server, pid, "IKKE_I_BRUK_LENGER", issuerId, idp);
     }
 
     public static String createToken(
             MockOAuth2Server oAuth2Server,
+            String pid,
             String sub,
             String issuerId,
-            String idp,
-            String pid
+            String idp
     ) {
         Map<String, String> claims = new HashMap<>();
 
-        if(StringUtils.isNoneEmpty(idp)) {
+        if (StringUtils.isNoneEmpty(idp)) {
             claims.put("idp", idp);
         }
 
-        if(StringUtils.isNoneEmpty(pid)) {
+        if (StringUtils.isNoneEmpty(pid)) {
             claims.put("pid", pid);
         }
         String tokenIssuedByOAuth2Server = oAuth2Server.issueToken(
