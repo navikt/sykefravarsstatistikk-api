@@ -1,0 +1,53 @@
+{
+  "organisasjonsnummer": "311874411",
+  "navn": "SPISS SJOKKERT TIGER AS",
+  "organisasjonsform": {
+    "kode": "BEDR",
+    "beskrivelse": "Bedrift",
+    "_links": {
+      "self": {
+        "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/BEDR"
+      }
+    }
+  },
+  "postadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "0614",
+    "poststed": "OSLO",
+    "adresse": [
+      "Postboks 325  Alnabru"
+    ],
+    "kommune": "OSLO",
+    "kommunenummer": "0301"
+  },
+  "registreringsdatoEnhetsregisteret": "2009-11-30",
+  "registrertIMvaregisteret": false,
+  "naeringskode1": {
+    "beskrivelse": "Sykehjem",
+    "kode": "87.101"
+  },
+  "antallAnsatte": 78,
+  "overordnetEnhet": "310529915",
+  "oppstartsdato": "2012-01-01",
+  "datoEierskifte": "2013-01-01",
+  "beliggenhetsadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "0663",
+    "poststed": "OSLO",
+    "adresse": [
+      "Fredrik Selmers vei 2"
+    ],
+    "kommune": "OSLO",
+    "kommunenummer": "0301"
+  },
+  "_links": {
+    "self": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/underenheter/311874411"
+    },
+    "overordnetEnhet": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/310529915"
+    }
+  }
+}

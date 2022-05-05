@@ -46,7 +46,7 @@ jobs:
     #########################
     ### DEVELOPERS: Insert your feature branch name below (in addition to master) if you want to deploy it to dev
     #########################
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/oppgradering-av-spring-boot-etter-springshell-CVE-2022-22965'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/test-data-enhetsregisteret'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1

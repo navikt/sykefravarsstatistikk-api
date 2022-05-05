@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 
 import com.google.common.collect.ImmutableSet;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Fnr;
 import no.nav.security.token.support.core.context.TokenValidationContext;
 import no.nav.security.token.support.core.context.TokenValidationContextHolder;
@@ -16,6 +17,7 @@ import java.util.Set;
 
 import static java.lang.String.format;
 
+@Slf4j
 @Component
 public class TilgangskontrollUtils {
 
@@ -45,13 +47,18 @@ public class TilgangskontrollUtils {
         TokenValidationContext context = contextHolder.getTokenValidationContext();
 
         Optional<JwtTokenClaims> claimsForIssuerSelvbetjening = getClaimsFor(context, ISSUER_SELVBETJENING);
+
         if (claimsForIssuerSelvbetjening.isPresent()) {
+            log.info("Claims kommer fra issuer Selvbetjening (loginservice)");
+
             return new InnloggetBruker(
-                    new Fnr(claimsForIssuerSelvbetjening.get().getSubject()));
+                    new Fnr(getFnrFraClaims(claimsForIssuerSelvbetjening.get()))
+            );
         }
 
         Optional<JwtTokenClaims> claimsForIssuerTokenX = getClaimsFor(context, ISSUER_TOKENX);
         if (claimsForIssuerTokenX.isPresent()) {
+            log.info("Claims kommer fra issuer TokenX");
             String fnrString = getTokenXFnr(claimsForIssuerTokenX.get());
             return new InnloggetBruker(
                     new Fnr(fnrString)
@@ -65,6 +72,18 @@ public class TilgangskontrollUtils {
                         ISSUER_TOKENX
                 )
         );
+    }
+
+    private String getFnrFraClaims(JwtTokenClaims claimsForIssuerSelvbetjening) {
+        String fnrFromClaim = "";
+        if (claimsForIssuerSelvbetjening.getStringClaim("pid") != null) {
+            log.info("Fnr hentet fra claims 'pid'");
+            fnrFromClaim = claimsForIssuerSelvbetjening.getStringClaim("pid");
+        } else if (claimsForIssuerSelvbetjening.getStringClaim("sub") != null) {
+            log.info("Fnr hentet fra claims 'sub' skal snart fases ut");
+            fnrFromClaim = claimsForIssuerSelvbetjening.getStringClaim("sub");
+        }
+        return fnrFromClaim;
     }
 
     private Optional<JwtTokenClaims> getClaimsFor(TokenValidationContext context, String issuer) {
@@ -88,7 +107,7 @@ public class TilgangskontrollUtils {
         if (idp.matches("^https://oidc.*difi.*\\.no/idporten-oidc-provider/$")) {
             return claims.getStringClaim("pid");
         } else if (idp.matches("^https://nav(no|test)b2c\\.b2clogin\\.com/.*$")) {
-            return claims.getSubject();
+            return getFnrFraClaims(claims);
         } else if (idp.matches("https://fakedings.dev-gcp.nais.io/fake/idporten") && Arrays.stream(environment.getActiveProfiles()).noneMatch(profile -> profile.equals("prod"))) {
             return claims.getStringClaim("pid");
         } else {
