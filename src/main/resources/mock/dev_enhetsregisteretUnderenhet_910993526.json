@@ -1,0 +1,53 @@
+{
+  "organisasjonsnummer": "910993526",
+  "navn": "(devmock) VOLDA OG SØR-AUDNEDAL",
+  "organisasjonsform": {
+    "kode": "BEDR",
+    "beskrivelse": "Bedrift",
+    "_links": {
+      "self": {
+        "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/BEDR"
+      }
+    }
+  },
+  "postadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "0614",
+    "poststed": "OSLO",
+    "adresse": [
+      "Postboks 325  Alnabru"
+    ],
+    "kommune": "OSLO",
+    "kommunenummer": "0301"
+  },
+  "registreringsdatoEnhetsregisteret": "2009-11-30",
+  "registrertIMvaregisteret": false,
+  "naeringskode1": {
+    "beskrivelse": "Barnehage",
+    "kode": "88.911"
+  },
+  "antallAnsatte": 78,
+  "overordnetEnhet": "910562223",
+  "oppstartsdato": "2012-01-01",
+  "datoEierskifte": "2013-01-01",
+  "beliggenhetsadresse": {
+    "land": "Norge",
+    "landkode": "NO",
+    "postnummer": "0663",
+    "poststed": "OSLO",
+    "adresse": [
+      "Fredrik Selmers vei 2"
+    ],
+    "kommune": "OSLO",
+    "kommunenummer": "0301"
+  },
+  "_links": {
+    "self": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/underenheter/910993526"
+    },
+    "overordnetEnhet": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/810993472"
+    }
+  }
+}
