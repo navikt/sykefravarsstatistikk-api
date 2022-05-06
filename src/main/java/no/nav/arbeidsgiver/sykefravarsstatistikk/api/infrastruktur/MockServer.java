@@ -105,6 +105,7 @@ public class MockServer {
         mockKall(WireMock.urlPathMatching(path + "underenheter/910825518"), lesFilSomString("dev_enhetsregisteretUnderenhet_910825518.json"));
         mockKall(WireMock.urlPathMatching(path + "underenheter/910562436"), lesFilSomString("dev_enhetsregisteretUnderenhet_910562436.json"));
         mockKall(WireMock.urlPathMatching(path + "underenheter/910993526"), lesFilSomString("dev_enhetsregisteretUnderenhet_910993526.json"));
+        mockKall(WireMock.urlPathMatching(path + "underenheter/910993542"), lesFilSomString("dev_enhetsregisteretUnderenhet_910993542.json"));
         mockKall(WireMock.urlPathMatching(path + "underenheter/311874411"), lesFilSomString("dev_enhetsregisteretUnderenhet_311874411.json"));
         mockKall(WireMock.urlPathMatching(path + "underenheter/315829062"), lesFilSomString("dev_enhetsregisteretUnderenhet_315829062.json"));
         mockKall(WireMock.urlPathMatching(path + "enheter/[0-9]{9}"), lesFilSomString("enhetsregisteretEnhet.json"));
