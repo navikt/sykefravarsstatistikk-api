@@ -98,7 +98,7 @@ public class MockServer {
     @SneakyThrows
     private void mockKallFraEnhetsregisteret(String enhetsregisteretUrl) {
         String path = new URL(enhetsregisteretUrl).getPath();
-        mockKall(WireMock.urlPathMatching(path + "underenheter/[0-9]{9}"), lesFilSomString("enhetsregisteretUnderenhet.json"));
+        mockKall(WireMock.urlPathMatching(path + "underenheter/910969439"), lesFilSomString("enhetsregisteretUnderenhet.json"));
         mockKall(WireMock.urlPathMatching(path + "underenheter/444444444"), lesFilSomString("enhetsregisteretUnderenhet_444444444.json"));
         mockKall(WireMock.urlPathMatching(path + "underenheter/555555555"), lesFilSomString("enhetsregisteretUnderenhet_555555555.json"));
         mockKall(WireMock.urlPathMatching(path + "underenheter/910562452"), lesFilSomString("dev_enhetsregisteretUnderenhet_910562452.json"));

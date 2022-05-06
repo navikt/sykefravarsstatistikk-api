@@ -68,6 +68,10 @@ insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_pe
 insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values (444444444, 2018, 4, 4, 15.948185, 2171.961287);
 insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values (444444444, 2019, 1, 4, 21.4411, 1964.405661);
 insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values (444444444, 2019, 2,4, 240.3231, 2001.123456);
+insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values (444444444, 2020, 4, 4, 14.175982, 2185.841245);
+insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values (444444444, 2021, 1, 4, 15.948185, 2171.961287);
+insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values (444444444, 2021, 2, 4, 21.4411, 1964.405661);
+insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values (444444444, 2021, 3,4, 240.3231, 2001.123456);
 
 insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values (999263550, 2014, 2, 10, 2000.315251, 9290.320038);
 insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values (999263550, 2014, 3, 10, 1800.078753, 10260.185439);

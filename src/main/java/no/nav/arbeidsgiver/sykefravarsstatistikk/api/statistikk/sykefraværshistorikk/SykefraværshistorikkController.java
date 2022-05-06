@@ -13,6 +13,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertSykefraværService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertSykefraværshistorikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetBruker;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
 import no.nav.security.token.support.core.api.Protected;
 import org.springframework.http.HttpStatus;
@@ -101,31 +102,26 @@ public class SykefraværshistorikkController {
             @RequestParam("antallKvartaler") int antallKvartaler,
             HttpServletRequest request
     ) {
-        InnloggetBruker brukerMedIARettighet = null;
-        InnloggetBruker brukerUtenIARettighet = null;
 
-        try {
-            brukerMedIARettighet = tilgangskontrollService.hentInnloggetBruker();
-            tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
-                    new Orgnr(orgnrStr),
-                    brukerMedIARettighet,
-                    request.getMethod(),
-                    "" + request.getRequestURL()
-            );
-        } catch (Exception e) {
-            brukerUtenIARettighet = tilgangskontrollService.hentInnloggetBrukerForAlleRettigheter();
-            tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
-                    new Orgnr(orgnrStr),
-                    brukerUtenIARettighet,
-                    request.getMethod(),
-                    "" + request.getRequestURL()
-            );
-        }
+        InnloggetBruker bruker = tilgangskontrollService.hentInnloggetBruker();
+        tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
+                new Orgnr(orgnrStr),
+                bruker,
+                request.getMethod(),
+                "" + request.getRequestURL()
+        );
         Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr(orgnrStr));
 
         if (antallKvartaler != 4) {
             throw new IllegalArgumentException("For øyeblikket støtter vi kun summering av 4 kvartaler.");
         }
+
+        SummertSykefraværshistorikk summertSykefraværshistorikkVirksomhet =
+                summertSykefraværService.hentSummertSykefraværshistorikk(
+                        underenhet,
+                        SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL,
+                        antallKvartaler
+                );
 
         SummertSykefraværshistorikk summertSykefraværshistorikkBransjeEllerNæring =
                 summertSykefraværService.hentSummertSykefraværshistorikkForBransjeEllerNæring(
@@ -133,19 +129,8 @@ public class SykefraværshistorikkController {
                         SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL,
                         antallKvartaler
                 );
-        SummertSykefraværshistorikk summertSykefraværshistorikkVirksomhet = null;
-        if (brukerMedIARettighet != null) {
-            summertSykefraværshistorikkVirksomhet =
-                    summertSykefraværService.hentSummertSykefraværshistorikk(
-                            underenhet,
-                            SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL,
-                            antallKvartaler
-                    );
-            return Arrays.asList(summertSykefraværshistorikkVirksomhet, summertSykefraværshistorikkBransjeEllerNæring);
-        } else {
-            return Arrays.asList(summertSykefraværshistorikkBransjeEllerNæring);
-        }
 
+        return Arrays.asList(summertSykefraværshistorikkVirksomhet, summertSykefraværshistorikkBransjeEllerNæring);
     }
 
     @GetMapping(value = "/{orgnr}/sykefravarshistorikk/legemeldtsykefravarsprosent")
@@ -153,14 +138,27 @@ public class SykefraværshistorikkController {
             @PathVariable("orgnr") String orgnrStr,
             HttpServletRequest request
     ) {
-        InnloggetBruker bruker = tilgangskontrollService.hentInnloggetBruker();
 
-        tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
+        boolean brukerHarIARettighet = false;
+        InnloggetBruker bruker = tilgangskontrollService.hentInnloggetBrukerForAlleRettigheter();
+        brukerHarIARettighet = tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
                 new Orgnr(orgnrStr),
                 bruker,
                 request.getMethod(),
                 "" + request.getRequestURL()
         );
+
+        try {
+            bruker = tilgangskontrollService.hentInnloggetBruker();
+            brukerHarIARettighet = tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
+                    new Orgnr(orgnrStr),
+                    bruker,
+                    request.getMethod(),
+                    "" + request.getRequestURL()
+            );
+        } catch (TilgangskontrollException ignored) {
+
+        }
 
         Underenhet underenhet;
         try {
@@ -175,7 +173,8 @@ public class SykefraværshistorikkController {
         LegemeldtSykefraværsprosent legemeldtSykefraværsprosent =
                 summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
                         underenhet,
-                        SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL
+                        SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL,
+                        brukerHarIARettighet
                 );
 
         if (legemeldtSykefraværsprosent.getProsent() == null) {

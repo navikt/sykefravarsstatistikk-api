@@ -110,7 +110,7 @@ public class TilgangskontrollService {
         sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(orgnr, bruker, httpMetode, requestUrl);
     }
 
-    public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, InnloggetBruker bruker, String httpMetode, String requestUrl) {
+    public boolean sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, InnloggetBruker bruker, String httpMetode, String requestUrl) {
         boolean harTilgang = bruker.harTilgang(orgnr);
 
         sporbarhetslogg.loggHendelse(new Loggevent(
@@ -126,6 +126,7 @@ public class TilgangskontrollService {
         if (!harTilgang) {
             throw new TilgangskontrollException("Har ikke tilgang til statistikk for denne bedriften.");
         }
+        return harTilgang;
     }
 
 }

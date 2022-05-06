@@ -57,7 +57,8 @@ public class SummertLegemeldtSykefraværServiceTest {
 
         LegemeldtSykefraværsprosent legemeldtSykefraværsprosent = summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
                 underenhet,
-                new ÅrstallOgKvartal(2021, 2)
+                new ÅrstallOgKvartal(2021, 2),
+                true
         );
 
         assertThat(legemeldtSykefraværsprosent).isNotNull();
@@ -80,7 +81,8 @@ public class SummertLegemeldtSykefraværServiceTest {
 
         LegemeldtSykefraværsprosent legemeldtSykefraværsprosent = summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
                 underenhet,
-                new ÅrstallOgKvartal(2021, 2)
+                new ÅrstallOgKvartal(2021, 2),
+                true
         );
 
         assertThat(legemeldtSykefraværsprosent).isNotNull();
@@ -101,7 +103,8 @@ public class SummertLegemeldtSykefraværServiceTest {
                                 new Næringskode5Siffer("88911", "Barnehager"),
                                 0
                         ),
-                        new ÅrstallOgKvartal(2021, 2)
+                        new ÅrstallOgKvartal(2021, 2),
+                        true
                 );
 
         assertThat(legemeldtSykefraværsprosent).isNotNull();
@@ -122,13 +125,37 @@ public class SummertLegemeldtSykefraværServiceTest {
                                 new Næringskode5Siffer("88913", "Skolefritidsordninger"),
                                 0
                         ),
-                        new ÅrstallOgKvartal(2021, 2)
+                        new ÅrstallOgKvartal(2021, 2),
+                        true
                 );
 
         assertThat(legemeldtSykefraværsprosent).isNotNull();
         assertThat(legemeldtSykefraværsprosent.getType()).isEqualTo(Statistikkategori.NÆRING);
         assertThat(legemeldtSykefraværsprosent.getLabel()).isEqualTo("Skolefritidsordninger");
         assertThat(legemeldtSykefraværsprosent.getProsent()).isEqualTo(new BigDecimal(5.5));
+    }
+
+    @Test
+    public void legemeldtSykefraværsprosent_utleddes_fra_siste_4_kvartaler_for_bransje_når_bruker_ikke_har_IA_rettigheter() {
+        lagTestDataTilRepositoryForBransje();
+        Underenhet underenhet = new Underenhet(
+                new Orgnr("987654321"),
+                new Orgnr("999888777"),
+                "Test underenhet 2",
+                new Næringskode5Siffer("88911", "Barnehager"),
+                15
+        );
+
+        LegemeldtSykefraværsprosent legemeldtSykefraværsprosent = summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
+                underenhet,
+                new ÅrstallOgKvartal(2021, 2),
+                false
+        );
+
+        assertThat(legemeldtSykefraværsprosent).isNotNull();
+        assertThat(legemeldtSykefraværsprosent.getType()).isEqualTo(Statistikkategori.BRANSJE);
+        assertThat(legemeldtSykefraværsprosent.getLabel()).isEqualTo("Barnehager");
+        assertThat(legemeldtSykefraværsprosent.getProsent()).isEqualTo(new BigDecimal(8.5));
     }
 
     private void lagTestDataTilRepository() {

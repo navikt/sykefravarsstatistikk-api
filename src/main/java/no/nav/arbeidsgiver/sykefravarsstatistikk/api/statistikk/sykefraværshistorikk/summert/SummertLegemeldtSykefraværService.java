@@ -34,7 +34,8 @@ public class SummertLegemeldtSykefraværService {
 
     public LegemeldtSykefraværsprosent hentLegemeldtSykefraværsprosent(
             Underenhet underenhet,
-            ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal
+            ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal,
+            boolean harIARettigheter
     ) {
         ÅrstallOgKvartal eldsteÅrstallOgKvartal =
                 sistePubliserteÅrstallOgKvartal.minusKvartaler(antallKvartalerSomSkalSummeres - 1);
@@ -51,7 +52,7 @@ public class SummertLegemeldtSykefraværService {
         boolean erMaskert = summertSykefravær.isErMaskert();
         boolean harData = !(summertSykefravær.getKvartaler() == null || summertSykefravær.getKvartaler().isEmpty());
 
-        if (harData && !erMaskert) {
+        if (harData && !erMaskert && harIARettigheter) {
             return new LegemeldtSykefraværsprosent(
                     Statistikkategori.VIRKSOMHET,
                     underenhet.getNavn(),
