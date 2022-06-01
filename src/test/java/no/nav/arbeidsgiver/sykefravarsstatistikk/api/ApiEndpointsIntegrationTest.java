@@ -367,7 +367,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
                         "        \"kvartaler\": [" +
                         "          {" +
                         "            \"årstall\": 2021," +
-                        "            \"kvartal\": 1" +
+                        "            \"kvartal\": 2" +
                         "          }" +
                         "        ]" +
                         "      }," +
@@ -379,7 +379,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
                         "        \"kvartaler\": [" +
                         "          {" +
                         "            \"årstall\": 2021," +
-                        "            \"kvartal\": 1" +
+                        "            \"kvartal\": 2" +
                         "          }" +
                         "        ]" +
                         "      }" +
@@ -392,7 +392,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
                         "      \"kvartaler\": [" +
                         "        {" +
                         "          \"årstall\": 2021," +
-                        "          \"kvartal\": 1" +
+                        "          \"kvartal\": 2" +
                         "        }" +
                         "      ]" +
                         "    }" +
@@ -409,7 +409,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
                         "        \"kvartaler\": [" +
                         "          {" +
                         "            \"årstall\": 2021," +
-                        "            \"kvartal\": 1" +
+                        "            \"kvartal\": 2" +
                         "          }" +
                         "        ]" +
                         "      }," +
@@ -421,7 +421,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
                         "        \"kvartaler\": [" +
                         "          {" +
                         "            \"årstall\": 2021," +
-                        "            \"kvartal\": 1" +
+                        "            \"kvartal\": 2" +
                         "          }" +
                         "        ]" +
                         "      }" +
@@ -434,7 +434,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
                         "      \"kvartaler\": [" +
                         "        {" +
                         "          \"årstall\": 2021," +
-                        "          \"kvartal\": 1" +
+                        "          \"kvartal\": 2" +
                         "        }" +
                         "      ]" +
                         "    }" +
