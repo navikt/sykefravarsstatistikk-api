@@ -133,7 +133,7 @@ public class SykefraværshistorikkController {
     }
 
     @GetMapping(value = "/{orgnr}/sykefravarshistorikk/legemeldtsykefravarsprosent")
-    public ResponseEntity<LegemeldtSykefraværsprosent> hentLegemeldtSykefraværsprosent(
+    public ResponseEntity<List<LegemeldtSykefraværsprosent>> hentLegemeldtSykefraværsprosent(
             @PathVariable("orgnr") String orgnrStr,
             HttpServletRequest request
     ) {
@@ -156,13 +156,13 @@ public class SykefraværshistorikkController {
                     .body(null);
         }
 
-        LegemeldtSykefraværsprosent legemeldtSykefraværsprosent =
+        List<LegemeldtSykefraværsprosent> legemeldtSykefraværsprosent =
                 summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
                         underenhet,
                         SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL
                 );
 
-        if (legemeldtSykefraværsprosent.getProsent() == null) {
+        if (legemeldtSykefraværsprosent.isEmpty()|| legemeldtSykefraværsprosent.get(0).getProsent() == null) {
             log.info("Underenhet har ingen sykefraværsprosent tilgjengelig. Returnerer 204 - No Content");
             return ResponseEntity
                     .status(HttpStatus.NO_CONTENT)
