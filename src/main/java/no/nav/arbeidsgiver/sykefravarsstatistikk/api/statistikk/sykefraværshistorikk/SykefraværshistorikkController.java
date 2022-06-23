@@ -15,6 +15,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
 import no.nav.security.token.support.core.api.Protected;
+import org.apache.http.impl.BHttpConnectionBase;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +35,8 @@ public class SykefraværshistorikkController {
     private final TilgangskontrollService tilgangskontrollService;
     private final EnhetsregisteretClient enhetsregisteretClient;
     private final SummertSykefraværService summertSykefraværService;
-    private final SummertLegemeldtSykefraværService summertLegemeldtSykefraværService;
+    private final SummertLegemeldtSykefraværService summertLegemeldtSykefraværService; //TODO: Fjern meg når MSA har gått over til OppsummertSykefraværshistorikk
+    private final OppsummertSykefravarsstatistikkService oppsummertSykefravarsstatistikkService;
 
     public static final ÅrstallOgKvartal SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL = new ÅrstallOgKvartal(2022, 1);
 
@@ -44,12 +46,13 @@ public class SykefraværshistorikkController {
             TilgangskontrollService tilgangskontrollService,
             EnhetsregisteretClient enhetsregisteretClient,
             SummertSykefraværService summertSykefraværService,
-            SummertLegemeldtSykefraværService summertLegemeldtSykefraværService
+            OppsummertSykefravarsstatistikkService oppsummertSykefravarsstatistikkService, SummertLegemeldtSykefraværService summertLegemeldtSykefraværService
     ) {
         this.kvartalsvisSykefraværshistorikkService = kvartalsvisSykefraværshistorikkService;
         this.tilgangskontrollService = tilgangskontrollService;
         this.enhetsregisteretClient = enhetsregisteretClient;
         this.summertSykefraværService = summertSykefraværService;
+        this.oppsummertSykefravarsstatistikkService = oppsummertSykefravarsstatistikkService;
         this.summertLegemeldtSykefraværService = summertLegemeldtSykefraværService;
     }
 
@@ -132,8 +135,9 @@ public class SykefraværshistorikkController {
         return Arrays.asList(summertSykefraværshistorikkVirksomhet, summertSykefraværshistorikkBransjeEllerNæring);
     }
 
+    // TODO: Fjern når MSA har gått over til det nye endepunktet
     @GetMapping(value = "/{orgnr}/sykefravarshistorikk/legemeldtsykefravarsprosent")
-    public ResponseEntity<List<LegemeldtSykefraværsprosent>> hentLegemeldtSykefraværsprosent(
+    public ResponseEntity<LegemeldtSykefraværsprosent> hentLegemeldtSykefraværsprosent(
             @PathVariable("orgnr") String orgnrStr,
             HttpServletRequest request
     ) {
@@ -156,13 +160,13 @@ public class SykefraværshistorikkController {
                     .body(null);
         }
 
-        List<LegemeldtSykefraværsprosent> legemeldtSykefraværsprosent =
+        LegemeldtSykefraværsprosent legemeldtSykefraværsprosent =
                 summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
                         underenhet,
                         SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL
                 );
 
-        if (legemeldtSykefraværsprosent.isEmpty()|| legemeldtSykefraværsprosent.get(0).getProsent() == null) {
+        if (legemeldtSykefraværsprosent.getProsent() == null) {
             log.info("Underenhet har ingen sykefraværsprosent tilgjengelig. Returnerer 204 - No Content");
             return ResponseEntity
                     .status(HttpStatus.NO_CONTENT)
@@ -173,4 +177,20 @@ public class SykefraværshistorikkController {
                 .status(HttpStatus.OK)
                 .body(legemeldtSykefraværsprosent);
     }
+
+
+    @GetMapping("v1/{orgnr}/sykefravarshistorikk/oppsummert")
+    public ResponseEntity<OppsummertSykefraværsstatistikk> hentOppsummertSykefraværsstatistikk (
+            @PathVariable("orgnr") String orgnr,
+            HttpServletRequest request
+    ) {
+        OppsummertSykefraværsstatistikk statistikker = oppsummertSykefravarsstatistikkService.hentNoeGreier();
+
+        return ResponseEntity.status(HttpStatus.OK).body(statistikker);
+    }
 }
+
+
+
+
+

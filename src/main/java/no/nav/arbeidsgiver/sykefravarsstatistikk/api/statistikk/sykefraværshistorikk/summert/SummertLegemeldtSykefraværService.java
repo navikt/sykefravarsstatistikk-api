@@ -32,11 +32,10 @@ public class SummertLegemeldtSykefraværService {
 
     static int antallKvartalerSomSkalSummeres = 4;
 
-    public List<LegemeldtSykefraværsprosent> hentLegemeldtSykefraværsprosent(
+    public LegemeldtSykefraværsprosent hentLegemeldtSykefraværsprosent(
             Underenhet underenhet,
             ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal
     ) {
-        List<LegemeldtSykefraværsprosent> legemeldtSykefraværsprosentListe = null;
         ÅrstallOgKvartal eldsteÅrstallOgKvartal =
                 sistePubliserteÅrstallOgKvartal.minusKvartaler(antallKvartalerSomSkalSummeres - 1);
 
@@ -53,11 +52,10 @@ public class SummertLegemeldtSykefraværService {
         boolean harData = !(summertSykefravær.getKvartaler() == null || summertSykefravær.getKvartaler().isEmpty());
 
         if (harData && !erMaskert) {
-            legemeldtSykefraværsprosentListe.add(new LegemeldtSykefraværsprosent(
-                            Statistikkategori.VIRKSOMHET,
-                            underenhet.getNavn(),
-                            summertSykefravær.getProsent()
-                    )
+            return new LegemeldtSykefraværsprosent(
+                    Statistikkategori.VIRKSOMHET,
+                    underenhet.getNavn(),
+                    summertSykefravær.getProsent()
             );
         }
         BransjeEllerNæring bransjeEllerNæring =
@@ -72,13 +70,11 @@ public class SummertLegemeldtSykefraværService {
             SummertSykefravær summertSykefraværBransje =
                     SummertSykefravær.getSummertSykefravær(listeAvSykefraværForEttKvartalForBransje);
 
-            legemeldtSykefraværsprosentListe.add(new LegemeldtSykefraværsprosent(
-                            bransjeEllerNæring.getStatistikkategori(),
-                            bransje.getNavn(),
-                            summertSykefraværBransje.getProsent()
-                    )
+            return new LegemeldtSykefraværsprosent(
+                    bransjeEllerNæring.getStatistikkategori(),
+                    bransje.getNavn(),
+                    summertSykefraværBransje.getProsent()
             );
-            return legemeldtSykefraværsprosentListe;
         } else {
             Næring næring = bransjeEllerNæring.getNæring();
             List<UmaskertSykefraværForEttKvartal> listeAvSykefraværForEttKvartalForNæring =
@@ -89,13 +85,11 @@ public class SummertLegemeldtSykefraværService {
             SummertSykefravær summertSykefraværNæring =
                     SummertSykefravær.getSummertSykefravær(listeAvSykefraværForEttKvartalForNæring);
 
-            legemeldtSykefraværsprosentListe.add(new LegemeldtSykefraværsprosent(
-                            bransjeEllerNæring.getStatistikkategori(),
-                            næring.getNavn(),
-                            summertSykefraværNæring.getProsent()
-                    )
+            return new LegemeldtSykefraværsprosent(
+                    bransjeEllerNæring.getStatistikkategori(),
+                    næring.getNavn(),
+                    summertSykefraværNæring.getProsent()
             );
-            return legemeldtSykefraværsprosentListe;
         }
     }
 }
