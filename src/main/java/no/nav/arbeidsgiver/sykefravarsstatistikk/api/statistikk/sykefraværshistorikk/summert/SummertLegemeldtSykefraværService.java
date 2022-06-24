@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.antallKvartalerSomSkalSummeres;
+
 @Slf4j
 @Component
 public class SummertLegemeldtSykefraværService {
@@ -30,7 +32,6 @@ public class SummertLegemeldtSykefraværService {
         this.bransjeEllerNæringService = bransjeEllerNæringService;
     }
 
-    static int antallKvartalerSomSkalSummeres = 4;
 
     public LegemeldtSykefraværsprosent hentLegemeldtSykefraværsprosent(
             Underenhet underenhet,

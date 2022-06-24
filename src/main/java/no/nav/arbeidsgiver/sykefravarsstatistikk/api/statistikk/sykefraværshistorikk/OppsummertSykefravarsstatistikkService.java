@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
+import io.vavr.collection.Tree;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
@@ -15,8 +15,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.Tilgangsko
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.antallKvartalerSomSkalSummeres;
 
 @Service
 public class OppsummertSykefravarsstatistikkService {
@@ -58,13 +60,13 @@ public class OppsummertSykefravarsstatistikkService {
                     ""
             );
 
-        }
-        catch (TilgangskontrollException){}
+        } catch (TilgangskontrollException tilgangskontrollException) {
 
+        }
+        return null;
     }
 
-    private GenerellStatistikk(Underenhet )
-    {
+    Optional<GenerellStatistikk> hentGenerellStatistikk(Underenhet underenhet) {
         ÅrstallOgKvartal eldsteÅrstallOgKvartal =
                 SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL.minusKvartaler(antallKvartalerSomSkalSummeres - 1);
 
@@ -81,11 +83,12 @@ public class OppsummertSykefravarsstatistikkService {
         boolean harData = !(summertSykefravær.getKvartaler() == null || summertSykefravær.getKvartaler().isEmpty());
 
         if (harData && !erMaskert) {
-            return new LegemeldtSykefraværsprosent(
+            return Optional.of(new GenerellStatistikk(
                     Statistikkategori.VIRKSOMHET,
                     underenhet.getNavn(),
                     summertSykefravær.getProsent()
-            );
+            ));
         }
+        return Optional.empty();
     }
 }
