@@ -52,7 +52,7 @@ class OppsummertSykefravarsstatistikkServiceTest {
     }
 
     @Test
-    void hentGenerellStatistikk_skal_hente_virksomhet_når_brukere_har_tilgang() {
+    void hentGenerellStatistikk_skal_hente_virksomhet_prosent_når_virksomhet_har_ikke_maskert_statistikk() {
         lagTestDataTilRepository();
         Underenhet underenhet = new Underenhet(
                 new Orgnr("987654321"),
@@ -64,7 +64,7 @@ class OppsummertSykefravarsstatistikkServiceTest {
         assertThat(oppsummertSykefravarsstatistikkService.hentGenerellStatistikk(underenhet)).isEqualTo(
                 Optional.of(new GenerellStatistikk(
                         Statistikkategori.VIRKSOMHET,
-                        "Test underenhet 2",
+                        "Test underenhe",
                         new BigDecimal("10.5")
                 ))
         );

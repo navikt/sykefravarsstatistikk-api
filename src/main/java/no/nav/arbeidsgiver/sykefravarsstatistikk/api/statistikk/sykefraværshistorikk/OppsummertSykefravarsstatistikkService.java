@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
-import io.vavr.collection.Tree;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
@@ -12,13 +11,13 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetBruker;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.antallKvartalerSomSkalSummeres;
 
 @Service
 public class OppsummertSykefravarsstatistikkService {
@@ -67,17 +66,10 @@ public class OppsummertSykefravarsstatistikkService {
     }
 
     Optional<GenerellStatistikk> hentGenerellStatistikk(Underenhet underenhet) {
-        ÅrstallOgKvartal eldsteÅrstallOgKvartal =
-                SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL.minusKvartaler(antallKvartalerSomSkalSummeres - 1);
-
-        List<UmaskertSykefraværForEttKvartal> sykefraværForEttKvartalListe =
-                sykefraværprosentRepository.hentUmaskertSykefraværForEttKvartalListe(
-                        underenhet,
-                        eldsteÅrstallOgKvartal
-                );
-
+        List<UmaskertSykefraværForEttKvartal> umaskertSykefraværFor5SisteKvartaler =
+                hentUmaskertsiste5kvartaler(underenhet);
         SummertSykefravær summertSykefravær =
-                SummertSykefravær.getSummertSykefravær(sykefraværForEttKvartalListe);
+                hentSummertSykefraværFra4SisteKvartaler(umaskertSykefraværFor5SisteKvartaler);
 
         boolean erMaskert = summertSykefravær.isErMaskert();
         boolean harData = !(summertSykefravær.getKvartaler() == null || summertSykefravær.getKvartaler().isEmpty());
@@ -86,9 +78,35 @@ public class OppsummertSykefravarsstatistikkService {
             return Optional.of(new GenerellStatistikk(
                     Statistikkategori.VIRKSOMHET,
                     underenhet.getNavn(),
-                    summertSykefravær.getProsent()
+                    summertSykefravær.getProsent().toString()
             ));
         }
         return Optional.empty();
     }
+
+    @NotNull
+    private SummertSykefravær hentSummertSykefraværFra4SisteKvartaler(
+            List<UmaskertSykefraværForEttKvartal> umaskertSykefraværForEttKvartaler) {
+
+        return
+                SummertSykefravær.getSummertSykefravær(umaskertSykefraværForEttKvartaler.subList(
+                        0, 3
+                ));
+    }
+
+    private List<UmaskertSykefraværForEttKvartal> hentUmaskertsiste5kvartaler(Underenhet underenhet) {
+        ÅrstallOgKvartal eldsteÅrstallOgKvartal =
+                SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL.minusKvartaler(4);
+
+        return
+                sykefraværprosentRepository.hentUmaskertSykefraværForEttKvartalListe(
+                        underenhet,
+                        eldsteÅrstallOgKvartal
+                );
+
+// TODO redusere til 1. 2022, og 1. 2021 --> 1.2021, 1.2022
+        // regne trending ut ifra de 2 --- porsent-prosent
+
+    }
+
 }

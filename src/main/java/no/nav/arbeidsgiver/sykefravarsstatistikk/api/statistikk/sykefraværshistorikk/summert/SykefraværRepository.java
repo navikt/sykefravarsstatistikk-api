@@ -25,7 +25,6 @@ public class SykefraværRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
 
     }
-
     public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefraværForEttKvartalListe(
             Virksomhet virksomhet,
             ÅrstallOgKvartal fraÅrstallOgKvartal
