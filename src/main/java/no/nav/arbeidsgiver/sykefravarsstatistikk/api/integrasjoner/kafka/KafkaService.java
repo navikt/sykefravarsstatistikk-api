@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaProperties;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
@@ -52,7 +52,7 @@ public class KafkaService {
     }
 
     public void send(
-            ÅrstallOgKvartal årstallOgKvartal,
+            Kvartal kvartal,
             VirksomhetSykefravær virksomhetSykefravær,
             List<SykefraværMedKategori> næring5SifferSykefravær,
             SykefraværMedKategori næringSykefravær,
@@ -76,8 +76,8 @@ public class KafkaService {
 
         KafkaTopicKey key = new KafkaTopicKey(
                 virksomhetSykefravær.getOrgnr(),
-                årstallOgKvartal.getKvartal(),
-                årstallOgKvartal.getÅrstall()
+                kvartal.getKvartal(),
+                kvartal.getÅrstall()
         );
         KafkaTopicValue value = new KafkaTopicValue(
                 virksomhetSykefravær,

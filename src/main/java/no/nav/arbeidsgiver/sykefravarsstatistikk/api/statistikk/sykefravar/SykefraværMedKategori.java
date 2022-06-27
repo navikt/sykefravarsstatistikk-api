@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
 
@@ -18,11 +18,11 @@ public class SykefraværMedKategori extends SykefraværForEttKvartal {
     public SykefraværMedKategori(
             Statistikkategori statistikkategori,
             String kode,
-            ÅrstallOgKvartal årstallOgKvartal,
+            Kvartal kvartal,
             BigDecimal tapteDagsverk,
             BigDecimal muligeDagsverk,
             int antallPersoner) {
-        super(årstallOgKvartal, tapteDagsverk, muligeDagsverk, antallPersoner);
+        super(kvartal, tapteDagsverk, muligeDagsverk, antallPersoner);
         this.kategori = statistikkategori;
         this.kode = kode;
         this.antallPersoner = antallPersoner;
@@ -41,7 +41,7 @@ public class SykefraværMedKategori extends SykefraværForEttKvartal {
             @JsonProperty("muligeDagsverk") BigDecimal muligeDagsverk,
             @JsonProperty("antallPersoner") int antallPersoner
     ){
-        super(new ÅrstallOgKvartal(årstall, kvartal), tapteDagsverk, muligeDagsverk, antallPersoner);
+        super(new Kvartal(årstall, kvartal), tapteDagsverk, muligeDagsverk, antallPersoner);
         this.kategori = kategori;
         this.kode = kode;
         this.antallPersoner = antallPersoner;

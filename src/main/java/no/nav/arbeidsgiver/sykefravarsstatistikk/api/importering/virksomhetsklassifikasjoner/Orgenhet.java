@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
 
 import java.util.Objects;
 
@@ -11,7 +11,7 @@ public class Orgenhet {
     private final String rectype;
     private final String sektor;
     private final String næring;
-    private final ÅrstallOgKvartal årstallOgKvartal;
+    private final Kvartal kvartal;
 
     public Orgenhet(
             Orgnr orgnr,
@@ -19,14 +19,14 @@ public class Orgenhet {
             String rectype,
             String sektor,
             String næring,
-            ÅrstallOgKvartal årstallOgKvartal
+            Kvartal kvartal
     ) {
         this.orgnr = orgnr;
         this.navn = navn;
         this.rectype = rectype;
         this.sektor = sektor;
         this.næring = næring;
-        this.årstallOgKvartal = årstallOgKvartal;
+        this.kvartal = kvartal;
     }
 
     public Orgnr getOrgnr() { return orgnr; }
@@ -34,7 +34,7 @@ public class Orgenhet {
     public String getRectype() { return rectype; }
     public String getSektor() { return sektor; }
     public String getNæring() { return næring; }
-    public ÅrstallOgKvartal getÅrstallOgKvartal() { return  årstallOgKvartal; }
+    public Kvartal getÅrstallOgKvartal() { return kvartal; }
 
 
     @Override
@@ -49,7 +49,7 @@ public class Orgenhet {
         if (!Objects.equals(rectype, orgenhet.rectype)) return false;
         if (!Objects.equals(sektor, orgenhet.sektor)) return false;
         if (!Objects.equals(næring, orgenhet.næring)) return false;
-        return årstallOgKvartal.equals(orgenhet.årstallOgKvartal);
+        return kvartal.equals(orgenhet.kvartal);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class Orgenhet {
         result = 31 * result + (rectype != null ? rectype.hashCode() : 0);
         result = 31 * result + (sektor != null ? sektor.hashCode() : 0);
         result = 31 * result + (næring != null ? næring.hashCode() : 0);
-        result = 31 * result + årstallOgKvartal.hashCode();
+        result = 31 * result + kvartal.hashCode();
         return result;
     }
 }

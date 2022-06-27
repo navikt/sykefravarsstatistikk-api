@@ -9,7 +9,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.LocalOgUnitTestOidcConfiguration;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import org.junit.jupiter.api.AfterEach;
@@ -61,8 +61,8 @@ public class GraderingRepositoryJdbcTest {
             .orgnr(new Orgnr("777777777"))
             .næringskode(new Næringskode5Siffer("14120", "Produksjon av arbeidstøy"))
             .build();
-    private static ÅrstallOgKvartal _2020_1 = new ÅrstallOgKvartal(2020, 1);
-    private static ÅrstallOgKvartal _2019_4 = new ÅrstallOgKvartal(2019, 4);
+    private static Kvartal _2020_1 = new Kvartal(2020, 1);
+    private static Kvartal _2019_4 = new Kvartal(2019, 4);
 
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
@@ -125,7 +125,7 @@ public class GraderingRepositoryJdbcTest {
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(
                 new UmaskertSykefraværForEttKvartal(
-                        new ÅrstallOgKvartal(2019, 4),
+                        new Kvartal(2019, 4),
                         new BigDecimal(22),
                         new BigDecimal(200),
                         14
@@ -133,7 +133,7 @@ public class GraderingRepositoryJdbcTest {
         );
         assertThat(resultat.get(1)).isEqualTo(
                 new UmaskertSykefraværForEttKvartal(
-                        new ÅrstallOgKvartal(2020, 1),
+                        new Kvartal(2020, 1),
                         new BigDecimal(25),
                         new BigDecimal(300),
                         15
@@ -186,7 +186,7 @@ public class GraderingRepositoryJdbcTest {
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(
                 new UmaskertSykefraværForEttKvartal(
-                        new ÅrstallOgKvartal(2019, 4),
+                        new Kvartal(2019, 4),
                         new BigDecimal(10),
                         new BigDecimal(100),
                         7
@@ -194,7 +194,7 @@ public class GraderingRepositoryJdbcTest {
         );
         assertThat(resultat.get(1)).isEqualTo(
                 new UmaskertSykefraværForEttKvartal(
-                        new ÅrstallOgKvartal(2020, 1),
+                        new Kvartal(2020, 1),
                         new BigDecimal(12),
                         new BigDecimal(100),
                         7
@@ -251,7 +251,7 @@ public class GraderingRepositoryJdbcTest {
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(
                 new UmaskertSykefraværForEttKvartal(
-                        new ÅrstallOgKvartal(2019, 4),
+                        new Kvartal(2019, 4),
                         new BigDecimal(10),
                         new BigDecimal(100),
                         7
@@ -259,7 +259,7 @@ public class GraderingRepositoryJdbcTest {
         );
         assertThat(resultat.get(1)).isEqualTo(
                 new UmaskertSykefraværForEttKvartal(
-                        new ÅrstallOgKvartal(2020, 1),
+                        new Kvartal(2020, 1),
                         new BigDecimal(12),
                         new BigDecimal(100),
                         7
@@ -332,7 +332,7 @@ public class GraderingRepositoryJdbcTest {
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(
                 new UmaskertSykefraværForEttKvartal(
-                        new ÅrstallOgKvartal(2019, 4),
+                        new Kvartal(2019, 4),
                         new BigDecimal(10),
                         new BigDecimal(100),
                         7
@@ -340,7 +340,7 @@ public class GraderingRepositoryJdbcTest {
         );
         assertThat(resultat.get(1)).isEqualTo(
                 new UmaskertSykefraværForEttKvartal(
-                        new ÅrstallOgKvartal(2020, 1),
+                        new Kvartal(2020, 1),
                         new BigDecimal(37),
                         new BigDecimal(400),
                         22
@@ -387,7 +387,7 @@ public class GraderingRepositoryJdbcTest {
         assertThat(resultat.size()).isEqualTo(1);
         assertThat(resultat.get(0)).isEqualTo(
                 new UmaskertSykefraværForEttKvartal(
-                        new ÅrstallOgKvartal(2020, 1),
+                        new Kvartal(2020, 1),
                         new BigDecimal(12),
                         new BigDecimal(100),
                         7
@@ -402,7 +402,7 @@ public class GraderingRepositoryJdbcTest {
             String næring,
             String næringskode,
             String rectype,
-            ÅrstallOgKvartal årstallOgKvartal,
+            Kvartal kvartal,
             int antallGraderteSykemeldinger,
             int antallSykemeldinger,
             int antallPersoner,
@@ -442,8 +442,8 @@ public class GraderingRepositoryJdbcTest {
                         næring,
                         næringskode,
                         rectype,
-                        årstallOgKvartal.getÅrstall(),
-                        årstallOgKvartal.getKvartal(),
+                        kvartal.getÅrstall(),
+                        kvartal.getKvartal(),
                         antallGraderteSykemeldinger,
                         tapteDagsverkGradertSykemelding,
                         antallSykemeldinger,

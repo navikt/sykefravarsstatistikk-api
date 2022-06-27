@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -44,11 +44,11 @@ public class EksporteringRepository {
         return Arrays.stream(results).sum();
     }
 
-    public List<VirksomhetEksportPerKvartal> hentVirksomhetEksportPerKvartal(ÅrstallOgKvartal årstallOgKvartal) {
+    public List<VirksomhetEksportPerKvartal> hentVirksomhetEksportPerKvartal(Kvartal kvartal) {
         SqlParameterSource parametre =
                 new MapSqlParameterSource()
-                        .addValue("årstall", årstallOgKvartal.getÅrstall())
-                        .addValue("kvartal", årstallOgKvartal.getKvartal());
+                        .addValue("årstall", kvartal.getÅrstall())
+                        .addValue("kvartal", kvartal.getKvartal());
 
         return namedParameterJdbcTemplate.query(
                 "select orgnr, arstall, kvartal, eksportert " +
@@ -59,7 +59,7 @@ public class EksporteringRepository {
                 (resultSet, rowNum) ->
                         new VirksomhetEksportPerKvartal(
                                 new Orgnr(resultSet.getString("orgnr")),
-                                new ÅrstallOgKvartal(
+                                new Kvartal(
                                         resultSet.getInt("arstall"),
                                         resultSet.getInt("kvartal")
                                 ),
@@ -70,7 +70,7 @@ public class EksporteringRepository {
 
     public int batchOpprettVirksomheterBekreftetEksportert(
             List<String> virksomheterSomErBekreftetEksportert,
-            ÅrstallOgKvartal årstallOgKvartal
+            Kvartal kvartal
 
     ) {
 
@@ -79,8 +79,8 @@ public class EksporteringRepository {
                 .map(
                         orgnr -> new BatchUpdateVirksomhetTilEksport(
                                 orgnr,
-                                årstallOgKvartal.getÅrstall(),
-                                årstallOgKvartal.getKvartal(),
+                                kvartal.getÅrstall(),
+                                kvartal.getKvartal(),
                                 true,
                                 LocalDateTime.now()
                         )

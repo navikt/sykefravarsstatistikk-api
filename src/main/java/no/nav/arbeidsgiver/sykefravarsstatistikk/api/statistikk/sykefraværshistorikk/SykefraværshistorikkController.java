@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.SISTE_PUBLISERTE_KVARTAL;
 
 @Slf4j
 @Protected
@@ -120,14 +120,14 @@ public class SykefraværshistorikkController {
         SummertSykefraværshistorikk summertSykefraværshistorikkVirksomhet =
                 summertSykefraværService.hentSummertSykefraværshistorikk(
                         underenhet,
-                        SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL,
+                        SISTE_PUBLISERTE_KVARTAL,
                         antallKvartaler
                 );
 
         SummertSykefraværshistorikk summertSykefraværshistorikkBransjeEllerNæring =
                 summertSykefraværService.hentSummertSykefraværshistorikkForBransjeEllerNæring(
                         underenhet,
-                        SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL,
+                        SISTE_PUBLISERTE_KVARTAL,
                         antallKvartaler
                 );
 
@@ -162,7 +162,7 @@ public class SykefraværshistorikkController {
         LegemeldtSykefraværsprosent legemeldtSykefraværsprosent =
                 summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
                         underenhet,
-                        SISTE_PUBLISERTE_ÅRSTALL_OG_KVARTAL
+                        SISTE_PUBLISERTE_KVARTAL
                 );
 
         if (legemeldtSykefraværsprosent.getProsent() == null) {
@@ -179,11 +179,11 @@ public class SykefraværshistorikkController {
 
 
     @GetMapping("v1/{orgnr}/sykefravarshistorikk/oppsummert")
-    public ResponseEntity<OppsummertSykefraværsstatistikk> hentOppsummertSykefraværsstatistikk (
+    public ResponseEntity<List<GenerellStatistikk>> hentOppsummertSykefraværsstatistikk (
             @PathVariable("orgnr") String orgnr,
             HttpServletRequest request
     ) {
-        OppsummertSykefraværsstatistikk statistikker = oppsummertSykefravarsstatistikkService.hentNoeGreier(orgnr);
+        List<GenerellStatistikk> statistikker = oppsummertSykefravarsstatistikkService.hentOppsummertStatistikk(orgnr);
 
         return ResponseEntity.status(HttpStatus.OK).body(statistikker);
     }

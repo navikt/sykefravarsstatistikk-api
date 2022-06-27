@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Statistikkilde;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæringMedVarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
@@ -74,8 +74,8 @@ public class StatistikkRepositoryJdbcTest {
                 parametreForStatistikk(2019, 1, 10, 5, 100)
         );
 
-        ÅrstallOgKvartal årstallOgKvartal = statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.LAND);
-        assertThat(årstallOgKvartal).isEqualTo(new ÅrstallOgKvartal(2019, 2));
+        Kvartal kvartal = statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.LAND);
+        assertThat(kvartal).isEqualTo(new Kvartal(2019, 2));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class StatistikkRepositoryJdbcTest {
         Assertions.assertThat(resultList.size()).isEqualTo(1);
         Assertions.assertThat(resultList.get(0)).isEqualTo(
                 new UmaskertSykefraværForEttKvartalMedVarighet(
-                        new ÅrstallOgKvartal(2019, 1),
+                        new Kvartal(2019, 1),
                         new BigDecimal("55.123"),
                         new BigDecimal("856.891"),
                         14,
@@ -134,7 +134,7 @@ public class StatistikkRepositoryJdbcTest {
         Assertions.assertThat(resultList.size()).isEqualTo(1);
         Assertions.assertThat(resultList.get(0)).isEqualTo(
                 new UmaskertSykefraværForEttKvartal(
-                        new ÅrstallOgKvartal(2020, 3),
+                        new Kvartal(2020, 3),
                         new BigDecimal("3"),
                         new BigDecimal("100"),
                         13
@@ -159,7 +159,7 @@ public class StatistikkRepositoryJdbcTest {
 
         list.add(sykefraværsstatistikkVirksomhet);
 
-        statistikkRepository.importSykefraværsstatistikkVirksomhet(list, new ÅrstallOgKvartal(2019, 3));
+        statistikkRepository.importSykefraværsstatistikkVirksomhet(list, new Kvartal(2019, 3));
 
         List<RawDataStatistikkVirksomhet> resultList = hentRawDataStatistikkVirksomhet();
         Assertions.assertThat(resultList.size()).isEqualTo(1);
@@ -187,7 +187,7 @@ public class StatistikkRepositoryJdbcTest {
         lagreSykefraværprosentNæringMedVarighet("02", "A", 2019, 1);
 
         int antallSlettet = statistikkRepository.slettSykefraværsstatistikkNæringMedVarighet(
-                new ÅrstallOgKvartal(2019, 1)
+                new Kvartal(2019, 1)
         );
         List<UmaskertSykefraværForEttKvartalMedVarighet> list = hentSykefraværprosentNæringMedVarighet();
         Assertions.assertThat(list.size()).isEqualTo(4);
@@ -220,7 +220,7 @@ public class StatistikkRepositoryJdbcTest {
                 "select * from sykefravar_statistikk_naring_med_varighet",
                 new MapSqlParameterSource(),
                 (rs, rowNum) -> new UmaskertSykefraværForEttKvartalMedVarighet(
-                        new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
+                        new Kvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
                         rs.getBigDecimal("tapte_dagsverk"),
                         rs.getBigDecimal("mulige_dagsverk"),
                         rs.getInt("antall_personer"),
@@ -234,7 +234,7 @@ public class StatistikkRepositoryJdbcTest {
                 "select * from sykefravar_statistikk_virksomhet_med_gradering",
                 new MapSqlParameterSource(),
                 (rs, rowNum) -> new UmaskertSykefraværForEttKvartal(
-                        new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
+                        new Kvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
                         rs.getBigDecimal("tapte_dagsverk_gradert_sykemelding"),
                         rs.getBigDecimal("mulige_dagsverk"),
                         rs.getInt("antall_personer")

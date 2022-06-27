@@ -6,7 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
@@ -49,12 +49,12 @@ public class SummertSykefraværServiceTest {
             );
 
     private Underenhet barnehage;
-    private static final ÅrstallOgKvartal _2020_3 = new ÅrstallOgKvartal(2020, 3);
-    private static final ÅrstallOgKvartal _2020_2 = new ÅrstallOgKvartal(2020, 2);
-    private static final ÅrstallOgKvartal _2020_1 = new ÅrstallOgKvartal(2020, 1);
-    private static final ÅrstallOgKvartal _2019_4 = new ÅrstallOgKvartal(2019, 4);
-    private static final ÅrstallOgKvartal _2019_3 = new ÅrstallOgKvartal(2019, 3);
-    private static final ÅrstallOgKvartal _2019_2 = new ÅrstallOgKvartal(2019, 2);
+    private static final Kvartal _2020_3 = new Kvartal(2020, 3);
+    private static final Kvartal _2020_2 = new Kvartal(2020, 2);
+    private static final Kvartal _2020_1 = new Kvartal(2020, 1);
+    private static final Kvartal _2019_4 = new Kvartal(2019, 4);
+    private static final Kvartal _2019_3 = new Kvartal(2019, 3);
+    private static final Kvartal _2019_2 = new Kvartal(2019, 2);
 
     @BeforeEach
     public void setUp() {
@@ -81,17 +81,17 @@ public class SummertSykefraværServiceTest {
         listeAvGraderteSykemeldinger.add(getGradertSykefravær(_2019_3, new BigDecimal(0), new BigDecimal(50), 5));
 
         SummertSykefravær summerSykefraværGradering = summertSykefraværService.getSummerSykefraværGradering(
-                new ÅrstallOgKvartal(2020, 4),
+                new Kvartal(2020, 4),
                 4,
                 listeAvGraderteSykemeldinger
         );
 
         assertThat(summerSykefraværGradering).isNotNull();
-        List<ÅrstallOgKvartal> expectedListeAvKvartaler = new ArrayList<>();
+        List<Kvartal> expectedListeAvKvartaler = new ArrayList<>();
         expectedListeAvKvartaler.add(_2020_3);
         expectedListeAvKvartaler.add(_2020_2);
         expectedListeAvKvartaler.add(_2020_1);
-        expectedListeAvKvartaler.sort(ÅrstallOgKvartal::compareTo);
+        expectedListeAvKvartaler.sort(Kvartal::compareTo);
         assertThat(summerSykefraværGradering.getKvartaler()).isEqualTo(expectedListeAvKvartaler);
         assertBigDecimalIsEqual(summerSykefraværGradering.getProsent(), 10.9f);
         assertBigDecimalIsEqual(summerSykefraværGradering.getMuligeDagsverk(), 450f);
@@ -102,7 +102,7 @@ public class SummertSykefraværServiceTest {
     @Test
     public void hentSummertKorttidsOgLangtidsfraværForBransjeEllerNæring__() {
         new UmaskertSykefraværForEttKvartalMedVarighet(
-                new ÅrstallOgKvartal(2020, 1),
+                new Kvartal(2020, 1),
                 BigDecimal.valueOf(5),
                 BigDecimal.valueOf(0),
                 0,
@@ -110,14 +110,14 @@ public class SummertSykefraværServiceTest {
         );
         List<UmaskertSykefraværForEttKvartalMedVarighet> sykefraværMed1Kvartal = Arrays.asList(
                 new UmaskertSykefraværForEttKvartalMedVarighet(
-                        new ÅrstallOgKvartal(2020, 1),
+                        new Kvartal(2020, 1),
                         BigDecimal.valueOf(5),
                         BigDecimal.valueOf(0),
                         0,
                         Varighetskategori._1_DAG_TIL_7_DAGER
                 ),
                 new UmaskertSykefraværForEttKvartalMedVarighet(
-                        new ÅrstallOgKvartal(2020, 1),
+                        new Kvartal(2020, 1),
                         BigDecimal.valueOf(0),
                         BigDecimal.valueOf(10),
                         2,
@@ -129,7 +129,7 @@ public class SummertSykefraværServiceTest {
         SummertSykefraværshistorikk summertSykefraværshistorikk =
                 summertSykefraværService.hentSummertSykefraværshistorikkForBransjeEllerNæring(
                         barnehage,
-                        new ÅrstallOgKvartal(2020, 1),
+                        new Kvartal(2020, 1),
                         4
                 );
 
@@ -141,14 +141,14 @@ public class SummertSykefraværServiceTest {
 
 
     private UmaskertSykefraværForEttKvartal getGradertSykefravær(
-            ÅrstallOgKvartal årstallOgKvartal,
+            Kvartal kvartal,
             BigDecimal tapteDagsverkGradertSykemelding,
             BigDecimal muligeDagsverk,
             int antallPersoner
     ) {
         return
                 new UmaskertSykefraværForEttKvartal(
-                        årstallOgKvartal,
+                        kvartal,
                         tapteDagsverkGradertSykemelding,
                         muligeDagsverk,
                         antallPersoner

@@ -2,12 +2,11 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.NæringOgNæringskode5siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataNæringskode5siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner.Orgenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.GraderingRepository;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_1;
@@ -40,7 +38,7 @@ class PostImporteringServiceTest {
     private EksporteringRepository eksporteringRepository;
 
     private PostImporteringService service;
-    private ÅrstallOgKvartal __2020_4 = new ÅrstallOgKvartal(2020, 4);
+    private Kvartal __2020_4 = new Kvartal(2020, 4);
 
     @BeforeEach
     public void setUp() {
@@ -69,11 +67,11 @@ class PostImporteringServiceTest {
     }
 
     private void mockForberedNesteEksport(
-            ÅrstallOgKvartal årstallOgKvartal,
+            Kvartal kvartal,
             List<VirksomhetMetadata> virksomhetMetadataListe
     ) {
         when(
-                virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal))
+                virksomhetMetadataRepository.hentVirksomhetMetadata(kvartal))
                 .thenReturn(virksomhetMetadataListe);
         when(
                 eksporteringRepository.opprettEksport(any()))
@@ -81,11 +79,11 @@ class PostImporteringServiceTest {
     }
 
     private void mockImportVirksomhetMetadata(
-            ÅrstallOgKvartal årstallOgKvartal,
+            Kvartal kvartal,
             List<Orgenhet> orgenhetSomSkalTilVirksomhetMetadata
     ) {
         when(
-                datavarehusRepository.hentOrgenhet(årstallOgKvartal, true))
+                datavarehusRepository.hentOrgenhet(kvartal, true))
                 .thenReturn(orgenhetSomSkalTilVirksomhetMetadata);
         when(
                 virksomhetMetadataRepository.opprettVirksomhetMetadata(any()))
@@ -93,11 +91,11 @@ class PostImporteringServiceTest {
     }
 
     private void mockImportVirksomhetNæringskode5sifferMapping(
-            ÅrstallOgKvartal årstallOgKvartal,
+            Kvartal kvartal,
             List<VirksomhetMetadataNæringskode5siffer> virksomhetMetadataNæringskode5sifferListe
     ) {
         when(
-                graderingRepository.hentVirksomhetMetadataNæringskode5siffer(årstallOgKvartal))
+                graderingRepository.hentVirksomhetMetadataNæringskode5siffer(kvartal))
                 .thenReturn(virksomhetMetadataNæringskode5sifferListe);
         when(
                 virksomhetMetadataRepository.opprettVirksomhetMetadataNæringskode5siffer(any()))
@@ -105,13 +103,13 @@ class PostImporteringServiceTest {
     }
 
     private List<VirksomhetMetadataNæringskode5siffer> getVirksomhetMetadataNæringskode5sifferListe(
-            ÅrstallOgKvartal årstallOgKvartal
+            Kvartal kvartal
     ) {
         List<VirksomhetMetadataNæringskode5siffer> virksomhetMetadataNæringskode5siffer = new ArrayList<>();
         virksomhetMetadataNæringskode5siffer.add(
                 new VirksomhetMetadataNæringskode5siffer(
                         new Orgnr(ORGNR_VIRKSOMHET_1),
-                        årstallOgKvartal,
+                        kvartal,
                         new NæringOgNæringskode5siffer(
                                 "10",
                                 "10101"
@@ -120,7 +118,7 @@ class PostImporteringServiceTest {
         virksomhetMetadataNæringskode5siffer.add(
                 new VirksomhetMetadataNæringskode5siffer(
                         new Orgnr(ORGNR_VIRKSOMHET_1),
-                        årstallOgKvartal,
+                        kvartal,
                         new NæringOgNæringskode5siffer(
                                 "10",
                                 "10102"
@@ -129,7 +127,7 @@ class PostImporteringServiceTest {
         virksomhetMetadataNæringskode5siffer.add(
                 new VirksomhetMetadataNæringskode5siffer(
                         new Orgnr(ORGNR_VIRKSOMHET_1),
-                        årstallOgKvartal,
+                        kvartal,
                         new NæringOgNæringskode5siffer(
                                 "20",
                                 "20101"
@@ -140,7 +138,7 @@ class PostImporteringServiceTest {
     }
 
     @NotNull
-    private List<Orgenhet> getOrgenhetListe(ÅrstallOgKvartal årstallOgKvartal) {
+    private List<Orgenhet> getOrgenhetListe(Kvartal kvartal) {
         List<Orgenhet> orgenhetSomSkalTilVirksomhetMetadata = new ArrayList<>();
         orgenhetSomSkalTilVirksomhetMetadata.add(
                 new Orgenhet(
@@ -149,7 +147,7 @@ class PostImporteringServiceTest {
                         "2",
                         "3",
                         "10",
-                        årstallOgKvartal)
+                        kvartal)
         );
         orgenhetSomSkalTilVirksomhetMetadata.add(
                 new Orgenhet(
@@ -158,13 +156,13 @@ class PostImporteringServiceTest {
                         "2",
                         "3",
                         "20",
-                        årstallOgKvartal)
+                        kvartal)
         );
 
         return orgenhetSomSkalTilVirksomhetMetadata;
     }
 
-    private List<VirksomhetMetadata> getVirksomhetMetadataListe(ÅrstallOgKvartal årstallOgKvartal) {
+    private List<VirksomhetMetadata> getVirksomhetMetadataListe(Kvartal kvartal) {
         List<VirksomhetMetadata> virksomhetMetadataListe = new ArrayList<>();
         virksomhetMetadataListe.add(
                 new VirksomhetMetadata(
@@ -173,7 +171,7 @@ class PostImporteringServiceTest {
                         "2",
                         "3",
                         "10",
-                        årstallOgKvartal
+                        kvartal
                 ));
         virksomhetMetadataListe.add(
                 new VirksomhetMetadata(
@@ -182,7 +180,7 @@ class PostImporteringServiceTest {
                         "2",
                         "3",
                         "20",
-                        årstallOgKvartal
+                        kvartal
                 ));
 
         return virksomhetMetadataListe;

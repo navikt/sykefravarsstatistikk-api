@@ -4,7 +4,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -114,7 +114,7 @@ public class KvartalsvisSykefraværRepository {
 
     private SykefraværForEttKvartal mapTilKvartalsvisSykefraværprosent(ResultSet rs) throws SQLException {
         return new SykefraværForEttKvartal(
-                new ÅrstallOgKvartal(
+                new Kvartal(
                         rs.getInt("arstall"),
                         rs.getInt("kvartal")
                 ),

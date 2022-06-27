@@ -18,7 +18,7 @@ public class BransjeEllerNæringService {
         this.klassifikasjonerRepository = klassifikasjonerRepository;
     }
 
-    public BransjeEllerNæring getBransjeEllerNæring(Næringskode5Siffer næringskode5Siffer) {
+    public BransjeEllerNæring skalHenteDataPåBransjeEllerNæringsnivå(Næringskode5Siffer næringskode5Siffer) {
         Optional<Bransje> bransje = bransjeprogram.finnBransje(næringskode5Siffer);
 
         boolean skalHenteDataPåNæring2Siffer =

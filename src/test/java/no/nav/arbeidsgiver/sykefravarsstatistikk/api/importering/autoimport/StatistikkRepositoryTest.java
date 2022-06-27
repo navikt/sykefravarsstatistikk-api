@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.SlettOgOpprettResultat;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.BatchCreateSykefraværsstatistikkFunction;
@@ -45,7 +45,7 @@ public class StatistikkRepositoryTest {
         SlettOgOpprettResultat resultat = statistikkRepository.importStatistikk(
                 "Test stats",
                 Collections.emptyList(),
-                new ÅrstallOgKvartal(2019, 3),
+                new Kvartal(2019, 3),
                 getIntegrasjonUtils()
         );
 

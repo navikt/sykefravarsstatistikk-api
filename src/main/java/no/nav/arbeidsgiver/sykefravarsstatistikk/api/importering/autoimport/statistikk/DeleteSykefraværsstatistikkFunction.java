@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
 
 @FunctionalInterface
 public interface DeleteSykefraværsstatistikkFunction {
-    int apply(ÅrstallOgKvartal årstallOgKvartal);
+    int apply(Kvartal kvartal);
 }

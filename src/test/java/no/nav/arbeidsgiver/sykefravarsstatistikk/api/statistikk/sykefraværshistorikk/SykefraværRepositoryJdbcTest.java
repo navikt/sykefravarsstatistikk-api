@@ -4,7 +4,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfi
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
@@ -61,7 +61,7 @@ public class SykefraværRepositoryJdbcTest {
 
         List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(
                 BARNEHAGE,
-                new ÅrstallOgKvartal(2021, 4));
+                new Kvartal(2021, 4));
 
         assertThat(resultat.size()).isEqualTo(0);
     }
@@ -72,7 +72,7 @@ public class SykefraværRepositoryJdbcTest {
 
         List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(
                 BARNEHAGE,
-                new ÅrstallOgKvartal(2018, 3));
+                new Kvartal(2018, 3));
 
         assertThat(resultat.size()).isEqualTo(4);
         assertThat(resultat.get(0)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2018, 3, 6));
@@ -85,7 +85,7 @@ public class SykefraværRepositoryJdbcTest {
 
         List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(
                 BARNEHAGE,
-                new ÅrstallOgKvartal(2019, 1));
+                new Kvartal(2019, 1));
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 1, 3));
         assertThat(resultat.get(1)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2));
@@ -154,7 +154,7 @@ public class SykefraværRepositoryJdbcTest {
             int totalAntallPersoner
     ) {
         return new UmaskertSykefraværForEttKvartal(
-                new ÅrstallOgKvartal(årstall, kvartal),
+                new Kvartal(årstall, kvartal),
                 new BigDecimal(totalTapteDagsverk),
                 new BigDecimal(totalMuligeDagsverk),
                 totalAntallPersoner

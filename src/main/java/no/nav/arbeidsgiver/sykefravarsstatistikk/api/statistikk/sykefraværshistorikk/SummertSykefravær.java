@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 import lombok.Getter;
 import lombok.Setter;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -13,13 +13,13 @@ import java.util.stream.Collectors;
 @Getter
 public class SummertSykefravær extends MaskerbartSykefravær {
 
-    private final List<ÅrstallOgKvartal> kvartaler;
+    private final List<Kvartal> kvartaler;
 
     public SummertSykefravær(
             BigDecimal tapteDagsverk,
             BigDecimal muligeDagsverk,
             int maksAntallPersonerOverPerioden,
-            List<ÅrstallOgKvartal> kvartaler
+            List<Kvartal> kvartaler
     ) {
         super(
                 tapteDagsverk,
@@ -60,7 +60,7 @@ public class SummertSykefravær extends MaskerbartSykefravær {
                 totalTaptedagsverk,
                 totalMuligedagsverk,
                 maksAntallPersoner,
-                kvartalsvisSykefravær.stream().map( k -> k.getÅrstallOgKvartal()).collect(Collectors.toList())
+                kvartalsvisSykefravær.stream().map( k -> k.getKvartalsverdi()).collect(Collectors.toList())
         );
     }
 

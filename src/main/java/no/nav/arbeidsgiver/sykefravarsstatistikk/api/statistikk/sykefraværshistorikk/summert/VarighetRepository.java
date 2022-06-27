@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -84,7 +84,7 @@ public class VarighetRepository {
 
     private UmaskertSykefraværForEttKvartalMedVarighet mapTilKvartalsvisSykefraværMedVarighet(ResultSet rs) throws SQLException {
         return new UmaskertSykefraværForEttKvartalMedVarighet(
-                new ÅrstallOgKvartal(
+                new Kvartal(
                         rs.getInt("arstall"),
                         rs.getInt("kvartal")
                 ),

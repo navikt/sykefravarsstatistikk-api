@@ -6,7 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -31,7 +31,7 @@ public class GraderingRepository {
     }
 
     public List<VirksomhetMetadataNæringskode5siffer> hentVirksomhetMetadataNæringskode5siffer(
-            ÅrstallOgKvartal årstallOgKvartal
+            Kvartal kvartal
     ) {
         try {
             return namedParameterJdbcTemplate.query(
@@ -43,11 +43,11 @@ public class GraderingRepository {
                             " group by arstall, kvartal, orgnr, naring, naring_kode" +
                             " order by arstall, kvartal, orgnr, naring, naring_kode",
                     new MapSqlParameterSource()
-                            .addValue("årstall", årstallOgKvartal.getÅrstall())
-                            .addValue("kvartal", årstallOgKvartal.getKvartal()),
+                            .addValue("årstall", kvartal.getÅrstall())
+                            .addValue("kvartal", kvartal.getKvartal()),
                     (rs, rowNum) -> new VirksomhetMetadataNæringskode5siffer(
                             new Orgnr(rs.getString("orgnr")),
-                            new ÅrstallOgKvartal(
+                            new Kvartal(
                                     rs.getInt("arstall"),
                                     rs.getInt("kvartal")
                             ),
@@ -132,7 +132,7 @@ public class GraderingRepository {
 
     private UmaskertSykefraværForEttKvartal mapTilUmaskertSykefraværForEttKvartal(ResultSet rs) throws SQLException {
         return new UmaskertSykefraværForEttKvartal(
-                new ÅrstallOgKvartal(
+                new Kvartal(
                         rs.getInt("arstall"),
                         rs.getInt("kvartal")
                 ),

@@ -8,7 +8,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksp
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
@@ -61,14 +61,14 @@ public class EksporteringService {
     }
 
 
-    public int eksporter(ÅrstallOgKvartal årstallOgKvartal, EksporteringBegrensning eksporteringBegrensning) {
+    public int eksporter(Kvartal kvartal, EksporteringBegrensning eksporteringBegrensning) {
 
         if (!erEksporteringAktivert) {
             log.info("Eksportering er ikke aktivert. Avbrytter. ");
             return 0;
         }
         List<VirksomhetEksportPerKvartal> virksomheterTilEksport =
-                getListeAvVirksomhetEksportPerKvartal(årstallOgKvartal, eksporteringBegrensning);
+                getListeAvVirksomhetEksportPerKvartal(kvartal, eksporteringBegrensning);
 
 
         int antallStatistikkSomSkalEksporteres = virksomheterTilEksport.isEmpty() ?
@@ -77,22 +77,22 @@ public class EksporteringService {
 
         if (antallStatistikkSomSkalEksporteres == 0) {
             log.info("Ingen statistikk å eksportere for årstall '{}' og kvartal '{}'.",
-                    årstallOgKvartal.getÅrstall(),
-                    årstallOgKvartal.getKvartal()
+                    kvartal.getÅrstall(),
+                    kvartal.getKvartal()
             );
             return 0;
         }
 
         log.info(
                 "Starting eksportering for årstall '{}' og kvartal '{}'. Skal eksportere '{}' rader med statistikk. ",
-                årstallOgKvartal.getÅrstall(),
-                årstallOgKvartal.getKvartal(),
+                kvartal.getÅrstall(),
+                kvartal.getKvartal(),
                 antallStatistikkSomSkalEksporteres
         );
         int antallEksporterteVirksomheter = 0;
 
         try {
-            antallEksporterteVirksomheter = eksporter(virksomheterTilEksport, årstallOgKvartal);
+            antallEksporterteVirksomheter = eksporter(virksomheterTilEksport, kvartal);
         } catch (KafkaUtsendingException | KafkaException e) {
             log.warn("Fikk Exception fra Kafka med melding:'{}'. Avbryter prosess.", e.getMessage(), e);
         }
@@ -103,31 +103,31 @@ public class EksporteringService {
 
     protected int eksporter(
             List<VirksomhetEksportPerKvartal> virksomheterTilEksport,
-            ÅrstallOgKvartal årstallOgKvartal
+            Kvartal kvartal
     ) throws KafkaUtsendingException {
         long startEksportering = System.currentTimeMillis();
         kafkaService.nullstillUtsendingRapport(virksomheterTilEksport.size());
 
         List<VirksomhetMetadata> virksomhetMetadataListe =
-                virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal);
+                virksomhetMetadataRepository.hentVirksomhetMetadata(kvartal);
         SykefraværsstatistikkLand sykefraværsstatistikkLand =
-                sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentLand(årstallOgKvartal);
+                sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentLand(kvartal);
         List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor =
-                sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(årstallOgKvartal);
+                sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(kvartal);
         List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring =
-                sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(årstallOgKvartal);
+                sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(kvartal);
         List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer =
                 sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5Siffer(
-                        årstallOgKvartal
+                        kvartal
                 );
         List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet =
-                sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(årstallOgKvartal);
+                sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(kvartal);
 
         Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighetMap =
                 toMap(sykefraværsstatistikkVirksomhetUtenVarighet);
 
         SykefraværMedKategori landSykefravær = getSykefraværMedKategoriForLand(
-                årstallOgKvartal,
+                kvartal,
                 sykefraværsstatistikkLand
         );
 
@@ -148,7 +148,7 @@ public class EksporteringService {
 
                     sendIBatch(
                             virksomheterMetadataIDenneSubset,
-                            årstallOgKvartal,
+                            kvartal,
                             sykefraværsstatistikkSektor,
                             sykefraværsstatistikkNæring,
                             sykefraværsstatistikkNæring5Siffer,
@@ -189,7 +189,7 @@ public class EksporteringService {
 
     protected void sendIBatch(
             List<VirksomhetMetadata> virksomheterMetadata,
-            ÅrstallOgKvartal årstallOgKvartal,
+            Kvartal kvartal,
             List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor,
             List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring,
             List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer,
@@ -208,7 +208,7 @@ public class EksporteringService {
 
                     if (virksomhetMetadata != null) {
                         kafkaService.send(
-                                årstallOgKvartal,
+                                kvartal,
                                 getVirksomhetSykefravær(
                                         virksomhetMetadata,
                                         sykefraværsstatistikkVirksomhetUtenVarighet
@@ -235,7 +235,7 @@ public class EksporteringService {
                         int antallVirksomhetertLagretSomEksportert =
                                 leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
                                         virksomhetMetadata.getOrgnr(),
-                                        årstallOgKvartal,
+                                        kvartal,
                                         eksporterteVirksomheterListe
                                 );
                         antallVirksomheterLagretSomEksportertIDb.addAndGet(antallVirksomhetertLagretSomEksportert);
@@ -244,7 +244,7 @@ public class EksporteringService {
         );
 
         int antallRestendeOppdatert = lagreEksporterteVirksomheterOgNullstillLista(
-                årstallOgKvartal,
+                kvartal,
                 eksporterteVirksomheterListe
         );
         antallVirksomheterLagretSomEksportertIDb.addAndGet(antallRestendeOppdatert);
@@ -269,27 +269,27 @@ public class EksporteringService {
 
     private int leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
             String orgnr,
-            ÅrstallOgKvartal årstallOgKvartal,
+            Kvartal kvartal,
             @NotNull List<String> virksomheterSomSkalFlaggesSomEksportert
     ) {
         virksomheterSomSkalFlaggesSomEksportert.add(orgnr);
 
         if (virksomheterSomSkalFlaggesSomEksportert.size() == OPPDATER_VIRKSOMHETER_SOM_ER_EKSPORTERT_BATCH_STØRRELSE) {
-            return lagreEksporterteVirksomheterOgNullstillLista(årstallOgKvartal, virksomheterSomSkalFlaggesSomEksportert);
+            return lagreEksporterteVirksomheterOgNullstillLista(kvartal, virksomheterSomSkalFlaggesSomEksportert);
         } else {
             return 0;
         }
     }
 
     private int lagreEksporterteVirksomheterOgNullstillLista(
-            ÅrstallOgKvartal årstallOgKvartal,
+            Kvartal kvartal,
             List<String> virksomheterSomSkalFlaggesSomEksportert
     ) {
         int antallSomSkalOppdateres = virksomheterSomSkalFlaggesSomEksportert.size();
         long startWriteToDB = System.nanoTime();
         eksporteringRepository.batchOpprettVirksomheterBekreftetEksportert(
                 virksomheterSomSkalFlaggesSomEksportert,
-                årstallOgKvartal
+                kvartal
         );
         virksomheterSomSkalFlaggesSomEksportert.clear();
         long stopWriteToDB = System.nanoTime();
@@ -330,11 +330,11 @@ public class EksporteringService {
 
     @NotNull
     protected List<VirksomhetEksportPerKvartal> getListeAvVirksomhetEksportPerKvartal(
-            ÅrstallOgKvartal årstallOgKvartal,
+            Kvartal kvartal,
             EksporteringBegrensning eksporteringBegrensning
     ) {
         List<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartal =
-                eksporteringRepository.hentVirksomhetEksportPerKvartal(årstallOgKvartal);
+                eksporteringRepository.hentVirksomhetEksportPerKvartal(kvartal);
 
 
         Stream<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartalStream = virksomhetEksportPerKvartal
@@ -391,7 +391,7 @@ public class EksporteringService {
         return new VirksomhetSykefravær(
                 virksomhetMetadata.getOrgnr(),
                 virksomhetMetadata.getNavn(),
-                new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
+                new Kvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
                 sfStatistikk.getTapteDagsverk(),
                 sfStatistikk.getMuligeDagsverk(),
                 sfStatistikk.getAntallPersoner()
@@ -408,7 +408,7 @@ public class EksporteringService {
         return new VirksomhetSykefravær(
                 virksomhetMetadata.getOrgnr(),
                 virksomhetMetadata.getNavn(),
-                new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
+                new Kvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
                 sfStatistikk != null ? sfStatistikk.getTapteDagsverk() : null,
                 sfStatistikk != null ? sfStatistikk.getMuligeDagsverk() : null,
                 sfStatistikk != null ? sfStatistikk.getAntallPersoner() : 0
@@ -416,13 +416,13 @@ public class EksporteringService {
     }
 
     protected static SykefraværMedKategori getSykefraværMedKategoriForLand(
-            ÅrstallOgKvartal årstallOgKvartal,
+            Kvartal kvartal,
             SykefraværsstatistikkLand sykefraværsstatistikkLand
     ) {
         return new SykefraværMedKategori(
                 Statistikkategori.LAND,
                 "NO",
-                årstallOgKvartal,
+                kvartal,
                 sykefraværsstatistikkLand.getTapteDagsverk(),
                 sykefraværsstatistikkLand.getMuligeDagsverk(),
                 sykefraværsstatistikkLand.getAntallPersoner()
@@ -452,7 +452,7 @@ public class EksporteringService {
         return new SykefraværMedKategori(
                 Statistikkategori.SEKTOR,
                 sfSektor.getSektorkode(),
-                new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
+                new Kvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
                 sfSektor.getTapteDagsverk(),
                 sfSektor.getMuligeDagsverk(),
                 sfSektor.getAntallPersoner()
@@ -482,7 +482,7 @@ public class EksporteringService {
         return new SykefraværMedKategori(
                 Statistikkategori.NÆRING2SIFFER,
                 sfNæring.getNæringkode(),
-                new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
+                new Kvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
                 sfNæring.getTapteDagsverk(),
                 sfNæring.getMuligeDagsverk(),
                 sfNæring.getAntallPersoner()
@@ -505,7 +505,7 @@ public class EksporteringService {
                             new SykefraværMedKategori(
                                     Statistikkategori.NÆRING5SIFFER,
                                     sfNæring5Siffer.getNæringkode5siffer(),
-                                    new ÅrstallOgKvartal(
+                                    new Kvartal(
                                             virksomhetMetadata.getÅrstall(),
                                             virksomhetMetadata.getKvartal()
                                     ),

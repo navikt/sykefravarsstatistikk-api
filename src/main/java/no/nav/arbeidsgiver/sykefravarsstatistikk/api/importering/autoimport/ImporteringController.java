@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.Importeringsobjekt;
 import no.nav.security.token.support.core.api.Protected;
 import org.springframework.context.annotation.Profile;
@@ -43,13 +43,13 @@ public class ImporteringController {
     ) {
         if (importeringsobjekter == null || importeringsobjekter.isEmpty()) {
             importeringService.reimporterSykefraværsstatistikk(
-                    new ÅrstallOgKvartal(fraÅrstall, fraKvartal),
-                    new ÅrstallOgKvartal(tilÅrstall, tilKvartal)
+                    new Kvartal(fraÅrstall, fraKvartal),
+                    new Kvartal(tilÅrstall, tilKvartal)
             );
         } else {
             importeringService.reimporterSykefraværsstatistikk(
-                    new ÅrstallOgKvartal(fraÅrstall, fraKvartal),
-                    new ÅrstallOgKvartal(tilÅrstall, tilKvartal),
+                    new Kvartal(fraÅrstall, fraKvartal),
+                    new Kvartal(tilÅrstall, tilKvartal),
                     importeringsobjekter
             );
         }
@@ -61,7 +61,7 @@ public class ImporteringController {
             @RequestParam int årstall,
             @RequestParam int kvartal
     ) {
-        ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
+        Kvartal årstallOgKvartal = new Kvartal(årstall, kvartal);
         Pair<Integer, Integer> antallImportert =
                 postImporteringService.importVirksomhetMetadataOgVirksomhetNæringskode5sifferMapping(årstallOgKvartal);
 
@@ -77,7 +77,7 @@ public class ImporteringController {
             @RequestParam int årstall,
             @RequestParam int kvartal
     ) {
-        ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
+        Kvartal årstallOgKvartal = new Kvartal(årstall, kvartal);
         int antallOpprettet = postImporteringService.forberedNesteEksport(årstallOgKvartal);
 
         if (antallOpprettet >= 0) {

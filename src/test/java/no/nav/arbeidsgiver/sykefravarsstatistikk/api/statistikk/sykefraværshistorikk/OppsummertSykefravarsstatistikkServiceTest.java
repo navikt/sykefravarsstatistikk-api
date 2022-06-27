@@ -61,40 +61,40 @@ class OppsummertSykefravarsstatistikkServiceTest {
                 new Næringskode5Siffer("88911", "Barnehager"),
                 15
         );
-        assertThat(oppsummertSykefravarsstatistikkService.hentGenerellStatistikk(underenhet)).isEqualTo(
+        assertThat(oppsummertSykefravarsstatistikkService.hentOgBearbeidStatistikk(underenhet)).isEqualTo(
                 Optional.of(new GenerellStatistikk(
                         Statistikkategori.VIRKSOMHET,
-                        "Test underenhe",
-                        new BigDecimal("10.5")
+                        "Test underenhet 2",
+                        "10.5"
                 ))
         );
 
     }
 
     private void lagTestDataTilRepository() {
-        when(sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(any(Virksomhet.class), any(ÅrstallOgKvartal.class)))
+        when(sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(any(Virksomhet.class), any(Kvartal.class)))
                 .thenReturn(
                         Arrays.asList(
-                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 11),
-                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 1), 10)
+                                umaskertSykefraværprosent(new Kvartal(2021, 2), 11),
+                                umaskertSykefraværprosent(new Kvartal(2021, 1), 10)
                         )
                 );
     }
 
     private static UmaskertSykefraværForEttKvartal umaskertSykefraværprosent(
-            ÅrstallOgKvartal årstallOgKvartal,
+            Kvartal kvartal,
             double prosent
     ) {
-        return umaskertSykefraværprosent(årstallOgKvartal, prosent, 10);
+        return umaskertSykefraværprosent(kvartal, prosent, 10);
     }
 
     private static UmaskertSykefraværForEttKvartal umaskertSykefraværprosent(
-            ÅrstallOgKvartal årstallOgKvartal,
+            Kvartal kvartal,
             double prosent,
             int antallPersoner
     ) {
         return new UmaskertSykefraværForEttKvartal(
-                årstallOgKvartal,
+                kvartal,
                 new BigDecimal(prosent),
                 new BigDecimal(100),
                 antallPersoner

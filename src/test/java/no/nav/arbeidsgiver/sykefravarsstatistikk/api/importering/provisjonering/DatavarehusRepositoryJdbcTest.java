@@ -4,7 +4,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfi
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.StatistikkildeDvh;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæringMedVarighet;
@@ -79,10 +79,10 @@ public class DatavarehusRepositoryJdbcTest {
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 4, 6, 10, 100);
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2020, 1, 1, 1, 10);
 
-        ÅrstallOgKvartal sisteÅrstallOgKvartal =
+        Kvartal sisteKvartal =
                 repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh.LAND_OG_SEKTOR);
 
-        assertThat(sisteÅrstallOgKvartal).isEqualTo(new ÅrstallOgKvartal(2020, 1));
+        assertThat(sisteKvartal).isEqualTo(new Kvartal(2020, 1));
     }
 
     @Test
@@ -108,10 +108,10 @@ public class DatavarehusRepositoryJdbcTest {
                 100
         );
 
-        ÅrstallOgKvartal sisteÅrstallOgKvartal =
+        Kvartal sisteKvartal =
                 repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh.NÆRING);
 
-        assertThat(sisteÅrstallOgKvartal).isEqualTo(new ÅrstallOgKvartal(2020, 1));
+        assertThat(sisteKvartal).isEqualTo(new Kvartal(2020, 1));
     }
 
     @Test
@@ -137,10 +137,10 @@ public class DatavarehusRepositoryJdbcTest {
                 100
         );
 
-        ÅrstallOgKvartal sisteÅrstallOgKvartal =
+        Kvartal sisteKvartal =
                 repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh.NÆRING_5_SIFFER);
 
-        assertThat(sisteÅrstallOgKvartal).isEqualTo(new ÅrstallOgKvartal(2020, 2));
+        assertThat(sisteKvartal).isEqualTo(new Kvartal(2020, 2));
     }
 
     @Test
@@ -166,10 +166,10 @@ public class DatavarehusRepositoryJdbcTest {
                 101
         );
 
-        ÅrstallOgKvartal sisteÅrstallOgKvartal =
+        Kvartal sisteKvartal =
                 repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh.VIRKSOMHET);
 
-        assertThat(sisteÅrstallOgKvartal).isEqualTo(new ÅrstallOgKvartal(2019, 1));
+        assertThat(sisteKvartal).isEqualTo(new Kvartal(2019, 1));
     }
 
     @Test
@@ -179,7 +179,7 @@ public class DatavarehusRepositoryJdbcTest {
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
 
         List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor =
-                repository.hentSykefraværsstatistikkSektor(new ÅrstallOgKvartal(2018, 4));
+                repository.hentSykefraværsstatistikkSektor(new Kvartal(2018, 4));
 
         assertThat(sykefraværsstatistikkSektor.size()).isEqualTo(1);
         SykefraværsstatistikkSektor sykefraværsstatistikkSektorExpected = new SykefraværsstatistikkSektor(2018, 4, "1", 4, new BigDecimal(15), new BigDecimal(200));
@@ -195,7 +195,7 @@ public class DatavarehusRepositoryJdbcTest {
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
 
         List<SykefraværsstatistikkLand> sykefraværsstatistikkLand =
-                repository.hentSykefraværsstatistikkLand(new ÅrstallOgKvartal(2018, 4));
+                repository.hentSykefraværsstatistikkLand(new Kvartal(2018, 4));
 
         assertThat(sykefraværsstatistikkLand.size()).isEqualTo(1);
         assertThat(sykefraværsstatistikkLand.get(0)).isEqualTo(new SykefraværsstatistikkLand(
@@ -216,7 +216,7 @@ public class DatavarehusRepositoryJdbcTest {
         insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2019, 2, 9, ORGNR_VIRKSOMHET_1, "10062", _8_DAGER_TIL_16_DAGER, "M", 9, 99);
 
         List<SykefraværsstatistikkVirksomhet> sykefraværsstatistikkVirksomhet =
-                repository.hentSykefraværsstatistikkVirksomhet(new ÅrstallOgKvartal(2018, 4));
+                repository.hentSykefraværsstatistikkVirksomhet(new Kvartal(2018, 4));
 
         assertThat(sykefraværsstatistikkVirksomhet.size()).isEqualTo(2);
         SykefraværsstatistikkVirksomhet expected = new SykefraværsstatistikkVirksomhet(
@@ -245,7 +245,7 @@ public class DatavarehusRepositoryJdbcTest {
         insertSykefraværsstatistikkVirksomhetInDvhTabell(namedParameterJdbcTemplate, 2019, 2, 9, ORGNR_VIRKSOMHET_3, "85000", _8_DAGER_TIL_16_DAGER, "M", 9, 99);
 
         List<SykefraværsstatistikkNæringMedVarighet> sykefraværsstatistikkNæringMedVarighet =
-                repository.hentSykefraværsstatistikkNæringMedVarighet(new ÅrstallOgKvartal(2018, 4));
+                repository.hentSykefraværsstatistikkNæringMedVarighet(new Kvartal(2018, 4));
 
         assertThat(sykefraværsstatistikkNæringMedVarighet.size()).isEqualTo(3);
         SykefraværsstatistikkNæringMedVarighet expected = new SykefraværsstatistikkNæringMedVarighet(
@@ -300,7 +300,7 @@ public class DatavarehusRepositoryJdbcTest {
         );
 
         List<SykefraværsstatistikkVirksomhetMedGradering> sykefraværsstatistikkVirksomhetMedGradering =
-                repository.hentSykefraværsstatistikkVirksomhetMedGradering(new ÅrstallOgKvartal(2018, 4));
+                repository.hentSykefraværsstatistikkVirksomhetMedGradering(new Kvartal(2018, 4));
 
         assertThat(sykefraværsstatistikkVirksomhetMedGradering.size()).isEqualTo(2);
         SykefraværsstatistikkVirksomhetMedGradering expected = new SykefraværsstatistikkVirksomhetMedGradering(
@@ -341,7 +341,7 @@ public class DatavarehusRepositoryJdbcTest {
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
 
         List<SykefraværsstatistikkLand> sykefraværsstatistikkLand =
-                repository.hentSykefraværsstatistikkLand(new ÅrstallOgKvartal(2018, 4));
+                repository.hentSykefraværsstatistikkLand(new Kvartal(2018, 4));
 
         assertTrue(sykefraværsstatistikkLand.isEmpty());
     }
@@ -374,7 +374,7 @@ public class DatavarehusRepositoryJdbcTest {
         insertOrgenhetInDvhTabell(namedParameterJdbcTemplate, ORGNR_VIRKSOMHET_1, SEKTOR, NÆRINGSKODE_2SIFFER, "Virksomhet 1", 2020, 3);
 
         List<Orgenhet> orgenhetList = repository.hentOrgenhet(
-                new ÅrstallOgKvartal(
+                new Kvartal(
                         2020,
                         3
                 )
@@ -388,7 +388,7 @@ public class DatavarehusRepositoryJdbcTest {
                                 RECTYPE_FOR_VIRKSOMHET,
                                 SEKTOR,
                                 NÆRINGSKODE_2SIFFER,
-                                new ÅrstallOgKvartal(
+                                new Kvartal(
                                         2020,
                                         3
                                 )
