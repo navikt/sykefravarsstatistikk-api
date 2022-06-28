@@ -1,10 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
@@ -42,6 +39,7 @@ public class SykefraværRepositoryJdbcTest {
             .antallAnsatte(10)
             .overordnetEnhetOrgnr(new Orgnr("1111111111")).build();
 
+    static final Næring NÆRING = new Næring("10", "test Næring");
 
     @BeforeEach
     public void setUp() {
@@ -91,6 +89,18 @@ public class SykefraværRepositoryJdbcTest {
         assertThat(resultat.get(1)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2));
     }
 
+    @Test
+    void hentUmaskertSykefraværForEttKvartalListe_skal_hente_riktig_data() {
+        // TODO her  skal vi teste at repository retunere riktige næringer til riktige kvartaler
+        persisterDatasetIDb(NÆRING);
+        List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(
+                NÆRING,
+                new Kvartal(2019, 1));
+        assertThat(resultat.size()).isEqualTo(2);
+        assertThat(resultat.get(0)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 1, 3));
+        assertThat(resultat.get(1)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2));
+
+    }
 
     private void persisterDatasetIDb(Underenhet barnehage) {
         jdbcTemplate.update(
@@ -120,6 +130,44 @@ public class SykefraværRepositoryJdbcTest {
         );
     }
 
+    private void persisterDatasetIDb(Næring næring) {
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_naring " +
+                        "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk)" +
+                        "values " +
+                        "(:årstall, :kvartal, :næringkode, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
+                parametre(2019, 2, næring, 10, 2, 1000)
+        );
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_naring " +
+                        "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk)" +
+                        "values " +
+                        "(:årstall, :kvartal, :næringkode, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
+                parametre(2019, 1, new Næring("94", "NOT EKSIST"), 10, 3, 100)
+        );
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_naring " +
+                        "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk)" +
+                        "values " +
+                        "(:årstall, :kvartal, :næringkode, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
+                parametre(2019, 1, næring, 10, 3, 100)
+        );
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_naring " +
+                        "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk)" +
+                        "values " +
+                        "(:årstall, :kvartal, :næringkode, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
+                parametre(2018, 4, næring, 10, 5, 100)
+        );
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_naring " +
+                        "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk)" +
+                        "values " +
+                        "(:årstall, :kvartal, :næringkode, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
+                parametre(2018, 3, næring, 10, 6, 100)
+        );
+    }
+
     private MapSqlParameterSource parametre(int årstall, int kvartal, int antallPersoner, int tapteDagsverk, int muligeDagsverk) {
         return new MapSqlParameterSource()
                 .addValue("arstall", årstall)
@@ -139,6 +187,18 @@ public class SykefraværRepositoryJdbcTest {
     ) {
         return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
                 .addValue("orgnr", orgnr.getVerdi());
+    }
+
+    private MapSqlParameterSource parametre(
+            int årstall,
+            int kvartal,
+            Næring næring,
+            int antallPersoner,
+            int tapteDagsverk,
+            int muligeDagsverk
+    ) {
+        return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
+                .addValue("naring_kode", næring.getKode());
     }
 
     @NotNull

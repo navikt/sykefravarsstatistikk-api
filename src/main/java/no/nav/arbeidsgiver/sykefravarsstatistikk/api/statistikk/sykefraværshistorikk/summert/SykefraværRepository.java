@@ -153,7 +153,7 @@ public class SykefraværRepository {
                 : emptyList());
   }
 
-´
+
   private List<UmaskertSykefraværForEttKvartal> sorterKronologisk(List<UmaskertSykefraværForEttKvartal> statistikk) {
     return statistikk.stream()
             .sorted(Comparator.comparing(UmaskertSykefraværForEttKvartal::getKvartal))

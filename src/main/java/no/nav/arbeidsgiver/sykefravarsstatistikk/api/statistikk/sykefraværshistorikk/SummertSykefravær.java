@@ -60,7 +60,7 @@ public class SummertSykefravær extends MaskerbartSykefravær {
                 totalTaptedagsverk,
                 totalMuligedagsverk,
                 maksAntallPersoner,
-                kvartalsvisSykefravær.stream().map( k -> k.getKvartalsverdi()).collect(Collectors.toList())
+                kvartalsvisSykefravær.stream().map(UmaskertSykefraværForEttKvartal::getKvartal).collect(Collectors.toList())
         );
     }
 

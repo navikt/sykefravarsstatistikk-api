@@ -109,7 +109,7 @@ public class OppsummertSykefravarsstatistikkService {
         );
     }
 
-    private String kalkulerTrend(List<UmaskertSykefraværForEttKvartal> sykefravær) {
+    String kalkulerTrend(List<UmaskertSykefraværForEttKvartal> sykefravær) {
         Optional<UmaskertSykefraværForEttKvartal> sykefraværProsentSisteKvartal =
                 sykefravær.stream().filter(
                         umaskertSykefraværForEttKvartal -> umaskertSykefraværForEttKvartal.getKvartal().equals(SISTE_PUBLISERTE_KVARTAL)
@@ -119,7 +119,7 @@ public class OppsummertSykefravarsstatistikkService {
                         umaskertSykefraværForEttKvartal -> umaskertSykefraværForEttKvartal.getKvartal().equals(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4))
                 ).findFirst();
         if (sykefraværProsentSisteKvartal.isEmpty() || sykefraværProsentSisteKvartalEttÅrTilbake.isEmpty()) {
-            return "UFULLStendigDATA";// TODO finne bedre retun verdi vi manglende av data grunnlag
+            return "UfullstendigData";// TODO finne bedre retun verdi vi manglende av data grunnlag
         } else {
             return
                     (sykefraværProsentSisteKvartal.get().getProsent().subtract(sykefraværProsentSisteKvartalEttÅrTilbake.get().getProsent())).toString();
@@ -128,7 +128,7 @@ public class OppsummertSykefravarsstatistikkService {
     }
 
 
-    private Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>>
+    Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>>
     hentUmaskertStatistikkForSisteFemKvartaler(Underenhet bedrift) {
         Kvartal eldsteKvartalViBryrOssOm = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4);
         return sykefraværprosentRepository.getAllTheThings(bedrift, eldsteKvartalViBryrOssOm);
