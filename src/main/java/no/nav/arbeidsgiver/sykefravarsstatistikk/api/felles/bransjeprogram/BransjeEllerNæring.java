@@ -32,6 +32,10 @@ public class BransjeEllerNæring {
         return verdi.getLeft();
     }
 
+    public String getVerdiSomString() {
+        return verdi.get().toString();
+    }
+
     public Næring getNæring() {
         return verdi.get();
     }

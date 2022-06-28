@@ -8,5 +8,7 @@ public enum Statistikkategori {
     VIRKSOMHET,
     OVERORDNET_ENHET,
     NÆRING2SIFFER,
-    NÆRING5SIFFER
+    NÆRING5SIFFER,
+    TREND_NÆRING,
+    TREND_BRANSJE
 }
