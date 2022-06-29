@@ -29,32 +29,32 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistik
 public class OppsummertSykefravarsstatistikkService {
     private final SykefraværRepository sykefraværprosentRepository;
     private final BransjeEllerNæringService bransjeEllerNæringService;
-    private final TilgangskontrollService tilgangskontrollService;
+    //private final TilgangskontrollService tilgangskontrollService;
     private final EnhetsregisteretClient enhetsregisteretClient;
 
     public OppsummertSykefravarsstatistikkService(
             SykefraværRepository sykefraværprosentRepository,
             BransjeEllerNæringService bransjeEllerNæringService,
-            TilgangskontrollService tilgangskontrollService,
+      //      TilgangskontrollService tilgangskontrollService,
             EnhetsregisteretClient enhetsregisteretClient) {
         this.sykefraværprosentRepository = sykefraværprosentRepository;
         this.bransjeEllerNæringService = bransjeEllerNæringService;
-        this.tilgangskontrollService = tilgangskontrollService;
+        //this.tilgangskontrollService = tilgangskontrollService;
         this.enhetsregisteretClient = enhetsregisteretClient;
     }
 
     public List<GenerellStatistikk> hentOppsummertStatistikk(String orgnr) {
-        InnloggetBruker innloggetBruker =
+   /*     InnloggetBruker innloggetBruker =
                 tilgangskontrollService.hentInnloggetBrukerForAlleRettigheter();
         tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
                 new Orgnr(orgnr), innloggetBruker, "", "");
-
+*/
         Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr(orgnr));
 
         BransjeEllerNæring bransjeEllerNæring =
                 bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(
                         underenhet.getNæringskode());
-        try {
+       /* try {
             InnloggetBruker innloggetBrukerMedIARettigheter =
                     tilgangskontrollService.hentInnloggetBruker();
             tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
@@ -62,7 +62,7 @@ public class OppsummertSykefravarsstatistikkService {
 
         } catch (TilgangskontrollException tilgangskontrollException) {
 
-        }
+        }*/
         return null;
     }
 

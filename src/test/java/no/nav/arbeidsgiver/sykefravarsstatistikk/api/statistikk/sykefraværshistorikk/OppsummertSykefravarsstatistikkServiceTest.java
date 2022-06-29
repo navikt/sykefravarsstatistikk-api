@@ -48,7 +48,6 @@ class OppsummertSykefravarsstatistikkServiceTest {
                                 new Bransjeprogram(),
                                 klassifikasjonerRepository
                         ),
-                        tilgangskontrollService,
                         enhetsregisteretClient
                 );
     }
