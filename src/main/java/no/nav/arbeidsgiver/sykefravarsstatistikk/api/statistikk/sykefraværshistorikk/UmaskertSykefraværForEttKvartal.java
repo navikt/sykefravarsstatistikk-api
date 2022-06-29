@@ -44,9 +44,7 @@ public class UmaskertSykefraværForEttKvartal implements Comparable<UmaskertSyke
     }
 
     public BigDecimal getProsent() {
-    return getTapteDagsverk()
-        .divide(getMuligeDagsverk(), RoundingMode.HALF_UP)
-        .multiply(new BigDecimal(100));
+    return getTapteDagsverk().divide(getMuligeDagsverk()).multiply(new BigDecimal(100));
     }
 
     public static UmaskertSykefraværForEttKvartal tomtUmaskertKvartalsvisSykefravær(ÅrstallOgKvartal årstallOgKvartal) {

@@ -124,10 +124,7 @@ class OppsummertSykefravarsstatistikkServiceTest {
                         umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 1), 10),
                         umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 13),
                         umaskertSykefraværprosent(new ÅrstallOgKvartal(2022, 1), 9)
-                )
-        )).isEqualTo(
-                "-1.00"
-        );
+                ))).isEqualTo("-1.00");
     }
 
     @Test

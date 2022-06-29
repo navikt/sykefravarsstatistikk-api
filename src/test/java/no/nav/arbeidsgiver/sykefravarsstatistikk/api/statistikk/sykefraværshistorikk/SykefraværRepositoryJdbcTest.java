@@ -135,35 +135,35 @@ public class SykefraværRepositoryJdbcTest {
                 "insert into sykefravar_statistikk_naring " +
                         "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk)" +
                         "values " +
-                        "(:årstall, :kvartal, :næringkode, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
-                parametre(2019, 2, næring, 10, 2, 1000)
+                        "(:arstall, :kvartal, :næringskode, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(2019, 2, næring, 10, 2, 100)
         );
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_naring " +
                         "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk)" +
                         "values " +
-                        "(:årstall, :kvartal, :næringkode, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
+                        "(:arstall, :kvartal, :næringskode, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
                 parametre(2019, 1, new Næring("94", "NOT EKSIST"), 10, 3, 100)
         );
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_naring " +
                         "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk)" +
                         "values " +
-                        "(:årstall, :kvartal, :næringkode, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
+                        "(:arstall, :kvartal, :næringskode, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
                 parametre(2019, 1, næring, 10, 3, 100)
         );
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_naring " +
                         "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk)" +
                         "values " +
-                        "(:årstall, :kvartal, :næringkode, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
+                        "(:arstall, :kvartal, :næringskode, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
                 parametre(2018, 4, næring, 10, 5, 100)
         );
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_naring " +
                         "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk)" +
                         "values " +
-                        "(:årstall, :kvartal, :næringkode, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
+                        "(:arstall, :kvartal, :næringskode, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
                 parametre(2018, 3, næring, 10, 6, 100)
         );
     }
@@ -198,7 +198,7 @@ public class SykefraværRepositoryJdbcTest {
             int muligeDagsverk
     ) {
         return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
-                .addValue("naring_kode", næring.getKode());
+                .addValue("næringskode", næring.getKode());
     }
 
     @NotNull

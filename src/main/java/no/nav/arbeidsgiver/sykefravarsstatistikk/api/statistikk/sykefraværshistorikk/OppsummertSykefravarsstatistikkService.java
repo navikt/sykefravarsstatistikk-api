@@ -1,23 +1,20 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetBruker;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -110,23 +107,27 @@ public class OppsummertSykefravarsstatistikkService {
     }
 
     String kalkulerTrend(List<UmaskertSykefraværForEttKvartal> sykefravær) {
-        Optional<UmaskertSykefraværForEttKvartal> sykefraværProsentSisteKvartal =
-                sykefravær.stream().filter(
-                        umaskertSykefraværForEttKvartal -> umaskertSykefraværForEttKvartal.getÅrstallOgKvartal().equals(SISTE_PUBLISERTE_KVARTAL)
-                ).findFirst();
-        Optional<UmaskertSykefraværForEttKvartal> sykefraværProsentSisteKvartalEttÅrTilbake =
-                sykefravær.stream().filter(
-                        umaskertSykefraværForEttKvartal -> umaskertSykefraværForEttKvartal.getÅrstallOgKvartal().equals(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4))
-                ).findFirst();
-        if (sykefraværProsentSisteKvartal.isEmpty() || sykefraværProsentSisteKvartalEttÅrTilbake.isEmpty()) {
-            return "UfullstendigData";// TODO finne bedre retun verdi vi manglende av data grunnlag
-        } else {
-            return
-                    (sykefraværProsentSisteKvartal.get().getProsent().subtract(sykefraværProsentSisteKvartalEttÅrTilbake.get().getProsent())).toString();
 
-        }
+    List<UmaskertSykefraværForEttKvartal> relevanteDatapunkter =
+        sykefravær.stream()
+            .filter(
+                sykefraværEttKvartal ->
+                    sykefraværEttKvartal.getÅrstallOgKvartal().equals(SISTE_PUBLISERTE_KVARTAL)
+                        || sykefraværEttKvartal.getÅrstallOgKvartal()
+                            .equals(SISTE_PUBLISERTE_KVARTAL.minusEttÅr()))
+            .sorted(Comparator.comparing(UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal))
+            .collect(Collectors.toList());
+
+    if (relevanteDatapunkter.size() != 2) {
+      return "UfullstendigData"; // TODO finne bedre retun verdi vi manglende av data grunnlag
     }
 
+    return relevanteDatapunkter.stream()
+        .map(UmaskertSykefraværForEttKvartal::getProsent)
+        .reduce((s1, s2) -> s2.subtract(s1))
+        .get()
+        .toString();
+  }
 
     Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>>
     hentUmaskertStatistikkForSisteFemKvartaler(Underenhet bedrift) {

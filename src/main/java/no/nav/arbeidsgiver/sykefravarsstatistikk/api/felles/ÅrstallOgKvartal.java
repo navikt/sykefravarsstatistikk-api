@@ -33,6 +33,10 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
         return årstallOgKvartal;
     }
 
+    public ÅrstallOgKvartal minusEttÅr() {
+        return this.minusKvartaler(4);
+    }
+
     public ÅrstallOgKvartal plussKvartaler(int antallKvartaler) {
         if (antallKvartaler < 0) {
             return minusKvartaler(-antallKvartaler);
