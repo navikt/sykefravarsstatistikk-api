@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
@@ -36,7 +36,7 @@ public class SykefraværRepository {
   }
 
   public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefraværForEttKvartalListe(
-      Virksomhet virksomhet, Kvartal fraKvartal) {
+      Virksomhet virksomhet, ÅrstallOgKvartal fraÅrstallOgKvartal) {
     try {
       return sorterKronologisk(namedParameterJdbcTemplate.query(
           "SELECT sum(tapte_dagsverk) as tapte_dagsverk,"
@@ -54,8 +54,8 @@ public class SykefraværRepository {
               + "ORDER BY arstall, kvartal ",
           new MapSqlParameterSource()
               .addValue("orgnr", virksomhet.getOrgnr().getVerdi())
-              .addValue("arstall", fraKvartal.getÅrstall())
-              .addValue("kvartal", fraKvartal.getKvartal()),
+              .addValue("arstall", fraÅrstallOgKvartal.getÅrstall())
+              .addValue("kvartal", fraÅrstallOgKvartal.getKvartal()),
           (rs, rowNum) -> mapTilUmaskertSykefraværForEttKvartal(rs)));
     } catch (EmptyResultDataAccessException e) {
       return emptyList();
@@ -63,7 +63,7 @@ public class SykefraværRepository {
   }
 
   public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefraværForEttKvartalListe(
-      Bransje bransje, Kvartal fraKvartal) {
+      Bransje bransje, ÅrstallOgKvartal fraÅrstallOgKvartal) {
 
     boolean skalHenteDataPåNæring2Siffer = bransje.lengdePåNæringskoder() == 2;
     String tabellnavn =
@@ -86,8 +86,8 @@ public class SykefraværRepository {
           new MapSqlParameterSource()
               .addValue("tabellnavn", tabellnavn)
               .addValue("naringKoder", bransje.getKoderSomSpesifisererNæringer())
-              .addValue("arstall", fraKvartal.getÅrstall())
-              .addValue("kvartal", fraKvartal.getKvartal()),
+              .addValue("arstall", fraÅrstallOgKvartal.getÅrstall())
+              .addValue("kvartal", fraÅrstallOgKvartal.getKvartal()),
           (rs, rowNum) -> mapTilUmaskertSykefraværForEttKvartal(rs)));
     } catch (EmptyResultDataAccessException e) {
       return emptyList();
@@ -95,7 +95,7 @@ public class SykefraværRepository {
   }
 
   public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefraværForEttKvartalListe(
-      Næring næring, Kvartal fraKvartal) {
+      Næring næring, ÅrstallOgKvartal fraÅrstallOgKvartal) {
     try {
       return sorterKronologisk(namedParameterJdbcTemplate.query(
           "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal "
@@ -109,15 +109,15 @@ public class SykefraværRepository {
               + "ORDER BY arstall, kvartal ",
           new MapSqlParameterSource()
               .addValue("naringKode", næring.getKode())
-              .addValue("arstall", fraKvartal.getÅrstall())
-              .addValue("kvartal", fraKvartal.getKvartal()),
+              .addValue("arstall", fraÅrstallOgKvartal.getÅrstall())
+              .addValue("kvartal", fraÅrstallOgKvartal.getKvartal()),
           (rs, rowNum) -> mapTilUmaskertSykefraværForEttKvartal(rs)));
     } catch (EmptyResultDataAccessException e) {
       return emptyList();
     }
   }
 
-  public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefraværForNorge(Kvartal fra) {
+  public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefraværForNorge(ÅrstallOgKvartal fra) {
     try {
       try {
         return sorterKronologisk(namedParameterJdbcTemplate.query(
@@ -139,31 +139,31 @@ public class SykefraværRepository {
   }
 
   public Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> getAllTheThings(
-      Virksomhet virksomhet, Kvartal fraKvartal) {
+      Virksomhet virksomhet, ÅrstallOgKvartal fraÅrstallOgKvartal) {
     Næring næringen = new Næring(virksomhet.getNæringskode().getKode(), "");
     Optional<Bransje> bransjen = new Bransjeprogram().finnBransje(virksomhet.getNæringskode());
 
     return Map.of(
-        VIRKSOMHET, hentUmaskertSykefraværForEttKvartalListe(virksomhet, fraKvartal),
-        LAND, hentUmaskertSykefraværForNorge(fraKvartal),
-        NÆRING, hentUmaskertSykefraværForEttKvartalListe(næringen, fraKvartal),
+        VIRKSOMHET, hentUmaskertSykefraværForEttKvartalListe(virksomhet, fraÅrstallOgKvartal),
+        LAND, hentUmaskertSykefraværForNorge(fraÅrstallOgKvartal),
+        NÆRING, hentUmaskertSykefraværForEttKvartalListe(næringen, fraÅrstallOgKvartal),
         BRANSJE,
             bransjen.isPresent()
-                ? hentUmaskertSykefraværForEttKvartalListe(bransjen.get(), fraKvartal)
+                ? hentUmaskertSykefraværForEttKvartalListe(bransjen.get(), fraÅrstallOgKvartal)
                 : emptyList());
   }
 
 
   private List<UmaskertSykefraværForEttKvartal> sorterKronologisk(List<UmaskertSykefraværForEttKvartal> statistikk) {
     return statistikk.stream()
-            .sorted(Comparator.comparing(UmaskertSykefraværForEttKvartal::getKvartal))
+            .sorted(Comparator.comparing(UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal))
             .collect(Collectors.toList());
   }
 
   private UmaskertSykefraværForEttKvartal mapTilUmaskertSykefraværForEttKvartal(ResultSet rs)
       throws SQLException {
     return new UmaskertSykefraværForEttKvartal(
-        new Kvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
+        new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
         rs.getBigDecimal("tapte_dagsverk"),
         rs.getBigDecimal("mulige_dagsverk"),
         rs.getInt("antall_personer"));

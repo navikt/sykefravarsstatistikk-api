@@ -6,7 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.Sykefraværsst
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
@@ -45,7 +45,7 @@ public class EksporteringServiceMockTest {
     private EksporteringService service;
 
     @Captor
-    ArgumentCaptor<Kvartal> årstallOgKvartalArgumentCaptor;
+    ArgumentCaptor<ÅrstallOgKvartal> årstallOgKvartalArgumentCaptor;
     @Captor
     ArgumentCaptor<VirksomhetSykefravær> virksomhetSykefraværArgumentCaptor;
     @Captor

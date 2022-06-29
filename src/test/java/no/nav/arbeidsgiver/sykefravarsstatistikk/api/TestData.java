@@ -10,7 +10,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner.Næringsgruppering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnOrganisasjon;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.besøksstatistikk.SammenligningEvent;
@@ -171,7 +171,7 @@ public class TestData {
         return new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "bransje", "12322");
     }
 
-    public static Kvartal etÅrstallOgKvartal() {
-        return new Kvartal(2019, 4);
+    public static ÅrstallOgKvartal etÅrstallOgKvartal() {
+        return new ÅrstallOgKvartal(2019, 4);
     }
 }

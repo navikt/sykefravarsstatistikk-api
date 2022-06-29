@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,19 +18,19 @@ class ImporteringKvalitetssjekkServiceTest {
     @BeforeEach
     void setUp() {
         rådataVarighet = new ImporteringKvalitetssjekkService.Rådata(
-                new Kvartal(2019,1),
+                new ÅrstallOgKvartal(2019,1),
                 2906119,
                 new BigDecimal( 7605068.452380),
                 new BigDecimal(138977027.572757)
         );
         rådataGradert = new ImporteringKvalitetssjekkService.Rådata(
-                new Kvartal(2019,1),
+                new ÅrstallOgKvartal(2019,1),
                 2906119,
                 new BigDecimal( 7605068.452380),
                 new BigDecimal(138977027.572757)
         );
         rådataForrskjell = new ImporteringKvalitetssjekkService.Rådata(
-                new Kvartal(2019,1),
+                new ÅrstallOgKvartal(2019,1),
                 3652652,
                 new BigDecimal( 32659852.654987),
                 new BigDecimal(3265698.639654)

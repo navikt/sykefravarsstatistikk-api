@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
@@ -25,10 +25,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class EksporteringServiceTestUtils {
 
     // Data for testing & Utilities
-    public static Kvartal __2020_4 = new Kvartal(2020, 4);
-    public static Kvartal __2020_2 = new Kvartal(2020, 2);
-    public static Kvartal __2021_1 = new Kvartal(2021, 1);
-    public static Kvartal __2021_2 = new Kvartal(2021, 2);
+    public static ÅrstallOgKvartal __2020_4 = new ÅrstallOgKvartal(2020, 4);
+    public static ÅrstallOgKvartal __2020_2 = new ÅrstallOgKvartal(2020, 2);
+    public static ÅrstallOgKvartal __2021_1 = new ÅrstallOgKvartal(2021, 1);
+    public static ÅrstallOgKvartal __2021_2 = new ÅrstallOgKvartal(2021, 2);
     public static Orgnr ORGNR_VIRKSOMHET_1 = new Orgnr("987654321");
     public static Orgnr ORGNR_VIRKSOMHET_2 = new Orgnr("912345678");
     public static Orgnr ORGNR_VIRKSOMHET_3 = new Orgnr("999966633");
@@ -149,7 +149,7 @@ public class EksporteringServiceTestUtils {
         return new VirksomhetSykefravær(
                 virksomhetMetadata.getOrgnr(),
                 virksomhetMetadata.getNavn(),
-                new Kvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
+                new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
                 null,
                 null,
                 0
@@ -231,7 +231,7 @@ public class EksporteringServiceTestUtils {
         return new VirksomhetSykefravær(
                 virksomhetMetadata.getOrgnr(),
                 virksomhetMetadata.getNavn(),
-                new Kvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
+                new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
                 new BigDecimal(tapteDagsverk),
                 new BigDecimal(muligeDagsverk),
                 antallPersoner
@@ -242,7 +242,7 @@ public class EksporteringServiceTestUtils {
         return new VirksomhetSykefravær(
                 virksomhetMetadata.getOrgnr(),
                 virksomhetMetadata.getNavn(),
-                new Kvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
+                new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
                 new BigDecimal(3678),
                 new BigDecimal(188000),
                 156

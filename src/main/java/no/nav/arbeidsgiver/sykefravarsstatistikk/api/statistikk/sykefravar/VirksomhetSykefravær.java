@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
 
@@ -21,12 +21,12 @@ public class VirksomhetSykefravær extends SykefraværForEttKvartal {
     public VirksomhetSykefravær(
             String orgnr,
             String navn,
-            Kvartal kvartal,
+            ÅrstallOgKvartal årstallOgKvartal,
             BigDecimal tapteDagsverk,
             BigDecimal mulige_dagsverk,
             int antallPersoner
     ) {
-        super(kvartal, tapteDagsverk, mulige_dagsverk, antallPersoner);
+        super(årstallOgKvartal, tapteDagsverk, mulige_dagsverk, antallPersoner);
         this.kategori = Statistikkategori.VIRKSOMHET;
         this.orgnr = orgnr;
         this.navn = navn;
@@ -50,7 +50,7 @@ public class VirksomhetSykefravær extends SykefraværForEttKvartal {
             @JsonProperty("antallPersoner")
                     int antallPersoner
     ) {
-        super(new Kvartal(årstall, kvartal), tapteDagsverk, muligeDagsverk, antallPersoner);
+        super(new ÅrstallOgKvartal(årstall, kvartal), tapteDagsverk, muligeDagsverk, antallPersoner);
         this.kategori = Statistikkategori.VIRKSOMHET;
         this.orgnr = orgnr;
         this.navn = navn;

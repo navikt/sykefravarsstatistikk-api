@@ -8,7 +8,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -75,7 +75,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
         List<SykefraværForEttKvartal> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand();
         assertThat(resultat.size()).isEqualTo(3);
         assertThat(resultat.get(0)).isEqualTo(new SykefraværForEttKvartal(
-                new Kvartal(2018, 4),
+                new ÅrstallOgKvartal(2018, 4),
                 new BigDecimal(6),
                 new BigDecimal(100),
                 10
@@ -110,7 +110,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
                 (statligForvaltning);
         assertThat(resultat.size()).isEqualTo(3);
         assertThat(resultat.get(0)).isEqualTo(new SykefraværForEttKvartal(
-                new Kvartal(2018, 4),
+                new ÅrstallOgKvartal(2018, 4),
                 new BigDecimal(4),
                 new BigDecimal(100),
                 10
@@ -139,7 +139,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
         List<SykefraværForEttKvartal> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentNæring(produksjonAvKlær);
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(new SykefraværForEttKvartal(
-                        new Kvartal(2019, 1),
+                        new ÅrstallOgKvartal(2019, 1),
                         new BigDecimal(3),
                         new BigDecimal(100),
                         10
@@ -182,7 +182,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
         List<SykefraværForEttKvartal> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentBransje(sykehjem);
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(new SykefraværForEttKvartal(
-                new Kvartal(2019, 1),
+                new ÅrstallOgKvartal(2019, 1),
                 new BigDecimal(8),
                 new BigDecimal(200),
                 20
@@ -215,7 +215,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
         List<SykefraværForEttKvartal> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(barnehage);
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(new SykefraværForEttKvartal(
-                new Kvartal(2018, 4),
+                new ÅrstallOgKvartal(2018, 4),
                 new BigDecimal(5),
                 new BigDecimal(100),
                 10
@@ -241,7 +241,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
         );
         List<SykefraværForEttKvartal> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(barnehage);
         assertThat(resultat).isEqualTo(Arrays.asList(new SykefraværForEttKvartal(
-                new Kvartal(2019, 2),
+                new ÅrstallOgKvartal(2019, 2),
                 new BigDecimal(7),
                 new BigDecimal(200),
                 20

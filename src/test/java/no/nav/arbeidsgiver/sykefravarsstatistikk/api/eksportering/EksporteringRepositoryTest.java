@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.LocalOgUnitTestOidcConfiguration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +40,7 @@ class EksporteringRepositoryTest {
     public static final Orgnr ORGNR_1 = new Orgnr(ORGNR_VIRKSOMHET_1);
     public static final Orgnr ORGNR_2 = new Orgnr(ORGNR_VIRKSOMHET_2);
     public static final Orgnr ORGNR_3 = new Orgnr(ORGNR_VIRKSOMHET_3);
-    public static final Kvartal _2021_1 = new Kvartal(2021, 1);
+    public static final ÅrstallOgKvartal _2021_1 = new ÅrstallOgKvartal(2021, 1);
 
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
@@ -63,28 +63,28 @@ class EksporteringRepositoryTest {
     void hentVirksomhetEksportPerKvartal__returnerer_antall_VirksomhetEksportPerKvartal_funnet() {
         createVirksomhetEksportPerKvartal(new VirksomhetEksportPerKvartalMedDatoer(
                 new Orgnr("999999999"),
-                new Kvartal(2019, 2),
+                new ÅrstallOgKvartal(2019, 2),
                 true,
                 LocalDateTime.now(),
                 LocalDateTime.now()
         ));
         createVirksomhetEksportPerKvartal(new VirksomhetEksportPerKvartalMedDatoer(
                 new Orgnr("999999998"),
-                new Kvartal(2019, 2),
+                new ÅrstallOgKvartal(2019, 2),
                 false,
                 LocalDateTime.now(),
                 null
         ));
         createVirksomhetEksportPerKvartal(new VirksomhetEksportPerKvartalMedDatoer(
                 new Orgnr("999999998"),
-                new Kvartal(2019, 3),
+                new ÅrstallOgKvartal(2019, 3),
                 true,
                 LocalDateTime.now(),
                 LocalDateTime.now()
         ));
 
         List<VirksomhetEksportPerKvartal> resultat =
-                eksporteringRepository.hentVirksomhetEksportPerKvartal(new Kvartal(2019, 2));
+                eksporteringRepository.hentVirksomhetEksportPerKvartal(new ÅrstallOgKvartal(2019, 2));
 
         assertEquals(2, resultat.size());
         assertTrue(resultat.stream().anyMatch(virksomhetEksportPerKvartal ->
@@ -117,7 +117,7 @@ class EksporteringRepositoryTest {
 
         eksporteringRepository.batchOpprettVirksomheterBekreftetEksportert(
                 virksomheterBekreftetEksportert,
-                new Kvartal(2020, 2)
+                new ÅrstallOgKvartal(2020, 2)
         );
 
         List<VirksomhetBekreftetEksportert> results = hentAlleVirksomhetBekreftetEksportert();
@@ -133,7 +133,7 @@ class EksporteringRepositoryTest {
 
         eksporteringRepository.batchOpprettVirksomheterBekreftetEksportert(
                 virksomheterBekreftetEksportert,
-                new Kvartal(2020, 2)
+                new ÅrstallOgKvartal(2020, 2)
         );
 
         List<VirksomhetBekreftetEksportert> results = hentAlleVirksomhetBekreftetEksportert();
@@ -173,14 +173,14 @@ class EksporteringRepositoryTest {
         createVirksomhetBekreftetEksportert(
                 new VirksomhetBekreftetEksportert(
                         new Orgnr(ORGNR_VIRKSOMHET_1),
-                        new Kvartal(2020, 1),
+                        new ÅrstallOgKvartal(2020, 1),
                         LocalDateTime.now()
                 )
         );
         createVirksomhetBekreftetEksportert(
                 new VirksomhetBekreftetEksportert(
                         new Orgnr(ORGNR_VIRKSOMHET_2),
-                        new Kvartal(2020, 1),
+                        new ÅrstallOgKvartal(2020, 1),
                         LocalDateTime.now()
                 )
         );
@@ -289,8 +289,8 @@ class EksporteringRepositoryTest {
     private int createVirksomhetEksportPerKvartal(VirksomhetEksportPerKvartalMedDatoer virksomhet) {
         MapSqlParameterSource parametre = new MapSqlParameterSource()
                 .addValue("orgnr", virksomhet.orgnr.getVerdi())
-                .addValue("årstall", virksomhet.kvartal.getÅrstall())
-                .addValue("kvartal", virksomhet.kvartal.getKvartal())
+                .addValue("årstall", virksomhet.årstallOgKvartal.getÅrstall())
+                .addValue("kvartal", virksomhet.årstallOgKvartal.getKvartal())
                 .addValue("eksportert", virksomhet.eksportert)
                 .addValue("oppdatert", virksomhet.oppdatert);
 
@@ -303,8 +303,8 @@ class EksporteringRepositoryTest {
     private int createVirksomhetBekreftetEksportert(VirksomhetBekreftetEksportert virksomhet) {
         MapSqlParameterSource parametre = new MapSqlParameterSource()
                 .addValue("orgnr", virksomhet.orgnr.getVerdi())
-                .addValue("årstall", virksomhet.kvartal.getÅrstall())
-                .addValue("kvartal", virksomhet.kvartal.getKvartal())
+                .addValue("årstall", virksomhet.årstallOgKvartal.getÅrstall())
+                .addValue("kvartal", virksomhet.årstallOgKvartal.getKvartal())
                 .addValue("opprettet", virksomhet.opprettet);
 
         return jdbcTemplate.update(
@@ -321,7 +321,7 @@ class EksporteringRepositoryTest {
                 (resultSet, rowNum) ->
                         new VirksomhetEksportPerKvartalMedDatoer(
                                 new Orgnr(resultSet.getString("orgnr")),
-                                new Kvartal(
+                                new ÅrstallOgKvartal(
                                         resultSet.getInt("arstall"),
                                         resultSet.getInt("kvartal")
                                 ),
@@ -342,7 +342,7 @@ class EksporteringRepositoryTest {
                 (resultSet, rowNum) ->
                         new VirksomhetBekreftetEksportert(
                                 new Orgnr(resultSet.getString("orgnr")),
-                                new Kvartal(
+                                new ÅrstallOgKvartal(
                                         resultSet.getInt("arstall"),
                                         resultSet.getInt("kvartal")
                                 ),
@@ -354,20 +354,20 @@ class EksporteringRepositoryTest {
 
     class VirksomhetEksportPerKvartalMedDatoer {
         Orgnr orgnr;
-        Kvartal kvartal;
+        ÅrstallOgKvartal årstallOgKvartal;
         boolean eksportert;
         LocalDateTime opprettet;
         LocalDateTime oppdatert;
 
         public VirksomhetEksportPerKvartalMedDatoer(
                 Orgnr orgnr,
-                Kvartal kvartal,
+                ÅrstallOgKvartal årstallOgKvartal,
                 boolean eksportert,
                 LocalDateTime opprettet,
                 LocalDateTime oppdatert
         ) {
             this.orgnr = orgnr;
-            this.kvartal = kvartal;
+            this.årstallOgKvartal = årstallOgKvartal;
             this.eksportert = eksportert;
             this.opprettet = opprettet;
             this.oppdatert = oppdatert;
@@ -376,16 +376,16 @@ class EksporteringRepositoryTest {
 
     class VirksomhetBekreftetEksportert {
         Orgnr orgnr;
-        Kvartal kvartal;
+        ÅrstallOgKvartal årstallOgKvartal;
         LocalDateTime opprettet;
 
         public VirksomhetBekreftetEksportert(
                 Orgnr orgnr,
-                Kvartal kvartal,
+                ÅrstallOgKvartal årstallOgKvartal,
                 LocalDateTime opprettet
         ) {
             this.orgnr = orgnr;
-            this.kvartal = kvartal;
+            this.årstallOgKvartal = årstallOgKvartal;
             this.opprettet = opprettet;
         }
     }

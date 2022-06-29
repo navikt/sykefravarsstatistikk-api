@@ -27,7 +27,7 @@ insert into dt_p.agg_ia_sykefravar_land_v
  );
 insert into dt_p.agg_ia_sykefravar_land_v
 (
-    arstall, kvartal,
+    arstall, årstallOgKvartal,
     naring, naringnavn,
     alder, kjonn,
     fylkbo, fylknavn,
@@ -51,7 +51,7 @@ values
 );
 insert into dt_p.agg_ia_sykefravar_land_v
 (
-    arstall, kvartal,
+    arstall, årstallOgKvartal,
     naring, naringnavn,
     alder, kjonn,
     fylkbo, fylknavn,
@@ -75,7 +75,7 @@ values
 );
 insert into dt_p.agg_ia_sykefravar_land_v
 (
-    arstall, kvartal,
+    arstall, årstallOgKvartal,
     naring, naringnavn,
     alder, kjonn,
     fylkbo, fylknavn,

@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ public class VirksomhetMetadata {
     private final String rectype;
     private final String sektor;
     private final String næring;
-    private final Kvartal kvartal;
+    private final ÅrstallOgKvartal årstallOgKvartal;
     private final List<NæringOgNæringskode5siffer> næringOgNæringskode5siffer;
 
     public VirksomhetMetadata(
@@ -22,14 +22,14 @@ public class VirksomhetMetadata {
             String rectype,
             String sektor,
             String næring,
-            Kvartal kvartal
+            ÅrstallOgKvartal årstallOgKvartal
     ) {
         this.orgnr = orgnr;
         this.navn = navn;
         this.rectype = rectype;
         this.sektor = sektor;
         this.næring = næring;
-        this.kvartal = kvartal;
+        this.årstallOgKvartal = årstallOgKvartal;
         this.næringOgNæringskode5siffer = new ArrayList<>();
     }
 
@@ -38,8 +38,8 @@ public class VirksomhetMetadata {
     public String getRectype() { return rectype; }
     public String getSektor() { return sektor; }
     public String getNæring() { return næring; }
-    public int getÅrstall() { return  kvartal.getÅrstall(); }
-    public int getKvartal() { return  kvartal.getKvartal(); }
+    public int getÅrstall() { return  årstallOgKvartal.getÅrstall(); }
+    public int getKvartal() { return  årstallOgKvartal.getKvartal(); }
     public List<NæringOgNæringskode5siffer> getNæringOgNæringskode5siffer() { return næringOgNæringskode5siffer; }
 
     public void leggTilNæringOgNæringskode5siffer(List<NæringOgNæringskode5siffer> næringOgNæringskode5siffer) {
@@ -61,7 +61,7 @@ public class VirksomhetMetadata {
         if (!rectype.equals(that.rectype)) return false;
         if (!sektor.equals(that.sektor)) return false;
         if (!næring.equals(that.næring)) return false;
-        if (!kvartal.equals(that.kvartal)) return false;
+        if (!årstallOgKvartal.equals(that.årstallOgKvartal)) return false;
         return Objects.equals(næringOgNæringskode5siffer, that.næringOgNæringskode5siffer);
     }
 
@@ -72,7 +72,7 @@ public class VirksomhetMetadata {
         result = 31 * result + rectype.hashCode();
         result = 31 * result + sektor.hashCode();
         result = 31 * result + næring.hashCode();
-        result = 31 * result + kvartal.hashCode();
+        result = 31 * result + årstallOgKvartal.hashCode();
         result = 31 * result + (næringOgNæringskode5siffer != null ? næringOgNæringskode5siffer.hashCode() : 0);
         return result;
     }

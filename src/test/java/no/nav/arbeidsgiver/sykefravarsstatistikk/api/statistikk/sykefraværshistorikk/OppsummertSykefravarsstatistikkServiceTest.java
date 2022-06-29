@@ -89,11 +89,11 @@ class OppsummertSykefravarsstatistikkServiceTest {
                 )).isEqualTo(
                 Map.of(Statistikkategori.VIRKSOMHET,
                         Arrays.asList(
-                                umaskertSykefraværprosent(new Kvartal(2022, 1), 11),
-                                umaskertSykefraværprosent(new Kvartal(2021, 4), 10),
-                                umaskertSykefraværprosent(new Kvartal(2021, 3), 10),
-                                umaskertSykefraværprosent(new Kvartal(2021, 2), 10),
-                                umaskertSykefraværprosent(new Kvartal(2021, 1), 10)
+                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2022, 1), 11),
+                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 4), 10),
+                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 3), 10),
+                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 10),
+                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 1), 10)
                         )
                 )
         );
@@ -102,8 +102,8 @@ class OppsummertSykefravarsstatistikkServiceTest {
     @Test
     void kalkulerTrend_skal_returnere_ufullstendigdata_ved_mangel_av_ett_kvartal() {
         assertThat(oppsummertSykefravarsstatistikkService.kalkulerTrend(Arrays.asList(
-                        umaskertSykefraværprosent(new Kvartal(2021, 2), 11),
-                        umaskertSykefraværprosent(new Kvartal(2021, 1), 10)
+                        umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 11),
+                        umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 1), 10)
                 )
         )).isEqualTo("UfullstendigData");
     }
@@ -111,8 +111,8 @@ class OppsummertSykefravarsstatistikkServiceTest {
     @Test
     void kalkulerTrend_skal_returnere_stigende_ved_økende_trend() {
         assertThat(oppsummertSykefravarsstatistikkService.kalkulerTrend(Arrays.asList(
-                        umaskertSykefraværprosent(new Kvartal(2022, 1), 11),
-                        umaskertSykefraværprosent(new Kvartal(2021, 1), 10)
+                        umaskertSykefraværprosent(new ÅrstallOgKvartal(2022, 1), 11),
+                        umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 1), 10)
                 )
         )).isEqualTo(
                 "1.00"
@@ -122,9 +122,9 @@ class OppsummertSykefravarsstatistikkServiceTest {
     @Test
     void kalkulerTrend_skal_returnere_synkende_ved_nedadgående_trend() {
         assertThat(oppsummertSykefravarsstatistikkService.kalkulerTrend(Arrays.asList(
-                        umaskertSykefraværprosent(new Kvartal(2021, 1), 10),
-                        umaskertSykefraværprosent(new Kvartal(2021, 2), 13),
-                        umaskertSykefraværprosent(new Kvartal(2022, 1), 9)
+                        umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 1), 10),
+                        umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 13),
+                        umaskertSykefraværprosent(new ÅrstallOgKvartal(2022, 1), 9)
                 )
         )).isEqualTo(
                 "-1.00"
@@ -138,41 +138,41 @@ class OppsummertSykefravarsstatistikkServiceTest {
     }
 
     private void lagTestDataTilRepository() {
-        when(sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(any(Virksomhet.class), any(Kvartal.class)))
+        when(sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(any(Virksomhet.class), any(ÅrstallOgKvartal.class)))
                 .thenReturn(
                         Arrays.asList(
-                                umaskertSykefraværprosent(new Kvartal(2021, 2), 11),
-                                umaskertSykefraværprosent(new Kvartal(2021, 1), 10)
+                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 11),
+                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 1), 10)
                         )
                 );
-        when(sykefraværRepository.getAllTheThings(any(Virksomhet.class), any(Kvartal.class)))
+        when(sykefraværRepository.getAllTheThings(any(Virksomhet.class), any(ÅrstallOgKvartal.class)))
                 .thenReturn(Map.of(Statistikkategori.VIRKSOMHET,
                         Arrays.asList(// TODO fiks dette og gjern de gamle kvartaler etter test som sikrer riktig data from repository er på plass
-                                umaskertSykefraværprosent(new Kvartal(2022, 1), 11),
-                                umaskertSykefraværprosent(new Kvartal(2021, 4), 10),
-                                umaskertSykefraværprosent(new Kvartal(2021, 3), 10),
-                                umaskertSykefraværprosent(new Kvartal(2021, 2), 10),
-                                umaskertSykefraværprosent(new Kvartal(2021, 1), 10),
-                                umaskertSykefraværprosent(new Kvartal(2020, 4), 10),
-                                umaskertSykefraværprosent(new Kvartal(2020, 3), 10)
+                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2022, 1), 11),
+                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 4), 10),
+                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 3), 10),
+                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 10),
+                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 1), 10),
+                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2020, 4), 10),
+                                umaskertSykefraværprosent(new ÅrstallOgKvartal(2020, 3), 10)
                         )
                 ));
     }
 
     private static UmaskertSykefraværForEttKvartal umaskertSykefraværprosent(
-            Kvartal kvartal,
+            ÅrstallOgKvartal årstallOgKvartal,
             double prosent
     ) {
-        return umaskertSykefraværprosent(kvartal, prosent, 10);
+        return umaskertSykefraværprosent(årstallOgKvartal, prosent, 10);
     }
 
     private static UmaskertSykefraværForEttKvartal umaskertSykefraværprosent(
-            Kvartal kvartal,
+            ÅrstallOgKvartal årstallOgKvartal,
             double prosent,
             int antallPersoner
     ) {
         return new UmaskertSykefraværForEttKvartal(
-                kvartal,
+                årstallOgKvartal,
                 new BigDecimal(prosent),
                 new BigDecimal(100),
                 antallPersoner

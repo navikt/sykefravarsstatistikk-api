@@ -6,7 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SummertSykefravær;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
@@ -35,7 +35,7 @@ public class SummertSykefraværService {
 
     public SummertSykefraværshistorikk hentSummertSykefraværshistorikkForBransjeEllerNæring(
             Underenhet underenhet,
-            Kvartal sistePubliserteKvartal,
+            ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal,
             int antallKvartalerSomSkalSummeres
     ) {
         if (antallKvartalerSomSkalSummeres < 1) {
@@ -66,13 +66,13 @@ public class SummertSykefraværService {
 
         SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
                 SummertKorttidsOgLangtidsfravær.getSummertKorttidsOgLangtidsfravær(
-                        sistePubliserteKvartal,
+                        sistePubliserteÅrstallOgKvartal,
                         antallKvartalerSomSkalSummeres,
                         sykefraværVarighet
                 );
 
         SummertSykefravær summertSykefraværGradering = getSummerSykefraværGradering(
-                sistePubliserteKvartal,
+                sistePubliserteÅrstallOgKvartal,
                 antallKvartalerSomSkalSummeres,
                 sykefraværGradering
         );
@@ -87,7 +87,7 @@ public class SummertSykefraværService {
 
     public SummertSykefraværshistorikk hentSummertSykefraværshistorikk(
             Underenhet underenhet,
-            Kvartal sistePubliserteKvartal,
+            ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal,
             int antallKvartalerSomSkalSummeres
     ) {
         if (antallKvartalerSomSkalSummeres < 1) {
@@ -101,13 +101,13 @@ public class SummertSykefraværService {
 
         SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
                 SummertKorttidsOgLangtidsfravær.getSummertKorttidsOgLangtidsfravær(
-                        sistePubliserteKvartal,
+                        sistePubliserteÅrstallOgKvartal,
                         antallKvartalerSomSkalSummeres,
                         sykefraværVarighet
                 );
 
         SummertSykefravær summertSykefraværGradering = getSummerSykefraværGradering(
-                sistePubliserteKvartal,
+                sistePubliserteÅrstallOgKvartal,
                 antallKvartalerSomSkalSummeres,
                 sykefraværGradering
         );
@@ -122,18 +122,18 @@ public class SummertSykefraværService {
 
 
     protected SummertSykefravær getSummerSykefraværGradering(
-            Kvartal sistePubliserteKvartal,
+            ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal,
             int antallKvartalerSomSkalSummeres,
             List<UmaskertSykefraværForEttKvartal> sykefraværGradering
     ) {
-        List<Kvartal> kvartalerSomSkalSummeres = Kvartal.range(
-                sistePubliserteKvartal.minusKvartaler(antallKvartalerSomSkalSummeres - 1),
-                sistePubliserteKvartal
+        List<ÅrstallOgKvartal> kvartalerSomSkalSummeres = ÅrstallOgKvartal.range(
+                sistePubliserteÅrstallOgKvartal.minusKvartaler(antallKvartalerSomSkalSummeres - 1),
+                sistePubliserteÅrstallOgKvartal
         );
 
         List<UmaskertSykefraværForEttKvartal> gradertSykefraværForDeKvartaleneSomSkalSummeres =
                 sykefraværGradering.stream()
-                        .filter(v -> kvartalerSomSkalSummeres.contains(v.getKvartalsverdi()))
+                        .filter(v -> kvartalerSomSkalSummeres.contains(v.getÅrstallOgKvartal()))
                         .sorted(UmaskertSykefraværForEttKvartal::compareTo)
                         .collect(Collectors.toList());
 

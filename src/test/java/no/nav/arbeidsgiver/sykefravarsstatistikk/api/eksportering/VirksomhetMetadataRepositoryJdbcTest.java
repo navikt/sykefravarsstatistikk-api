@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -74,12 +74,12 @@ class VirksomhetMetadataRepositoryJdbcTest {
     public void opprettVirksomhetMetadataNæringskode5siffer__oppretter_riktig_metadataNæringskode5siffer() {
         VirksomhetMetadataNæringskode5siffer virksomhetMetadataNæringskode5siffer1 = new VirksomhetMetadataNæringskode5siffer(
                 new Orgnr(ORGNR_VIRKSOMHET_1),
-                new Kvartal(2020, 3),
+                new ÅrstallOgKvartal(2020, 3),
                 new NæringOgNæringskode5siffer(NÆRINGSKODE_2SIFFER, "10001")
         );
         VirksomhetMetadataNæringskode5siffer virksomhetMetadataNæringskode5siffer2 = new VirksomhetMetadataNæringskode5siffer(
                 new Orgnr(ORGNR_VIRKSOMHET_1),
-                new Kvartal(2020, 3),
+                new ÅrstallOgKvartal(2020, 3),
                 new NæringOgNæringskode5siffer(NÆRINGSKODE_2SIFFER, "10002")
         );
 
@@ -101,7 +101,7 @@ class VirksomhetMetadataRepositoryJdbcTest {
                 RECTYPE_FOR_VIRKSOMHET,
                 SEKTOR,
                 NÆRINGSKODE_2SIFFER,
-                new Kvartal(2020, 3)
+                new ÅrstallOgKvartal(2020, 3)
         );
         VirksomhetMetadata virksomhetMetadataVirksomhet2 = new VirksomhetMetadata(
                 new Orgnr(ORGNR_VIRKSOMHET_2),
@@ -109,7 +109,7 @@ class VirksomhetMetadataRepositoryJdbcTest {
                 RECTYPE_FOR_VIRKSOMHET,
                 SEKTOR,
                 NÆRINGSKODE_2SIFFER,
-                new Kvartal(2020, 3)
+                new ÅrstallOgKvartal(2020, 3)
         );
 
         repository.opprettVirksomhetMetadata(Arrays.asList(
@@ -127,7 +127,7 @@ class VirksomhetMetadataRepositoryJdbcTest {
         opprettTestVirksomhetMetaData(2020, 2);
 
         List<VirksomhetMetadata> results = repository.hentVirksomhetMetadata(
-                new Kvartal(
+                new ÅrstallOgKvartal(
                         2019,
                         2)
         );
@@ -140,7 +140,7 @@ class VirksomhetMetadataRepositoryJdbcTest {
         opprettTestVirksomhetMetaData(2020, 3);
 
         List<VirksomhetMetadata> results = repository.hentVirksomhetMetadata(
-                new Kvartal(
+                new ÅrstallOgKvartal(
                         2020,
                         3)
         );
@@ -177,7 +177,7 @@ class VirksomhetMetadataRepositoryJdbcTest {
                         rs.getString("rectype"),
                         rs.getString("sektor"),
                         rs.getString("naring_kode"),
-                        new Kvartal(
+                        new ÅrstallOgKvartal(
                                 rs.getInt("arstall"),
                                 rs.getInt("kvartal")
                         )
@@ -191,7 +191,7 @@ class VirksomhetMetadataRepositoryJdbcTest {
                 new MapSqlParameterSource(),
                 (rs, rowNum) -> new VirksomhetMetadataNæringskode5siffer(
                         new Orgnr(rs.getString("orgnr")),
-                        new Kvartal(
+                        new ÅrstallOgKvartal(
                                 rs.getInt("arstall"),
                                 rs.getInt("kvartal")
                         ),

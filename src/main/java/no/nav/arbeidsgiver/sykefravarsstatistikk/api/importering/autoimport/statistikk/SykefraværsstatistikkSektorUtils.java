@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -21,7 +21,7 @@ public class SykefraværsstatistikkSektorUtils extends SykefraværsstatistikkInt
     @Override
     public DeleteSykefraværsstatistikkFunction getDeleteFunction() {
         DeleteSykefraværsstatistikkFunction function =
-                (Kvartal årstallOgKvartal) -> {
+                (ÅrstallOgKvartal årstallOgKvartal) -> {
                     SqlParameterSource namedParameters =
                             new MapSqlParameterSource()
                                     .addValue(ARSTALL, årstallOgKvartal.getÅrstall())

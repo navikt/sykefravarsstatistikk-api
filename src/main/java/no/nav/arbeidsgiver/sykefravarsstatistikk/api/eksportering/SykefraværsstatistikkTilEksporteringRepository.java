@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
@@ -29,15 +29,15 @@ public class SykefraværsstatistikkTilEksporteringRepository {
 
 
     public SykefraværsstatistikkLand hentSykefraværprosentLand(
-            Kvartal kvartal) {
+            ÅrstallOgKvartal årstallOgKvartal) {
         try {
             List<SykefraværsstatistikkLand> resultat = namedParameterJdbcTemplate.query(
                     "select arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk " +
                             "from sykefravar_statistikk_land " +
                             "where arstall = :arstall and kvartal = :kvartal order by arstall, kvartal",
                     new MapSqlParameterSource()
-                            .addValue("arstall", kvartal.getÅrstall())
-                            .addValue("kvartal", kvartal.getKvartal()),
+                            .addValue("arstall", årstallOgKvartal.getÅrstall())
+                            .addValue("kvartal", årstallOgKvartal.getKvartal()),
                     (rs, rowNum) -> mapTilSykefraværsstatistikkLand(rs)
             );
 
@@ -51,7 +51,7 @@ public class SykefraværsstatistikkTilEksporteringRepository {
     }
 
     public List<SykefraværsstatistikkSektor> hentSykefraværprosentAlleSektorer(
-            Kvartal kvartal) {
+            ÅrstallOgKvartal årstallOgKvartal) {
         try {
             return namedParameterJdbcTemplate.query(
                     "select sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk " +
@@ -59,8 +59,8 @@ public class SykefraværsstatistikkTilEksporteringRepository {
                             "where arstall = :arstall and kvartal = :kvartal " +
                             "order by arstall, kvartal, sektor_kode",
                     new MapSqlParameterSource()
-                            .addValue("arstall", kvartal.getÅrstall())
-                            .addValue("kvartal", kvartal.getKvartal()),
+                            .addValue("arstall", årstallOgKvartal.getÅrstall())
+                            .addValue("kvartal", årstallOgKvartal.getKvartal()),
                     (rs, rowNum) -> mapTilSykefraværsstatistikkSektor(rs)
             );
         } catch (EmptyResultDataAccessException e) {
@@ -69,15 +69,15 @@ public class SykefraværsstatistikkTilEksporteringRepository {
     }
 
     public List<SykefraværsstatistikkNæring> hentSykefraværprosentAlleNæringer(
-            Kvartal kvartal) {
+            ÅrstallOgKvartal årstallOgKvartal) {
         try {
             return namedParameterJdbcTemplate.query(
                     "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk " +
                             "from sykefravar_statistikk_naring " +
                             "where arstall = :arstall and kvartal = :kvartal order by arstall, kvartal, naring_kode",
                     new MapSqlParameterSource()
-                            .addValue("arstall", kvartal.getÅrstall())
-                            .addValue("kvartal", kvartal.getKvartal()),
+                            .addValue("arstall", årstallOgKvartal.getÅrstall())
+                            .addValue("kvartal", årstallOgKvartal.getKvartal()),
                     (rs, rowNum) -> mapTilSykefraværsstatistikkNæring(rs)
             );
         } catch (EmptyResultDataAccessException e) {
@@ -86,15 +86,15 @@ public class SykefraværsstatistikkTilEksporteringRepository {
     }
 
     public List<SykefraværsstatistikkNæring5Siffer> hentSykefraværprosentAlleNæringer5Siffer(
-            Kvartal kvartal) {
+            ÅrstallOgKvartal årstallOgKvartal) {
         try {
             return namedParameterJdbcTemplate.query(
                     "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk " +
                             "from sykefravar_statistikk_naring5siffer " +
                             "where arstall = :arstall and kvartal = :kvartal order by arstall, kvartal, naring_kode",
                     new MapSqlParameterSource()
-                            .addValue("arstall", kvartal.getÅrstall())
-                            .addValue("kvartal", kvartal.getKvartal()),
+                            .addValue("arstall", årstallOgKvartal.getÅrstall())
+                            .addValue("kvartal", årstallOgKvartal.getKvartal()),
                     (rs, rowNum) -> mapTilSykefraværsstatistikkNæring5Siffer(rs)
             );
         } catch (EmptyResultDataAccessException e) {
@@ -103,7 +103,7 @@ public class SykefraværsstatistikkTilEksporteringRepository {
     }
 
     public List<SykefraværsstatistikkVirksomhetUtenVarighet> hentSykefraværprosentAlleVirksomheter(
-            Kvartal kvartal) {
+            ÅrstallOgKvartal årstallOgKvartal) {
         try {
             return namedParameterJdbcTemplate.query(
                     "select arstall, kvartal, orgnr, " +
@@ -114,8 +114,8 @@ public class SykefraværsstatistikkTilEksporteringRepository {
                             "where arstall = :arstall and kvartal = :kvartal " +
                             "group by arstall, kvartal, orgnr",
                     new MapSqlParameterSource()
-                            .addValue("arstall", kvartal.getÅrstall())
-                            .addValue("kvartal", kvartal.getKvartal()),
+                            .addValue("arstall", årstallOgKvartal.getÅrstall())
+                            .addValue("kvartal", årstallOgKvartal.getKvartal()),
                     (rs, rowNum) -> mapTilSykefraværsstatistikkVirksomhet(rs)
             );
         } catch (EmptyResultDataAccessException e) {

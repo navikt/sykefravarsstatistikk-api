@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
@@ -10,10 +10,10 @@ import java.util.Objects;
 public class SykefraværForEttKvartal extends MaskerbartSykefravær implements Comparable<SykefraværForEttKvartal> {
 
     @JsonIgnore
-    private final Kvartal kvartal;
+    private final ÅrstallOgKvartal årstallOgKvartal;
 
     public SykefraværForEttKvartal(
-            Kvartal kvartal,
+            ÅrstallOgKvartal årstallOgKvartal,
             BigDecimal tapteDagsverk,
             BigDecimal muligeDagsverk,
             int antallPersoner
@@ -22,17 +22,17 @@ public class SykefraværForEttKvartal extends MaskerbartSykefravær implements C
                 tapteDagsverk,
                 muligeDagsverk,
                 antallPersoner,
-                kvartal != null
+                årstallOgKvartal != null
         );
-        this.kvartal = kvartal;
+        this.årstallOgKvartal = årstallOgKvartal;
     }
 
     public int getKvartal() {
-        return kvartal != null ? kvartal.getKvartal() : 0;
+        return årstallOgKvartal != null ? årstallOgKvartal.getKvartal() : 0;
     }
 
     public int getÅrstall() {
-        return kvartal != null ? kvartal.getÅrstall() : 0;
+        return årstallOgKvartal != null ? årstallOgKvartal.getÅrstall() : 0;
     }
 
 
@@ -43,8 +43,8 @@ public class SykefraværForEttKvartal extends MaskerbartSykefravær implements C
                 .compare(this, sykefraværForEttKvartal);
     }
 
-    public Kvartal getÅrstallOgKvartal() {
-        return kvartal;
+    public ÅrstallOgKvartal getÅrstallOgKvartal() {
+        return årstallOgKvartal;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class SykefraværForEttKvartal extends MaskerbartSykefravær implements C
         if (!(o instanceof SykefraværForEttKvartal)) return false;
         if (!super.equals(o)) return false;
         SykefraværForEttKvartal that = (SykefraværForEttKvartal) o;
-        return (kvartal.equals(that.kvartal)
+        return (årstallOgKvartal.equals(that.årstallOgKvartal)
                 && getProsent().equals(that.getProsent())
                 && getTapteDagsverk().equals(that.getTapteDagsverk())
                 && getMuligeDagsverk().equals(that.getMuligeDagsverk())
@@ -62,6 +62,6 @@ public class SykefraværForEttKvartal extends MaskerbartSykefravær implements C
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), kvartal);
+        return Objects.hash(super.hashCode(), årstallOgKvartal);
     }
 }

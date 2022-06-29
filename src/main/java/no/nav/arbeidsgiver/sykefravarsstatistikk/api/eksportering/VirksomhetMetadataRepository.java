@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.util.Pair;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -55,10 +55,10 @@ public class VirksomhetMetadataRepository {
         return Arrays.stream(results).sum();
     }
 
-    public List<VirksomhetMetadata> hentVirksomhetMetadata(Kvartal kvartal) {
+    public List<VirksomhetMetadata> hentVirksomhetMetadata(ÅrstallOgKvartal årstallOgKvartal) {
         MapSqlParameterSource paramSource = new MapSqlParameterSource()
-                .addValue("årstall", kvartal.getÅrstall())
-                .addValue("kvartal", kvartal.getKvartal());
+                .addValue("årstall", årstallOgKvartal.getÅrstall())
+                .addValue("kvartal", årstallOgKvartal.getKvartal());
 
         List<VirksomhetMetadata> virksomhetMetadata = namedParameterJdbcTemplate.query(
                 "select orgnr, navn, rectype, sektor, naring_kode, arstall, kvartal " +
@@ -73,7 +73,7 @@ public class VirksomhetMetadataRepository {
                                 resultSet.getString("rectype"),
                                 resultSet.getString("sektor"),
                                 resultSet.getString("naring_kode"),
-                                new Kvartal(
+                                new ÅrstallOgKvartal(
                                         resultSet.getInt("arstall"),
                                         resultSet.getInt("kvartal")
                                 )

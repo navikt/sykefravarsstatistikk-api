@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.importering.integrasjon.utils;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.DeleteSykefraværsstatistikkFunction;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.SykefraværsstatistikkNæringUtils;
@@ -90,7 +90,7 @@ public class SykefraværsstatistikkNæringUtilsJdbcTest {
         lagreSykefraværprosentNæring(namedParameterJdbcTemplate, "02", 2019, 1);
 
         DeleteSykefraværsstatistikkFunction deleteFunction = utils.getDeleteFunction();
-        deleteFunction.apply(new Kvartal(2018, 4));
+        deleteFunction.apply(new ÅrstallOgKvartal(2018, 4));
 
         List<Sykefraværprosent> list = hentSykefraværprosentNæring(namedParameterJdbcTemplate);
         assertThat(list.size()).isEqualTo(4);

@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.StatistikkildeDvh;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
@@ -62,14 +62,14 @@ public class DatavarehusRepository {
    Statistikk
   */
 
-    public Kvartal hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh type) {
-        List<Kvartal> alleKvartaler = namedParameterJdbcTemplate.query(
+    public ÅrstallOgKvartal hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh type) {
+        List<ÅrstallOgKvartal> alleKvartaler = namedParameterJdbcTemplate.query(
                 String.format("select distinct arstall, kvartal " +
                         "from %s " +
                         "order by arstall desc, kvartal desc", type.tabell),
                 new MapSqlParameterSource(),
                 (resultSet, rowNum) ->
-                        new Kvartal(
+                        new ÅrstallOgKvartal(
                                 resultSet.getInt(ARSTALL),
                                 resultSet.getInt(KVARTAL)
                         )
@@ -78,11 +78,11 @@ public class DatavarehusRepository {
     }
 
 
-    public List<SykefraværsstatistikkLand> hentSykefraværsstatistikkLand(Kvartal kvartal) {
+    public List<SykefraværsstatistikkLand> hentSykefraværsstatistikkLand(ÅrstallOgKvartal årstallOgKvartal) {
         SqlParameterSource namedParameters =
                 new MapSqlParameterSource()
-                        .addValue(ARSTALL, kvartal.getÅrstall())
-                        .addValue(KVARTAL, kvartal.getKvartal());
+                        .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+                        .addValue(KVARTAL, årstallOgKvartal.getKvartal());
 
         return namedParameterJdbcTemplate.query(
                 "select arstall, kvartal, " +
@@ -103,11 +103,11 @@ public class DatavarehusRepository {
                                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
     }
 
-    public List<SykefraværsstatistikkSektor> hentSykefraværsstatistikkSektor(Kvartal kvartal) {
+    public List<SykefraværsstatistikkSektor> hentSykefraværsstatistikkSektor(ÅrstallOgKvartal årstallOgKvartal) {
         SqlParameterSource namedParameters =
                 new MapSqlParameterSource()
-                        .addValue(ARSTALL, kvartal.getÅrstall())
-                        .addValue(KVARTAL, kvartal.getKvartal());
+                        .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+                        .addValue(KVARTAL, årstallOgKvartal.getKvartal());
 
         return namedParameterJdbcTemplate.query(
                 "select arstall, kvartal, sektor, " +
@@ -129,11 +129,11 @@ public class DatavarehusRepository {
                                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
     }
 
-    public List<SykefraværsstatistikkNæring> hentSykefraværsstatistikkNæring(Kvartal kvartal) {
+    public List<SykefraværsstatistikkNæring> hentSykefraværsstatistikkNæring(ÅrstallOgKvartal årstallOgKvartal) {
         SqlParameterSource namedParameters =
                 new MapSqlParameterSource()
-                        .addValue(ARSTALL, kvartal.getÅrstall())
-                        .addValue(KVARTAL, kvartal.getKvartal());
+                        .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+                        .addValue(KVARTAL, årstallOgKvartal.getKvartal());
 
         return namedParameterJdbcTemplate.query(
                 "select arstall, kvartal, naring, " +
@@ -155,11 +155,11 @@ public class DatavarehusRepository {
                                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
     }
 
-    public List<SykefraværsstatistikkNæring> hentSykefraværsstatistikkNæring5siffer(Kvartal kvartal) {
+    public List<SykefraværsstatistikkNæring> hentSykefraværsstatistikkNæring5siffer(ÅrstallOgKvartal årstallOgKvartal) {
         SqlParameterSource namedParameters =
                 new MapSqlParameterSource()
-                        .addValue(ARSTALL, kvartal.getÅrstall())
-                        .addValue(KVARTAL, kvartal.getKvartal());
+                        .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+                        .addValue(KVARTAL, årstallOgKvartal.getKvartal());
 
         return namedParameterJdbcTemplate.query(
                 "select arstall, kvartal, naering_kode, " +
@@ -181,11 +181,11 @@ public class DatavarehusRepository {
 
     }
 
-    public List<SykefraværsstatistikkVirksomhet> hentSykefraværsstatistikkVirksomhet(Kvartal kvartal) {
+    public List<SykefraværsstatistikkVirksomhet> hentSykefraværsstatistikkVirksomhet(ÅrstallOgKvartal årstallOgKvartal) {
         SqlParameterSource namedParameters =
                 new MapSqlParameterSource()
-                        .addValue(ARSTALL, kvartal.getÅrstall())
-                        .addValue(KVARTAL, kvartal.getKvartal());
+                        .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+                        .addValue(KVARTAL, årstallOgKvartal.getKvartal());
 
         return namedParameterJdbcTemplate.query(
                 "select arstall, kvartal, orgnr, varighet, rectype, " +
@@ -208,11 +208,11 @@ public class DatavarehusRepository {
                                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
     }
 
-    public List<SykefraværsstatistikkNæringMedVarighet> hentSykefraværsstatistikkNæringMedVarighet(Kvartal kvartal) {
+    public List<SykefraværsstatistikkNæringMedVarighet> hentSykefraværsstatistikkNæringMedVarighet(ÅrstallOgKvartal årstallOgKvartal) {
         SqlParameterSource namedParameters =
                 new MapSqlParameterSource()
-                        .addValue(ARSTALL, kvartal.getÅrstall())
-                        .addValue(KVARTAL, kvartal.getKvartal());
+                        .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+                        .addValue(KVARTAL, årstallOgKvartal.getKvartal());
 
         return namedParameterJdbcTemplate.query(
                 "select arstall, kvartal, naering_kode, varighet, " +
@@ -236,12 +236,12 @@ public class DatavarehusRepository {
     }
 
     public List<SykefraværsstatistikkVirksomhetMedGradering> hentSykefraværsstatistikkVirksomhetMedGradering(
-            Kvartal kvartal
+            ÅrstallOgKvartal årstallOgKvartal
     ) {
         SqlParameterSource namedParameters =
                 new MapSqlParameterSource()
-                        .addValue(ARSTALL, kvartal.getÅrstall())
-                        .addValue(KVARTAL, kvartal.getKvartal())
+                        .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+                        .addValue(KVARTAL, årstallOgKvartal.getKvartal())
                         .addValue(RECTYPE, RECTYPE_FOR_VIRKSOMHET);
 
         return namedParameterJdbcTemplate.query(
@@ -298,11 +298,11 @@ public class DatavarehusRepository {
                                 resultSet.getString(NARINGNAVN)));
     }
 
-    public List<Orgenhet> hentOrgenhet(Kvartal kvartal) {
-        return hentOrgenhet(kvartal, false);
+    public List<Orgenhet> hentOrgenhet(ÅrstallOgKvartal årstallOgKvartal) {
+        return hentOrgenhet(årstallOgKvartal, false);
     }
 
-    public List<Orgenhet> hentOrgenhet(Kvartal kvartal, boolean filtrerPåÅrstallOgKvartal) {
+    public List<Orgenhet> hentOrgenhet(ÅrstallOgKvartal årstallOgKvartal, boolean filtrerPåÅrstallOgKvartal) {
 
         MapSqlParameterSource namedParameters = new MapSqlParameterSource();
         StringBuffer query = new StringBuffer("select orgnr, offnavn, rectype, sektor, naring, arstall, kvartal " +
@@ -311,8 +311,8 @@ public class DatavarehusRepository {
                 "and offnavn is not null ");
 
         if (filtrerPåÅrstallOgKvartal) {
-            namedParameters.addValue(ARSTALL, kvartal.getÅrstall())
-                    .addValue(KVARTAL, kvartal.getKvartal());
+            namedParameters.addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+                    .addValue(KVARTAL, årstallOgKvartal.getKvartal());
             query.append("and arstall = :arstall ");
             query.append("and kvartal = :kvartal");
         }
@@ -327,21 +327,21 @@ public class DatavarehusRepository {
                                 resultSet.getString(RECTYPE),
                                 resultSet.getString(SEKTOR),
                                 resultSet.getString(NARING),
-                                filtrerPåÅrstallOgKvartal? new Kvartal(
+                                filtrerPåÅrstallOgKvartal? new ÅrstallOgKvartal(
                                         resultSet.getInt(ARSTALL),
                                         resultSet.getInt(KVARTAL)
-                                ) : kvartal
+                                ) : årstallOgKvartal
                         )
                 )
         );
     }
 
-    public List<Kvartal> hentSisteKvartalForOrgenhet() {
+    public List<ÅrstallOgKvartal> hentSisteKvartalForOrgenhet() {
         return namedParameterJdbcTemplate.query(
                 "select distinct arstall, kvartal from dt_p.v_dim_ia_orgenhet order by arstall, kvartal desc",
                 new MapSqlParameterSource(),
                 ((resultSet, i) ->
-                        new Kvartal(
+                        new ÅrstallOgKvartal(
                                 resultSet.getInt(ARSTALL),
                                 resultSet.getInt(KVARTAL)
                         )

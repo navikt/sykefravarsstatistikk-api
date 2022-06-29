@@ -59,7 +59,7 @@ public class SykefraværRepositoryJdbcTest {
 
         List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(
                 BARNEHAGE,
-                new Kvartal(2021, 4));
+                new ÅrstallOgKvartal(2021, 4));
 
         assertThat(resultat.size()).isEqualTo(0);
     }
@@ -70,7 +70,7 @@ public class SykefraværRepositoryJdbcTest {
 
         List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(
                 BARNEHAGE,
-                new Kvartal(2018, 3));
+                new ÅrstallOgKvartal(2018, 3));
 
         assertThat(resultat.size()).isEqualTo(4);
         assertThat(resultat.get(0)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2018, 3, 6));
@@ -83,7 +83,7 @@ public class SykefraværRepositoryJdbcTest {
 
         List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(
                 BARNEHAGE,
-                new Kvartal(2019, 1));
+                new ÅrstallOgKvartal(2019, 1));
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 1, 3));
         assertThat(resultat.get(1)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2));
@@ -95,7 +95,7 @@ public class SykefraværRepositoryJdbcTest {
         persisterDatasetIDb(NÆRING);
         List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(
                 NÆRING,
-                new Kvartal(2019, 1));
+                new ÅrstallOgKvartal(2019, 1));
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 1, 3));
         assertThat(resultat.get(1)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2));
@@ -214,7 +214,7 @@ public class SykefraværRepositoryJdbcTest {
             int totalAntallPersoner
     ) {
         return new UmaskertSykefraværForEttKvartal(
-                new Kvartal(årstall, kvartal),
+                new ÅrstallOgKvartal(årstall, kvartal),
                 new BigDecimal(totalTapteDagsverk),
                 new BigDecimal(totalMuligeDagsverk),
                 totalAntallPersoner

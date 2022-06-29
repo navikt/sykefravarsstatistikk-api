@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SummertSykefravær;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
@@ -24,21 +24,21 @@ public class SummertKorttidsOgLangtidsfravær {
 
 
     public static SummertKorttidsOgLangtidsfravær getSummertKorttidsOgLangtidsfravær(
-            Kvartal sistePubliserteKvartal,
+            ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal,
             int antallKvartalerSomSkalSummeres,
             List<UmaskertSykefraværForEttKvartalMedVarighet> sykefraværVarighet
     ) {
-        List<Kvartal> kvartalerSomSkalSummeres = Kvartal.range(
-                sistePubliserteKvartal.minusKvartaler(antallKvartalerSomSkalSummeres - 1),
-                sistePubliserteKvartal
+        List<ÅrstallOgKvartal> kvartalerSomSkalSummeres = ÅrstallOgKvartal.range(
+                sistePubliserteÅrstallOgKvartal.minusKvartaler(antallKvartalerSomSkalSummeres - 1),
+                sistePubliserteÅrstallOgKvartal
         );
 
-        Map<Kvartal, List<UmaskertSykefraværForEttKvartalMedVarighet>> årstallOgKvartals =
+        Map<ÅrstallOgKvartal, List<UmaskertSykefraværForEttKvartalMedVarighet>> årstallOgKvartals =
                 sykefraværVarighet.stream()
-                        .filter(v -> kvartalerSomSkalSummeres.contains(v.getKvartal()))
+                        .filter(v -> kvartalerSomSkalSummeres.contains(v.getÅrstallOgKvartal()))
                         .collect(
                                 Collectors.groupingBy(
-                                        UmaskertSykefraværForEttKvartalMedVarighet::getKvartal
+                                        UmaskertSykefraværForEttKvartalMedVarighet::getÅrstallOgKvartal
                                 )
                         );
 
@@ -106,12 +106,12 @@ public class SummertKorttidsOgLangtidsfravær {
                 totalTaptedagsverk,
                 totalMuligedagsverk,
                 maksAntallPersoner,
-                kvartalsvisSykefravær.stream().map(UmaskertSykefraværForEttKvartal::getKvartal).collect(Collectors.toList())
+                kvartalsvisSykefravær.stream().map( k -> k.getÅrstallOgKvartal()).collect(Collectors.toList())
         );
     }
 
     private static UmaskertSykefraværForEttKvartal summerSykefraværPåVarighet(
-            Kvartal kvartal,
+            ÅrstallOgKvartal årstallOgKvartal,
             List<UmaskertSykefraværForEttKvartalMedVarighet> sykefraværVarighet,
             String korttidEllerLangtid
     ) {
@@ -128,7 +128,7 @@ public class SummertKorttidsOgLangtidsfravær {
                 })
                 .map(UmaskertSykefraværForEttKvartalMedVarighet::tilUmaskertSykefraværForEttKvartal)
                 .reduce(
-                        UmaskertSykefraværForEttKvartal.tomtUmaskertKvartalsvisSykefravær(kvartal),
+                        UmaskertSykefraværForEttKvartal.tomtUmaskertKvartalsvisSykefravær(årstallOgKvartal),
                         UmaskertSykefraværForEttKvartal::add
                 );
     }

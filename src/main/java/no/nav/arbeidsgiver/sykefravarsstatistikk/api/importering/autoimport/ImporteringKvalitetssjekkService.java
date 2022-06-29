@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
 import lombok.AllArgsConstructor;
 import lombok.Value;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -43,9 +43,9 @@ public class ImporteringKvalitetssjekkService {
         resultatlinjer.add("Antall linjer virksomhet: " + rådataForVirksomhet.size());
         resultatlinjer.add("Antall linjer virksomhet med gradering: " + rådataForVirksomhetMedGradering.size());
 
-        List<Kvartal> årstallOgKvartal = rådataForNæring
+        List<ÅrstallOgKvartal> årstallOgKvartal = rådataForNæring
                 .stream()
-                .map(RådataMedNæringskode::getKvartal)
+                .map(RådataMedNæringskode::getÅrstallOgKvartal)
                 .distinct()
                 .collect(Collectors.toList());
 
@@ -130,7 +130,7 @@ public class ImporteringKvalitetssjekkService {
             List<Rådata> rådataList
     ) {
         return rådataList.stream()
-                .filter(rådataListElement -> rådataListElement.kvartal.equals(rådata.kvartal))
+                .filter(rådataListElement -> rådataListElement.årstallOgKvartal.equals(rådata.årstallOgKvartal))
                 .findAny();
     }
 
@@ -138,13 +138,13 @@ public class ImporteringKvalitetssjekkService {
         return data1.getNæringskode().equals(data2.getNæringskode()) &&
                 erLike(
                         new Rådata(
-                                data1.getKvartal(),
+                                data1.getÅrstallOgKvartal(),
                                 data1.getAntallPersoner(),
                                 data1.getTapteDagsverk(),
                                 data1.getMuligeDagsverk()
                         ),
                         new Rådata(
-                                data2.getKvartal(),
+                                data2.getÅrstallOgKvartal(),
                                 data2.getAntallPersoner(),
                                 data2.getTapteDagsverk(),
                                 data2.getMuligeDagsverk()
@@ -153,7 +153,7 @@ public class ImporteringKvalitetssjekkService {
     }
 
     private static boolean erLike(Rådata data1, Rådata data2) {
-        return data1.getKvartal().equals(data2.getKvartal()) &&
+        return data1.getÅrstallOgKvartal().equals(data2.getÅrstallOgKvartal()) &&
                 data1.getAntallPersoner().equals(data2.getAntallPersoner()) &&
                 bigDecimalApproxEquals(data1.getTapteDagsverk(), data2.getTapteDagsverk()) &&
                 bigDecimalApproxEquals(data1.getMuligeDagsverk(), data2.getMuligeDagsverk());
@@ -161,25 +161,25 @@ public class ImporteringKvalitetssjekkService {
 
     private boolean erLikeUtenomTall(RådataMedNæringskode data1, RådataMedNæringskode data2) {
         return data1.getNæringskode().equals(data2.getNæringskode()) &&
-                data1.getKvartal().equals(data2.getKvartal());
+                data1.getÅrstallOgKvartal().equals(data2.getÅrstallOgKvartal());
     }
 
     private static boolean bigDecimalApproxEquals(BigDecimal number1, BigDecimal number2) {
         return number1.subtract(number2).abs().compareTo(BIG_DECIMAL_FEILMARGIN) < 0;
     }
 
-    private List<RådataMedNæringskode> getRådataForKvartal(List<RådataMedNæringskode> rådata, Kvartal kvartal) {
+    private List<RådataMedNæringskode> getRådataForKvartal(List<RådataMedNæringskode> rådata, ÅrstallOgKvartal kvartal) {
         return rådata.stream()
-                .filter(data -> data.getKvartal().equals(kvartal))
+                .filter(data -> data.getÅrstallOgKvartal().equals(kvartal))
                 .collect(Collectors.toList());
     }
 
     private Rådata getSykefraværRådataForKvartal(
             List<Rådata> sykefraværRådata,
-            Kvartal kvartal
+            ÅrstallOgKvartal kvartal
     ) {
         return sykefraværRådata.stream()
-                .filter(data -> data.getKvartal().equals(kvartal))
+                .filter(data -> data.getÅrstallOgKvartal().equals(kvartal))
                 .findAny()
                 .orElse(null);
     }
@@ -191,7 +191,7 @@ public class ImporteringKvalitetssjekkService {
                 new MapSqlParameterSource(),
                 (rs, rowNum) -> new RådataMedNæringskode(
                         rs.getString("naring_kode"),
-                        new Kvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
+                        new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
                         rs.getInt("antall_personer"),
                         rs.getBigDecimal("tapte_dagsverk"),
                         rs.getBigDecimal("mulige_dagsverk")
@@ -211,7 +211,7 @@ public class ImporteringKvalitetssjekkService {
                 new MapSqlParameterSource(),
                 (rs, rowNum) -> new RådataMedNæringskode(
                         rs.getString("naring_kode"),
-                        new Kvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
+                        new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
                         rs.getInt("sum_antall_personer"),
                         rs.getBigDecimal("sum_tapte_dagsverk"),
                         rs.getBigDecimal("sum_mulige_dagsverk")
@@ -234,7 +234,7 @@ public class ImporteringKvalitetssjekkService {
                 parametre,
                 (rs, rowNum) -> new RådataMedNæringskode(
                         rs.getString("naring_kode"),
-                        new Kvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
+                        new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
                         rs.getInt("sum_antall_personer"),
                         rs.getBigDecimal("sum_tapte_dagsverk"),
                         rs.getBigDecimal("sum_mulige_dagsverk")
@@ -253,7 +253,7 @@ public class ImporteringKvalitetssjekkService {
                         "order by arstall, kvartal ",
                 new MapSqlParameterSource(),
                 (rs, rowNum) -> new Rådata(
-                        new Kvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
+                        new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
                         rs.getInt("sum_antall_personer"),
                         rs.getBigDecimal("sum_tapte_dagsverk"),
                         rs.getBigDecimal("sum_mulige_dagsverk")
@@ -272,7 +272,7 @@ public class ImporteringKvalitetssjekkService {
                         "order by arstall, kvartal ",
                 new MapSqlParameterSource(),
                 (rs, rowNum) -> new Rådata(
-                        new Kvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
+                        new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
                         rs.getInt("sum_antall_personer"),
                         rs.getBigDecimal("sum_tapte_dagsverk"),
                         rs.getBigDecimal("sum_mulige_dagsverk")
@@ -283,7 +283,7 @@ public class ImporteringKvalitetssjekkService {
     @AllArgsConstructor
     @Value
     protected static class Rådata {
-        private Kvartal kvartal;
+        private ÅrstallOgKvartal årstallOgKvartal;
         private final Integer antallPersoner;
         private final BigDecimal tapteDagsverk;
         private final BigDecimal muligeDagsverk;
@@ -293,7 +293,7 @@ public class ImporteringKvalitetssjekkService {
     @Value
     private static class RådataMedNæringskode {
         private final String næringskode;
-        private Kvartal kvartal;
+        private ÅrstallOgKvartal årstallOgKvartal;
         private final Integer antallPersoner;
         private final BigDecimal tapteDagsverk;
         private final BigDecimal muligeDagsverk;

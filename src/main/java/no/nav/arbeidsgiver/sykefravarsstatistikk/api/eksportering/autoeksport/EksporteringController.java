@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.security.token.support.core.api.Protected;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -34,7 +34,7 @@ public class EksporteringController {
                 EksporteringBegrensning.build().utenBegrensning() :
                 EksporteringBegrensning.build().medBegrensning(begrensningTil);
 
-        Kvartal årstallOgKvartal = new Kvartal(årstall, kvartal);
+        ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
         int antallEksportert =
                 eksporteringService.eksporter(årstallOgKvartal, eksporteringBegrensning);
 

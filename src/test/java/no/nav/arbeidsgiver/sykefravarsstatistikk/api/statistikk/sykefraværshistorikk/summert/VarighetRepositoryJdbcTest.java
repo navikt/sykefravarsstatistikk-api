@@ -7,7 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
 import org.junit.jupiter.api.AfterEach;
@@ -72,7 +72,7 @@ public class VarighetRepositoryJdbcTest {
 
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(new UmaskertSykefraværForEttKvartalMedVarighet(
-                new Kvartal(2019, 2),
+                new ÅrstallOgKvartal(2019, 2),
                 new BigDecimal(4),
                 new BigDecimal(0),
                 0,
@@ -80,7 +80,7 @@ public class VarighetRepositoryJdbcTest {
         ));
 
         assertThat(resultat.get(1)).isEqualTo(new UmaskertSykefraværForEttKvartalMedVarighet(
-                new Kvartal(2019, 2),
+                new ÅrstallOgKvartal(2019, 2),
                 new BigDecimal(0),
                 new BigDecimal(100),
                 6,
@@ -100,7 +100,7 @@ public class VarighetRepositoryJdbcTest {
 
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(new UmaskertSykefraværForEttKvartalMedVarighet(
-                new Kvartal(2019, 2),
+                new ÅrstallOgKvartal(2019, 2),
                 new BigDecimal(4),
                 new BigDecimal(0),
                 0,
@@ -108,7 +108,7 @@ public class VarighetRepositoryJdbcTest {
         ));
 
         assertThat(resultat.get(1)).isEqualTo(new UmaskertSykefraværForEttKvartalMedVarighet(
-                new Kvartal(2019, 2),
+                new ÅrstallOgKvartal(2019, 2),
                 new BigDecimal(0),
                 new BigDecimal(10),
                 1,
@@ -134,7 +134,7 @@ public class VarighetRepositoryJdbcTest {
 
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(new UmaskertSykefraværForEttKvartalMedVarighet(
-                new Kvartal(2019, 2),
+                new ÅrstallOgKvartal(2019, 2),
                 new BigDecimal(4),
                 new BigDecimal(0),
                 0,
@@ -142,7 +142,7 @@ public class VarighetRepositoryJdbcTest {
         ));
 
         assertThat(resultat.get(1)).isEqualTo(new UmaskertSykefraværForEttKvartalMedVarighet(
-                new Kvartal(2019, 2),
+                new ÅrstallOgKvartal(2019, 2),
                 new BigDecimal(0),
                 new BigDecimal(10),
                 1,

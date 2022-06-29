@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -18,46 +19,48 @@ import static java.lang.Integer.max;
 public class UmaskertSykefraværForEttKvartal implements Comparable<UmaskertSykefraværForEttKvartal>  {
 
     @JsonIgnore
-    private final Kvartal kvartal;
+    private final ÅrstallOgKvartal årstallOgKvartal;
     private final BigDecimal tapteDagsverk;
     private final BigDecimal muligeDagsverk;
     private final int antallPersoner;
 
     public UmaskertSykefraværForEttKvartal(
-            Kvartal kvartal,
+            ÅrstallOgKvartal årstallOgKvartal,
             BigDecimal tapteDagsverk,
             BigDecimal muligeDagsverk,
             int antallPersoner) {
-        this.kvartal = kvartal;
+        this.årstallOgKvartal = årstallOgKvartal;
         this.tapteDagsverk = tapteDagsverk.setScale(1, RoundingMode.HALF_UP);
         this.muligeDagsverk = muligeDagsverk.setScale(1, RoundingMode.HALF_UP);
         this.antallPersoner = antallPersoner;
     }
 
-    public int getKvartalsverdi() {
-        return kvartal != null ? kvartal.getKvartal() : 0;
+    public int getKvartal() {
+        return årstallOgKvartal != null ? årstallOgKvartal.getKvartal() : 0;
     }
 
     public int getÅrstall() {
-        return kvartal != null ? kvartal.getÅrstall() : 0;
+        return årstallOgKvartal != null ? årstallOgKvartal.getÅrstall() : 0;
     }
 
     public BigDecimal getProsent() {
-        return getTapteDagsverk().divide(getMuligeDagsverk()).multiply(new BigDecimal(100));
+    return getTapteDagsverk()
+        .divide(getMuligeDagsverk(), RoundingMode.HALF_UP)
+        .multiply(new BigDecimal(100));
     }
 
-    public static UmaskertSykefraværForEttKvartal tomtUmaskertKvartalsvisSykefravær(Kvartal kvartal) {
-        return new UmaskertSykefraværForEttKvartal(kvartal, new BigDecimal(0), new BigDecimal(0), 0);
+    public static UmaskertSykefraværForEttKvartal tomtUmaskertKvartalsvisSykefravær(ÅrstallOgKvartal årstallOgKvartal) {
+        return new UmaskertSykefraværForEttKvartal(årstallOgKvartal, new BigDecimal(0), new BigDecimal(0), 0);
     }
 
     public UmaskertSykefraværForEttKvartal add(
             UmaskertSykefraværForEttKvartal sykefravær
     ) {
-        if (!sykefravær.getKvartal().equals(kvartal)) {
+        if (!sykefravær.getÅrstallOgKvartal().equals(årstallOgKvartal)) {
             throw new IllegalArgumentException("Kan ikke summere kvartalsvis sykefravær med forskjellige kvartaler");
         }
         return new UmaskertSykefraværForEttKvartal(
-                kvartal,
+                årstallOgKvartal,
                 tapteDagsverk.add(sykefravær.getTapteDagsverk()),
                 muligeDagsverk.add(sykefravær.getMuligeDagsverk()),
                 max(antallPersoner, sykefravær.getAntallPersoner())
@@ -65,9 +68,9 @@ public class UmaskertSykefraværForEttKvartal implements Comparable<UmaskertSyke
     }
 
     @Override
-    public int compareTo(UmaskertSykefraværForEttKvartal kvartalsvisSykefravær) {
+    public int compareTo(@NotNull UmaskertSykefraværForEttKvartal kvartalsvisSykefravær) {
         return Comparator
-                .comparing(UmaskertSykefraværForEttKvartal::getKvartalsverdi)
+                .comparing(UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal)
                 .compare(this, kvartalsvisSykefravær);
     }
 }

@@ -7,7 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMeta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataNæringskode5siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner.Orgenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.GraderingRepository;
 import org.jetbrains.annotations.Nullable;
@@ -46,9 +46,9 @@ public class PostImporteringService {
     }
 
     // Kall fra Scheduler / Importering
-    public int fullførPostImporteringOgForberedNesteEksport(Kvartal kvartal) {
+    public int fullførPostImporteringOgForberedNesteEksport(ÅrstallOgKvartal årstallOgKvartal) {
         Pair<Integer, Integer> antallVirksomheterImportert =
-                importVirksomhetMetadataOgVirksomhetNæringskode5sifferMapping(kvartal);
+                importVirksomhetMetadataOgVirksomhetNæringskode5sifferMapping(årstallOgKvartal);
         boolean harNoeÅForbereddeTilNesteEksport = antallVirksomheterImportert.getFirst() > 0;
 
         if (!harNoeÅForbereddeTilNesteEksport) {
@@ -58,21 +58,21 @@ public class PostImporteringService {
             log.info("Post-importering for årstall '{}' og kvartal '{}' er ferdig med " +
                             "'{}' VirksomhetMetadata opprettet og " +
                             "'{}' VirksomhetMetadataNæringskode5siffer opprettet",
-                    kvartal.getÅrstall(),
-                    kvartal.getKvartal(),
+                    årstallOgKvartal.getÅrstall(),
+                    årstallOgKvartal.getKvartal(),
                     antallVirksomheterImportert.getFirst(),
                     antallVirksomheterImportert.getSecond()
             );
         }
 
-        int antallRaderTilNesteEksportering = forberedNesteEksport(kvartal);
+        int antallRaderTilNesteEksportering = forberedNesteEksport(årstallOgKvartal);
 
         log.info(
                 "Forberedelse til neste eksport er ferdig, med '{}' rader klare til neste eksportering " +
                         "(årstall '{}', kvartal '{}')",
                 antallRaderTilNesteEksportering,
-                kvartal.getÅrstall(),
-                kvartal.getKvartal()
+                årstallOgKvartal.getÅrstall(),
+                årstallOgKvartal.getKvartal()
         );
         return antallRaderTilNesteEksportering;
     }
@@ -80,7 +80,7 @@ public class PostImporteringService {
 
     // Kall fra Controller / backdoor
     protected Pair<Integer, Integer> importVirksomhetMetadataOgVirksomhetNæringskode5sifferMapping(
-            Kvartal kvartal
+            ÅrstallOgKvartal årstallOgKvartal
     ) {
         if (!erImporteringAktivert) {
             log.info("Importering er ikke aktivert. Skal ikke importere VirksomhetMetadata " +
@@ -88,8 +88,8 @@ public class PostImporteringService {
             return Pair.of(0, 0);
         }
 
-        int antallVirksomhetMetadataOpprettet = importVirksomhetMetadata(kvartal);
-        int antallVirksomhetMetadataNæringskode5siffer = importVirksomhetNæringskode5sifferMapping(kvartal);
+        int antallVirksomhetMetadataOpprettet = importVirksomhetMetadata(årstallOgKvartal);
+        int antallVirksomhetMetadataNæringskode5siffer = importVirksomhetNæringskode5sifferMapping(årstallOgKvartal);
 
         log.info(
                 "Importering av VirksomhetMetadata og VirksomhetNæringskode5sifferMapping er ferdig. " +
@@ -101,13 +101,13 @@ public class PostImporteringService {
     }
 
     // Kall fra Controller / backdoor
-    protected int forberedNesteEksport(Kvartal kvartal) {
+    protected int forberedNesteEksport(ÅrstallOgKvartal årstallOgKvartal) {
         if (!erEksporteringAktivert) {
             log.info(
                     "Eksportering er ikke aktivert. " +
                             "Skal ikke forberedde til neste eksportering for årstall '{}' og kvartal '{}'. ",
-                    kvartal.getÅrstall(),
-                    kvartal.getKvartal()
+                    årstallOgKvartal.getÅrstall(),
+                    årstallOgKvartal.getKvartal()
             );
             return 0;
         }
@@ -124,7 +124,7 @@ public class PostImporteringService {
         int antallSlettetEksportertPerKvartal = eksporteringRepository.slettEksportertPerKvartal();
         log.info("Slettet '{}' rader fra forrige eksportering.", antallSlettetEksportertPerKvartal);
         List<VirksomhetMetadata> virksomhetMetadata =
-                virksomhetMetadataRepository.hentVirksomhetMetadata(kvartal);
+                virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal);
 
         List<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartalListe =
                 mapToVirksomhetEksportPerKvartal(virksomhetMetadata);
@@ -140,8 +140,8 @@ public class PostImporteringService {
     }
 
 
-    private int importVirksomhetMetadata(Kvartal kvartal) {
-        List<Orgenhet> orgenhetList = hentOrgenhetListeFraDvh(kvartal);
+    private int importVirksomhetMetadata(ÅrstallOgKvartal årstallOgKvartal) {
+        List<Orgenhet> orgenhetList = hentOrgenhetListeFraDvh(årstallOgKvartal);
 
         if (orgenhetList.isEmpty()) {
             log.warn("Stopper import av metadata.");
@@ -152,8 +152,8 @@ public class PostImporteringService {
         int antallSlettet = virksomhetMetadataRepository.slettVirksomhetMetadata();
         log.info("Slettet '{}' VirksomhetMetadata for årstall '{}' og kvartal '{}'",
                 antallSlettet,
-                kvartal.getÅrstall(),
-                kvartal.getKvartal()
+                årstallOgKvartal.getÅrstall(),
+                årstallOgKvartal.getKvartal()
         );
         int antallOpprettet =
                 virksomhetMetadataRepository.opprettVirksomhetMetadata(mapToVirksomhetMetadata(orgenhetList));
@@ -163,11 +163,11 @@ public class PostImporteringService {
     }
 
     @Nullable
-    private List<Orgenhet> hentOrgenhetListeFraDvh(Kvartal kvartal) {
-        List<Orgenhet> orgenhetList = datavarehusRepository.hentOrgenhet(kvartal, true);
+    private List<Orgenhet> hentOrgenhetListeFraDvh(ÅrstallOgKvartal årstallOgKvartal) {
+        List<Orgenhet> orgenhetList = datavarehusRepository.hentOrgenhet(årstallOgKvartal, true);
 
         if (orgenhetList.isEmpty()) {
-            List<Kvartal> alleSisteTilgjengeligKvartal = datavarehusRepository.hentSisteKvartalForOrgenhet();
+            List<ÅrstallOgKvartal> alleSisteTilgjengeligKvartal = datavarehusRepository.hentSisteKvartalForOrgenhet();
 
             if (alleSisteTilgjengeligKvartal == null || alleSisteTilgjengeligKvartal.isEmpty()) {
                 log.warn("Ingen Orgenhet i DVH funnet til import.");
@@ -178,30 +178,30 @@ public class PostImporteringService {
                 log.warn(
                         "Har ikke funnet Orgenhet for årstall '{}' og kvartal '{}'. " +
                                 "Flere enn 1 årstal og kvartal funnet i DVH for Orgenhet, antall: '{}'.",
-                        kvartal.getÅrstall(),
-                        kvartal.getKvartal(),
+                        årstallOgKvartal.getÅrstall(),
+                        årstallOgKvartal.getKvartal(),
                         alleSisteTilgjengeligKvartal.size()
                 );
                 return Collections.emptyList();
             }
 
-            Kvartal tilgjengeligKvartal = alleSisteTilgjengeligKvartal.get(0);
+            ÅrstallOgKvartal tilgjengeligÅrstallOgKvartal = alleSisteTilgjengeligKvartal.get(0);
             log.warn(
                     "Har ikke funnet Orgenhet for årstall '{}' og kvartal '{}'. Importerer VirksomhetMetadata " +
                             "med det årstall og kvartal som er tilgjengelig i datavarehus: '{} {}'",
-                    kvartal.getÅrstall(),
-                    kvartal.getKvartal(),
-                    tilgjengeligKvartal.getÅrstall(),
-                    tilgjengeligKvartal.getKvartal()
+                    årstallOgKvartal.getÅrstall(),
+                    årstallOgKvartal.getKvartal(),
+                    tilgjengeligÅrstallOgKvartal.getÅrstall(),
+                    tilgjengeligÅrstallOgKvartal.getKvartal()
             );
-            orgenhetList = datavarehusRepository.hentOrgenhet(kvartal);
+            orgenhetList = datavarehusRepository.hentOrgenhet(årstallOgKvartal);
         }
         return orgenhetList;
     }
 
-    private int importVirksomhetNæringskode5sifferMapping(Kvartal kvartal) {
+    private int importVirksomhetNæringskode5sifferMapping(ÅrstallOgKvartal årstallOgKvartal) {
         List<VirksomhetMetadataNæringskode5siffer> virksomhetMetadataNæringskode5siffer =
-                graderingRepository.hentVirksomhetMetadataNæringskode5siffer(kvartal);
+                graderingRepository.hentVirksomhetMetadataNæringskode5siffer(årstallOgKvartal);
 
         if (virksomhetMetadataNæringskode5siffer.isEmpty()) {
             log.warn("Ingen virksomhetMetadataNæringskode5siffer funnet i vår statistikk tabell. Stopper import. ");
@@ -239,7 +239,7 @@ public class PostImporteringService {
         return virksomhetMetadataList.stream().map(
                 virksomhetMetadata -> new VirksomhetEksportPerKvartal(
                         new Orgnr(virksomhetMetadata.getOrgnr()),
-                        new Kvartal(
+                        new ÅrstallOgKvartal(
                                 virksomhetMetadata.getÅrstall(),
                                 virksomhetMetadata.getKvartal()),
                         false

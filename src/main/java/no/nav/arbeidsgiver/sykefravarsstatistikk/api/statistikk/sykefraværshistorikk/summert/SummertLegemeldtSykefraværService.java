@@ -6,7 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Kvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.LegemeldtSykefraværsprosent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SummertSykefravær;
@@ -35,15 +35,15 @@ public class SummertLegemeldtSykefraværService {
 
     public LegemeldtSykefraværsprosent hentLegemeldtSykefraværsprosent(
             Underenhet underenhet,
-            Kvartal sistePubliserteKvartal
+            ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal
     ) {
-        Kvartal eldsteKvartal =
-                sistePubliserteKvartal.minusKvartaler(antallKvartalerSomSkalSummeres - 1);
+        ÅrstallOgKvartal eldsteÅrstallOgKvartal =
+                sistePubliserteÅrstallOgKvartal.minusKvartaler(antallKvartalerSomSkalSummeres - 1);
 
         List<UmaskertSykefraværForEttKvartal> sykefraværForEttKvartalListe =
                 sykefraværprosentRepository.hentUmaskertSykefraværForEttKvartalListe(
                         underenhet,
-                        eldsteKvartal
+                        eldsteÅrstallOgKvartal
                 );
 
         SummertSykefravær summertSykefravær =
@@ -66,7 +66,7 @@ public class SummertLegemeldtSykefraværService {
             Bransje bransje = bransjeEllerNæring.getBransje();
             List<UmaskertSykefraværForEttKvartal> listeAvSykefraværForEttKvartalForBransje =
                     sykefraværprosentRepository.hentUmaskertSykefraværForEttKvartalListe(
-                            bransje, eldsteKvartal
+                            bransje, eldsteÅrstallOgKvartal
                     );
             SummertSykefravær summertSykefraværBransje =
                     SummertSykefravær.getSummertSykefravær(listeAvSykefraværForEttKvartalForBransje);
@@ -81,7 +81,7 @@ public class SummertLegemeldtSykefraværService {
             List<UmaskertSykefraværForEttKvartal> listeAvSykefraværForEttKvartalForNæring =
                     sykefraværprosentRepository.hentUmaskertSykefraværForEttKvartalListe(
                             næring,
-                            eldsteKvartal
+                            eldsteÅrstallOgKvartal
                     );
             SummertSykefravær summertSykefraværNæring =
                     SummertSykefravær.getSummertSykefravær(listeAvSykefraværForEttKvartalForNæring);
