@@ -1,0 +1,24 @@
+apiVersion: "nais.io/v1"
+kind: "Alert"
+metadata:
+  name: sykefravarsstatistikk-api-alert
+  namespace: arbeidsgiver
+  labels:
+    team: arbeidsgiver
+spec:
+  receivers:
+    slack:
+      channel: '#arbeidsgiver-teamia-alerts-dev'
+      prependText: '<!channel> | '
+  alerts:
+    - alert: applikasjon nede
+      expr: sum(up{app="sykefravarsstatistikk-api", job="kubernetes-pods"}) == 0
+      for: 2m
+      description: "sykefravarsstatistikk-api er nede"
+      action: "Sjekk logs.adeo.no for logger, og Grafana-dashboardet vårt: https://grafana.nais.io/dashboards/f/cvOhCMUnz/team-ia"
+
+    - alert: det har skjedd en feil i sykefraværsstatistikk-api
+      expr: sum(increase(logd_messages_total{log_app="sykefravarsstatistikk-api",log_level="Error"}[10m])) > 0
+      for: 10s
+      description: "sykefravarsstatistikk-api har logget en feil"
+      action: "Sjekk logs.adeo.no for logger, og Grafana-dashboardet vårt: https://grafana.nais.io/dashboards/f/cvOhCMUnz/team-ia"
