@@ -62,8 +62,8 @@ public class SykefraværRepository {
     public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefravær(
           Bransje bransje, ÅrstallOgKvartal fraÅrstallOgKvartal) {
 
-        if (bransje.lengdePåNæringskoder() != 2) {
-            throw (new IllegalArgumentException("Denne metoden funker bare for 2-siffer næringskoder"));
+        if (bransje.lengdePåNæringskoder() != 5) {
+            throw (new IllegalArgumentException("Denne metoden funker bare for 5-siffer næringskoder"));
         }
 
         try {
@@ -133,7 +133,7 @@ public class SykefraværRepository {
         }
     }
 
-    public Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> getAllTheThings(
+    public Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> hentUmaskertSykefraværAlleKategorier(
           Virksomhet virksomhet, ÅrstallOgKvartal fraÅrstallOgKvartal) {
         Næring næringen = new Næring(virksomhet.getNæringskode().getKode(), "");
         Optional<Bransje> bransjen = new Bransjeprogram().finnBransje(virksomhet.getNæringskode());
@@ -143,7 +143,7 @@ public class SykefraværRepository {
               LAND, hentUmaskertSykefraværForNorge(fraÅrstallOgKvartal),
               NÆRING, hentUmaskertSykefravær(næringen, fraÅrstallOgKvartal),
               BRANSJE,
-              bransjen.isPresent()
+              bransjen.isPresent() && bransjen.get().lengdePåNæringskoder() == 5
                     ? hentUmaskertSykefravær(bransjen.get(), fraÅrstallOgKvartal)
                     : emptyList());
     }

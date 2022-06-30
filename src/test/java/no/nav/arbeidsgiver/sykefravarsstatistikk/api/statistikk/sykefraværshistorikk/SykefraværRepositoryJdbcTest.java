@@ -46,10 +46,6 @@ public class SykefraværRepositoryJdbcTest {
             ArbeidsmiljøportalenBransje.BARNEHAGER,
             "Barnehage",
             "88911");
-    static final Bransje NÆRINGMIDDELINDUSTRIEN = new Bransje(
-          ArbeidsmiljøportalenBransje.NÆRINGSMIDDELINDUSTRI,
-          "Næringsmiddelsindustrien",
-          "10");
 
     @BeforeEach
     public void setUp() {
@@ -108,7 +104,6 @@ public class SykefraværRepositoryJdbcTest {
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 1, 3));
         assertThat(resultat.get(1)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2));
-
     }
 
     @Test
@@ -117,17 +112,6 @@ public class SykefraværRepositoryJdbcTest {
         List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefravær(
               BARNEHAGEBRANSJEN,
                 new ÅrstallOgKvartal(2019, 1));
-        assertThat(resultat.size()).isEqualTo(2);
-        assertThat(resultat.get(0)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 1, 3));
-        assertThat(resultat.get(1)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2));
-    }
-
-    @Test
-    void hentUmaskertSykefravær_skal_hente_riktig_data_for_2sifferBransje() {
-        persisterDatasetIDbForBransjeMed5SifferKode(BARNEHAGEBRANSJEN);
-        List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefravær(
-              NÆRINGMIDDELINDUSTRIEN,
-              new ÅrstallOgKvartal(2019, 1));
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 1, 3));
         assertThat(resultat.get(1)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2));
