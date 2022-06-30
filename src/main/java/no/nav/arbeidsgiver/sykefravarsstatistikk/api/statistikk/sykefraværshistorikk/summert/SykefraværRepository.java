@@ -35,7 +35,7 @@ public class SykefraværRepository {
     this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
   }
 
-  public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefraværForEttKvartalListe(
+  public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefravær(
       Virksomhet virksomhet, ÅrstallOgKvartal fraÅrstallOgKvartal) {
     try {
       return sorterKronologisk(namedParameterJdbcTemplate.query(
@@ -62,7 +62,7 @@ public class SykefraværRepository {
     }
   }
 
-  public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefraværForEttKvartalListe(
+  public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefravær(
       Bransje bransje, ÅrstallOgKvartal fraÅrstallOgKvartal) {
 
     boolean skalHenteDataPåNæring2Siffer = bransje.lengdePåNæringskoder() == 2;
@@ -94,7 +94,7 @@ public class SykefraværRepository {
     }
   }
 
-  public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefraværForEttKvartalListe(
+  public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefravær(
       Næring næring, ÅrstallOgKvartal fraÅrstallOgKvartal) {
     try {
       return sorterKronologisk(namedParameterJdbcTemplate.query(
@@ -144,12 +144,12 @@ public class SykefraværRepository {
     Optional<Bransje> bransjen = new Bransjeprogram().finnBransje(virksomhet.getNæringskode());
 
     return Map.of(
-        VIRKSOMHET, hentUmaskertSykefraværForEttKvartalListe(virksomhet, fraÅrstallOgKvartal),
+        VIRKSOMHET, hentUmaskertSykefravær(virksomhet, fraÅrstallOgKvartal),
         LAND, hentUmaskertSykefraværForNorge(fraÅrstallOgKvartal),
-        NÆRING, hentUmaskertSykefraværForEttKvartalListe(næringen, fraÅrstallOgKvartal),
+        NÆRING, hentUmaskertSykefravær(næringen, fraÅrstallOgKvartal),
         BRANSJE,
             bransjen.isPresent()
-                ? hentUmaskertSykefraværForEttKvartalListe(bransjen.get(), fraÅrstallOgKvartal)
+                ? hentUmaskertSykefravær(bransjen.get(), fraÅrstallOgKvartal)
                 : emptyList());
   }
 

@@ -73,7 +73,7 @@ class OppsummertSykefravarsstatistikkServiceTest {
     }
 
     @Test
-    void hentUmaskertStatistikkForSisteFemKvartaler_skal_hente_maks_5_sista_kvartaler() {
+    void hentUmaskertStatistikkForSisteFemKvartaler_skal_hente_maks_5_siste_kvartaler() {
         lagTestDataTilRepository();
         Underenhet underenhet = new Underenhet(
                 new Orgnr("987654321"),
@@ -134,7 +134,7 @@ class OppsummertSykefravarsstatistikkServiceTest {
     }
 
     private void lagTestDataTilRepository() {
-        when(sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(any(Virksomhet.class), any(ÅrstallOgKvartal.class)))
+        when(sykefraværRepository.hentUmaskertSykefravær(any(Virksomhet.class), any(ÅrstallOgKvartal.class)))
                 .thenReturn(
                         Arrays.asList(
                                 umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 11),

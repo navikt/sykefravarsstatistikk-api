@@ -132,7 +132,7 @@ public class SummertLegemeldtSykefraværServiceTest {
     }
 
     private void lagTestDataTilRepository() {
-        when(sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(any(Virksomhet.class), any(ÅrstallOgKvartal.class)))
+        when(sykefraværRepository.hentUmaskertSykefravær(any(Virksomhet.class), any(ÅrstallOgKvartal.class)))
                 .thenReturn(
                         Arrays.asList(
                                 umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 11),
@@ -142,7 +142,7 @@ public class SummertLegemeldtSykefraværServiceTest {
     }
 
     private void lagTestDataTilRepository(int antallPersoner) {
-        when(sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(any(Virksomhet.class), any(ÅrstallOgKvartal.class)))
+        when(sykefraværRepository.hentUmaskertSykefravær(any(Virksomhet.class), any(ÅrstallOgKvartal.class)))
                 .thenReturn(
                         Arrays.asList(
                                 umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 11, antallPersoner),
@@ -150,7 +150,7 @@ public class SummertLegemeldtSykefraværServiceTest {
                         )
                 );
 
-        when(sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(any(Bransje.class), any(ÅrstallOgKvartal.class)))
+        when(sykefraværRepository.hentUmaskertSykefravær(any(Bransje.class), any(ÅrstallOgKvartal.class)))
                 .thenReturn(
                         Arrays.asList(
                                 umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 11),
@@ -160,10 +160,10 @@ public class SummertLegemeldtSykefraværServiceTest {
     }
 
     private void lagTestDataTilRepositoryForBransje() {
-        when(sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(any(Virksomhet.class), any(ÅrstallOgKvartal.class)))
+        when(sykefraværRepository.hentUmaskertSykefravær(any(Virksomhet.class), any(ÅrstallOgKvartal.class)))
                 .thenReturn(Collections.emptyList());
 
-        when(sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(any(Bransje.class), any(ÅrstallOgKvartal.class)))
+        when(sykefraværRepository.hentUmaskertSykefravær(any(Bransje.class), any(ÅrstallOgKvartal.class)))
                 .thenReturn(
                         Arrays.asList(
                                 umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 8),
@@ -173,10 +173,10 @@ public class SummertLegemeldtSykefraværServiceTest {
     }
 
     private void lagTestDataTilRepositoryForNæring() {
-        when(sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(any(Virksomhet.class), any(ÅrstallOgKvartal.class)))
+        when(sykefraværRepository.hentUmaskertSykefravær(any(Virksomhet.class), any(ÅrstallOgKvartal.class)))
                 .thenReturn(Collections.emptyList());
 
-        when(sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(any(Næring.class), any(ÅrstallOgKvartal.class)))
+        when(sykefraværRepository.hentUmaskertSykefravær(any(Næring.class), any(ÅrstallOgKvartal.class)))
                 .thenReturn(
                         Arrays.asList(
                                 umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 5),

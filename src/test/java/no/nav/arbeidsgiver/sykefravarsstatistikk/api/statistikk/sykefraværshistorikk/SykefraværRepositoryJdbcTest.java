@@ -2,6 +2,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
@@ -40,6 +42,10 @@ public class SykefraværRepositoryJdbcTest {
             .overordnetEnhetOrgnr(new Orgnr("1111111111")).build();
 
     static final Næring NÆRING = new Næring("10", "test Næring");
+    static final Bransje BRANSJEBARNEHAGE = new Bransje(
+            ArbeidsmiljøportalenBransje.BARNEHAGER,
+            "Barnehage",
+            "88911");
 
     @BeforeEach
     public void setUp() {
@@ -57,7 +63,7 @@ public class SykefraværRepositoryJdbcTest {
     public void hentSykefraværprosentVirksomhet__skal_returnerer_empty_list_dersom_ingen_data_funnet_for_årstall_og_kvartal() {
         persisterDatasetIDb(BARNEHAGE);
 
-        List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(
+        List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefravær(
                 BARNEHAGE,
                 new ÅrstallOgKvartal(2021, 4));
 
@@ -68,7 +74,7 @@ public class SykefraværRepositoryJdbcTest {
     public void hentSykefraværprosentVirksomhet__skal_returnere_riktig_sykefravær() {
         persisterDatasetIDb(BARNEHAGE);
 
-        List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(
+        List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefravær(
                 BARNEHAGE,
                 new ÅrstallOgKvartal(2018, 3));
 
@@ -81,7 +87,7 @@ public class SykefraværRepositoryJdbcTest {
     public void hentSykefraværprosentVirksomhet__skal_returnere_riktig_sykefravær_for_ønskede_kvartaler() {
         persisterDatasetIDb(BARNEHAGE);
 
-        List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(
+        List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefravær(
                 BARNEHAGE,
                 new ÅrstallOgKvartal(2019, 1));
         assertThat(resultat.size()).isEqualTo(2);
@@ -91,9 +97,8 @@ public class SykefraværRepositoryJdbcTest {
 
     @Test
     void hentUmaskertSykefraværForEttKvartalListe_skal_hente_riktig_data() {
-        // TODO her  skal vi teste at repository retunere riktige næringer til riktige kvartaler
         persisterDatasetIDb(NÆRING);
-        List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefraværForEttKvartalListe(
+        List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefravær(
                 NÆRING,
                 new ÅrstallOgKvartal(2019, 1));
         assertThat(resultat.size()).isEqualTo(2);
@@ -101,6 +106,19 @@ public class SykefraværRepositoryJdbcTest {
         assertThat(resultat.get(1)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2));
 
     }
+
+    @Test
+    void hentUmaskertSykefravær_skal_hente_riktig_data_for_bransje() {
+        persisterDatasetIDbForBransjeMed5SifferKode(BRANSJEBARNEHAGE);
+        List<UmaskertSykefraværForEttKvartal> resultat = sykefraværRepository.hentUmaskertSykefravær(
+                BRANSJEBARNEHAGE,
+                new ÅrstallOgKvartal(2019, 1));
+        assertThat(resultat.size()).isEqualTo(2);
+        assertThat(resultat.get(0)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 1, 3));
+        assertThat(resultat.get(1)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2));
+
+    }
+
 
     private void persisterDatasetIDb(Underenhet barnehage) {
         jdbcTemplate.update(
@@ -165,6 +183,44 @@ public class SykefraværRepositoryJdbcTest {
                         "values " +
                         "(:arstall, :kvartal, :næringskode, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
                 parametre(2018, 3, næring, 10, 6, 100)
+        );
+    }
+
+    private void persisterDatasetIDbForBransjeMed5SifferKode(Bransje bransje) {
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_naring5siffer " +
+                        "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk)" +
+                        "values " +
+                        "(:arstall, :kvartal, :næringskode, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(2019, 2, new Næring(bransje.getKoderSomSpesifisererNæringer().get(0), bransje.getNavn()), 10, 2, 100)
+        );
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_naring5siffer " +
+                        "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk)" +
+                        "values " +
+                        "(:arstall, :kvartal, :næringskode, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(2019, 1, new Næring("94444", "NOT EKSIST"), 10, 3, 100)
+        );
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_naring5siffer " +
+                        "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk)" +
+                        "values " +
+                        "(:arstall, :kvartal, :næringskode, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(2019, 1, new Næring(bransje.getKoderSomSpesifisererNæringer().get(0), bransje.getNavn()), 10, 3, 100)
+        );
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_naring5siffer " +
+                        "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk)" +
+                        "values " +
+                        "(:arstall, :kvartal, :næringskode, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(2018, 4, new Næring(bransje.getKoderSomSpesifisererNæringer().get(0), bransje.getNavn()), 10, 5, 100)
+        );
+        jdbcTemplate.update(
+                "insert into sykefravar_statistikk_naring5siffer " +
+                        "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk)" +
+                        "values " +
+                        "(:arstall, :kvartal, :næringskode, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
+                parametre(2018, 3, new Næring(bransje.getKoderSomSpesifisererNæringer().get(0), bransje.getNavn()), 10, 6, 100)
         );
     }
 

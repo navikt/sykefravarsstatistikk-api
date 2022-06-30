@@ -41,7 +41,7 @@ public class SummertLegemeldtSykefraværService {
                 sistePubliserteÅrstallOgKvartal.minusKvartaler(antallKvartalerSomSkalSummeres - 1);
 
         List<UmaskertSykefraværForEttKvartal> sykefraværForEttKvartalListe =
-                sykefraværprosentRepository.hentUmaskertSykefraværForEttKvartalListe(
+                sykefraværprosentRepository.hentUmaskertSykefravær(
                         underenhet,
                         eldsteÅrstallOgKvartal
                 );
@@ -65,7 +65,7 @@ public class SummertLegemeldtSykefraværService {
         if (bransjeEllerNæring.isBransje()) {
             Bransje bransje = bransjeEllerNæring.getBransje();
             List<UmaskertSykefraværForEttKvartal> listeAvSykefraværForEttKvartalForBransje =
-                    sykefraværprosentRepository.hentUmaskertSykefraværForEttKvartalListe(
+                    sykefraværprosentRepository.hentUmaskertSykefravær(
                             bransje, eldsteÅrstallOgKvartal
                     );
             SummertSykefravær summertSykefraværBransje =
@@ -79,7 +79,7 @@ public class SummertLegemeldtSykefraværService {
         } else {
             Næring næring = bransjeEllerNæring.getNæring();
             List<UmaskertSykefraværForEttKvartal> listeAvSykefraværForEttKvartalForNæring =
-                    sykefraværprosentRepository.hentUmaskertSykefraværForEttKvartalListe(
+                    sykefraværprosentRepository.hentUmaskertSykefravær(
                             næring,
                             eldsteÅrstallOgKvartal
                     );
