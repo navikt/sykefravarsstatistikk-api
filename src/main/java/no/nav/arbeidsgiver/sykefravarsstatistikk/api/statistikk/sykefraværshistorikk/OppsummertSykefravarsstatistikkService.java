@@ -12,9 +12,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -67,48 +65,42 @@ public class OppsummertSykefravarsstatistikkService {
     List<GenerellStatistikk> hentOgBearbeidStatistikk(Underenhet virksomhet) {
         Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefraværsdata =
                 hentUmaskertStatistikkForSisteFemKvartaler(virksomhet);
+        List<GenerellStatistikk> samletKategoerierListe = new ArrayList<>();
 
-        Sykefraværsprosent fraværsprosentVirksomhet = kalkulerSykefraværSisteFireKvartaler(sykefraværsdata.get(VIRKSOMHET));
-        GenerellStatistikk sykefraværVirksomhet =
+        Optional<Sykefraværsprosent> fraværsprosentVirksomhet = kalkulerSykefraværSisteFireKvartaler(sykefraværsdata.get(VIRKSOMHET));
+        fraværsprosentVirksomhet.ifPresent(sykefraværsprosent -> samletKategoerierListe.add(
                 new GenerellStatistikk(
                         VIRKSOMHET,
                         virksomhet.getNavn(),
-                        fraværsprosentVirksomhet.getProsent().toString(),
-                        fraværsprosentVirksomhet.getKvartalerIBeregningen());
+                        sykefraværsprosent.getProsent().toString(),
+                        sykefraværsprosent.getKvartalerIBeregningen())));
 
         BransjeEllerNæring næringEllerBransje =
                 bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(
                         virksomhet.getNæringskode());
 
-        Sykefraværsprosent statistikkBransjeEllerNæring = kalkulerSykefraværSisteFireKvartaler(sykefraværsdata.get(næringEllerBransje.getStatistikkategori()));
-        GenerellStatistikk sykefraværNæringEllerBransje =
-                new GenerellStatistikk(
-                        næringEllerBransje.getStatistikkategori(),
-                        næringEllerBransje.getVerdiSomString(),
-                        statistikkBransjeEllerNæring.getProsent().toString(),
-                        statistikkBransjeEllerNæring.getKvartalerIBeregningen());
+        Optional<Sykefraværsprosent> statistikkBransjeEllerNæring = kalkulerSykefraværSisteFireKvartaler(sykefraværsdata.get(næringEllerBransje.getStatistikkategori()));
+        statistikkBransjeEllerNæring.ifPresent(sykefraværsprosent -> samletKategoerierListe.add(new GenerellStatistikk(
+                næringEllerBransje.getStatistikkategori(),
+                næringEllerBransje.getVerdiSomString(),
+                sykefraværsprosent.getProsent().toString(),
+                sykefraværsprosent.getKvartalerIBeregningen())));
+        Optional<Sykefraværsprosent> fraværsprosentNorge = kalkulerSykefraværSisteFireKvartaler(sykefraværsdata.get(LAND));
 
-        Sykefraværsprosent fraværsprosentNorge = kalkulerSykefraværSisteFireKvartaler(sykefraværsdata.get(LAND));
-        GenerellStatistikk sykefraværNorge =
-                new GenerellStatistikk(
-                        LAND,
-                        "Norge",
-                        fraværsprosentNorge.getProsent().toString(), fraværsprosentNorge.getKvartalerIBeregningen());
+        fraværsprosentNorge.ifPresent(sykefraværsprosent -> samletKategoerierListe.add(new GenerellStatistikk(
+                LAND,
+                "Norge",
+                sykefraværsprosent.getProsent().toString(), sykefraværsprosent.getKvartalerIBeregningen())));
 
         Statistikkategori trendkategoriNæringEllerBransje = næringEllerBransje.isBransje() ? TREND_BRANSJE : TREND_NÆRING;
 
-        GenerellStatistikk trendNæringEllerBransje = new GenerellStatistikk(
+        statistikkBransjeEllerNæring.ifPresent(sykefraværsprosent -> samletKategoerierListe.add(new GenerellStatistikk(
                 trendkategoriNæringEllerBransje,
                 næringEllerBransje.getVerdiSomString(),
                 kalkulerTrend(sykefraværsdata.get(næringEllerBransje.getStatistikkategori())),
-                statistikkBransjeEllerNæring.getKvartalerIBeregningen());
+                statistikkBransjeEllerNæring.get().getKvartalerIBeregningen())));
 
-        return List.of(
-                sykefraværVirksomhet,
-                sykefraværNæringEllerBransje,
-                sykefraværNorge,
-                trendNæringEllerBransje
-        );
+        return samletKategoerierListe;
     }
 
     String kalkulerTrend(List<UmaskertSykefraværForEttKvartal> sykefravær) {
@@ -140,13 +132,13 @@ public class OppsummertSykefravarsstatistikkService {
         return sykefraværprosentRepository.hentUmaskertSykefraværAlleKategorier(bedrift, eldsteÅrstallOgKvartalViBryrOssOm);
     }
 
-    private Sykefraværsprosent kalkulerSykefraværSisteFireKvartaler(
+    private Optional<Sykefraværsprosent> kalkulerSykefraværSisteFireKvartaler(
             List<UmaskertSykefraværForEttKvartal> statistikk) {
 
         Stream<UmaskertSykefraværForEttKvartal> statistikkStream
                 = ekstraherSisteFireKvartaler(statistikk).stream();
 
-        if (statistikkStream.count() == 0) return null;
+        if (statistikkStream.findAny().isEmpty()) return null;
 
         BigDecimal prosent = statistikkStream.map(
                         data ->
@@ -158,7 +150,7 @@ public class OppsummertSykefravarsstatistikkService {
         List<ÅrstallOgKvartal> kvartaler = statistikkStream.map(
                 UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal).collect(Collectors.toList());
 
-        return new Sykefraværsprosent(prosent, kvartaler);
+        return Optional.of(new Sykefraværsprosent(prosent, kvartaler));
     }
 
 
@@ -169,11 +161,11 @@ public class OppsummertSykefravarsstatistikkService {
                         .mapToObj(SISTE_PUBLISERTE_KVARTAL::minusKvartaler)
                         .collect(Collectors.toList());
 
-        try {
+        if (statistikk != null) {
             return statistikk.stream()
                     .filter(data -> sisteFireKvartaler.contains(data.getÅrstallOgKvartal()))
                     .collect(Collectors.toList());
-        } catch (Exception e) {
+        } else {
             return List.of();
         }
     }
