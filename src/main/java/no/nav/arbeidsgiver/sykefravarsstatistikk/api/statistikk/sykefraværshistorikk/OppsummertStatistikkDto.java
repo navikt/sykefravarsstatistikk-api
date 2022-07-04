@@ -7,9 +7,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategor
 import java.util.List;
 
 @Data
-public class GenerellStatistikk {
+public class OppsummertStatistikkDto {
     private final Statistikkategori type;
     private final String label;
     private final String verdi;
+    private final Integer antallTilfellerIBeregningen;
     private final List<ÅrstallOgKvartal> kvartalerIBeregningen;
 }

@@ -1,6 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Collection;
+import java.util.Optional;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -20,9 +22,9 @@ public class UmaskertSykefraværForEttKvartal implements Comparable<UmaskertSyke
 
     @JsonIgnore
     private final ÅrstallOgKvartal årstallOgKvartal;
-    private final BigDecimal tapteDagsverk;
-    private final BigDecimal muligeDagsverk;
-    private final int antallPersoner;
+    protected final BigDecimal tapteDagsverk;
+    protected final BigDecimal muligeDagsverk;
+    protected final int antallPersoner;
 
     public UmaskertSykefraværForEttKvartal(
             ÅrstallOgKvartal årstallOgKvartal,
@@ -49,6 +51,13 @@ public class UmaskertSykefraværForEttKvartal implements Comparable<UmaskertSyke
 
     public static UmaskertSykefraværForEttKvartal tomtUmaskertKvartalsvisSykefravær(ÅrstallOgKvartal årstallOgKvartal) {
         return new UmaskertSykefraværForEttKvartal(årstallOgKvartal, new BigDecimal(0), new BigDecimal(0), 0);
+    }
+
+    public static Optional<UmaskertSykefraværForEttKvartal> hentUtKvartal(
+          Collection<UmaskertSykefraværForEttKvartal> sykefravær, ÅrstallOgKvartal kvartal) {
+        return sykefravær.stream()
+              .filter(datapunkt -> datapunkt.getÅrstallOgKvartal() == kvartal)
+              .findAny();
     }
 
     public UmaskertSykefraværForEttKvartal add(

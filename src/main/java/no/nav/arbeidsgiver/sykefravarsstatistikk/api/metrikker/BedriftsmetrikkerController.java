@@ -38,7 +38,7 @@ public class BedriftsmetrikkerController {
             @PathVariable("orgnr") String orgnrStr) {
 
         Orgnr orgnr = new Orgnr(orgnrStr);
-        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
+        Underenhet underenhet = enhetsregisteretClient.hentUnderenhet(orgnr);
         Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
         Bedriftsmetrikker bedriftsmetrikker = Bedriftsmetrikker.builder()
                 .antallAnsatte(new BigDecimal(underenhet.getAntallAnsatte()))

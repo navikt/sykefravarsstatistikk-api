@@ -1,10 +1,14 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.TREND_BRANSJE;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.TREND_NÆRING;
+
 import io.vavr.control.Either;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 
 public class BransjeEllerNæring {
+
     public final Either<Bransje, Næring> verdi;
 
 
@@ -24,6 +28,11 @@ public class BransjeEllerNæring {
         }
     }
 
+    public Statistikkategori getTrendkategori() {
+        return this.isBransje() ? TREND_BRANSJE : TREND_NÆRING;
+    }
+
+
     public boolean isBransje() {
         return verdi.isLeft();
     }
@@ -33,7 +42,7 @@ public class BransjeEllerNæring {
     }
 
     public String getVerdiSomString() {
-        return verdi.get().toString();
+        return (this.isBransje() ? verdi.getLeft() : verdi.get()).toString();
     }
 
     public Næring getNæring() {

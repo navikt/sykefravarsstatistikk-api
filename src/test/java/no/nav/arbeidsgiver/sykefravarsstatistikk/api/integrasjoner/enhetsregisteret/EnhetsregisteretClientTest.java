@@ -87,7 +87,7 @@ public class EnhetsregisteretClientTest {
     @Test
     public void hentInformasjonOmUnderenhet__skal_hente_riktige_felter() {
         mockRespons(gyldigUnderenhetRespons("971800534"));
-        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr("971800534"));
+        Underenhet underenhet = enhetsregisteretClient.hentUnderenhet(new Orgnr("971800534"));
 
         assertThat(underenhet.getOrgnr().getVerdi()).isEqualTo("971800534");
         assertThat(underenhet.getOverordnetEnhetOrgnr().getVerdi()).isEqualTo("999263550");
@@ -111,7 +111,7 @@ public class EnhetsregisteretClientTest {
 
         assertThrows(
                 EnhetsregisteretIkkeTilgjengeligException.class,
-                () -> enhetsregisteretClient.hentInformasjonOmUnderenhet(etOrgnr())
+                () -> enhetsregisteretClient.hentUnderenhet(etOrgnr())
         );
     }
     @Test
@@ -122,7 +122,7 @@ public class EnhetsregisteretClientTest {
 
         assertThrows(
                 EnhetsregisteretMappingException.class,
-                () -> enhetsregisteretClient.hentInformasjonOmUnderenhet(etOrgnr())
+                () -> enhetsregisteretClient.hentUnderenhet(etOrgnr())
         );
     }
 
@@ -133,7 +133,7 @@ public class EnhetsregisteretClientTest {
 
         assertThrows(
                 IllegalStateException.class,
-                () -> enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr("777777777"))
+                () -> enhetsregisteretClient.hentUnderenhet(new Orgnr("777777777"))
         );
     }
 

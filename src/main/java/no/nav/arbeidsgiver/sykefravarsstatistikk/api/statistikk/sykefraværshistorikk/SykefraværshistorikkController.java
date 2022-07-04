@@ -72,7 +72,7 @@ public class SykefraværshistorikkController {
                 "" + request.getRequestURL()
         );
 
-        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
+        Underenhet underenhet = enhetsregisteretClient.hentUnderenhet(orgnr);
         OverordnetEnhet overordnetEnhet = enhetsregisteretClient.hentInformasjonOmEnhet(underenhet.getOverordnetEnhetOrgnr());
 
         boolean harTilgangTilOverordnetEnhet = tilgangskontrollService.hentTilgangTilOverordnetEnhetOgLoggSikkerhetshendelse(
@@ -111,7 +111,7 @@ public class SykefraværshistorikkController {
                 request.getMethod(),
                 "" + request.getRequestURL()
         );
-        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr(orgnrStr));
+        Underenhet underenhet = enhetsregisteretClient.hentUnderenhet(new Orgnr(orgnrStr));
 
         if (antallKvartaler != 4) {
             throw new IllegalArgumentException("For øyeblikket støtter vi kun summering av 4 kvartaler.");
@@ -151,7 +151,7 @@ public class SykefraværshistorikkController {
 
         Underenhet underenhet;
         try {
-            underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr(orgnrStr));
+            underenhet = enhetsregisteretClient.hentUnderenhet(new Orgnr(orgnrStr));
         } catch (IngenNæringException e) {
             log.info("Underenhet har ingen næring. Returnerer 204 - No Content");
             return ResponseEntity
@@ -179,11 +179,17 @@ public class SykefraværshistorikkController {
 
 
     @GetMapping("v1/{orgnr}/sykefravarshistorikk/oppsummert")
-    public ResponseEntity<List<GenerellStatistikk>> hentOppsummertSykefraværsstatistikk (
+    public ResponseEntity<List<OppsummertStatistikkDto>> hentOppsummertSykefraværsstatistikk (
             @PathVariable("orgnr") String orgnr,
             HttpServletRequest request
     ) {
-        List<GenerellStatistikk> statistikker = oppsummertSykefravarsstatistikkService.hentOppsummertStatistikk(orgnr);
+
+        InnloggetBruker bruker = tilgangskontrollService.hentInnloggetBrukerForAlleRettigheter();
+
+        // Returnerer 403 dersom brukeren ikke representerer bedriften
+        bruker.sjekkTilgang(new Orgnr(orgnr));
+
+        List<OppsummertStatistikkDto> statistikker = oppsummertSykefravarsstatistikkService.hentOppsummertStatistikk(orgnr);
 
         return ResponseEntity.status(HttpStatus.OK).body(statistikker);
     }

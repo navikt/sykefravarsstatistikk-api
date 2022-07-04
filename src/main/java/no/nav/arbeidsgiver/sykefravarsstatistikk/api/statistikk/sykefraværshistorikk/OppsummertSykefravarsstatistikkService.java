@@ -1,6 +1,23 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
-import lombok.Data;
+import static java.math.BigDecimal.ZERO;
+import static java.math.RoundingMode.HALF_DOWN;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.SISTE_PUBLISERTE_KVARTAL;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.CollectionUtils.joinLists;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.sisteFireKvartaler;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.LAND;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.VIRKSOMHET;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal.hentUtKvartal;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
@@ -9,198 +26,233 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetBruker;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
+import org.apache.commons.lang3.NotImplementedException;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import static java.math.BigDecimal.ZERO;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.SISTE_PUBLISERTE_KVARTAL;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.*;
 
 @Service
 public class OppsummertSykefravarsstatistikkService {
+
     private final SykefraværRepository sykefraværprosentRepository;
     private final BransjeEllerNæringService bransjeEllerNæringService;
-    //private final TilgangskontrollService tilgangskontrollService;
+    private final TilgangskontrollService tilgangskontrollService;
     private final EnhetsregisteretClient enhetsregisteretClient;
 
     public OppsummertSykefravarsstatistikkService(
-            SykefraværRepository sykefraværprosentRepository,
-            BransjeEllerNæringService bransjeEllerNæringService,
-            //      TilgangskontrollService tilgangskontrollService,
-            EnhetsregisteretClient enhetsregisteretClient) {
+          SykefraværRepository sykefraværprosentRepository,
+          BransjeEllerNæringService bransjeEllerNæringService,
+          TilgangskontrollService tilgangskontrollService,
+          EnhetsregisteretClient enhetsregisteretClient) {
         this.sykefraværprosentRepository = sykefraværprosentRepository;
         this.bransjeEllerNæringService = bransjeEllerNæringService;
-        //this.tilgangskontrollService = tilgangskontrollService;
+        this.tilgangskontrollService = tilgangskontrollService;
         this.enhetsregisteretClient = enhetsregisteretClient;
     }
 
-    public List<GenerellStatistikk> hentOppsummertStatistikk(String orgnr) {
-   /*     InnloggetBruker innloggetBruker =
-                tilgangskontrollService.hentInnloggetBrukerForAlleRettigheter();
-        tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
-                new Orgnr(orgnr), innloggetBruker, "", "");
-*/
-        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr(orgnr));
+    public List<OppsummertStatistikkDto> hentOppsummertStatistikk(String orgnr,
+          InnloggetBruker bruker) {
+
+        Underenhet virksomhet = enhetsregisteretClient.hentUnderenhet(new Orgnr(orgnr));
+
+        // Har brukeren IA-rettigheter?
+        return hentStatistikkUtenTallFraVirksomheten(virksomhet);
+
+        // Brukeren HAR ia-rettigheter. Skal tallene maskeres?
+
+        List<OppsummertStatistikkDto> statistikk = hentOgBearbeidStatistikk(virksomhet);
+
+
+    }
+
+    private List<OppsummertStatistikkDto> hentStatistikkUtenTallFraVirksomheten(
+          Underenhet virksomhet) {
+        // TODO
+        throw new NotImplementedException();
+    }
+
+    List<OppsummertStatistikkDto> hentOgBearbeidStatistikk(Underenhet virksomhet) {
+        Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefraværsdata =
+              hentUmaskertStatistikkForSisteFemKvartaler(virksomhet);
 
         BransjeEllerNæring bransjeEllerNæring =
-                bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(
-                        underenhet.getNæringskode());
-       /* try {
-            InnloggetBruker innloggetBrukerMedIARettigheter =
-                    tilgangskontrollService.hentInnloggetBruker();
-            tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
-                    new Orgnr(orgnr), innloggetBrukerMedIARettigheter, "", "");
+              bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(
+                    virksomhet.getNæringskode());
 
-        } catch (TilgangskontrollException tilgangskontrollException) {
-
-        }*/
-        return null;
+        return Stream.of(
+                    sykefraværVirksomhet(
+                          virksomhet, sykefraværsdata),
+                    fraværsprosentBransjeEllerNæring(
+                          sykefraværsdata, bransjeEllerNæring),
+                    fraværsprosentNorge(
+                          sykefraværsdata),
+                    trendBransjeEllerNæring(
+                          sykefraværsdata, bransjeEllerNæring))
+              .filter(Optional::isPresent)
+              .map(Optional::get)
+              .collect(Collectors.toList());
     }
 
-    List<GenerellStatistikk> hentOgBearbeidStatistikk(Underenhet virksomhet) {
-        Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefraværsdata =
-                hentUmaskertStatistikkForSisteFemKvartaler(virksomhet);
-        List<GenerellStatistikk> samletKategoerierListe = new ArrayList<>();
-
-        Optional<Sykefraværsprosent> fraværsprosentVirksomhet = kalkulerSykefraværSisteFireKvartaler(sykefraværsdata.get(VIRKSOMHET));
-        fraværsprosentVirksomhet.ifPresent(sykefraværsprosent -> samletKategoerierListe.add(
-                new GenerellStatistikk(
-                        VIRKSOMHET,
-                        virksomhet.getNavn(),
-                        sykefraværsprosent.getProsent().toString(),
-                        sykefraværsprosent.getKvartalerIBeregningen())));
-
-        BransjeEllerNæring næringEllerBransje =
-                bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(
-                        virksomhet.getNæringskode());
-
-        Optional<Sykefraværsprosent> statistikkBransjeEllerNæring = kalkulerSykefraværSisteFireKvartaler(sykefraværsdata.get(næringEllerBransje.getStatistikkategori()));
-        statistikkBransjeEllerNæring.ifPresent(sykefraværsprosent -> samletKategoerierListe.add(new GenerellStatistikk(
-                næringEllerBransje.getStatistikkategori(),
-                næringEllerBransje.getVerdiSomString(),
-                sykefraværsprosent.getProsent().toString(),
-                sykefraværsprosent.getKvartalerIBeregningen())));
-        Optional<Sykefraværsprosent> fraværsprosentNorge = kalkulerSykefraværSisteFireKvartaler(sykefraværsdata.get(LAND));
-
-        fraværsprosentNorge.ifPresent(sykefraværsprosent -> samletKategoerierListe.add(new GenerellStatistikk(
-                LAND,
-                "Norge",
-                sykefraværsprosent.getProsent().toString(), sykefraværsprosent.getKvartalerIBeregningen())));
-
-        Statistikkategori trendkategoriNæringEllerBransje = næringEllerBransje.isBransje() ? TREND_BRANSJE : TREND_NÆRING;
-
-        statistikkBransjeEllerNæring.ifPresent(sykefraværsprosent -> samletKategoerierListe.add(new GenerellStatistikk(
-                trendkategoriNæringEllerBransje,
-                næringEllerBransje.getVerdiSomString(),
-                kalkulerTrend(sykefraværsdata.get(næringEllerBransje.getStatistikkategori())),
-                statistikkBransjeEllerNæring.get().getKvartalerIBeregningen())));
-
-        return samletKategoerierListe;
+    private Optional<OppsummertStatistikkDto> trendBransjeEllerNæring(
+          Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefraværsdata,
+          BransjeEllerNæring bransjeEllerNæring) {
+        Optional<OppsummertStatistikkDto> trendverdiBransjeEllerNæring =
+              Trend.kalkulerTrend(sykefraværsdata.get(bransjeEllerNæring.getTrendkategori()))
+                    .tilOppsummertStatistikkDto(
+                          bransjeEllerNæring.getTrendkategori(),
+                          bransjeEllerNæring.getVerdiSomString());
+        return trendverdiBransjeEllerNæring;
     }
 
-    String kalkulerTrend(List<UmaskertSykefraværForEttKvartal> sykefravær) {
-
-        List<UmaskertSykefraværForEttKvartal> relevanteDatapunkter =
-                sykefravær.stream()
-                        .filter(
-                                sykefraværEttKvartal ->
-                                        sykefraværEttKvartal.getÅrstallOgKvartal().equals(SISTE_PUBLISERTE_KVARTAL)
-                                                || sykefraværEttKvartal.getÅrstallOgKvartal()
-                                                .equals(SISTE_PUBLISERTE_KVARTAL.minusEttÅr()))
-                        .sorted(Comparator.comparing(UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal))
-                        .collect(Collectors.toList());
-
-        if (relevanteDatapunkter.size() != 2) {
-            return "UfullstendigData"; // TODO finne bedre retun verdi vi manglende av data grunnlag
-        }
-
-        return relevanteDatapunkter.stream()
-                .map(UmaskertSykefraværForEttKvartal::getProsent)
-                .reduce((s1, s2) -> s2.subtract(s1))
-                .get()
-                .toString();
+    private Optional<OppsummertStatistikkDto> fraværsprosentNorge(
+          Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefraværsdata) {
+        return hentSummerbartSykefravær(sykefraværsdata.get(LAND))
+              .tilGenerellStatistikkDto(LAND, "Norge");
     }
 
-    Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>>
-    hentUmaskertStatistikkForSisteFemKvartaler(Underenhet bedrift) {
-        ÅrstallOgKvartal eldsteÅrstallOgKvartalViBryrOssOm = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4);
-        return sykefraværprosentRepository.hentUmaskertSykefraværAlleKategorier(bedrift, eldsteÅrstallOgKvartalViBryrOssOm);
+    private Optional<OppsummertStatistikkDto> fraværsprosentBransjeEllerNæring(
+          Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefraværsdata,
+          BransjeEllerNæring bransjeEllerNæring) {
+        return hentSummerbartSykefravær(
+              sykefraværsdata.get(bransjeEllerNæring.getStatistikkategori()))
+              .tilGenerellStatistikkDto(
+                    bransjeEllerNæring.getStatistikkategori(),
+                    bransjeEllerNæring.getVerdiSomString());
     }
 
-    private Optional<Sykefraværsprosent> kalkulerSykefraværSisteFireKvartaler(
-            List<UmaskertSykefraværForEttKvartal> statistikk) {
+    private Optional<OppsummertStatistikkDto> sykefraværVirksomhet(
+          Underenhet virksomhet,
+          Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefraværsdata) {
+        return hentSummerbartSykefravær(sykefraværsdata.get(VIRKSOMHET))
+              .tilGenerellStatistikkDto(VIRKSOMHET, virksomhet.getNavn());
+    }
 
-        Stream<UmaskertSykefraværForEttKvartal> statistikkStream
-                = ekstraherSisteFireKvartaler(statistikk).stream();
 
-        if (statistikkStream.findAny().isEmpty()) return null;
+    private Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>>
+    hentUmaskertStatistikkForSisteFemKvartaler(Underenhet forBedrift) {
+        ÅrstallOgKvartal fraKvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4);
+        return sykefraværprosentRepository
+              .hentUmaskertSykefraværAlleKategorier(forBedrift, fraKvartal);
+    }
 
-        BigDecimal prosent = statistikkStream.map(
-                        data ->
-                                new Sykefravær(
-                                        data.getMuligeDagsverk(), data.getTapteDagsverk(), data.getAntallPersoner()))
-                .reduce(Sykefravær.NULLPUNKT, Sykefravær::leggSammen)
-                .kalkulerFraværsprosent();
 
-        List<ÅrstallOgKvartal> kvartaler = statistikkStream.map(
-                UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal).collect(Collectors.toList());
+    private SummerbartSykefravær hentSummerbartSykefravær(
+          List<UmaskertSykefraværForEttKvartal> statistikk) {
 
-        return Optional.of(new Sykefraværsprosent(prosent, kvartaler));
+        return ekstraherSisteFireKvartaler(statistikk).stream()
+              .map(SummerbartSykefravær::new)
+              .reduce(SummerbartSykefravær.NULLPUNKT, SummerbartSykefravær::leggSammen);
     }
 
 
     private List<UmaskertSykefraværForEttKvartal> ekstraherSisteFireKvartaler(
-            List<UmaskertSykefraværForEttKvartal> statistikk) {
-        List<ÅrstallOgKvartal> sisteFireKvartaler =
-                IntStream.range(0, 4)
-                        .mapToObj(SISTE_PUBLISERTE_KVARTAL::minusKvartaler)
-                        .collect(Collectors.toList());
-
-        if (statistikk != null) {
-            return statistikk.stream()
-                    .filter(data -> sisteFireKvartaler.contains(data.getÅrstallOgKvartal()))
-                    .collect(Collectors.toList());
-        } else {
+          List<UmaskertSykefraværForEttKvartal> statistikk) {
+        if (statistikk == null) {
             return List.of();
         }
+        return statistikk.stream()
+              .filter(data -> sisteFireKvartaler().contains(data.getÅrstallOgKvartal()))
+              .collect(Collectors.toList());
     }
-
 }
 
+@ToString
+@EqualsAndHashCode
+@AllArgsConstructor
+class SummerbartSykefravær {
 
-@Data
-class Sykefraværsprosent {
-    private final BigDecimal prosent;
-    private final List<ÅrstallOgKvartal> kvartalerIBeregningen;
-}
+    static SummerbartSykefravær NULLPUNKT = new SummerbartSykefravær(ZERO, ZERO, 0, List.of());
 
-
-class Sykefravær {
     public BigDecimal mulige;
     public BigDecimal tapte;
-    public int antallPersonerIGrunnlaget;
+    public int antallTilfellerIGrunnlaget;
+    public List<ÅrstallOgKvartal> kvartalerIGrunnlaget;
 
-    Sykefravær(BigDecimal mulige, BigDecimal tapte, int antallPersonerIGrunnlaget) {
-        this.mulige = mulige;
-        this.tapte = tapte;
-        this.antallPersonerIGrunnlaget = antallPersonerIGrunnlaget;
+    SummerbartSykefravær(@NotNull UmaskertSykefraværForEttKvartal data) {
+        this.mulige = data.muligeDagsverk;
+        this.tapte = data.tapteDagsverk;
+        this.antallTilfellerIGrunnlaget = data.antallPersoner;
+        this.kvartalerIGrunnlaget = List.of(data.getÅrstallOgKvartal());
     }
 
-    BigDecimal kalkulerFraværsprosent() {
-        return tapte.divide(mulige);
+    public Optional<OppsummertStatistikkDto> tilGenerellStatistikkDto(
+          Statistikkategori type, String label) {
+        return this.erTom() ? Optional.empty() : Optional.of(
+              new OppsummertStatistikkDto(
+                    type,
+                    label,
+                    kalkulerFraværsprosent(),
+                    antallTilfellerIGrunnlaget,
+                    kvartalerIGrunnlaget)
+        );
     }
 
-    Sykefravær leggSammen(Sykefravær other) {
-        return new Sykefravær(
-                this.mulige.add(other.mulige),
-                this.tapte.add(other.tapte),
-                this.antallPersonerIGrunnlaget + other.antallPersonerIGrunnlaget);
+    public boolean erTom() {
+        return this.equals(SummerbartSykefravær.NULLPUNKT);
     }
 
-    static Sykefravær NULLPUNKT = new Sykefravær(ZERO, ZERO, 0);
+    String kalkulerFraværsprosent() {
+        return tapte.divide(mulige, 2, HALF_DOWN).multiply(new BigDecimal(100)).toString();
+    }
+
+    SummerbartSykefravær leggSammen(@NotNull SummerbartSykefravær other) {
+        return new SummerbartSykefravær(
+              this.mulige.add(other.mulige),
+              this.tapte.add(other.tapte),
+              this.antallTilfellerIGrunnlaget + other.antallTilfellerIGrunnlaget,
+              joinLists(this.kvartalerIGrunnlaget, other.kvartalerIGrunnlaget));
+    }
+}
+
+
+@ToString
+@EqualsAndHashCode
+@AllArgsConstructor
+class Trend {
+
+    static Trend NULLPUNKT = new Trend(ZERO, 0, List.of());
+    public BigDecimal trendverdi;
+    public int antallTilfellerIBeregningen;
+    public List<ÅrstallOgKvartal> kvartalerIBeregningen;
+
+    public static Trend kalkulerTrend(List<UmaskertSykefraværForEttKvartal> sykefravær) {
+
+        Optional<UmaskertSykefraværForEttKvartal> maybeNyesteSykefravær =
+              hentUtKvartal(sykefravær, SISTE_PUBLISERTE_KVARTAL);
+        Optional<UmaskertSykefraværForEttKvartal> maybeSykefraværetEtÅrSiden =
+              hentUtKvartal(sykefravær, SISTE_PUBLISERTE_KVARTAL.minusEttÅr());
+
+        if (maybeNyesteSykefravær.isEmpty() || maybeSykefraværetEtÅrSiden.isEmpty()) {
+            return Trend.NULLPUNKT;
+        }
+
+        UmaskertSykefraværForEttKvartal nyesteSykefravær = maybeNyesteSykefravær.get();
+        UmaskertSykefraværForEttKvartal sykefraværetEttÅrSiden = maybeSykefraværetEtÅrSiden.get();
+
+        BigDecimal trendverdi = nyesteSykefravær.getProsent()
+              .subtract(sykefraværetEttÅrSiden.getProsent());
+        int antallTilfeller =
+              nyesteSykefravær.antallPersoner + sykefraværetEttÅrSiden.antallPersoner;
+
+        return new Trend(
+              trendverdi,
+              antallTilfeller,
+              List.of(SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusEttÅr()));
+
+    }
+
+    public boolean erTom() {
+        return this.equals(NULLPUNKT);
+    }
+
+    public Optional<OppsummertStatistikkDto> tilOppsummertStatistikkDto(Statistikkategori type,
+          String label) {
+        return this.erTom() ? Optional.empty() : Optional.of(new OppsummertStatistikkDto(
+              type,
+              label,
+              this.trendverdi.toString(),
+              this.antallTilfellerIBeregningen,
+              this.kvartalerIBeregningen));
+    }
 }

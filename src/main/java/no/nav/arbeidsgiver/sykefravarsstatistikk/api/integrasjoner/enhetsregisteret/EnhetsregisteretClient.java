@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregist
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.InstitusjonellSektorkode;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
@@ -39,7 +38,7 @@ public class EnhetsregisteretClient {
 
     public Virksomhet hentInformasjonOmVirksomhet(Orgnr orgnrTilVirksomhet) {
         try {
-            return hentInformasjonOmUnderenhet(orgnrTilVirksomhet);
+            return hentUnderenhet(orgnrTilVirksomhet);
         } catch(RestClientException exception) {
             return hentInformasjonOmEnhet(orgnrTilVirksomhet);
         }
@@ -58,7 +57,7 @@ public class EnhetsregisteretClient {
         }
     }
 
-    public Underenhet hentInformasjonOmUnderenhet(Orgnr orgnrTilUnderenhet) {
+    public Underenhet hentUnderenhet(Orgnr orgnrTilUnderenhet) {
         try {
             String url = enhetsregisteretUrl + "underenheter/" + orgnrTilUnderenhet.getVerdi();
             String respons = restTemplate.getForObject(url, String.class);
