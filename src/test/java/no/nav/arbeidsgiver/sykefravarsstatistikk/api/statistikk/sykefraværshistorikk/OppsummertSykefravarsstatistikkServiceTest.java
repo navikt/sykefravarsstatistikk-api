@@ -19,6 +19,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.OppsummertSykefravarsstatistikkService.Trend;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,6 +72,7 @@ class OppsummertSykefravarsstatistikkServiceTest {
                           new Bransjeprogram(),
                           klassifikasjonerRepository
                     ),
+                    tilgangskontrollService,
                     enhetsregisteretClient
               );
     }
@@ -107,44 +109,56 @@ class OppsummertSykefravarsstatistikkServiceTest {
               Statistikkategori.TREND_BRANSJE);
 
         List<Statistikkategori> statistikktyper =
-              oppsummertSykefravarsstatistikkService.hentOgBearbeidStatistikk(
-              virksomhet).stream().map(OppsummertStatistikkDto::getType).collect(Collectors.toList());
+              oppsummertSykefravarsstatistikkService.hentOgBearbeidStatistikk(virksomhet).stream()
+                    .map(OppsummertStatistikkDto::getType)
+                    .collect(Collectors.toList());
         assertThat(statistikktyper).isEqualTo(forventedeStatistikktyper);
     }
 
     @Test
     void kalkulerTrend_skal_returnere_ufullstendigdata_ved_mangel_av_ett_kvartal() {
-        assertThat(oppsummertSykefravarsstatistikkService.kalkulerTrend(Arrays.asList(
-                    umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 11),
-                    umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 1), 10)
+        assertThat(Trend.kalkulerTrend(Arrays.asList(
+                    umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 11, 1),
+                    umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 1), 10, 3)
               )
-        )).isEqualTo("UfullstendigData");
+        )).isEqualTo(Trend.NULLPUNKT);
     }
 
     @Test
     void kalkulerTrend_skal_returnere_stigende_ved_økende_trend() {
-        assertThat(oppsummertSykefravarsstatistikkService.kalkulerTrend(Arrays.asList(
-                    umaskertSykefraværprosent(new ÅrstallOgKvartal(2022, 1), 11),
-                    umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 1), 10)
+        ÅrstallOgKvartal k1 = new ÅrstallOgKvartal(2022, 1);
+        ÅrstallOgKvartal k2 = new ÅrstallOgKvartal(2021, 1);
+        assertThat(Trend.kalkulerTrend(Arrays.asList(
+                    umaskertSykefraværprosent(k1, 3),
+                    umaskertSykefraværprosent(k2, 2)
               )
         )).isEqualTo(
-              "1.00"
+              new Trend(new BigDecimal("1.00"), 4, List.of(k1, k2))
         );
     }
 
     @Test
     void kalkulerTrend_skal_returnere_synkende_ved_nedadgående_trend() {
-        assertThat(oppsummertSykefravarsstatistikkService.kalkulerTrend(Arrays.asList(
-              umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 1), 10),
-              umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 13),
-              umaskertSykefraværprosent(new ÅrstallOgKvartal(2022, 1), 9)
-        ))).isEqualTo("-1.00");
+        List<UmaskertSykefraværForEttKvartal> kvartaler = List.of(
+              umaskertSykefraværprosent(
+                    new ÅrstallOgKvartal(2021, 1), 10, 1),
+              umaskertSykefraværprosent(
+                    new ÅrstallOgKvartal(2021, 2), 13, 2),
+              umaskertSykefraværprosent(
+                    new ÅrstallOgKvartal(2022, 1), 9, 3)
+        );
+        Trend forventetTrend = new Trend(new BigDecimal("-1.00"), 5,
+              kvartaler.stream()
+                    .map(UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal)
+                    .collect(Collectors.toList()));
+
+        assertThat(Trend.kalkulerTrend(kvartaler)).isEqualTo(forventetTrend);
     }
 
     @Test
     void kalkulerTrend_skal_returnere_tåle_tomt_datagrunnlag() {
-        assertThat(oppsummertSykefravarsstatistikkService.kalkulerTrend(List.of()))
-              .isEqualTo("UfullstendigData");
+        assertThat(Trend.kalkulerTrend(List.of()))
+              .isEqualTo(Trend.NULLPUNKT);
     }
 
     private void lagTestDataTilRepository() {

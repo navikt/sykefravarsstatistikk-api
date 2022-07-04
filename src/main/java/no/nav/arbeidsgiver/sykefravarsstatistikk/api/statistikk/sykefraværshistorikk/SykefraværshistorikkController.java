@@ -189,7 +189,8 @@ public class SykefraværshistorikkController {
         // Returnerer 403 dersom brukeren ikke representerer bedriften
         bruker.sjekkTilgang(new Orgnr(orgnr));
 
-        List<OppsummertStatistikkDto> statistikker = oppsummertSykefravarsstatistikkService.hentOppsummertStatistikk(orgnr);
+        List<OppsummertStatistikkDto> statistikker =
+              oppsummertSykefravarsstatistikkService.hentOppsummertStatistikk(orgnr, bruker);
 
         return ResponseEntity.status(HttpStatus.OK).body(statistikker);
     }

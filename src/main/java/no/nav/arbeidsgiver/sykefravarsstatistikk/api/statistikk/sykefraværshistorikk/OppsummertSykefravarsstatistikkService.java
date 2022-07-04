@@ -56,20 +56,15 @@ public class OppsummertSykefravarsstatistikkService {
 
         Underenhet virksomhet = enhetsregisteretClient.hentUnderenhet(new Orgnr(orgnr));
 
-        // Har brukeren IA-rettigheter?
-        return hentStatistikkUtenTallFraVirksomheten(virksomhet);
+        // Har brukeren IA-rettigheter ELLER tallene skal maskeres?
+        // return hentStatistikkUtenTallFraVirksomheten(virksomhet);
+
 
         // Brukeren HAR ia-rettigheter. Skal tallene maskeres?
 
         List<OppsummertStatistikkDto> statistikk = hentOgBearbeidStatistikk(virksomhet);
 
-
-    }
-
-    private List<OppsummertStatistikkDto> hentStatistikkUtenTallFraVirksomheten(
-          Underenhet virksomhet) {
-        // TODO
-        throw new NotImplementedException();
+        return null;
     }
 
     List<OppsummertStatistikkDto> hentOgBearbeidStatistikk(Underenhet virksomhet) {
@@ -97,18 +92,22 @@ public class OppsummertSykefravarsstatistikkService {
     private Optional<OppsummertStatistikkDto> trendBransjeEllerNæring(
           Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefraværsdata,
           BransjeEllerNæring bransjeEllerNæring) {
-        Optional<OppsummertStatistikkDto> trendverdiBransjeEllerNæring =
-              Trend.kalkulerTrend(sykefraværsdata.get(bransjeEllerNæring.getTrendkategori()))
-                    .tilOppsummertStatistikkDto(
-                          bransjeEllerNæring.getTrendkategori(),
-                          bransjeEllerNæring.getVerdiSomString());
-        return trendverdiBransjeEllerNæring;
+        return Trend.kalkulerTrend(sykefraværsdata.get(bransjeEllerNæring.getTrendkategori()))
+              .tilOppsummertStatistikkDto(
+                    bransjeEllerNæring.getTrendkategori(),
+                    bransjeEllerNæring.getVerdiSomString());
     }
 
     private Optional<OppsummertStatistikkDto> fraværsprosentNorge(
           Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefraværsdata) {
         return hentSummerbartSykefravær(sykefraværsdata.get(LAND))
               .tilGenerellStatistikkDto(LAND, "Norge");
+    }
+
+    private List<OppsummertStatistikkDto> hentStatistikkUtenTallFraVirksomheten(
+          Underenhet virksomhet) {
+        // TODO
+        throw new NotImplementedException();
     }
 
     private Optional<OppsummertStatistikkDto> fraværsprosentBransjeEllerNæring(
@@ -154,6 +153,58 @@ public class OppsummertSykefravarsstatistikkService {
         return statistikk.stream()
               .filter(data -> sisteFireKvartaler().contains(data.getÅrstallOgKvartal()))
               .collect(Collectors.toList());
+    }
+
+
+    @ToString
+    @EqualsAndHashCode
+    @AllArgsConstructor
+    static
+    class Trend {
+        static Trend NULLPUNKT = new Trend(ZERO, 0, List.of());
+        public BigDecimal trendverdi;
+        public int antallTilfellerIBeregningen;
+        public List<ÅrstallOgKvartal> kvartalerIBeregningen;
+
+        public static Trend kalkulerTrend(List<UmaskertSykefraværForEttKvartal> sykefravær) {
+
+            Optional<UmaskertSykefraværForEttKvartal> maybeNyesteSykefravær =
+                  hentUtKvartal(sykefravær, SISTE_PUBLISERTE_KVARTAL);
+            Optional<UmaskertSykefraværForEttKvartal> maybeSykefraværetEtÅrSiden =
+                  hentUtKvartal(sykefravær, SISTE_PUBLISERTE_KVARTAL.minusEttÅr());
+
+            if (maybeNyesteSykefravær.isEmpty() || maybeSykefraværetEtÅrSiden.isEmpty()) {
+                return Trend.NULLPUNKT;
+            }
+
+            UmaskertSykefraværForEttKvartal nyesteSykefravær = maybeNyesteSykefravær.get();
+            UmaskertSykefraværForEttKvartal sykefraværetEttÅrSiden = maybeSykefraværetEtÅrSiden.get();
+
+            BigDecimal trendverdi = nyesteSykefravær.getProsent()
+                  .subtract(sykefraværetEttÅrSiden.getProsent());
+            int antallTilfeller =
+                  nyesteSykefravær.antallPersoner + sykefraværetEttÅrSiden.antallPersoner;
+
+            return new Trend(
+                  trendverdi,
+                  antallTilfeller,
+                  List.of(SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusEttÅr()));
+
+        }
+
+        public boolean erTom() {
+            return this.equals(NULLPUNKT);
+        }
+
+        public Optional<OppsummertStatistikkDto> tilOppsummertStatistikkDto(Statistikkategori type,
+              String label) {
+            return this.erTom() ? Optional.empty() : Optional.of(new OppsummertStatistikkDto(
+                  type,
+                  label,
+                  this.trendverdi.toString(),
+                  this.antallTilfellerIBeregningen,
+                  this.kvartalerIBeregningen));
+        }
     }
 }
 
@@ -205,54 +256,3 @@ class SummerbartSykefravær {
     }
 }
 
-
-@ToString
-@EqualsAndHashCode
-@AllArgsConstructor
-class Trend {
-
-    static Trend NULLPUNKT = new Trend(ZERO, 0, List.of());
-    public BigDecimal trendverdi;
-    public int antallTilfellerIBeregningen;
-    public List<ÅrstallOgKvartal> kvartalerIBeregningen;
-
-    public static Trend kalkulerTrend(List<UmaskertSykefraværForEttKvartal> sykefravær) {
-
-        Optional<UmaskertSykefraværForEttKvartal> maybeNyesteSykefravær =
-              hentUtKvartal(sykefravær, SISTE_PUBLISERTE_KVARTAL);
-        Optional<UmaskertSykefraværForEttKvartal> maybeSykefraværetEtÅrSiden =
-              hentUtKvartal(sykefravær, SISTE_PUBLISERTE_KVARTAL.minusEttÅr());
-
-        if (maybeNyesteSykefravær.isEmpty() || maybeSykefraværetEtÅrSiden.isEmpty()) {
-            return Trend.NULLPUNKT;
-        }
-
-        UmaskertSykefraværForEttKvartal nyesteSykefravær = maybeNyesteSykefravær.get();
-        UmaskertSykefraværForEttKvartal sykefraværetEttÅrSiden = maybeSykefraværetEtÅrSiden.get();
-
-        BigDecimal trendverdi = nyesteSykefravær.getProsent()
-              .subtract(sykefraværetEttÅrSiden.getProsent());
-        int antallTilfeller =
-              nyesteSykefravær.antallPersoner + sykefraværetEttÅrSiden.antallPersoner;
-
-        return new Trend(
-              trendverdi,
-              antallTilfeller,
-              List.of(SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusEttÅr()));
-
-    }
-
-    public boolean erTom() {
-        return this.equals(NULLPUNKT);
-    }
-
-    public Optional<OppsummertStatistikkDto> tilOppsummertStatistikkDto(Statistikkategori type,
-          String label) {
-        return this.erTom() ? Optional.empty() : Optional.of(new OppsummertStatistikkDto(
-              type,
-              label,
-              this.trendverdi.toString(),
-              this.antallTilfellerIBeregningen,
-              this.kvartalerIBeregningen));
-    }
-}
