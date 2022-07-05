@@ -1,7 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.SISTE_PUBLISERTE_KVARTAL;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -16,6 +14,8 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 @ToString
 public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
+
+    public static ÅrstallOgKvartal SISTE_PUBLISERTE_KVARTAL = new ÅrstallOgKvartal(2022, 1);
 
     private final int årstall;
     private final int kvartal;

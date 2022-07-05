@@ -15,8 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.antallKvartalerSomSkalSummeres;
-
 @Slf4j
 @Component
 public class SummertLegemeldtSykefraværService {
@@ -38,7 +36,7 @@ public class SummertLegemeldtSykefraværService {
             ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal
     ) {
         ÅrstallOgKvartal eldsteÅrstallOgKvartal =
-                sistePubliserteÅrstallOgKvartal.minusKvartaler(antallKvartalerSomSkalSummeres - 1);
+                sistePubliserteÅrstallOgKvartal.minusKvartaler(3);
 
         List<UmaskertSykefraværForEttKvartal> sykefraværForEttKvartalListe =
                 sykefraværprosentRepository.hentUmaskertSykefravær(

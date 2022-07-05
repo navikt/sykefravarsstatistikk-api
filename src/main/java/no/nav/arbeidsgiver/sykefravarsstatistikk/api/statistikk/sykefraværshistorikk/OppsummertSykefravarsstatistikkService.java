@@ -2,13 +2,14 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 import static java.math.BigDecimal.ZERO;
 import static java.math.RoundingMode.HALF_DOWN;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.SISTE_PUBLISERTE_KVARTAL;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.CollectionUtils.joinLists;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.sisteFireKvartaler;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.LAND;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.VIRKSOMHET;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal.hentUtKvartal;
 
+import io.vavr.control.Either;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -25,10 +26,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Brans
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.oppsummert.OppsummertStatistikkDto;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetBruker;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
-import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -51,25 +52,25 @@ public class OppsummertSykefravarsstatistikkService {
         this.enhetsregisteretClient = enhetsregisteretClient;
     }
 
-    public List<OppsummertStatistikkDto> hentOppsummertStatistikk(String orgnr,
-          InnloggetBruker bruker) {
+    public Either<TilgangskontrollException, List<OppsummertStatistikkDto>> hentOppsummertStatistikk(
+          Orgnr orgnr) {
 
-        Underenhet virksomhet = enhetsregisteretClient.hentUnderenhet(new Orgnr(orgnr));
+        if (!tilgangskontrollService.brukerRepresentererVirksomheten(orgnr)) {
+            return Either.left(
+                  new TilgangskontrollException("Bruker mangler tilgang til denne virksomheten"));
+        }
 
-        // Har brukeren IA-rettigheter ELLER tallene skal maskeres?
-        // return hentStatistikkUtenTallFraVirksomheten(virksomhet);
+        Underenhet virksomhet = enhetsregisteretClient.hentUnderenhet(orgnr);
+        if (!tilgangskontrollService.brukerHarIaRettigheter(orgnr)) {
+            // return hentStatistikkUtenTallFraVirksomheten(virksomhet);
+        }
 
-
-        // Brukeren HAR ia-rettigheter. Skal tallene maskeres?
-
-        List<OppsummertStatistikkDto> statistikk = hentOgBearbeidStatistikk(virksomhet);
-
-        return null;
+        return Either.right(hentOgBearbeidStatistikk(virksomhet));
     }
 
     List<OppsummertStatistikkDto> hentOgBearbeidStatistikk(Underenhet virksomhet) {
         Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefraværsdata =
-              hentUmaskertStatistikkForSisteFemKvartaler(virksomhet);
+              hentUmaskertStatistikkForSisteFemKvartaler(virksomhet) ;
 
         BransjeEllerNæring bransjeEllerNæring =
               bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(
@@ -84,33 +85,30 @@ public class OppsummertSykefravarsstatistikkService {
                           sykefraværsdata),
                     trendBransjeEllerNæring(
                           sykefraværsdata, bransjeEllerNæring))
-              .filter(Optional::isPresent)
-              .map(Optional::get)
+              .filter(Either::isRight)
+              .map(Either::get)
               .collect(Collectors.toList());
     }
 
-    private Optional<OppsummertStatistikkDto> trendBransjeEllerNæring(
+    private Either<ManglendeDataException, OppsummertStatistikkDto> trendBransjeEllerNæring(
           Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefraværsdata,
           BransjeEllerNæring bransjeEllerNæring) {
-        return Trend.kalkulerTrend(sykefraværsdata.get(bransjeEllerNæring.getTrendkategori()))
-              .tilOppsummertStatistikkDto(
-                    bransjeEllerNæring.getTrendkategori(),
-                    bransjeEllerNæring.getVerdiSomString());
+        Either<ManglendeDataException, Trend> maybeTrend = Trend.kalkulerTrend(
+              sykefraværsdata.get(bransjeEllerNæring.getTrendkategori()));
+
+        return maybeTrend.map(r -> r.tilOppsummertStatistikkDto(
+              bransjeEllerNæring.getTrendkategori(),
+              bransjeEllerNæring.getVerdiSomString())
+        );
     }
 
-    private Optional<OppsummertStatistikkDto> fraværsprosentNorge(
+    private Either<ManglendeDataException, OppsummertStatistikkDto> fraværsprosentNorge(
           Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefraværsdata) {
         return hentSummerbartSykefravær(sykefraværsdata.get(LAND))
               .tilGenerellStatistikkDto(LAND, "Norge");
     }
 
-    private List<OppsummertStatistikkDto> hentStatistikkUtenTallFraVirksomheten(
-          Underenhet virksomhet) {
-        // TODO
-        throw new NotImplementedException();
-    }
-
-    private Optional<OppsummertStatistikkDto> fraværsprosentBransjeEllerNæring(
+    private Either<ManglendeDataException, OppsummertStatistikkDto> fraværsprosentBransjeEllerNæring(
           Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefraværsdata,
           BransjeEllerNæring bransjeEllerNæring) {
         return hentSummerbartSykefravær(
@@ -120,7 +118,7 @@ public class OppsummertSykefravarsstatistikkService {
                     bransjeEllerNæring.getVerdiSomString());
     }
 
-    private Optional<OppsummertStatistikkDto> sykefraværVirksomhet(
+    private Either<ManglendeDataException, OppsummertStatistikkDto> sykefraværVirksomhet(
           Underenhet virksomhet,
           Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefraværsdata) {
         return hentSummerbartSykefravær(sykefraværsdata.get(VIRKSOMHET))
@@ -161,49 +159,46 @@ public class OppsummertSykefravarsstatistikkService {
     @AllArgsConstructor
     static
     class Trend {
-        static Trend NULLPUNKT = new Trend(ZERO, 0, List.of());
+
         public BigDecimal trendverdi;
         public int antallTilfellerIBeregningen;
         public List<ÅrstallOgKvartal> kvartalerIBeregningen;
 
-        public static Trend kalkulerTrend(List<UmaskertSykefraværForEttKvartal> sykefravær) {
+        public static Either<ManglendeDataException, Trend> kalkulerTrend(
+              List<UmaskertSykefraværForEttKvartal> sykefravær) {
 
-            Optional<UmaskertSykefraværForEttKvartal> maybeNyesteSykefravær =
+            Optional<UmaskertSykefraværForEttKvartal> nyesteSykefravær =
                   hentUtKvartal(sykefravær, SISTE_PUBLISERTE_KVARTAL);
-            Optional<UmaskertSykefraværForEttKvartal> maybeSykefraværetEtÅrSiden =
+            Optional<UmaskertSykefraværForEttKvartal> sykefraværetEtÅrSiden =
                   hentUtKvartal(sykefravær, SISTE_PUBLISERTE_KVARTAL.minusEttÅr());
 
-            if (maybeNyesteSykefravær.isEmpty() || maybeSykefraværetEtÅrSiden.isEmpty()) {
-                return Trend.NULLPUNKT;
+            if (nyesteSykefravær.isEmpty() || sykefraværetEtÅrSiden.isEmpty()) {
+                return Either.left(
+                      new ManglendeDataException("Mangler data, kan ikke kalkulere trenden."));
             }
 
-            UmaskertSykefraværForEttKvartal nyesteSykefravær = maybeNyesteSykefravær.get();
-            UmaskertSykefraværForEttKvartal sykefraværetEttÅrSiden = maybeSykefraværetEtÅrSiden.get();
-
-            BigDecimal trendverdi = nyesteSykefravær.getProsent()
-                  .subtract(sykefraværetEttÅrSiden.getProsent());
+            BigDecimal trendverdi = nyesteSykefravær.get().getProsent()
+                  .subtract(sykefraværetEtÅrSiden.get().getProsent());
             int antallTilfeller =
-                  nyesteSykefravær.antallPersoner + sykefraværetEttÅrSiden.antallPersoner;
+                  nyesteSykefravær.get().antallPersoner
+                        + sykefraværetEtÅrSiden.get().antallPersoner;
 
-            return new Trend(
-                  trendverdi,
-                  antallTilfeller,
-                  List.of(SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusEttÅr()));
-
+            return Either.right(
+                  new Trend(
+                        trendverdi,
+                        antallTilfeller,
+                        List.of(SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusEttÅr())
+                  ));
         }
 
-        public boolean erTom() {
-            return this.equals(NULLPUNKT);
-        }
-
-        public Optional<OppsummertStatistikkDto> tilOppsummertStatistikkDto(Statistikkategori type,
-              String label) {
-            return this.erTom() ? Optional.empty() : Optional.of(new OppsummertStatistikkDto(
+        public OppsummertStatistikkDto tilOppsummertStatistikkDto(
+              Statistikkategori type, String label) {
+            return new OppsummertStatistikkDto(
                   type,
                   label,
                   this.trendverdi.toString(),
                   this.antallTilfellerIBeregningen,
-                  this.kvartalerIBeregningen));
+                  this.kvartalerIBeregningen);
         }
     }
 }
@@ -227,24 +222,24 @@ class SummerbartSykefravær {
         this.kvartalerIGrunnlaget = List.of(data.getÅrstallOgKvartal());
     }
 
-    public Optional<OppsummertStatistikkDto> tilGenerellStatistikkDto(
+    public Either<ManglendeDataException, OppsummertStatistikkDto> tilGenerellStatistikkDto(
           Statistikkategori type, String label) {
-        return this.erTom() ? Optional.empty() : Optional.of(
-              new OppsummertStatistikkDto(
-                    type,
-                    label,
-                    kalkulerFraværsprosent(),
-                    antallTilfellerIGrunnlaget,
-                    kvartalerIGrunnlaget)
-        );
+
+        return kalkulerFraværsprosent().map(prosent -> new OppsummertStatistikkDto(
+              type,
+              label,
+              prosent.toString(),
+              antallTilfellerIGrunnlaget,
+              kvartalerIGrunnlaget));
     }
 
-    public boolean erTom() {
-        return this.equals(SummerbartSykefravær.NULLPUNKT);
-    }
+    Either<ManglendeDataException, BigDecimal> kalkulerFraværsprosent() {
+        if (this.equals(NULLPUNKT)) {
+            return Either.left(new ManglendeDataException("Ingen sykefraværsdata tilgjengelig."));
+        }
 
-    String kalkulerFraværsprosent() {
-        return tapte.divide(mulige, 2, HALF_DOWN).multiply(new BigDecimal(100)).toString();
+        return Either.right(
+              tapte.divide(mulige, 2, HALF_DOWN).multiply(new BigDecimal(100)));
     }
 
     SummerbartSykefravær leggSammen(@NotNull SummerbartSykefravær other) {

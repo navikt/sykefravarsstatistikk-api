@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk;
 public enum Statistikkategori {
     LAND,
     SEKTOR,
-    NÆRING,// TODO Bestemme mellom NÆRING,NÆRING2SIFFER OG NÆRING5SIFFER
+    NÆRING,
     BRANSJE,
     VIRKSOMHET,
     OVERORDNET_ENHET,
