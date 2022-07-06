@@ -118,29 +118,27 @@ class AggregertHistorikkServiceTest {
 
     @Test
     void kalkulerTrend_skal_returnere_ManglendeDataException_ved_mangel_av_ett_kvartal() {
-        assertThat(Trendkalkulator.kalkulerTrend(Arrays.asList(
+        assertThat(new Trendkalkulator(List.of(
                         umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 11, 1),
                         umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 1), 10, 3)
-                )
-        ).isLeft()).hasSameClassAs(ManglendeDataException.class);
+                )).kalkulerTrend().getLeft()
+        ).isExactlyInstanceOf(ManglendeDataException.class);
     }
 
     @Test
     void kalkulerTrend_skal_returnere_stigende_ved_økende_trend() {
         ÅrstallOgKvartal k1 = new ÅrstallOgKvartal(2022, 1);
         ÅrstallOgKvartal k2 = new ÅrstallOgKvartal(2021, 1);
-        assertThat(Trendkalkulator.kalkulerTrend(Arrays.asList(
-                        umaskertSykefraværprosent(k1, 3),
-                        umaskertSykefraværprosent(k2, 2)
-                )
-        )).isEqualTo(
-                new Trendkalkulator(new BigDecimal("1.00"), 4, List.of(k1, k2))
-        );
+        assertThat(new Trendkalkulator(List.of(
+                umaskertSykefraværprosent(k1, 3),
+                umaskertSykefraværprosent(k2, 2)
+        )).kalkulerTrend().get())
+                .isEqualTo(new Trend(new BigDecimal("1.00"), 4, List.of(k1, k2)));
     }
 
     @Test
     void kalkulerTrend_skal_returnere_synkende_ved_nedadgående_trend() {
-        List<UmaskertSykefraværForEttKvartal> kvartaler = List.of(
+        List<UmaskertSykefraværForEttKvartal> kvartalstall = List.of(
                 umaskertSykefraværprosent(
                         SISTE_PUBLISERTE_KVARTAL, 10, 1),
                 umaskertSykefraværprosent(
@@ -148,17 +146,18 @@ class AggregertHistorikkServiceTest {
                 umaskertSykefraværprosent(
                         SISTE_PUBLISERTE_KVARTAL.minusEttÅr(), 9, 3)
         );
-        Trendkalkulator forventetTrend = new Trendkalkulator(new BigDecimal("-1.00"), 5,
-                kvartaler.stream()
+        Trend forventetTrend = new Trend(new BigDecimal("-1.00"), 5,
+                kvartalstall.stream()
                         .map(UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal)
                         .collect(Collectors.toList()));
 
-        assertThat(Trendkalkulator.kalkulerTrend(kvartaler)).isEqualTo(forventetTrend);
+        assertThat(new Trendkalkulator(kvartalstall).kalkulerTrend().get())
+                .isEqualTo(forventetTrend);
     }
 
     @Test
     void kalkulerTrend_skal_returnere_tåle_tomt_datagrunnlag() {
-        assertThat(Trendkalkulator.kalkulerTrend(List.of()).getLeft())
+        assertThat(new Trendkalkulator(List.of()).kalkulerTrend().getLeft())
                 .isExactlyInstanceOf(ManglendeDataException.class);
     }
 

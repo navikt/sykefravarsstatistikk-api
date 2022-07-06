@@ -11,7 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.ManglendeDataException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 
@@ -23,17 +22,15 @@ class Trendkalkulator {
     private static final ÅrstallOgKvartal nyesteKvartal = SISTE_PUBLISERTE_KVARTAL;
     private static final ÅrstallOgKvartal ettÅrTidligere =
             SISTE_PUBLISERTE_KVARTAL.minusEttÅr();
-    private BigDecimal trendverdi;
-    private int antallTilfellerIBeregningen;
-    private List<ÅrstallOgKvartal> kvartalerIBeregningen;
+    List<UmaskertSykefraværForEttKvartal> datagrunnlag;
 
-    static Either<ManglendeDataException, Trendkalkulator> kalkulerTrend(
-            List<UmaskertSykefraværForEttKvartal> sykefravær) {
+
+    Either<ManglendeDataException, Trend> kalkulerTrend() {
 
         Optional<UmaskertSykefraværForEttKvartal> nyesteSykefravær =
-                hentUtKvartal(sykefravær, nyesteKvartal);
+                hentUtKvartal(datagrunnlag, nyesteKvartal);
         Optional<UmaskertSykefraværForEttKvartal> sykefraværetEtÅrSiden =
-                hentUtKvartal(sykefravær, ettÅrTidligere);
+                hentUtKvartal(datagrunnlag, ettÅrTidligere);
 
         if (nyesteSykefravær.isEmpty() || sykefraværetEtÅrSiden.isEmpty()) {
             return Either.left(
@@ -43,25 +40,16 @@ class Trendkalkulator {
 
         BigDecimal trendverdi = nyesteSykefravær.get().getProsent()
                 .subtract(sykefraværetEtÅrSiden.get().getProsent());
+
         int antallTilfeller =
                 nyesteSykefravær.get().getAntallPersoner()
                         + sykefraværetEtÅrSiden.get().getAntallPersoner();
 
         return Either.right(
-                new Trendkalkulator(
+                new Trend(
                         trendverdi,
                         antallTilfeller,
-                        List.of(SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusEttÅr())
+                        List.of(nyesteKvartal, ettÅrTidligere)
                 ));
-    }
-
-    AggregertHistorikkDto tilAggregertHistorikkDto(
-            Statistikkategori type, String label) {
-        return new AggregertHistorikkDto(
-                type,
-                label,
-                this.trendverdi.toString(),
-                this.antallTilfellerIBeregningen,
-                this.kvartalerIBeregningen);
     }
 }

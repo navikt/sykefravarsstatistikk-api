@@ -47,8 +47,9 @@ public class Prosentkalkulator {
 
     Either<ManglendeDataException, AggregertHistorikkDto> trendBransjeEllerNæring(
             BransjeEllerNæring bransjeEllerNæring) {
-        Either<ManglendeDataException, Trendkalkulator> maybeTrend = Trendkalkulator.kalkulerTrend(
-                sykefraværsdata.hentFor(bransjeEllerNæring.getTrendkategori()));
+        Either<ManglendeDataException, Trend> maybeTrend =
+                new Trendkalkulator(sykefraværsdata.hentFor(bransjeEllerNæring.getTrendkategori()))
+                        .kalkulerTrend();
 
         return maybeTrend.map(r -> r.tilAggregertHistorikkDto(
                 bransjeEllerNæring.getTrendkategori(),
