@@ -14,7 +14,7 @@ public class ÅrstallOgKvartalTest {
     @Test
     public void minusEtÅr_returnererSammeKvartalEttÅrSiden() {
         assertThat(new ÅrstallOgKvartal(2022, 1).minusEttÅr()).isEqualTo(new ÅrstallOgKvartal(2021, 1));
-        assertThat(new ÅrstallOgKvartal(2020, 2).minusEttÅr()).isEqualTo(new ÅrstallOgKvartal(2020, 2));
+        assertThat(new ÅrstallOgKvartal(2020, 2).minusEttÅr()).isEqualTo(new ÅrstallOgKvartal(2019, 2));
     }
 
     @Test

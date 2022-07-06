@@ -11,7 +11,6 @@ public class BransjeEllerNæring {
 
     public final Either<Bransje, Næring> verdi;
 
-
     public BransjeEllerNæring(Bransje bransje) {
         this.verdi = Either.left(bransje);
     }
