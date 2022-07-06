@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 
 @EqualsAndHashCode
 @Getter
-@ToString
 public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
 
     public static ÅrstallOgKvartal SISTE_PUBLISERTE_KVARTAL = new ÅrstallOgKvartal(2022, 1);
@@ -82,6 +81,11 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
         } else {
             return new ÅrstallOgKvartal(årstall, kvartal + 1);
         }
+    }
+
+    @Override
+    public String toString(){
+        return kvartal + ". kvartal " + årstall;
     }
 
     @Override

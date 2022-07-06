@@ -70,7 +70,7 @@ public class OppsummertSykefravarsstatistikkService {
 
     List<OppsummertStatistikkDto> hentOgBearbeidStatistikk(Underenhet virksomhet) {
         Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefraværsdata =
-              hentUmaskertStatistikkForSisteFemKvartaler(virksomhet) ;
+              hentUmaskertStatistikkForSisteFemKvartaler(virksomhet);
 
         BransjeEllerNæring bransjeEllerNæring =
               bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(
@@ -160,6 +160,9 @@ public class OppsummertSykefravarsstatistikkService {
     static
     class Trend {
 
+        private static final ÅrstallOgKvartal nyesteKvartal = SISTE_PUBLISERTE_KVARTAL;
+        private static final ÅrstallOgKvartal ettÅrTidligere =
+              SISTE_PUBLISERTE_KVARTAL.minusEttÅr();
         public BigDecimal trendverdi;
         public int antallTilfellerIBeregningen;
         public List<ÅrstallOgKvartal> kvartalerIBeregningen;
@@ -168,13 +171,14 @@ public class OppsummertSykefravarsstatistikkService {
               List<UmaskertSykefraværForEttKvartal> sykefravær) {
 
             Optional<UmaskertSykefraværForEttKvartal> nyesteSykefravær =
-                  hentUtKvartal(sykefravær, SISTE_PUBLISERTE_KVARTAL);
+                  hentUtKvartal(sykefravær, nyesteKvartal);
             Optional<UmaskertSykefraværForEttKvartal> sykefraværetEtÅrSiden =
-                  hentUtKvartal(sykefravær, SISTE_PUBLISERTE_KVARTAL.minusEttÅr());
+                  hentUtKvartal(sykefravær, ettÅrTidligere);
 
             if (nyesteSykefravær.isEmpty() || sykefraværetEtÅrSiden.isEmpty()) {
                 return Either.left(
-                      new ManglendeDataException("Mangler data, kan ikke kalkulere trenden."));
+                      new ManglendeDataException(
+                            "Mangler " + nyesteKvartal + " eller " + ettÅrTidligere));
             }
 
             BigDecimal trendverdi = nyesteSykefravær.get().getProsent()

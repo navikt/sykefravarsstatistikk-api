@@ -35,7 +35,6 @@ class OppsummertSykefravarsstatistikkServiceTest {
 
     @Mock
     private SykefraværRepository sykefraværRepository;
-
     @Mock
     private KlassifikasjonerRepository klassifikasjonerRepository;
     @Mock
