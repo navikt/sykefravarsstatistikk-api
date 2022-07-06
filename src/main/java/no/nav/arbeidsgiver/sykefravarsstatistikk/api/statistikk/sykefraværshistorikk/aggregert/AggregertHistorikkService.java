@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.oppsummert;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
 
@@ -11,7 +11,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
@@ -21,14 +20,14 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.Tilgangsko
 import org.springframework.stereotype.Service;
 
 @Service
-public class OppsummertSykefravarsstatistikkService {
+public class AggregertHistorikkService {
 
     private final SykefraværRepository sykefraværprosentRepository;
     private final BransjeEllerNæringService bransjeEllerNæringService;
     private final TilgangskontrollService tilgangskontrollService;
     private final EnhetsregisteretClient enhetsregisteretClient;
 
-    public OppsummertSykefravarsstatistikkService(
+    public AggregertHistorikkService(
             SykefraværRepository sykefraværprosentRepository,
             BransjeEllerNæringService bransjeEllerNæringService,
             TilgangskontrollService tilgangskontrollService,
@@ -39,7 +38,7 @@ public class OppsummertSykefravarsstatistikkService {
         this.enhetsregisteretClient = enhetsregisteretClient;
     }
 
-    public Either<TilgangskontrollException, List<OppsummertStatistikkDto>> hentOppsummertStatistikk(
+    public Either<TilgangskontrollException, List<AggregertHistorikkDto>> hentAggregertHistorikk(
             Orgnr orgnr) {
 
         if (!tilgangskontrollService.brukerRepresentererVirksomheten(orgnr)) {
@@ -55,7 +54,7 @@ public class OppsummertSykefravarsstatistikkService {
         return Either.right(hentOgBearbeidStatistikk(virksomhet));
     }
 
-    List<OppsummertStatistikkDto> hentOgBearbeidStatistikk(Underenhet virksomhet) {
+    List<AggregertHistorikkDto> hentOgBearbeidStatistikk(Underenhet virksomhet) {
         Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefraværsdata =
                 hentForSisteFemKvartaler(virksomhet);
 
@@ -66,7 +65,7 @@ public class OppsummertSykefravarsstatistikkService {
         Prosentkalkulator kalkulator = new Prosentkalkulator(sykefraværsdata);
 
         return Stream.of(
-                        kalkulator.sykefraværVirksomhet(virksomhet.getNavn()),
+                        kalkulator.fraværsprosentVirksomhet(virksomhet.getNavn()),
                         kalkulator.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
                         kalkulator.fraværsprosentNorge(),
                         kalkulator.trendBransjeEllerNæring(bransjeEllerNæring))
@@ -75,11 +74,11 @@ public class OppsummertSykefravarsstatistikkService {
                 .collect(Collectors.toList());
     }
 
-
     private Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>>
     hentForSisteFemKvartaler(Underenhet forBedrift) {
-        ÅrstallOgKvartal fraKvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4);
         return sykefraværprosentRepository
-                .hentUmaskertSykefraværAlleKategorier(forBedrift, fraKvartal);
+                .hentUmaskertSykefraværAlleKategorier(forBedrift,
+                        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4));
     }
 }
+

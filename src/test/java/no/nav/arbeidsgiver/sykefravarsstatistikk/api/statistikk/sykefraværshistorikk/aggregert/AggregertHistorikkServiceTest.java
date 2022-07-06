@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.oppsummert;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,7 +31,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class OppsummertSykefravarsstatistikkServiceTest {
+class AggregertHistorikkServiceTest {
 
     @Mock
     private SykefraværRepository sykefraværRepository;
@@ -42,7 +42,7 @@ class OppsummertSykefravarsstatistikkServiceTest {
     @Mock
     private EnhetsregisteretClient enhetsregisteretClient;
 
-    private OppsummertSykefravarsstatistikkService oppsummertSykefravarsstatistikkService;
+    private AggregertHistorikkService aggregertHistorikkService;
 
     private static UmaskertSykefraværForEttKvartal umaskertSykefraværprosent(
             ÅrstallOgKvartal årstallOgKvartal,
@@ -66,8 +66,8 @@ class OppsummertSykefravarsstatistikkServiceTest {
 
     @BeforeEach
     public void setUp() {
-        oppsummertSykefravarsstatistikkService =
-                new OppsummertSykefravarsstatistikkService(
+        aggregertHistorikkService =
+                new AggregertHistorikkService(
                         sykefraværRepository,
                         new BransjeEllerNæringService(
                                 new Bransjeprogram(),
@@ -91,7 +91,7 @@ class OppsummertSykefravarsstatistikkServiceTest {
         );
 
         assertThat(
-                oppsummertSykefravarsstatistikkService.hentOgBearbeidStatistikk(virksomhetUtenData))
+                aggregertHistorikkService.hentOgBearbeidStatistikk(virksomhetUtenData))
                 .isEqualTo(List.of());
     }
 
@@ -110,8 +110,8 @@ class OppsummertSykefravarsstatistikkServiceTest {
                 Statistikkategori.TREND_BRANSJE);
 
         List<Statistikkategori> statistikktyper =
-                oppsummertSykefravarsstatistikkService.hentOgBearbeidStatistikk(virksomhet).stream()
-                        .map(OppsummertStatistikkDto::getType)
+                aggregertHistorikkService.hentOgBearbeidStatistikk(virksomhet).stream()
+                        .map(AggregertHistorikkDto::getType)
                         .collect(Collectors.toList());
         assertThat(statistikktyper).isEqualTo(forventedeStatistikktyper);
     }

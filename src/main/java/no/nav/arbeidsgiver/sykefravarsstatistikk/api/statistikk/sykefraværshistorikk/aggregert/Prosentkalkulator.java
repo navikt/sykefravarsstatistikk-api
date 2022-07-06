@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.oppsummert;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.sisteFireKvartaler;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.LAND;
@@ -27,12 +27,12 @@ public class Prosentkalkulator {
                 .reduce(SumAvSykefravær.NULLPUNKT, SumAvSykefravær::summerOpp);
     }
 
-    Either<ManglendeDataException, OppsummertStatistikkDto> fraværsprosentNorge() {
+    Either<ManglendeDataException, AggregertHistorikkDto> fraværsprosentNorge() {
         return summerOppSisteFireKvartaler(sykefraværsdata.get(LAND))
                 .tilOppsummertStatistikkDto(LAND, "Norge");
     }
 
-    Either<ManglendeDataException, OppsummertStatistikkDto> fraværsprosentBransjeEllerNæring(
+    Either<ManglendeDataException, AggregertHistorikkDto> fraværsprosentBransjeEllerNæring(
             BransjeEllerNæring bransjeEllerNæring) {
         return summerOppSisteFireKvartaler(
                 sykefraværsdata.get(bransjeEllerNæring.getStatistikkategori()))
@@ -41,18 +41,18 @@ public class Prosentkalkulator {
                         bransjeEllerNæring.getVerdiSomString());
     }
 
-    Either<ManglendeDataException, OppsummertStatistikkDto> sykefraværVirksomhet(
+    Either<ManglendeDataException, AggregertHistorikkDto> fraværsprosentVirksomhet(
             String virksomhetsnavn) {
         return summerOppSisteFireKvartaler(sykefraværsdata.get(VIRKSOMHET))
                 .tilOppsummertStatistikkDto(VIRKSOMHET, virksomhetsnavn);
     }
 
-    Either<ManglendeDataException, OppsummertStatistikkDto> trendBransjeEllerNæring(
+    Either<ManglendeDataException, AggregertHistorikkDto> trendBransjeEllerNæring(
             BransjeEllerNæring bransjeEllerNæring) {
         Either<ManglendeDataException, Trendkalkulator> maybeTrend = Trendkalkulator.kalkulerTrend(
                 sykefraværsdata.get(bransjeEllerNæring.getTrendkategori()));
 
-        return maybeTrend.map(r -> r.tilOppsummertStatistikkDto(
+        return maybeTrend.map(r -> r.tilAggregertHistorikkDto(
                 bransjeEllerNæring.getTrendkategori(),
                 bransjeEllerNæring.getVerdiSomString())
         );
@@ -68,4 +68,3 @@ public class Prosentkalkulator {
                 .collect(Collectors.toList());
     }
 }
-

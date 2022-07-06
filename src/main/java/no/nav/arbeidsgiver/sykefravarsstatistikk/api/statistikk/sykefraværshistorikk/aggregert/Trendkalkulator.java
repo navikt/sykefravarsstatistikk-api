@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.oppsummert;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal.hentUtKvartal;
@@ -55,9 +55,9 @@ class Trendkalkulator {
                 ));
     }
 
-    OppsummertStatistikkDto tilOppsummertStatistikkDto(
+    AggregertHistorikkDto tilAggregertHistorikkDto(
             Statistikkategori type, String label) {
-        return new OppsummertStatistikkDto(
+        return new AggregertHistorikkDto(
                 type,
                 label,
                 this.trendverdi.toString(),

@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.oppsummert;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
 import static java.math.BigDecimal.ZERO;
 import static java.math.RoundingMode.HALF_DOWN;
@@ -35,10 +35,10 @@ class SumAvSykefravær {
         this.kvartaler = List.of(data.getÅrstallOgKvartal());
     }
 
-    Either<ManglendeDataException, OppsummertStatistikkDto> tilOppsummertStatistikkDto(
+    Either<ManglendeDataException, AggregertHistorikkDto> tilOppsummertStatistikkDto(
             Statistikkategori type, String label) {
 
-        return kalkulerFraværsprosent().map(prosent -> new OppsummertStatistikkDto(
+        return kalkulerFraværsprosent().map(prosent -> new AggregertHistorikkDto(
                 type,
                 label,
                 prosent.toString(),
