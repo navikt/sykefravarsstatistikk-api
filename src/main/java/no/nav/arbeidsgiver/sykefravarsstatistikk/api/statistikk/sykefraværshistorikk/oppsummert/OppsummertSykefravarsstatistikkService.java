@@ -63,7 +63,7 @@ public class OppsummertSykefravarsstatistikkService {
                 bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(
                         virksomhet.getNæringskode());
 
-        OppsummertSykefraværKalkulator kalkulator = new OppsummertSykefraværKalkulator(sykefraværsdata);
+        Prosentkalkulator kalkulator = new Prosentkalkulator(sykefraværsdata);
 
         return Stream.of(
                         kalkulator.sykefraværVirksomhet(virksomhet.getNavn()),

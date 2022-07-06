@@ -18,16 +18,16 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 @ToString
 @EqualsAndHashCode
 @AllArgsConstructor
-class TrendKalkulator {
+class Trendkalkulator {
 
     private static final ÅrstallOgKvartal nyesteKvartal = SISTE_PUBLISERTE_KVARTAL;
     private static final ÅrstallOgKvartal ettÅrTidligere =
             SISTE_PUBLISERTE_KVARTAL.minusEttÅr();
-    public BigDecimal trendverdi;
-    public int antallTilfellerIBeregningen;
-    public List<ÅrstallOgKvartal> kvartalerIBeregningen;
+    private BigDecimal trendverdi;
+    private int antallTilfellerIBeregningen;
+    private List<ÅrstallOgKvartal> kvartalerIBeregningen;
 
-    public static Either<ManglendeDataException, TrendKalkulator> kalkulerTrend(
+    static Either<ManglendeDataException, Trendkalkulator> kalkulerTrend(
             List<UmaskertSykefraværForEttKvartal> sykefravær) {
 
         Optional<UmaskertSykefraværForEttKvartal> nyesteSykefravær =
@@ -48,14 +48,14 @@ class TrendKalkulator {
                         + sykefraværetEtÅrSiden.get().getAntallPersoner();
 
         return Either.right(
-                new TrendKalkulator(
+                new Trendkalkulator(
                         trendverdi,
                         antallTilfeller,
                         List.of(SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusEttÅr())
                 ));
     }
 
-    public OppsummertStatistikkDto tilOppsummertStatistikkDto(
+    OppsummertStatistikkDto tilOppsummertStatistikkDto(
             Statistikkategori type, String label) {
         return new OppsummertStatistikkDto(
                 type,

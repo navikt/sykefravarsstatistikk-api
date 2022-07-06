@@ -118,7 +118,7 @@ class OppsummertSykefravarsstatistikkServiceTest {
 
     @Test
     void kalkulerTrend_skal_returnere_ManglendeDataException_ved_mangel_av_ett_kvartal() {
-        assertThat(TrendKalkulator.kalkulerTrend(Arrays.asList(
+        assertThat(Trendkalkulator.kalkulerTrend(Arrays.asList(
                         umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 11, 1),
                         umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 1), 10, 3)
                 )
@@ -129,12 +129,12 @@ class OppsummertSykefravarsstatistikkServiceTest {
     void kalkulerTrend_skal_returnere_stigende_ved_økende_trend() {
         ÅrstallOgKvartal k1 = new ÅrstallOgKvartal(2022, 1);
         ÅrstallOgKvartal k2 = new ÅrstallOgKvartal(2021, 1);
-        assertThat(TrendKalkulator.kalkulerTrend(Arrays.asList(
+        assertThat(Trendkalkulator.kalkulerTrend(Arrays.asList(
                         umaskertSykefraværprosent(k1, 3),
                         umaskertSykefraværprosent(k2, 2)
                 )
         )).isEqualTo(
-                new TrendKalkulator(new BigDecimal("1.00"), 4, List.of(k1, k2))
+                new Trendkalkulator(new BigDecimal("1.00"), 4, List.of(k1, k2))
         );
     }
 
@@ -148,17 +148,17 @@ class OppsummertSykefravarsstatistikkServiceTest {
                 umaskertSykefraværprosent(
                         SISTE_PUBLISERTE_KVARTAL.minusEttÅr(), 9, 3)
         );
-        TrendKalkulator forventetTrend = new TrendKalkulator(new BigDecimal("-1.00"), 5,
+        Trendkalkulator forventetTrend = new Trendkalkulator(new BigDecimal("-1.00"), 5,
                 kvartaler.stream()
                         .map(UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal)
                         .collect(Collectors.toList()));
 
-        assertThat(TrendKalkulator.kalkulerTrend(kvartaler)).isEqualTo(forventetTrend);
+        assertThat(Trendkalkulator.kalkulerTrend(kvartaler)).isEqualTo(forventetTrend);
     }
 
     @Test
     void kalkulerTrend_skal_returnere_tåle_tomt_datagrunnlag() {
-        assertThat(TrendKalkulator.kalkulerTrend(List.of()).getLeft())
+        assertThat(Trendkalkulator.kalkulerTrend(List.of()).getLeft())
                 .isExactlyInstanceOf(ManglendeDataException.class);
     }
 
