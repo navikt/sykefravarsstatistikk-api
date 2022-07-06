@@ -80,8 +80,8 @@ class AggregertHistorikkServiceTest {
 
     @Test
     void hentOgBearbeidStatistikk_kræsjerIkkeVedManglendeData() {
-        when(sykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(), any())).thenReturn(
-                Map.of());
+        when(sykefraværRepository.hentHistorikkAlleKategorier(any(), any())).thenReturn(
+                new Historikkdata(Map.of()));
         Underenhet virksomhetUtenData = new Underenhet(
                 new Orgnr("987654321"),
                 new Orgnr("999888777"),
@@ -163,10 +163,10 @@ class AggregertHistorikkServiceTest {
     }
 
     private void lagTestDataTilRepository() {
-        when(sykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(Virksomhet.class),
+        when(sykefraværRepository.hentHistorikkAlleKategorier(any(Virksomhet.class),
                 any(ÅrstallOgKvartal.class)))
                 .thenReturn(
-                        Map.of(
+                        new Historikkdata(Map.of(
                                 Statistikkategori.VIRKSOMHET,
                                 genererTestSykefravær(0),
                                 Statistikkategori.NÆRING,
@@ -175,7 +175,7 @@ class AggregertHistorikkServiceTest {
                                 genererTestSykefravær(20),
                                 Statistikkategori.LAND,
                                 genererTestSykefravær(30)
-                        ));
+                        )));
     }
 
     private List<UmaskertSykefraværForEttKvartal> genererTestSykefravær(int offset) {

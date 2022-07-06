@@ -5,8 +5,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.Historikkdata;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -133,19 +133,20 @@ public class SykefraværRepository {
         }
     }
 
-    public Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> hentUmaskertSykefraværAlleKategorier(
+    public Historikkdata hentHistorikkAlleKategorier(
           Virksomhet virksomhet, ÅrstallOgKvartal fraÅrstallOgKvartal) {
         Næring næringen = new Næring(virksomhet.getNæringskode().getKode(), "");
         Optional<Bransje> bransjen = new Bransjeprogram().finnBransje(virksomhet.getNæringskode());
 
-        return Map.of(
+        return new Historikkdata(Map.of(
               VIRKSOMHET, hentUmaskertSykefravær(virksomhet, fraÅrstallOgKvartal),
               LAND, hentUmaskertSykefraværForNorge(fraÅrstallOgKvartal),
               NÆRING, hentUmaskertSykefravær(næringen, fraÅrstallOgKvartal),
               BRANSJE,
               bransjen.isPresent() && bransjen.get().lengdePåNæringskoder() == 5
                     ? hentUmaskertSykefravær(bransjen.get(), fraÅrstallOgKvartal)
-                    : emptyList());
+                    : emptyList()))
+                ;
     }
 
 

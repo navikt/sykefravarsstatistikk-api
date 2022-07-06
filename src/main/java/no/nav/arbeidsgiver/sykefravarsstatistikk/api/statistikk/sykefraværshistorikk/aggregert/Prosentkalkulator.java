@@ -6,18 +6,16 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistik
 
 import io.vavr.control.Either;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.ManglendeDataException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 
 @AllArgsConstructor
 public class Prosentkalkulator {
 
-    public Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefraværsdata;
+    public Historikkdata sykefraværsdata;
 
     private SumAvSykefravær summerOppSisteFireKvartaler(
             List<UmaskertSykefraværForEttKvartal> statistikk) {
@@ -28,14 +26,14 @@ public class Prosentkalkulator {
     }
 
     Either<ManglendeDataException, AggregertHistorikkDto> fraværsprosentNorge() {
-        return summerOppSisteFireKvartaler(sykefraværsdata.get(LAND))
+        return summerOppSisteFireKvartaler(sykefraværsdata.hentFor(LAND))
                 .tilOppsummertStatistikkDto(LAND, "Norge");
     }
 
     Either<ManglendeDataException, AggregertHistorikkDto> fraværsprosentBransjeEllerNæring(
             BransjeEllerNæring bransjeEllerNæring) {
         return summerOppSisteFireKvartaler(
-                sykefraværsdata.get(bransjeEllerNæring.getStatistikkategori()))
+                sykefraværsdata.hentFor(bransjeEllerNæring.getStatistikkategori()))
                 .tilOppsummertStatistikkDto(
                         bransjeEllerNæring.getStatistikkategori(),
                         bransjeEllerNæring.getVerdiSomString());
@@ -43,14 +41,14 @@ public class Prosentkalkulator {
 
     Either<ManglendeDataException, AggregertHistorikkDto> fraværsprosentVirksomhet(
             String virksomhetsnavn) {
-        return summerOppSisteFireKvartaler(sykefraværsdata.get(VIRKSOMHET))
+        return summerOppSisteFireKvartaler(sykefraværsdata.hentFor(VIRKSOMHET))
                 .tilOppsummertStatistikkDto(VIRKSOMHET, virksomhetsnavn);
     }
 
     Either<ManglendeDataException, AggregertHistorikkDto> trendBransjeEllerNæring(
             BransjeEllerNæring bransjeEllerNæring) {
         Either<ManglendeDataException, Trendkalkulator> maybeTrend = Trendkalkulator.kalkulerTrend(
-                sykefraværsdata.get(bransjeEllerNæring.getTrendkategori()));
+                sykefraværsdata.hentFor(bransjeEllerNæring.getTrendkategori()));
 
         return maybeTrend.map(r -> r.tilAggregertHistorikkDto(
                 bransjeEllerNæring.getTrendkategori(),

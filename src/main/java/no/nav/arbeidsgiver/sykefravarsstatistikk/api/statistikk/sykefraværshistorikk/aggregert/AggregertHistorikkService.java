@@ -4,7 +4,6 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKva
 
 import io.vavr.control.Either;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
@@ -12,8 +11,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
@@ -55,7 +52,7 @@ public class AggregertHistorikkService {
     }
 
     List<AggregertHistorikkDto> hentOgBearbeidStatistikk(Underenhet virksomhet) {
-        Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefraværsdata =
+        Historikkdata sykefraværsdata =
                 hentForSisteFemKvartaler(virksomhet);
 
         BransjeEllerNæring bransjeEllerNæring =
@@ -74,10 +71,10 @@ public class AggregertHistorikkService {
                 .collect(Collectors.toList());
     }
 
-    private Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>>
+    private Historikkdata
     hentForSisteFemKvartaler(Underenhet forBedrift) {
         return sykefraværprosentRepository
-                .hentUmaskertSykefraværAlleKategorier(forBedrift,
+                .hentHistorikkAlleKategorier(forBedrift,
                         SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4));
     }
 }
