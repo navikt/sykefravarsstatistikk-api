@@ -20,7 +20,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.ManglendeDataException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
@@ -122,7 +122,7 @@ class AggregertHistorikkServiceTest {
                         umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 11, 1),
                         umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 1), 10, 3)
                 )).kalkulerTrend().getLeft()
-        ).isExactlyInstanceOf(ManglendeDataException.class);
+        ).isExactlyInstanceOf(UtilstrekkeligDataException.class);
     }
 
     @Test
@@ -158,7 +158,7 @@ class AggregertHistorikkServiceTest {
     @Test
     void kalkulerTrend_skal_returnere_tåle_tomt_datagrunnlag() {
         assertThat(new Trendkalkulator(List.of()).kalkulerTrend().getLeft())
-                .isExactlyInstanceOf(ManglendeDataException.class);
+                .isExactlyInstanceOf(UtilstrekkeligDataException.class);
     }
 
     private void lagTestDataTilRepository() {

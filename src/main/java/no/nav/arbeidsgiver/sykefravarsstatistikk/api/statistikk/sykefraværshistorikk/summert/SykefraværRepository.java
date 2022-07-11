@@ -62,7 +62,7 @@ public class SykefraværRepository {
     public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefravær(
           Bransje bransje, ÅrstallOgKvartal fraÅrstallOgKvartal) {
 
-        if (bransje.lengdePåNæringskoder() != 5) {
+        if (bransje.erDefinertPåTosiffernivå()) {
             throw (new IllegalArgumentException("Denne metoden funker bare for 5-siffer næringskoder"));
         }
 
@@ -143,10 +143,9 @@ public class SykefraværRepository {
               LAND, hentUmaskertSykefraværForNorge(fraÅrstallOgKvartal),
               NÆRING, hentUmaskertSykefravær(næringen, fraÅrstallOgKvartal),
               BRANSJE,
-              bransjen.isPresent() && bransjen.get().lengdePåNæringskoder() == 5
+              bransjen.isPresent() && bransjen.get().erDefinertPåFemsiffernivå()
                     ? hentUmaskertSykefravær(bransjen.get(), fraÅrstallOgKvartal)
-                    : emptyList()))
-                ;
+                    : emptyList()));
     }
 
 

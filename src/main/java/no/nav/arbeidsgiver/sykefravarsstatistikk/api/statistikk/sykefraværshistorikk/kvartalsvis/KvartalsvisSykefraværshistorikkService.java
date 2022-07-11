@@ -57,7 +57,7 @@ public class KvartalsvisSykefraværshistorikkService {
         Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
         boolean skalHenteDataPåNæring2Siffer =
                 bransje.isEmpty()
-                        || bransje.get().lengdePåNæringskoder() == 2;
+                        || bransje.get().erDefinertPåTosiffernivå();
 
         Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(institusjonellSektorkode);
 

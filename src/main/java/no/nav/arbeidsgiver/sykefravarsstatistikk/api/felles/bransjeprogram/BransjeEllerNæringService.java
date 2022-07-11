@@ -23,7 +23,7 @@ public class BransjeEllerNæringService {
 
         boolean skalHenteDataPåNæring2Siffer =
                 bransje.isEmpty()
-                        || bransje.get().lengdePåNæringskoder() == 2;
+                        || bransje.get().erDefinertPåTosiffernivå();
 
         if (skalHenteDataPåNæring2Siffer) {
             Næring næring = klassifikasjonerRepository.hentNæring(næringskode5Siffer.hentNæringskode2Siffer());

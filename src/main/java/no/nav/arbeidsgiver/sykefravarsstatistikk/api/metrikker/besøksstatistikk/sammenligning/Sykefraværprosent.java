@@ -26,7 +26,7 @@ public class Sykefraværprosent {
     public Sykefraværprosent(String label, BigDecimal tapteDagsverk, BigDecimal muligeDagsverk, int antallPersoner) {
         this.label = label;
 
-        if (antallPersoner >= Konstanter.MINIMUM_ANTALL_PERSONER_SOM_SKAL_TIL_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER) {
+        if (antallPersoner >= Konstanter.MINIMUM_ANTALL_PERSONER_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER) {
             this.antallPersoner = antallPersoner;
             erMaskert = false;
             prosent = tapteDagsverk

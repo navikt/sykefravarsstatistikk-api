@@ -25,7 +25,7 @@ public abstract class MaskerbartSykefravær {
         erMaskert =
                 harSykefraværData &&
                 antallPersoner
-                        < Konstanter.MINIMUM_ANTALL_PERSONER_SOM_SKAL_TIL_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
+                        < Konstanter.MINIMUM_ANTALL_PERSONER_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
         boolean kanKalkuleres = harSykefraværData;
 
         if (!erMaskert && kanKalkuleres) {

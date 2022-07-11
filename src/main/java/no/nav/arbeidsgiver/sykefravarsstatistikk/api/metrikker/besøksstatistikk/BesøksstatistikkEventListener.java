@@ -13,7 +13,7 @@ import java.time.temporal.IsoFields;
 import java.util.List;
 
 import static java.time.ZonedDateTime.now;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.MINIMUM_ANTALL_PERSONER_SOM_SKAL_TIL_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.MINIMUM_ANTALL_PERSONER_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
 
 @Slf4j
 @Component
@@ -60,6 +60,6 @@ public class BesøksstatistikkEventListener {
 
     private boolean kanLagreBesøksdata(SammenligningEvent event) {
         return !event.getSammenligning().getVirksomhet().isErMaskert()
-                && event.getUnderenhet().getAntallAnsatte() >= MINIMUM_ANTALL_PERSONER_SOM_SKAL_TIL_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
+                && event.getUnderenhet().getAntallAnsatte() >= MINIMUM_ANTALL_PERSONER_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
     }
 }

@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.ManglendeDataException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 
 @ToString
@@ -25,7 +25,7 @@ class Trendkalkulator {
     List<UmaskertSykefraværForEttKvartal> datagrunnlag;
 
 
-    Either<ManglendeDataException, Trend> kalkulerTrend() {
+    Either<UtilstrekkeligDataException, Trend> kalkulerTrend() {
 
         Optional<UmaskertSykefraværForEttKvartal> nyesteSykefravær =
                 hentUtKvartal(datagrunnlag, nyesteKvartal);
@@ -34,7 +34,7 @@ class Trendkalkulator {
 
         if (nyesteSykefravær.isEmpty() || sykefraværetEtÅrSiden.isEmpty()) {
             return Either.left(
-                    new ManglendeDataException(
+                    new UtilstrekkeligDataException(
                             "Mangler " + nyesteKvartal + " eller " + ettÅrTidligere));
         }
 
