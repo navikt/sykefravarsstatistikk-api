@@ -55,7 +55,9 @@ public class AggregertHistorikkService {
     }
 
 
-    private List<AggregertHistorikkDto> aggregerData(Underenhet virksomhet, Sykefraværsdata sykefravær) {
+    private List<AggregertHistorikkDto> aggregerData(
+            Underenhet virksomhet,
+            Sykefraværsdata sykefravær) {
         Prosentkalkulator kalkulator = new Prosentkalkulator(sykefravær);
 
         BransjeEllerNæring bransjeEllerNæring =

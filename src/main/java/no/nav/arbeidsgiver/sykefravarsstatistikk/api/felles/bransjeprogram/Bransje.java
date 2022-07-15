@@ -14,7 +14,7 @@ public class Bransje {
     private final List<String> koderSomSpesifisererNæringer;
 
     public Bransje(ArbeidsmiljøportalenBransje type, String navn,
-            String... koderSomSpesifisererNæringer) {
+          String... koderSomSpesifisererNæringer) {
         this.type = type;
         this.navn = navn;
         this.koderSomSpesifisererNæringer = Arrays.asList(koderSomSpesifisererNæringer);
@@ -40,7 +40,7 @@ public class Bransje {
             return 5;
         }
         throw new IllegalStateException(
-                "Støtter kun bransjer som er spesifisert av enten 2 eller 5 sifre");
+              "Støtter kun bransjer som er spesifisert av enten 2 eller 5 sifre");
     }
 
     public boolean erDefinertPåTosiffernivå() {
