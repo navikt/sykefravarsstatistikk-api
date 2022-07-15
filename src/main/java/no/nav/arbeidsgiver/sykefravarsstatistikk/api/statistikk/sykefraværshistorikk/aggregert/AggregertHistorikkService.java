@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.VIRKSOMHET;
 
 import io.vavr.control.Either;
 import java.util.List;
@@ -44,22 +45,22 @@ public class AggregertHistorikkService {
         }
 
         Underenhet virksomhet = enhetsregisteretClient.hentUnderenhet(orgnr);
+        Sykefraværsdata sykefraværsdata = hentForSisteFemKvartaler(virksomhet);
+
         if (!tilgangskontrollService.brukerHarIaRettigheter(orgnr)) {
-            // return hentStatistikkUtenTallFraVirksomheten(virksomhet);
+            sykefraværsdata.filtrerBortDataFor(VIRKSOMHET);
         }
 
-        return Either.right(hentOgBearbeidStatistikk(virksomhet));
+        return Either.right(aggregerData(virksomhet, sykefraværsdata));
     }
 
-    List<AggregertHistorikkDto> hentOgBearbeidStatistikk(Underenhet virksomhet) {
-        Historikkdata sykefraværsdata =
-                hentForSisteFemKvartaler(virksomhet);
+
+    private List<AggregertHistorikkDto> aggregerData(Underenhet virksomhet, Sykefraværsdata sykefravær) {
+        Prosentkalkulator kalkulator = new Prosentkalkulator(sykefravær);
 
         BransjeEllerNæring bransjeEllerNæring =
                 bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(
                         virksomhet.getNæringskode());
-
-        Prosentkalkulator kalkulator = new Prosentkalkulator(sykefraværsdata);
 
         return Stream.of(
                         kalkulator.fraværsprosentVirksomhet(virksomhet.getNavn()),
@@ -71,7 +72,7 @@ public class AggregertHistorikkService {
                 .collect(Collectors.toList());
     }
 
-    private Historikkdata
+    private Sykefraværsdata
     hentForSisteFemKvartaler(Underenhet forBedrift) {
         return sykefraværprosentRepository
                 .hentHistorikkAlleKategorier(forBedrift,

@@ -6,7 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Brans
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.Historikkdata;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.Sykefraværsdata;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -119,7 +119,7 @@ public class SykefraværRepository {
                       "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal "
                             + "FROM sykefravar_statistikk_land "
                             + "WHERE (arstall = :arstall and kvartal >= :kvartal) "
-                            + "  or (arstall > :arstall) +) "
+                            + "  or (arstall > :arstall) "
                             + "ORDER BY arstall, kvartal ",
                       new MapSqlParameterSource()
                             .addValue("arstall", fra.getÅrstall())
@@ -133,12 +133,12 @@ public class SykefraværRepository {
         }
     }
 
-    public Historikkdata hentHistorikkAlleKategorier(
+    public Sykefraværsdata hentHistorikkAlleKategorier(
           Virksomhet virksomhet, ÅrstallOgKvartal fraÅrstallOgKvartal) {
         Næring næringen = new Næring(virksomhet.getNæringskode().getKode(), "");
         Optional<Bransje> bransjen = new Bransjeprogram().finnBransje(virksomhet.getNæringskode());
 
-        return new Historikkdata(Map.of(
+        return new Sykefraværsdata(Map.of(
               VIRKSOMHET, hentUmaskertSykefravær(virksomhet, fraÅrstallOgKvartal),
               LAND, hentUmaskertSykefraværForNorge(fraÅrstallOgKvartal),
               NÆRING, hentUmaskertSykefravær(næringen, fraÅrstallOgKvartal),

@@ -185,7 +185,7 @@ public class SykefraværshistorikkController {
                 .body(legemeldtSykefraværsprosent);
     }
 
-    @GetMapping("/{orgnr}/sykefravarshistorikk/aggregert")
+    @GetMapping("/v1/{orgnr}/sykefravarshistorikk/aggregert/nyeste")
     public ResponseEntity<List<AggregertHistorikkDto>> hentAggregertHistorikk(
             @PathVariable("orgnr") String orgnr,
             HttpServletRequest request

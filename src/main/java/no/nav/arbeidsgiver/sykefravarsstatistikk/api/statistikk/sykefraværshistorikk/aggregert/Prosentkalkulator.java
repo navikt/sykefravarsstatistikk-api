@@ -16,7 +16,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 @AllArgsConstructor
 public class Prosentkalkulator {
 
-    public Historikkdata sykefraværsdata;
+    public Sykefraværsdata sykefraværsdata;
 
     private SumAvSykefraværOverFlereKvartaler summerOppSisteFireKvartaler(
             List<UmaskertSykefraværForEttKvartal> statistikk) {
@@ -27,14 +27,14 @@ public class Prosentkalkulator {
     }
 
     Either<DataException, AggregertHistorikkDto> fraværsprosentNorge() {
-        return summerOppSisteFireKvartaler(sykefraværsdata.hentFor(LAND))
+        return summerOppSisteFireKvartaler(sykefraværsdata.hentUtFor(LAND))
                 .tilAggregertHistorikkDto(LAND, "Norge");
     }
 
     Either<DataException, AggregertHistorikkDto> fraværsprosentBransjeEllerNæring(
             BransjeEllerNæring bransjeEllerNæring) {
         return summerOppSisteFireKvartaler(
-                sykefraværsdata.hentFor(bransjeEllerNæring.getStatistikkategori()))
+                sykefraværsdata.hentUtFor(bransjeEllerNæring.getStatistikkategori()))
                 .tilAggregertHistorikkDto(
                         bransjeEllerNæring.getStatistikkategori(),
                         bransjeEllerNæring.getVerdiSomString());
@@ -42,14 +42,14 @@ public class Prosentkalkulator {
 
     Either<DataException, AggregertHistorikkDto> fraværsprosentVirksomhet(
             String virksomhetsnavn) {
-        return summerOppSisteFireKvartaler(sykefraværsdata.hentFor(VIRKSOMHET))
+        return summerOppSisteFireKvartaler(sykefraværsdata.hentUtFor(VIRKSOMHET))
                 .tilAggregertHistorikkDto(VIRKSOMHET, virksomhetsnavn);
     }
 
     Either<UtilstrekkeligDataException, AggregertHistorikkDto> trendBransjeEllerNæring(
             BransjeEllerNæring bransjeEllerNæring) {
         Either<UtilstrekkeligDataException, Trend> maybeTrend =
-                new Trendkalkulator(sykefraværsdata.hentFor(bransjeEllerNæring.getTrendkategori()))
+                new Trendkalkulator(sykefraværsdata.hentUtFor(bransjeEllerNæring.getTrendkategori()))
                         .kalkulerTrend();
 
         return maybeTrend.map(r -> r.tilAggregertHistorikkDto(

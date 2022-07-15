@@ -47,5 +47,4 @@ class SumAvSykefraværOverFlereKvartalerTest {
         Assertions.assertThat(sykefraværTiTilfeller.get())
                 .isEqualTo(new BigDecimal("50.00"));
     }
-
 }

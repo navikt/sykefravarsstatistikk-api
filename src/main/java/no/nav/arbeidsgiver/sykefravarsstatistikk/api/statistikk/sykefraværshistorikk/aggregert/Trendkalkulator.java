@@ -35,7 +35,7 @@ class Trendkalkulator {
         if (nyesteSykefravær.isEmpty() || sykefraværetEtÅrSiden.isEmpty()) {
             return Either.left(
                     new UtilstrekkeligDataException(
-                            "Mangler " + nyesteKvartal + " eller " + ettÅrTidligere));
+                            "Mangler data for " + nyesteKvartal + " eller " + ettÅrTidligere));
         }
 
         BigDecimal trendverdi = nyesteSykefravær.get().getProsent()

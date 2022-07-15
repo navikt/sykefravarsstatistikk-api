@@ -81,7 +81,7 @@ class AggregertHistorikkServiceTest {
     @Test
     void hentOgBearbeidStatistikk_kræsjerIkkeVedManglendeData() {
         when(sykefraværRepository.hentHistorikkAlleKategorier(any(), any())).thenReturn(
-                new Historikkdata(Map.of()));
+                new Sykefraværsdata(Map.of()));
         Underenhet virksomhetUtenData = new Underenhet(
                 new Orgnr("987654321"),
                 new Orgnr("999888777"),
@@ -91,7 +91,8 @@ class AggregertHistorikkServiceTest {
         );
 
         assertThat(
-                aggregertHistorikkService.hentOgBearbeidStatistikk(virksomhetUtenData))
+                aggregertHistorikkService.aggregerData(virksomhetUtenData,
+                        sykefraværsdata))
                 .isEqualTo(List.of());
     }
 
@@ -110,7 +111,7 @@ class AggregertHistorikkServiceTest {
                 Statistikkategori.TREND_BRANSJE);
 
         List<Statistikkategori> statistikktyper =
-                aggregertHistorikkService.hentOgBearbeidStatistikk(virksomhet).stream()
+                aggregertHistorikkService.aggregerData(virksomhet, sykefraværsdata).stream()
                         .map(AggregertHistorikkDto::getType)
                         .collect(Collectors.toList());
         assertThat(statistikktyper).isEqualTo(forventedeStatistikktyper);
@@ -165,7 +166,7 @@ class AggregertHistorikkServiceTest {
         when(sykefraværRepository.hentHistorikkAlleKategorier(any(Virksomhet.class),
                 any(ÅrstallOgKvartal.class)))
                 .thenReturn(
-                        new Historikkdata(Map.of(
+                        new Sykefraværsdata(Map.of(
                                 Statistikkategori.VIRKSOMHET,
                                 genererTestSykefravær(0),
                                 Statistikkategori.NÆRING,

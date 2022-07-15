@@ -9,11 +9,15 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 
 @Getter
 @AllArgsConstructor
-public class Historikkdata {
+public class Sykefraværsdata {
 
     private Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefravær;
 
-    List<UmaskertSykefraværForEttKvartal> hentFor(Statistikkategori kategori) {
+    List<UmaskertSykefraværForEttKvartal> hentUtFor(Statistikkategori kategori) {
         return sykefravær.get(kategori);
+    }
+
+    void filtrerBortDataFor(Statistikkategori kategori) {
+        sykefravær.remove(kategori);
     }
 }
