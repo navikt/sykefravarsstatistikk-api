@@ -5,7 +5,6 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKva
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.BRANSJE;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.LAND;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.NÆRING;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.TREND_BRANSJE;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.VIRKSOMHET;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,7 +25,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Brans
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Statistikktype;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
@@ -138,15 +137,15 @@ class AggregertHistorikkServiceTest {
                     )
               ));
 
-        List<Statistikkategori> forventedeStatistikktyper =
+        List<Statistikktype> forventedeStatistikktyper =
               List.of(
-                    VIRKSOMHET,
-                    BRANSJE,
-                    LAND,
-                    TREND_BRANSJE
+                    Statistikktype.PROSENT_SISTE_4_KVARTALER_VIRKSOMHET,
+                    Statistikktype.PROSENT_SISTE_4_KVARTALER_BRANSJE,
+                    Statistikktype.PROSENT_SISTE_4_KVARTALER_LAND,
+                    Statistikktype.TREND_BRANSJE
               );
 
-        List<Statistikkategori> statistikktyper =
+        List<Statistikktype> statistikktyper =
               serviceUnderTest.hentAggregertHistorikk(etOrgnr).get().stream()
                     .map(AggregertHistorikkDto::getType)
                     .collect(Collectors.toList());

@@ -9,9 +9,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.StatistikkUtils;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.DataException;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Statistikktype;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
 
 @AllArgsConstructor
 public class Prosentkalkulator {
@@ -19,52 +21,55 @@ public class Prosentkalkulator {
     public Sykefraværsdata sykefraværsdata;
 
     private SumAvSykefraværOverFlereKvartaler summerOppSisteFireKvartaler(
-            List<UmaskertSykefraværForEttKvartal> statistikk) {
+          List<UmaskertSykefraværForEttKvartal> statistikk) {
 
         return ekstraherSisteFireKvartaler(statistikk).stream()
-                .map(SumAvSykefraværOverFlereKvartaler::new)
-                .reduce(SumAvSykefraværOverFlereKvartaler.NULLPUNKT, SumAvSykefraværOverFlereKvartaler::summerOpp);
+              .map(SumAvSykefraværOverFlereKvartaler::new)
+              .reduce(SumAvSykefraværOverFlereKvartaler.NULLPUNKT,
+                    SumAvSykefraværOverFlereKvartaler::summerOpp);
     }
 
     Either<DataException, AggregertHistorikkDto> fraværsprosentNorge() {
         return summerOppSisteFireKvartaler(sykefraværsdata.hentUtFor(LAND))
-                .tilAggregertHistorikkDto(LAND, "Norge");
+              .tilAggregertHistorikkDto(Statistikktype.PROSENT_SISTE_4_KVARTALER_LAND, "Norge");
     }
 
     Either<DataException, AggregertHistorikkDto> fraværsprosentBransjeEllerNæring(
-            BransjeEllerNæring bransjeEllerNæring) {
+          BransjeEllerNæring bransjeEllerNæring) {
         return summerOppSisteFireKvartaler(
-                sykefraværsdata.hentUtFor(bransjeEllerNæring.getStatistikkategori()))
-                .tilAggregertHistorikkDto(
-                        bransjeEllerNæring.getStatistikkategori(),
-                        bransjeEllerNæring.getVerdiSomString());
+              sykefraværsdata.hentUtFor(bransjeEllerNæring.getStatistikkategori()))
+              .tilAggregertHistorikkDto(
+                    StatistikkUtils.getProsenttypeFor(bransjeEllerNæring),
+                    bransjeEllerNæring.getVerdiSomString());
     }
 
     Either<DataException, AggregertHistorikkDto> fraværsprosentVirksomhet(
-            String virksomhetsnavn) {
+          String virksomhetsnavn) {
         return summerOppSisteFireKvartaler(sykefraværsdata.hentUtFor(VIRKSOMHET))
-                .tilAggregertHistorikkDto(VIRKSOMHET, virksomhetsnavn);
+              .tilAggregertHistorikkDto(
+                    Statistikktype.PROSENT_SISTE_4_KVARTALER_VIRKSOMHET, virksomhetsnavn);
     }
 
     Either<UtilstrekkeligDataException, AggregertHistorikkDto> trendBransjeEllerNæring(
-            BransjeEllerNæring bransjeEllerNæring) {
+          BransjeEllerNæring bransjeEllerNæring) {
         Either<UtilstrekkeligDataException, Trend> maybeTrend =
-                new Trendkalkulator(sykefraværsdata.hentUtFor(bransjeEllerNæring.getStatistikkategori()))
-                        .kalkulerTrend();
+              new Trendkalkulator(
+                    sykefraværsdata.hentUtFor(bransjeEllerNæring.getStatistikkategori()))
+                    .kalkulerTrend();
 
         return maybeTrend.map(r -> r.tilAggregertHistorikkDto(
-                bransjeEllerNæring.getTrendkategori(),
-                bransjeEllerNæring.getVerdiSomString())
+              StatistikkUtils.getTrendtypeFor(bransjeEllerNæring),
+              bransjeEllerNæring.getVerdiSomString())
         );
     }
 
     private List<UmaskertSykefraværForEttKvartal> ekstraherSisteFireKvartaler(
-            List<UmaskertSykefraværForEttKvartal> statistikk) {
+          List<UmaskertSykefraværForEttKvartal> statistikk) {
         if (statistikk == null) {
             return List.of();
         }
         return statistikk.stream()
-                .filter(datapunkt -> sisteFireKvartaler().contains(datapunkt.getÅrstallOgKvartal()))
-                .collect(Collectors.toList());
+              .filter(datapunkt -> sisteFireKvartaler().contains(datapunkt.getÅrstallOgKvartal()))
+              .collect(Collectors.toList());
     }
 }
