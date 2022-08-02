@@ -134,7 +134,8 @@ public class SykefraværRepository {
     }
 
     public Sykefraværsdata hentHistorikkAlleKategorier(
-          Virksomhet virksomhet, ÅrstallOgKvartal fraÅrstallOgKvartal) {
+          Virksomhet virksomhet,
+          ÅrstallOgKvartal fraÅrstallOgKvartal) {
         Næring næringen = new Næring(virksomhet.getNæringskode().getKode(), "");
         Optional<Bransje> bransjen = new Bransjeprogram().finnBransje(virksomhet.getNæringskode());
 

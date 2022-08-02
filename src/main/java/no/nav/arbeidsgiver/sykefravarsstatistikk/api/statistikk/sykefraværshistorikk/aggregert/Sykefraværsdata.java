@@ -11,11 +11,11 @@ public class Sykefraværsdata {
 
     private Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefravær;
 
-    List<UmaskertSykefraværForEttKvartal> hentUtFor(Statistikkategori kategori) {
+    List<UmaskertSykefraværForEttKvartal> filtrerPåKategori(Statistikkategori kategori) {
         return sykefravær.get(kategori);
     }
 
-    void filtrerBortDataFor(Statistikkategori kategori) {
+    void filtrerBortKategori(Statistikkategori kategori) {
         sykefravær.remove(kategori);
     }
 }

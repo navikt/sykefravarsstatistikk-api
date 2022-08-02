@@ -18,14 +18,14 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.Tilgangsko
 import org.springframework.stereotype.Service;
 
 @Service
-public class AggregertHistorikkService {
+public class AggregertStatistikkService {
 
     private final SykefraværRepository sykefraværprosentRepository;
     private final BransjeEllerNæringService bransjeEllerNæringService;
     private final TilgangskontrollService tilgangskontrollService;
     private final EnhetsregisteretClient enhetsregisteretClient;
 
-    public AggregertHistorikkService(
+    public AggregertStatistikkService(
             SykefraværRepository sykefraværprosentRepository,
             BransjeEllerNæringService bransjeEllerNæringService,
             TilgangskontrollService tilgangskontrollService,
@@ -36,7 +36,7 @@ public class AggregertHistorikkService {
         this.enhetsregisteretClient = enhetsregisteretClient;
     }
 
-    public Either<TilgangskontrollException, List<AggregertHistorikkDto>> hentAggregertHistorikk(
+    public Either<TilgangskontrollException, List<AggregertStatistikkDto>> hentAggregertStatistikk(
             Orgnr orgnr) {
 
         if (!tilgangskontrollService.brukerRepresentererVirksomheten(orgnr)) {
@@ -48,16 +48,18 @@ public class AggregertHistorikkService {
         Sykefraværsdata sykefraværsdata = hentForSisteFemKvartaler(virksomhet);
 
         if (!tilgangskontrollService.brukerHarIaRettigheter(orgnr)) {
-            sykefraværsdata.filtrerBortDataFor(VIRKSOMHET);
+            sykefraværsdata.filtrerBortKategori(VIRKSOMHET);
         }
 
         return Either.right(aggregerData(virksomhet, sykefraværsdata));
     }
 
 
-    private List<AggregertHistorikkDto> aggregerData(
+    private List<AggregertStatistikkDto> aggregerData(
             Underenhet virksomhet,
             Sykefraværsdata sykefravær) {
+
+        // TODO: rename
         Prosentkalkulator kalkulator = new Prosentkalkulator(sykefravær);
 
         BransjeEllerNæring bransjeEllerNæring =

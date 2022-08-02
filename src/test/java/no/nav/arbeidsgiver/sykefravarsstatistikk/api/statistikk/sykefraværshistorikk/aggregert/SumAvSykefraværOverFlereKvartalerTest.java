@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 import io.vavr.control.Either;
 import java.math.BigDecimal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.DataException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.StatistikkException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,7 @@ class SumAvSykefraværOverFlereKvartalerTest {
 
     @Test
     void kalkulerFraværsprosentMedMaskering_maskererDataHvisAntallTilfellerErUnderFem() {
-        Either<DataException, BigDecimal> maskertSykefravær = new SumAvSykefraværOverFlereKvartaler(
+        Either<StatistikkException, BigDecimal> maskertSykefravær = new SumAvSykefraværOverFlereKvartaler(
                 new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2022, 1),
                         new BigDecimal(100),
@@ -26,7 +26,7 @@ class SumAvSykefraværOverFlereKvartalerTest {
 
     @Test
     void kalkulerFraværsprosentMedMaskering_returnerProsentHvisAntallTilfellerErFemEllerMer() {
-        Either<DataException, BigDecimal> sykefraværFemTilfeller = new SumAvSykefraværOverFlereKvartaler(
+        Either<StatistikkException, BigDecimal> sykefraværFemTilfeller = new SumAvSykefraværOverFlereKvartaler(
                 new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2022, 1),
                         new BigDecimal(100),
@@ -34,7 +34,7 @@ class SumAvSykefraværOverFlereKvartalerTest {
                         5)
         ).kalkulerFraværsprosentMedMaskering();
 
-        Either<DataException, BigDecimal> sykefraværTiTilfeller = new SumAvSykefraværOverFlereKvartaler(
+        Either<StatistikkException, BigDecimal> sykefraværTiTilfeller = new SumAvSykefraværOverFlereKvartaler(
                 new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2022, 1),
                         new BigDecimal(100),

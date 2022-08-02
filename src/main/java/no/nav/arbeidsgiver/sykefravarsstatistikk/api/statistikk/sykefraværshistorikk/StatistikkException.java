@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
-public class DataException extends RuntimeException {
+public class StatistikkException extends RuntimeException {
 
-    public DataException(String message) {
+    public StatistikkException(String message) {
         super(message);
     }
 }

@@ -1,9 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
 import static java.math.BigDecimal.ZERO;
-import static java.math.RoundingMode.HALF_DOWN;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.MINIMUM_ANTALL_PERSONER_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.CollectionUtils.joinLists;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.StatistikkUtils.kalkulerSykefraværsprosent;
 
 import io.vavr.control.Either;
 import java.math.BigDecimal;
@@ -12,9 +12,8 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.DataException;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Statistikktype;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Agreggeringstype;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.StatistikkException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
 import org.jetbrains.annotations.NotNull;
@@ -24,8 +23,9 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 class SumAvSykefraværOverFlereKvartaler {
 
-    static SumAvSykefraværOverFlereKvartaler NULLPUNKT = new SumAvSykefraværOverFlereKvartaler(
-          ZERO, ZERO, 0, List.of());
+    static SumAvSykefraværOverFlereKvartaler NULLPUNKT =
+          new SumAvSykefraværOverFlereKvartaler(
+                ZERO, ZERO, 0, List.of());
 
     private BigDecimal muligeDagsverk;
     private BigDecimal tapteDagsverk;
@@ -40,11 +40,11 @@ class SumAvSykefraværOverFlereKvartaler {
         this.kvartaler = List.of(data.getÅrstallOgKvartal());
     }
 
-    public Either<DataException, AggregertHistorikkDto> tilAggregertHistorikkDto(
-          Statistikktype type, String label) {
+    public Either<StatistikkException, AggregertStatistikkDto> tilAggregertStatistikkDto(
+          Agreggeringstype type, String label) {
 
         return kalkulerFraværsprosentMedMaskering().map(
-              prosent -> AggregertHistorikkDto.builder()
+              prosent -> AggregertStatistikkDto.builder()
                     .type(type)
                     .label(label)
                     .verdi(prosent.toString())
@@ -54,7 +54,7 @@ class SumAvSykefraværOverFlereKvartaler {
         );
     }
 
-    Either<DataException, BigDecimal> kalkulerFraværsprosentMedMaskering() {
+    Either<StatistikkException, BigDecimal> kalkulerFraværsprosentMedMaskering() {
         if (this.equals(NULLPUNKT)) {
             return Either.left(new UtilstrekkeligDataException(
                   "Trenger minst ett kvartal for å beregene sykefraværsprosent."));
@@ -65,8 +65,7 @@ class SumAvSykefraværOverFlereKvartaler {
             return Either.left(new MaskerteDataException(
                   "Ikke nok sykefraværstilfeller til å kunne vise sykefraværsprosenten."));
         }
-        return Either.right(
-              tapteDagsverk.divide(muligeDagsverk, 2, HALF_DOWN).multiply(new BigDecimal(100)));
+        return Either.right(kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk));
     }
 
     SumAvSykefraværOverFlereKvartaler summerOpp(@NotNull SumAvSykefraværOverFlereKvartaler other) {
@@ -78,7 +77,7 @@ class SumAvSykefraværOverFlereKvartaler {
     }
 }
 
-class MaskerteDataException extends DataException {
+class MaskerteDataException extends StatistikkException {
 
     public MaskerteDataException(String årsak) {
         super("Data er maskert: " + årsak);

@@ -11,8 +11,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.IngenNæringException;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.AggregertHistorikkDto;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.AggregertHistorikkService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.AggregertStatistikkDto;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.AggregertStatistikkService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikkService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertLegemeldtSykefraværService;
@@ -39,14 +39,14 @@ public class SykefraværshistorikkController {
     private final EnhetsregisteretClient enhetsregisteretClient;
     private final SummertSykefraværService summertSykefraværService;
     private final SummertLegemeldtSykefraværService summertLegemeldtSykefraværService; //TODO:
-    private final AggregertHistorikkService aggregertHistorikkService;
+    private final AggregertStatistikkService aggregertHistorikkService;
 
     public SykefraværshistorikkController(
             KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService,
             TilgangskontrollService tilgangskontrollService,
             EnhetsregisteretClient enhetsregisteretClient,
             SummertSykefraværService summertSykefraværService,
-            AggregertHistorikkService aggregertHistorikkService,
+            AggregertStatistikkService aggregertHistorikkService,
             SummertLegemeldtSykefraværService summertLegemeldtSykefraværService
     ) {
         this.kvartalsvisSykefraværshistorikkService = kvartalsvisSykefraværshistorikkService;
@@ -185,14 +185,14 @@ public class SykefraværshistorikkController {
                 .body(legemeldtSykefraværsprosent);
     }
 
-    @GetMapping("/v1/{orgnr}/sykefravarshistorikk/aggregert/siste")
-    public ResponseEntity<List<AggregertHistorikkDto>> hentAggregertHistorikk(
+    @GetMapping("/{orgnr}/sykefravarshistorikk/aggregert/siste")
+    public ResponseEntity<List<AggregertStatistikkDto>> hentAggregertStatistikk(
             @PathVariable("orgnr") String orgnr,
             HttpServletRequest request
     ) {
 
-        List<AggregertHistorikkDto> statistikk =
-                aggregertHistorikkService.hentAggregertHistorikk(new Orgnr(orgnr))
+        List<AggregertStatistikkDto> statistikk =
+                aggregertHistorikkService.hentAggregertStatistikk(new Orgnr(orgnr))
                         .getOrElseThrow(e -> e);
 
         return ResponseEntity.status(HttpStatus.OK).body(statistikk);

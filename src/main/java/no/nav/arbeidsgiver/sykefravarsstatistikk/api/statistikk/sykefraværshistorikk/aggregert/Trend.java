@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Statistikktype;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Agreggeringstype;
 
 @Data
 @AllArgsConstructor
@@ -15,9 +15,9 @@ public class Trend {
     public int antallTilfellerIBeregningen;
     public List<ÅrstallOgKvartal> kvartalerIBeregningen;
 
-    AggregertHistorikkDto tilAggregertHistorikkDto(
-          Statistikktype type, String label) {
-        return AggregertHistorikkDto.builder()
+    AggregertStatistikkDto tilAggregertHistorikkDto(
+          Agreggeringstype type, String label) {
+        return AggregertStatistikkDto.builder()
               .type(type)
               .label(label)
               .verdi(this.trendverdi.toString())

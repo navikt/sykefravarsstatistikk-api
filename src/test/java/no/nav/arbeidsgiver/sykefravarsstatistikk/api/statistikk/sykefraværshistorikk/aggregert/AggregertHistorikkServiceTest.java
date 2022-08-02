@@ -25,7 +25,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Brans
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Statistikktype;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Agreggeringstype;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
@@ -51,7 +51,7 @@ class AggregertHistorikkServiceTest {
           .overordnetEnhetOrgnr(new Orgnr("1111111111")).build();
 
 
-    private AggregertHistorikkService serviceUnderTest;
+    private AggregertStatistikkService serviceUnderTest;
     @Mock
     private SykefraværRepository mockSykefraværRepository;
     @Mock
@@ -76,7 +76,7 @@ class AggregertHistorikkServiceTest {
     @BeforeEach
     public void setUp() {
 
-        serviceUnderTest = new AggregertHistorikkService(
+        serviceUnderTest = new AggregertStatistikkService(
               mockSykefraværRepository,
               mockBransjeEllerNæringService,
               mockTilgangskontrollService,
@@ -104,7 +104,7 @@ class AggregertHistorikkServiceTest {
         // Helt tomt resultat skal ikke kræsje
         when(mockSykefraværRepository.hentHistorikkAlleKategorier(any(), any()))
               .thenReturn(new Sykefraværsdata(Map.of()));
-        assertThat(serviceUnderTest.hentAggregertHistorikk(etOrgnr).get())
+        assertThat(serviceUnderTest.hentAggregertStatistikk(etOrgnr).get())
               .isEqualTo(List.of());
 
         // Resultat med statistikkategri og tomme lister skal heller ikke kræsje
@@ -115,7 +115,7 @@ class AggregertHistorikkServiceTest {
                     NÆRING, List.of(),
                     BRANSJE, List.of()
               )));
-        assertThat(serviceUnderTest.hentAggregertHistorikk(etOrgnr).get())
+        assertThat(serviceUnderTest.hentAggregertStatistikk(etOrgnr).get())
               .isEqualTo(List.of());
     }
 
@@ -137,17 +137,17 @@ class AggregertHistorikkServiceTest {
                     )
               ));
 
-        List<Statistikktype> forventedeStatistikktyper =
+        List<Agreggeringstype> forventedeStatistikktyper =
               List.of(
-                    Statistikktype.PROSENT_SISTE_4_KVARTALER_VIRKSOMHET,
-                    Statistikktype.PROSENT_SISTE_4_KVARTALER_BRANSJE,
-                    Statistikktype.PROSENT_SISTE_4_KVARTALER_LAND,
-                    Statistikktype.TREND_BRANSJE
+                    Agreggeringstype.PROSENT_SISTE_4_KVARTALER_VIRKSOMHET,
+                    Agreggeringstype.PROSENT_SISTE_4_KVARTALER_BRANSJE,
+                    Agreggeringstype.PROSENT_SISTE_4_KVARTALER_LAND,
+                    Agreggeringstype.TREND_BRANSJE
               );
 
-        List<Statistikktype> statistikktyper =
-              serviceUnderTest.hentAggregertHistorikk(etOrgnr).get().stream()
-                    .map(AggregertHistorikkDto::getType)
+        List<Agreggeringstype> statistikktyper =
+              serviceUnderTest.hentAggregertStatistikk(etOrgnr).get().stream()
+                    .map(AggregertStatistikkDto::getType)
                     .collect(Collectors.toList());
         assertThat(statistikktyper).isEqualTo(forventedeStatistikktyper);
     }

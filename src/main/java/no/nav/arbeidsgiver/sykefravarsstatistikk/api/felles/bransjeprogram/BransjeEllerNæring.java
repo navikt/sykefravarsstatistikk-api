@@ -27,11 +27,6 @@ public class BransjeEllerNæring {
         }
     }
 
-    public Statistikkategori getTrendkategori() {
-        return this.isBransje() ? TREND_BRANSJE : TREND_NÆRING;
-    }
-
-
     public boolean isBransje() {
         return verdi.isLeft();
     }
