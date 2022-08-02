@@ -103,7 +103,7 @@ public class SykefraværRepository {
                         + ") "
                         + "ORDER BY arstall, kvartal ",
                   new MapSqlParameterSource()
-                        .addValue("naringKode", næring.getKode())
+                        .addValue("naringKode", næring.getKode().substring(0,2))
                         .addValue("arstall", fraÅrstallOgKvartal.getÅrstall())
                         .addValue("kvartal", fraÅrstallOgKvartal.getKvartal()),
                   (rs, rowNum) -> mapTilUmaskertSykefraværForEttKvartal(rs)));
