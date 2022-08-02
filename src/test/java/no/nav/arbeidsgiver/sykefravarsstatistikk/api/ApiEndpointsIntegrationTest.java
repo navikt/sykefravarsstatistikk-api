@@ -111,26 +111,79 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
     @Test
     public void hentAgreggertStatistikk_skalFunke() throws Exception {
         String jwtToken = TestTokenUtil.createToken(
-              mockOAuth2Server,
-              "15008462396",
-              TOKENX_ISSUER_ID,
-              "https://oidc.difi.no/idporten-oidc-provider/"
+                mockOAuth2Server,
+                "15008462396",
+                TOKENX_ISSUER_ID,
+                "https://oidc.difi.no/idporten-oidc-provider/"
         );
 
         HttpResponse<String> response = newBuilder().build().send(
-              HttpRequest.newBuilder()
-                    .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET +
-                          "/sykefravarshistorikk/aggregert/siste")
-                    )
-                    .header(
-                          AUTHORIZATION,
-                          "Bearer " + jwtToken
-                    )
-                    .GET()
-                    .build(),
-              ofString()
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET +
+                                "/sykefravarshistorikk/aggregert/siste")
+                        )
+                        .header(
+                                AUTHORIZATION,
+                                "Bearer " + jwtToken
+                        )
+                        .GET()
+                        .build(),
+                ofString()
         );
         assertThat(response.statusCode()).isEqualTo(200);
+    }
+
+    @Test
+    public void hentAgreggertStatistikk_skal_returnere_403_naar_bruker_mangler_tilgang() throws Exception {
+        String jwtToken = TestTokenUtil.createToken(
+                mockOAuth2Server,
+                "15008462396",
+                TOKENX_ISSUER_ID,
+                "https://oidc.difi.no/idporten-oidc-provider/"
+        );
+
+        HttpResponse<String> response = newBuilder().build().send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET_INGEN_TILGANG +
+                                "/sykefravarshistorikk/aggregert/siste")
+                        )
+                        .header(
+                                AUTHORIZATION,
+                                "Bearer " + jwtToken
+                        )
+                        .GET()
+                        .build(),
+                ofString()
+        );
+        assertThat(response.statusCode()).isEqualTo(403);
+    }
+@Test
+    public void hentAgreggertStatistikk_skal_returnere_virksomhetsstatistikk_og_andre_typer() throws Exception {
+        String jwtToken = TestTokenUtil.createToken(
+                mockOAuth2Server,
+                "15008462396",
+                TOKENX_ISSUER_ID,
+                "https://oidc.difi.no/idporten-oidc-provider/"
+        );
+
+        HttpResponse<String> response = newBuilder().build().send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET +
+                                "/sykefravarshistorikk/aggregert/siste")
+                        )
+                        .header(
+                                AUTHORIZATION,
+                                "Bearer " + jwtToken
+                        )
+                        .GET()
+                        .build(),
+                ofString()
+        );
+        assertThat(response.statusCode()).isEqualTo(200);
+        JsonNode responseBody = objectMapper.readTree(response.body());
+        // TODO fullføre me
+        assertThat(responseBody).isEqualTo(4);
+        assertThat(responseBody.get(0).get("label")).isEqualTo(objectMapper.readTree("\"Næring\""));
     }
 
     @Test
@@ -182,31 +235,31 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         assertThat(alleSykefraværshistorikk.get(0).get("label")).isEqualTo(objectMapper.readTree("\"Norge\""));
         assertThat(alleSykefraværshistorikk.get(0).get("kvartalsvisSykefraværsprosent").get(0))
                 .isEqualTo(objectMapper.readTree(
-                        "{\"tapteDagsverk\":5884917.3,\"muligeDagsverk\":1.125256909E8,\"prosent\":5.2,\"erMaskert\":false,\"årstall\":2014,\"kvartal\":2}"
+                                "{\"tapteDagsverk\":5884917.3,\"muligeDagsverk\":1.125256909E8,\"prosent\":5.2,\"erMaskert\":false,\"årstall\":2014,\"kvartal\":2}"
                         )
                 );
         assertThat(alleSykefraværshistorikk.get(1).get("label")).isEqualTo(objectMapper.readTree("\"Statlig forvaltning\""));
         assertThat(alleSykefraværshistorikk.get(1).get("kvartalsvisSykefraværsprosent").get(0))
                 .isEqualTo(objectMapper.readTree(
-                        "{\"tapteDagsverk\":657853.3,\"muligeDagsverk\":1.35587109E7,\"prosent\":4.9,\"årstall\":2014,\"kvartal\":2,\"erMaskert\":false}"
+                                "{\"tapteDagsverk\":657853.3,\"muligeDagsverk\":1.35587109E7,\"prosent\":4.9,\"årstall\":2014,\"kvartal\":2,\"erMaskert\":false}"
                         )
                 );
         assertThat(alleSykefraværshistorikk.get(2).get("label")).isEqualTo(objectMapper.readTree("\"Produksjon av nærings- og nytelsesmidler\""));
         assertThat(alleSykefraværshistorikk.get(2).get("kvartalsvisSykefraværsprosent").get(0))
                 .isEqualTo(objectMapper.readTree(
-                        "{\"tapteDagsverk\":144324.8,\"muligeDagsverk\":2562076.9,\"prosent\":5.6,\"årstall\":2017,\"kvartal\":1,\"erMaskert\":false}"
+                                "{\"tapteDagsverk\":144324.8,\"muligeDagsverk\":2562076.9,\"prosent\":5.6,\"årstall\":2017,\"kvartal\":1,\"erMaskert\":false}"
                         )
                 );
         assertThat(alleSykefraværshistorikk.get(3).get("label")).isEqualTo(objectMapper.readTree("\"NAV ARBEID OG YTELSER AVD OSLO\""));
         assertThat(alleSykefraværshistorikk.get(3).get("kvartalsvisSykefraværsprosent").get(0))
                 .isEqualTo(objectMapper.readTree(
-                        "{\"tapteDagsverk\":235.3,\"muligeDagsverk\":929.3,\"prosent\":25.3,\"årstall\":2014,\"kvartal\":2,\"erMaskert\":false}"
+                                "{\"tapteDagsverk\":235.3,\"muligeDagsverk\":929.3,\"prosent\":25.3,\"årstall\":2014,\"kvartal\":2,\"erMaskert\":false}"
                         )
                 );
         assertThat(alleSykefraværshistorikk.get(4).get("label")).isEqualTo(objectMapper.readTree("\"NAV ARBEID OG YTELSER\""));
         assertThat(alleSykefraværshistorikk.get(4).get("kvartalsvisSykefraværsprosent").get(0))
                 .isEqualTo(objectMapper.readTree(
-                        "{\"tapteDagsverk\":2000.3,\"muligeDagsverk\":9290.3,\"prosent\":21.5,\"årstall\":2014,\"kvartal\":2,\"erMaskert\":false}"
+                                "{\"tapteDagsverk\":2000.3,\"muligeDagsverk\":9290.3,\"prosent\":21.5,\"årstall\":2014,\"kvartal\":2,\"erMaskert\":false}"
                         )
                 );
 
