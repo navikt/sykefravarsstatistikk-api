@@ -1,10 +1,26 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
+import static java.util.Collections.emptyList;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.BRANSJE;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.LAND;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.NÆRING;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.VIRKSOMHET;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.Sykefraværsdata;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -12,14 +28,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static java.util.Collections.emptyList;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.*;
 
 @Component
 public class SykefraværRepository {
@@ -63,12 +71,16 @@ public class SykefraværRepository {
           Bransje bransje, ÅrstallOgKvartal fraÅrstallOgKvartal) {
 
         if (bransje.erDefinertPåTosiffernivå()) {
-            throw (new IllegalArgumentException("Denne metoden funker bare for 5-siffer næringskoder"));
+            throw (new IllegalArgumentException(
+                  "Denne metoden funker bare for 5-siffer næringskoder"));
         }
 
         try {
             return namedParameterJdbcTemplate.query(
-                  "SELECT sum(tapte_dagsverk) as tapte_dagsverk, sum(mulige_dagsverk) as mulige_dagsverk, sum(antall_personer) as antall_personer, arstall, kvartal " +
+                  "SELECT sum(tapte_dagsverk) as tapte_dagsverk, sum(mulige_dagsverk) as "
+                        + "mulige_dagsverk, sum(antall_personer) as antall_personer, arstall, "
+                        + "kvartal "
+                        +
                         "FROM sykefravar_statistikk_naring5siffer " +
                         "where naring_kode in (:naringKoder) " +
                         "and (" +
@@ -103,7 +115,7 @@ public class SykefraværRepository {
                         + ") "
                         + "ORDER BY arstall, kvartal ",
                   new MapSqlParameterSource()
-                        .addValue("naringKode", næring.getKode().substring(0,2))
+                        .addValue("naringKode", næring.getKode().substring(0, 2))
                         .addValue("arstall", fraÅrstallOgKvartal.getÅrstall())
                         .addValue("kvartal", fraÅrstallOgKvartal.getKvartal()),
                   (rs, rowNum) -> mapTilUmaskertSykefraværForEttKvartal(rs)));
@@ -112,7 +124,8 @@ public class SykefraværRepository {
         }
     }
 
-    public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefraværForNorge(ÅrstallOgKvartal fra) {
+    public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefraværForNorge(
+          ÅrstallOgKvartal fra) {
         try {
             try {
                 return sorterKronologisk(namedParameterJdbcTemplate.query(
@@ -133,24 +146,29 @@ public class SykefraværRepository {
         }
     }
 
-    public Sykefraværsdata hentHistorikkAlleKategorier(
+    public Sykefraværsdata hentUmaskertSykefraværAlleKategorier(
           Virksomhet virksomhet,
           ÅrstallOgKvartal fraÅrstallOgKvartal) {
-        Næring næringen = new Næring(virksomhet.getNæringskode().getKode(), "");
-        Optional<Bransje> bransjen = new Bransjeprogram().finnBransje(virksomhet.getNæringskode());
+        Næring næring = new Næring(virksomhet.getNæringskode().getKode(), "");
+        Optional<Bransje> maybeBransje
+              = new Bransjeprogram().finnBransje(virksomhet.getNæringskode());
 
-        return new Sykefraværsdata(Map.of(
-              VIRKSOMHET, hentUmaskertSykefravær(virksomhet, fraÅrstallOgKvartal),
-              LAND, hentUmaskertSykefraværForNorge(fraÅrstallOgKvartal),
-              NÆRING, hentUmaskertSykefravær(næringen, fraÅrstallOgKvartal),
-              BRANSJE,
-              bransjen.isPresent() && bransjen.get().erDefinertPåFemsiffernivå()
-                    ? hentUmaskertSykefravær(bransjen.get(), fraÅrstallOgKvartal)
-                    : emptyList()));
+        Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> data = new HashMap<>();
+        data.put(VIRKSOMHET,
+              hentUmaskertSykefravær(virksomhet, fraÅrstallOgKvartal));
+        data.put(LAND, hentUmaskertSykefraværForNorge(fraÅrstallOgKvartal));
+        data.put(NÆRING, hentUmaskertSykefravær(næring, fraÅrstallOgKvartal));
+
+        if (maybeBransje.isPresent() && maybeBransje.get().erDefinertPåFemsiffernivå()) {
+            data.put(BRANSJE, hentUmaskertSykefravær(maybeBransje.get(), fraÅrstallOgKvartal));
+        }
+
+        return new Sykefraværsdata(data);
     }
 
 
-    private List<UmaskertSykefraværForEttKvartal> sorterKronologisk(List<UmaskertSykefraværForEttKvartal> statistikk) {
+    private List<UmaskertSykefraværForEttKvartal> sorterKronologisk(
+          List<UmaskertSykefraværForEttKvartal> statistikk) {
         return statistikk.stream()
               .sorted(Comparator.comparing(UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal))
               .collect(Collectors.toList());

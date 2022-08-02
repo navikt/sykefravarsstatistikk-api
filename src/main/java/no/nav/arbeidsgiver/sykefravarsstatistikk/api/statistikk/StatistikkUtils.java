@@ -10,7 +10,8 @@ public class StatistikkUtils {
 
     /**
      * Men å være en felles source of trouth for kalkulering av sykefraværsprosent. Denne metoden
-     * bør altså ikke dupliseres, men refaktoreres til bruk.
+     * bør altså ikke dupliseres, men refaktorer gjerne eksisterende metoder slik at de også bruker
+     * denne.
      */
     public static BigDecimal kalkulerSykefraværsprosent(
           @NotNull BigDecimal tapteDagsverk,

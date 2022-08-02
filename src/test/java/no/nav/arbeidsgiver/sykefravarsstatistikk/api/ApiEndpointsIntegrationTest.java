@@ -31,7 +31,6 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    @Autowired
     MockOAuth2Server mockOAuth2Server;
 
     @LocalServerPort
@@ -247,7 +246,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         assertThat(alleSykefraværshistorikk.get(2).get("label")).isEqualTo(objectMapper.readTree("\"Produksjon av nærings- og nytelsesmidler\""));
         assertThat(alleSykefraværshistorikk.get(2).get("kvartalsvisSykefraværsprosent").get(0))
                 .isEqualTo(objectMapper.readTree(
-                                "{\"tapteDagsverk\":144324.8,\"muligeDagsverk\":2562076.9,\"prosent\":5.6,\"årstall\":2017,\"kvartal\":1,\"erMaskert\":false}"
+                                "{\"tapteDagsverk\":144324.8,\"muligeDagsverk\":2562076.9,\"prosent\":5.6,\"årstall\":2019,\"kvartal\":1,\"erMaskert\":false}"
                         )
                 );
         assertThat(alleSykefraværshistorikk.get(3).get("label")).isEqualTo(objectMapper.readTree("\"NAV ARBEID OG YTELSER AVD OSLO\""));

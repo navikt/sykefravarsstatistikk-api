@@ -26,10 +26,10 @@ public class AggregertStatistikkService {
     private final EnhetsregisteretClient enhetsregisteretClient;
 
     public AggregertStatistikkService(
-            SykefraværRepository sykefraværprosentRepository,
-            BransjeEllerNæringService bransjeEllerNæringService,
-            TilgangskontrollService tilgangskontrollService,
-            EnhetsregisteretClient enhetsregisteretClient) {
+          SykefraværRepository sykefraværprosentRepository,
+          BransjeEllerNæringService bransjeEllerNæringService,
+          TilgangskontrollService tilgangskontrollService,
+          EnhetsregisteretClient enhetsregisteretClient) {
         this.sykefraværprosentRepository = sykefraværprosentRepository;
         this.bransjeEllerNæringService = bransjeEllerNæringService;
         this.tilgangskontrollService = tilgangskontrollService;
@@ -37,11 +37,11 @@ public class AggregertStatistikkService {
     }
 
     public Either<TilgangskontrollException, List<AggregertStatistikkDto>> hentAggregertStatistikk(
-            Orgnr orgnr) {
+          Orgnr orgnr) {
 
         if (!tilgangskontrollService.brukerRepresentererVirksomheten(orgnr)) {
             return Either.left(
-                    new TilgangskontrollException("Bruker mangler tilgang til denne virksomheten"));
+                  new TilgangskontrollException("Bruker mangler tilgang til denne virksomheten"));
         }
 
         Underenhet virksomhet = enhetsregisteretClient.hentUnderenhet(orgnr);
@@ -56,30 +56,30 @@ public class AggregertStatistikkService {
 
 
     private List<AggregertStatistikkDto> aggregerData(
-            Underenhet virksomhet,
-            Sykefraværsdata sykefravær) {
+          Underenhet virksomhet,
+          Sykefraværsdata sykefravær) {
 
         // TODO: rename
         Prosentkalkulator kalkulator = new Prosentkalkulator(sykefravær);
 
         BransjeEllerNæring bransjeEllerNæring =
-                bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(
-                        virksomhet.getNæringskode());
+              bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(
+                    virksomhet.getNæringskode());
 
         return Stream.of(
-                        kalkulator.fraværsprosentVirksomhet(virksomhet.getNavn()),
-                        kalkulator.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
-                        kalkulator.fraværsprosentNorge(),
-                        kalkulator.trendBransjeEllerNæring(bransjeEllerNæring))
-                .filter(Either::isRight)
-                .map(Either::get)
-                .collect(Collectors.toList());
+                    kalkulator.fraværsprosentVirksomhet(virksomhet.getNavn()),
+                    kalkulator.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
+                    kalkulator.fraværsprosentNorge(),
+                    kalkulator.trendBransjeEllerNæring(bransjeEllerNæring))
+              .filter(Either::isRight)
+              .map(Either::get)
+              .collect(Collectors.toList());
     }
 
     private Sykefraværsdata
     hentForSisteFemKvartaler(Underenhet forBedrift) {
         return sykefraværprosentRepository
-                .hentHistorikkAlleKategorier(forBedrift,
+                .hentUmaskertSykefraværAlleKategorier(forBedrift,
                         SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4));
     }
 }

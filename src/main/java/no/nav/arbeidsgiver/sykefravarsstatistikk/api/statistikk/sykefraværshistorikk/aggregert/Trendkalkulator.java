@@ -38,8 +38,8 @@ class Trendkalkulator {
                             "Mangler data for " + nyesteKvartal + " og/eller " + ettÅrTidligere));
         }
 
-        BigDecimal trendverdi = nyesteSykefravær.get().getProsent()
-                .subtract(sykefraværetEtÅrSiden.get().getProsent());
+        BigDecimal trendverdi = nyesteSykefravær.get().getSykefraværsprosent()
+                .subtract(sykefraværetEtÅrSiden.get().getSykefraværsprosent());
 
         int antallTilfeller =
                 nyesteSykefravær.get().getAntallPersoner()

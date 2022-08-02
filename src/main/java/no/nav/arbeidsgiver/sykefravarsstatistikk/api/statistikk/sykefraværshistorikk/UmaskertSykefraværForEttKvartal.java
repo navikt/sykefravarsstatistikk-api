@@ -12,6 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.StatistikkUtils;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
@@ -61,8 +62,8 @@ public class UmaskertSykefraværForEttKvartal implements
         return årstallOgKvartal != null ? årstallOgKvartal.getÅrstall() : 0;
     }
 
-    public BigDecimal getProsent() {
-        return getTapteDagsverk().divide(getMuligeDagsverk()).multiply(new BigDecimal(100));
+    public BigDecimal getSykefraværsprosent() {
+        return StatistikkUtils.kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk);
     }
 
     public UmaskertSykefraværForEttKvartal add(

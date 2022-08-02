@@ -102,13 +102,13 @@ class AggregertHistorikkServiceTest {
               .thenReturn(enBransje);
 
         // Helt tomt resultat skal ikke kræsje
-        when(mockSykefraværRepository.hentHistorikkAlleKategorier(any(), any()))
+        when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(), any()))
               .thenReturn(new Sykefraværsdata(Map.of()));
         assertThat(serviceUnderTest.hentAggregertStatistikk(etOrgnr).get())
               .isEqualTo(List.of());
 
         // Resultat med statistikkategri og tomme lister skal heller ikke kræsje
-        when(mockSykefraværRepository.hentHistorikkAlleKategorier(any(), any())).thenReturn(
+        when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(), any())).thenReturn(
               new Sykefraværsdata(Map.of(
                     VIRKSOMHET, List.of(),
                     LAND, List.of(),
@@ -127,7 +127,7 @@ class AggregertHistorikkServiceTest {
         when(mockBransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(any()))
               .thenReturn(enBransje);
 
-        when(mockSykefraværRepository.hentHistorikkAlleKategorier(any(), any()))
+        when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(), any()))
               .thenReturn(new Sykefraværsdata(
                     Map.of(
                           VIRKSOMHET, genererTestSykefravær(1),
@@ -173,14 +173,14 @@ class AggregertHistorikkServiceTest {
     @Test
     void kalkulerTrend_skal_returnere_synkende_ved_nedadgående_trend() {
         List<UmaskertSykefraværForEttKvartal> kvartalstall =
-              List.of(umaskertSykefraværprosent(SISTE_PUBLISERTE_KVARTAL, 10, 1),
+              List.of(umaskertSykefraværprosent(SISTE_PUBLISERTE_KVARTAL, 8, 1),
                     umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 13, 2),
-                    umaskertSykefraværprosent(SISTE_PUBLISERTE_KVARTAL.minusEttÅr(), 9, 3)
+                    umaskertSykefraværprosent(SISTE_PUBLISERTE_KVARTAL.minusEttÅr(), 10, 3)
               );
-        Trend forventetTrend = new Trend(new BigDecimal("-1.00"), 5, kvartalstall.stream()
-              .map(UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal)
-              .collect(
-                    Collectors.toList()));
+        Trend forventetTrend = new Trend(
+              new BigDecimal("-2.00"),
+              4,
+              List.of(SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusEttÅr()));
 
         assertThat(new Trendkalkulator(kvartalstall).kalkulerTrend().get()).isEqualTo(
               forventetTrend);
@@ -193,7 +193,7 @@ class AggregertHistorikkServiceTest {
     }
 
     private void lagTestDataTilRepository() {
-        when(mockSykefraværRepository.hentHistorikkAlleKategorier(any(Virksomhet.class),
+        when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(Virksomhet.class),
               any(ÅrstallOgKvartal.class)
         )).thenReturn(new Sykefraværsdata(
               Map.of(VIRKSOMHET, genererTestSykefravær(0),
