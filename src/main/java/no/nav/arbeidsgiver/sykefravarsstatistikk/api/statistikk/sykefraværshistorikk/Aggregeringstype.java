@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
-public enum Agreggeringstype {
+public enum Aggregeringstype {
     PROSENT_SISTE_4_KVARTALER_VIRKSOMHET,
     PROSENT_SISTE_4_KVARTALER_LAND,
     PROSENT_SISTE_4_KVARTALER_NÆRING,

@@ -4,13 +4,13 @@ import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Agreggeringstype;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Aggregeringstype;
 
 @Data
 @Builder
 public class AggregertStatistikkDto {
 
-    private final Agreggeringstype type;
+    private final Aggregeringstype type;
     private final String label;
     private final String verdi;
     private final Integer antallTilfellerIBeregningen;

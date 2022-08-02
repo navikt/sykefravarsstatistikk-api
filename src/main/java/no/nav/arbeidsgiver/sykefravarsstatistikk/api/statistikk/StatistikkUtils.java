@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Agreggeringstype;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Aggregeringstype;
 import org.jetbrains.annotations.NotNull;
 
 public class StatistikkUtils {
@@ -21,15 +21,15 @@ public class StatistikkUtils {
               .multiply(new BigDecimal(100));
     }
 
-    public static Agreggeringstype getProsenttypeFor(BransjeEllerNæring bransjeEllerNæring) {
+    public static Aggregeringstype getProsenttypeFor(BransjeEllerNæring bransjeEllerNæring) {
         return bransjeEllerNæring.isBransje()
-              ? Agreggeringstype.PROSENT_SISTE_4_KVARTALER_BRANSJE
-              : Agreggeringstype.PROSENT_SISTE_4_KVARTALER_NÆRING;
+              ? Aggregeringstype.PROSENT_SISTE_4_KVARTALER_BRANSJE
+              : Aggregeringstype.PROSENT_SISTE_4_KVARTALER_NÆRING;
     }
 
-    public static Agreggeringstype getTrendtypeFor(BransjeEllerNæring bransjeEllerNæring) {
+    public static Aggregeringstype getTrendtypeFor(BransjeEllerNæring bransjeEllerNæring) {
         return bransjeEllerNæring.isBransje()
-              ? Agreggeringstype.TREND_BRANSJE
-              : Agreggeringstype.TREND_NÆRING;
+              ? Aggregeringstype.TREND_BRANSJE
+              : Aggregeringstype.TREND_NÆRING;
     }
 }

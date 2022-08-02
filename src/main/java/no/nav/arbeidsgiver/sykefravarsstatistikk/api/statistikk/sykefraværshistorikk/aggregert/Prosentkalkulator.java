@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.StatistikkUtils;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Agreggeringstype;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Aggregeringstype;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.StatistikkException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
@@ -31,7 +31,7 @@ public class Prosentkalkulator {
 
     Either<StatistikkException, AggregertStatistikkDto> fraværsprosentNorge() {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(LAND))
-              .tilAggregertStatistikkDto(Agreggeringstype.PROSENT_SISTE_4_KVARTALER_LAND, "Norge");
+              .tilAggregertStatistikkDto(Aggregeringstype.PROSENT_SISTE_4_KVARTALER_LAND, "Norge");
     }
 
     Either<StatistikkException, AggregertStatistikkDto> fraværsprosentBransjeEllerNæring(
@@ -47,7 +47,7 @@ public class Prosentkalkulator {
           String virksomhetsnavn) {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(VIRKSOMHET))
               .tilAggregertStatistikkDto(
-                    Agreggeringstype.PROSENT_SISTE_4_KVARTALER_VIRKSOMHET, virksomhetsnavn);
+                    Aggregeringstype.PROSENT_SISTE_4_KVARTALER_VIRKSOMHET, virksomhetsnavn);
     }
 
     Either<UtilstrekkeligDataException, AggregertStatistikkDto> trendBransjeEllerNæring(

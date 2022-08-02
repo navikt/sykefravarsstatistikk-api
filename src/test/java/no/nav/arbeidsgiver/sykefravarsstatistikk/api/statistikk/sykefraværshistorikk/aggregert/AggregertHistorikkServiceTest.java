@@ -25,7 +25,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Brans
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Agreggeringstype;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Aggregeringstype;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
@@ -137,15 +137,15 @@ class AggregertHistorikkServiceTest {
                     )
               ));
 
-        List<Agreggeringstype> forventedeStatistikktyper =
+        List<Aggregeringstype> forventedeStatistikktyper =
               List.of(
-                    Agreggeringstype.PROSENT_SISTE_4_KVARTALER_VIRKSOMHET,
-                    Agreggeringstype.PROSENT_SISTE_4_KVARTALER_BRANSJE,
-                    Agreggeringstype.PROSENT_SISTE_4_KVARTALER_LAND,
-                    Agreggeringstype.TREND_BRANSJE
+                    Aggregeringstype.PROSENT_SISTE_4_KVARTALER_VIRKSOMHET,
+                    Aggregeringstype.PROSENT_SISTE_4_KVARTALER_BRANSJE,
+                    Aggregeringstype.PROSENT_SISTE_4_KVARTALER_LAND,
+                    Aggregeringstype.TREND_BRANSJE
               );
 
-        List<Agreggeringstype> statistikktyper =
+        List<Aggregeringstype> statistikktyper =
               serviceUnderTest.hentAggregertStatistikk(etOrgnr).get().stream()
                     .map(AggregertStatistikkDto::getType)
                     .collect(Collectors.toList());
