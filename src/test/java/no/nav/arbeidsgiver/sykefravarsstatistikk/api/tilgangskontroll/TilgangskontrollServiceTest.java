@@ -63,7 +63,7 @@ public class TilgangskontrollServiceTest {
         when(tokenUtils.hentInnloggetBruker()).thenReturn(new InnloggetBruker(fnr));
         when(altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(any(), eq(fnr))).thenThrow(new AltinnException(""));
 
-        assertThrows(AltinnException.class, () -> tilgangskontroll.hentInnloggetBruker());
+        assertThrows(AltinnException.class, () -> tilgangskontroll.hentBrukerKunIaRettigheter());
     }
     @Test
     public void hentInnloggetBrukerForAlleTilganger__skal_feile_med_riktig_exception_hvis_altinn_feiler() {

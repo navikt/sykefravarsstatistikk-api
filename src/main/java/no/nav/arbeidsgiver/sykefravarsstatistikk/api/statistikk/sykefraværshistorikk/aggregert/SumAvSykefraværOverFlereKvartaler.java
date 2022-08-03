@@ -68,7 +68,7 @@ class SumAvSykefraværOverFlereKvartaler {
         return Either.right(kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk));
     }
 
-    SumAvSykefraværOverFlereKvartaler summerOpp(@NotNull SumAvSykefraværOverFlereKvartaler other) {
+    SumAvSykefraværOverFlereKvartaler leggSammen(@NotNull SumAvSykefraværOverFlereKvartaler other) {
         return new SumAvSykefraværOverFlereKvartaler(
               this.muligeDagsverk.add(other.muligeDagsverk),
               this.tapteDagsverk.add(other.tapteDagsverk),

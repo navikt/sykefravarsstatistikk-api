@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -16,11 +15,7 @@ public class Sykefraværsdata {
         return sykefravær.get(kategori);
     }
 
-    void filtrerBortKategori(Statistikkategori kategori) {
-        sykefravær.remove(kategori);
+    void filtrerBortVirksomhetsdata() {
+        sykefravær.remove(Statistikkategori.VIRKSOMHET);
     }
-     void filtrerBortTommeKategorier() {
-        sykefravær.entrySet().removeIf(dataelement -> dataelement.getValue().isEmpty());
-     }
-
 }

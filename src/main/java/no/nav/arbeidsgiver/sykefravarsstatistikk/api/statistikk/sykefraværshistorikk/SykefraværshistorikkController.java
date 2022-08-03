@@ -65,7 +65,7 @@ public class SykefraværshistorikkController {
 
         Orgnr orgnr = new Orgnr(orgnrStr);
 
-        InnloggetBruker bruker = tilgangskontrollService.hentInnloggetBruker();
+        InnloggetBruker bruker = tilgangskontrollService.hentBrukerKunIaRettigheter();
 
         tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
                 orgnr,
@@ -108,7 +108,7 @@ public class SykefraværshistorikkController {
             HttpServletRequest request
     ) {
 
-        InnloggetBruker bruker = tilgangskontrollService.hentInnloggetBruker();
+        InnloggetBruker bruker = tilgangskontrollService.hentBrukerKunIaRettigheter();
         tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
                 new Orgnr(orgnrStr),
                 bruker,
@@ -146,7 +146,7 @@ public class SykefraværshistorikkController {
             @PathVariable("orgnr") String orgnrStr,
             HttpServletRequest request
     ) {
-        InnloggetBruker bruker = tilgangskontrollService.hentInnloggetBruker();
+        InnloggetBruker bruker = tilgangskontrollService.hentBrukerKunIaRettigheter();
 
         tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
                 new Orgnr(orgnrStr),

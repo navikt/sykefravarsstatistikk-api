@@ -17,17 +17,9 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
 
 @AllArgsConstructor
-public class Prosentkalkulator {
+public class Aggregeringskalkulator {
 
     public Sykefraværsdata sykefraværsdata;
-
-    private SumAvSykefraværOverFlereKvartaler summerOppSisteFireKvartaler(
-          List<UmaskertSykefraværForEttKvartal> statistikk) {
-
-        return ekstraherSisteFireKvartaler(statistikk).stream()
-              .map(SumAvSykefraværOverFlereKvartaler::new)
-              .reduce(NULLPUNKT, SumAvSykefraværOverFlereKvartaler::summerOpp);
-    }
 
     Either<StatistikkException, AggregertStatistikkDto> fraværsprosentNorge() {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(LAND))
@@ -61,6 +53,14 @@ public class Prosentkalkulator {
               StatistikkUtils.getTrendtypeFor(bransjeEllerNæring),
               bransjeEllerNæring.getVerdiSomString())
         );
+    }
+
+    private SumAvSykefraværOverFlereKvartaler summerOppSisteFireKvartaler(
+          List<UmaskertSykefraværForEttKvartal> statistikk) {
+
+        return ekstraherSisteFireKvartaler(statistikk).stream()
+              .map(SumAvSykefraværOverFlereKvartaler::new)
+              .reduce(NULLPUNKT, SumAvSykefraværOverFlereKvartaler::leggSammen);
     }
 
     private List<UmaskertSykefraværForEttKvartal> ekstraherSisteFireKvartaler(

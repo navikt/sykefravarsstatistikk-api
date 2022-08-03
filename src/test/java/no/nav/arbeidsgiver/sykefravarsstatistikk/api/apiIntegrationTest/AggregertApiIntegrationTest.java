@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.apiIntegrationTest;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static java.net.http.HttpClient.newBuilder;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.TOKENX_ISSUER_ID;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Aggregeringstype.PROSENT_SISTE_4_KVARTALER_LAND;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Aggregeringstype.PROSENT_SISTE_4_KVARTALER_NÆRING;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Aggregeringstype.PROSENT_SISTE_4_KVARTALER_VIRKSOMHET;
@@ -23,7 +22,6 @@ import no.nav.security.mock.oauth2.MockOAuth2Server;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.web.context.WebApplicationContext;
 
 public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
 
@@ -39,32 +37,23 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    public void hentAgreggertStatistikk_skalReturnere200OK() throws Exception {
-        String jwtToken = TestTokenUtil.createMockIdportenTokenXToken(mockOAuth2Server);
-
-        HttpResponse<String> response = utførKall(ORGNR_UNDERENHET, jwtToken);
-        assertThat(response.statusCode()).isEqualTo(200);
-    }
-
-    @Test
     public void hentAgreggertStatistikk_skal_returnere_403_naar_bruker_mangler_tilgang()
           throws Exception {
         String jwtToken = TestTokenUtil.createMockIdportenTokenXToken(mockOAuth2Server);
 
-        HttpResponse<String> response = utførKall(ORGNR_UNDERENHET_INGEN_TILGANG, jwtToken);
+        HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET_INGEN_TILGANG, jwtToken);
         assertThat(response.statusCode()).isEqualTo(403);
     }
 
     @Test
-    public void hentAgreggertStatistikk_skal_returnere_virksomhetsstatistikk_og_andre_typer()
+    public void hentAgreggertStatistikk_returnererForventedeTyperForBedriftSomHarAlleTyperData()
           throws Exception {
         String jwtToken = TestTokenUtil.createMockIdportenTokenXToken(mockOAuth2Server);
 
-        HttpResponse<String> response = utførKall(ORGNR_UNDERENHET, jwtToken);
+        HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET, jwtToken);
         assertThat(response.statusCode()).isEqualTo(200);
         JsonNode responseBody = objectMapper.readTree(response.body());
-        // TODO fullføre me
-        assertThat(responseBody.size()).isEqualTo(4);
+
         assertThat(responseBody.findValuesAsText("type"))
               .containsExactlyInAnyOrderElementsOf(
                     List.of(
@@ -75,7 +64,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
                     ));
     }
 
-    private HttpResponse<String> utførKall(String orgnr, String jwtToken)
+    private HttpResponse<String> utførAutorisertKall(String orgnr, String jwtToken)
           throws IOException, InterruptedException {
         return newBuilder().build().send(
               HttpRequest.newBuilder()

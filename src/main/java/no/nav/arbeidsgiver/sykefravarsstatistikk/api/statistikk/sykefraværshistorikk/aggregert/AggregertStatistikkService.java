@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.VIRKSOMHET;
 
 import io.vavr.control.Either;
 import java.util.List;
@@ -48,7 +47,7 @@ public class AggregertStatistikkService {
         Sykefraværsdata sykefraværsdata = hentForSisteFemKvartaler(virksomhet);
 
         if (!tilgangskontrollService.brukerHarIaRettigheter(orgnr)) {
-            sykefraværsdata.filtrerBortKategori(VIRKSOMHET);
+            sykefraværsdata.filtrerBortVirksomhetsdata();
         }
 
         return Either.right(aggregerData(virksomhet, sykefraværsdata));
@@ -59,8 +58,7 @@ public class AggregertStatistikkService {
           Underenhet virksomhet,
           Sykefraværsdata sykefravær) {
 
-        // TODO: rename
-        Prosentkalkulator kalkulator = new Prosentkalkulator(sykefravær);
+        Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(sykefravær);
 
         BransjeEllerNæring bransjeEllerNæring =
               bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(

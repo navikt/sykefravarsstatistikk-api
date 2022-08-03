@@ -41,8 +41,7 @@ public class TilgangskontrollService {
         this.tokenXClient = tokenXClient;
     }
 
-    public InnloggetBruker hentInnloggetBruker() {
-        //TODO: rename denne til slik at det blir tydelig at den bare henter brukere med ia-rettigheter?
+    public InnloggetBruker hentBrukerKunIaRettigheter() {
         InnloggetBruker innloggetBruker = tokenUtils.hentInnloggetBruker();
         try {
             JwtToken exchangedTokenToAltinnProxy =
@@ -60,7 +59,7 @@ public class TilgangskontrollService {
     }
 
     public boolean brukerHarIaRettigheter(Orgnr tilOrgnr) {
-        return hentInnloggetBruker().harTilgang(tilOrgnr);
+        return hentBrukerKunIaRettigheter().harTilgang(tilOrgnr);
     }
 
     public boolean brukerRepresentererVirksomheten(Orgnr orgnr){
@@ -114,7 +113,7 @@ public class TilgangskontrollService {
 
     public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, String httpMetode,
           String requestUrl) {
-        InnloggetBruker bruker = hentInnloggetBruker();
+        InnloggetBruker bruker = hentBrukerKunIaRettigheter();
         sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(orgnr, bruker, httpMetode, requestUrl);
     }
 
