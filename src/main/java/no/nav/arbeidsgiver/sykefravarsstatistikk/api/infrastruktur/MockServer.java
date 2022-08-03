@@ -8,6 +8,7 @@ import com.github.tomakehurst.wiremock.matching.*;
 import io.micrometer.core.instrument.util.IOUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
@@ -51,13 +52,7 @@ public class MockServer {
                 || Arrays.asList(environment.getActiveProfiles()).contains("mvc-test")
         ) {
             log.info("Mocker kall fra Altinn");
-            //mockKallFraFil(altinnUrl + "ekstern/altinn/api/serviceowner/reportees", "altinnReportees.json");
-           /* mockKallFraFil(
-                    altinnUrl + "ekstern/altinn/api/serviceowner/authorization/roles",
-                    "altinnAuthorization-roles.json"
-            );*/
-            //mockKall(altinnProxyUrl + "organisasjoner", HttpStatus.NOT_FOUND);
-            //mockKallFraFil(altinnProxyUrl + "v2/organisasjoner", "altinnReportees.json");
+            mockKall(altinnProxyUrl + "v2/organisasjoner", HttpStatus.NOT_FOUND);
             mockKallUtenParametereFraFil(altinnProxyUrl + "v2/organisasjoner", "altinnReportees.json");
             mockKallMedParametereFraFil(altinnProxyUrl + "v2/organisasjoner", "altinnReporteesMedIARettigheter.json");
         }
@@ -141,15 +136,9 @@ public class MockServer {
     private void mockKallMedParametereFraFil(String url, String filnavn) {
         String body = lesFilSomString(filnavn);
         String path = new URL(url).getPath();
-        System.out.println("********************************************");
-        System.out.println("body:"+body);
-        System.out.println("********************************************");
-        Map<String, StringValuePattern> params = new HashMap<>();
+        Map<String, StringValuePattern> params = getParams();
         params.put("serviceCode", new ContainsPattern("3403"));
         params.put("serviceEdition", new AnythingPattern());
-        params.put("filter", new AnythingPattern());
-        params.put("top", new AnythingPattern());
-        params.put("skip", new AnythingPattern());
 
         server.stubFor(
                 WireMock.get(urlPathEqualTo(path))
@@ -161,17 +150,12 @@ public class MockServer {
                         )
         );
     }
+
     @SneakyThrows
     private void mockKallUtenParametereFraFil(String url, String filnavn) {
         String body = lesFilSomString(filnavn);
         String path = new URL(url).getPath();
-        System.out.println("********************************************");
-        System.out.println("body:"+body);
-        System.out.println("********************************************");
-        Map<String, StringValuePattern> params = new HashMap<>();
-        params.put("filter", new AnythingPattern());
-        params.put("top", new AnythingPattern());
-        params.put("skip", new AnythingPattern());
+        Map<String, StringValuePattern> params = getParams();
 
         server.stubFor(
                 WireMock.get(urlPathEqualTo(path))
@@ -182,6 +166,15 @@ public class MockServer {
                                 .withBody(body)
                         )
         );
+    }
+
+    @NotNull
+    private Map<String, StringValuePattern> getParams() {
+        Map<String, StringValuePattern> params = new HashMap<>();
+        params.put("filter", new AnythingPattern());
+        params.put("top", new AnythingPattern());
+        params.put("skip", new AnythingPattern());
+        return params;
     }
 
     @SneakyThrows
