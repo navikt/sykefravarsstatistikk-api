@@ -4,8 +4,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.common.ConsoleNotifier;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.github.tomakehurst.wiremock.matching.UrlPathPattern;
-import com.github.tomakehurst.wiremock.matching.UrlPattern;
+import com.github.tomakehurst.wiremock.matching.*;
 import io.micrometer.core.instrument.util.IOUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +16,10 @@ import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Slf4j
@@ -50,12 +51,15 @@ public class MockServer {
                 || Arrays.asList(environment.getActiveProfiles()).contains("mvc-test")
         ) {
             log.info("Mocker kall fra Altinn");
-            mockKallFraFil(altinnUrl + "ekstern/altinn/api/serviceowner/reportees", "altinnReportees.json");
-            mockKallFraFil(
+            //mockKallFraFil(altinnUrl + "ekstern/altinn/api/serviceowner/reportees", "altinnReportees.json");
+           /* mockKallFraFil(
                     altinnUrl + "ekstern/altinn/api/serviceowner/authorization/roles",
                     "altinnAuthorization-roles.json"
-            );
-            mockKall(altinnProxyUrl + "organisasjoner", HttpStatus.NOT_FOUND);
+            );*/
+            //mockKall(altinnProxyUrl + "organisasjoner", HttpStatus.NOT_FOUND);
+            //mockKallFraFil(altinnProxyUrl + "v2/organisasjoner", "altinnReportees.json");
+            mockKallUtenParametereFraFil(altinnProxyUrl + "v2/organisasjoner", "altinnReportees.json");
+            mockKallMedParametereFraFil(altinnProxyUrl + "v2/organisasjoner", "altinnReporteesMedIARettigheter.json");
         }
 
         log.info("Mocker kall fra Enhetsregisteret");
@@ -119,7 +123,7 @@ public class MockServer {
     @SneakyThrows
     private void mockKall(String url, String body) {
         String path = new URL(url).getPath();
-        mockKall(WireMock.urlPathEqualTo(path), body);
+        mockKall(urlPathEqualTo(path), body);
     }
 
     @SneakyThrows
@@ -130,6 +134,53 @@ public class MockServer {
                         .withStatus(HttpStatus.OK.value())
                         .withBody(body)
                 )
+        );
+    }
+
+    @SneakyThrows
+    private void mockKallMedParametereFraFil(String url, String filnavn) {
+        String body = lesFilSomString(filnavn);
+        String path = new URL(url).getPath();
+        System.out.println("********************************************");
+        System.out.println("body:"+body);
+        System.out.println("********************************************");
+        Map<String, StringValuePattern> params = new HashMap<>();
+        params.put("serviceCode", new ContainsPattern("3403"));
+        params.put("serviceEdition", new AnythingPattern());
+        params.put("filter", new AnythingPattern());
+        params.put("top", new AnythingPattern());
+        params.put("skip", new AnythingPattern());
+
+        server.stubFor(
+                WireMock.get(urlPathEqualTo(path))
+                        .withQueryParams(params)
+                        .willReturn(WireMock.aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withStatus(HttpStatus.OK.value())
+                                .withBody(body)
+                        )
+        );
+    }
+    @SneakyThrows
+    private void mockKallUtenParametereFraFil(String url, String filnavn) {
+        String body = lesFilSomString(filnavn);
+        String path = new URL(url).getPath();
+        System.out.println("********************************************");
+        System.out.println("body:"+body);
+        System.out.println("********************************************");
+        Map<String, StringValuePattern> params = new HashMap<>();
+        params.put("filter", new AnythingPattern());
+        params.put("top", new AnythingPattern());
+        params.put("skip", new AnythingPattern());
+
+        server.stubFor(
+                WireMock.get(urlPathEqualTo(path))
+                        .withQueryParams(params)
+                        .willReturn(WireMock.aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withStatus(HttpStatus.OK.value())
+                                .withBody(body)
+                        )
         );
     }
 

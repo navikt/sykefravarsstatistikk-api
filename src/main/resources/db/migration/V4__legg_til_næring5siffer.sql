@@ -1,4 +1,5 @@
-create table sykefravar_statistikk_naring5siffer (
+create table
+    sykefravar_statistikk_naring5siffer (
   id serial primary key,
   naring_kode varchar not null,
   arstall smallint not null,
