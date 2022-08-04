@@ -2,6 +2,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeCreator;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import common.SpringIntegrationTestbase;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.security.mock.oauth2.MockOAuth2Server;
@@ -108,7 +110,6 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtToken);
     }
 
-
     @Test
     public void hentAgreggertStatistikk_skalFunke() throws Exception {
         String jwtToken = TestTokenUtil.createToken(
@@ -158,7 +159,8 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         );
         assertThat(response.statusCode()).isEqualTo(403);
     }
-@Test
+
+    @Test
     public void hentAgreggertStatistikk_skal_returnere_virksomhetsstatistikk_og_andre_typer() throws Exception {
         String jwtToken = TestTokenUtil.createToken(
                 mockOAuth2Server,
@@ -182,9 +184,19 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         );
         assertThat(response.statusCode()).isEqualTo(200);
         JsonNode responseBody = objectMapper.readTree(response.body());
-        // TODO fullføre me
-        assertThat(responseBody).isEqualTo(4);
-        assertThat(responseBody.get(0).get("label")).isEqualTo(objectMapper.readTree("\"Næring\""));
+        JsonNode prosentSiste4KvartalerVirksomhet = responseBody.get(0);
+        JsonNode prosentSiste4KvartalerNæring = responseBody.get(1);
+        JsonNode prosentSiste4KvartalerLand = responseBody.get(2);
+        JsonNode trendNæring = responseBody.get(3);
+
+        assertThat(prosentSiste4KvartalerVirksomhet.get("label").textValue())
+                .isEqualTo("NAV ARBEID OG YTELSER AVD OSLO");
+        assertThat(prosentSiste4KvartalerNæring.get("label").textValue())
+                .isEqualTo("Næring(kode=10, navn=Produksjon av nærings- og nytelsesmidler)");
+        assertThat(prosentSiste4KvartalerLand.get("label").textValue())
+                .isEqualTo("Norge");
+        assertThat(trendNæring.get("label").textValue())
+                .isEqualTo("Næring(kode=10, navn=Produksjon av nærings- og nytelsesmidler)");
     }
 
     @Test
@@ -429,4 +441,8 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
                 ""
         );
     }
+
+    /*
+    [{"type":"PROSENT_SISTE_4_KVARTALER_VIRKSOMHET","label":"NAV ARBEID OG YTELSER AVD OSLO","verdi":"5.00","antallTilfellerIBeregningen":40,"kvartalerIBeregningen":[{"årstall":2021,"kvartal":2},{"årstall":2021,"kvartal":3},{"årstall":2021,"kvartal":4},{"årstall":2022,"kvartal":1}]},{"type":"PROSENT_SISTE_4_KVARTALER_NÆRING","label":"Næring(kode=10, navn=Produksjon av nærings- og nytelsesmidler)","verdi":"6.00","antallTilfellerIBeregningen":40,"kvartalerIBeregningen":[{"årstall":2021,"kvartal":2},{"årstall":2021,"kvartal":3},{"årstall":2021,"kvartal":4},{"årstall":2022,"kvartal":1}]},{"type":"PROSENT_SISTE_4_KVARTALER_LAND","label":"Norge","verdi":"4.00","antallTilfellerIBeregningen":40,"kvartalerIBeregningen":[{"årstall":2021,"kvartal":2},{"årstall":2021,"kvartal":3},{"årstall":2021,"kvartal":4},{"årstall":2022,"kvartal":1}]},{"type":"TREND_NÆRING","label":"Næring(kode=10, navn=Produksjon av nærings- og nytelsesmidler)","verdi":"0.00","antallTilfellerIBeregningen":20,"kvartalerIBeregningen":[{"årstall":2022,"kvartal":1},{"årstall":2021,"kvartal":1}]}]
+     */
 }

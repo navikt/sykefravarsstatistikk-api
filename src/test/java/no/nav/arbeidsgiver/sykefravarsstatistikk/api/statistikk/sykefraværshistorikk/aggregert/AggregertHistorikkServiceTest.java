@@ -161,13 +161,14 @@ class AggregertHistorikkServiceTest {
               UtilstrekkeligDataException.class);
     }
 
+    // TODO: er det 4 eller 20 som er forventet?
     @Test
     void kalkulerTrend_skal_returnere_stigende_ved_økende_trend() {
         ÅrstallOgKvartal k1 = new ÅrstallOgKvartal(2022, 1);
         ÅrstallOgKvartal k2 = new ÅrstallOgKvartal(2021, 1);
         assertThat(new Trendkalkulator(List.of(umaskertSykefraværprosent(k1, 3),
               umaskertSykefraværprosent(k2, 2)
-        )).kalkulerTrend().get()).isEqualTo(new Trend(new BigDecimal("1.00"), 4, List.of(k1, k2)));
+        )).kalkulerTrend().get()).isEqualTo(new Trend(new BigDecimal("1.00"), 20, List.of(k1, k2)));
     }
 
     @Test
