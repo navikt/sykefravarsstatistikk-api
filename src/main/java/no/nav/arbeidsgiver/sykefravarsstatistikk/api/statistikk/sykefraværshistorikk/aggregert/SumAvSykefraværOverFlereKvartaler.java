@@ -40,7 +40,7 @@ class SumAvSykefraværOverFlereKvartaler {
         this.kvartaler = List.of(data.getÅrstallOgKvartal());
     }
 
-    public Either<StatistikkException, AggregertStatistikkDto> tilAggregertStatistikkDto(
+    public Either<StatistikkException, AggregertStatistikkDto> regnUtProsent(
           Aggregeringstype type, String label) {
 
         return kalkulerFraværsprosentMedMaskering().map(

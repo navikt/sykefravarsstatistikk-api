@@ -23,14 +23,14 @@ public class Aggregeringskalkulator {
 
     Either<StatistikkException, AggregertStatistikkDto> fraværsprosentNorge() {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(LAND))
-              .tilAggregertStatistikkDto(Aggregeringstype.PROSENT_SISTE_4_KVARTALER_LAND, "Norge");
+              .regnUtProsent(Aggregeringstype.PROSENT_SISTE_4_KVARTALER_LAND, "Norge");
     }
 
     Either<StatistikkException, AggregertStatistikkDto> fraværsprosentBransjeEllerNæring(
           BransjeEllerNæring bransjeEllerNæring) {
         return summerOppSisteFireKvartaler(
               sykefraværsdata.filtrerPåKategori(bransjeEllerNæring.getStatistikkategori()))
-              .tilAggregertStatistikkDto(
+              .regnUtProsent(
                     StatistikkUtils.getProsenttypeFor(bransjeEllerNæring),
                     bransjeEllerNæring.getVerdiSomString());
     }
@@ -38,7 +38,7 @@ public class Aggregeringskalkulator {
     Either<StatistikkException, AggregertStatistikkDto> fraværsprosentVirksomhet(
           String virksomhetsnavn) {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(VIRKSOMHET))
-              .tilAggregertStatistikkDto(
+              .regnUtProsent(
                     Aggregeringstype.PROSENT_SISTE_4_KVARTALER_VIRKSOMHET, virksomhetsnavn);
     }
 

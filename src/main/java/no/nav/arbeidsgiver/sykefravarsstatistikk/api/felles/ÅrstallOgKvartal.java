@@ -13,10 +13,20 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
 
+    // TODO: Denne verdien må oppdateres hver gang vi publiserer statistikk for nytt kvartal.
+    // Det bør automatiseres bort på et vis.
     public static ÅrstallOgKvartal SISTE_PUBLISERTE_KVARTAL = new ÅrstallOgKvartal(2022, 1);
 
     private final int årstall;
     private final int kvartal;
+
+    public static ÅrstallOgKvartal sisteKvartal() {
+        return SISTE_PUBLISERTE_KVARTAL;
+    }
+
+    public static ÅrstallOgKvartal sisteKvartalMinus(int n) {
+        return sisteKvartal().minusKvartaler(n);
+    }
 
     public ÅrstallOgKvartal(int årstall, int kvartal) {
         if (kvartal > 4 || kvartal < 1) {
