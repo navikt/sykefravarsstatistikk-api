@@ -26,7 +26,7 @@ class AggregeringskalkulatorTest {
     }
 
     @Test
-    void fraværsprosentNorge() {
+    void fraværsprosentLand() {
         Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(
               new Sykefraværsdata(Map.of(Statistikkategori.VIRKSOMHET, dummySykefravær))
         );
@@ -60,11 +60,25 @@ class AggregeringskalkulatorTest {
     }
 
     @Test
-    void fraværsprosentVirksomhet() {
+    void fraværsprosentNorge_regnerUtRiktigFraværsprosent() {
+        Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(
+              new Sykefraværsdata(Map.of(Statistikkategori.LAND, dummySykefravær))
+        );
+
+        assertThat(kalkulator.fraværsprosentNorge().get().getVerdi())
+              .isEqualTo("5.00");
     }
 
     @Test
-    void trendBransjeEllerNæring() {
+    void trendBransjeEllerNæring_regnerUtRiktigTrendForNæring() {
+        Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(
+              new Sykefraværsdata(Map.of(Statistikkategori.NÆRING, dummySykefravær))
+        );
+
+        BransjeEllerNæring næring = new BransjeEllerNæring(new Bransje(BARNEHAGER, "Barnehager", "88911"));
+
+        assertThat(kalkulator.trendBransjeEllerNæring(næring).get().getVerdi())
+              .isEqualTo("5.00");
     }
 
     private final List<UmaskertSykefraværForEttKvartal> dummySykefravær = List.of(
