@@ -161,7 +161,6 @@ class AggregertHistorikkServiceTest {
               UtilstrekkeligDataException.class);
     }
 
-    // TODO: er det 4 eller 20 som er forventet?
     @Test
     void kalkulerTrend_skal_returnere_stigende_ved_økende_trend() {
         ÅrstallOgKvartal k1 = new ÅrstallOgKvartal(2022, 1);

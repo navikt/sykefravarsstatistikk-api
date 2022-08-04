@@ -97,16 +97,14 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
                                 TREND_NÆRING.toString()
                         ));
 
-        /* TODO: hva skal vi verifisere her ???
         assertThat(responseBody.findValuesAsText("label"))
                 .containsExactlyInAnyOrderElementsOf(
                         List.of(
                                 "NAV ARBEID OG YTELSER AVD OSLO",
-                                "Trygdeordninger underlagt offentlig forvaltning",
-                                PROSENT_SISTE_4_KVARTALER_LAND.toString(),
+                                "Næring(kode=10, navn=Produksjon av nærings- og nytelsesmidler)",
+                                "Norge",
                                 TREND_NÆRING.toString()
                         ));
-                        */
     }
 
     @Test

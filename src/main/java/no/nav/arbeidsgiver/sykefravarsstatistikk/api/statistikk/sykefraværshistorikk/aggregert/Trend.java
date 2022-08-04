@@ -12,7 +12,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 public class Trend {
 
     public BigDecimal trendverdi;
-    public int antallTilfellerIBeregningen;
+    public int antallPersonerIBeregningen;
     public List<ÅrstallOgKvartal> kvartalerIBeregningen;
 
     AggregertStatistikkDto tilAggregertHistorikkDto(
@@ -21,7 +21,7 @@ public class Trend {
               .type(type)
               .label(label)
               .verdi(this.trendverdi.toString())
-              .antallTilfellerIBeregningen(this.antallTilfellerIBeregningen)
+              .antallTilfellerIBeregningen(this.antallPersonerIBeregningen)
               .kvartalerIBeregningen(this.kvartalerIBeregningen)
               .build();
     }
