@@ -10,6 +10,7 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
 
@@ -21,30 +22,35 @@ class Trendkalkulator {
     List<UmaskertSykefraværForEttKvartal> datagrunnlag;
 
     Either<UtilstrekkeligDataException, Trend> kalkulerTrend() {
-        Optional<UmaskertSykefraværForEttKvartal> nyesteSykefravær =
-              hentUtKvartal(datagrunnlag, sisteKvartal());
-        Optional<UmaskertSykefraværForEttKvartal> sykefraværetEtÅrSiden =
-              hentUtKvartal(datagrunnlag, sisteKvartal().minusEttÅr());
 
-        if (nyesteSykefravær.isEmpty() || sykefraværetEtÅrSiden.isEmpty()) {
+        ÅrstallOgKvartal sisteKvartal = sisteKvartal();
+        ÅrstallOgKvartal ettÅrSiden = sisteKvartal.minusEttÅr();
+
+        Optional<UmaskertSykefraværForEttKvartal> nyesteSykefravær =
+              hentUtKvartal(datagrunnlag, sisteKvartal);
+        Optional<UmaskertSykefraværForEttKvartal> sykefraværetEttÅrSiden =
+              hentUtKvartal(datagrunnlag, ettÅrSiden);
+
+        if (nyesteSykefravær.isEmpty() || sykefraværetEttÅrSiden.isEmpty()) {
             return Either.left(
                   new UtilstrekkeligDataException(
-                        "Mangler data for " + sisteKvartal() +
-                              " og/eller " + sisteKvartal().minusEttÅr()));
+                        "Mangler data for " + sisteKvartal + " og/eller " + ettÅrSiden));
         }
 
-        BigDecimal trendverdi = nyesteSykefravær.get().getSykefraværsprosent()
-              .subtract(sykefraværetEtÅrSiden.get().getSykefraværsprosent());
+        if (nyesteSykefravær.get().harAntallMuligeDagsverkLikNull() ||
+              sykefraværetEttÅrSiden.get().harAntallMuligeDagsverkLikNull()) {
+            return Either.left(new UtilstrekkeligDataException(
+                  "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."));
+        }
+
+        BigDecimal trendverdi = nyesteSykefravær.get().kalkulerSykefraværsprosent()
+              .subtract(sykefraværetEttÅrSiden.get().kalkulerSykefraværsprosent());
 
         int antallTilfeller =
               nyesteSykefravær.get().getAntallPersoner()
-                    + sykefraværetEtÅrSiden.get().getAntallPersoner();
+                    + sykefraværetEttÅrSiden.get().getAntallPersoner();
 
         return Either.right(
-              new Trend(
-                    trendverdi,
-                    antallTilfeller,
-                    List.of(sisteKvartal(), sisteKvartal().minusEttÅr())
-              ));
+              new Trend(trendverdi, antallTilfeller, List.of(sisteKvartal, ettÅrSiden)));
     }
 }

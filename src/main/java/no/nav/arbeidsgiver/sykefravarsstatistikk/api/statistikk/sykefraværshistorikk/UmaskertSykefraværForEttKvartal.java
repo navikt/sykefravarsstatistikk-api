@@ -62,8 +62,12 @@ public class UmaskertSykefraværForEttKvartal implements
         return årstallOgKvartal != null ? årstallOgKvartal.getÅrstall() : 0;
     }
 
-    public BigDecimal getSykefraværsprosent() {
+    public BigDecimal kalkulerSykefraværsprosent() {
         return StatistikkUtils.kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk);
+    }
+
+    public boolean harAntallMuligeDagsverkLikNull() {
+     return muligeDagsverk.equals(BigDecimal.ZERO);
     }
 
     public UmaskertSykefraværForEttKvartal add(

@@ -28,11 +28,6 @@ class StatistikkUtilsTest {
     }
 
     @Test
-    public void kalkulerSykefraværsprosent_håndtererNullMuligeDagsverk() {
-
-    }
-
-    @Test
     public void kalkulerSykefraværsprosent_regnerUtKorrektProsent() {
         assertThat(kalkulerSykefraværsprosent(new BigDecimal("5"), new BigDecimal("10")))
               .isEqualTo(new BigDecimal("50.0"));

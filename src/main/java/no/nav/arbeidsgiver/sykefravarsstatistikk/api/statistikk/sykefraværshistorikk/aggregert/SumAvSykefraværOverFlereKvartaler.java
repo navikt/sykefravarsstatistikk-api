@@ -59,8 +59,11 @@ class SumAvSykefraværOverFlereKvartaler {
             return Either.left(new UtilstrekkeligDataException(
                   "Trenger minst ett kvartal for å beregene sykefraværsprosent."));
         }
-
-        if (this.antallTilfeller
+        if (muligeDagsverk.equals(ZERO)) {
+            return Either.left(new UtilstrekkeligDataException(
+                  "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."));
+        }
+        if (antallTilfeller
               < MINIMUM_ANTALL_PERSONER_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER) {
             return Either.left(new MaskerteDataException(
                   "Ikke nok sykefraværstilfeller til å kunne vise sykefraværsprosenten."));
