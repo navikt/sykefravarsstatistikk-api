@@ -35,7 +35,7 @@ public class AggregertStatistikkService {
         this.enhetsregisteretClient = enhetsregisteretClient;
     }
 
-    public Either<TilgangskontrollException, List<AggregertStatistikkDto>> hentAggregertStatistikk(
+    public Either<TilgangskontrollException, AggregertStatistikkDto> hentAggregertStatistikk(
           Orgnr orgnr) {
 
         if (!tilgangskontrollService.brukerRepresentererVirksomheten(orgnr)) {
@@ -54,7 +54,7 @@ public class AggregertStatistikkService {
     }
 
 
-    private List<AggregertStatistikkDto> aggregerData(
+    private AggregertStatistikkDto aggregerData(
           Underenhet virksomhet,
           Sykefraværsdata sykefravær) {
 
@@ -64,14 +64,22 @@ public class AggregertStatistikkService {
               bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(
                     virksomhet.getNæringskode());
 
-        return Stream.of(
+        List<StatistikkDto> prosentSisteFireKvartaler = Stream.of(
                     kalkulator.fraværsprosentVirksomhet(virksomhet.getNavn()),
                     kalkulator.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
-                    kalkulator.fraværsprosentNorge(),
+                    kalkulator.fraværsprosentNorge())
+              .filter(Either::isRight)
+              .map(Either::get)
+              .collect(Collectors.toList());
+
+        List<StatistikkDto> trend = Stream.of(
                     kalkulator.trendBransjeEllerNæring(bransjeEllerNæring))
               .filter(Either::isRight)
               .map(Either::get)
               .collect(Collectors.toList());
+
+        return new AggregertStatistikkDto(prosentSisteFireKvartaler, trend);
+
     }
 
     private Sykefraværsdata

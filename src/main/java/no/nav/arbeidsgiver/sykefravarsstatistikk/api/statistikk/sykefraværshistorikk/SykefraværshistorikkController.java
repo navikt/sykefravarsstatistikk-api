@@ -42,12 +42,12 @@ public class SykefraværshistorikkController {
     private final AggregertStatistikkService aggregertHistorikkService;
 
     public SykefraværshistorikkController(
-            KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService,
-            TilgangskontrollService tilgangskontrollService,
-            EnhetsregisteretClient enhetsregisteretClient,
-            SummertSykefraværService summertSykefraværService,
-            AggregertStatistikkService aggregertHistorikkService,
-            SummertLegemeldtSykefraværService summertLegemeldtSykefraværService
+          KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService,
+          TilgangskontrollService tilgangskontrollService,
+          EnhetsregisteretClient enhetsregisteretClient,
+          SummertSykefraværService summertSykefraværService,
+          AggregertStatistikkService aggregertHistorikkService,
+          SummertLegemeldtSykefraværService summertLegemeldtSykefraværService
     ) {
         this.kvartalsvisSykefraværshistorikkService = kvartalsvisSykefraværshistorikkService;
         this.tilgangskontrollService = tilgangskontrollService;
@@ -59,8 +59,8 @@ public class SykefraværshistorikkController {
 
     @GetMapping(value = "/{orgnr}/sykefravarshistorikk/kvartalsvis")
     public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikk(
-            @PathVariable("orgnr") String orgnrStr,
-            HttpServletRequest request
+          @PathVariable("orgnr") String orgnrStr,
+          HttpServletRequest request
     ) {
 
         Orgnr orgnr = new Orgnr(orgnrStr);
@@ -68,34 +68,34 @@ public class SykefraværshistorikkController {
         InnloggetBruker bruker = tilgangskontrollService.hentBrukerKunIaRettigheter();
 
         tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
-                orgnr,
-                bruker,
-                request.getMethod(),
-                "" + request.getRequestURL()
+              orgnr,
+              bruker,
+              request.getMethod(),
+              "" + request.getRequestURL()
         );
 
         Underenhet underenhet = enhetsregisteretClient.hentUnderenhet(orgnr);
         OverordnetEnhet overordnetEnhet = enhetsregisteretClient.hentInformasjonOmEnhet(
-                underenhet.getOverordnetEnhetOrgnr());
+              underenhet.getOverordnetEnhetOrgnr());
 
         boolean harTilgangTilOverordnetEnhet =
-                tilgangskontrollService.hentTilgangTilOverordnetEnhetOgLoggSikkerhetshendelse(
-                        bruker,
-                        overordnetEnhet,
-                        underenhet,
-                        request.getMethod(),
-                        "" + request.getRequestURL()
-                );
+              tilgangskontrollService.hentTilgangTilOverordnetEnhetOgLoggSikkerhetshendelse(
+                    bruker,
+                    overordnetEnhet,
+                    underenhet,
+                    request.getMethod(),
+                    "" + request.getRequestURL()
+              );
 
         if (harTilgangTilOverordnetEnhet) {
             return kvartalsvisSykefraværshistorikkService.hentSykefraværshistorikk(
-                    underenhet,
-                    overordnetEnhet
+                  underenhet,
+                  overordnetEnhet
             );
         } else {
             return kvartalsvisSykefraværshistorikkService.hentSykefraværshistorikk(
-                    underenhet,
-                    overordnetEnhet.getInstitusjonellSektorkode()
+                  underenhet,
+                  overordnetEnhet.getInstitusjonellSektorkode()
             );
         }
     }
@@ -103,56 +103,56 @@ public class SykefraværshistorikkController {
 
     @GetMapping(value = "/{orgnr}/sykefravarshistorikk/summert")
     public List<SummertSykefraværshistorikk> hentSummertKorttidsOgLangtidsfraværV2(
-            @PathVariable("orgnr") String orgnrStr,
-            @RequestParam("antallKvartaler") int antallKvartaler,
-            HttpServletRequest request
+          @PathVariable("orgnr") String orgnrStr,
+          @RequestParam("antallKvartaler") int antallKvartaler,
+          HttpServletRequest request
     ) {
 
         InnloggetBruker bruker = tilgangskontrollService.hentBrukerKunIaRettigheter();
         tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
-                new Orgnr(orgnrStr),
-                bruker,
-                request.getMethod(),
-                "" + request.getRequestURL()
+              new Orgnr(orgnrStr),
+              bruker,
+              request.getMethod(),
+              "" + request.getRequestURL()
         );
         Underenhet underenhet = enhetsregisteretClient.hentUnderenhet(new Orgnr(orgnrStr));
 
         if (antallKvartaler != 4) {
             throw new IllegalArgumentException(
-                    "For øyeblikket støtter vi kun summering av 4 kvartaler.");
+                  "For øyeblikket støtter vi kun summering av 4 kvartaler.");
         }
 
         SummertSykefraværshistorikk summertSykefraværshistorikkVirksomhet =
-                summertSykefraværService.hentSummertSykefraværshistorikk(
-                        underenhet,
-                        SISTE_PUBLISERTE_KVARTAL,
-                        antallKvartaler
-                );
+              summertSykefraværService.hentSummertSykefraværshistorikk(
+                    underenhet,
+                    SISTE_PUBLISERTE_KVARTAL,
+                    antallKvartaler
+              );
 
         SummertSykefraværshistorikk summertSykefraværshistorikkBransjeEllerNæring =
-                summertSykefraværService.hentSummertSykefraværshistorikkForBransjeEllerNæring(
-                        underenhet,
-                        SISTE_PUBLISERTE_KVARTAL,
-                        antallKvartaler
-                );
+              summertSykefraværService.hentSummertSykefraværshistorikkForBransjeEllerNæring(
+                    underenhet,
+                    SISTE_PUBLISERTE_KVARTAL,
+                    antallKvartaler
+              );
 
         return Arrays.asList(summertSykefraværshistorikkVirksomhet,
-                summertSykefraværshistorikkBransjeEllerNæring);
+              summertSykefraværshistorikkBransjeEllerNæring);
     }
 
     // TODO: Fjern når MSA har gått over til "oppsummert"-endepunktet
     @GetMapping(value = "/{orgnr}/sykefravarshistorikk/legemeldtsykefravarsprosent")
     public ResponseEntity<LegemeldtSykefraværsprosent> hentLegemeldtSykefraværsprosent(
-            @PathVariable("orgnr") String orgnrStr,
-            HttpServletRequest request
+          @PathVariable("orgnr") String orgnrStr,
+          HttpServletRequest request
     ) {
         InnloggetBruker bruker = tilgangskontrollService.hentBrukerKunIaRettigheter();
 
         tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
-                new Orgnr(orgnrStr),
-                bruker,
-                request.getMethod(),
-                "" + request.getRequestURL()
+              new Orgnr(orgnrStr),
+              bruker,
+              request.getMethod(),
+              "" + request.getRequestURL()
         );
 
         Underenhet underenhet;
@@ -161,39 +161,39 @@ public class SykefraværshistorikkController {
         } catch (IngenNæringException e) {
             log.info("Underenhet har ingen næring. Returnerer 204 - No Content");
             return ResponseEntity
-                    .status(HttpStatus.NO_CONTENT)
-                    .body(null);
+                  .status(HttpStatus.NO_CONTENT)
+                  .body(null);
         }
 
         LegemeldtSykefraværsprosent legemeldtSykefraværsprosent =
-                summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
-                        underenhet,
-                        SISTE_PUBLISERTE_KVARTAL
-                );
+              summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
+                    underenhet,
+                    SISTE_PUBLISERTE_KVARTAL
+              );
 
         if (legemeldtSykefraværsprosent.getProsent() == null) {
             log.info(
-                    "Underenhet har ingen sykefraværsprosent tilgjengelig. Returnerer 204 - No "
-                            + "Content");
+                  "Underenhet har ingen sykefraværsprosent tilgjengelig. Returnerer 204 - No "
+                        + "Content");
             return ResponseEntity
-                    .status(HttpStatus.NO_CONTENT)
-                    .body(null);
+                  .status(HttpStatus.NO_CONTENT)
+                  .body(null);
         }
 
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(legemeldtSykefraværsprosent);
+              .status(HttpStatus.OK)
+              .body(legemeldtSykefraværsprosent);
     }
 
     @GetMapping("/{orgnr}/sykefravarshistorikk/aggregert/siste")
-    public ResponseEntity<List<AggregertStatistikkDto>> hentAggregertStatistikk(
-            @PathVariable("orgnr") String orgnr,
-            HttpServletRequest request
+    public ResponseEntity<AggregertStatistikkDto> hentAggregertStatistikk(
+          @PathVariable("orgnr") String orgnr,
+          HttpServletRequest request
     ) {
 
-        List<AggregertStatistikkDto> statistikk =
-                aggregertHistorikkService.hentAggregertStatistikk(new Orgnr(orgnr))
-                        .getOrElseThrow(e -> e);
+         AggregertStatistikkDto statistikk =
+              aggregertHistorikkService.hentAggregertStatistikk(new Orgnr(orgnr))
+                    .getOrElseThrow(e -> e);
 
         return ResponseEntity.status(HttpStatus.OK).body(statistikk);
     }

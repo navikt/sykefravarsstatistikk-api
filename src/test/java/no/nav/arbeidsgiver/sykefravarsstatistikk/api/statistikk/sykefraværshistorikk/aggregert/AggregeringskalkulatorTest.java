@@ -7,28 +7,19 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.List;
 import java.util.Map;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class AggregeringskalkulatorTest {
 
-    @BeforeEach
-    void setUp() {
-    }
-
-    @AfterEach
-    void tearDown() {
-    }
-
     @Test
-    void fraværsprosentLand() {
+    void fraværsprosentLand_regnerUtRiktigFraværsprosent() {
         Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(
-              new Sykefraværsdata(Map.of(Statistikkategori.VIRKSOMHET, dummySykefravær))
+              new Sykefraværsdata(Map.of(Statistikkategori.VIRKSOMHET, synkendeSykefravær))
         );
 
         assertThat(kalkulator.fraværsprosentVirksomhet("dummynavn").get().getVerdi())
@@ -38,10 +29,11 @@ class AggregeringskalkulatorTest {
     @Test
     void fraværsprosentBransjeEllerNæring_regnerUtRiktigFraværsprosentForBransje() {
         Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(
-              new Sykefraværsdata(Map.of(Statistikkategori.BRANSJE, dummySykefravær))
+              new Sykefraværsdata(Map.of(Statistikkategori.BRANSJE, synkendeSykefravær))
         );
 
-        BransjeEllerNæring bransje = new BransjeEllerNæring(new Bransje(BARNEHAGER, "Barnehager", "88911"));
+        BransjeEllerNæring bransje = new BransjeEllerNæring(
+              new Bransje(BARNEHAGER, "Barnehager", "88911"));
 
         assertThat(kalkulator.fraværsprosentBransjeEllerNæring(bransje).get().getVerdi())
               .isEqualTo("5.00");
@@ -50,19 +42,19 @@ class AggregeringskalkulatorTest {
     @Test
     void fraværsprosentBransjeEllerNæring_regnerUtRiktigFraværsprosentForNæring() {
         Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(
-              new Sykefraværsdata(Map.of(Statistikkategori.NÆRING, dummySykefravær))
+              new Sykefraværsdata(Map.of(Statistikkategori.NÆRING, synkendeSykefravær))
         );
 
-        BransjeEllerNæring næring = new BransjeEllerNæring(new Bransje(BARNEHAGER, "Barnehager", "88911"));
+        BransjeEllerNæring dummynæring = new BransjeEllerNæring(new Næring("00000", "Dummynæring"));
 
-        assertThat(kalkulator.fraværsprosentBransjeEllerNæring(næring).get().getVerdi())
+        assertThat(kalkulator.fraværsprosentBransjeEllerNæring(dummynæring).get().getVerdi())
               .isEqualTo("5.00");
     }
 
     @Test
     void fraværsprosentNorge_regnerUtRiktigFraværsprosent() {
         Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(
-              new Sykefraværsdata(Map.of(Statistikkategori.LAND, dummySykefravær))
+              new Sykefraværsdata(Map.of(Statistikkategori.LAND, synkendeSykefravær))
         );
 
         assertThat(kalkulator.fraværsprosentNorge().get().getVerdi())
@@ -72,16 +64,16 @@ class AggregeringskalkulatorTest {
     @Test
     void trendBransjeEllerNæring_regnerUtRiktigTrendForNæring() {
         Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(
-              new Sykefraværsdata(Map.of(Statistikkategori.NÆRING, dummySykefravær))
+              new Sykefraværsdata(Map.of(Statistikkategori.NÆRING, synkendeSykefravær))
         );
 
-        BransjeEllerNæring næring = new BransjeEllerNæring(new Bransje(BARNEHAGER, "Barnehager", "88911"));
+        BransjeEllerNæring dummynæring = new BransjeEllerNæring(new Næring("00000", "Dummynæring"));
 
-        assertThat(kalkulator.trendBransjeEllerNæring(næring).get().getVerdi())
-              .isEqualTo("5.00");
+        assertThat(kalkulator.trendBransjeEllerNæring(dummynæring).get().getVerdi())
+              .isEqualTo("-8.00");
     }
 
-    private final List<UmaskertSykefraværForEttKvartal> dummySykefravær = List.of(
+    private final List<UmaskertSykefraværForEttKvartal> synkendeSykefravær = List.of(
           opprettTestdata(sisteKvartalMinus(0), 2, 100, 1),
           opprettTestdata(sisteKvartalMinus(1), 4, 100, 2),
           opprettTestdata(sisteKvartalMinus(2), 6, 100, 3),

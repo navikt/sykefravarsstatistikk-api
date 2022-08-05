@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.StatistikkUtils;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Aggregeringstype;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.StatistikkException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
@@ -21,28 +19,27 @@ public class Aggregeringskalkulator {
 
     public Sykefraværsdata sykefraværsdata;
 
-    Either<StatistikkException, AggregertStatistikkDto> fraværsprosentNorge() {
+    Either<StatistikkException, StatistikkDto> fraværsprosentNorge() {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(LAND))
-              .regnUtProsent(Aggregeringstype.PROSENT_SISTE_4_KVARTALER_LAND, "Norge");
+              .regnUtProsentOgMapTilDto(LAND, "Norge");
     }
 
-    Either<StatistikkException, AggregertStatistikkDto> fraværsprosentBransjeEllerNæring(
+    Either<StatistikkException, StatistikkDto> fraværsprosentBransjeEllerNæring(
           BransjeEllerNæring bransjeEllerNæring) {
         return summerOppSisteFireKvartaler(
               sykefraværsdata.filtrerPåKategori(bransjeEllerNæring.getStatistikkategori()))
-              .regnUtProsent(
-                    StatistikkUtils.getProsenttypeFor(bransjeEllerNæring),
+              .regnUtProsentOgMapTilDto(
+                    bransjeEllerNæring.getStatistikkategori(),
                     bransjeEllerNæring.getVerdiSomString());
     }
 
-    Either<StatistikkException, AggregertStatistikkDto> fraværsprosentVirksomhet(
+    Either<StatistikkException, StatistikkDto> fraværsprosentVirksomhet(
           String virksomhetsnavn) {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(VIRKSOMHET))
-              .regnUtProsent(
-                    Aggregeringstype.PROSENT_SISTE_4_KVARTALER_VIRKSOMHET, virksomhetsnavn);
+              .regnUtProsentOgMapTilDto(VIRKSOMHET, virksomhetsnavn);
     }
 
-    Either<UtilstrekkeligDataException, AggregertStatistikkDto> trendBransjeEllerNæring(
+    Either<UtilstrekkeligDataException, StatistikkDto> trendBransjeEllerNæring(
           BransjeEllerNæring bransjeEllerNæring) {
         Either<UtilstrekkeligDataException, Trend> maybeTrend =
               new Trendkalkulator(
@@ -50,7 +47,7 @@ public class Aggregeringskalkulator {
                     .kalkulerTrend();
 
         return maybeTrend.map(r -> r.tilAggregertHistorikkDto(
-              StatistikkUtils.getTrendtypeFor(bransjeEllerNæring),
+              bransjeEllerNæring.getStatistikkategori(),
               bransjeEllerNæring.getVerdiSomString())
         );
     }

@@ -24,7 +24,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Brans
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Aggregeringstype;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
@@ -92,7 +92,7 @@ class AggregertHistorikkServiceTest {
         when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(), any()))
               .thenReturn(new Sykefraværsdata(Map.of()));
         assertThat(serviceUnderTest.hentAggregertStatistikk(etOrgnr).get())
-              .isEqualTo(List.of());
+              .isEqualTo(new AggregertStatistikkDto());
 
         // Resultat med statistikkategri og tomme lister skal heller ikke kræsje
         when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(),
@@ -104,7 +104,7 @@ class AggregertHistorikkServiceTest {
                     BRANSJE, List.of()
               )));
         assertThat(serviceUnderTest.hentAggregertStatistikk(etOrgnr).get())
-              .isEqualTo(List.of());
+              .isEqualTo(new AggregertStatistikkDto());
     }
 
     @Test
@@ -125,20 +125,25 @@ class AggregertHistorikkServiceTest {
                     )
               ));
 
-        List<Aggregeringstype> forventedeStatistikktyper =
-              List.of(
-                    Aggregeringstype.PROSENT_SISTE_4_KVARTALER_VIRKSOMHET,
-                    Aggregeringstype.PROSENT_SISTE_4_KVARTALER_BRANSJE,
-                    Aggregeringstype.PROSENT_SISTE_4_KVARTALER_LAND,
-                    Aggregeringstype.TREND_BRANSJE
-              );
+        List<Statistikkategori> forventedeProsenttyper =
+              List.of(VIRKSOMHET, BRANSJE, LAND);
 
-        List<Aggregeringstype> statistikktyper =
-              serviceUnderTest.hentAggregertStatistikk(etOrgnr).get().stream()
-                    .map(AggregertStatistikkDto::getType)
+        List<Statistikkategori> forventedeTrendtyper = List.of(BRANSJE);
+
+        List<Statistikkategori> prosentstatistikk =
+              serviceUnderTest.hentAggregertStatistikk(etOrgnr).get().prosentSiste4Kvartaler
+                    .stream()
+                    .map(StatistikkDto::getStatistikkategori)
                     .collect(Collectors.toList());
 
-        assertThat(statistikktyper).isEqualTo(forventedeStatistikktyper);
+        List<Statistikkategori> trendstatistikk =
+              serviceUnderTest.hentAggregertStatistikk(etOrgnr).get().trend
+                    .stream()
+                    .map(StatistikkDto::getStatistikkategori)
+                    .collect(Collectors.toList());
+
+        assertThat(trendstatistikk).isEqualTo(forventedeTrendtyper);
+        assertThat(prosentstatistikk).isEqualTo(forventedeProsenttyper);
     }
 
     @Test

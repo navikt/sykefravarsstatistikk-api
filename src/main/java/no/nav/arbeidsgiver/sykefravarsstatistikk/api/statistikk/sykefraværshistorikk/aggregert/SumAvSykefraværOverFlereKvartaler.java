@@ -12,7 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Aggregeringstype;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.StatistikkException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
@@ -40,15 +40,15 @@ class SumAvSykefraværOverFlereKvartaler {
         this.kvartaler = List.of(data.getÅrstallOgKvartal());
     }
 
-    public Either<StatistikkException, AggregertStatistikkDto> regnUtProsent(
-          Aggregeringstype type, String label) {
+    public Either<StatistikkException, StatistikkDto> regnUtProsentOgMapTilDto
+          (Statistikkategori type, String label) {
 
         return kalkulerFraværsprosentMedMaskering().map(
-              prosent -> AggregertStatistikkDto.builder()
-                    .type(type)
+              prosent -> StatistikkDto.builder()
+                    .statistikkategori(type)
                     .label(label)
                     .verdi(prosent.toString())
-                    .antallTilfellerIBeregningen(antallTilfeller)
+                    .antallPersonerIBeregningen(antallTilfeller)
                     .kvartalerIBeregningen(kvartaler)
                     .build()
         );

@@ -1,18 +1,16 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
 import java.util.List;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.Aggregeringstype;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
-@Builder
+@Setter
 public class AggregertStatistikkDto {
-
-    private final Aggregeringstype type;
-    private final String label;
-    private final String verdi;
-    private final Integer antallTilfellerIBeregningen;
-    private final List<ÅrstallOgKvartal> kvartalerIBeregningen;
+    public List<StatistikkDto> prosentSiste4Kvartaler = List.of();
+    public List<StatistikkDto> trend = List.of();
 }
