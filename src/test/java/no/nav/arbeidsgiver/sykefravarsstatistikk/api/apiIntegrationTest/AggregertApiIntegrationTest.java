@@ -46,15 +46,18 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
     @Autowired
     MockOAuth2Server mockOAuth2Server;
 
+
     @BeforeEach
     public void setUp() {
         slettAllStatistikkFraDatabase(jdbcTemplate);
     }
 
+
     @AfterEach
     public void tearDown() {
         slettAllStatistikkFraDatabase(jdbcTemplate);
     }
+
 
     @LocalServerPort
     private String port;
@@ -83,6 +86,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
 
         assertThat(response.statusCode()).isEqualTo(200);
     }
+
 
     @Test
     public void hentAgreggertStatistikk_returnererForventedeTyperForBedriftSomHarAlleTyperData()
@@ -115,6 +119,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
                 .isEqualTo("NAV ARBEID OG YTELSER AVD OSLO");
     }
 
+
     @Test
     public void hentAgreggertStatistikk_returnererIkkeVirksomhetstatistikkTilBrukerSomManglerIaRettigheter()
             throws Exception {
@@ -123,8 +128,6 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
         opprettStatistikkForLand(jdbcTemplate);
 
         HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER);
-        assertThat(response.statusCode()).isEqualTo(200);
-
         JsonNode responseBody = objectMapper.readTree(response.body());
 
         assertThat(responseBody.get("prosentSiste4Kvartaler").findValuesAsText("statistikkategori"))
@@ -137,6 +140,20 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
         assertThat(responseBody.get("trend").findValuesAsText("statistikkategori"))
                 .containsExactly(BRANSJE.toString());
     }
+
+
+    @Test
+    public void hentAgreggertStatistikk_viserNavnetTilBransjenEllerNæringenSomLabel()
+            throws Exception {
+        opprettStatistikkForNæring5Siffer(jdbcTemplate, BARNEHAGER, 2022, 1, 5, 100, 10);
+
+        HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER);
+        JsonNode responseBody = objectMapper.readTree(response.body());
+
+        JsonNode barnehageJson = responseBody.get("prosentSiste4Kvartaler").get(0);
+        assertThat(barnehageJson.get("label").toString()).isEqualTo("\"Barnehager\"");
+    }
+
 
     private HttpResponse<String> utførAutorisertKall(String orgnr)
             throws IOException, InterruptedException {

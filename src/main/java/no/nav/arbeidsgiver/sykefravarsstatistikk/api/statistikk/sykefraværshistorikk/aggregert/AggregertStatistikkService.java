@@ -61,12 +61,12 @@ public class AggregertStatistikkService {
                 bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(
                         virksomhet.getNæringskode()
                 );
-        List<StatistikkDto> prosentSisteFireKvartaler = EitherUtils.filterRight(
+        List<StatistikkDto> prosentSisteFireKvartaler = EitherUtils.filterRights(
                 kalkulator.fraværsprosentVirksomhet(virksomhet.getNavn()),
                 kalkulator.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
                 kalkulator.fraværsprosentNorge()
         );
-        List<StatistikkDto> trend = EitherUtils.filterRight(
+        List<StatistikkDto> trend = EitherUtils.filterRights(
                 kalkulator.trendBransjeEllerNæring(bransjeEllerNæring)
         );
         return new AggregertStatistikkDto(prosentSisteFireKvartaler, trend);

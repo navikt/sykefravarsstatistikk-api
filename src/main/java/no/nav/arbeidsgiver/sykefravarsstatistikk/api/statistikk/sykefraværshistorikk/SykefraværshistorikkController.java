@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @Protected
-@RestController()
+@RestController
 public class SykefraværshistorikkController {
 
     private final KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService;
@@ -191,8 +191,7 @@ public class SykefraværshistorikkController {
 
     @GetMapping("/{orgnr}/sykefravarshistorikk/aggregert/v1'")
     public ResponseEntity<AggregertStatistikkDto> hentAggregertStatistikk(
-            @PathVariable("orgnr") String orgnr,
-            HttpServletRequest request
+            @PathVariable("orgnr") String orgnr
     ) {
 
         AggregertStatistikkDto statistikk =

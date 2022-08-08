@@ -19,10 +19,12 @@ public class Aggregeringskalkulator {
 
     public Sykefraværsdata sykefraværsdata;
 
+
     Either<StatistikkException, StatistikkDto> fraværsprosentNorge() {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(LAND))
                 .regnUtProsentOgMapTilDto(LAND, "Norge");
     }
+
 
     Either<StatistikkException, StatistikkDto> fraværsprosentBransjeEllerNæring(
             BransjeEllerNæring bransjeEllerNæring) {
@@ -30,14 +32,16 @@ public class Aggregeringskalkulator {
                 sykefraværsdata.filtrerPåKategori(bransjeEllerNæring.getStatistikkategori()))
                 .regnUtProsentOgMapTilDto(
                         bransjeEllerNæring.getStatistikkategori(),
-                        bransjeEllerNæring.verdiSomString());
+                        bransjeEllerNæring.navn()
+                );
     }
 
-    Either<StatistikkException, StatistikkDto> fraværsprosentVirksomhet(
-            String virksomhetsnavn) {
+
+    Either<StatistikkException, StatistikkDto> fraværsprosentVirksomhet(String virksomhetsnavn) {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(VIRKSOMHET))
                 .regnUtProsentOgMapTilDto(VIRKSOMHET, virksomhetsnavn);
     }
+
 
     Either<UtilstrekkeligDataException, StatistikkDto> trendBransjeEllerNæring(
             BransjeEllerNæring bransjeEllerNæring) {
@@ -49,9 +53,10 @@ public class Aggregeringskalkulator {
 
         return maybeTrend.map(r -> r.tilAggregertHistorikkDto(
                 bransjeEllerNæring.getStatistikkategori(),
-                bransjeEllerNæring.verdiSomString())
+                bransjeEllerNæring.navn())
         );
     }
+
 
     private SumAvSykefraværOverFlereKvartaler summerOppSisteFireKvartaler(
             List<UmaskertSykefraværForEttKvartal> statistikk) {
@@ -60,6 +65,7 @@ public class Aggregeringskalkulator {
                 .map(SumAvSykefraværOverFlereKvartaler::new)
                 .reduce(NULLPUNKT, SumAvSykefraværOverFlereKvartaler::leggSammen);
     }
+
 
     private List<UmaskertSykefraværForEttKvartal> ekstraherSisteFireKvartaler(
             List<UmaskertSykefraværForEttKvartal> statistikk) {

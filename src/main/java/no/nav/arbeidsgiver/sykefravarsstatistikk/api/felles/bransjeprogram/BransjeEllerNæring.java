@@ -31,8 +31,8 @@ public class BransjeEllerNæring {
         return verdi.getLeft();
     }
 
-    public String verdiSomString() {
-        return (this.isBransje() ? verdi.getLeft() : verdi.get()).toString();
+    public String navn() {
+        return this.isBransje() ? verdi.getLeft().getNavn() : verdi.get().getNavn();
     }
 
     public Næring getNæring() {

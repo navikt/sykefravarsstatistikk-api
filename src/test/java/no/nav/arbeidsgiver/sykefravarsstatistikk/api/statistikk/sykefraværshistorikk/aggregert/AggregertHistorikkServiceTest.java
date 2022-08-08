@@ -60,6 +60,7 @@ class AggregertHistorikkServiceTest {
     @Mock
     private BransjeEllerNæringService mockBransjeEllerNæringService;
 
+
     @BeforeEach
     public void setUp() {
 
@@ -71,6 +72,7 @@ class AggregertHistorikkServiceTest {
         );
     }
 
+
     @AfterEach
     public void tearDown() {
         reset(
@@ -79,6 +81,7 @@ class AggregertHistorikkServiceTest {
                 mockBransjeEllerNæringService,
                 mockTilgangskontrollService);
     }
+
 
     @Test
     void hentAggregertHistorikk_kræsjerIkkeVedManglendeData() {
@@ -106,6 +109,7 @@ class AggregertHistorikkServiceTest {
         assertThat(serviceUnderTest.hentAggregertStatistikk(etOrgnr).get())
                 .isEqualTo(new AggregertStatistikkDto());
     }
+
 
     @Test
     void hentAggregertHistorikk_henterAltSykefraværDersomBrukerHarIaRettigheter() {
@@ -146,6 +150,7 @@ class AggregertHistorikkServiceTest {
         assertThat(prosentstatistikk).isEqualTo(forventedeProsenttyper);
     }
 
+
     @Test
     void kalkulerTrend_skal_returnere_ManglendeDataException_ved_mangel_av_ett_kvartal() {
         assertThat(new Trendkalkulator(
@@ -154,6 +159,7 @@ class AggregertHistorikkServiceTest {
                 )).kalkulerTrend().getLeft())
                 .isExactlyInstanceOf(UtilstrekkeligDataException.class);
     }
+
 
     @Test
     void kalkulerTrend_skal_returnere_stigende_ved_økende_trend() {
@@ -167,6 +173,7 @@ class AggregertHistorikkServiceTest {
                 .isEqualTo(
                         new Trend(new BigDecimal("1.0"), 20, List.of(k1, k2)));
     }
+
 
     @Test
     void kalkulerTrend_skal_returnere_synkende_ved_nedadgående_trend() {
@@ -185,11 +192,13 @@ class AggregertHistorikkServiceTest {
                 .isEqualTo(forventetTrend);
     }
 
+
     @Test
     void kalkulerTrend_skal_returnere_tåle_tomt_datagrunnlag() {
         assertThat(new Trendkalkulator(List.of()).kalkulerTrend().getLeft())
                 .isExactlyInstanceOf(UtilstrekkeligDataException.class);
     }
+
 
     private List<UmaskertSykefraværForEttKvartal> genererTestSykefravær(int offset) {
         return Arrays.asList(
@@ -202,6 +211,7 @@ class AggregertHistorikkServiceTest {
                 umaskertSykefraværprosent(new ÅrstallOgKvartal(2020, 3), 7.7 + offset, 10)
         );
     }
+
 
     private static UmaskertSykefraværForEttKvartal umaskertSykefraværprosent(
             ÅrstallOgKvartal årstallOgKvartal, double prosent, int antallPersoner) {

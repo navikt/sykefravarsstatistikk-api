@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 public class EitherUtils {
 
     @SafeVarargs
-    public static <L, R> List<R> filterRight(Either<L, R>... leftsAndRights) {
+    public static <L, R> List<R> filterRights(Either<L, R>... leftsAndRights) {
         return Stream.of(leftsAndRights)
                 .filter(Either::isRight)
                 .map(Either::get)
