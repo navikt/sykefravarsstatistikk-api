@@ -5,7 +5,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 
 public class BransjeEllerNæring {
-
     public final Either<Bransje, Næring> verdi;
 
     public BransjeEllerNæring(Bransje bransje) {
@@ -32,7 +31,7 @@ public class BransjeEllerNæring {
         return verdi.getLeft();
     }
 
-    public String getVerdiSomString() {
+    public String verdiSomString() {
         return (this.isBransje() ? verdi.getLeft() : verdi.get()).toString();
     }
 

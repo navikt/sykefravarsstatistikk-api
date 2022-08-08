@@ -26,29 +26,19 @@ public class Bransje {
             return;
         }
         throw new IllegalArgumentException(
-                "Støtter kun bransjer som er spesifisert av enten 2 eller 5 sifre");
+              "Støtter kun bransjer som er spesifisert av enten 2 eller 5 sifre");
     }
 
     private boolean inneholderKunKoderMedGittAntallSifre(int antallSifre) {
         return koderSomSpesifisererNæringer.stream().allMatch(kode -> kode.length() == antallSifre);
     }
 
-    int lengdePåNæringskoder() {
-        if (inneholderKunKoderMedGittAntallSifre(2)) {
-            return 2;
-        } else if (inneholderKunKoderMedGittAntallSifre(5)) {
-            return 5;
-        }
-        throw new IllegalStateException(
-              "Støtter kun bransjer som er spesifisert av enten 2 eller 5 sifre");
-    }
-
     public boolean erDefinertPåTosiffernivå() {
-        return lengdePåNæringskoder() == 2;
+        return inneholderKunKoderMedGittAntallSifre(2);
     }
 
     public boolean erDefinertPåFemsiffernivå() {
-        return lengdePåNæringskoder() == 5;
+        return inneholderKunKoderMedGittAntallSifre(5);
     }
 
     public boolean inkludererVirksomhet(Underenhet underenhet) {

@@ -38,7 +38,7 @@ public class EnhetsregisteretClient {
 
     public Virksomhet hentInformasjonOmVirksomhet(Orgnr orgnrTilVirksomhet) {
         try {
-            return hentUnderenhet(orgnrTilVirksomhet);
+            return hentInformasjonOmUnderenhet(orgnrTilVirksomhet);
         } catch(RestClientException exception) {
             return hentInformasjonOmEnhet(orgnrTilVirksomhet);
         }
@@ -57,7 +57,7 @@ public class EnhetsregisteretClient {
         }
     }
 
-    public Underenhet hentUnderenhet(Orgnr orgnrTilUnderenhet) {
+    public Underenhet hentInformasjonOmUnderenhet(Orgnr orgnrTilUnderenhet) {
         try {
             String url = enhetsregisteretUrl + "underenheter/" + orgnrTilUnderenhet.getVerdi();
             String respons = restTemplate.getForObject(url, String.class);

@@ -42,9 +42,9 @@ public class StatistikkRepository {
 
 
     public ÅrstallOgKvartal hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde type) {
-        List<ÅrstallOgKvartal> alleKvartaler =
+        List<ÅrstallOgKvartal> alleÅrstallOgKvartal =
                 hentAlleÅrstallOgKvartalForSykefraværsstatistikk(type);
-        return alleKvartaler.get(0);
+        return alleÅrstallOgKvartal.get(0);
     }
 
     @NotNull

@@ -6,10 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-@Setter
 public class AggregertStatistikkDto {
     public List<StatistikkDto> prosentSiste4Kvartaler = List.of();
     public List<StatistikkDto> trend = List.of();

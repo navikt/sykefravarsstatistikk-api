@@ -6,8 +6,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CollectionUtils {
-    public static <T> List<T> joinLists(Collection<T> list1, Collection<T> list2) {
-        return Stream.concat(list1.stream(), list2.stream())
+
+    public static <T> List<T> concatinate(Collection<T> collection1, Collection<T> collection2) {
+        return Stream.concat(collection1.stream(), collection2.stream())
               .collect(Collectors.toList());
     }
 }

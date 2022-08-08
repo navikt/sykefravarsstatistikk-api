@@ -16,13 +16,13 @@ public class Trend {
     public List<ÅrstallOgKvartal> kvartalerIBeregningen;
 
     StatistikkDto tilAggregertHistorikkDto(
-          Statistikkategori type, String label) {
+            Statistikkategori type, String label) {
         return StatistikkDto.builder()
-              .statistikkategori(type)
-              .label(label)
-              .verdi(this.trendverdi.toString())
-              .antallPersonerIBeregningen(this.antallPersonerIBeregningen)
-              .kvartalerIBeregningen(this.kvartalerIBeregningen)
-              .build();
+                .statistikkategori(type)
+                .label(label)
+                .verdi(this.trendverdi.toString())
+                .antallPersonerIBeregningen(this.antallPersonerIBeregningen)
+                .kvartalerIBeregningen(this.kvartalerIBeregningen)
+                .build();
     }
 }

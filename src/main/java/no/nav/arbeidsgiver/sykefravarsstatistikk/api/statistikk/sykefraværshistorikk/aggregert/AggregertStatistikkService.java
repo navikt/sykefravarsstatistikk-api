@@ -25,10 +25,10 @@ public class AggregertStatistikkService {
     private final EnhetsregisteretClient enhetsregisteretClient;
 
     public AggregertStatistikkService(
-          SykefraværRepository sykefraværprosentRepository,
-          BransjeEllerNæringService bransjeEllerNæringService,
-          TilgangskontrollService tilgangskontrollService,
-          EnhetsregisteretClient enhetsregisteretClient) {
+            SykefraværRepository sykefraværprosentRepository,
+            BransjeEllerNæringService bransjeEllerNæringService,
+            TilgangskontrollService tilgangskontrollService,
+            EnhetsregisteretClient enhetsregisteretClient) {
         this.sykefraværprosentRepository = sykefraværprosentRepository;
         this.bransjeEllerNæringService = bransjeEllerNæringService;
         this.tilgangskontrollService = tilgangskontrollService;
@@ -36,14 +36,14 @@ public class AggregertStatistikkService {
     }
 
     public Either<TilgangskontrollException, AggregertStatistikkDto> hentAggregertStatistikk(
-          Orgnr orgnr) {
+            Orgnr orgnr) {
 
         if (!tilgangskontrollService.brukerRepresentererVirksomheten(orgnr)) {
             return Either.left(
-                  new TilgangskontrollException("Bruker mangler tilgang til denne virksomheten"));
+                    new TilgangskontrollException("Bruker mangler tilgang til denne virksomheten"));
         }
 
-        Underenhet virksomhet = enhetsregisteretClient.hentUnderenhet(orgnr);
+        Underenhet virksomhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
         Sykefraværsdata sykefraværsdata = hentForSisteFemKvartaler(virksomhet);
 
         if (!tilgangskontrollService.brukerHarIaRettigheter(orgnr)) {
@@ -54,36 +54,33 @@ public class AggregertStatistikkService {
     }
 
 
-    private AggregertStatistikkDto aggregerData(
-          Underenhet virksomhet,
-          Sykefraværsdata sykefravær) {
+    private AggregertStatistikkDto aggregerData(Underenhet virksomhet, Sykefraværsdata sykefravær) {
 
         Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(sykefravær);
 
         BransjeEllerNæring bransjeEllerNæring =
-              bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(
-                    virksomhet.getNæringskode());
+                bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(
+                        virksomhet.getNæringskode());
 
         List<StatistikkDto> prosentSisteFireKvartaler = Stream.of(
-                    kalkulator.fraværsprosentVirksomhet(virksomhet.getNavn()),
-                    kalkulator.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
-                    kalkulator.fraværsprosentNorge())
-              .filter(Either::isRight)
-              .map(Either::get)
-              .collect(Collectors.toList());
+                        kalkulator.fraværsprosentVirksomhet(virksomhet.getNavn()),
+                        kalkulator.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
+                        kalkulator.fraværsprosentNorge())
+                .filter(Either::isRight)
+                .map(Either::get)
+                .collect(Collectors.toList());
 
         List<StatistikkDto> trend = Stream.of(
-                    kalkulator.trendBransjeEllerNæring(bransjeEllerNæring))
-              .filter(Either::isRight)
-              .map(Either::get)
-              .collect(Collectors.toList());
+                        kalkulator.trendBransjeEllerNæring(bransjeEllerNæring))
+                .filter(Either::isRight)
+                .map(Either::get)
+                .collect(Collectors.toList());
 
         return new AggregertStatistikkDto(prosentSisteFireKvartaler, trend);
 
     }
 
-    private Sykefraværsdata
-    hentForSisteFemKvartaler(Underenhet forBedrift) {
+    private Sykefraværsdata hentForSisteFemKvartaler(Underenhet forBedrift) {
         return sykefraværprosentRepository
                 .hentUmaskertSykefraværAlleKategorier(forBedrift,
                         SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4));

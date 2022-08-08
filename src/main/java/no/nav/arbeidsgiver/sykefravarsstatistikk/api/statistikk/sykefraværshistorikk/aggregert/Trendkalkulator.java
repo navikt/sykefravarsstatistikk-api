@@ -27,30 +27,30 @@ class Trendkalkulator {
         ÅrstallOgKvartal ettÅrSiden = sisteKvartal.minusEttÅr();
 
         Optional<UmaskertSykefraværForEttKvartal> nyesteSykefravær =
-              hentUtKvartal(datagrunnlag, sisteKvartal);
+                hentUtKvartal(datagrunnlag, sisteKvartal);
         Optional<UmaskertSykefraværForEttKvartal> sykefraværetEttÅrSiden =
-              hentUtKvartal(datagrunnlag, ettÅrSiden);
+                hentUtKvartal(datagrunnlag, ettÅrSiden);
 
         if (nyesteSykefravær.isEmpty() || sykefraværetEttÅrSiden.isEmpty()) {
             return Either.left(
-                  new UtilstrekkeligDataException(
-                        "Mangler data for " + sisteKvartal + " og/eller " + ettÅrSiden));
+                    new UtilstrekkeligDataException(
+                            "Mangler data for " + sisteKvartal + " og/eller " + ettÅrSiden));
         }
 
         if (nyesteSykefravær.get().harAntallMuligeDagsverkLikNull() ||
-              sykefraværetEttÅrSiden.get().harAntallMuligeDagsverkLikNull()) {
+                sykefraværetEttÅrSiden.get().harAntallMuligeDagsverkLikNull()) {
             return Either.left(new UtilstrekkeligDataException(
-                  "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."));
+                    "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."));
         }
 
         BigDecimal trendverdi = nyesteSykefravær.get().kalkulerSykefraværsprosent()
-              .subtract(sykefraværetEttÅrSiden.get().kalkulerSykefraværsprosent());
+                .subtract(sykefraværetEttÅrSiden.get().kalkulerSykefraværsprosent());
 
         int antallTilfeller =
-              nyesteSykefravær.get().getAntallPersoner()
-                    + sykefraværetEttÅrSiden.get().getAntallPersoner();
+                nyesteSykefravær.get().getAntallPersoner()
+                        + sykefraværetEttÅrSiden.get().getAntallPersoner();
 
         return Either.right(
-              new Trend(trendverdi, antallTilfeller, List.of(sisteKvartal, ettÅrSiden)));
+                new Trend(trendverdi, antallTilfeller, List.of(sisteKvartal, ettÅrSiden)));
     }
 }

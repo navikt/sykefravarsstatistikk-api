@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
 import static java.math.BigDecimal.ZERO;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.MINIMUM_ANTALL_PERSONER_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.CollectionUtils.joinLists;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.CollectionUtils.concatinate;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.StatistikkUtils.kalkulerSykefraværsprosent;
 
 import io.vavr.control.Either;
@@ -24,8 +24,7 @@ import org.jetbrains.annotations.NotNull;
 class SumAvSykefraværOverFlereKvartaler {
 
     static SumAvSykefraværOverFlereKvartaler NULLPUNKT =
-          new SumAvSykefraværOverFlereKvartaler(
-                ZERO, ZERO, 0, List.of());
+            new SumAvSykefraværOverFlereKvartaler(ZERO, ZERO, 0, List.of());
 
     private BigDecimal muligeDagsverk;
     private BigDecimal tapteDagsverk;
@@ -41,42 +40,42 @@ class SumAvSykefraværOverFlereKvartaler {
     }
 
     public Either<StatistikkException, StatistikkDto> regnUtProsentOgMapTilDto
-          (Statistikkategori type, String label) {
+            (Statistikkategori type, String label) {
 
         return kalkulerFraværsprosentMedMaskering().map(
-              prosent -> StatistikkDto.builder()
-                    .statistikkategori(type)
-                    .label(label)
-                    .verdi(prosent.toString())
-                    .antallPersonerIBeregningen(antallTilfeller)
-                    .kvartalerIBeregningen(kvartaler)
-                    .build()
+                prosent -> StatistikkDto.builder()
+                        .statistikkategori(type)
+                        .label(label)
+                        .verdi(prosent.toString())
+                        .antallPersonerIBeregningen(antallTilfeller)
+                        .kvartalerIBeregningen(kvartaler)
+                        .build()
         );
     }
 
     Either<StatistikkException, BigDecimal> kalkulerFraværsprosentMedMaskering() {
         if (this.equals(NULLPUNKT)) {
             return Either.left(new UtilstrekkeligDataException(
-                  "Trenger minst ett kvartal for å beregene sykefraværsprosent."));
+                    "Trenger minst ett kvartal for å beregene sykefraværsprosent."));
         }
         if (muligeDagsverk.equals(ZERO)) {
             return Either.left(new UtilstrekkeligDataException(
-                  "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."));
+                    "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."));
         }
         if (antallTilfeller
-              < MINIMUM_ANTALL_PERSONER_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER) {
+                < MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER) {
             return Either.left(new MaskerteDataException(
-                  "Ikke nok sykefraværstilfeller til å kunne vise sykefraværsprosenten."));
+                    "Ikke nok sykefraværstilfeller til å kunne vise sykefraværsprosenten."));
         }
         return Either.right(kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk));
     }
 
     SumAvSykefraværOverFlereKvartaler leggSammen(@NotNull SumAvSykefraværOverFlereKvartaler other) {
         return new SumAvSykefraværOverFlereKvartaler(
-              this.muligeDagsverk.add(other.muligeDagsverk),
-              this.tapteDagsverk.add(other.tapteDagsverk),
-              this.antallTilfeller + other.antallTilfeller,
-              joinLists(this.kvartaler, other.kvartaler));
+                this.muligeDagsverk.add(other.muligeDagsverk),
+                this.tapteDagsverk.add(other.tapteDagsverk),
+                this.antallTilfeller + other.antallTilfeller,
+                concatinate(this.kvartaler, other.kvartaler));
     }
 }
 

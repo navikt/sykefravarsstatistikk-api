@@ -3,7 +3,12 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.apiIntegrationTest;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static java.net.http.HttpClient.newBuilder;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.*;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.PRODUKSJON_NYTELSESMIDLER;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring2Siffer;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring5Siffer;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForVirksomhet;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.BRANSJE;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.LAND;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.NÆRING;
@@ -19,7 +24,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.security.mock.oauth2.MockOAuth2Server;
 import org.junit.jupiter.api.AfterEach;
@@ -45,7 +49,6 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
     @BeforeEach
     public void setUp() {
         slettAllStatistikkFraDatabase(jdbcTemplate);
-        opprettStatistikkForLand(jdbcTemplate);
     }
 
     @AfterEach
@@ -61,80 +64,96 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
 
 
     @Test
-    public void hentAgreggertStatistikk_skal_returnere_403_naar_bruker_ikke_representerer_bedriften()
-          throws Exception {
-        String jwtToken = TestTokenUtil.createMockIdportenTokenXToken(mockOAuth2Server);
+    public void hentAgreggertStatistikk_skalReturnere403NaarBrukerIkkeRepresentererBedriften()
+            throws Exception {
+        HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET_INGEN_TILGANG);
 
-        HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET_INGEN_TILGANG,
-              jwtToken);
         assertThat(response.statusCode()).isEqualTo(403);
+    }
+
+
+    @Test
+    public void hentAgreggertStatistikk_skalReturnereStatus200SelvOmDetIkkeFinnesData()
+            throws Exception {
+        HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET);
+
+        JsonNode responseBody = objectMapper.readTree(response.body());
+        assertThat(responseBody.get("prosentSiste4Kvartaler")).isEmpty();
+        assertThat(responseBody.get("trend")).isEmpty();
+
+        assertThat(response.statusCode()).isEqualTo(200);
     }
 
     @Test
     public void hentAgreggertStatistikk_returnererForventedeTyperForBedriftSomHarAlleTyperData()
-          throws Exception {
-        opprettStatistikkForNæring2Siffer(jdbcTemplate, PRODUKSJON, 2022, 1, 5, 100, 10);
-        opprettStatistikkForNæring2Siffer(jdbcTemplate, PRODUKSJON, 2021, 1, 20, 100, 10);
+            throws Exception {
+        opprettStatistikkForLand(jdbcTemplate);
+        opprettStatistikkForNæring2Siffer(jdbcTemplate, PRODUKSJON_NYTELSESMIDLER, 2022, 1, 5, 100,
+                10);
+        opprettStatistikkForNæring2Siffer(jdbcTemplate, PRODUKSJON_NYTELSESMIDLER, 2021, 1, 20, 100,
+                10);
         opprettStatistikkForVirksomhet(jdbcTemplate, ORGNR_UNDERENHET, 2022, 1, 5, 100, 10);
-        String jwtToken = TestTokenUtil.createMockIdportenTokenXToken(mockOAuth2Server);
 
-        HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET, jwtToken);
+        HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET);
         assertThat(response.statusCode()).isEqualTo(200);
 
         JsonNode responseBody = objectMapper.readTree(response.body());
-
-        assertThat(responseBody.get("prosentSiste4Kvartaler").findValuesAsText("statistikkategori"))
-              .containsExactlyInAnyOrderElementsOf(
-                    List.of(
-                          VIRKSOMHET.toString(),
-                          NÆRING.toString(),
-                          LAND.toString()
-                    ));
+        JsonNode prosentSiste4Kvartaler = responseBody.get("prosentSiste4Kvartaler");
 
         assertThat(responseBody.get("trend").findValuesAsText("statistikkategori"))
-              .containsExactly(NÆRING.toString());
+                .containsExactly(NÆRING.toString());
+
+        assertThat(prosentSiste4Kvartaler.findValuesAsText("statistikkategori"))
+                .containsExactlyInAnyOrderElementsOf(
+                        List.of(
+                                VIRKSOMHET.toString(),
+                                NÆRING.toString(),
+                                LAND.toString()
+                        ));
+
+        assertThat(prosentSiste4Kvartaler.get(0).get("label").textValue())
+                .isEqualTo("NAV ARBEID OG YTELSER AVD OSLO");
     }
 
     @Test
     public void hentAgreggertStatistikk_returnererIkkeVirksomhetstatistikkTilBrukerSomManglerIaRettigheter()
-          throws Exception {
+            throws Exception {
         opprettStatistikkForNæring5Siffer(jdbcTemplate, BARNEHAGER, 2022, 1, 5, 100, 10);
         opprettStatistikkForNæring5Siffer(jdbcTemplate, BARNEHAGER, 2021, 1, 1, 100, 10);
+        opprettStatistikkForLand(jdbcTemplate);
 
-        String jwtToken = TestTokenUtil.createMockIdportenTokenXToken(mockOAuth2Server);
-
-        HttpResponse<String> response = utførAutorisertKall(
-              ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER, jwtToken);
+        HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER);
         assertThat(response.statusCode()).isEqualTo(200);
 
         JsonNode responseBody = objectMapper.readTree(response.body());
 
         assertThat(responseBody.get("prosentSiste4Kvartaler").findValuesAsText("statistikkategori"))
-              .containsExactlyInAnyOrderElementsOf(
-                    List.of(
-                          BRANSJE.toString(),
-                          LAND.toString()
-                    ));
+                .containsExactlyInAnyOrderElementsOf(
+                        List.of(
+                                BRANSJE.toString(),
+                                LAND.toString()
+                        ));
 
         assertThat(responseBody.get("trend").findValuesAsText("statistikkategori"))
-              .containsExactly(BRANSJE.toString());
+                .containsExactly(BRANSJE.toString());
     }
 
-    private HttpResponse<String> utførAutorisertKall(String orgnr, String jwtToken)
-          throws IOException, InterruptedException {
+    private HttpResponse<String> utførAutorisertKall(String orgnr)
+            throws IOException, InterruptedException {
+        String jwtToken = TestTokenUtil.createMockIdportenTokenXToken(mockOAuth2Server);
         return newBuilder().build().send(
-              HttpRequest.newBuilder()
-                    .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/"
-                          + orgnr +
-                          "/sykefravarshistorikk/aggregert/siste")
-                    )
-                    .header(
-                          AUTHORIZATION,
-                          "Bearer " + jwtToken
-                    )
-                    .GET()
-                    .build(),
-              ofString()
+                HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/"
+                                + orgnr +
+                                "/sykefravarshistorikk/aggregert/v1'")
+                        )
+                        .header(
+                                AUTHORIZATION,
+                                "Bearer " + jwtToken
+                        )
+                        .GET()
+                        .build(),
+                ofString()
         );
     }
 }

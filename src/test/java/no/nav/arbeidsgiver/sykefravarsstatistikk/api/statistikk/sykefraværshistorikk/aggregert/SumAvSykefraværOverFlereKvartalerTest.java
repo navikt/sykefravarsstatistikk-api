@@ -12,7 +12,8 @@ class SumAvSykefraværOverFlereKvartalerTest {
 
     @Test
     void kalkulerFraværsprosentMedMaskering_maskererDataHvisAntallTilfellerErUnderFem() {
-        Either<StatistikkException, BigDecimal> maskertSykefravær = new SumAvSykefraværOverFlereKvartaler(
+        Either<StatistikkException, BigDecimal> maskertSykefravær =
+                new SumAvSykefraværOverFlereKvartaler(
                 new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2022, 1),
                         new BigDecimal(100),
@@ -26,7 +27,8 @@ class SumAvSykefraværOverFlereKvartalerTest {
 
     @Test
     void kalkulerFraværsprosentMedMaskering_returnerProsentHvisAntallTilfellerErFemEllerMer() {
-        Either<StatistikkException, BigDecimal> sykefraværFemTilfeller = new SumAvSykefraværOverFlereKvartaler(
+        Either<StatistikkException, BigDecimal> sykefraværFemTilfeller =
+                new SumAvSykefraværOverFlereKvartaler(
                 new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2022, 1),
                         new BigDecimal(100),
@@ -34,7 +36,8 @@ class SumAvSykefraværOverFlereKvartalerTest {
                         5)
         ).kalkulerFraværsprosentMedMaskering();
 
-        Either<StatistikkException, BigDecimal> sykefraværTiTilfeller = new SumAvSykefraværOverFlereKvartaler(
+        Either<StatistikkException, BigDecimal> sykefraværTiTilfeller =
+                new SumAvSykefraværOverFlereKvartaler(
                 new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2022, 1),
                         new BigDecimal(100),

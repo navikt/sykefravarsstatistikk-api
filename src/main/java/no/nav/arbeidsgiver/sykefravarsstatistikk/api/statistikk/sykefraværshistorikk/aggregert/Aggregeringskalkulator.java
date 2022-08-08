@@ -21,52 +21,53 @@ public class Aggregeringskalkulator {
 
     Either<StatistikkException, StatistikkDto> fraværsprosentNorge() {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(LAND))
-              .regnUtProsentOgMapTilDto(LAND, "Norge");
+                .regnUtProsentOgMapTilDto(LAND, "Norge");
     }
 
     Either<StatistikkException, StatistikkDto> fraværsprosentBransjeEllerNæring(
-          BransjeEllerNæring bransjeEllerNæring) {
+            BransjeEllerNæring bransjeEllerNæring) {
         return summerOppSisteFireKvartaler(
-              sykefraværsdata.filtrerPåKategori(bransjeEllerNæring.getStatistikkategori()))
-              .regnUtProsentOgMapTilDto(
-                    bransjeEllerNæring.getStatistikkategori(),
-                    bransjeEllerNæring.getVerdiSomString());
+                sykefraværsdata.filtrerPåKategori(bransjeEllerNæring.getStatistikkategori()))
+                .regnUtProsentOgMapTilDto(
+                        bransjeEllerNæring.getStatistikkategori(),
+                        bransjeEllerNæring.verdiSomString());
     }
 
     Either<StatistikkException, StatistikkDto> fraværsprosentVirksomhet(
-          String virksomhetsnavn) {
+            String virksomhetsnavn) {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(VIRKSOMHET))
-              .regnUtProsentOgMapTilDto(VIRKSOMHET, virksomhetsnavn);
+                .regnUtProsentOgMapTilDto(VIRKSOMHET, virksomhetsnavn);
     }
 
     Either<UtilstrekkeligDataException, StatistikkDto> trendBransjeEllerNæring(
-          BransjeEllerNæring bransjeEllerNæring) {
+            BransjeEllerNæring bransjeEllerNæring) {
         Either<UtilstrekkeligDataException, Trend> maybeTrend =
-              new Trendkalkulator(
-                    sykefraværsdata.filtrerPåKategori(bransjeEllerNæring.getStatistikkategori()))
-                    .kalkulerTrend();
+                new Trendkalkulator(
+                        sykefraværsdata.filtrerPåKategori(
+                                bransjeEllerNæring.getStatistikkategori()))
+                        .kalkulerTrend();
 
         return maybeTrend.map(r -> r.tilAggregertHistorikkDto(
-              bransjeEllerNæring.getStatistikkategori(),
-              bransjeEllerNæring.getVerdiSomString())
+                bransjeEllerNæring.getStatistikkategori(),
+                bransjeEllerNæring.verdiSomString())
         );
     }
 
     private SumAvSykefraværOverFlereKvartaler summerOppSisteFireKvartaler(
-          List<UmaskertSykefraværForEttKvartal> statistikk) {
+            List<UmaskertSykefraværForEttKvartal> statistikk) {
 
         return ekstraherSisteFireKvartaler(statistikk).stream()
-              .map(SumAvSykefraværOverFlereKvartaler::new)
-              .reduce(NULLPUNKT, SumAvSykefraværOverFlereKvartaler::leggSammen);
+                .map(SumAvSykefraværOverFlereKvartaler::new)
+                .reduce(NULLPUNKT, SumAvSykefraværOverFlereKvartaler::leggSammen);
     }
 
     private List<UmaskertSykefraværForEttKvartal> ekstraherSisteFireKvartaler(
-          List<UmaskertSykefraværForEttKvartal> statistikk) {
+            List<UmaskertSykefraværForEttKvartal> statistikk) {
         if (statistikk == null) {
             return List.of();
         }
         return statistikk.stream()
-              .filter(datapunkt -> sisteFireKvartaler().contains(datapunkt.getÅrstallOgKvartal()))
-              .collect(Collectors.toList());
+                .filter(datapunkt -> sisteFireKvartaler().contains(datapunkt.getÅrstallOgKvartal()))
+                .collect(Collectors.toList());
     }
 }

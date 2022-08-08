@@ -13,7 +13,8 @@ import java.util.List;
 
 public class TestUtils {
 
-    public static final Næring PRODUKSJON = new Næring("10", "Produksjon av nærings- og nytelsesmidler");
+    public static final Næring PRODUKSJON_NYTELSESMIDLER =
+          new Næring("10", "Produksjon av nærings- og nytelsesmidler");
 
     public static MapSqlParameterSource parametreForStatistikk(
             int årstall,
@@ -38,7 +39,6 @@ public class TestUtils {
         jdbcTemplate.update("delete from sykefravar_statistikk_naring5siffer", new MapSqlParameterSource());
         jdbcTemplate.update("delete from sykefravar_statistikk_sektor", new MapSqlParameterSource());
         jdbcTemplate.update("delete from sykefravar_statistikk_land", new MapSqlParameterSource());
-        //jdbcTemplate.update("delete from naring", new MapSqlParameterSource());
     }
 
     public static void slettAllEksportDataFraDatabase(NamedParameterJdbcTemplate jdbcTemplate) {

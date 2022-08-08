@@ -27,12 +27,12 @@ public class TilgangskontrollService {
     private final TokenXClient tokenXClient;
 
     public TilgangskontrollService(
-          AltinnKlientWrapper altinnKlientWrapper,
-          TilgangskontrollUtils tokenUtils,
-          Sporbarhetslogg sporbarhetslogg,
-          @Value("${altinn.iaweb.service.code}") String iawebServiceCode,
-          @Value("${altinn.iaweb.service.edition}") String iawebServiceEdition,
-          TokenXClient tokenXClient) {
+            AltinnKlientWrapper altinnKlientWrapper,
+            TilgangskontrollUtils tokenUtils,
+            Sporbarhetslogg sporbarhetslogg,
+            @Value("${altinn.iaweb.service.code}") String iawebServiceCode,
+            @Value("${altinn.iaweb.service.edition}") String iawebServiceEdition,
+            TokenXClient tokenXClient) {
         this.altinnKlientWrapper = altinnKlientWrapper;
         this.tokenUtils = tokenUtils;
         this.sporbarhetslogg = sporbarhetslogg;
@@ -45,12 +45,12 @@ public class TilgangskontrollService {
         InnloggetBruker innloggetBruker = tokenUtils.hentInnloggetBruker();
         try {
             JwtToken exchangedTokenToAltinnProxy =
-                  tokenXClient.exchangeTokenToAltinnProxy(tokenUtils.hentInnloggetJwtToken());
+                    tokenXClient.exchangeTokenToAltinnProxy(tokenUtils.hentInnloggetJwtToken());
             innloggetBruker.setOrganisasjoner(
-                  altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
-                        exchangedTokenToAltinnProxy,
-                        innloggetBruker.getFnr()
-                  )
+                    altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
+                            exchangedTokenToAltinnProxy,
+                            innloggetBruker.getFnr()
+                    )
             );
         } catch (ParseException | JOSEException | GeneralException | IOException | TokenXException e) {
             throw new TilgangskontrollException(e.getMessage());
@@ -62,7 +62,7 @@ public class TilgangskontrollService {
         return hentBrukerKunIaRettigheter().harTilgang(tilOrgnr);
     }
 
-    public boolean brukerRepresentererVirksomheten(Orgnr orgnr){
+    public boolean brukerRepresentererVirksomheten(Orgnr orgnr) {
         return hentInnloggetBrukerForAlleRettigheter().harTilgang(orgnr);
     }
 
@@ -70,13 +70,13 @@ public class TilgangskontrollService {
         InnloggetBruker innloggetBruker = tokenUtils.hentInnloggetBruker();
         try {
             JwtToken exchangedTokenToAltinnProxy =
-                  tokenXClient.exchangeTokenToAltinnProxy(tokenUtils.hentInnloggetJwtToken());
+                    tokenXClient.exchangeTokenToAltinnProxy(tokenUtils.hentInnloggetJwtToken());
 
             innloggetBruker.setOrganisasjoner(
-                  altinnKlientWrapper.hentOrgnumreDerBrukerHarTilgangTil(
-                        exchangedTokenToAltinnProxy,
-                        innloggetBruker.getFnr()
-                  )
+                    altinnKlientWrapper.hentOrgnumreDerBrukerHarTilgangTil(
+                            exchangedTokenToAltinnProxy,
+                            innloggetBruker.getFnr()
+                    )
             );
         } catch (ParseException | JOSEException | GeneralException | IOException | TokenXException e) {
             throw new TilgangskontrollException(e.getMessage());
@@ -85,55 +85,56 @@ public class TilgangskontrollService {
     }
 
     public boolean hentTilgangTilOverordnetEnhetOgLoggSikkerhetshendelse(
-          InnloggetBruker bruker,
-          OverordnetEnhet overordnetEnhet,
-          Underenhet underenhet,
-          String httpMetode,
-          String requestUrl
+            InnloggetBruker bruker,
+            OverordnetEnhet overordnetEnhet,
+            Underenhet underenhet,
+            String httpMetode,
+            String requestUrl
     ) {
         boolean harTilgang = bruker.harTilgang(overordnetEnhet.getOrgnr());
         String kommentar = String.format(
-              "Bruker ba om tilgang orgnr %s indirekte ved å kalle endepunktet til underenheten %s",
-              overordnetEnhet.getOrgnr().getVerdi(),
-              underenhet.getOrgnr().getVerdi()
+                "Bruker ba om tilgang orgnr %s indirekte ved å kalle endepunktet til underenheten"
+                        + " %s",
+                overordnetEnhet.getOrgnr().getVerdi(),
+                underenhet.getOrgnr().getVerdi()
         );
         sporbarhetslogg.loggHendelse(new Loggevent(
-                    bruker,
-                    overordnetEnhet.getOrgnr(),
-                    harTilgang,
-                    httpMetode,
-                    requestUrl,
-                    iawebServiceCode,
-                    iawebServiceEdition
-              ),
-              kommentar);
+                        bruker,
+                        overordnetEnhet.getOrgnr(),
+                        harTilgang,
+                        httpMetode,
+                        requestUrl,
+                        iawebServiceCode,
+                        iawebServiceEdition
+                ),
+                kommentar);
 
         return harTilgang;
     }
 
     public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, String httpMetode,
-          String requestUrl) {
+            String requestUrl) {
         InnloggetBruker bruker = hentBrukerKunIaRettigheter();
         sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(orgnr, bruker, httpMetode, requestUrl);
     }
 
     public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, InnloggetBruker bruker,
-          String httpMetode, String requestUrl) {
+            String httpMetode, String requestUrl) {
         boolean harTilgang = bruker.harTilgang(orgnr);
 
         sporbarhetslogg.loggHendelse(new Loggevent(
-              bruker,
-              orgnr,
-              harTilgang,
-              httpMetode,
-              requestUrl,
-              iawebServiceCode,
-              iawebServiceEdition
+                bruker,
+                orgnr,
+                harTilgang,
+                httpMetode,
+                requestUrl,
+                iawebServiceCode,
+                iawebServiceEdition
         ));
 
         if (!harTilgang) {
             throw new TilgangskontrollException(
-                  "Har ikke tilgang til statistikk for denne bedriften.");
+                    "Har ikke tilgang til statistikk for denne bedriften.");
         }
     }
 

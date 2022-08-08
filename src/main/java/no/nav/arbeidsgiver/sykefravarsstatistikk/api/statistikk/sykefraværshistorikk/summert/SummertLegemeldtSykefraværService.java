@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
@@ -13,11 +14,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Slf4j
 @Component
 public class SummertLegemeldtSykefraværService {
+
     private final SykefraværRepository sykefraværprosentRepository;
     private final BransjeEllerNæringService bransjeEllerNæringService;
 
@@ -29,7 +29,6 @@ public class SummertLegemeldtSykefraværService {
         this.sykefraværprosentRepository = sykefraværprosentRepository;
         this.bransjeEllerNæringService = bransjeEllerNæringService;
     }
-
 
     public LegemeldtSykefraværsprosent hentLegemeldtSykefraværsprosent(
             Underenhet underenhet,
@@ -48,7 +47,8 @@ public class SummertLegemeldtSykefraværService {
                 SummertSykefravær.getSummertSykefravær(sykefraværForEttKvartalListe);
 
         boolean erMaskert = summertSykefravær.isErMaskert();
-        boolean harData = !(summertSykefravær.getKvartaler() == null || summertSykefravær.getKvartaler().isEmpty());
+        boolean harData = !(summertSykefravær.getKvartaler() == null
+                || summertSykefravær.getKvartaler().isEmpty());
 
         if (harData && !erMaskert) {
             return new LegemeldtSykefraværsprosent(
@@ -58,7 +58,8 @@ public class SummertLegemeldtSykefraværService {
             );
         }
         BransjeEllerNæring bransjeEllerNæring =
-                bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(underenhet.getNæringskode());
+                bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(
+                        underenhet.getNæringskode());
 
         if (bransjeEllerNæring.isBransje()) {
             Bransje bransje = bransjeEllerNæring.getBransje();
@@ -67,7 +68,8 @@ public class SummertLegemeldtSykefraværService {
                             bransje, eldsteÅrstallOgKvartal
                     );
             SummertSykefravær summertSykefraværBransje =
-                    SummertSykefravær.getSummertSykefravær(listeAvSykefraværForEttKvartalForBransje);
+                    SummertSykefravær.getSummertSykefravær(
+                            listeAvSykefraværForEttKvartalForBransje);
 
             return new LegemeldtSykefraværsprosent(
                     bransjeEllerNæring.getStatistikkategori(),

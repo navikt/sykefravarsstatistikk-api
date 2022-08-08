@@ -63,7 +63,7 @@ public class DatavarehusRepository {
   */
 
     public ÅrstallOgKvartal hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh type) {
-        List<ÅrstallOgKvartal> alleKvartaler = namedParameterJdbcTemplate.query(
+        List<ÅrstallOgKvartal> alleÅrstallOgKvartal = namedParameterJdbcTemplate.query(
                 String.format("select distinct arstall, kvartal " +
                         "from %s " +
                         "order by arstall desc, kvartal desc", type.tabell),
@@ -74,7 +74,7 @@ public class DatavarehusRepository {
                                 resultSet.getInt(KVARTAL)
                         )
         );
-        return alleKvartaler.get(0);
+        return alleÅrstallOgKvartal.get(0);
     }
 
 
