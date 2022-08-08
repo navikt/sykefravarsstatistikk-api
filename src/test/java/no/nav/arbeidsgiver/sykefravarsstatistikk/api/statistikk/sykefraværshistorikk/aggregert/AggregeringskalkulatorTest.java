@@ -23,7 +23,7 @@ class AggregeringskalkulatorTest {
         );
 
         assertThat(kalkulator.fraværsprosentVirksomhet("dummynavn").get().getVerdi())
-              .isEqualTo("5.00");
+              .isEqualTo("5.0");
     }
 
     @Test
@@ -36,7 +36,7 @@ class AggregeringskalkulatorTest {
               new Bransje(BARNEHAGER, "Barnehager", "88911"));
 
         assertThat(kalkulator.fraværsprosentBransjeEllerNæring(bransje).get().getVerdi())
-              .isEqualTo("5.00");
+              .isEqualTo("5.0");
     }
 
     @Test
@@ -48,7 +48,7 @@ class AggregeringskalkulatorTest {
         BransjeEllerNæring dummynæring = new BransjeEllerNæring(new Næring("00000", "Dummynæring"));
 
         assertThat(kalkulator.fraværsprosentBransjeEllerNæring(dummynæring).get().getVerdi())
-              .isEqualTo("5.00");
+              .isEqualTo("5.0");
     }
 
     @Test
@@ -58,7 +58,7 @@ class AggregeringskalkulatorTest {
         );
 
         assertThat(kalkulator.fraværsprosentNorge().get().getVerdi())
-              .isEqualTo("5.00");
+              .isEqualTo("5.0");
     }
 
     @Test
@@ -70,7 +70,7 @@ class AggregeringskalkulatorTest {
         BransjeEllerNæring dummynæring = new BransjeEllerNæring(new Næring("00000", "Dummynæring"));
 
         assertThat(kalkulator.trendBransjeEllerNæring(dummynæring).get().getVerdi())
-              .isEqualTo("-8.00");
+              .isEqualTo("-8.0");
     }
 
     private final List<UmaskertSykefraværForEttKvartal> synkendeSykefravær = List.of(

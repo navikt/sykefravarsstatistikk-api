@@ -165,7 +165,7 @@ class AggregertHistorikkServiceTest {
                     umaskertSykefraværprosent(k2, 2)
               )).kalkulerTrend().get())
               .isEqualTo(
-                    new Trend(new BigDecimal("1.00"), 20, List.of(k1, k2)));
+                    new Trend(new BigDecimal("1.0"), 20, List.of(k1, k2)));
     }
 
     @Test
@@ -177,7 +177,7 @@ class AggregertHistorikkServiceTest {
                     umaskertSykefraværprosent(SISTE_PUBLISERTE_KVARTAL.minusEttÅr(), 10, 3)
               );
         Trend forventetTrend = new Trend(
-              new BigDecimal("-2.00"),
+              new BigDecimal("-2.0"),
               4,
               List.of(SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusEttÅr()));
 

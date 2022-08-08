@@ -43,8 +43,8 @@ class SumAvSykefraværOverFlereKvartalerTest {
         ).kalkulerFraværsprosentMedMaskering();
 
         Assertions.assertThat(sykefraværFemTilfeller.get())
-                .isEqualTo(new BigDecimal("50.00"));
+                .isEqualTo(new BigDecimal("50.0"));
         Assertions.assertThat(sykefraværTiTilfeller.get())
-                .isEqualTo(new BigDecimal("50.00"));
+                .isEqualTo(new BigDecimal("50.0"));
     }
 }

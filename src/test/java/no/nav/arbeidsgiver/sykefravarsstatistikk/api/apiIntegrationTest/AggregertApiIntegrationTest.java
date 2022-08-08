@@ -3,11 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.apiIntegrationTest;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static java.net.http.HttpClient.newBuilder;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring2Siffer;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring5Siffer;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForVirksomhet;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.oppretteStatistikkForLand;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.*;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.BRANSJE;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.LAND;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.NÆRING;
@@ -49,7 +45,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
     @BeforeEach
     public void setUp() {
         slettAllStatistikkFraDatabase(jdbcTemplate);
-        oppretteStatistikkForLand(jdbcTemplate);
+        opprettStatistikkForLand(jdbcTemplate);
     }
 
     @AfterEach
@@ -62,7 +58,6 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Næringskode5Siffer BARNEHAGER = new Næringskode5Siffer("88911", "Barnehager");
-    private final Næring PRODUKSJON = new Næring("10", "Produksjon av nærings- og nytelsesmidler");
 
 
     @Test

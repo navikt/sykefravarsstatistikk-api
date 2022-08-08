@@ -3,10 +3,17 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.SykefraværsstatistikkSektorUtils;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 public class TestUtils {
+
+    public static final Næring PRODUKSJON = new Næring("10", "Produksjon av nærings- og nytelsesmidler");
 
     public static MapSqlParameterSource parametreForStatistikk(
             int årstall,
@@ -41,7 +48,7 @@ public class TestUtils {
         jdbcTemplate.update("delete from virksomheter_bekreftet_eksportert", new MapSqlParameterSource());
     }
 
-    public static void oppretteStatistikkForLand(NamedParameterJdbcTemplate jdbcTemplate) {
+    public static void opprettStatistikkForLand(NamedParameterJdbcTemplate jdbcTemplate) {
         jdbcTemplate.update(
                 "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
@@ -76,7 +83,18 @@ public class TestUtils {
                 )
         );
     }
+    public static void opprettStatistikkForSektor(NamedParameterJdbcTemplate jdbcTemplate) {
 
+        new SykefraværsstatistikkSektorUtils(jdbcTemplate).getBatchCreateFunction(
+              List.of(
+                    new SykefraværsstatistikkSektor(
+                          ÅrstallOgKvartal.sisteKvartal().getÅrstall(),
+                          ÅrstallOgKvartal.sisteKvartal().getKvartal(),
+                          "1", 10, new BigDecimal("657853.346702"), new BigDecimal("13558710.866603")
+                    )
+              )
+        ).apply();
+    }
     public static void opprettStatistikkForNæring5Siffer(
             NamedParameterJdbcTemplate jdbcTemplate,
             Næringskode5Siffer næringskode5Siffer,
