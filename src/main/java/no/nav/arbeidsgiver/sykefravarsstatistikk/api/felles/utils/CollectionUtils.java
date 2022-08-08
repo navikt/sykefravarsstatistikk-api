@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 
 public class CollectionUtils {
 
-    public static <T> List<T> concatinate(Collection<T> collection1, Collection<T> collection2) {
+    public static <T> List<T> concat(Collection<T> collection1, Collection<T> collection2) {
         return Stream.concat(collection1.stream(), collection2.stream())
               .collect(Collectors.toList());
     }

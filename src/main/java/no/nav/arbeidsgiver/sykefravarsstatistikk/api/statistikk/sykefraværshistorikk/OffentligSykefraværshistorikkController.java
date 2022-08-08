@@ -1,5 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
@@ -14,9 +16,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-
 @Slf4j
 @Protected
 @RestController
@@ -26,8 +25,12 @@ public class OffentligSykefraværshistorikkController {
     private final TilgangskontrollService tilgangskontrollService;
     private final EnhetsregisteretClient enhetsregisteretClient;
 
-    public OffentligSykefraværshistorikkController(OffentligKvartalsvisSykefraværshistorikkService offentligKvartalsvisSykefraværshistorikkService, TilgangskontrollService tilgangskontrollService, EnhetsregisteretClient enhetsregisteretClient) {
-        this.offentligKvartalsvisSykefraværshistorikkService = offentligKvartalsvisSykefraværshistorikkService;
+    public OffentligSykefraværshistorikkController(
+            OffentligKvartalsvisSykefraværshistorikkService offentligKvartalsvisSykefraværshistorikkService,
+            TilgangskontrollService tilgangskontrollService,
+            EnhetsregisteretClient enhetsregisteretClient) {
+        this.offentligKvartalsvisSykefraværshistorikkService =
+                offentligKvartalsvisSykefraværshistorikkService;
         this.tilgangskontrollService = tilgangskontrollService;
         this.enhetsregisteretClient = enhetsregisteretClient;
     }

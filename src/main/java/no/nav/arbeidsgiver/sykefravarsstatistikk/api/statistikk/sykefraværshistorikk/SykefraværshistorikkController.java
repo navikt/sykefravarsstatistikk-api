@@ -118,8 +118,8 @@ public class SykefraværshistorikkController {
                 request.getMethod(),
                 "" + request.getRequestURL()
         );
-        Underenhet underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(
-                new Orgnr(orgnrStr));
+        Underenhet underenhet
+                = enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr(orgnrStr));
 
         if (antallKvartaler != 4) {
             throw new IllegalArgumentException(
@@ -144,7 +144,7 @@ public class SykefraværshistorikkController {
                 summertSykefraværshistorikkBransjeEllerNæring);
     }
 
-    // TODO: Fjern når MSA har gått over til "oppsummert"-endepunktet
+    // TODO: Fjern har vi har gått over til "aggregert"-endepunktet
     @GetMapping(value = "/{orgnr}/sykefravarshistorikk/legemeldtsykefravarsprosent")
     public ResponseEntity<LegemeldtSykefraværsprosent> hentLegemeldtSykefraværsprosent(
             @PathVariable("orgnr") String orgnrStr,

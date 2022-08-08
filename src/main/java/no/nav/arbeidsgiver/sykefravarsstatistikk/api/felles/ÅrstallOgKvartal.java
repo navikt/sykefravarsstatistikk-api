@@ -18,12 +18,8 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
     private int årstall;
     private int kvartal;
 
-    public static ÅrstallOgKvartal sisteKvartal() {
-        return SISTE_PUBLISERTE_KVARTAL;
-    }
-
     public static ÅrstallOgKvartal sisteKvartalMinus(int n) {
-        return sisteKvartal().minusKvartaler(n);
+        return SISTE_PUBLISERTE_KVARTAL.minusKvartaler(n);
     }
 
     public ÅrstallOgKvartal(int årstall, int kvartal) {
@@ -51,8 +47,8 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
 
     public static List<ÅrstallOgKvartal> sisteFireKvartaler() {
         return IntStream.range(0, 4)
-              .mapToObj(SISTE_PUBLISERTE_KVARTAL::minusKvartaler)
-              .collect(Collectors.toList());
+                .mapToObj(SISTE_PUBLISERTE_KVARTAL::minusKvartaler)
+                .collect(Collectors.toList());
     }
 
     public ÅrstallOgKvartal plussKvartaler(int antallKvartaler) {
@@ -91,14 +87,14 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
     }
 
     @Override
-    public String toString() {
-        return kvartal + ". kvartal " + årstall;
+    public int compareTo(@NotNull ÅrstallOgKvartal årstallOgKvartal) {
+        return Comparator.comparing(ÅrstallOgKvartal::getÅrstall)
+                .thenComparing(ÅrstallOgKvartal::getKvartal)
+                .compare(this, årstallOgKvartal);
     }
 
     @Override
-    public int compareTo(@NotNull ÅrstallOgKvartal årstallOgKvartal) {
-        return Comparator.comparing(ÅrstallOgKvartal::getÅrstall)
-              .thenComparing(ÅrstallOgKvartal::getKvartal)
-              .compare(this, årstallOgKvartal);
+    public String toString() {
+        return kvartal + ". kvartal " + årstall;
     }
 }

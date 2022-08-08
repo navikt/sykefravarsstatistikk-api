@@ -13,8 +13,8 @@ public class Bransje {
     private final String navn;
     private final List<String> koderSomSpesifisererNæringer;
 
-    public Bransje(ArbeidsmiljøportalenBransje type, String navn,
-          String... koderSomSpesifisererNæringer) {
+    public Bransje(
+            ArbeidsmiljøportalenBransje type, String navn, String... koderSomSpesifisererNæringer) {
         this.type = type;
         this.navn = navn;
         this.koderSomSpesifisererNæringer = Arrays.asList(koderSomSpesifisererNæringer);
@@ -26,7 +26,7 @@ public class Bransje {
             return;
         }
         throw new IllegalArgumentException(
-              "Støtter kun bransjer som er spesifisert av enten 2 eller 5 sifre");
+                "Støtter kun bransjer som er spesifisert av enten 2 eller 5 sifre");
     }
 
     private boolean inneholderKunKoderMedGittAntallSifre(int antallSifre) {

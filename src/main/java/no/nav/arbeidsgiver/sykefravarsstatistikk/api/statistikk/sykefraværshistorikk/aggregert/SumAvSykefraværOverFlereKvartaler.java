@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 import static java.math.BigDecimal.ZERO;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.CollectionUtils.concatinate;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.CollectionUtils.concat;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.StatistikkUtils.kalkulerSykefraværsprosent;
 
 import io.vavr.control.Either;
@@ -13,6 +13,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.MaskerteDataException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.StatistikkException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
@@ -39,6 +40,7 @@ class SumAvSykefraværOverFlereKvartaler {
         this.kvartaler = List.of(data.getÅrstallOgKvartal());
     }
 
+
     public Either<StatistikkException, StatistikkDto> regnUtProsentOgMapTilDto
             (Statistikkategori type, String label) {
 
@@ -52,6 +54,7 @@ class SumAvSykefraværOverFlereKvartaler {
                         .build()
         );
     }
+
 
     Either<StatistikkException, BigDecimal> kalkulerFraværsprosentMedMaskering() {
         if (this.equals(NULLPUNKT)) {
@@ -70,18 +73,12 @@ class SumAvSykefraværOverFlereKvartaler {
         return Either.right(kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk));
     }
 
+
     SumAvSykefraværOverFlereKvartaler leggSammen(@NotNull SumAvSykefraværOverFlereKvartaler other) {
         return new SumAvSykefraværOverFlereKvartaler(
                 this.muligeDagsverk.add(other.muligeDagsverk),
                 this.tapteDagsverk.add(other.tapteDagsverk),
                 this.antallTilfeller + other.antallTilfeller,
-                concatinate(this.kvartaler, other.kvartaler));
-    }
-}
-
-class MaskerteDataException extends StatistikkException {
-
-    public MaskerteDataException(String årsak) {
-        super("Data er maskert: " + årsak);
+                concat(this.kvartaler, other.kvartaler));
     }
 }

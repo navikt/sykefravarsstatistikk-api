@@ -11,7 +11,9 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettSta
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForSektor;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForVirksomhet;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +25,6 @@ import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.security.mock.oauth2.MockOAuth2Server;
 import org.jetbrains.annotations.NotNull;
@@ -34,11 +35,10 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
-@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
 
-    private final int SISTE_ÅRSTALL = ÅrstallOgKvartal.sisteKvartal().getÅrstall();
-    private final int SISTE_KVARTAL = ÅrstallOgKvartal.sisteKvartal().getKvartal();
+    private final int SISTE_ÅRSTALL = SISTE_PUBLISERTE_KVARTAL.getÅrstall();
+    private final int SISTE_KVARTAL = SISTE_PUBLISERTE_KVARTAL.getKvartal();
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -52,16 +52,18 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
     @LocalServerPort
     private String port;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final static String ORGNR_UNDERENHET = "910969439";
     private final static String ORGNR_OVERORDNET_ENHET = "999263550";
     private final static String ORGNR_UNDERENHET_INGEN_TILGANG = "777777777";
 
+
     @BeforeEach
     public void setUp() {
         slettAllStatistikkFraDatabase(jdbcTemplate);
     }
+
 
     @Test
     public void bedriftsmetrikker__skal_returnere_riktig_objekt() throws Exception {
@@ -71,7 +73,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
                                 + ORGNR_UNDERENHET + "/bedriftsmetrikker"))
                         .header(
                                 AUTHORIZATION,
-                                getBearerMedJwt("15008462396")
+                                getBearerMedJwt()
                         )
                         .GET()
                         .build(),
@@ -93,6 +95,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         assertThat(bedriftsmetrikker.get("antallAnsatte")).isEqualTo(objectMapper.readTree("143"));
     }
 
+
     @Test
     public void sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_selvbetjening_token()
             throws Exception {
@@ -105,6 +108,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         opprettGenerellStatistikk();
         sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtTokenIssuedByLoginservice);
     }
+
 
     @Test
     public void sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_selvbetjening_token__issued_med_sub()
@@ -120,6 +124,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtTokenIssuedByLoginservice);
     }
 
+
     @Test
     public void sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_idporten()
             throws Exception {
@@ -132,6 +137,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         opprettGenerellStatistikk();
         sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtToken);
     }
+
 
     @Test
     public void sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_loginservice()
@@ -148,6 +154,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtToken);
     }
 
+
     private void opprettGenerellStatistikk() {
         opprettStatistikkForLand(jdbcTemplate);
         opprettStatistikkForSektor(jdbcTemplate);
@@ -158,6 +165,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         opprettStatistikkForVirksomhet(jdbcTemplate, ORGNR_OVERORDNET_ENHET, SISTE_ÅRSTALL,
                 SISTE_KVARTAL, 7, 200, 10);
     }
+
 
     private void sjekkAtSykefraværshistorikkReturnereRiktigObjekt(String jwtToken)
             throws Exception {
@@ -241,6 +249,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
 
     }
 
+
     @Test
     public void sykefraværshistorikk__skal_IKKE_godkjenne_en_token_uten_sub_eller_pid()
             throws Exception {
@@ -270,6 +279,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
                 "{\"message\":\"You are not authorized to access this ressource\"}");
     }
 
+
     @Test
     public void sykefraværshistorikk_sektor__skal_utføre_tilgangskontroll()
             throws IOException, InterruptedException {
@@ -280,7 +290,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
                                 + "/sykefravarshistorikk/kvartalsvis"))
                         .header(
                                 AUTHORIZATION,
-                                getBearerMedJwt("15008462396")
+                                getBearerMedJwt()
                         )
                         .GET()
                         .build(),
@@ -302,7 +312,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
                                 + "/sykefravarshistorikk/summert?antallKvartaler=4"))
                         .header(
                                 AUTHORIZATION,
-                                getBearerMedJwt("15008462396")
+                                getBearerMedJwt()
                         )
                         .GET()
                         .build(),
@@ -312,6 +322,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         assertThat(response.body()).isEqualTo(
                 "{\"message\":\"You don't have access to this ressource\"}");
     }
+
 
     @Test
     public void legemeldtSykefraværsprosent__skal_returnere_riktig_objekt() throws Exception {
@@ -331,7 +342,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
                         )
                         .header(
                                 AUTHORIZATION,
-                                getBearerMedJwt("15008462396")
+                                getBearerMedJwt()
                         )
                         .GET()
                         .build(),
@@ -341,16 +352,15 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         assertThat(response.statusCode()).isEqualTo(200);
         JsonNode alleSykefraværshistorikk = objectMapper.readTree(response.body());
 
-        assertThat(
-                Stream.of(
-                        Statistikkategori.VIRKSOMHET.toString(),
-                        Statistikkategori.BRANSJE.toString(),
-                        Statistikkategori.NÆRING.toString()
-                ).anyMatch(alleSykefraværshistorikk.findValue("type").asText()::contains)
-        );
-        assertThat(alleSykefraværshistorikk.findValue("label").isTextual());
-        assertThat(alleSykefraværshistorikk.findValue("prosent").isNumber());
+        assertTrue(Stream.of(
+                Statistikkategori.VIRKSOMHET.toString(),
+                Statistikkategori.BRANSJE.toString(),
+                Statistikkategori.NÆRING.toString()
+        ).anyMatch(alleSykefraværshistorikk.findValue("type").asText()::contains));
+        assertTrue(alleSykefraværshistorikk.findValue("label").isTextual());
+        assertTrue(alleSykefraværshistorikk.findValue("prosent").isNumber());
     }
+
 
     @Test
     public void legemeldt_sykefraværsprosent_siste_4_kvartaler__skal_utføre_tilgangskontroll()
@@ -362,7 +372,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
                                 + "/sykefravarshistorikk/legemeldtsykefravarsprosent"))
                         .header(
                                 AUTHORIZATION,
-                                getBearerMedJwt("15008462396")
+                                getBearerMedJwt()
                         )
                         .GET()
                         .build(),
@@ -372,6 +382,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         assertThat(response.body()).isEqualTo(
                 "{\"message\":\"You don't have access to this ressource\"}");
     }
+
 
     @Test
     public void summert_sykefraværshistorikk_siste_4_kvartaler__skal_returnere_riktig_objekt()
@@ -383,7 +394,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
                                 + "/sykefravarshistorikk/summert?antallKvartaler=4"))
                         .header(
                                 AUTHORIZATION,
-                                getBearerMedJwt("15008462396")
+                                getBearerMedJwt()
                         )
                         .GET()
                         .build(),
@@ -394,6 +405,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         JsonNode responseBody = objectMapper.readTree(response.body());
         assertThat(responseBody).isNotEmpty();
     }
+
 
     @Test
     public void legemeldtSykefraværsprosent__når_virksomhet_ikke_har_næring_returnerer_204()
@@ -406,7 +418,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
                         )
                         .header(
                                 AUTHORIZATION,
-                                getBearerMedJwt("15008462396")
+                                getBearerMedJwt()
                         )
                         .GET()
                         .build(),
@@ -419,12 +431,13 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         assertThat(body).isNullOrEmpty();
     }
 
+
     @NotNull
-    private String getBearerMedJwt(String fnr) {
+    private String getBearerMedJwt() {
         return "Bearer "
                 + TestTokenUtil.createToken(
                 mockOAuth2Server,
-                fnr,
+                "15008462396",
                 SELVBETJENING_ISSUER_ID,
                 ""
         );

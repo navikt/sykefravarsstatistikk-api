@@ -8,16 +8,12 @@ import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Optional;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Data;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.StatistikkUtils;
 import org.jetbrains.annotations.NotNull;
 
-@Getter
-@EqualsAndHashCode
-@ToString
+@Data
 public class UmaskertSykefraværForEttKvartal implements
         Comparable<UmaskertSykefraværForEttKvartal> {
 
