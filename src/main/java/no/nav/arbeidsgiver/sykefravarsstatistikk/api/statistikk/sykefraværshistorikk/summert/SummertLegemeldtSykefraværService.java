@@ -58,8 +58,7 @@ public class SummertLegemeldtSykefraværService {
             );
         }
         BransjeEllerNæring bransjeEllerNæring =
-                bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(
-                        underenhet.getNæringskode());
+                bransjeEllerNæringService.bestemFraNæringskode(underenhet.getNæringskode());
 
         if (bransjeEllerNæring.isBransje()) {
             Bransje bransje = bransjeEllerNæring.getBransje();

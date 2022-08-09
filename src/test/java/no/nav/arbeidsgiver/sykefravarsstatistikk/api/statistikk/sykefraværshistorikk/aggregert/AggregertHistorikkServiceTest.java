@@ -88,7 +88,7 @@ class AggregertHistorikkServiceTest {
         when(mockTilgangskontrollService.brukerRepresentererVirksomheten(any())).thenReturn(true);
         when(mockEnhetsregisteretClient.hentInformasjonOmUnderenhet(any())).thenReturn(enBarnehage);
         when(mockTilgangskontrollService.brukerHarIaRettigheter(any())).thenReturn(true);
-        when(mockBransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(any()))
+        when(mockBransjeEllerNæringService.bestemFraNæringskode(any()))
                 .thenReturn(enBransje);
 
         // Helt tomt resultat skal ikke kræsje
@@ -116,7 +116,7 @@ class AggregertHistorikkServiceTest {
         when(mockTilgangskontrollService.brukerRepresentererVirksomheten(any())).thenReturn(true);
         when(mockEnhetsregisteretClient.hentInformasjonOmUnderenhet(any())).thenReturn(enBarnehage);
         when(mockTilgangskontrollService.brukerHarIaRettigheter(any())).thenReturn(true);
-        when(mockBransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(any()))
+        when(mockBransjeEllerNæringService.bestemFraNæringskode(any()))
                 .thenReturn(enBransje);
 
         when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(), any()))

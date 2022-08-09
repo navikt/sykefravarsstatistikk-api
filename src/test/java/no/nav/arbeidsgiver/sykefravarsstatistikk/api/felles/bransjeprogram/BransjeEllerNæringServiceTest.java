@@ -13,20 +13,20 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @ExtendWith(MockitoExtension.class)
 public class BransjeEllerNæringServiceTest {
 
-  BransjeEllerNæringService serviceUnderTest;
+  BransjeEllerNæringService bransjeEllerNæringService;
 
   @Mock private KlassifikasjonerRepository klassifikasjonerRepository;
 
   @BeforeEach
   public void setUp() {
-    serviceUnderTest =
+    bransjeEllerNæringService =
         new BransjeEllerNæringService(new Bransjeprogram(), klassifikasjonerRepository);
   }
 
   @Test
   public void skalHenteDataPåBransjeEllerNæringsnivå_skalReturnereBransje_forBarnehager() {
     Næringskode5Siffer barnehage = new Næringskode5Siffer("88911", "Barnehager");
-    BransjeEllerNæring actual = serviceUnderTest.skalHenteDataPåBransjeEllerNæringsnivå(barnehage);
+    BransjeEllerNæring actual = bransjeEllerNæringService.bestemFraNæringskode(barnehage);
 
     assertThat(actual.isBransje()).isTrue();
   }
@@ -35,7 +35,7 @@ public class BransjeEllerNæringServiceTest {
   public void skalHenteDataPåBransjeEllerNæringsnivå_skalReturnereNæring_forBedriftINæringsmiddelindustrien() {
     // En bedrift i næringsmiddelindustrien er i bransjeprogrammet, men data hentes likevel på tosiffernivå, aka næringsnivå
     Næringskode5Siffer næringINæringsmiddelindustriBransjen = new Næringskode5Siffer("10411", "Produksjon av rå fiskeoljer og fett");
-    BransjeEllerNæring actual = serviceUnderTest.skalHenteDataPåBransjeEllerNæringsnivå(næringINæringsmiddelindustriBransjen);
+    BransjeEllerNæring actual = bransjeEllerNæringService.bestemFraNæringskode(næringINæringsmiddelindustriBransjen);
 
     assertThat(actual.isBransje()).isFalse();
   }

@@ -201,8 +201,3 @@ public class SykefraværshistorikkController {
         return ResponseEntity.status(HttpStatus.OK).body(statistikk);
     }
 }
-
-
-
-
-

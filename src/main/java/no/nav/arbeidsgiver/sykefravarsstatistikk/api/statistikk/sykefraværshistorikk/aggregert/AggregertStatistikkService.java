@@ -58,7 +58,7 @@ public class AggregertStatistikkService {
         Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(sykefravær);
 
         BransjeEllerNæring bransjeEllerNæring =
-                bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(
+                bransjeEllerNæringService.bestemFraNæringskode(
                         virksomhet.getNæringskode()
                 );
         List<StatistikkDto> prosentSisteFireKvartaler = EitherUtils.filterRights(

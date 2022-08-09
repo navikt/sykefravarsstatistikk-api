@@ -48,7 +48,7 @@ public class SummertSykefraværService {
         List<UmaskertSykefraværForEttKvartal> sykefraværGradering;
 
         BransjeEllerNæring bransjeEllerNæring =
-                bransjeEllerNæringService.skalHenteDataPåBransjeEllerNæringsnivå(underenhet.getNæringskode());
+                bransjeEllerNæringService.bestemFraNæringskode(underenhet.getNæringskode());
 
         if (!bransjeEllerNæring.isBransje()) {
             type = Statistikkategori.NÆRING;
