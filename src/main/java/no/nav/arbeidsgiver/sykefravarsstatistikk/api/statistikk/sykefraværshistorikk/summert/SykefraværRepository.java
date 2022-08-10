@@ -167,7 +167,7 @@ public class SykefraværRepository {
     }
 
 
-    private List<UmaskertSykefraværForEttKvartal> sorterKronologisk(
+    protected static List<UmaskertSykefraværForEttKvartal> sorterKronologisk(
             List<UmaskertSykefraværForEttKvartal> statistikk) {
         return statistikk.stream()
                 .sorted(Comparator.comparing(UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal))
