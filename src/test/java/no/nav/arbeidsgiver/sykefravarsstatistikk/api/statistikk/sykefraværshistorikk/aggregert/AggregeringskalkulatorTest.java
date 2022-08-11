@@ -25,6 +25,7 @@ class AggregeringskalkulatorTest {
                 .isEqualTo("5.0");
     }
 
+
     @Test
     void fraværsprosentBransjeEllerNæring_regnerUtRiktigFraværsprosentForBransje() {
         Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(
@@ -38,6 +39,7 @@ class AggregeringskalkulatorTest {
                 .isEqualTo("5.0");
     }
 
+
     @Test
     void fraværsprosentBransjeEllerNæring_regnerUtRiktigFraværsprosentForNæring() {
         Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(
@@ -50,6 +52,7 @@ class AggregeringskalkulatorTest {
                 .isEqualTo("5.0");
     }
 
+
     @Test
     void fraværsprosentNorge_regnerUtRiktigFraværsprosent() {
         Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(
@@ -59,6 +62,7 @@ class AggregeringskalkulatorTest {
         assertThat(kalkulator.fraværsprosentNorge().get().getVerdi())
                 .isEqualTo("5.0");
     }
+
 
     @Test
     void trendBransjeEllerNæring_regnerUtRiktigTrendForNæring() {
@@ -72,6 +76,7 @@ class AggregeringskalkulatorTest {
         assertThat(kalkulator.trendBransjeEllerNæring(dummynæring).get().getVerdi())
                 .isEqualTo("-8.0");
     }
+
 
     private final List<UmaskertSykefraværForEttKvartal> synkendeSykefravær = List.of(
             new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(0), 2, 100, 1),

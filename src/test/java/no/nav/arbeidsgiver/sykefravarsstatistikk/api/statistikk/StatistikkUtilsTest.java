@@ -21,6 +21,7 @@ class StatistikkUtilsTest {
                 .isEqualTo(new BigDecimal("100.0"));
     }
 
+
     @Test
     public void kalkulerSykefraværsprosent_regnerUtKorrektProsent() {
         assertThat(kalkulerSykefraværsprosent(new BigDecimal("5"), new BigDecimal("10")))
@@ -35,6 +36,7 @@ class StatistikkUtilsTest {
         assertThat(kalkulerSykefraværsprosent(new BigDecimal("1.01"), new BigDecimal("1.02")))
                 .isEqualTo(new BigDecimal("99.0"));
     }
+
 
     @Test
     public void kalkulerSykefraværsprosent_runderOppKorrekt() {
@@ -59,6 +61,7 @@ class StatistikkUtilsTest {
         assertThat(kalkulerSykefraværsprosent(new BigDecimal("0.00005"), BigDecimal.ONE))
                 .isEqualTo(new BigDecimal("0.0"));
     }
+
 
     @Test
     public void kalkulerSykefraværsprosent_runderNedKorrekt() {
