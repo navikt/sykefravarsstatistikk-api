@@ -162,7 +162,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/"
                                 + orgnr +
-                                "/sykefravarshistorikk/aggregert/v1'")
+                                "/v1/sykefravarshistorikk/aggregert")
                         )
                         .header(
                                 AUTHORIZATION,

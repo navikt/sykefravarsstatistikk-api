@@ -60,6 +60,7 @@ public class SykefraværshistorikkController {
         this.summertLegemeldtSykefraværService = summertLegemeldtSykefraværService;
     }
 
+
     @GetMapping(value = "/{orgnr}/sykefravarshistorikk/kvartalsvis")
     public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikk(
             @PathVariable("orgnr") String orgnrStr,
@@ -144,6 +145,7 @@ public class SykefraværshistorikkController {
                 summertSykefraværshistorikkBransjeEllerNæring);
     }
 
+
     // TODO: Fjern har vi har gått over til "aggregert"-endepunktet
     @GetMapping(value = "/{orgnr}/sykefravarshistorikk/legemeldtsykefravarsprosent")
     public ResponseEntity<LegemeldtSykefraværsprosent> hentLegemeldtSykefraværsprosent(
@@ -189,7 +191,8 @@ public class SykefraværshistorikkController {
                 .body(legemeldtSykefraværsprosent);
     }
 
-    @GetMapping("/{orgnr}/sykefravarshistorikk/aggregert/v1'")
+
+    @GetMapping("/{orgnr}/v1/sykefravarshistorikk/aggregert")
     public ResponseEntity<AggregertStatistikkDto> hentAggregertStatistikk(
             @PathVariable("orgnr") String orgnr
     ) {
