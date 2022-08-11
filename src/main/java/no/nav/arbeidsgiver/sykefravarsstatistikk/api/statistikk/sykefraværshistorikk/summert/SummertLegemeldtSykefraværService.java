@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
@@ -13,11 +14,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Slf4j
 @Component
 public class SummertLegemeldtSykefraværService {
+
     private final SykefraværRepository sykefraværprosentRepository;
     private final BransjeEllerNæringService bransjeEllerNæringService;
 
@@ -30,17 +30,15 @@ public class SummertLegemeldtSykefraværService {
         this.bransjeEllerNæringService = bransjeEllerNæringService;
     }
 
-    static int antallKvartalerSomSkalSummeres = 4;
-
     public LegemeldtSykefraværsprosent hentLegemeldtSykefraværsprosent(
             Underenhet underenhet,
             ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal
     ) {
         ÅrstallOgKvartal eldsteÅrstallOgKvartal =
-                sistePubliserteÅrstallOgKvartal.minusKvartaler(antallKvartalerSomSkalSummeres - 1);
+                sistePubliserteÅrstallOgKvartal.minusKvartaler(3);
 
         List<UmaskertSykefraværForEttKvartal> sykefraværForEttKvartalListe =
-                sykefraværprosentRepository.hentUmaskertSykefraværForEttKvartalListe(
+                sykefraværprosentRepository.hentUmaskertSykefravær(
                         underenhet,
                         eldsteÅrstallOgKvartal
                 );
@@ -49,7 +47,8 @@ public class SummertLegemeldtSykefraværService {
                 SummertSykefravær.getSummertSykefravær(sykefraværForEttKvartalListe);
 
         boolean erMaskert = summertSykefravær.isErMaskert();
-        boolean harData = !(summertSykefravær.getKvartaler() == null || summertSykefravær.getKvartaler().isEmpty());
+        boolean harData = !(summertSykefravær.getKvartaler() == null
+                || summertSykefravær.getKvartaler().isEmpty());
 
         if (harData && !erMaskert) {
             return new LegemeldtSykefraværsprosent(
@@ -59,16 +58,17 @@ public class SummertLegemeldtSykefraværService {
             );
         }
         BransjeEllerNæring bransjeEllerNæring =
-                bransjeEllerNæringService.getBransjeEllerNæring(underenhet.getNæringskode());
+                bransjeEllerNæringService.bestemFraNæringskode(underenhet.getNæringskode());
 
         if (bransjeEllerNæring.isBransje()) {
             Bransje bransje = bransjeEllerNæring.getBransje();
             List<UmaskertSykefraværForEttKvartal> listeAvSykefraværForEttKvartalForBransje =
-                    sykefraværprosentRepository.hentUmaskertSykefraværForEttKvartalListe(
+                    sykefraværprosentRepository.hentUmaskertSykefravær(
                             bransje, eldsteÅrstallOgKvartal
                     );
             SummertSykefravær summertSykefraværBransje =
-                    SummertSykefravær.getSummertSykefravær(listeAvSykefraværForEttKvartalForBransje);
+                    SummertSykefravær.getSummertSykefravær(
+                            listeAvSykefraværForEttKvartalForBransje);
 
             return new LegemeldtSykefraværsprosent(
                     bransjeEllerNæring.getStatistikkategori(),
@@ -78,7 +78,7 @@ public class SummertLegemeldtSykefraværService {
         } else {
             Næring næring = bransjeEllerNæring.getNæring();
             List<UmaskertSykefraværForEttKvartal> listeAvSykefraværForEttKvartalForNæring =
-                    sykefraværprosentRepository.hentUmaskertSykefraværForEttKvartalListe(
+                    sykefraværprosentRepository.hentUmaskertSykefravær(
                             næring,
                             eldsteÅrstallOgKvartal
                     );

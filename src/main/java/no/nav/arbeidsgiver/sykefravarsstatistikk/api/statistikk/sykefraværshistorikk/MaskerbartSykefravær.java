@@ -1,8 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.*;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -24,11 +25,9 @@ public abstract class MaskerbartSykefravær {
     ) {
         erMaskert =
                 harSykefraværData &&
-                antallPersoner
-                        < Konstanter.MINIMUM_ANTALL_PERSONER_SOM_SKAL_TIL_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
-        boolean kanKalkuleres = harSykefraværData;
+                antallPersoner < MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
 
-        if (!erMaskert && kanKalkuleres) {
+        if (!erMaskert && harSykefraværData) {
             prosent = tapteDagsverk
                     .multiply(new BigDecimal(100))
                     .divide(muligeDagsverk, 1, RoundingMode.HALF_UP);

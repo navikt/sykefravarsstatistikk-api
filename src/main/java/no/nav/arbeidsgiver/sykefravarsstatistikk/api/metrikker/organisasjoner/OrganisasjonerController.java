@@ -20,7 +20,7 @@ public class OrganisasjonerController {
 
     @GetMapping("/organisasjoner/statistikk")
     public List<AltinnOrganisasjon> hentOrganisasjonerMedStatistikktilgang() {
-        InnloggetBruker innloggetBruker = tilgangskontrollService.hentInnloggetBruker();
+        InnloggetBruker innloggetBruker = tilgangskontrollService.hentBrukerKunIaRettigheter();
         return innloggetBruker.getOrganisasjoner();
     }
     @GetMapping("/organisasjoner")

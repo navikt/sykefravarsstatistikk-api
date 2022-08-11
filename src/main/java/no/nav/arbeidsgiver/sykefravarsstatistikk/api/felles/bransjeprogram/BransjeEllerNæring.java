@@ -7,7 +7,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategor
 public class BransjeEllerNæring {
     public final Either<Bransje, Næring> verdi;
 
-
     public BransjeEllerNæring(Bransje bransje) {
         this.verdi = Either.left(bransje);
     }
@@ -30,6 +29,10 @@ public class BransjeEllerNæring {
 
     public Bransje getBransje() {
         return verdi.getLeft();
+    }
+
+    public String navn() {
+        return this.isBransje() ? verdi.getLeft().getNavn() : verdi.get().getNavn();
     }
 
     public Næring getNæring() {

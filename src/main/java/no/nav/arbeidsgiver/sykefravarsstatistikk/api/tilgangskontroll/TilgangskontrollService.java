@@ -2,6 +2,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.oauth2.sdk.GeneralException;
+import java.io.IOException;
+import java.text.ParseException;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
@@ -12,10 +14,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.sporbarhet
 import no.nav.security.token.support.core.jwt.JwtToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
-
-import java.io.IOException;
-import java.text.ParseException;
 
 @Slf4j
 @Component
@@ -43,7 +41,7 @@ public class TilgangskontrollService {
         this.tokenXClient = tokenXClient;
     }
 
-    public InnloggetBruker hentInnloggetBruker() {
+    public InnloggetBruker hentBrukerKunIaRettigheter() {
         InnloggetBruker innloggetBruker = tokenUtils.hentInnloggetBruker();
         try {
             JwtToken exchangedTokenToAltinnProxy =
@@ -58,6 +56,14 @@ public class TilgangskontrollService {
             throw new TilgangskontrollException(e.getMessage());
         }
         return innloggetBruker;
+    }
+
+    public boolean brukerHarIaRettigheter(Orgnr tilOrgnr) {
+        return hentBrukerKunIaRettigheter().harTilgang(tilOrgnr);
+    }
+
+    public boolean brukerRepresentererVirksomheten(Orgnr orgnr) {
+        return hentInnloggetBrukerForAlleRettigheter().harTilgang(orgnr);
     }
 
     public InnloggetBruker hentInnloggetBrukerForAlleRettigheter() {
@@ -87,7 +93,8 @@ public class TilgangskontrollService {
     ) {
         boolean harTilgang = bruker.harTilgang(overordnetEnhet.getOrgnr());
         String kommentar = String.format(
-                "Bruker ba om tilgang orgnr %s indirekte ved å kalle endepunktet til underenheten %s",
+                "Bruker ba om tilgang orgnr %s indirekte ved å kalle endepunktet til underenheten"
+                        + " %s",
                 overordnetEnhet.getOrgnr().getVerdi(),
                 underenhet.getOrgnr().getVerdi()
         );
@@ -105,12 +112,14 @@ public class TilgangskontrollService {
         return harTilgang;
     }
 
-    public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, String httpMetode, String requestUrl) {
-        InnloggetBruker bruker = hentInnloggetBruker();
+    public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, String httpMetode,
+            String requestUrl) {
+        InnloggetBruker bruker = hentBrukerKunIaRettigheter();
         sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(orgnr, bruker, httpMetode, requestUrl);
     }
 
-    public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, InnloggetBruker bruker, String httpMetode, String requestUrl) {
+    public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr orgnr, InnloggetBruker bruker,
+            String httpMetode, String requestUrl) {
         boolean harTilgang = bruker.harTilgang(orgnr);
 
         sporbarhetslogg.loggHendelse(new Loggevent(
@@ -124,7 +133,8 @@ public class TilgangskontrollService {
         ));
 
         if (!harTilgang) {
-            throw new TilgangskontrollException("Har ikke tilgang til statistikk for denne bedriften.");
+            throw new TilgangskontrollException(
+                    "Har ikke tilgang til statistikk for denne bedriften.");
         }
     }
 

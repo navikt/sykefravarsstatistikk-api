@@ -19,5 +19,15 @@ insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte
 insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values(2018, 4, 10, 7357660.879256, 143033580.877087);
 insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values(2019, 1, 10, 7605099.154119, 138978910.743955);
 insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values(2019, 2, 10, 6548546.846546, 145788910.465464);
+insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values(2019, 3, 10, 6548546.846546, 145788910.465464);
+insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values(2019, 4, 10, 6548546.846546, 145788910.465464);
+insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values(2020, 1, 10, 6548546.846546, 145788910.465464);
+insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values(2020, 2, 10, 6548546.846546, 145788910.465464);
+insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values(2020, 3, 10, 6548546.846546, 145788910.465464);
+insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values(2021, 1, 10, 6548546.846546, 145788910.465464);
+insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values(2021, 2, 10, 6548546.846546, 145788910.465464);
+insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values(2021, 3, 10, 6548546.846546, 145788910.465464);
+insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values(2021, 4, 10, 6548546.846546, 145788910.465464);
+insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values(2022, 1, 10, 6548546.846546, 145788910.465464);
 
 commit

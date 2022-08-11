@@ -30,10 +30,7 @@ jobs:
   build-and-push-image:
     name: Build and push Docker image
     needs: test
-    #########################
-    ### DEVELOPERS: Insert your feature branch name below (in addition to master) if you want to deploy it to dev
-    #########################
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/rydde-opp-i-alerts'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/nytt-endepunkt'
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -64,7 +61,7 @@ jobs:
   deploy-to-dev:
     name: Deploy to dev
     needs: build-and-push-image
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/rydde-opp-i-alerts'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/nytt-endepunkt'
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2

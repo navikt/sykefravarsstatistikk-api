@@ -1,20 +1,29 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles;
 
-import lombok.Data;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import lombok.Data;
+import org.jetbrains.annotations.NotNull;
 
 @Data
 public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
-    private final int årstall;
-    private final int kvartal;
 
-    public ÅrstallOgKvartal(int årstall, int kvartal){
-        if (kvartal > 4 || kvartal < 1){
+    // TODO: Disse verdiene må oppdateres hver gang vi publiserer statistikk for nytt kvartal.
+    // Det bør automatiseres bort på et vis.
+    public static ÅrstallOgKvartal SISTE_PUBLISERTE_KVARTAL = new ÅrstallOgKvartal(2022, 1);
+
+    private int årstall;
+    private int kvartal;
+
+    public static ÅrstallOgKvartal sisteKvartalMinus(int n) {
+        return SISTE_PUBLISERTE_KVARTAL.minusKvartaler(n);
+    }
+
+    public ÅrstallOgKvartal(int årstall, int kvartal) {
+        if (kvartal > 4 || kvartal < 1) {
             throw new IllegalArgumentException("Kvartal må være 1, 2, 3 eller 4");
         }
         this.årstall = årstall;
@@ -30,6 +39,16 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
             årstallOgKvartal = årstallOgKvartal.forrigeKvartal();
         }
         return årstallOgKvartal;
+    }
+
+    public ÅrstallOgKvartal minusEttÅr() {
+        return new ÅrstallOgKvartal(this.årstall - 1, this.kvartal);
+    }
+
+    public static List<ÅrstallOgKvartal> sisteFireKvartaler() {
+        return IntStream.range(0, 4)
+                .mapToObj(SISTE_PUBLISERTE_KVARTAL::minusKvartaler)
+                .collect(Collectors.toList());
     }
 
     public ÅrstallOgKvartal plussKvartaler(int antallKvartaler) {
@@ -75,15 +94,7 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ÅrstallOgKvartal)) return false;
-        ÅrstallOgKvartal that = (ÅrstallOgKvartal) o;
-        return årstall == that.årstall && kvartal == that.kvartal;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(årstall, kvartal);
+    public String toString() {
+        return kvartal + ". kvartal " + årstall;
     }
 }

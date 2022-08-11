@@ -11,6 +11,7 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.enNæringsk
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.enUnderenhetBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BransjeTest {
     Bransjeprogram bransjeprogram = new Bransjeprogram();
@@ -106,8 +107,8 @@ public class BransjeTest {
 
     @Test
     public void lengdePåNæringskoder__skal_returnere_riktig_lengde() {
-        assertThat(new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "navn", "12345", "34567", "56789").lengdePåNæringskoder()).isEqualTo(5);
-        assertThat(new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "navn", "12", "34", "45").lengdePåNæringskoder()).isEqualTo(2);
+        assertTrue(new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "navn", "12345", "34567", "56789").erDefinertPåFemsiffernivå());
+        assertTrue(new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "navn", "12", "34", "45").erDefinertPåTosiffernivå());
     }
 
     @Test

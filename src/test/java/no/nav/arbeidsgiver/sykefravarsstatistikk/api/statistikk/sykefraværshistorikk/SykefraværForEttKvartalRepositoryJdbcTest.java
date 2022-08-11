@@ -28,6 +28,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._8_UKER_TIL_20_UKER;
@@ -56,26 +57,11 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
 
     @Test
     public void hentSykefraværprosentLand__skal_returnere_riktig_sykefravær() {
-        jdbcTemplate.update(
-                "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                        + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(2019, 2, 10, 4, 100)
-        );
-        jdbcTemplate.update(
-                "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                        + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(2019, 1, 10, 5, 100)
-        );
-        jdbcTemplate.update(
-                "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                        + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-                parametre(2018, 4, 10, 6, 100)
-        );
-
+        opprettStatistikkForLand(jdbcTemplate);
         List<SykefraværForEttKvartal> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand();
         assertThat(resultat.size()).isEqualTo(3);
         assertThat(resultat.get(0)).isEqualTo(new SykefraværForEttKvartal(
-                new ÅrstallOgKvartal(2018, 4),
+                ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2),
                 new BigDecimal(6),
                 new BigDecimal(100),
                 10
