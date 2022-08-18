@@ -115,7 +115,14 @@ public class AggregertStatistikkService {
                 kalkulatorLangtid.fraværsprosentVirksomhet(virksomhet.getNavn()),
                 kalkulatorLangtid.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
         );
+
+        // TODO: Jeg er identisk med trendTotalt.
+        //  Fjern meg når Forebygge fravær har tatt trendTotalt i bruk.
         List<StatistikkDto> trend = EitherUtils.filterRights(
+                kalkulatorTotal.trendBransjeEllerNæring(bransjeEllerNæring)
+        );
+
+        List<StatistikkDto> trendTotalt = EitherUtils.filterRights(
                 kalkulatorTotal.trendBransjeEllerNæring(bransjeEllerNæring)
         );
         return new AggregertStatistikkDto(
@@ -124,7 +131,8 @@ public class AggregertStatistikkService {
                 prosentSisteFireKvartalerGradert,
                 prosentSisteFireKvartalerKorttid,
                 prosentSisteFireKvartalerLangtid,
-                trend);
+                trend,
+                trendTotalt);
     }
 
 
@@ -157,16 +165,16 @@ public class AggregertStatistikkService {
             Underenhet virksomhet,
             Predicate<UmaskertSykefraværForEttKvartalMedVarighet> langtidEllerKorttid) {
 
-        Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> entenLangtidEllerKortidsfravær
+        Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> entenKorttidsEllerLangtidsfravær
                 = new HashMap<>();
 
         varighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(virksomhet)
                 .forEach((statistikkategori, fravær) ->
-                        entenLangtidEllerKortidsfravær.put(statistikkategori, fravær.stream()
+                        entenKorttidsEllerLangtidsfravær.put(statistikkategori, fravær.stream()
                                 .filter(langtidEllerKorttid)
                                 .map(UmaskertSykefraværForEttKvartalMedVarighet::tilUmaskertSykefraværForEttKvartal)
                                 .collect(Collectors.toList())));
 
-        return new Sykefraværsdata(entenLangtidEllerKortidsfravær);
+        return new Sykefraværsdata(entenKorttidsEllerLangtidsfravær);
     }
 }
