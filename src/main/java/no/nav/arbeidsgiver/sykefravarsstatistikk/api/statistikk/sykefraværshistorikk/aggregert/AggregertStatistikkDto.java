@@ -12,5 +12,6 @@ import lombok.Setter;
 public class AggregertStatistikkDto {
     public List<StatistikkDto> prosentSiste4Kvartaler = List.of();
     public List<StatistikkDto> gradertProsentSiste4Kvartaler = List.of();
+    public List<StatistikkDto> korttidProsentSiste4Kvartaler = List.of();
     public List<StatistikkDto> trend = List.of();
 }

@@ -68,7 +68,7 @@ class AggregertHistorikkServiceTest {
         serviceUnderTest = new AggregertStatistikkService(
               mockSykefraværRepository,
               mockGraderingRepository,
-              mockBransjeEllerNæringService,
+              varighetRepository, mockBransjeEllerNæringService,
               mockTilgangskontrollService,
               mockEnhetsregisteretClient
         );
