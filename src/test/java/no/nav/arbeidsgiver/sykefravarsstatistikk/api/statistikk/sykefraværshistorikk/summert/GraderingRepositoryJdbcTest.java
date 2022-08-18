@@ -28,6 +28,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.GraderingTestUtils.insertDataMedGradering;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_FORETAK;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
@@ -396,90 +397,5 @@ public class GraderingRepositoryJdbcTest {
     }
 
 
-    private void insertDataMedGradering(
-            NamedParameterJdbcTemplate jdbcTemplate,
-            String orgnr,
-            String næring,
-            String næringskode,
-            String rectype,
-            ÅrstallOgKvartal årstallOgKvartal,
-            int antallGraderteSykemeldinger,
-            int antallSykemeldinger,
-            int antallPersoner,
-            BigDecimal tapteDagsverkGradertSykemelding,
-            BigDecimal tapteDagsverk,
-            BigDecimal muligeDagsverk
-    ) {
-        jdbcTemplate.update(
-                "insert into sykefravar_statistikk_virksomhet_med_gradering (" +
-                        "orgnr, " +
-                        "naring, " +
-                        "naring_kode, " +
-                        "rectype, " +
-                        "arstall, " +
-                        "kvartal," +
-                        "antall_graderte_sykemeldinger, " +
-                        "tapte_dagsverk_gradert_sykemelding, " +
-                        "antall_sykemeldinger, " +
-                        "antall_personer, " +
-                        "tapte_dagsverk, " +
-                        "mulige_dagsverk) "
-                        + "VALUES (" +
-                        ":orgnr, " +
-                        ":naring, " +
-                        ":naring_kode, " +
-                        ":rectype, " +
-                        ":arstall, " +
-                        ":kvartal, " +
-                        ":antall_graderte_sykemeldinger, " +
-                        ":tapte_dagsverk_gradert_sykemelding, " +
-                        ":antall_sykemeldinger , " +
-                        ":antall_personer, " +
-                        ":tapte_dagsverk, " +
-                        ":mulige_dagsverk)",
-                parametre(
-                        orgnr,
-                        næring,
-                        næringskode,
-                        rectype,
-                        årstallOgKvartal.getÅrstall(),
-                        årstallOgKvartal.getKvartal(),
-                        antallGraderteSykemeldinger,
-                        tapteDagsverkGradertSykemelding,
-                        antallSykemeldinger,
-                        antallPersoner,
-                        tapteDagsverk,
-                        muligeDagsverk
-                )
-        );
-    }
 
-    private MapSqlParameterSource parametre(
-            String orgnr,
-            String naring,
-            String næringskode,
-            String rectype,
-            int årstall,
-            int kvartal,
-            int antallGraderteSykemeldinger,
-            BigDecimal tapteDagsverkGradertSykemelding,
-            int antallSykemeldinger,
-            int antallPersoner,
-            BigDecimal tapteDagsverk,
-            BigDecimal muligeDagsverk
-    ) {
-        return new MapSqlParameterSource()
-                .addValue("orgnr", orgnr)
-                .addValue("naring", naring)
-                .addValue("naring_kode", næringskode)
-                .addValue("rectype", rectype)
-                .addValue("arstall", årstall)
-                .addValue("kvartal", kvartal)
-                .addValue("antall_graderte_sykemeldinger", antallGraderteSykemeldinger)
-                .addValue("tapte_dagsverk_gradert_sykemelding", tapteDagsverkGradertSykemelding)
-                .addValue("antall_sykemeldinger", antallSykemeldinger)
-                .addValue("antall_personer", antallPersoner)
-                .addValue("tapte_dagsverk", tapteDagsverk)
-                .addValue("mulige_dagsverk", muligeDagsverk);
-    }
 }

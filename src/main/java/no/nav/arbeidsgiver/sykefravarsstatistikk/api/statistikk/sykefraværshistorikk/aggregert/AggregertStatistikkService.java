@@ -70,6 +70,7 @@ public class AggregertStatistikkService {
                 );
         List<StatistikkDto> prosentSisteFireKvartaler = EitherUtils.filterRights(
                 kalkulatorTotal.fraværsprosentVirksomhet(virksomhet.getNavn()),
+                kalkulatorTotal.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
                 kalkulatorTotal.fraværsprosentNorge()
         );
         List<StatistikkDto> gradertProsentSisteFireKvartaler = EitherUtils.filterRights(
