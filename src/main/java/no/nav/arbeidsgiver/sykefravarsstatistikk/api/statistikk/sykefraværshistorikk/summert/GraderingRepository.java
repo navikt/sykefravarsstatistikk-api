@@ -1,6 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.BRANSJE;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.NÆRING;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,6 +22,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.Sykefraværsdata;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -69,7 +72,7 @@ public class GraderingRepository {
     }
 
 
-    public List<UmaskertSykefraværForEttKvartal> hentSykefraværForEttKvartalMedGradering(
+    public List<UmaskertSykefraværForEttKvartal> hentSykefraværMedGradering(
             Virksomhet virksomhet) {
         try {
             return namedParameterJdbcTemplate.query(
@@ -96,7 +99,7 @@ public class GraderingRepository {
     }
 
 
-    public Sykefraværsdata hentGradertSykefraværAlleKategorier(Virksomhet virksomhet) {
+    public Sykefraværsdata hentGradertSykefraværAlleKategorier(@NotNull Virksomhet virksomhet) {
 
         Næring næring = new Næring(virksomhet.getNæringskode().getKode(), "");
         Optional<Bransje> maybeBransje
@@ -104,21 +107,20 @@ public class GraderingRepository {
 
         Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> data = new HashMap<>();
 
-        data.put(Statistikkategori.VIRKSOMHET, hentSykefraværForEttKvartalMedGradering(virksomhet));
-        data.put(Statistikkategori.NÆRING, hentSykefraværForEttKvartalMedGradering(næring));
+        data.put(Statistikkategori.VIRKSOMHET, hentSykefraværMedGradering(virksomhet));
 
-        // TODO: Skal vi sende næringstall dersom virkosmheten er definert i bransjeprogrammet?
-        //  :hmm:
-        if (maybeBransje.isPresent() && maybeBransje.get().erDefinertPåFemsiffernivå()) {
-            data.put(Statistikkategori.BRANSJE,
-                    hentSykefraværForEttKvartalMedGradering(maybeBransje.get()));
+        if (maybeBransje.isEmpty()) {
+            data.put(NÆRING, hentSykefraværMedGradering(næring));
+        } else if (maybeBransje.get().erDefinertPåFemsiffernivå()) {
+            data.put(BRANSJE, hentSykefraværMedGradering(maybeBransje.get()));
+        } else {
+            data.put(BRANSJE, hentSykefraværMedGradering(næring));
         }
-
         return new Sykefraværsdata(data);
     }
 
 
-    public List<UmaskertSykefraværForEttKvartal> hentSykefraværForEttKvartalMedGradering(
+    public List<UmaskertSykefraværForEttKvartal> hentSykefraværMedGradering(
             Næring næring) {
         try {
             return namedParameterJdbcTemplate.query(
@@ -135,7 +137,7 @@ public class GraderingRepository {
                             " group by arstall, kvartal" +
                             " order by arstall, kvartal",
                     new MapSqlParameterSource()
-                            .addValue("naring", næring.getKode())
+                            .addValue("naring", næring.getKode().substring(0,2))
                             .addValue("rectype", RECTYPE_FOR_VIRKSOMHET),
                     (rs, rowNum) -> mapTilUmaskertSykefraværForEttKvartal(rs)
             );
@@ -146,8 +148,7 @@ public class GraderingRepository {
     }
 
 
-    public List<UmaskertSykefraværForEttKvartal> hentSykefraværForEttKvartalMedGradering(
-            Bransje bransje) {
+    public List<UmaskertSykefraværForEttKvartal> hentSykefraværMedGradering(Bransje bransje) {
         try {
             return namedParameterJdbcTemplate.query(
                     "select arstall, kvartal," +

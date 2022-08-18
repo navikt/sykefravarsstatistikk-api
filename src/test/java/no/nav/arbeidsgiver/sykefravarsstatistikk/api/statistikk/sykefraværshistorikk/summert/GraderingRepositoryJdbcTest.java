@@ -19,7 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -121,7 +120,7 @@ public class GraderingRepositoryJdbcTest {
         );
 
         List<UmaskertSykefraværForEttKvartal> resultat =
-                graderingRepository.hentSykefraværForEttKvartalMedGradering(UNDERENHET_1_NÆRING_14);
+                graderingRepository.hentSykefraværMedGradering(UNDERENHET_1_NÆRING_14);
 
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(
@@ -182,7 +181,7 @@ public class GraderingRepositoryJdbcTest {
                 new BigDecimal(300)
         );
 
-        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværForEttKvartalMedGradering(UNDERENHET_1_NÆRING_14);
+        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværMedGradering(UNDERENHET_1_NÆRING_14);
 
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(
@@ -247,7 +246,7 @@ public class GraderingRepositoryJdbcTest {
                 new BigDecimal(300)
         );
 
-        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværForEttKvartalMedGradering(PRODUKSJON_AV_KLÆR);
+        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværMedGradering(PRODUKSJON_AV_KLÆR);
 
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(
@@ -327,7 +326,7 @@ public class GraderingRepositoryJdbcTest {
                 new BigDecimal(3000)
         );
 
-        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværForEttKvartalMedGradering(
+        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværMedGradering(
                 new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "sykehus", "86101", "86211"));
 
         assertThat(resultat.size()).isEqualTo(2);
@@ -382,7 +381,7 @@ public class GraderingRepositoryJdbcTest {
                 new BigDecimal(100)
         );
 
-        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværForEttKvartalMedGradering(
+        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværMedGradering(
                 new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "sykehus", "86101", "86211"));
 
         assertThat(resultat.size()).isEqualTo(1);
