@@ -19,7 +19,6 @@ public class Aggregeringskalkulator {
 
     public Sykefraværsdata sykefraværsdata;
 
-
     Either<StatistikkException, StatistikkDto> fraværsprosentNorge() {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(LAND))
                 .regnUtProsentOgMapTilDto(LAND, "Norge");

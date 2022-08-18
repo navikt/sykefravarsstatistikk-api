@@ -10,6 +10,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Brans
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.EitherUtils;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.GraderingRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class AggregertStatistikkService {
 
     private final SykefraværRepository sykefraværprosentRepository;
+    private final GraderingRepository graderingRepository;
     private final BransjeEllerNæringService bransjeEllerNæringService;
     private final TilgangskontrollService tilgangskontrollService;
     private final EnhetsregisteretClient enhetsregisteretClient;
@@ -26,10 +28,12 @@ public class AggregertStatistikkService {
 
     public AggregertStatistikkService(
             SykefraværRepository sykefraværprosentRepository,
+            GraderingRepository graderingRepository,
             BransjeEllerNæringService bransjeEllerNæringService,
             TilgangskontrollService tilgangskontrollService,
             EnhetsregisteretClient enhetsregisteretClient) {
         this.sykefraværprosentRepository = sykefraværprosentRepository;
+        this.graderingRepository = graderingRepository;
         this.bransjeEllerNæringService = bransjeEllerNæringService;
         this.tilgangskontrollService = tilgangskontrollService;
         this.enhetsregisteretClient = enhetsregisteretClient;
@@ -44,39 +48,53 @@ public class AggregertStatistikkService {
                     new TilgangskontrollException("Bruker mangler tilgang til denne virksomheten"));
         }
         Underenhet virksomhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
-        Sykefraværsdata sykefraværsdata = hentForSisteFemKvartaler(virksomhet);
+        Sykefraværsdata totalSykefravær = hentTotalsykefraværForSisteFemKvartaler(virksomhet);
+        Sykefraværsdata gradertSykefravær = hentGradertSykefravær(virksomhet);
 
         if (!tilgangskontrollService.brukerHarIaRettigheter(orgnr)) {
-            sykefraværsdata.filtrerBortVirksomhetsdata();
+            totalSykefravær.filtrerBortVirksomhetsdata();
         }
-        return Either.right(aggregerData(virksomhet, sykefraværsdata));
+        return Either.right(aggregerData(virksomhet, totalSykefravær, gradertSykefravær));
     }
 
 
-    private AggregertStatistikkDto aggregerData(Underenhet virksomhet, Sykefraværsdata sykefravær) {
+    private AggregertStatistikkDto aggregerData(Underenhet virksomhet,
+            Sykefraværsdata totalsykefravær, Sykefraværsdata gradertSykefravær) {
 
-        Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(sykefravær);
+        Aggregeringskalkulator kalkulatorTotal = new Aggregeringskalkulator(totalsykefravær);
+        Aggregeringskalkulator kalkulatorGradert = new Aggregeringskalkulator(gradertSykefravær);
 
         BransjeEllerNæring bransjeEllerNæring =
                 bransjeEllerNæringService.bestemFraNæringskode(
                         virksomhet.getNæringskode()
                 );
         List<StatistikkDto> prosentSisteFireKvartaler = EitherUtils.filterRights(
-                kalkulator.fraværsprosentVirksomhet(virksomhet.getNavn()),
-                kalkulator.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
-                kalkulator.fraværsprosentNorge()
+                kalkulatorTotal.fraværsprosentVirksomhet(virksomhet.getNavn()),
+                kalkulatorTotal.fraværsprosentNorge()
+        );
+        List<StatistikkDto> gradertProsentSisteFireKvartaler = EitherUtils.filterRights(
+                kalkulatorGradert.fraværsprosentVirksomhet(virksomhet.getNavn()),
+                kalkulatorGradert.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
         );
         List<StatistikkDto> trend = EitherUtils.filterRights(
-                kalkulator.trendBransjeEllerNæring(bransjeEllerNæring)
+                kalkulatorTotal.trendBransjeEllerNæring(bransjeEllerNæring)
         );
-        return new AggregertStatistikkDto(prosentSisteFireKvartaler, trend);
+        return new AggregertStatistikkDto(
+                prosentSisteFireKvartaler,
+                gradertProsentSisteFireKvartaler,
+                trend);
     }
 
 
-    private Sykefraværsdata hentForSisteFemKvartaler(Underenhet forBedrift) {
+    private Sykefraværsdata hentTotalsykefraværForSisteFemKvartaler(Underenhet forBedrift) {
         return sykefraværprosentRepository
                 .hentUmaskertSykefraværAlleKategorier(
                         forBedrift, SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4)
                 );
+    }
+
+
+    private Sykefraværsdata hentGradertSykefravær(Underenhet virksomhet) {
+        return graderingRepository.hentGradertSykefraværAlleKategorier(virksomhet);
     }
 }
