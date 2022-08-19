@@ -36,12 +36,12 @@ public class AggregertStatistikkService {
 
 
     public AggregertStatistikkService(
-            SykefraværRepository sykefraværprosentRepository,
-            GraderingRepository graderingRepository,
-            VarighetRepository varighetRepository,
-            BransjeEllerNæringService bransjeEllerNæringService,
-            TilgangskontrollService tilgangskontrollService,
-            EnhetsregisteretClient enhetsregisteretClient) {
+          SykefraværRepository sykefraværprosentRepository,
+          GraderingRepository graderingRepository,
+          VarighetRepository varighetRepository,
+          BransjeEllerNæringService bransjeEllerNæringService,
+          TilgangskontrollService tilgangskontrollService,
+          EnhetsregisteretClient enhetsregisteretClient) {
         this.sykefraværprosentRepository = sykefraværprosentRepository;
         this.graderingRepository = graderingRepository;
         this.varighetRepository = varighetRepository;
@@ -52,11 +52,11 @@ public class AggregertStatistikkService {
 
 
     public Either<TilgangskontrollException, AggregertStatistikkDto> hentAggregertStatistikk(
-            Orgnr orgnr) {
+          Orgnr orgnr) {
 
         if (!tilgangskontrollService.brukerRepresentererVirksomheten(orgnr)) {
             return Either.left(
-                    new TilgangskontrollException("Bruker mangler tilgang til denne virksomheten"));
+                  new TilgangskontrollException("Bruker mangler tilgang til denne virksomheten"));
         }
         Underenhet virksomhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
         Sykefraværsdata totalSykefravær = hentTotalfraværSisteFemKvartaler(virksomhet);
@@ -68,21 +68,21 @@ public class AggregertStatistikkService {
             totalSykefravær.filtrerBortVirksomhetsdata();
         }
         return Either.right(aggregerData(
-                virksomhet,
-                totalSykefravær,
-                gradertSykefravær,
-                korttidSykefravær,
-                langtidsfravær
+              virksomhet,
+              totalSykefravær,
+              gradertSykefravær,
+              korttidSykefravær,
+              langtidsfravær
         ));
     }
 
 
     private AggregertStatistikkDto aggregerData(
-            Underenhet virksomhet,
-            Sykefraværsdata totalfravær,
-            Sykefraværsdata gradertFravær,
-            Sykefraværsdata korttidsfravær,
-            Sykefraværsdata langtidsfravær
+          Underenhet virksomhet,
+          Sykefraværsdata totalfravær,
+          Sykefraværsdata gradertFravær,
+          Sykefraværsdata korttidsfravær,
+          Sykefraværsdata langtidsfravær
     ) {
         Aggregeringskalkulator kalkulatorTotal = new Aggregeringskalkulator(totalfravær);
         Aggregeringskalkulator kalkulatorGradert = new Aggregeringskalkulator(gradertFravær);
@@ -94,53 +94,53 @@ public class AggregertStatistikkService {
         // TODO: Jeg er identisk med prosentSisteFireKvartalerTotalt.
         //  Fjern meg når Forebygge fravær har tatt prosentSisteFireKvartalerTotalt i bruk.
         List<StatistikkDto> prosentSisteFireKvartaler = EitherUtils.filterRights(
-                kalkulatorTotal.fraværsprosentVirksomhet(virksomhet.getNavn()),
-                kalkulatorTotal.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
-                kalkulatorTotal.fraværsprosentNorge()
+              kalkulatorTotal.fraværsprosentVirksomhet(virksomhet.getNavn()),
+              kalkulatorTotal.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
+              kalkulatorTotal.fraværsprosentNorge()
         );
         List<StatistikkDto> prosentSisteFireKvartalerTotalt = EitherUtils.filterRights(
-                kalkulatorTotal.fraværsprosentVirksomhet(virksomhet.getNavn()),
-                kalkulatorTotal.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
-                kalkulatorTotal.fraværsprosentNorge()
+              kalkulatorTotal.fraværsprosentVirksomhet(virksomhet.getNavn()),
+              kalkulatorTotal.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
+              kalkulatorTotal.fraværsprosentNorge()
         );
         List<StatistikkDto> prosentSisteFireKvartalerGradert = EitherUtils.filterRights(
-                kalkulatorGradert.fraværsprosentVirksomhet(virksomhet.getNavn()),
-                kalkulatorGradert.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
+              kalkulatorGradert.fraværsprosentVirksomhet(virksomhet.getNavn()),
+              kalkulatorGradert.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
         );
         List<StatistikkDto> prosentSisteFireKvartalerKorttid = EitherUtils.filterRights(
-                kalkulatorKorttid.fraværsprosentVirksomhet(virksomhet.getNavn()),
-                kalkulatorKorttid.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
+              kalkulatorKorttid.fraværsprosentVirksomhet(virksomhet.getNavn()),
+              kalkulatorKorttid.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
         );
         List<StatistikkDto> prosentSisteFireKvartalerLangtid = EitherUtils.filterRights(
-                kalkulatorLangtid.fraværsprosentVirksomhet(virksomhet.getNavn()),
-                kalkulatorLangtid.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
+              kalkulatorLangtid.fraværsprosentVirksomhet(virksomhet.getNavn()),
+              kalkulatorLangtid.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
         );
 
         // TODO: Jeg er identisk med trendTotalt.
         //  Fjern meg når Forebygge fravær har tatt trendTotalt i bruk.
         List<StatistikkDto> trend = EitherUtils.filterRights(
-                kalkulatorTotal.trendBransjeEllerNæring(bransjeEllerNæring)
+              kalkulatorTotal.trendBransjeEllerNæring(bransjeEllerNæring)
         );
 
         List<StatistikkDto> trendTotalt = EitherUtils.filterRights(
-                kalkulatorTotal.trendBransjeEllerNæring(bransjeEllerNæring)
+              kalkulatorTotal.trendBransjeEllerNæring(bransjeEllerNæring)
         );
         return new AggregertStatistikkDto(
-                prosentSisteFireKvartaler,
-                prosentSisteFireKvartalerTotalt,
-                prosentSisteFireKvartalerGradert,
-                prosentSisteFireKvartalerKorttid,
-                prosentSisteFireKvartalerLangtid,
-                trend,
-                trendTotalt);
+              prosentSisteFireKvartaler,
+              prosentSisteFireKvartalerTotalt,
+              prosentSisteFireKvartalerGradert,
+              prosentSisteFireKvartalerKorttid,
+              prosentSisteFireKvartalerLangtid,
+              trend,
+              trendTotalt);
     }
 
 
     private Sykefraværsdata hentTotalfraværSisteFemKvartaler(Underenhet forBedrift) {
         return sykefraværprosentRepository
-                .hentUmaskertSykefraværAlleKategorier(
-                        forBedrift, SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4)
-                );
+              .hentUmaskertSykefraværAlleKategorier(
+                    forBedrift, SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4)
+              );
     }
 
 
@@ -151,30 +151,30 @@ public class AggregertStatistikkService {
 
     private Sykefraværsdata hentKorttidsfravær(Underenhet virksomhet) {
         return hentLangtidsEllerKorttidsfravær(
-                virksomhet, datapunkt -> datapunkt.getVarighet().erKorttidVarighet());
+              virksomhet, datapunkt -> datapunkt.getVarighet().erKorttidVarighet());
     }
 
 
     private Sykefraværsdata hentLangtidsfravær(Underenhet virksomhet) {
         return hentLangtidsEllerKorttidsfravær(
-                virksomhet, datapunkt -> datapunkt.getVarighet().erLangtidVarighet());
+              virksomhet, datapunkt -> datapunkt.getVarighet().erLangtidVarighet());
     }
 
 
     private Sykefraværsdata hentLangtidsEllerKorttidsfravær(
-            Underenhet virksomhet,
-            Predicate<UmaskertSykefraværForEttKvartalMedVarighet> langtidEllerKorttid) {
+          Underenhet virksomhet,
+          Predicate<UmaskertSykefraværForEttKvartalMedVarighet> entenLangtidEllerKorttid) {
 
-        Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> entenKorttidsEllerLangtidsfravær
-                = new HashMap<>();
+        Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> filtrertFravær
+              = new HashMap<>();
 
         varighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(virksomhet)
-                .forEach((statistikkategori, fravær) ->
-                        entenKorttidsEllerLangtidsfravær.put(statistikkategori, fravær.stream()
-                                .filter(langtidEllerKorttid)
-                                .map(UmaskertSykefraværForEttKvartalMedVarighet::tilUmaskertSykefraværForEttKvartal)
-                                .collect(Collectors.toList())));
+              .forEach((statistikkategori, fravær) ->
+                    filtrertFravær.put(statistikkategori, fravær.stream()
+                          .filter(entenLangtidEllerKorttid)
+                          .map(UmaskertSykefraværForEttKvartalMedVarighet::tilUmaskertSykefraværForEttKvartal)
+                          .collect(Collectors.toList())));
 
-        return new Sykefraværsdata(entenKorttidsEllerLangtidsfravær);
+        return new Sykefraværsdata(filtrertFravær);
     }
 }

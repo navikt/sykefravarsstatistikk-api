@@ -1,5 +1,21 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje.BARNEHAGER;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.BRANSJE;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.LAND;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.NÆRING;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.VIRKSOMHET;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
@@ -13,6 +29,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.GraderingRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.VarighetRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,20 +37,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje.BARNEHAGER;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AggregertHistorikkServiceTest {
@@ -60,6 +63,8 @@ class AggregertHistorikkServiceTest {
     private EnhetsregisteretClient mockEnhetsregisteretClient;
     @Mock
     private BransjeEllerNæringService mockBransjeEllerNæringService;
+    @Mock
+    private VarighetRepository varighetRepository;
 
 
     @BeforeEach
@@ -68,7 +73,8 @@ class AggregertHistorikkServiceTest {
         serviceUnderTest = new AggregertStatistikkService(
               mockSykefraværRepository,
               mockGraderingRepository,
-              varighetRepository, mockBransjeEllerNæringService,
+              varighetRepository,
+              mockBransjeEllerNæringService,
               mockTilgangskontrollService,
               mockEnhetsregisteretClient
         );
@@ -91,8 +97,7 @@ class AggregertHistorikkServiceTest {
         when(mockTilgangskontrollService.brukerRepresentererVirksomheten(any())).thenReturn(true);
         when(mockEnhetsregisteretClient.hentInformasjonOmUnderenhet(any())).thenReturn(enBarnehage);
         when(mockTilgangskontrollService.brukerHarIaRettigheter(any())).thenReturn(true);
-        when(mockBransjeEllerNæringService.bestemFraNæringskode(any()))
-              .thenReturn(enBransje);
+        when(mockBransjeEllerNæringService.finnBransje(any())).thenReturn(enBransje);
 
         // Helt tomt resultat skal ikke kræsje
         when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(), any()))
@@ -128,8 +133,7 @@ class AggregertHistorikkServiceTest {
         when(mockTilgangskontrollService.brukerRepresentererVirksomheten(any())).thenReturn(true);
         when(mockEnhetsregisteretClient.hentInformasjonOmUnderenhet(any())).thenReturn(enBarnehage);
         when(mockTilgangskontrollService.brukerHarIaRettigheter(any())).thenReturn(true);
-        when(mockBransjeEllerNæringService.bestemFraNæringskode(any()))
-              .thenReturn(enBransje);
+        when(mockBransjeEllerNæringService.finnBransje(any())).thenReturn(enBransje);
 
         when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(), any()))
               .thenReturn(new Sykefraværsdata(
@@ -162,7 +166,8 @@ class AggregertHistorikkServiceTest {
                     .map(StatistikkDto::getStatistikkategori)
                     .collect(Collectors.toList());
         List<Statistikkategori> gradertProsentstatistikk =
-              serviceUnderTest.hentAggregertStatistikk(etOrgnr).get().gradertProsentSiste4Kvartaler
+              serviceUnderTest.hentAggregertStatistikk(etOrgnr)
+                    .get().prosentSiste4KvartalerGradert
                     .stream()
                     .map(StatistikkDto::getStatistikkategori)
                     .collect(Collectors.toList());
