@@ -139,27 +139,6 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
               new BigDecimal(300)
         );
 
-        VarighetTestUtils.leggTilVirksomhetsstatistikkMedVarighet(
-              jdbcTemplate,
-              ORGNR_UNDERENHET,
-              new ÅrstallOgKvartal(2022,1),
-              Varighetskategori._1_DAG_TIL_7_DAGER,
-              0,2,0
-        );
-        VarighetTestUtils.leggTilVirksomhetsstatistikkMedVarighet(
-              jdbcTemplate,
-              ORGNR_UNDERENHET,
-              new ÅrstallOgKvartal(2022,1),
-              Varighetskategori._8_UKER_TIL_20_UKER,
-              0,4,0
-        );
-        VarighetTestUtils.leggTilVirksomhetsstatistikkMedVarighet(
-              jdbcTemplate,
-              ORGNR_UNDERENHET,
-              new ÅrstallOgKvartal(2022,1),
-              Varighetskategori.TOTAL,
-              10,0,100
-        );
         //when(mockEnhetsregisteretClient.hentInformasjonOmUnderenhet(any())).thenReturn
         // (enProduksjonVirksomhetsNæring);
         HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET);
@@ -170,8 +149,6 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
 
         JsonNode gradertProsentSiste4Kvartaler = responseBody.get("prosentSiste4KvartalerGradert");
 
-        JsonNode korttidProsentSiste4Kvartaler = responseBody.get("prosentSiste4KvartalerKorttid");
-        JsonNode LangtidProsentSiste4Kvartaler = responseBody.get("prosentSiste4KvartalerLangtid");
 
         assertThat(responseBody.get("trend").findValuesAsText("statistikkategori"))
               .containsExactly(BRANSJE.toString());
@@ -206,7 +183,38 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
               .isEqualTo("NAV ARBEID OG YTELSER AVD OSLO");
     }
 
+    @Test
+    public void hentAggregertStatistikk_returnerer_varighet_når_den_vi_har_varighet_statistikk()
+    throws Exception{
+        VarighetTestUtils.leggTilVirksomhetsstatistikkMedVarighet(
+              jdbcTemplate,
+              ORGNR_UNDERENHET,
+              new ÅrstallOgKvartal(2022,1),
+              Varighetskategori._1_DAG_TIL_7_DAGER,
+              0,2,0
+        );
+        VarighetTestUtils.leggTilVirksomhetsstatistikkMedVarighet(
+              jdbcTemplate,
+              ORGNR_UNDERENHET,
+              new ÅrstallOgKvartal(2022,1),
+              Varighetskategori._8_UKER_TIL_20_UKER,
+              0,4,0
+        );
+        VarighetTestUtils.leggTilVirksomhetsstatistikkMedVarighet(
+              jdbcTemplate,
+              ORGNR_UNDERENHET,
+              new ÅrstallOgKvartal(2022,1),
+              Varighetskategori.TOTAL,
+              10,0,100
+        );
+        HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET);
+        assertThat(response.statusCode()).isEqualTo(200);
 
+        JsonNode responseBody = objectMapper.readTree(response.body());
+        JsonNode korttidProsentSiste4Kvartaler = responseBody.get("prosentSiste4KvartalerKorttid");
+        JsonNode LangtidProsentSiste4Kvartaler = responseBody.get("prosentSiste4KvartalerLangtid");
+
+    }
     @Test
     public void hentAgreggertStatistikk_returnererIkkeVirksomhetstatistikkTilBrukerSomManglerIaRettigheter()
           throws Exception {
