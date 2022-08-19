@@ -25,7 +25,9 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Brans
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.GraderingRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
@@ -64,7 +66,7 @@ class AggregertHistorikkServiceTest {
     @Mock
     private BransjeEllerNæringService mockBransjeEllerNæringService;
     @Mock
-    private VarighetRepository varighetRepository;
+    private VarighetRepository mockVarighetRepository;
 
 
     @BeforeEach
@@ -73,7 +75,7 @@ class AggregertHistorikkServiceTest {
         serviceUnderTest = new AggregertStatistikkService(
               mockSykefraværRepository,
               mockGraderingRepository,
-              varighetRepository,
+              mockVarighetRepository,
               mockBransjeEllerNæringService,
               mockTilgangskontrollService,
               mockEnhetsregisteretClient
@@ -86,6 +88,7 @@ class AggregertHistorikkServiceTest {
         reset(
               mockSykefraværRepository,
               mockGraderingRepository,
+              mockVarighetRepository,
               mockEnhetsregisteretClient,
               mockBransjeEllerNæringService,
               mockTilgangskontrollService);
@@ -130,10 +133,7 @@ class AggregertHistorikkServiceTest {
 
     @Test
     void hentAggregertHistorikk_henterAltSykefraværDersomBrukerHarIaRettigheter() {
-        when(mockTilgangskontrollService.brukerRepresentererVirksomheten(any())).thenReturn(true);
-        when(mockEnhetsregisteretClient.hentInformasjonOmUnderenhet(any())).thenReturn(enBarnehage);
-        when(mockTilgangskontrollService.brukerHarIaRettigheter(any())).thenReturn(true);
-        when(mockBransjeEllerNæringService.finnBransje(any())).thenReturn(enBransje);
+        mockAvhengigheterForBarnehageMedIaRettigheter();
 
         when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(), any()))
               .thenReturn(new Sykefraværsdata(
@@ -233,6 +233,52 @@ class AggregertHistorikkServiceTest {
     }
 
 
+    @Test
+    public void hentAggregertStatistikk_summererKorrektLangtidsfravær() {
+        mockAvhengigheterForBarnehageMedIaRettigheter();
+
+        when(mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any()))
+              .thenReturn(
+                    Map.of(VIRKSOMHET, List.of(
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 10, 0, 2,
+                                Varighetskategori._20_UKER_TIL_39_UKER),
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 20, 0, 2,
+                                Varighetskategori._8_UKER_TIL_20_UKER),
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 5, 0, 2,
+                                Varighetskategori._8_DAGER_TIL_16_DAGER),
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 0, 100, 0,
+                                Varighetskategori.TOTAL),
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 10, 0, 2,
+                                Varighetskategori._20_UKER_TIL_39_UKER),
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 0, 100, 0,
+                                Varighetskategori.TOTAL)
+                    ))
+              );
+        StatistikkDto forventet =
+              new StatistikkDto(
+                    VIRKSOMHET,
+                    VIRKSOMHET.name(),
+                    "20",
+                    8,
+                    List.of(
+                          SISTE_PUBLISERTE_KVARTAL,
+                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1)
+                    ));
+        assertThat(
+              serviceUnderTest.hentAggregertStatistikk(etOrgnr)
+                    .get().prosentSiste4KvartalerLangtid.get(0))
+              .isEqualTo(forventet);
+    }
+
+
+    private void mockAvhengigheterForBarnehageMedIaRettigheter() {
+        when(mockTilgangskontrollService.brukerRepresentererVirksomheten(any())).thenReturn(true);
+        when(mockEnhetsregisteretClient.hentInformasjonOmUnderenhet(any())).thenReturn(enBarnehage);
+        when(mockTilgangskontrollService.brukerHarIaRettigheter(any())).thenReturn(true);
+        when(mockBransjeEllerNæringService.finnBransje(any())).thenReturn(enBransje);
+    }
+
+
     private List<UmaskertSykefraværForEttKvartal> genererTestSykefravær(int offset) {
         return Arrays.asList(
               umaskertSykefraværprosent(new ÅrstallOgKvartal(2022, 1), 1.1 + offset, 10),
@@ -253,6 +299,19 @@ class AggregertHistorikkServiceTest {
               new BigDecimal(prosent),
               new BigDecimal(100),
               antallPersoner
+        );
+    }
+
+
+    private static UmaskertSykefraværForEttKvartalMedVarighet fraværMedVarighet(
+          ÅrstallOgKvartal årstallOgKvartal, int tapteDagsverk, int muligeDagsverk,
+          int antallPersoner, Varighetskategori varighetskategori) {
+        return new UmaskertSykefraværForEttKvartalMedVarighet(
+              årstallOgKvartal,
+              new BigDecimal(tapteDagsverk),
+              new BigDecimal(muligeDagsverk),
+              antallPersoner,
+              varighetskategori
         );
     }
 
