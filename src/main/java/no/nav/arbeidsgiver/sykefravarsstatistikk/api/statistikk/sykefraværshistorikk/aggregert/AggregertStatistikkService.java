@@ -6,6 +6,7 @@ import io.vavr.control.Either;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
@@ -151,13 +152,17 @@ public class AggregertStatistikkService {
 
     private Sykefraværsdata hentKorttidsfravær(Underenhet virksomhet) {
         return hentLangtidsEllerKorttidsfravær(
-              virksomhet, datapunkt -> datapunkt.getVarighet().erKorttidVarighet());
+              virksomhet, datapunkt -> datapunkt.getVarighet().erKorttidVarighet()
+                    || datapunkt.getVarighet().erTotalvarighet()
+        );
     }
 
 
     private Sykefraværsdata hentLangtidsfravær(Underenhet virksomhet) {
         return hentLangtidsEllerKorttidsfravær(
-              virksomhet, datapunkt -> datapunkt.getVarighet().erLangtidVarighet());
+              virksomhet, datapunkt -> datapunkt.getVarighet().erLangtidVarighet()
+                    || datapunkt.getVarighet().erTotalvarighet()
+        );
     }
 
 
@@ -171,8 +176,13 @@ public class AggregertStatistikkService {
         varighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(virksomhet)
               .forEach((statistikkategori, fravær) ->
                     filtrertFravær.put(statistikkategori, fravær.stream()
-                          .filter(entenLangtidEllerKorttid)
-                          .map(UmaskertSykefraværForEttKvartalMedVarighet::tilUmaskertSykefraværForEttKvartal)
+                          .filter(entenLangtidEllerKorttid).collect(
+                                Collectors.groupingBy(
+                                      UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal,
+                                      Collectors.reducing(UmaskertSykefraværForEttKvartal::add)))
+                          .values().stream()
+                          .filter(Optional::isPresent)
+                          .map(Optional::get)
                           .collect(Collectors.toList())));
 
         return new Sykefraværsdata(filtrertFravær);

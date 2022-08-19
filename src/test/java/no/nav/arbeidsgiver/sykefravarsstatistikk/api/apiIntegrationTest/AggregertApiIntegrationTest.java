@@ -1,8 +1,31 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.apiIntegrationTest;
 
+import static com.google.common.net.HttpHeaders.AUTHORIZATION;
+import static java.net.http.HttpClient.newBuilder;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.GraderingTestUtils.insertDataMedGradering;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.PRODUKSJON_NYTELSESMIDLER;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring2Siffer;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring5Siffer;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForVirksomhet;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.BRANSJE;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.LAND;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.VIRKSOMHET;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import common.SpringIntegrationTestbase;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.VarighetTestUtils;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
@@ -15,22 +38,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.List;
-
-import static com.google.common.net.HttpHeaders.AUTHORIZATION;
-import static java.net.http.HttpClient.newBuilder;
-import static java.net.http.HttpResponse.BodyHandlers.ofString;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.GraderingTestUtils.insertDataMedGradering;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.*;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
@@ -139,8 +146,6 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
               new BigDecimal(300)
         );
 
-        //when(mockEnhetsregisteretClient.hentInformasjonOmUnderenhet(any())).thenReturn
-        // (enProduksjonVirksomhetsNæring);
         HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET);
         assertThat(response.statusCode()).isEqualTo(200);
 
@@ -148,7 +153,6 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
         JsonNode prosentSiste4Kvartaler = responseBody.get("prosentSiste4Kvartaler");
 
         JsonNode gradertProsentSiste4Kvartaler = responseBody.get("prosentSiste4KvartalerGradert");
-
 
         assertThat(responseBody.get("trend").findValuesAsText("statistikkategori"))
               .containsExactly(BRANSJE.toString());
@@ -166,6 +170,56 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
                           VIRKSOMHET.toString(),
                           BRANSJE.toString()
                     ));
+
+        assertThat(prosentSiste4Kvartaler.get(0).get("label").textValue())
+              .isEqualTo("NAV ARBEID OG YTELSER AVD OSLO");
+    }
+
+
+    @Test
+    public void hentAggregertStatistikk_returnererLangtidOgKorttidForVirksomhetOgBransje()
+          throws Exception {
+        VarighetTestUtils.leggTilVirksomhetsstatistikkMedVarighet(
+              jdbcTemplate,
+              ORGNR_UNDERENHET,
+              new ÅrstallOgKvartal(2022, 1),
+              Varighetskategori._1_DAG_TIL_7_DAGER,
+              0, 2, 0
+        );
+        VarighetTestUtils.leggTilVirksomhetsstatistikkMedVarighet(
+              jdbcTemplate,
+              ORGNR_UNDERENHET,
+              new ÅrstallOgKvartal(2022, 1),
+              Varighetskategori._8_UKER_TIL_20_UKER,
+              0, 4, 0
+        );
+        VarighetTestUtils.leggTilVirksomhetsstatistikkMedVarighet(
+              jdbcTemplate,
+              ORGNR_UNDERENHET,
+              new ÅrstallOgKvartal(2022, 1),
+              Varighetskategori.TOTAL,
+              10, 0, 100
+        );
+        VarighetTestUtils.leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
+              jdbcTemplate,
+              new Næringskode5Siffer("10300", ""),
+              SISTE_PUBLISERTE_KVARTAL,
+              10, 100
+        );
+        VarighetTestUtils.leggTilStatisitkkNæringMedVarighet(
+              jdbcTemplate,
+              new Næringskode5Siffer("10300", ""),
+              SISTE_PUBLISERTE_KVARTAL,
+              Varighetskategori._1_DAG_TIL_7_DAGER,
+              10
+        );
+        HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET);
+        assertThat(response.statusCode()).isEqualTo(200);
+
+        JsonNode responseBody = objectMapper.readTree(response.body());
+        JsonNode korttidProsentSiste4Kvartaler = responseBody.get("prosentSiste4KvartalerKorttid");
+        JsonNode LangtidProsentSiste4Kvartaler = responseBody.get("prosentSiste4KvartalerLangtid");
+
         assertThat(korttidProsentSiste4Kvartaler.findValuesAsText("statistikkategori"))
               .containsExactlyInAnyOrderElementsOf(
                     List.of(
@@ -178,43 +232,9 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
                           VIRKSOMHET.toString(),
                           BRANSJE.toString()
                     ));
-
-        assertThat(prosentSiste4Kvartaler.get(0).get("label").textValue())
-              .isEqualTo("NAV ARBEID OG YTELSER AVD OSLO");
     }
 
-    @Test
-    public void hentAggregertStatistikk_returnerer_varighet_når_den_vi_har_varighet_statistikk()
-    throws Exception{
-        VarighetTestUtils.leggTilVirksomhetsstatistikkMedVarighet(
-              jdbcTemplate,
-              ORGNR_UNDERENHET,
-              new ÅrstallOgKvartal(2022,1),
-              Varighetskategori._1_DAG_TIL_7_DAGER,
-              0,2,0
-        );
-        VarighetTestUtils.leggTilVirksomhetsstatistikkMedVarighet(
-              jdbcTemplate,
-              ORGNR_UNDERENHET,
-              new ÅrstallOgKvartal(2022,1),
-              Varighetskategori._8_UKER_TIL_20_UKER,
-              0,4,0
-        );
-        VarighetTestUtils.leggTilVirksomhetsstatistikkMedVarighet(
-              jdbcTemplate,
-              ORGNR_UNDERENHET,
-              new ÅrstallOgKvartal(2022,1),
-              Varighetskategori.TOTAL,
-              10,0,100
-        );
-        HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET);
-        assertThat(response.statusCode()).isEqualTo(200);
 
-        JsonNode responseBody = objectMapper.readTree(response.body());
-        JsonNode korttidProsentSiste4Kvartaler = responseBody.get("prosentSiste4KvartalerKorttid");
-        JsonNode LangtidProsentSiste4Kvartaler = responseBody.get("prosentSiste4KvartalerLangtid");
-
-    }
     @Test
     public void hentAgreggertStatistikk_returnererIkkeVirksomhetstatistikkTilBrukerSomManglerIaRettigheter()
           throws Exception {

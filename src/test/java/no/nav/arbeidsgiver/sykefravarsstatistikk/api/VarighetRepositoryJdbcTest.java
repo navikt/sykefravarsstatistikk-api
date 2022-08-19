@@ -1,8 +1,19 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.VarighetTestUtils.leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.VarighetTestUtils.leggTilVirksomhetsstatistikkMedVarighet;
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
+import java.math.BigDecimal;
+import java.util.List;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.VarighetRepository;
@@ -18,22 +29,17 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.VarighetTestUtils.*;
-import static org.assertj.core.api.Java6Assertions.assertThat;
-
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {AppConfigForJdbcTesterConfig.class})
 @DataJdbcTest(excludeAutoConfiguration = {TestDatabaseAutoConfiguration.class})
 public class VarighetRepositoryJdbcTest {
+
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     private VarighetRepository varighetRepository;
+
 
     @BeforeEach
     public void setUp() {
@@ -41,10 +47,12 @@ public class VarighetRepositoryJdbcTest {
         slettAllStatistikkFraDatabase(jdbcTemplate);
     }
 
+
     @AfterEach
     public void tearDown() {
         slettAllStatistikkFraDatabase(jdbcTemplate);
     }
+
 
     @Test
     public void hentSykefraværForEttKvartalMedVarighet__skal_returnere_riktig_sykefravær() {
@@ -67,7 +75,9 @@ public class VarighetRepositoryJdbcTest {
               6, 0, 100
         );
 
-        List<UmaskertSykefraværForEttKvartalMedVarighet> resultat = varighetRepository.hentSykefraværForEttKvartalMedVarighet(barnehage);
+        List<UmaskertSykefraværForEttKvartalMedVarighet> resultat =
+              varighetRepository.hentSykefraværForEttKvartalMedVarighet(
+                    barnehage);
 
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(new UmaskertSykefraværForEttKvartalMedVarighet(
@@ -87,15 +97,20 @@ public class VarighetRepositoryJdbcTest {
         ));
     }
 
+
     @Test
     public void hentSykefraværForEttKvartalMedVarighet_for_næring__skal_returnere_riktig_sykefravær() {
         Næringskode5Siffer barnehager = new Næringskode5Siffer("88911", "Barnehager");
 
-        leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(jdbcTemplate, barnehager, 2019, 2, 1, 10 );
-        leggTilStatisitkkNæringMedVarighetForVarighetskategori(jdbcTemplate, barnehager, 2019, 2, Varighetskategori._1_DAG_TIL_7_DAGER, 4);
+        leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
+              jdbcTemplate, barnehager, new ÅrstallOgKvartal(2019, 2), 1, 10);
+        VarighetTestUtils.leggTilStatisitkkNæringMedVarighet(jdbcTemplate, barnehager,
+              new ÅrstallOgKvartal(2019, 2),
+              Varighetskategori._1_DAG_TIL_7_DAGER, 4);
 
         List<UmaskertSykefraværForEttKvartalMedVarighet> resultat =
-              varighetRepository.hentSykefraværForEttKvartalMedVarighet(new Næring(barnehager.getKode(), ""));
+              varighetRepository.hentSykefraværForEttKvartalMedVarighet(
+                    new Næring(barnehager.getKode(), ""));
 
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(new UmaskertSykefraværForEttKvartalMedVarighet(
@@ -115,21 +130,32 @@ public class VarighetRepositoryJdbcTest {
         ));
     }
 
+
     @Test
     public void hentSykefraværForEttKvartalMedVarighet_for_bransje__skal_returnere_riktig_sykefravær() {
-        Næringskode5Siffer sykehus = new Næringskode5Siffer("86101", "Alminnelige somatiske sykehus");
+        Næringskode5Siffer sykehus = new Næringskode5Siffer("86101",
+              "Alminnelige somatiske sykehus");
         Næringskode5Siffer legetjeneste = new Næringskode5Siffer("86211", "Allmenn legetjeneste");
 
-        leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(jdbcTemplate, sykehus, 2019, 2, 1, 10);
-        leggTilStatisitkkNæringMedVarighetForVarighetskategori(jdbcTemplate, sykehus, 2019, 2, Varighetskategori._1_DAG_TIL_7_DAGER, 4);
-        leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(jdbcTemplate, legetjeneste, 2019, 2, 5, 50);
-        leggTilStatisitkkNæringMedVarighetForVarighetskategori(jdbcTemplate, legetjeneste, 2019, 2, Varighetskategori._1_DAG_TIL_7_DAGER, 8);
+        leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(jdbcTemplate, sykehus,
+              new ÅrstallOgKvartal(2019, 2), 1, 10);
+        VarighetTestUtils.leggTilStatisitkkNæringMedVarighet(jdbcTemplate, sykehus,
+              new ÅrstallOgKvartal(2019, 2),
+              Varighetskategori._1_DAG_TIL_7_DAGER, 4);
+        leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(jdbcTemplate, legetjeneste,
+              new ÅrstallOgKvartal(2019, 2),
+              5, 50);
+        VarighetTestUtils.leggTilStatisitkkNæringMedVarighet(jdbcTemplate, legetjeneste,
+              new ÅrstallOgKvartal(2019, 2),
+              Varighetskategori._1_DAG_TIL_7_DAGER, 8);
 
-        List<UmaskertSykefraværForEttKvartalMedVarighet> resultat = varighetRepository.hentSykefraværForEttKvartalMedVarighet(new Bransje(
-              ArbeidsmiljøportalenBransje.SYKEHUS,
-              "Sykehus",
-              "86101", "86102", "86104", "86105", "86106", "86107"
-        ));
+        List<UmaskertSykefraværForEttKvartalMedVarighet> resultat =
+              varighetRepository.hentSykefraværForEttKvartalMedVarighet(
+                    new Bransje(
+                          ArbeidsmiljøportalenBransje.SYKEHUS,
+                          "Sykehus",
+                          "86101", "86102", "86104", "86105", "86106", "86107"
+                    ));
 
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(new UmaskertSykefraværForEttKvartalMedVarighet(
