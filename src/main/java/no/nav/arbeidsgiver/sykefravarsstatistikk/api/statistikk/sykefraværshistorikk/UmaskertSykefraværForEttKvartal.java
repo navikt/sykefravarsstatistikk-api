@@ -82,7 +82,7 @@ public class UmaskertSykefraværForEttKvartal implements
                 årstallOgKvartal,
                 tapteDagsverk.add(sykefravær.getTapteDagsverk()),
                 muligeDagsverk.add(sykefravær.getMuligeDagsverk()),
-                max(antallPersoner, sykefravær.getAntallPersoner())
+                antallPersoner + sykefravær.getAntallPersoner()
         );
     }
 

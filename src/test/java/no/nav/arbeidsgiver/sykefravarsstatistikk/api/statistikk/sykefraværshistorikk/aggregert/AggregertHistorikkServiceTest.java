@@ -1,21 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje.BARNEHAGER;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.BRANSJE;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.LAND;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.NÆRING;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.VIRKSOMHET;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.when;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
@@ -39,6 +23,21 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje.BARNEHAGER;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AggregertHistorikkServiceTest {
@@ -234,40 +233,147 @@ class AggregertHistorikkServiceTest {
 
 
     @Test
-    public void hentAggregertStatistikk_summererKorrektLangtidsfravær() {
+    public void hentAggregertStatistikk_summererKorrektLangtidsfraværOgIkkeMaskereUtenBehov() {
         mockAvhengigheterForBarnehageMedIaRettigheter();
-
+        when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(), any()))
+              .thenReturn(new Sykefraværsdata(
+                    Map.of(
+                          VIRKSOMHET, genererTestSykefravær(1)
+                    )
+              ));
+        when(mockGraderingRepository.hentGradertSykefraværAlleKategorier(any()))
+              .thenReturn(new Sykefraværsdata(
+                    Map.of(
+                          VIRKSOMHET, genererTestSykefravær(50)
+                    )
+              ));
         when(mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any()))
               .thenReturn(
                     Map.of(VIRKSOMHET, List.of(
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 10, 0, 2,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 10, 0, 1,
                                 Varighetskategori._20_UKER_TIL_39_UKER),
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 40, 0, 1,
+                                Varighetskategori._17_DAGER_TIL_8_UKER),
                           fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 20, 0, 2,
                                 Varighetskategori._8_UKER_TIL_20_UKER),
                           fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 5, 0, 2,
                                 Varighetskategori._8_DAGER_TIL_16_DAGER),
                           fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 0, 100, 0,
                                 Varighetskategori.TOTAL),
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 10, 0, 2,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 10, 0, 1,
                                 Varighetskategori._20_UKER_TIL_39_UKER),
                           fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 0, 100, 0,
                                 Varighetskategori.TOTAL)
                     ))
               );
+
         StatistikkDto forventet =
               new StatistikkDto(
                     VIRKSOMHET,
-                    VIRKSOMHET.name(),
-                    "20",
-                    8,
+                    "En Barnehage",
+                    "40.0",
+                    5,
                     List.of(
-                          SISTE_PUBLISERTE_KVARTAL,
-                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1)
+                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                          SISTE_PUBLISERTE_KVARTAL
                     ));
         assertThat(
               serviceUnderTest.hentAggregertStatistikk(etOrgnr)
                     .get().prosentSiste4KvartalerLangtid.get(0))
               .isEqualTo(forventet);
+    }
+
+    @Test
+    public void hentAggregertStatistikk_summererKorrektKorttidsfraværOgIkkeMaskereUtenBehov() {
+        mockAvhengigheterForBarnehageMedIaRettigheter();
+        when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(), any()))
+              .thenReturn(new Sykefraværsdata(
+                    Map.of(
+                          VIRKSOMHET, genererTestSykefravær(1)
+                    )
+              ));
+        when(mockGraderingRepository.hentGradertSykefraværAlleKategorier(any()))
+              .thenReturn(new Sykefraværsdata(
+                    Map.of(
+                          VIRKSOMHET, genererTestSykefravær(50)
+                    )
+              ));
+        when(mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any()))
+              .thenReturn(
+                    Map.of(VIRKSOMHET, List.of(
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 40, 0, 2,
+                                Varighetskategori._1_DAG_TIL_7_DAGER),
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 5, 0, 2,
+                                Varighetskategori._8_DAGER_TIL_16_DAGER),
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 0, 100, 0,
+                                Varighetskategori.TOTAL),
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 10, 0, 1,
+                                Varighetskategori._8_DAGER_TIL_16_DAGER),
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 0, 100, 0,
+                                Varighetskategori.TOTAL)
+                    ))
+              );
+
+        StatistikkDto forventet =
+              new StatistikkDto(
+                    VIRKSOMHET,
+                    "En Barnehage",
+                    "27.5",
+                    5,
+                    List.of(
+                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                          SISTE_PUBLISERTE_KVARTAL
+                    ));
+        assertThat(
+              serviceUnderTest.hentAggregertStatistikk(etOrgnr)
+                    .get().prosentSiste4KvartalerKorttid.get(0))
+              .isEqualTo(forventet);
+    }
+
+    @Test
+    public void hentAggregertStatistikk_summererKorrektLangtidsfravær__OgMaksererVedBehov() {
+        mockAvhengigheterForBarnehageMedIaRettigheter();
+        when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(), any()))
+              .thenReturn(new Sykefraværsdata(
+                    Map.of(
+                          VIRKSOMHET, genererTestSykefravær(1),
+                          LAND, genererTestSykefravær(10),
+                          NÆRING, genererTestSykefravær(20),
+                          BRANSJE, genererTestSykefravær(30)
+                    )
+              ));
+        when(mockGraderingRepository.hentGradertSykefraværAlleKategorier(any()))
+              .thenReturn(new Sykefraværsdata(
+                    Map.of(
+                          VIRKSOMHET, genererTestSykefravær(50),
+                          NÆRING, genererTestSykefravær(60),
+                          BRANSJE, genererTestSykefravær(70)
+                    )
+              ));
+        when(mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any()))
+              .thenReturn(
+                    Map.of(VIRKSOMHET, List.of(
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 10, 0, 1,
+                                Varighetskategori._20_UKER_TIL_39_UKER),
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 20, 0, 2,
+                                Varighetskategori._8_UKER_TIL_20_UKER),
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 5, 0, 4,
+                                Varighetskategori._8_DAGER_TIL_16_DAGER),
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 0, 100, 0,
+                                Varighetskategori.TOTAL),
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 10, 0, 1,
+                                Varighetskategori._20_UKER_TIL_39_UKER),
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 0, 100, 0,
+                                Varighetskategori.TOTAL)
+                    ))
+              );
+
+        assertThrows(IndexOutOfBoundsException.class,
+              () -> serviceUnderTest.hentAggregertStatistikk(etOrgnr)
+                    .get().prosentSiste4KvartalerKorttid.get(0));
+        assertThrows(IndexOutOfBoundsException.class,
+              () -> serviceUnderTest.hentAggregertStatistikk(etOrgnr)
+                    .get().prosentSiste4KvartalerLangtid.get(0));
     }
 
 
