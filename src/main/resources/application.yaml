@@ -35,7 +35,7 @@ wiremock.mock:
   port: 8081
 
 enhetsregisteret:
-  url: "http://localhost:${wiremock.mock.port}/enhetsregisteret/"
+  url: "https://arbeidsgiver-mock-enhetsregisteret.dev.nav.no/enhetsregisteret/api/"
 
 altinn:
   url: "https://api-gw-q1.adeo.no/"
