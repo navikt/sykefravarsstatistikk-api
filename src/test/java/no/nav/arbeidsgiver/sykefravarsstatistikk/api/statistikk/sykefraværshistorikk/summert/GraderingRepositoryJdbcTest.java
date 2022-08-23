@@ -19,7 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -28,6 +27,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.GraderingTestUtils.insertDataMedGradering;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_FORETAK;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
@@ -120,7 +120,7 @@ public class GraderingRepositoryJdbcTest {
         );
 
         List<UmaskertSykefraværForEttKvartal> resultat =
-                graderingRepository.hentSykefraværForEttKvartalMedGradering(UNDERENHET_1_NÆRING_14);
+                graderingRepository.hentSykefraværMedGradering(UNDERENHET_1_NÆRING_14);
 
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(
@@ -181,7 +181,7 @@ public class GraderingRepositoryJdbcTest {
                 new BigDecimal(300)
         );
 
-        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværForEttKvartalMedGradering(UNDERENHET_1_NÆRING_14);
+        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværMedGradering(UNDERENHET_1_NÆRING_14);
 
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(
@@ -246,7 +246,7 @@ public class GraderingRepositoryJdbcTest {
                 new BigDecimal(300)
         );
 
-        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværForEttKvartalMedGradering(PRODUKSJON_AV_KLÆR);
+        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværMedGradering(PRODUKSJON_AV_KLÆR);
 
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0)).isEqualTo(
@@ -326,7 +326,7 @@ public class GraderingRepositoryJdbcTest {
                 new BigDecimal(3000)
         );
 
-        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværForEttKvartalMedGradering(
+        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværMedGradering(
                 new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "sykehus", "86101", "86211"));
 
         assertThat(resultat.size()).isEqualTo(2);
@@ -381,7 +381,7 @@ public class GraderingRepositoryJdbcTest {
                 new BigDecimal(100)
         );
 
-        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværForEttKvartalMedGradering(
+        List<UmaskertSykefraværForEttKvartal> resultat = graderingRepository.hentSykefraværMedGradering(
                 new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "sykehus", "86101", "86211"));
 
         assertThat(resultat.size()).isEqualTo(1);
@@ -396,90 +396,5 @@ public class GraderingRepositoryJdbcTest {
     }
 
 
-    private void insertDataMedGradering(
-            NamedParameterJdbcTemplate jdbcTemplate,
-            String orgnr,
-            String næring,
-            String næringskode,
-            String rectype,
-            ÅrstallOgKvartal årstallOgKvartal,
-            int antallGraderteSykemeldinger,
-            int antallSykemeldinger,
-            int antallPersoner,
-            BigDecimal tapteDagsverkGradertSykemelding,
-            BigDecimal tapteDagsverk,
-            BigDecimal muligeDagsverk
-    ) {
-        jdbcTemplate.update(
-                "insert into sykefravar_statistikk_virksomhet_med_gradering (" +
-                        "orgnr, " +
-                        "naring, " +
-                        "naring_kode, " +
-                        "rectype, " +
-                        "arstall, " +
-                        "kvartal," +
-                        "antall_graderte_sykemeldinger, " +
-                        "tapte_dagsverk_gradert_sykemelding, " +
-                        "antall_sykemeldinger, " +
-                        "antall_personer, " +
-                        "tapte_dagsverk, " +
-                        "mulige_dagsverk) "
-                        + "VALUES (" +
-                        ":orgnr, " +
-                        ":naring, " +
-                        ":naring_kode, " +
-                        ":rectype, " +
-                        ":arstall, " +
-                        ":kvartal, " +
-                        ":antall_graderte_sykemeldinger, " +
-                        ":tapte_dagsverk_gradert_sykemelding, " +
-                        ":antall_sykemeldinger , " +
-                        ":antall_personer, " +
-                        ":tapte_dagsverk, " +
-                        ":mulige_dagsverk)",
-                parametre(
-                        orgnr,
-                        næring,
-                        næringskode,
-                        rectype,
-                        årstallOgKvartal.getÅrstall(),
-                        årstallOgKvartal.getKvartal(),
-                        antallGraderteSykemeldinger,
-                        tapteDagsverkGradertSykemelding,
-                        antallSykemeldinger,
-                        antallPersoner,
-                        tapteDagsverk,
-                        muligeDagsverk
-                )
-        );
-    }
 
-    private MapSqlParameterSource parametre(
-            String orgnr,
-            String naring,
-            String næringskode,
-            String rectype,
-            int årstall,
-            int kvartal,
-            int antallGraderteSykemeldinger,
-            BigDecimal tapteDagsverkGradertSykemelding,
-            int antallSykemeldinger,
-            int antallPersoner,
-            BigDecimal tapteDagsverk,
-            BigDecimal muligeDagsverk
-    ) {
-        return new MapSqlParameterSource()
-                .addValue("orgnr", orgnr)
-                .addValue("naring", naring)
-                .addValue("naring_kode", næringskode)
-                .addValue("rectype", rectype)
-                .addValue("arstall", årstall)
-                .addValue("kvartal", kvartal)
-                .addValue("antall_graderte_sykemeldinger", antallGraderteSykemeldinger)
-                .addValue("tapte_dagsverk_gradert_sykemelding", tapteDagsverkGradertSykemelding)
-                .addValue("antall_sykemeldinger", antallSykemeldinger)
-                .addValue("antall_personer", antallPersoner)
-                .addValue("tapte_dagsverk", tapteDagsverk)
-                .addValue("mulige_dagsverk", muligeDagsverk);
-    }
 }

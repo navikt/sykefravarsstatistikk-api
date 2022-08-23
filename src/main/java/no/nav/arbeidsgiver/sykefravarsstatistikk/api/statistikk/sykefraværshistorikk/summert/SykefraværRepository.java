@@ -157,10 +157,13 @@ public class SykefraværRepository {
         data.put(VIRKSOMHET,
                 hentUmaskertSykefravær(virksomhet, fraÅrstallOgKvartal));
         data.put(LAND, hentUmaskertSykefraværForNorge(fraÅrstallOgKvartal));
-        data.put(NÆRING, hentUmaskertSykefravær(næring, fraÅrstallOgKvartal));
 
-        if (maybeBransje.isPresent() && maybeBransje.get().erDefinertPåFemsiffernivå()) {
+        if (maybeBransje.isEmpty()) {
+            data.put(NÆRING, hentUmaskertSykefravær(næring, fraÅrstallOgKvartal));
+        } else if (maybeBransje.get().erDefinertPåFemsiffernivå()) {
             data.put(BRANSJE, hentUmaskertSykefravær(maybeBransje.get(), fraÅrstallOgKvartal));
+        } else {
+            data.put(BRANSJE, hentUmaskertSykefravær(næring, fraÅrstallOgKvartal));
         }
 
         return new Sykefraværsdata(data);

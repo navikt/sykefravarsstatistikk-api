@@ -1,34 +1,45 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.BRANSJE;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.NÆRING;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.NæringOgNæringskode5siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataNæringskode5siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.Sykefraværsdata;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
-
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
-
 @Component
 public class GraderingRepository {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public GraderingRepository(@Qualifier("sykefravarsstatistikkJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+
+    public GraderingRepository(
+            @Qualifier("sykefravarsstatistikkJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
+
 
     public List<VirksomhetMetadataNæringskode5siffer> hentVirksomhetMetadataNæringskode5siffer(
             ÅrstallOgKvartal årstallOgKvartal
@@ -51,7 +62,8 @@ public class GraderingRepository {
                                     rs.getInt("arstall"),
                                     rs.getInt("kvartal")
                             ),
-                            new NæringOgNæringskode5siffer(rs.getString("naring"), rs.getString("naring_kode"))
+                            new NæringOgNæringskode5siffer(rs.getString("naring"),
+                                    rs.getString("naring_kode"))
                     )
             );
         } catch (EmptyResultDataAccessException e) {
@@ -59,11 +71,15 @@ public class GraderingRepository {
         }
     }
 
-    public List<UmaskertSykefraværForEttKvartal> hentSykefraværForEttKvartalMedGradering(Virksomhet virksomhet) {
+
+    public List<UmaskertSykefraværForEttKvartal> hentSykefraværMedGradering(
+            Virksomhet virksomhet) {
         try {
             return namedParameterJdbcTemplate.query(
                     "select arstall, kvartal," +
-                            " sum(tapte_dagsverk_gradert_sykemelding) as sum_tapte_dagsverk_gradert_sykemelding, " +
+                            " sum(tapte_dagsverk_gradert_sykemelding) as "
+                            + "sum_tapte_dagsverk_gradert_sykemelding, "
+                            +
                             " sum(mulige_dagsverk) as sum_mulige_dagsverk, " +
                             " sum(antall_personer) as sum_antall_personer " +
                             " from sykefravar_statistikk_virksomhet_med_gradering " +
@@ -82,11 +98,36 @@ public class GraderingRepository {
         }
     }
 
-    public List<UmaskertSykefraværForEttKvartal> hentSykefraværForEttKvartalMedGradering(Næring næring) {
+
+    public Sykefraværsdata hentGradertSykefraværAlleKategorier(@NotNull Virksomhet virksomhet) {
+
+        Næring næring = new Næring(virksomhet.getNæringskode().getKode(), "");
+        Optional<Bransje> maybeBransje
+                = new Bransjeprogram().finnBransje(virksomhet.getNæringskode());
+
+        Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> data = new HashMap<>();
+
+        data.put(Statistikkategori.VIRKSOMHET, hentSykefraværMedGradering(virksomhet));
+
+        if (maybeBransje.isEmpty()) {
+            data.put(NÆRING, hentSykefraværMedGradering(næring));
+        } else if (maybeBransje.get().erDefinertPåFemsiffernivå()) {
+            data.put(BRANSJE, hentSykefraværMedGradering(maybeBransje.get()));
+        } else {
+            data.put(BRANSJE, hentSykefraværMedGradering(næring));
+        }
+        return new Sykefraværsdata(data);
+    }
+
+
+    public List<UmaskertSykefraværForEttKvartal> hentSykefraværMedGradering(
+            Næring næring) {
         try {
             return namedParameterJdbcTemplate.query(
                     "select arstall, kvartal," +
-                            " sum(tapte_dagsverk_gradert_sykemelding) as sum_tapte_dagsverk_gradert_sykemelding, " +
+                            " sum(tapte_dagsverk_gradert_sykemelding) as "
+                            + "sum_tapte_dagsverk_gradert_sykemelding, "
+                            +
                             " sum(mulige_dagsverk) as sum_mulige_dagsverk, " +
                             " sum(antall_personer) as sum_antall_personer " +
                             " from sykefravar_statistikk_virksomhet_med_gradering " +
@@ -96,7 +137,7 @@ public class GraderingRepository {
                             " group by arstall, kvartal" +
                             " order by arstall, kvartal",
                     new MapSqlParameterSource()
-                            .addValue("naring", næring.getKode())
+                            .addValue("naring", næring.getKode().substring(0,2))
                             .addValue("rectype", RECTYPE_FOR_VIRKSOMHET),
                     (rs, rowNum) -> mapTilUmaskertSykefraværForEttKvartal(rs)
             );
@@ -106,11 +147,14 @@ public class GraderingRepository {
 
     }
 
-    public List<UmaskertSykefraværForEttKvartal> hentSykefraværForEttKvartalMedGradering(Bransje bransje) {
+
+    public List<UmaskertSykefraværForEttKvartal> hentSykefraværMedGradering(Bransje bransje) {
         try {
             return namedParameterJdbcTemplate.query(
                     "select arstall, kvartal," +
-                            " sum(tapte_dagsverk_gradert_sykemelding) as sum_tapte_dagsverk_gradert_sykemelding, " +
+                            " sum(tapte_dagsverk_gradert_sykemelding) as "
+                            + "sum_tapte_dagsverk_gradert_sykemelding, "
+                            +
                             " sum(mulige_dagsverk) as sum_mulige_dagsverk, " +
                             " sum(antall_personer) as sum_antall_personer " +
                             " from sykefravar_statistikk_virksomhet_med_gradering " +
@@ -130,7 +174,8 @@ public class GraderingRepository {
     }
 
 
-    private UmaskertSykefraværForEttKvartal mapTilUmaskertSykefraværForEttKvartal(ResultSet rs) throws SQLException {
+    private UmaskertSykefraværForEttKvartal mapTilUmaskertSykefraværForEttKvartal(ResultSet rs)
+            throws SQLException {
         return new UmaskertSykefraværForEttKvartal(
                 new ÅrstallOgKvartal(
                         rs.getInt("arstall"),
