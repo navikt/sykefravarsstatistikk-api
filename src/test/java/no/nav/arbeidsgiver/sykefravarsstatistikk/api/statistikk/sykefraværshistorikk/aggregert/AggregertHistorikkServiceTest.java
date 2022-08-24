@@ -160,7 +160,7 @@ class AggregertHistorikkServiceTest {
         List<Statistikkategori> forventedeTrendtyper = List.of(BRANSJE);
 
         List<Statistikkategori> prosentstatistikk =
-              serviceUnderTest.hentAggregertStatistikk(etOrgnr).get().prosentSiste4Kvartaler
+              serviceUnderTest.hentAggregertStatistikk(etOrgnr).get().prosentSiste4KvartalerTotalt
                     .stream()
                     .map(StatistikkDto::getStatistikkategori)
                     .collect(Collectors.toList());
@@ -172,7 +172,7 @@ class AggregertHistorikkServiceTest {
                     .collect(Collectors.toList());
 
         List<Statistikkategori> trendstatistikk =
-              serviceUnderTest.hentAggregertStatistikk(etOrgnr).get().trend
+              serviceUnderTest.hentAggregertStatistikk(etOrgnr).get().trendTotalt
                     .stream()
                     .map(StatistikkDto::getStatistikkategori)
                     .collect(Collectors.toList());
@@ -184,7 +184,7 @@ class AggregertHistorikkServiceTest {
 
 
     @Test
-    void kalkulerTrend_skal_returnere_ManglendeDataException_ved_mangel_av_ett_kvartal() {
+    void kalkulerTrend_returnererManglendeDataException_nårEtKvartalMangler() {
         assertThat(new Trendkalkulator(
               List.of(umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 2), 11, 1),
                     umaskertSykefraværprosent(new ÅrstallOgKvartal(2021, 1), 10, 3)
@@ -194,7 +194,7 @@ class AggregertHistorikkServiceTest {
 
 
     @Test
-    void kalkulerTrend_skal_returnere_stigende_ved_økende_trend() {
+    void kalkulerTrend_returnererPositivTrend_dersomSykefraværetØker() {
         ÅrstallOgKvartal k1 = new ÅrstallOgKvartal(2022, 1);
         ÅrstallOgKvartal k2 = new ÅrstallOgKvartal(2021, 1);
         assertThat(new Trendkalkulator(
@@ -208,7 +208,7 @@ class AggregertHistorikkServiceTest {
 
 
     @Test
-    void kalkulerTrend_skal_returnere_synkende_ved_nedadgående_trend() {
+    void kalkulerTrend_returnereNegativTrend_dersomSykefraværetMinker() {
         List<UmaskertSykefraværForEttKvartal> kvartalstall =
               List.of(
                     umaskertSykefraværprosent(SISTE_PUBLISERTE_KVARTAL, 8, 1),
@@ -226,14 +226,14 @@ class AggregertHistorikkServiceTest {
 
 
     @Test
-    void kalkulerTrend_skal_returnere_tåle_tomt_datagrunnlag() {
+    void kalkulerTrend_girUtrilstrekkeligDataException_vedTomtDatagrunnlag() {
         assertThat(new Trendkalkulator(List.of()).kalkulerTrend().getLeft())
               .isExactlyInstanceOf(UtilstrekkeligDataException.class);
     }
 
 
     @Test
-    public void hentAggregertStatistikk_summererKorrektLangtidsfraværOgIkkeMaskereUtenBehov() {
+    public void hentAggregertStatistikk_regnerUtLangtidsfravær_dersomAntallPersonerErOverEllerLikFem() {
         mockAvhengigheterForBarnehageMedIaRettigheter();
         when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(), any()))
               .thenReturn(new Sykefraværsdata(
@@ -284,7 +284,7 @@ class AggregertHistorikkServiceTest {
     }
 
     @Test
-    public void hentAggregertStatistikk_summererKorrektKorttidsfraværOgIkkeMaskereUtenBehov() {
+    public void hentAggregertStatistikk_returnererKorttidsfravær_dersomAntallPersonerErOverEllerLikFem() {
         mockAvhengigheterForBarnehageMedIaRettigheter();
         when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(), any()))
               .thenReturn(new Sykefraværsdata(
@@ -331,7 +331,7 @@ class AggregertHistorikkServiceTest {
     }
 
     @Test
-    public void hentAggregertStatistikk_summererKorrektLangtidsfravær__OgMaksererVedBehov() {
+    public void hentAggregertStatistikk_maskererKorttidOgLangtid_dersomAntallTilfellerErUnderFem() {
         mockAvhengigheterForBarnehageMedIaRettigheter();
         when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(), any()))
               .thenReturn(new Sykefraværsdata(
@@ -375,6 +375,39 @@ class AggregertHistorikkServiceTest {
               () -> serviceUnderTest.hentAggregertStatistikk(etOrgnr)
                     .get().prosentSiste4KvartalerLangtid.get(0));
     }
+
+    @Test
+    public void hentAggregertStatistikk_returnererTapteOgMuligeDagsverk() {
+        mockAvhengigheterForBarnehageMedIaRettigheter();
+        when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(), any()))
+              .thenReturn(new Sykefraværsdata(
+                    Map.of(
+                          VIRKSOMHET, genererTestSykefravær(1)
+                    )
+              ));
+        when(mockGraderingRepository.hentGradertSykefraværAlleKategorier(any()))
+              .thenReturn(new Sykefraværsdata(
+                    Map.of(
+                          VIRKSOMHET, genererTestSykefravær(50)
+                    )
+              ));
+        when(mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any()))
+              .thenReturn(
+                    Map.of(VIRKSOMHET, List.of(
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 40, 0, 2,
+                                Varighetskategori._1_DAG_TIL_7_DAGER),
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 5, 0, 2,
+                                Varighetskategori._8_DAGER_TIL_16_DAGER),
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 0, 100, 0,
+                                Varighetskategori.TOTAL),
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 10, 0, 1,
+                                Varighetskategori._8_DAGER_TIL_16_DAGER),
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 0, 100, 0,
+                                Varighetskategori.TOTAL)
+                    ))
+              );
+    }
+
 
 
     private void mockAvhengigheterForBarnehageMedIaRettigheter() {

@@ -6,9 +6,7 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistik
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.SumAvSykefraværOverFlereKvartaler.NULLPUNKT;
 
 import io.vavr.control.Either;
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
@@ -39,6 +37,19 @@ public class Aggregeringskalkulator {
     }
 
 
+    Either<StatistikkException, StatistikkDto> tapteDagsverkVirksomhet(String bedriftsnavn) {
+        return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(VIRKSOMHET))
+              .getTapteDagsverkOgMapTilDto(VIRKSOMHET, bedriftsnavn);
+    }
+
+
+    Either<StatistikkException, StatistikkDto> muligeDagsverkVirksomhet(String bedriftsnavn) {
+        return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(VIRKSOMHET))
+              .getMuligeDagsverkOgMapTilDto(VIRKSOMHET, bedriftsnavn);
+
+    }
+
+
     Either<StatistikkException, StatistikkDto> fraværsprosentVirksomhet(String virksomhetsnavn) {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(VIRKSOMHET))
               .regnUtProsentOgMapTilDto(VIRKSOMHET, virksomhetsnavn);
@@ -60,48 +71,6 @@ public class Aggregeringskalkulator {
     }
 
 
-    Either<UtilstrekkeligDataException, StatistikkDto> tapteDagsverkVirksomhet(
-          String bedriftsnavn) {
-        return dagsverkVirksomhet(
-              bedriftsnavn,
-              SumAvSykefraværOverFlereKvartaler::getTapteDagsverk
-        );
-    }
-
-
-    Either<UtilstrekkeligDataException, StatistikkDto> muligeDagsverkVirksomhet(
-          String bedriftsnavn) {
-        return dagsverkVirksomhet(
-              bedriftsnavn,
-              SumAvSykefraværOverFlereKvartaler::getMuligeDagsverk
-        );
-    }
-
-
-    private Either<UtilstrekkeligDataException, StatistikkDto> dagsverkVirksomhet(
-          String bedriftsnavn,
-          Function<SumAvSykefraværOverFlereKvartaler, BigDecimal> tapteEllerMulige) {
-
-        List<UmaskertSykefraværForEttKvartal> virksomhetsdata = sykefraværsdata.filtrerPåKategori(
-              VIRKSOMHET);
-
-        if (virksomhetsdata.isEmpty()) {
-            return Either.left(new UtilstrekkeligDataException(
-                  "Trenger minst data for ett kvartal for å regne ut tapte og mulige dagsverk."));
-        }
-
-        SumAvSykefraværOverFlereKvartaler summert = summerOppSisteFireKvartaler(virksomhetsdata);
-
-        return Either.right(
-              StatistikkDto.builder()
-                    .statistikkategori(VIRKSOMHET)
-                    .label(bedriftsnavn)
-                    .verdi(tapteEllerMulige.apply(summert).toString())
-                    .antallPersonerIBeregningen(summert.antallTilfeller)
-                    .kvartalerIBeregningen(summert.kvartaler).build()
-        );
-    }
-
 
     private SumAvSykefraværOverFlereKvartaler summerOppSisteFireKvartaler(
           List<UmaskertSykefraværForEttKvartal> statistikk) {
@@ -121,5 +90,4 @@ public class Aggregeringskalkulator {
               .filter(datapunkt -> sisteFireKvartaler().contains(datapunkt.getÅrstallOgKvartal()))
               .collect(Collectors.toList());
     }
-
 }
