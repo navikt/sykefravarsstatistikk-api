@@ -267,19 +267,23 @@ public class StatistikkRepository {
 
     // opprett metoder
 
-    public void importerPubliseringsdatoer(PubliseringsdatoDbDto data) {
-        // TODO: Trenger "ON DUPLICATE KEY UPDATE"-policy i tabellen dersom vi vil overskrive med
-        //  insert
+    public void oppdaterPubliseringsdatoer(List<PubliseringsdatoDbDto> data) {
         namedParameterJdbcTemplate.update(
-              "insert into dk_p.publiseringstabell "
-                    + "(aktivitet, offentlig_dato, oppdatert_dato) "
-                    + "values "
-                    + "(:aktivitet, :offentlig_dato, oppdatert_dato)",
-              new MapSqlParameterSource()
-                    .addValue("aktivitet", data.getAktivitet())
-                    .addValue("offentlig_dato", data.getOffentligDato())
-                    .addValue("oppdatert_dato", data.getOppdatertDato())
-        )
+                "delete from publiseringsdatoer", new MapSqlParameterSource()
+        );
+        data.forEach((publiseringsdato) ->
+                namedParameterJdbcTemplate.update(
+                        "insert into publiseringsdatoer "
+                                + "(rapport_periode, offentlig_dato, oppdatert_dato, aktivitet) "
+                                + "values "
+                                + "(:rapport_periode, :offentlig_dato, :oppdatert_dato, :aktivitet)",
+                        new MapSqlParameterSource()
+                                .addValue("rapport_periode", publiseringsdato.getRapportPeriode())
+                                .addValue("offentlig_dato", publiseringsdato.getOffentligDato())
+                                .addValue("oppdatert_dato", publiseringsdato.getOppdatertDato())
+                                .addValue("aktivitet", publiseringsdato.getAktivitet())
+                )
+        );
     }
 
     public int opprettSykefraværsstatistikkNæringMedVarighet(

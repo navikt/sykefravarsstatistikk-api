@@ -34,12 +34,6 @@ public class PubliseringsdatoInfoService {
         return publiseringsdatoInfoListe;
     }
 
-    private static CompletableFuture<Næring> uthentingMedTimeout(Supplier<Næring> hentNæringSupplier) {
-        return CompletableFuture
-                .supplyAsync(hentNæringSupplier)
-                .orTimeout(TIMEOUT_UTHENTING_FRA_DB_I_SEKUNDER, TimeUnit.SECONDS);
-    }
-
     protected static CompletableFuture<PubliseringsdatoInfo> uthentingMedFeilhåndteringOgTimeout(
             Supplier<PubliseringsdatoInfo> publiseringsdatoInfoSupplier
     ) {
@@ -62,7 +56,7 @@ public class PubliseringsdatoInfoService {
     }
 
     private static PubliseringsdatoInfo byggPubliseringsdatoInfo (
-            List<PubliseringsdatoDbDto> publiseringsdatoFullInfo
+            List<PubliseringsdatoDbDto> publiseringsdatoDbDto
     ) {
         PubliseringsdatoInfo publiseringsdatoInfo = new PubliseringsdatoInfo();
         publiseringsdatoInfo.setGjeldendePeriode("periode");

@@ -1,45 +1,29 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.publiseringsdatoer;
 
-import java.util.Comparator;
+import java.sql.Date;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 
 @Getter
 @EqualsAndHashCode
-public class PubliseringsdatoDbDto implements Comparable<PubliseringsdatoDbDto> {
+public class PubliseringsdatoDbDto {
 
-    private final ÅrstallOgKvartal årstallOgKvartal;
-    private final String offentligDato;
-    private final String oppdatertDato;
+    private final Integer rapportPeriode; // (sic)
+    private final Date offentligDato;
+    private final Date oppdatertDato;
     private final String aktivitet;
 
 
     public PubliseringsdatoDbDto(
-          ÅrstallOgKvartal årstallOgKvartal,
-          String offentligDato,
+          Integer rapportPeriode,
+          Date offentligDato,
+          Date oppdatertDato,
           // dato for offentliggjøring. todo: kanskje bruke LocalDateTime eller annen datotype her?
           String aktivitet // beskrivelse, typ "Sykefravær pr 3. kvartal 2022"
     ) {
-        this.årstallOgKvartal = årstallOgKvartal;
+        this.rapportPeriode = rapportPeriode;
         this.offentligDato = offentligDato;
+        this.oppdatertDato = oppdatertDato;
         this.aktivitet = aktivitet;
-    }
-
-
-    public int getKvartal() {
-        return årstallOgKvartal != null ? årstallOgKvartal.getKvartal() : 0;
-    }
-
-
-    public int getÅrstall() {
-        return årstallOgKvartal != null ? årstallOgKvartal.getÅrstall() : 0;
-    }
-
-
-    public int compareTo(PubliseringsdatoDbDto publiseringsdatoFullInfo) {
-        return Comparator
-              .comparing(PubliseringsdatoDbDto::getÅrstallOgKvartal)
-              .compare(this, publiseringsdatoFullInfo);
     }
 }

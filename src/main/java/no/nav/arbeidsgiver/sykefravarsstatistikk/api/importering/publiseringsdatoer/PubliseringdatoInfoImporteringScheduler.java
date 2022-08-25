@@ -42,7 +42,7 @@ public class PubliseringdatoInfoImporteringScheduler {
 
 
     private void importering() {
-        log.info("Jobb for å importere publiseringsdatoer er startet.");
+        log.info("Kjører jobb for å importere publiseringsdatoer er startet.");
         importeringService.importerDatoer();
     }
 

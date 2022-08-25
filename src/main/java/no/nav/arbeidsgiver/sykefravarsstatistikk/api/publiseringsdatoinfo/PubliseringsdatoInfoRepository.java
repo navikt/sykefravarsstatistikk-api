@@ -23,19 +23,12 @@ public class PubliseringsdatoInfoRepository {
 
     public List<PubliseringsdatoDbDto> hentPubliseringsdatoFullInfo() {
         try {
-            return namedParameterJdbcTemplate.query(
-                    "select * " +
-                            "from dk_p.publiseringstabell" +
-                            "where TABELL_NAVN = 'AGG_FAK_SYKEFRAVAR_DIA' " +
-                            "and PERIODE_TYPE = 'KVARTAL'" +
-                            "order by offentlig_dato desc",
+            return namedParameterJdbcTemplate.query("select * from publiseringsdatoer ",
                     new HashMap<>(),
                     (rs, rowNum) -> new PubliseringsdatoDbDto(
-                            new ÅrstallOgKvartal(
-                                    rs.getInt("arstall"),
-                                    rs.getInt("kvartal")
-                            ),
-                            rs.getString("offentlig_dato"),
+                            rs.getInt("rapport_periode"),
+                            rs.getDate("offentlig_dato"),
+                            rs.getDate("oppdatert_dato"),
                             rs.getString("aktivitet")
                     )
             );
