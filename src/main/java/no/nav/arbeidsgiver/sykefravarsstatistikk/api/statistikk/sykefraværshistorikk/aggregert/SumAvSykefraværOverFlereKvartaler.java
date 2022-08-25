@@ -8,8 +8,10 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistik
 import io.vavr.control.Either;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
@@ -27,10 +29,12 @@ class SumAvSykefraværOverFlereKvartaler {
     static SumAvSykefraværOverFlereKvartaler NULLPUNKT =
           new SumAvSykefraværOverFlereKvartaler(ZERO, ZERO, 0, List.of());
 
+    @Getter
     BigDecimal muligeDagsverk;
+    @Getter
     BigDecimal tapteDagsverk;
-    int antallPersoner;
-    List<ÅrstallOgKvartal> kvartaler;
+    private int antallPersoner;
+    private List<ÅrstallOgKvartal> kvartaler;
 
 
     SumAvSykefraværOverFlereKvartaler(@NotNull UmaskertSykefraværForEttKvartal data) {
@@ -66,30 +70,17 @@ class SumAvSykefraværOverFlereKvartaler {
     }
 
 
-    Either<StatistikkException, StatistikkDto> getMuligeDagsverkOgMapTilDto(
-          Statistikkategori type, String virksomhetsnavn
-    ) {
-        if (datagrunnlagetErTomt()) {
-            return Either.left(new UtilstrekkeligDataException());
-        }
-        if (dataMåMaskeres()) {
-            return Either.left(new MaskerteDataException());
-        }
-        return Either.right(
-              this.tilStatistikkDto(type, virksomhetsnavn, muligeDagsverk.toString()));
-    }
-
-
     Either<StatistikkException, StatistikkDto> getTapteDagsverkOgMapTilDto(
           Statistikkategori type, String virksomhetsnavn
     ) {
-        if (datagrunnlagetErTomt()) {
-            return Either.left(new UtilstrekkeligDataException());
-        }
-        if (dataMåMaskeres()) {
-            return Either.left(new MaskerteDataException());
-        }
-        return Either.right(this.tilStatistikkDto(type, virksomhetsnavn, tapteDagsverk.toString()));
+        return getAntallDagsverkOgMapTilDto(type, virksomhetsnavn, this::getTapteDagsverk);
+    }
+
+
+    Either<StatistikkException, StatistikkDto> getMuligeDagsverkOgMapTilDto(
+          Statistikkategori type, String virksomhetsnavn
+    ) {
+        return getAntallDagsverkOgMapTilDto(type, virksomhetsnavn, this::getMuligeDagsverk);
     }
 
 
@@ -99,6 +90,23 @@ class SumAvSykefraværOverFlereKvartaler {
               this.tapteDagsverk.add(other.tapteDagsverk),
               this.antallPersoner + other.antallPersoner,
               concat(this.kvartaler, other.kvartaler));
+    }
+
+
+    private Either<StatistikkException, StatistikkDto> getAntallDagsverkOgMapTilDto(
+          Statistikkategori type, String virksomhetsnavn,
+          Supplier<BigDecimal> tapteEllerMuligeDagsverk
+    ) {
+        if (datagrunnlagetErTomt()) {
+            return Either.left(new UtilstrekkeligDataException());
+        }
+        if (dataMåMaskeres()) {
+            return Either.left(new MaskerteDataException());
+        }
+        return Either.right(
+              this.tilStatistikkDto(
+                    type, virksomhetsnavn, tapteEllerMuligeDagsverk.get().toString())
+        );
     }
 
 
