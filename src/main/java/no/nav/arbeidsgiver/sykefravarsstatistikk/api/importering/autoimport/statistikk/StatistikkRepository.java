@@ -12,6 +12,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværssta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetMedGradering;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.publiseringsdatoer.PubliseringsdatoDbDto;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -265,6 +266,21 @@ public class StatistikkRepository {
 
 
     // opprett metoder
+
+    public void importerPubliseringsdatoer(PubliseringsdatoDbDto data) {
+        // TODO: Trenger "ON DUPLICATE KEY UPDATE"-policy i tabellen dersom vi vil overskrive med
+        //  insert
+        namedParameterJdbcTemplate.update(
+              "insert into dk_p.publiseringstabell "
+                    + "(aktivitet, offentlig_dato, oppdatert_dato) "
+                    + "values "
+                    + "(:aktivitet, :offentlig_dato, oppdatert_dato)",
+              new MapSqlParameterSource()
+                    .addValue("aktivitet", data.getAktivitet())
+                    .addValue("offentlig_dato", data.getOffentligDato())
+                    .addValue("oppdatert_dato", data.getOppdatertDato())
+        )
+    }
 
     public int opprettSykefraværsstatistikkNæringMedVarighet(
             List<? extends Sykefraværsstatistikk> sykefraværsstatistikk

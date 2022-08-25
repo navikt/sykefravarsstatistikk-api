@@ -14,9 +14,9 @@ import java.time.temporal.ChronoUnit;
 @Slf4j
 public class ImporteringScheduler {
     private final LockingTaskExecutor taskExecutor;
-    private final ImporteringService importeringService;
+    private final SykefraværsstatistikkImporteringService importeringService;
 
-    public ImporteringScheduler(LockingTaskExecutor taskExecutor, ImporteringService importeringService) {
+    public ImporteringScheduler(LockingTaskExecutor taskExecutor, SykefraværsstatistikkImporteringService importeringService) {
         this.taskExecutor = taskExecutor;
         this.importeringService = importeringService;
     }

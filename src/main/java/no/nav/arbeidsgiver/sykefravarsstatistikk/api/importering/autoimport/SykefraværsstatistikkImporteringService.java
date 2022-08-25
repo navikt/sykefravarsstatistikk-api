@@ -21,13 +21,13 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class ImporteringService {
+public class SykefraværsstatistikkImporteringService {
 
     private final StatistikkRepository statistikkRepository;
     private final DatavarehusRepository datavarehusRepository;
     private final boolean erImporteringAktivert;
 
-    public ImporteringService(
+    public SykefraværsstatistikkImporteringService(
             StatistikkRepository statistikkRepository,
             DatavarehusRepository datavarehusRepository,
             @Value("${statistikk.importering.aktivert}") Boolean erImporteringAktivert) {

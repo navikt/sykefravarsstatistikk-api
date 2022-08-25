@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoinfo;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.PubliseringsdatoFullInfo;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.publiseringsdatoer.PubliseringsdatoDbDto;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -62,7 +62,7 @@ public class PubliseringsdatoInfoService {
     }
 
     private static PubliseringsdatoInfo byggPubliseringsdatoInfo (
-            List<PubliseringsdatoFullInfo> publiseringsdatoFullInfo
+            List<PubliseringsdatoDbDto> publiseringsdatoFullInfo
     ) {
         PubliseringsdatoInfo publiseringsdatoInfo = new PubliseringsdatoInfo();
         publiseringsdatoInfo.setGjeldendePeriode("periode");

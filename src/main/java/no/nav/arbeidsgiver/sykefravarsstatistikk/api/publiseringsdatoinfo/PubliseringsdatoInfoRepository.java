@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoinfo;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.PubliseringsdatoFullInfo;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.publiseringsdatoer.PubliseringsdatoDbDto;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -21,7 +21,7 @@ public class PubliseringsdatoInfoRepository {
 
     }
 
-    public List<PubliseringsdatoFullInfo> hentPubliseringsdatoFullInfo() {
+    public List<PubliseringsdatoDbDto> hentPubliseringsdatoFullInfo() {
         try {
             return namedParameterJdbcTemplate.query(
                     "select * " +
@@ -30,7 +30,7 @@ public class PubliseringsdatoInfoRepository {
                             "and PERIODE_TYPE = 'KVARTAL'" +
                             "order by offentlig_dato desc",
                     new HashMap<>(),
-                    (rs, rowNum) -> new PubliseringsdatoFullInfo(
+                    (rs, rowNum) -> new PubliseringsdatoDbDto(
                             new ÅrstallOgKvartal(
                                     rs.getInt("arstall"),
                                     rs.getInt("kvartal")

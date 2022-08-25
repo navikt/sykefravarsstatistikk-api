@@ -33,7 +33,7 @@ class SumAvSykefraværOverFlereKvartaler {
     private List<ÅrstallOgKvartal> kvartaler;
 
 
-    SumAvSykefraværOverFlereKvartaler(@NotNull UmaskertSykefraværForEttKvartal data) {
+SumAvSykefraværOverFlereKvartaler(@NotNull UmaskertSykefraværForEttKvartal data) {
         this.muligeDagsverk = data.getMuligeDagsverk();
         this.tapteDagsverk = data.getTapteDagsverk();
         this.antallTilfeller = data.getAntallPersoner();
