@@ -110,7 +110,11 @@ public class EksporteringService {
 
         List<VirksomhetMetadata> virksomhetMetadataListe =
                 virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal);
+        // TODO har starter endringer, bør vi hente siste fire kvartaler(her skjer ikke noe utregning  av
+        //  prosent eller maskering , OG vi må legge til kvartaler i beregningen.
         SykefraværsstatistikkLand sykefraværsstatistikkLand =
+                sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentLand(årstallOgKvartal);
+        SykefraværsstatistikkLand sykefraværsstatistikkLandSiste4Kvartaler =
                 sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentLand(årstallOgKvartal);
         List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor =
                 sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(årstallOgKvartal);
@@ -201,7 +205,9 @@ public class EksporteringService {
         AtomicInteger antallSentTilEksport = new AtomicInteger();
         AtomicInteger antallVirksomheterLagretSomEksportertIDb = new AtomicInteger();
         List<String> eksporterteVirksomheterListe = new ArrayList<>();
-
+        // TODO har starter utregning og utsending
+        //  har bør vi endre til å bruke Kalkurer for utregning av prosent.
+        //  husk å TA MED KvartalerIBeregningen, siden her har vi endret til at de er med.
         virksomheterMetadata.stream().forEach(
                 virksomhetMetadata -> {
                     long startUtsendingProcess = System.nanoTime();

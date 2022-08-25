@@ -17,6 +17,7 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -57,7 +58,9 @@ public class KafkaService {
             List<SykefraværMedKategori> næring5SifferSykefravær,
             SykefraværMedKategori næringSykefravær,
             SykefraværMedKategori sektorSykefravær,
-            SykefraværMedKategori landSykefravær
+            SykefraværMedKategori landSykefravær,
+            Map<SykefraværMedKategori,List<ÅrstallOgKvartal>> virksomhetSykefraværSiste4Kvartaler
+            // TODO: Legge til prosent her???
     ) {
         // TODO bytt til Prometheus
         kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
