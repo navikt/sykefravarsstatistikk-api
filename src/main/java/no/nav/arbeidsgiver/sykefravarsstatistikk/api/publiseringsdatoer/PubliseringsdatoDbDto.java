@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.publiseringsdatoer;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer;
 
 import java.sql.Date;
 import lombok.EqualsAndHashCode;

@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoinfo;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
@@ -12,26 +12,26 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 @Protected
 @RestController
-public class PubliseringsdatoInfoController {
+public class PubliseringsdatoerController {
 
     private final TilgangskontrollService tilgangskontrollService;
-    private final PubliseringsdatoInfoService publiseringsdatoInfoService;
+    private final PubliseringsdatoerService publiseringsdatoerService;
 
 
-    public PubliseringsdatoInfoController(
+    public PubliseringsdatoerController(
             TilgangskontrollService tilgangskontrollService,
-            PubliseringsdatoInfoService publiseringsdatoInfoService
+            PubliseringsdatoerService publiseringsdatoerService
     ) {
         this.tilgangskontrollService = tilgangskontrollService;
-        this.publiseringsdatoInfoService = publiseringsdatoInfoService;
+        this.publiseringsdatoerService = publiseringsdatoerService;
     }
 
 
     @GetMapping(value = "/publiseringsdato")
-    public PubliseringsdatoInfo hentPubliseringsdatoInfo(
+    public Publiseringsdatoer hentPubliseringsdatoInfo(
             HttpServletRequest request
     ) {
-        return publiseringsdatoInfoService.hentPubliseringsdatoInfo();
+        return publiseringsdatoerService.hentPubliseringsdatoer();
     }
 
 }

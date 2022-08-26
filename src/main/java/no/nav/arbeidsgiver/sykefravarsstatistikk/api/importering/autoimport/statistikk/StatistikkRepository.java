@@ -1,6 +1,12 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.SykefraværsstatistikkIntegrasjon.ARSTALL;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.SykefraværsstatistikkIntegrasjon.KVARTAL;
+
 import com.google.common.collect.Lists;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.SlettOgOpprettResultat;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
@@ -12,7 +18,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværssta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetMedGradering;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.publiseringsdatoer.PubliseringsdatoDbDto;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -20,13 +25,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.SykefraværsstatistikkIntegrasjon.ARSTALL;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.SykefraværsstatistikkIntegrasjon.KVARTAL;
 
 @Slf4j
 @Component
@@ -266,25 +264,6 @@ public class StatistikkRepository {
 
 
     // opprett metoder
-
-    public void oppdaterPubliseringsdatoer(List<PubliseringsdatoDbDto> data) {
-        namedParameterJdbcTemplate.update(
-                "delete from publiseringsdatoer", new MapSqlParameterSource()
-        );
-        data.forEach((publiseringsdato) ->
-                log.info(String.valueOf(namedParameterJdbcTemplate.update(
-                        "insert into publiseringsdatoer "
-                                + "(rapport_periode, offentlig_dato, oppdatert_i_dvh, aktivitet) "
-                                + "values "
-                                + "(:rapport_periode, :offentlig_dato, :oppdatert_i_dvh, :aktivitet)",
-                        new MapSqlParameterSource()
-                                .addValue("rapport_periode", publiseringsdato.getRapportPeriode())
-                                .addValue("offentlig_dato", publiseringsdato.getOffentligDato())
-                                .addValue("oppdatert_i_dvh", publiseringsdato.getOppdatertDato())
-                                .addValue("aktivitet", publiseringsdato.getAktivitet())
-                )))
-        );
-    }
 
     public int opprettSykefraværsstatistikkNæringMedVarighet(
             List<? extends Sykefraværsstatistikk> sykefraværsstatistikk

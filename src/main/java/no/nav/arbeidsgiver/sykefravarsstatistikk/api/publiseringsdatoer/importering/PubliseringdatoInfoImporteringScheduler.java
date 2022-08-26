@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.publiseringsdatoer;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.importering;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -14,11 +14,11 @@ import org.springframework.stereotype.Component;
 public class PubliseringdatoInfoImporteringScheduler {
 
     private final LockingTaskExecutor taskExecutor;
-    private final PubliseringsdatoInfoImporteringService importeringService;
+    private final PubliseringsdatoerImportService importeringService;
 
 
     public PubliseringdatoInfoImporteringScheduler(LockingTaskExecutor taskExecutor,
-          PubliseringsdatoInfoImporteringService importeringService
+          PubliseringsdatoerImportService importeringService
     ) {
         this.taskExecutor = taskExecutor;
         this.importeringService = importeringService;
@@ -42,8 +42,8 @@ public class PubliseringdatoInfoImporteringScheduler {
 
 
     private void importering() {
-        log.info("Jobb for å importere publiseringsdatoer er startet.");
-        importeringService.importerDatoer();
+        log.info("Jobb for å importere publiseringsdatoer fra datavarehus er startet.");
+        importeringService.importerDatoerFraDatavarehus();
         log.info("Jobb for å importere publiseringsdatoer er avsluttet.");
     }
 
