@@ -63,14 +63,6 @@ public class ApplikasjonDBConfigLocal {
         return new NamedParameterJdbcTemplate(dataSource);
     }
 
-    @Primary
-    @Bean(name = "publiseringsdatoInfoJdbcTemplate")
-    public NamedParameterJdbcTemplate publiseringsdatoInfoJdbcTemplate(
-            @Qualifier("publiseringsdatoInfoDataSource") DataSource dataSource
-    ) {
-        return new NamedParameterJdbcTemplate(dataSource);
-    }
-
     @Bean
     public FlywayMigrationStrategy flywayMigrationStrategy() {
         List<String> locations = new ArrayList<>();

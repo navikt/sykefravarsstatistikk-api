@@ -1,5 +1,6 @@
 -- Tabeller fra datavarehus
 create schema dt_p;
+create schema dk_p;
 
 create table dt_p.v_dim_ia_sektor
 (

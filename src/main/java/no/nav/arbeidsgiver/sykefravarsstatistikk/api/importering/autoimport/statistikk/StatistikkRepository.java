@@ -272,17 +272,17 @@ public class StatistikkRepository {
                 "delete from publiseringsdatoer", new MapSqlParameterSource()
         );
         data.forEach((publiseringsdato) ->
-                namedParameterJdbcTemplate.update(
+                log.info(String.valueOf(namedParameterJdbcTemplate.update(
                         "insert into publiseringsdatoer "
-                                + "(rapport_periode, offentlig_dato, oppdatert_dato, aktivitet) "
+                                + "(rapport_periode, offentlig_dato, oppdatert_i_dvh, aktivitet) "
                                 + "values "
-                                + "(:rapport_periode, :offentlig_dato, :oppdatert_dato, :aktivitet)",
+                                + "(:rapport_periode, :offentlig_dato, :oppdatert_i_dvh, :aktivitet)",
                         new MapSqlParameterSource()
                                 .addValue("rapport_periode", publiseringsdato.getRapportPeriode())
                                 .addValue("offentlig_dato", publiseringsdato.getOffentligDato())
-                                .addValue("oppdatert_dato", publiseringsdato.getOppdatertDato())
+                                .addValue("oppdatert_i_dvh", publiseringsdato.getOppdatertDato())
                                 .addValue("aktivitet", publiseringsdato.getAktivitet())
-                )
+                )))
         );
     }
 

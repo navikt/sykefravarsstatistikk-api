@@ -28,7 +28,7 @@ public class PubliseringsdatoInfoRepository {
                     (rs, rowNum) -> new PubliseringsdatoDbDto(
                             rs.getInt("rapport_periode"),
                             rs.getDate("offentlig_dato"),
-                            rs.getDate("oppdatert_dato"),
+                            rs.getDate("oppdatert_i_dvh"),
                             rs.getString("aktivitet")
                     )
             );

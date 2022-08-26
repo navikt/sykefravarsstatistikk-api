@@ -351,9 +351,9 @@ public class DatavarehusRepository {
         try {
             return namedParameterJdbcTemplate.query(
                     "select rapport_periode, offentlig_dato, oppdatert_dato, aktivitet " +
-                            "from dk_p.publiseringstabell" +
+                            "from dk_p.publiseringstabell " +
                             "where TABELL_NAVN = 'AGG_FAK_SYKEFRAVAR_DIA' " +
-                            "and PERIODE_TYPE = 'KVARTAL'" +
+                            "and PERIODE_TYPE = 'KVARTAL' " +
                             "order by offentlig_dato desc",
                     new HashMap<>(),
                     (rs, rowNum) -> new PubliseringsdatoDbDto(

@@ -25,7 +25,7 @@ public class PubliseringdatoInfoImporteringScheduler {
     }
 
 
-    @Scheduled(cron = "0 5 4 * * ?")
+    @Scheduled(cron = "* * * * * ?")
     public void scheduledImportering() {
         Duration lockAtMostFor = Duration.of(10, ChronoUnit.MINUTES);
         Duration lockAtLeastFor = Duration.of(1, ChronoUnit.MINUTES);
@@ -42,8 +42,9 @@ public class PubliseringdatoInfoImporteringScheduler {
 
 
     private void importering() {
-        log.info("Kjører jobb for å importere publiseringsdatoer er startet.");
+        log.info("Jobb for å importere publiseringsdatoer er startet.");
         importeringService.importerDatoer();
+        log.info("Jobb for å importere publiseringsdatoer er avsluttet.");
     }
 
 }
