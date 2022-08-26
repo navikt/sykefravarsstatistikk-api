@@ -35,6 +35,9 @@ public enum Varighetskategori {
         }
     }
 
+    public boolean erTotalvarighet(){
+        return this.kode.equals("X");
+    }
     public boolean erKorttidVarighet(){
         switch (this.kode){
             case "A":

@@ -11,9 +11,14 @@ public class Sykefraværsdata {
 
     private Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefravær;
 
+
     List<UmaskertSykefraværForEttKvartal> filtrerPåKategori(Statistikkategori kategori) {
-        return sykefravær.get(kategori);
+        if (sykefravær.containsKey(kategori)) {
+            return sykefravær.get(kategori);
+        }
+        return List.of();
     }
+
 
     void filtrerBortVirksomhetsdata() {
         sykefravær.remove(Statistikkategori.VIRKSOMHET);

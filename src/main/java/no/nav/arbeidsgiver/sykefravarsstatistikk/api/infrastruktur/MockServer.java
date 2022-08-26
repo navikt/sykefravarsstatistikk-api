@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@Profile({"local", "dev", "mvc-test"})
+@Profile({"local", "mvc-test"})
 public class MockServer {
     public static final boolean AKTIVER_VERBOSE_LOGGING_I_KONSOLEN = false;
     private final WireMockServer server;

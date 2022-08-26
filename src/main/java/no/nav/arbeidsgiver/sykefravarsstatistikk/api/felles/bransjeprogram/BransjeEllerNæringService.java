@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram;
 
 import java.util.Optional;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,7 @@ public class BransjeEllerNæringService {
     }
 
 
+    @Deprecated
     public BransjeEllerNæring bestemFraNæringskode(Næringskode5Siffer næringskode5Siffer) {
         Optional<Bransje> bransje = bransjeprogram.finnBransje(næringskode5Siffer);
 
@@ -34,5 +36,18 @@ public class BransjeEllerNæringService {
         } else {
             return new BransjeEllerNæring(bransje.get());
         }
+    }
+
+
+    public BransjeEllerNæring finnBransje(Underenhet virksomhet) {
+        Optional<Bransje> bransje = bransjeprogram.finnBransje(virksomhet);
+
+        if (bransje.isPresent()) {
+            return new BransjeEllerNæring(bransje.get());
+        }
+        return new BransjeEllerNæring(
+                klassifikasjonerRepository.hentNæring(
+                        virksomhet.getNæringskode().hentNæringskode2Siffer())
+        );
     }
 }
