@@ -89,9 +89,9 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
         assertThat(response.statusCode()).isEqualTo(200);
 
         JsonNode responseBody = objectMapper.readTree(response.body());
-        assertThat(responseBody.get("prosentSiste4Kvartaler")).isEmpty();
+        assertThat(responseBody.get("prosentSiste4KvartalerTotalt")).isEmpty();
         assertThat(responseBody.get("prosentSiste4KvartalerGradert")).isEmpty();
-        assertThat(responseBody.get("trend")).isEmpty();
+        assertThat(responseBody.get("trendTotalt")).isEmpty();
         assertThat(responseBody.get("prosentSiste4KvartalerKorttid")).isEmpty();
         assertThat(responseBody.get("prosentSiste4KvartalerLangtid")).isEmpty();
         assertThat(responseBody.get("trendTotalt")).isEmpty();
@@ -150,11 +150,11 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
         assertThat(response.statusCode()).isEqualTo(200);
 
         JsonNode responseBody = objectMapper.readTree(response.body());
-        JsonNode prosentSiste4Kvartaler = responseBody.get("prosentSiste4Kvartaler");
+        JsonNode prosentSiste4Kvartaler = responseBody.get("prosentSiste4KvartalerTotalt");
 
         JsonNode gradertProsentSiste4Kvartaler = responseBody.get("prosentSiste4KvartalerGradert");
 
-        assertThat(responseBody.get("trend").findValuesAsText("statistikkategori"))
+        assertThat(responseBody.get("trendTotalt").findValuesAsText("statistikkategori"))
               .containsExactly(BRANSJE.toString());
 
         assertThat(prosentSiste4Kvartaler.findValuesAsText("statistikkategori"))
@@ -245,14 +245,14 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
         HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER);
         JsonNode responseBody = objectMapper.readTree(response.body());
 
-        assertThat(responseBody.get("prosentSiste4Kvartaler").findValuesAsText("statistikkategori"))
+        assertThat(responseBody.get("prosentSiste4KvartalerTotalt").findValuesAsText("statistikkategori"))
               .containsExactlyInAnyOrderElementsOf(
                     List.of(
                           BRANSJE.toString(),
                           LAND.toString()
                     ));
 
-        assertThat(responseBody.get("trend").findValuesAsText("statistikkategori"))
+        assertThat(responseBody.get("trendTotalt").findValuesAsText("statistikkategori"))
               .containsExactly(BRANSJE.toString());
     }
 
@@ -265,7 +265,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
         HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER);
         JsonNode responseBody = objectMapper.readTree(response.body());
 
-        JsonNode barnehageJson = responseBody.get("prosentSiste4Kvartaler").get(0);
+        JsonNode barnehageJson = responseBody.get("prosentSiste4KvartalerTotalt").get(0);
         assertThat(barnehageJson.get("label").toString()).isEqualTo("\"Barnehager\"");
     }
 

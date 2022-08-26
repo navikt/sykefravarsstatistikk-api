@@ -92,13 +92,6 @@ public class AggregertStatistikkService {
 
         BransjeEllerNæring bransjeEllerNæring = bransjeEllerNæringService.finnBransje(virksomhet);
 
-        // TODO: Jeg er identisk med prosentSisteFireKvartalerTotalt.
-        //  Fjern meg når Forebygge fravær har tatt prosentSisteFireKvartalerTotalt i bruk.
-        List<StatistikkDto> prosentSisteFireKvartaler = EitherUtils.filterRights(
-              kalkulatorTotal.fraværsprosentVirksomhet(virksomhet.getNavn()),
-              kalkulatorTotal.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
-              kalkulatorTotal.fraværsprosentNorge()
-        );
         List<StatistikkDto> prosentSisteFireKvartalerTotalt = EitherUtils.filterRights(
               kalkulatorTotal.fraværsprosentVirksomhet(virksomhet.getNavn()),
               kalkulatorTotal.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
@@ -117,23 +110,26 @@ public class AggregertStatistikkService {
               kalkulatorLangtid.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
         );
 
-        // TODO: Jeg er identisk med trendTotalt.
-        //  Fjern meg når Forebygge fravær har tatt trendTotalt i bruk.
-        List<StatistikkDto> trend = EitherUtils.filterRights(
-              kalkulatorTotal.trendBransjeEllerNæring(bransjeEllerNæring)
-        );
-
         List<StatistikkDto> trendTotalt = EitherUtils.filterRights(
               kalkulatorTotal.trendBransjeEllerNæring(bransjeEllerNæring)
         );
+
+        List<StatistikkDto> tapteDagsverkTotalt = EitherUtils.filterRights(
+              kalkulatorTotal.tapteDagsverkVirksomhet(virksomhet.getNavn())
+        );
+
+        List<StatistikkDto> muligeDagsverkTotalt = EitherUtils.filterRights(
+              kalkulatorTotal.muligeDagsverkVirksomhet(virksomhet.getNavn())
+        );
+
         return new AggregertStatistikkDto(
-              prosentSisteFireKvartaler,
               prosentSisteFireKvartalerTotalt,
               prosentSisteFireKvartalerGradert,
               prosentSisteFireKvartalerKorttid,
               prosentSisteFireKvartalerLangtid,
-              trend,
-              trendTotalt);
+              trendTotalt,
+              tapteDagsverkTotalt,
+              muligeDagsverkTotalt);
     }
 
 
