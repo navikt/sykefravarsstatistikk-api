@@ -6,7 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner.Orgenhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoDvhDto;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoDbDto;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -347,7 +347,7 @@ public class DatavarehusRepository {
         );
     }
 
-    public List<PubliseringsdatoDvhDto> hentPubliseringsdatoerFraDvh() {
+    public List<PubliseringsdatoDbDto> hentPubliseringsdatoerFraDvh() {
         try {
             return namedParameterJdbcTemplate.query(
                   "select rapport_periode, offentlig_dato, oppdatert_dato, aktivitet " +
@@ -356,7 +356,7 @@ public class DatavarehusRepository {
                         "and PERIODE_TYPE = 'KVARTAL' " +
                         "order by offentlig_dato desc",
                   new HashMap<>(),
-                  (rs, rowNum) -> new PubliseringsdatoDvhDto(
+                  (rs, rowNum) -> new PubliseringsdatoDbDto(
                         rs.getInt("rapport_periode"),
                         rs.getDate("offentlig_dato"),
                         rs.getDate("oppdatert_dato"),

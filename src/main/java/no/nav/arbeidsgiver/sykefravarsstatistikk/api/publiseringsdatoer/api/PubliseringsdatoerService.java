@@ -1,11 +1,12 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoDvhDto;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.ImporttidspunktDto;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoDbDto;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoerRepository;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +39,7 @@ public class PubliseringsdatoerService {
         return publiseringsdatoerListe;
     }
 
-    protected static CompletableFuture<Publiseringsdatoer> uthentingMedFeilhåndteringOgTimeout(
+    protected CompletableFuture<Publiseringsdatoer> uthentingMedFeilhåndteringOgTimeout(
           Supplier<Publiseringsdatoer> publiseringsdatoInfoSupplier
     ) {
         return CompletableFuture
@@ -59,53 +60,35 @@ public class PubliseringsdatoerService {
                     });
     }
 
-    private static Publiseringsdatoer byggPubliseringsdatoInfo(
-          List<PubliseringsdatoDvhDto> publiseringsdatoer
+    private Publiseringsdatoer byggPubliseringsdatoInfo(
+          List<PubliseringsdatoDbDto> publiseringsdatoer
     ) {
-        log.info("hei fra byggPubliseringsdatoInfo");
-        PubliseringsdatoDvhDto forrigePubliseringsdatoElement = finnForrigePubliseringsdatoElement(publiseringsdatoer);
-        ÅrstallOgKvartal gjeldendePeriode = finnÅrstallOgKvartalForPeriode(forrigePubliseringsdatoElement.getRapportPeriode());
+        final ImporttidspunktDto forrigeImporttidspunktMedPeriode =
+              publiseringsdatoerRepository.hentSisteImporttidspunktMedPeriode();
+
         return Publiseringsdatoer.builder()
-              .gjeldendeÅrstall(String.valueOf(gjeldendePeriode.getÅrstall()))
-              .gjeldendeKvartal(String.valueOf(gjeldendePeriode.getKvartal()))
-              .forrigePubliseringsdato(forrigePubliseringsdatoElement.getOffentligDato()
-                    .toString())
-              .nestePubliseringsdato("neste dato")
+              .gjeldendeÅrstall(String.valueOf(forrigeImporttidspunktMedPeriode.getGjeldendeÅrstall()))
+              .gjeldendeKvartal(String.valueOf(forrigeImporttidspunktMedPeriode.getGjeldendeKvartal()))
+              .forrigePubliseringsdato(
+                    forrigeImporttidspunktMedPeriode.getImportertTidspunkt().toLocalDateTime().toLocalDate().toString()
+              )
+              .nestePubliseringsdato(finnNestePubliseringsdato(publiseringsdatoer).toString())
               .build();
     }
 
-    private static PubliseringsdatoDvhDto finnForrigePubliseringsdatoElement(
-          List<PubliseringsdatoDvhDto> publiseringsdatoer
+    private LocalDate finnNestePubliseringsdato(
+          List<PubliseringsdatoDbDto> publiseringsdatoer
     ) {
-        List<PubliseringsdatoDvhDto> tidligerePubliseringsdatoer =
+        final Timestamp forrigePubliseringsdato =
+              publiseringsdatoerRepository.hentSisteImporttidspunktMedPeriode().getImportertTidspunkt();
+        List<PubliseringsdatoDbDto> tidligerePubliseringsdatoer =
               publiseringsdatoer.stream()
                     .filter(
                           publiseringsdato ->
-                                publiseringsdato.getOffentligDato().toLocalDate().isBefore(LocalDate.now())
-                    ).sorted(PubliseringsdatoDvhDto::sammenlignOffentligDato)
+                                publiseringsdato.getOffentligDato().toLocalDate().isAfter(forrigePubliseringsdato
+                                      .toLocalDateTime().toLocalDate())
+                    ).sorted(PubliseringsdatoDbDto::sammenlignOffentligDato)
                     .collect(Collectors.toList());
-        return tidligerePubliseringsdatoer.get(tidligerePubliseringsdatoer.size() - 1);
-    }
-
-    private static PubliseringsdatoDvhDto finnNestePubliseringsdatoElement(
-          List<PubliseringsdatoDvhDto> publiseringsdatoer
-    ) {
-        List<PubliseringsdatoDvhDto> tidligerePubliseringsdatoer =
-              publiseringsdatoer.stream()
-                    .filter(
-                          publiseringsdato ->
-                                publiseringsdato.getOffentligDato().toLocalDate().isAfter(LocalDate.now())
-                    ).sorted(PubliseringsdatoDvhDto::sammenlignOffentligDato)
-                    .collect(Collectors.toList());
-        return tidligerePubliseringsdatoer.get(0);
-    }
-
-    private static ÅrstallOgKvartal finnÅrstallOgKvartalForPeriode(
-          Integer rapportPeriode
-    ) {
-        String periode = String.valueOf(rapportPeriode);
-        return new ÅrstallOgKvartal(
-              Integer.parseInt(periode.substring(0, 4)), Integer.parseInt(periode.substring(4))
-        );
+        return tidligerePubliseringsdatoer.get(0).getOffentligDato().toLocalDate();
     }
 }

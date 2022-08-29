@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.importe
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoDvhDto;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoDbDto;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoerRepository;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +27,7 @@ public class PubliseringsdatoerImportService {
 
     public void importerDatoerFraDatavarehus() {
 
-        List<PubliseringsdatoDvhDto> publiseringsdatoerFraDvh =
+        List<PubliseringsdatoDbDto> publiseringsdatoerFraDvh =
               datavarehusRepository.hentPubliseringsdatoerFraDvh();
 
         publiseringsdatoerRepository.oppdaterPubliseringsdatoer(publiseringsdatoerFraDvh);

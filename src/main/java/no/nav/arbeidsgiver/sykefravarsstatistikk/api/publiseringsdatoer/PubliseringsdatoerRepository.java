@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -26,16 +27,15 @@ public class PubliseringsdatoerRepository {
     }
 
 
-    public List<PubliseringsdatoDvhDto> hentPubliseringsdatoer() {
+    public List<PubliseringsdatoDbDto> hentPubliseringsdatoer() {
         try {
             return jdbcTemplate.query("select * from publiseringsdatoer",
                   new HashMap<>(),
-                  (rs, rowNum) -> new PubliseringsdatoDvhDto(
+                  (rs, rowNum) -> new PubliseringsdatoDbDto(
                         rs.getInt("rapport_periode"),
                         rs.getDate("offentlig_dato"),
                         rs.getDate("oppdatert_i_dvh"),
-                        rs.getString("aktivitet"),
-                        rs.getBoolean("er_publisert")
+                        rs.getString("aktivitet")
                   )
             );
         } catch (EmptyResultDataAccessException e) {
@@ -43,8 +43,7 @@ public class PubliseringsdatoerRepository {
         }
     }
 
-
-    public void oppdaterPubliseringsdatoer(List<PubliseringsdatoDvhDto> data) {
+    public void oppdaterPubliseringsdatoer(List<PubliseringsdatoDbDto> data) {
         int antallRadetSlettet = jdbcTemplate.update(
               "delete from publiseringsdatoer", new MapSqlParameterSource()
         );
@@ -67,4 +66,32 @@ public class PubliseringsdatoerRepository {
         log.info("Antall rader satt inn i 'publiseringsdatoer': " + antallRaderSattInn);
     }
 
+    public void oppdaterSisteImporttidspunkt(ÅrstallOgKvartal årstallOgKvartal) {
+        jdbcTemplate.update(
+              "insert into importtidspunkt "
+                    + "(aarstall, kvartal) "
+                    + "values "
+                    + "(:aarstall, :kvartal)",
+              new MapSqlParameterSource()
+                    .addValue("aarstall", årstallOgKvartal.getÅrstall())
+                    .addValue("kvartal", årstallOgKvartal.getKvartal())
+        );
+        log.info("Oppdaterte tidspunkt for import av sykefraværstatistikk for " + årstallOgKvartal);
+    }
+
+    public ImporttidspunktDto hentSisteImporttidspunktMedPeriode() {
+        return jdbcTemplate.query(
+              "select * from importtidspunkt "
+                    + "order by importert desc "
+                    + "limit 1",
+              new HashMap<>(),
+              (rs, rowNum) -> new ImporttidspunktDto(
+                    new ÅrstallOgKvartal(
+                          Integer.valueOf(rs.getString("aarstall")),
+                          Integer.valueOf(rs.getString("kvartal"))
+                    ),
+                    rs.getTimestamp("importert")
+              )
+        ).get(0);
+    }
 }

@@ -15,7 +15,6 @@ public class PubliseringsdatoDbDto {
     private final Date oppdatertDato;
     private final String aktivitet;
 
-
     public PubliseringsdatoDbDto(
           Integer rapportPeriode,
           Date offentligDato, // dato for offentliggjøring

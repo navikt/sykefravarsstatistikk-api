@@ -27,14 +27,15 @@ public class ImporteringScheduler {
         Duration lockAtLeastFor = Duration.of(1, ChronoUnit.MINUTES);
 
         taskExecutor.executeWithLock(
-                (Runnable) this::importering,
-                new LockConfiguration(Instant.now(), "importering", lockAtMostFor, lockAtLeastFor)
+              (Runnable) this::importering,
+              new LockConfiguration(Instant.now(), "importering", lockAtMostFor, lockAtLeastFor)
         );
     }
 
     private void importering() {
         log.info("Jobb for å importere sykefraværsstatistikk er startet.");
         importeringService.importerHvisDetFinnesNyStatistikk();
+
     }
 
 }
