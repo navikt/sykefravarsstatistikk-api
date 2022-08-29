@@ -11,27 +11,27 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class PubliseringdatoInfoImporteringScheduler {
+public class PubliseringdatoInfoImportScheduler {
 
     private final LockingTaskExecutor taskExecutor;
-    private final PubliseringsdatoerImportService importeringService;
+    private final PubliseringsdatoerImportService importService;
 
 
-    public PubliseringdatoInfoImporteringScheduler(LockingTaskExecutor taskExecutor,
-          PubliseringsdatoerImportService importeringService
+    public PubliseringdatoInfoImportScheduler(LockingTaskExecutor taskExecutor,
+                                              PubliseringsdatoerImportService importService
     ) {
         this.taskExecutor = taskExecutor;
-        this.importeringService = importeringService;
+        this.importService = importService;
     }
 
 
     @Scheduled(cron = "* * * * * ?")
-    public void scheduledImportering() {
+    public void scheduledImport() {
         Duration lockAtMostFor = Duration.of(10, ChronoUnit.MINUTES);
         Duration lockAtLeastFor = Duration.of(1, ChronoUnit.MINUTES);
 
         taskExecutor.executeWithLock(
-              (Runnable) this::importering,
+              (Runnable) this::importer,
               new LockConfiguration(
                     Instant.now(),
                     "publiseringsdatoer",
@@ -41,10 +41,9 @@ public class PubliseringdatoInfoImporteringScheduler {
     }
 
 
-    private void importering() {
+    private void importer() {
         log.info("Jobb for å importere publiseringsdatoer fra datavarehus er startet.");
-        importeringService.importerDatoerFraDatavarehus();
+        importService.importerDatoerFraDatavarehus();
         log.info("Jobb for å importere publiseringsdatoer er avsluttet.");
     }
-
 }

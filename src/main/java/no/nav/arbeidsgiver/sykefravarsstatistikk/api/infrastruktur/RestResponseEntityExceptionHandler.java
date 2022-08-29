@@ -61,13 +61,13 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler(value = {TilgangskontrollException.class})
     @ResponseBody
     protected ResponseEntity<Object> handleTilgangskontrollException(RuntimeException e, WebRequest webRequest) {
-        return getResponseEntity(e, "You don't have access to this ressource", HttpStatus.FORBIDDEN);
+        return getResponseEntity(e, "You don't have access to this resource", HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(value = {JwtTokenUnauthorizedException.class, AccessDeniedException.class})
     @ResponseBody
     protected ResponseEntity<Object> handleUnauthorizedException(RuntimeException e, WebRequest webRequest) {
-        return getResponseEntity(e, "You are not authorized to access this ressource", HttpStatus.UNAUTHORIZED);
+        return getResponseEntity(e, "You are not authorized to access this resource", HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(value = {AltinnException.class})

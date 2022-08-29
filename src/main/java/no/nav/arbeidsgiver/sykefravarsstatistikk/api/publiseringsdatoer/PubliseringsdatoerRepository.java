@@ -1,14 +1,15 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -19,21 +20,22 @@ public class PubliseringsdatoerRepository {
 
     public PubliseringsdatoerRepository(
           @Qualifier("sykefravarsstatistikkJdbcTemplate")
-                NamedParameterJdbcTemplate namedParameterJdbcTemplate
+          NamedParameterJdbcTemplate namedParameterJdbcTemplate
     ) {
         this.jdbcTemplate = namedParameterJdbcTemplate;
     }
 
 
-    public List<PubliseringsdatoDbDto> hentPubliseringsdatoer() {
+    public List<PubliseringsdatoDvhDto> hentPubliseringsdatoer() {
         try {
-            return jdbcTemplate.query("select * from publiseringsdatoer ",
+            return jdbcTemplate.query("select * from publiseringsdatoer",
                   new HashMap<>(),
-                  (rs, rowNum) -> new PubliseringsdatoDbDto(
+                  (rs, rowNum) -> new PubliseringsdatoDvhDto(
                         rs.getInt("rapport_periode"),
                         rs.getDate("offentlig_dato"),
                         rs.getDate("oppdatert_i_dvh"),
-                        rs.getString("aktivitet")
+                        rs.getString("aktivitet"),
+                        rs.getBoolean("er_publisert")
                   )
             );
         } catch (EmptyResultDataAccessException e) {
@@ -42,7 +44,7 @@ public class PubliseringsdatoerRepository {
     }
 
 
-    public void oppdaterPubliseringsdatoer(List<PubliseringsdatoDbDto> data) {
+    public void oppdaterPubliseringsdatoer(List<PubliseringsdatoDvhDto> data) {
         int antallRadetSlettet = jdbcTemplate.update(
               "delete from publiseringsdatoer", new MapSqlParameterSource()
         );
