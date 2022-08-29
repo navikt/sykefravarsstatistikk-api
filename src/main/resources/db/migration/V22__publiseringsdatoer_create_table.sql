@@ -7,3 +7,8 @@ create table publiseringsdatoer
     er_publisert    boolean not null,
     importert       timestamp default current_timestamp
 );
+
+create table publiseringsstatus
+(
+
+)

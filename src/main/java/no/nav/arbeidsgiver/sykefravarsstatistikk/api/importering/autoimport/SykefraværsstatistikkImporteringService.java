@@ -58,6 +58,7 @@ public class SykefraværsstatistikkImporteringService {
                 log.info("Importerer ny statistikk");
                 importerNyStatistikk(årstallOgKvartalForDvh.get(0));
                 //TODO: kall postImport
+                oppdaterPubliseringsstatus();
             } else {
                 log.info("Statistikk er klar til importering men automatisk importering er ikke aktivert");
             }
@@ -65,6 +66,12 @@ public class SykefraværsstatistikkImporteringService {
             log.info("Importerer ikke ny statistikk");
         }
     }
+
+
+    private void oppdaterPubliseringsstatus() {
+        // SKriv til DB: tidsstempel
+    }
+
 
     public void reimporterSykefraværsstatistikk(ÅrstallOgKvartal fra, ÅrstallOgKvartal til) {
         ÅrstallOgKvartal.range(fra, til).forEach(this::importerNyStatistikk);
