@@ -10,6 +10,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaProperties;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.StatistikkDto;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
@@ -53,14 +54,14 @@ public class KafkaService {
     }
 
     public void send(
-            ÅrstallOgKvartal årstallOgKvartal,
-            VirksomhetSykefravær virksomhetSykefravær,
-            List<SykefraværMedKategori> næring5SifferSykefravær,
-            SykefraværMedKategori næringSykefravær,
-            SykefraværMedKategori sektorSykefravær,
-            SykefraværMedKategori landSykefravær,
-            Map<SykefraværMedKategori,List<ÅrstallOgKvartal>> virksomhetSykefraværSiste4Kvartaler
-            // TODO: Legge til prosent her???
+          ÅrstallOgKvartal årstallOgKvartal,
+          VirksomhetSykefravær virksomhetSykefravær,
+          List<SykefraværMedKategori> næring5SifferSykefravær,
+          SykefraværMedKategori næringSykefravær,
+          SykefraværMedKategori sektorSykefravær,
+          SykefraværMedKategori landSykefravær,
+          List<StatistikkDto> landSykefraværSiste4Kvartaler // TODO endre til generellstatistikkDTO Eller Liste av statistikkDTO
+          // TODO: Legge til prosent her???
     ) {
         // TODO bytt til Prometheus
         kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
@@ -87,7 +88,9 @@ public class KafkaService {
                 næring5SifferSykefravær,
                 næringSykefravær,
                 sektorSykefravær,
-                landSykefravær);
+                landSykefravær,
+                landSykefraværSiste4Kvartaler
+                );
 
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 

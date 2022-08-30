@@ -1,15 +1,13 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.NæringOgNæringskode5siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.StatistikkDto;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,15 +16,13 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.*;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -39,6 +35,8 @@ public class EksporteringServiceMockTest {
     private VirksomhetMetadataRepository virksomhetMetadataRepository;
     @Mock
     private SykefraværsstatistikkTilEksporteringRepository sykefraværsstatistikkTilEksporteringRepository;
+    @Mock
+    private SykefraværRepository sykefraværsRepository;
     @Mock
     private KafkaService kafkaService;
 
@@ -56,6 +54,8 @@ public class EksporteringServiceMockTest {
     ArgumentCaptor<SykefraværMedKategori> sektorSykefraværArgumentCaptor;
     @Captor
     ArgumentCaptor<SykefraværMedKategori> landSykefraværArgumentCaptor;
+    @Captor
+    ArgumentCaptor<List<StatistikkDto>> statistikkDtoListLandArgumentCaptor; // TODO MÅ endres to be generelt
 
     @BeforeEach
     public void setUp() {
@@ -63,6 +63,7 @@ public class EksporteringServiceMockTest {
                 eksporteringRepository,
                 virksomhetMetadataRepository,
                 sykefraværsstatistikkTilEksporteringRepository,
+              sykefraværsRepository,
                 kafkaService,
                 true
         );
@@ -217,8 +218,6 @@ public class EksporteringServiceMockTest {
         ));
         when(virksomhetMetadataRepository.hentVirksomhetMetadata(__2020_2))
                 .thenReturn(Arrays.asList(virksomhetMetadata));
-        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentLand(__2020_2))
-                .thenReturn(sykefraværsstatistikkLand);
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(__2020_2))
                 .thenReturn(Arrays.asList(sykefraværsstatistikkSektor));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(__2020_2))
@@ -227,6 +226,8 @@ public class EksporteringServiceMockTest {
                 .thenReturn(Arrays.asList(sykefraværsstatistikkNæring5Siffer));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(__2020_2))
                 .thenReturn(Arrays.asList(sykefraværsstatistikkVirksomhet));
+        when(sykefraværsRepository.hentUmaskertSykefraværForNorge(any()))
+                .thenReturn(sykefraværsstatistikkLandSiste4Kvartaler(SISTE_PUBLISERTE_KVARTAL));
 
         int antallEksporterte = service.eksporter(__2020_2, EksporteringBegrensning.build().utenBegrensning());
 
@@ -236,7 +237,8 @@ public class EksporteringServiceMockTest {
                 næring5SifferSykefraværArgumentCaptor.capture(),
                 næringSykefraværArgumentCaptor.capture(),
                 sektorSykefraværArgumentCaptor.capture(),
-                landSykefraværArgumentCaptor.capture()
+                landSykefraværArgumentCaptor.capture(),
+                statistikkDtoListLandArgumentCaptor.capture()
         );
         assertThat(årstallOgKvartalArgumentCaptor.getValue()).isEqualTo(__2020_2);
         assertEqualsVirksomhetSykefravær(virksomhetSykefravær, virksomhetSykefraværArgumentCaptor.getValue());
@@ -248,6 +250,11 @@ public class EksporteringServiceMockTest {
         assertEqualsSykefraværMedKategori(næringSykefravær, næringSykefraværArgumentCaptor.getValue());
         assertEqualsSykefraværMedKategori(sektorSykefravær, sektorSykefraværArgumentCaptor.getValue());
         assertEqualsSykefraværMedKategori(landSykefravær, landSykefraværArgumentCaptor.getValue());
+        assertEqualsSykefraværMedKategori(
+              statistikkDtoList(
+                    SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)).get(0),
+                    statistikkDtoListLandArgumentCaptor.getValue().get(0)
+        );
         assertThat(antallEksporterte).isEqualTo(1);
     }
 

@@ -4,18 +4,16 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksp
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaTopicValue;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.StatistikkDto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils.assertBigDecimalIsEqual;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
@@ -73,6 +71,23 @@ public class EksporteringServiceTestUtils {
             new BigDecimal(500000000),
             2500000
     );
+    public static List<StatistikkDto> statistikkDtoList(ÅrstallOgKvartal årstallOgKvartal) {
+        return List.of(StatistikkDto.builder()
+              .statistikkategori(Statistikkategori.LAND)
+              .label("Norge")
+              .verdi("1.9")
+              .antallPersonerIBeregningen(10000000)
+              .kvartalerIBeregningen(
+                    List.of(
+                          årstallOgKvartal,
+                          årstallOgKvartal.plussKvartaler(1),
+                          årstallOgKvartal.plussKvartaler(2),
+                          årstallOgKvartal.plussKvartaler(3)
+                    )
+              )
+              .build());
+    }
+
     public static VirksomhetMetadata virksomhet1Metadata_2020_4 = new VirksomhetMetadata(
             ORGNR_VIRKSOMHET_1,
             "Virksomhet 1",
@@ -279,6 +294,32 @@ public class EksporteringServiceTestUtils {
             new BigDecimal(10000000),
             new BigDecimal(500000000)
     );
+
+    public static List<UmaskertSykefraværForEttKvartal> sykefraværsstatistikkLandSiste4Kvartaler(ÅrstallOgKvartal årstallOgKvartal) {
+        return List.of(
+              new UmaskertSykefraværForEttKvartal(
+                    årstallOgKvartal,
+                    new BigDecimal(10000000),
+                    new BigDecimal(500000000),
+                    2500000
+              ), new UmaskertSykefraværForEttKvartal(
+                    årstallOgKvartal.minusKvartaler(1),
+                    new BigDecimal(9000000),
+                    new BigDecimal(500000000),
+                    2500000
+              ), new UmaskertSykefraværForEttKvartal(
+                    årstallOgKvartal.minusKvartaler(2),
+                    new BigDecimal(11000000),
+                    new BigDecimal(500000000),
+                    2500000
+              ), new UmaskertSykefraværForEttKvartal(
+                    årstallOgKvartal.minusKvartaler(3),
+                    new BigDecimal(8000000),
+                    new BigDecimal(500000000),
+                    2500000
+              )
+        );
+    }
     public static SykefraværsstatistikkSektor sykefraværsstatistikkSektor = new SykefraværsstatistikkSektor(
             __2020_2.getÅrstall(),
             __2020_2.getKvartal(),
@@ -339,6 +380,16 @@ public class EksporteringServiceTestUtils {
         assertThat(actual.getKvartal()).as("Sjekk kvartal").isEqualTo(expected.getKvartal());
         assertBigDecimalIsEqual(actual.getMuligeDagsverk(), expected.getMuligeDagsverk());
         assertBigDecimalIsEqual(actual.getTapteDagsverk(), expected.getTapteDagsverk());
+    }
+public static void assertEqualsSykefraværMedKategori(
+            StatistikkDto expected,
+            StatistikkDto actual
+    ) {
+        assertThat(actual.getStatistikkategori()).as("Sjekk Statistikkategori").isEqualTo(expected.getStatistikkategori());
+        assertThat(actual.getLabel()).as("Sjekk label").isEqualTo(expected.getLabel());
+        assertThat(actual.getKvartalerIBeregningen()).as("Sjekk kvartaler i beregningen").containsExactlyInAnyOrderElementsOf(expected.getKvartalerIBeregningen());
+        assertThat(actual.getVerdi()).as("Sjekk verdi").isEqualTo( expected.getVerdi());
+        assertThat(actual.getAntallPersonerIBeregningen()).as("Sjekk antall personer").isEqualTo( expected.getAntallPersonerIBeregningen());
     }
 
     public static void assertKafkaTopicValueEquals(KafkaTopicValue expected, KafkaTopicValue actual) {

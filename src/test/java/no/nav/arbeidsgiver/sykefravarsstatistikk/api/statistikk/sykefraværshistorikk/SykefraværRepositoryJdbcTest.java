@@ -1,18 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
-import static org.assertj.core.api.Java6Assertions.assertThat;
-
-import java.math.BigDecimal;
-import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
@@ -27,6 +18,15 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
+import static org.assertj.core.api.Java6Assertions.assertThat;
 
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension.class)
@@ -62,6 +62,27 @@ public class SykefraværRepositoryJdbcTest {
         slettAllStatistikkFraDatabase(jdbcTemplate);
     }
 
+    @Test
+    void hentUmaskertSykefraværForNorge_skal_hente_riktig_data() {
+        opprettStatistikkForLand(jdbcTemplate);
+        List<UmaskertSykefraværForEttKvartal> resultat =
+              sykefraværRepository.hentUmaskertSykefraværForNorge(
+                    SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1));
+        assertThat(resultat.size()).isEqualTo(2);
+        assertThat(resultat.get(0)).isEqualTo(
+              sykefraværForEtÅrstallOgKvartal(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getÅrstall(), SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getKvartal(), 5)
+        );
+        assertThat(resultat.get(1)).isEqualTo(
+              sykefraværForEtÅrstallOgKvartal(SISTE_PUBLISERTE_KVARTAL.getÅrstall(), SISTE_PUBLISERTE_KVARTAL.getKvartal(), 4)
+        );
+
+        /*assertThat(resultat).containsExactlyInAnyOrderElementsOf(
+              Arrays.asList(
+                    sykefraværForEtÅrstallOgKvartal(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getÅrstall(), SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getKvartal(), 4),
+                    sykefraværForEtÅrstallOgKvartal(SISTE_PUBLISERTE_KVARTAL.getÅrstall(), SISTE_PUBLISERTE_KVARTAL.getKvartal(), 5)
+                    )
+        );*/
+    }
 
     @Test
     public void hentSykefraværprosentVirksomhet__skal_returnerer_empty_list_dersom_ingen_data_funnet_for_årstall_og_kvartal() {
