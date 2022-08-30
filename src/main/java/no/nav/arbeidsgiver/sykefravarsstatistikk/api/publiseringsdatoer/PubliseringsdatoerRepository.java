@@ -86,11 +86,9 @@ public class PubliseringsdatoerRepository {
                     + "limit 1",
               new HashMap<>(),
               (rs, rowNum) -> new ImporttidspunktDto(
-                    new ÅrstallOgKvartal(
-                          Integer.valueOf(rs.getString("aarstall")),
-                          Integer.valueOf(rs.getString("kvartal"))
-                    ),
-                    rs.getTimestamp("importert")
+                    rs.getTimestamp("importert"),
+                    rs.getString("aarstall"),
+                    rs.getString("kvartal")
               )
         ).get(0);
     }
