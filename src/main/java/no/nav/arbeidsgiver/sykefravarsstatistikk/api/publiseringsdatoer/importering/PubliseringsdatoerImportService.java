@@ -26,7 +26,6 @@ public class PubliseringsdatoerImportService {
 
 
     public void importerDatoerFraDatavarehus() {
-
         List<PubliseringsdatoDbDto> publiseringsdatoerFraDvh =
               datavarehusRepository.hentPubliseringsdatoerFraDvh();
 

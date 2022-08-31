@@ -39,6 +39,7 @@ public class PubliseringsdatoerRepository {
                   )
             );
         } catch (EmptyResultDataAccessException e) {
+            log.error("Fant ikke publiseringsdatoer i databasen, returnerer tom liste");
             return Collections.emptyList();
         }
     }
