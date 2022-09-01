@@ -43,7 +43,7 @@ public class PubliseringsdatoerService {
     ) {
         final Timestamp forrigePubliseringsdato =
               publiseringsdatoerRepository.hentSisteImporttidspunktMedPeriode().getImportertTidspunkt();
-        List<PubliseringsdatoDbDto> tidligerePubliseringsdatoer =
+        List<PubliseringsdatoDbDto> fremtidigePubliseringsdatoer =
               publiseringsdatoer.stream()
                     .filter(
                           publiseringsdato ->
@@ -51,6 +51,6 @@ public class PubliseringsdatoerService {
                                       .toLocalDateTime().toLocalDate())
                     ).sorted(PubliseringsdatoDbDto::sammenlignOffentligDato)
                     .collect(Collectors.toList());
-        return tidligerePubliseringsdatoer.get(0).getOffentligDato().toLocalDate();
+        return fremtidigePubliseringsdatoer.get(0).getOffentligDato().toLocalDate();
     }
 }

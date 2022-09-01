@@ -53,5 +53,7 @@ class PubliseringsdatoerImportServiceTest {
         serviceUnderTest.importerDatoerFraDatavarehus();
         verify(mockPubliseringsdatoerRepository, times(1))
               .oppdaterPubliseringsdatoer(publiseringsdatoDbDtoListe);
+
+        // TODO: Sjekk at også publiseringssstatustabellen blir opdatert riktig
     }
 }

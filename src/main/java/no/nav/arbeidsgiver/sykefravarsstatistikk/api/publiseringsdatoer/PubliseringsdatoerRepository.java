@@ -1,5 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer;
 
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -7,10 +11,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 
 @Slf4j
 @Component
@@ -21,7 +21,7 @@ public class PubliseringsdatoerRepository {
 
     public PubliseringsdatoerRepository(
           @Qualifier("sykefravarsstatistikkJdbcTemplate")
-          NamedParameterJdbcTemplate namedParameterJdbcTemplate
+                NamedParameterJdbcTemplate namedParameterJdbcTemplate
     ) {
         this.jdbcTemplate = namedParameterJdbcTemplate;
     }
@@ -43,6 +43,7 @@ public class PubliseringsdatoerRepository {
             return Collections.emptyList();
         }
     }
+
 
     public void oppdaterPubliseringsdatoer(List<PubliseringsdatoDbDto> data) {
         int antallRadetSlettet = jdbcTemplate.update(
@@ -67,24 +68,25 @@ public class PubliseringsdatoerRepository {
         log.info("Antall rader satt inn i 'publiseringsdatoer': " + antallRaderSattInn);
     }
 
+
     public void oppdaterSisteImporttidspunkt(ÅrstallOgKvartal årstallOgKvartal) {
         jdbcTemplate.update(
               "insert into importtidspunkt "
-                    + "(aarstall, kvartal) "
+                    + "(aarstall, kvartal, importert) "
                     + "values "
-                    + "(:aarstall, :kvartal)",
+                    + "(:aarstall, :kvartal, :importert)",
               new MapSqlParameterSource()
                     .addValue("aarstall", årstallOgKvartal.getÅrstall())
                     .addValue("kvartal", årstallOgKvartal.getKvartal())
+                    .addValue("importert", LocalDateTime.now())
         );
         log.info("Oppdaterte tidspunkt for import av sykefraværstatistikk for " + årstallOgKvartal);
     }
 
+
     public ImporttidspunktDto hentSisteImporttidspunktMedPeriode() {
         return jdbcTemplate.query(
-              "select * from importtidspunkt "
-                    + "order by importert desc "
-                    + "limit 1",
+              "select * from importtidspunkt order by importert desc fetch first 1 rows only",
               new HashMap<>(),
               (rs, rowNum) -> new ImporttidspunktDto(
                     rs.getTimestamp("importert"),

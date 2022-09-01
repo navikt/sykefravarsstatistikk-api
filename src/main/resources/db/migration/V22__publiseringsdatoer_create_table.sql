@@ -11,5 +11,5 @@ create table importtidspunkt
 (
     aarstall  varchar not null,
     kvartal   varchar not null,
-    importert timestamp default current_timestamp
+    importert timestamp not null
 );
