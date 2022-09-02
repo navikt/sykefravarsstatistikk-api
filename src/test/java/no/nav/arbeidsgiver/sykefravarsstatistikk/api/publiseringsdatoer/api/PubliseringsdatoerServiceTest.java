@@ -1,13 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.when;
-
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.ImporttidspunktDto;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoDbDto;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoerRepository;
@@ -17,6 +9,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PubliseringsdatoerServiceTest {
@@ -69,7 +70,7 @@ class PubliseringsdatoerServiceTest {
 
 
     @Test
-    void hentPubliseringsdatoer() {
+    void hentPubliseringsdatoer_nårPubliseringHarSkjeddSomPlanlagt_publiseringsdatoerErRiktige() {
         final ImporttidspunktDto sisteImporttidspunkt = new ImporttidspunktDto(
               Timestamp.valueOf(LocalDateTime.of(2022, 9, 8, 8, 0)),
               "2022",
@@ -92,7 +93,7 @@ class PubliseringsdatoerServiceTest {
 
 
     @Test
-    void hentPubliseringsdatoer_denAndreCasen() {
+    void hentPubliseringsdatoer_nårPubliseringSkjerEnDagForSent_returnererKorrektDatoForForrigePubliseringIstedenforPlanlagtDato() {
         final ImporttidspunktDto sisteImportErEnDagForSeint = new ImporttidspunktDto(
               Timestamp.valueOf(LocalDateTime.of(2022, 6, 3, 8, 0)),
               "2022",

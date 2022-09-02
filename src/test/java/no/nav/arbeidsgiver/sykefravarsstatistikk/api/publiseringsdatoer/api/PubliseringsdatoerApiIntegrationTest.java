@@ -1,20 +1,17 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api;
 
-import static java.net.http.HttpClient.newBuilder;
-import static java.net.http.HttpResponse.BodyHandlers.ofString;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import common.SpringIntegrationTestbase;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.web.server.LocalServerPort;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import lombok.SneakyThrows;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+
+import static java.net.http.HttpClient.newBuilder;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class PubliseringsdatoerApiIntegrationTest extends SpringIntegrationTestbase {
 
@@ -33,11 +30,11 @@ public class PubliseringsdatoerApiIntegrationTest extends SpringIntegrationTestb
                     .build(),
               ofString());
 
-        String forventetRespons = "{\n"
-              + "  \"gjeldendeÅrstall\": \"2022\",\n"
-              + "  \"gjeldendeKvartal\": \"1\",\n"
-              + "  \"forrigePubliseringsdato\": \"2022-02-06\", \n"
-              + "  \"nestePubliseringsdato\": \"2022-09-08\"\n"
+        String forventetRespons = "{"
+              + "\"gjeldendeÅrstall\":\"2022\","
+              + "\"gjeldendeKvartal\":\"02\","
+              + "\"forrigePubliseringsdato\":\"2022-09-08\","
+              + "\"nestePubliseringsdato\":\"2022-12-01\""
               + "}";
 
         assertThat(response.body()).isEqualTo(forventetRespons);
