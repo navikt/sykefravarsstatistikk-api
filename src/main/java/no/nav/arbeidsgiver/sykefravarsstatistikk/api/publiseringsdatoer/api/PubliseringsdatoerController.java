@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api;
 
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.DatauthentingFeil;
 import no.nav.security.token.support.core.api.Unprotected;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,7 +27,10 @@ public class PubliseringsdatoerController {
   public Publiseringsdatoer hentPubliseringsdatoInfo(
       HttpServletRequest request
   ) {
-    return publiseringsdatoerService.hentPubliseringsdatoer().getOrNull();
-  }
 
+    return publiseringsdatoerService.hentPubliseringsdatoer()
+        .getOrElseThrow(
+            () -> new DatauthentingFeil("Klarte ikke hente publiseringsdatoer, prøv igjen senere")
+        );
+  }
 }

@@ -38,16 +38,15 @@
         <include resource="org/springframework/boot/logging/logback/base.xml"/>
         <logger name="org.springframework.web" level="info"/>
         <logger name="no.nav.security.token.support.spring.test" level="debug"/>
-
-        <appender name="static-appender" class="common.StaticAppender" />
-        <root level="trace">
-            <appender-ref ref="static-appender" />
-        </root>
-
     </springProfile>
     <springProfile name="db-test">
         <include resource="org/springframework/boot/logging/logback/base.xml"/>
         <logger name="org.springframework.web" level="info"/>
     </springProfile>
+
+    <appender name="static-appender" class="common.StaticAppender" />
+    <root level="trace">
+        <appender-ref ref="static-appender" />
+    </root>
 
 </configuration>

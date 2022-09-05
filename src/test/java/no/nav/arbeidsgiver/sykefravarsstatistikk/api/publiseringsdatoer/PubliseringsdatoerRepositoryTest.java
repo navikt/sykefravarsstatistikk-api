@@ -6,6 +6,8 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 import common.StaticAppender;
 import io.vavr.control.Option;
 import java.util.List;
@@ -42,7 +44,12 @@ class PubliseringsdatoerRepositoryTest {
 
     Option<ImporttidspunktDto> faktisk = publiseringsdatoerRepository.hentSisteImporttidspunkt();
     assertTrue(faktisk.isEmpty());
-    assertThat(StaticAppender.getEvents()).extracting("message");
+    ILoggingEvent errormelding = StaticAppender.getEvents().get(0);
+
+    assertThat(errormelding.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(errormelding.getMessage()).isEqualTo(
+        "Klarte ikke hente ut siste importtidspunkt: java.lang.ArrayIndexOutOfBoundsException: "
+            + "Index 0 out of bounds for length 0");
   }
 
   private RowMapper<?> anyRowMapper() {
