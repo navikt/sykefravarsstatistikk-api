@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer;
 
+import java.time.LocalDate;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
@@ -23,5 +24,9 @@ public class ImporttidspunktDto {
         this.importertTidspunkt = importertTidspunkt;
         this.gjeldendeÅrstall = gjeldendeÅrstall;
         this.gjeldendeKvartal = gjeldendeKvartal;
+    }
+
+    public LocalDate getImportertDato() {
+        return this.getImportertTidspunkt().toLocalDateTime().toLocalDate();
     }
 }

@@ -1,56 +1,78 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api;
 
-import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.ImporttidspunktDto;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoDbDto;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoerRepository;
-import org.springframework.stereotype.Component;
-
-import java.sql.Timestamp;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoDbDto;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoerRepository;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 public class PubliseringsdatoerService {
 
-    private final PubliseringsdatoerRepository publiseringsdatoerRepository;
+  private final PubliseringsdatoerRepository publiseringsdatoerRepository;
 
-    public PubliseringsdatoerService(
-          PubliseringsdatoerRepository publiseringsdatoerRepository
-    ) {
-        this.publiseringsdatoerRepository = publiseringsdatoerRepository;
-    }
+  public PubliseringsdatoerService(
+      PubliseringsdatoerRepository publiseringsdatoerRepository
+  ) {
+    this.publiseringsdatoerRepository = publiseringsdatoerRepository;
+  }
 
-    public Publiseringsdatoer hentPubliseringsdatoer() {
-        final ImporttidspunktDto forrigeImporttidspunktMedPeriode =
-              publiseringsdatoerRepository.hentSisteImporttidspunktMedPeriode();
+  public Option<Publiseringsdatoer> hentPubliseringsdatoer() {
 
-        return Publiseringsdatoer.builder()
-              .gjeldendeÅrstall(String.valueOf(forrigeImporttidspunktMedPeriode.getGjeldendeÅrstall()))
-              .gjeldendeKvartal(String.valueOf(forrigeImporttidspunktMedPeriode.getGjeldendeKvartal()))
-              .forrigePubliseringsdato(
-                    forrigeImporttidspunktMedPeriode.getImportertTidspunkt().toLocalDateTime().toLocalDate().toString()
-              )
-              .nestePubliseringsdato(
-                    finnNestePubliseringsdato(publiseringsdatoerRepository.hentPubliseringsdatoer()).toString()
-              ).build();
-    }
+    List<PubliseringsdatoDbDto> publiseringsdatoer
+        = publiseringsdatoerRepository.hentPubliseringsdatoer();
 
-    private LocalDate finnNestePubliseringsdato(
-          List<PubliseringsdatoDbDto> publiseringsdatoer
-    ) {
-        final Timestamp forrigePubliseringsdato =
-              publiseringsdatoerRepository.hentSisteImporttidspunktMedPeriode().getImportertTidspunkt();
-        List<PubliseringsdatoDbDto> fremtidigePubliseringsdatoer =
-              publiseringsdatoer.stream()
-                    .filter(
-                          publiseringsdato ->
-                                publiseringsdato.getOffentligDato().toLocalDate().isAfter(forrigePubliseringsdato
-                                      .toLocalDateTime().toLocalDate())
-                    ).sorted(PubliseringsdatoDbDto::sammenlignOffentligDato)
-                    .collect(Collectors.toList());
-        return fremtidigePubliseringsdatoer.get(0).getOffentligDato().toLocalDate();
-    }
+    return publiseringsdatoerRepository.hentSisteImporttidspunkt()
+        .map(
+            forrigeImport -> Publiseringsdatoer.builder()
+                .gjeldendeÅrstall(String.valueOf(forrigeImport.getGjeldendeÅrstall()))
+                .gjeldendeKvartal(String.valueOf(forrigeImport.getGjeldendeKvartal()))
+                .forrigePubliseringsdato(forrigeImport.getImportertDato().toString())
+                .nestePubliseringsdato(
+                    finnNestePubliseringsdato(publiseringsdatoer, forrigeImport.getImportertDato())
+                        .map(LocalDate::toString)
+                        .getOrElse("Ingen kommende puliseringsdatoer er tilgjengelige"))
+                .build()
+        );
+  }
+
+  private Option<LocalDate> finnNestePubliseringsdato(
+      List<PubliseringsdatoDbDto> publiseringsdatoer,
+      LocalDate forrigeImporttidspunkt
+  ) {
+
+    List<PubliseringsdatoDbDto> fremtidigePubliseringsdatoer = sorterEldsteDatoerFørst(
+        filtrerBortDatoerEldreEnnForrigeLanseringsdato(
+            publiseringsdatoer,
+            forrigeImporttidspunkt
+        ));
+
+    return Try.of(() -> fremtidigePubliseringsdatoer.get(0).getOffentligDato().toLocalDate())
+        .onFailure(e -> log.warn("Ingen senere publiseringsdatoer er tilgjengelige i kalenderen"))
+        .toOption();
+  }
+
+  private List<PubliseringsdatoDbDto> filtrerBortDatoerEldreEnnForrigeLanseringsdato(
+      List<PubliseringsdatoDbDto> publiseringsdatoer,
+      LocalDate forrigePubliseringsdato) {
+    return publiseringsdatoer.stream()
+        .filter(
+            publiseringsdato ->
+                publiseringsdato.getOffentligDato().toLocalDate()
+                    .isAfter(forrigePubliseringsdato))
+        .collect(Collectors.toList());
+  }
+
+  private static List<PubliseringsdatoDbDto> sorterEldsteDatoerFørst(
+      List<PubliseringsdatoDbDto> datoer) {
+    return datoer
+        .stream()
+        .sorted(PubliseringsdatoDbDto::sammenlignOffentligDato)
+        .collect(Collectors.toList());
+  }
 }
