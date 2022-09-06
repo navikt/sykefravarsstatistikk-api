@@ -45,7 +45,7 @@
     </springProfile>
 
     <appender name="static-appender" class="common.StaticAppender" />
-    <root level="trace">
+    <root level="error">
         <appender-ref ref="static-appender" />
     </root>
 

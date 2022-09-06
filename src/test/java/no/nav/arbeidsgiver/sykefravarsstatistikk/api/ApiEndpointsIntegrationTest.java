@@ -276,7 +276,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         );
         assertThat(response.statusCode()).isEqualTo(401);
         assertThat(response.body()).isEqualTo(
-                "{\"message\":\"You are not authorized to access this ressource\"}");
+                "{\"message\":\"You are not authorized to access this resource\"}");
     }
 
 
@@ -298,7 +298,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         );
         assertThat(response.statusCode()).isEqualTo(403);
         assertThat(response.body()).isEqualTo(
-                "{\"message\":\"You don't have access to this ressource\"}");
+                "{\"message\":\"You don't have access to this resource\"}");
     }
 
 
@@ -320,7 +320,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         );
         assertThat(response.statusCode()).isEqualTo(403);
         assertThat(response.body()).isEqualTo(
-                "{\"message\":\"You don't have access to this ressource\"}");
+                "{\"message\":\"You don't have access to this resource\"}");
     }
 
 
@@ -380,7 +380,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         );
         assertThat(response.statusCode()).isEqualTo(403);
         assertThat(response.body()).isEqualTo(
-                "{\"message\":\"You don't have access to this ressource\"}");
+                "{\"message\":\"You don't have access to this resource\"}");
     }
 
 
