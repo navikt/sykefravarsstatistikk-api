@@ -5,12 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +24,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils.assertBigDecimalIsEqual;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæringer2Siffer;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -121,6 +118,34 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
         assertThat(resultat_2019_1.size()).isEqualTo(2);
         assertSykefraværsstatistikkForNæringIsEqual(resultat_2019_1, 2019, 1, 10, produksjon, 3, 100);
         assertSykefraværsstatistikkForNæringIsEqual(resultat_2019_1, 2019, 1, 10, utdanning, 8, 100);
+    }
+
+    @Test
+    void hentUmaskertSykefraværForNæringerSiste4Kvartaler_skal_hente_riktig_data() {
+        opprettStatistikkForNæringer2Siffer(jdbcTemplate);
+        List<SykefraværsstatistikkNæring> forventet= List.of(
+               new SykefraværsstatistikkNæring(SISTE_PUBLISERTE_KVARTAL.getÅrstall(),SISTE_PUBLISERTE_KVARTAL.getKvartal(),"10",50,new BigDecimal(20000),new BigDecimal(1000000)),
+               new SykefraværsstatistikkNæring(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getÅrstall(),SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getKvartal(),"10",50,new BigDecimal(30000),new BigDecimal(1000000)),
+               new SykefraværsstatistikkNæring(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getÅrstall(),SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getKvartal(),"10",50,new BigDecimal(40000),new BigDecimal(1000000)),
+               new SykefraværsstatistikkNæring(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getÅrstall(),SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getKvartal(),"10",50,new BigDecimal(50000),new BigDecimal(1000000)),
+               new SykefraværsstatistikkNæring(SISTE_PUBLISERTE_KVARTAL.getÅrstall(),SISTE_PUBLISERTE_KVARTAL.getKvartal(),"88",50,new BigDecimal(25000),new BigDecimal(1000000))
+        );
+        List<SykefraværsstatistikkNæring> resultat =
+              repository.hentSykefraværprosentAlleNæringerSiste4Kvartaler(
+                    SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3));
+        assertThat(resultat.size()).isEqualTo(5);
+        assertThat(resultat).containsExactlyInAnyOrderElementsOf(
+              forventet);
+    }
+
+    @Test
+    void hentUmaskertSykefraværForNæringerSiste4Kvartaler_skalIkkeKrasjeVedManglendeData() {
+        List<SykefraværsstatistikkNæring> resultat =
+              repository.hentSykefraværprosentAlleNæringerSiste4Kvartaler(
+                    SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3));
+        assertThat(resultat.size()).isEqualTo(0);
+        assertThat(resultat).containsExactlyInAnyOrderElementsOf(
+              List.of());
     }
 
     @Test

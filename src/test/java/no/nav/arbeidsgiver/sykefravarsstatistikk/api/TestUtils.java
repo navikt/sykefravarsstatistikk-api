@@ -146,6 +146,22 @@ public class TestUtils {
     }
 
 
+    public static void opprettStatistikkForNæringer2Siffer(NamedParameterJdbcTemplate jdbcTemplate){
+        opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("10",""),
+              SISTE_PUBLISERTE_KVARTAL.getÅrstall(), SISTE_PUBLISERTE_KVARTAL.getKvartal(), 20000,1000000,50);
+        opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("10",""),
+              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getÅrstall(), SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getKvartal(), 30000,1000000,50);
+        opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("10",""),
+              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getÅrstall(), SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getKvartal(), 40000,1000000,50);
+        opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("10",""),
+              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getÅrstall(), SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getKvartal(), 50000,1000000,50);
+        opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("10",""),
+              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4).getÅrstall(), SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4).getKvartal(), 60000,1000000,50);
+        opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("88",""),
+              SISTE_PUBLISERTE_KVARTAL.getÅrstall(), SISTE_PUBLISERTE_KVARTAL.getKvartal(), 25000,1000000,50);
+        opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("88",""),
+              SISTE_PUBLISERTE_KVARTAL.minusEttÅr().getÅrstall(), SISTE_PUBLISERTE_KVARTAL.minusEttÅr().getKvartal(), 30000,1000000,50);
+    }
     public static void opprettStatistikkForNæring2Siffer(
             NamedParameterJdbcTemplate jdbcTemplate,
             Næring næring,

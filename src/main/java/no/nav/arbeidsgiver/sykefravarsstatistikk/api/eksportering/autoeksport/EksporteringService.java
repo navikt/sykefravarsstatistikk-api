@@ -3,19 +3,11 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 import com.google.common.collect.Lists;
 import io.vavr.control.Either;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.EitherUtils;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUtsendingException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
@@ -136,10 +128,13 @@ public class EksporteringService {
                     Map.of(Statistikkategori.LAND,umaskertSykefraværsstatistikkSiste4KvartalerLand)
               )
         );
+        // Sektor trenger IKKE noe endring nå
         List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor =
               sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(årstallOgKvartal);
+        // TODO her skal vi endre til å bruke den nye uthenting
         List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring =
-              sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(årstallOgKvartal);
+              sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringerSiste4Kvartaler(årstallOgKvartal.minusKvartaler(3));
+
         List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer =
               sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5Siffer(
                     årstallOgKvartal
@@ -520,6 +515,45 @@ public class EksporteringService {
                     v -> v.getNæringkode().equals(virksomhetMetadata.getNæring())
                           && v.getÅrstall() == virksomhetMetadata.getÅrstall()
                           && v.getKvartal() == virksomhetMetadata.getKvartal()
+              ).collect(toSingleton(
+                    new SykefraværsstatistikkNæring(
+                          virksomhetMetadata.getÅrstall(),
+                          virksomhetMetadata.getKvartal(),
+                          virksomhetMetadata.getNæring(),
+                          0,
+                          null,
+                          null
+                    )
+              ));
+
+        return new SykefraværMedKategori(
+              Statistikkategori.NÆRING2SIFFER,
+              sfNæring.getNæringkode(),
+              new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
+              sfNæring.getTapteDagsverk(),
+              sfNæring.getMuligeDagsverk(),
+              sfNæring.getAntallPersoner()
+        );
+    }
+
+    protected static SykefraværMedKategori getSykefraværMedKategoriForNæringSiste4Kvartaler(
+          VirksomhetMetadata virksomhetMetadata,
+          List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring,
+          ÅrstallOgKvartal fraÅrstallOgKvartal
+    ) {
+        SykefraværsstatistikkNæring sfNæring =
+              sykefraværsstatistikkNæring.stream().filter(
+                    v -> v.getNæringkode().equals(virksomhetMetadata.getNæring())
+                          && v.getÅrstall() == virksomhetMetadata.getÅrstall()
+                          && v.getKvartal() == virksomhetMetadata.getKvartal()
+                          && (
+                                (v.getÅrstall() > fraÅrstallOgKvartal.getÅrstall())
+                                      ||
+                                      (
+                                            v.getÅrstall() == fraÅrstallOgKvartal.getÅrstall()
+                                            && v.getKvartal() >= fraÅrstallOgKvartal.getKvartal()
+                                      )
+                    )
               ).collect(toSingleton(
                     new SykefraværsstatistikkNæring(
                           virksomhetMetadata.getÅrstall(),
