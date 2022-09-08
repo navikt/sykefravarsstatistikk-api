@@ -221,7 +221,7 @@ class AggregertHistorikkServiceTest {
         List<UmaskertSykefraværForEttKvartal> kvartalstall =
               List.of(
                     umaskertSykefravær(SISTE_PUBLISERTE_KVARTAL, 8, 1),
-                    umaskertSykefravær(new ÅrstallOgKvartal(2021, 2), 13, 2),
+                    umaskertSykefravær(new ÅrstallOgKvartal(2020, 2), 13, 2),
                     umaskertSykefravær(SISTE_PUBLISERTE_KVARTAL.minusEttÅr(), 10, 3)
               );
         Trend forventetTrend = new Trend(
@@ -285,8 +285,8 @@ class AggregertHistorikkServiceTest {
                     "40.0",
                     5,
                     List.of(
-                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
-                          SISTE_PUBLISERTE_KVARTAL
+                          SISTE_PUBLISERTE_KVARTAL,
+                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1)
                     ));
         assertThat(
               serviceUnderTest.hentAggregertStatistikk(etOrgnr)
@@ -333,8 +333,8 @@ class AggregertHistorikkServiceTest {
                     "27.5",
                     5,
                     List.of(
-                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
-                          SISTE_PUBLISERTE_KVARTAL
+                          SISTE_PUBLISERTE_KVARTAL,
+                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1)
                     ));
         assertThat(
               serviceUnderTest.hentAggregertStatistikk(etOrgnr)
