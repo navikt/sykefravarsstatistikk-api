@@ -203,8 +203,8 @@ class AggregertHistorikkServiceTest {
 
     @Test
     void kalkulerTrend_returnererPositivTrend_dersomSykefraværetØker() {
-        ÅrstallOgKvartal k1 = new ÅrstallOgKvartal(2022, 1);
-        ÅrstallOgKvartal k2 = new ÅrstallOgKvartal(2021, 1);
+        ÅrstallOgKvartal k1 = new ÅrstallOgKvartal(2022, 2);
+        ÅrstallOgKvartal k2 = new ÅrstallOgKvartal(2021, 2);
         assertThat(new Trendkalkulator(
               List.of(
                     umaskertSykefravær(k1, 3, 10),
@@ -421,13 +421,13 @@ class AggregertHistorikkServiceTest {
 
     private List<UmaskertSykefraværForEttKvartal> genererTestSykefravær(int offset) {
         return Arrays.asList(
-              umaskertSykefravær(new ÅrstallOgKvartal(2022, 1), 1.1 + offset, 10),
-              umaskertSykefravær(new ÅrstallOgKvartal(2021, 4), 2.2 + offset, 10),
-              umaskertSykefravær(new ÅrstallOgKvartal(2021, 3), 3.3 + offset, 10),
-              umaskertSykefravær(new ÅrstallOgKvartal(2021, 2), 4.4 + offset, 10),
-              umaskertSykefravær(new ÅrstallOgKvartal(2021, 1), 5.5 + offset, 10),
-              umaskertSykefravær(new ÅrstallOgKvartal(2020, 4), 6.6 + offset, 10),
-              umaskertSykefravær(new ÅrstallOgKvartal(2020, 3), 7.7 + offset, 10)
+              umaskertSykefravær(new ÅrstallOgKvartal(2022, 2), 1.1 + offset, 10),
+              umaskertSykefravær(new ÅrstallOgKvartal(2022, 1), 2.2 + offset, 10),
+              umaskertSykefravær(new ÅrstallOgKvartal(2021, 4), 3.3 + offset, 10),
+              umaskertSykefravær(new ÅrstallOgKvartal(2021, 3), 4.4 + offset, 10),
+              umaskertSykefravær(new ÅrstallOgKvartal(2021, 2), 5.5 + offset, 10),
+              umaskertSykefravær(new ÅrstallOgKvartal(2021, 1), 6.6 + offset, 10),
+              umaskertSykefravær(new ÅrstallOgKvartal(2020, 4), 7.7 + offset, 10)
         );
     }
 
