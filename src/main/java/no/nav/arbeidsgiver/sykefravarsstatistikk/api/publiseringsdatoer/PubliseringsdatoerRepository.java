@@ -9,7 +9,6 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -91,12 +90,6 @@ public class PubliseringsdatoerRepository {
   }
 
 
-  public ImporttidspunktDto hentSisteImporttidspunktUtenFeilhåndtering()
-      throws DataAccessException {
-    return hentSisteImporttidspunktFraDb();
-  }
-
-
   private ImporttidspunktDto hentSisteImporttidspunktFraDb() {
     return jdbcTemplate
         .query("select * from importtidspunkt order by importert desc "
@@ -104,8 +97,9 @@ public class PubliseringsdatoerRepository {
             new HashMap<>(),
             (rs, rowNum) -> new ImporttidspunktDto(
                 rs.getTimestamp("importert"),
-                rs.getString("aarstall"),
-                rs.getString("kvartal")))
-        .get(0);
+                new ÅrstallOgKvartal(
+                    rs.getInt("aarstall"),
+                    rs.getInt("kvartal")))
+        ).get(0);
   }
 }

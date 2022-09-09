@@ -30,13 +30,12 @@ public class PubliseringsdatoerService {
     return publiseringsdatoerRepository.hentSisteImporttidspunkt()
         .map(
             forrigeImport -> Publiseringsdatoer.builder()
-                .gjeldendeÅrstall(String.valueOf(forrigeImport.getGjeldendeÅrstall()))
-                .gjeldendeKvartal(String.valueOf(forrigeImport.getGjeldendeKvartal()))
-                .forrigePubliseringsdato(forrigeImport.getImportertDato().toString())
+                .gjeldendePeriode(forrigeImport.getGjeldendePeriode())
+                .sistePubliseringsdato(forrigeImport.getImportertDato().toString())
                 .nestePubliseringsdato(
                     finnNestePubliseringsdato(publiseringsdatoer, forrigeImport.getImportertDato())
                         .map(LocalDate::toString)
-                        .getOrElse("Ingen kommende puliseringsdatoer er tilgjengelige"))
+                        .getOrElse("Ingen kommende publiseringsdatoer er tilgjengelige"))
                 .build()
         );
   }
@@ -72,7 +71,7 @@ public class PubliseringsdatoerService {
       List<PubliseringsdatoDbDto> datoer) {
     return datoer
         .stream()
-        .sorted(PubliseringsdatoDbDto::sammenlignOffentligDato)
+        .sorted(PubliseringsdatoDbDto::sammenlignPubliseringsdatoer)
         .collect(Collectors.toList());
   }
 }

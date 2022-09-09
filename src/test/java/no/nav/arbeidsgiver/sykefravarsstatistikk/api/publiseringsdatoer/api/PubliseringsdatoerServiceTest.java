@@ -9,6 +9,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.ImporttidspunktDto;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoDbDto;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoerRepository;
@@ -74,8 +75,7 @@ class PubliseringsdatoerServiceTest {
     final Option<ImporttidspunktDto> sisteImporttidspunkt = Option.of(
         new ImporttidspunktDto(
             Timestamp.valueOf(LocalDateTime.of(2022, 9, 8, 8, 0)),
-            "2022",
-            "2"
+            new ÅrstallOgKvartal(2022, 2)
         ));
 
     when(mockPubliseringsdatoerRepository.hentSisteImporttidspunkt())
@@ -84,10 +84,9 @@ class PubliseringsdatoerServiceTest {
 
     Publiseringsdatoer faktiskeDatoer = serviceUnderTest.hentPubliseringsdatoer().get();
     Publiseringsdatoer forventet = new Publiseringsdatoer(
-        "2022",
-        "2",
         "2022-09-08",
-        "2022-12-01"
+        "2022-12-01",
+        new ÅrstallOgKvartal(2022, 2)
     );
 
     assertThat(faktiskeDatoer).isEqualTo(forventet);
@@ -99,20 +98,18 @@ class PubliseringsdatoerServiceTest {
     final Option<ImporttidspunktDto> enDagEtterPlanlagtImport = Option.of(
         new ImporttidspunktDto(
             Timestamp.valueOf(LocalDateTime.of(2022, 6, 3, 8, 0)),
-            "2022",
-            "1"
-        ));
+            new ÅrstallOgKvartal(2022, 1))
+    );
 
-    when(mockPubliseringsdatoerRepository.hentSisteImporttidspunkt()).thenReturn(
-        enDagEtterPlanlagtImport);
+    when(mockPubliseringsdatoerRepository.hentSisteImporttidspunkt())
+        .thenReturn(enDagEtterPlanlagtImport);
     when(mockPubliseringsdatoerRepository.hentPubliseringsdatoer()).thenReturn(publiseringsdatoer);
 
     Publiseringsdatoer faktiskeDatoer = serviceUnderTest.hentPubliseringsdatoer().get();
     Publiseringsdatoer forventet = new Publiseringsdatoer(
-        "2022",
-        "1",
         "2022-06-03",
-        "2022-09-08"
+        "2022-09-08",
+        new ÅrstallOgKvartal(2022, 1)
     );
 
     assertThat(faktiskeDatoer).isEqualTo(forventet);

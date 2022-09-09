@@ -1,32 +1,27 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-
-import java.sql.Timestamp;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 
 @Getter
 @EqualsAndHashCode
 public class ImporttidspunktDto {
 
-    private final Timestamp importertTidspunkt;
-    private final String gjeldendeÅrstall;
-    private final String gjeldendeKvartal;
+  private final Timestamp sistImportertTidspunkt;
+  private final ÅrstallOgKvartal gjeldendePeriode;
 
-    public ImporttidspunktDto(
-          Timestamp importertTidspunkt,
-          String gjeldendeÅrstall,
-          String gjeldendeKvartal
+  public ImporttidspunktDto(
+      Timestamp sistImportertTidspunkt,
+      ÅrstallOgKvartal gjeldendePeriode
+  ) {
+    this.sistImportertTidspunkt = sistImportertTidspunkt;
+    this.gjeldendePeriode = gjeldendePeriode;
+  }
 
-
-    ) {
-        this.importertTidspunkt = importertTidspunkt;
-        this.gjeldendeÅrstall = gjeldendeÅrstall;
-        this.gjeldendeKvartal = gjeldendeKvartal;
-    }
-
-    public LocalDate getImportertDato() {
-        return this.getImportertTidspunkt().toLocalDateTime().toLocalDate();
-    }
+  public LocalDate getImportertDato() {
+    return this.getSistImportertTidspunkt().toLocalDateTime().toLocalDate();
+  }
 }
