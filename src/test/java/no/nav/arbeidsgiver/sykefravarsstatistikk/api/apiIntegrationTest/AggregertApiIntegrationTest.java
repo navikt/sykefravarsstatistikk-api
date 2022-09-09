@@ -101,31 +101,36 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
 
     @Test
     public void hentAgreggertStatistikk_returnererForventedeTyperForBedriftSomHarAlleTyperData()
-          throws Exception {
+        throws Exception {
+        ÅrstallOgKvartal ettÅrSiden = SISTE_PUBLISERTE_KVARTAL.minusEttÅr();
         opprettStatistikkForLand(jdbcTemplate);
-        opprettStatistikkForNæring2Siffer(jdbcTemplate, PRODUKSJON_NYTELSESMIDLER, 2022, 1, 5, 100,
-              10);
-        opprettStatistikkForNæring2Siffer(jdbcTemplate, PRODUKSJON_NYTELSESMIDLER, 2021, 1, 20, 100,
-              10);
-        opprettStatistikkForVirksomhet(jdbcTemplate, ORGNR_UNDERENHET, 2022, 1, 5, 100, 10);
+        opprettStatistikkForNæring2Siffer(jdbcTemplate, PRODUKSJON_NYTELSESMIDLER,
+            SISTE_PUBLISERTE_KVARTAL.getÅrstall(), SISTE_PUBLISERTE_KVARTAL.getKvartal(), 5, 100,
+            10);
+        opprettStatistikkForNæring2Siffer(jdbcTemplate, PRODUKSJON_NYTELSESMIDLER,
+            ettÅrSiden.getÅrstall(), ettÅrSiden.getKvartal(), 20, 100,
+            10);
+        opprettStatistikkForVirksomhet(jdbcTemplate, ORGNR_UNDERENHET,
+            SISTE_PUBLISERTE_KVARTAL.getÅrstall(), SISTE_PUBLISERTE_KVARTAL.getKvartal(), 5, 100,
+            10);
 
         insertDataMedGradering(
-              jdbcTemplate,
-              ORGNR_UNDERENHET,
-              "10", "10300",
-              RECTYPE_FOR_VIRKSOMHET, new ÅrstallOgKvartal(2022, 1),
-              5,
-              9,
-              7,
-              new BigDecimal(10),
-              new BigDecimal(20),
-              new BigDecimal(100)
+            jdbcTemplate,
+            ORGNR_UNDERENHET,
+            "10", "10300",
+            RECTYPE_FOR_VIRKSOMHET, SISTE_PUBLISERTE_KVARTAL,
+            5,
+            9,
+            7,
+            new BigDecimal(10),
+            new BigDecimal(20),
+            new BigDecimal(100)
         );
         insertDataMedGradering(
               jdbcTemplate,
               ORGNR_UNDERENHET,
               "10", "10300",
-              RECTYPE_FOR_VIRKSOMHET, new ÅrstallOgKvartal(2021, 4),
+              RECTYPE_FOR_VIRKSOMHET, SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
               2,
               9,
               7,
@@ -137,7 +142,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
               jdbcTemplate,
               ORGNR_UNDERENHET,
               "10", "10300",
-              RECTYPE_FOR_VIRKSOMHET, new ÅrstallOgKvartal(2021, 3),
+              RECTYPE_FOR_VIRKSOMHET, SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2),
               19,
               30,
               15,
@@ -237,23 +242,28 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
 
     @Test
     public void hentAgreggertStatistikk_returnererIkkeVirksomhetstatistikkTilBrukerSomManglerIaRettigheter()
-          throws Exception {
-        opprettStatistikkForNæring5Siffer(jdbcTemplate, BARNEHAGER, 2022, 1, 5, 100, 10);
-        opprettStatistikkForNæring5Siffer(jdbcTemplate, BARNEHAGER, 2021, 1, 1, 100, 10);
+        throws Exception {
+        ÅrstallOgKvartal ettÅrSiden = SISTE_PUBLISERTE_KVARTAL.minusEttÅr();
+        opprettStatistikkForNæring5Siffer(jdbcTemplate, BARNEHAGER,
+            SISTE_PUBLISERTE_KVARTAL.getÅrstall(), SISTE_PUBLISERTE_KVARTAL.getKvartal(), 5, 100,
+            10);
+        opprettStatistikkForNæring5Siffer(jdbcTemplate, BARNEHAGER, ettÅrSiden.getÅrstall(),
+            ettÅrSiden.getKvartal(), 1, 100, 10);
         opprettStatistikkForLand(jdbcTemplate);
 
         HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER);
         JsonNode responseBody = objectMapper.readTree(response.body());
 
-        assertThat(responseBody.get("prosentSiste4KvartalerTotalt").findValuesAsText("statistikkategori"))
-              .containsExactlyInAnyOrderElementsOf(
-                    List.of(
-                          BRANSJE.toString(),
-                          LAND.toString()
-                    ));
+        assertThat(
+            responseBody.get("prosentSiste4KvartalerTotalt").findValuesAsText("statistikkategori"))
+            .containsExactlyInAnyOrderElementsOf(
+                List.of(
+                    BRANSJE.toString(),
+                    LAND.toString()
+                ));
 
         assertThat(responseBody.get("trendTotalt").findValuesAsText("statistikkategori"))
-              .containsExactly(BRANSJE.toString());
+            .containsExactly(BRANSJE.toString());
     }
 
 

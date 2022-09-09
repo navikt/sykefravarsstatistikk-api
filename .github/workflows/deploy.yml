@@ -1,6 +1,6 @@
 name: Build & deploy
 
-on: [ push ]
+on: [push]
 
 env:
   IMAGE: ghcr.io/${{ github.repository }}:${{ github.sha }}
