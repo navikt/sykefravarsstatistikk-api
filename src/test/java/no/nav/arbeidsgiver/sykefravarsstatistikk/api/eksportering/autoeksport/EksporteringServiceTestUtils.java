@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils.assertBigDecimalIsEqual;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -133,6 +134,33 @@ public class EksporteringServiceTestUtils {
             __2021_2
     );
 
+    public static VirksomhetMetadata virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL = new VirksomhetMetadata(
+            ORGNR_VIRKSOMHET_1,
+            "Virksomhet 1",
+            RECTYPE_FOR_VIRKSOMHET,
+            "1",
+            "11",
+            SISTE_PUBLISERTE_KVARTAL
+    );
+
+    public static VirksomhetMetadata virksomhet1_TilHørerBransjeMetadata__2021_2 = new VirksomhetMetadata(
+            ORGNR_VIRKSOMHET_1,
+            "Virksomhet 1",
+            RECTYPE_FOR_VIRKSOMHET,
+            "1",
+            "86",
+            __2021_2
+    );
+
+    public static VirksomhetMetadata virksomhet1_TilHørerBransjeMetadata__SISTE_PUBLISERTE_KVARTAL = new VirksomhetMetadata(
+            ORGNR_VIRKSOMHET_1,
+            "Virksomhet 1",
+            RECTYPE_FOR_VIRKSOMHET,
+            "1",
+            "86",
+            SISTE_PUBLISERTE_KVARTAL
+    );
+
     public static SykefraværsstatistikkVirksomhetUtenVarighet byggSykefraværsstatistikkVirksomhet(
             VirksomhetMetadata virksomhetMetadata
     ) {
@@ -195,6 +223,17 @@ public class EksporteringServiceTestUtils {
                 156,
                 new BigDecimal(3678),
                 new BigDecimal(188000)
+        );
+    }
+
+    public static SykefraværsstatistikkNæring byggSykefraværStatistikkNæring(VirksomhetMetadata virksomhetMetadata, ÅrstallOgKvartal statistikkÅrstallOgKvartal) {
+        return new SykefraværsstatistikkNæring(
+                statistikkÅrstallOgKvartal.getÅrstall(),
+                statistikkÅrstallOgKvartal.getKvartal(),
+                virksomhetMetadata.getNæring(),
+                156,
+              new BigDecimal(3678),
+              new BigDecimal(188000)
         );
     }
 

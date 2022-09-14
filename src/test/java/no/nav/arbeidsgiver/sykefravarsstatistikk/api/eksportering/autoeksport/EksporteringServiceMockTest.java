@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
@@ -39,6 +40,8 @@ public class EksporteringServiceMockTest {
     private SykefraværRepository sykefraværsRepository;
     @Mock
     private KafkaService kafkaService;
+    @Mock
+    private BransjeEllerNæringService bransjeEllerNæringService;
 
     private EksporteringService service;
 
@@ -55,7 +58,7 @@ public class EksporteringServiceMockTest {
     @Captor
     ArgumentCaptor<SykefraværMedKategori> landSykefraværArgumentCaptor;
     @Captor
-    ArgumentCaptor<List<StatistikkDto>> statistikkDtoListLandArgumentCaptor; // TODO MÅ endres to be generelt
+    ArgumentCaptor<List<StatistikkDto>> statistikkDtoListArgumentCaptor;
 
     @BeforeEach
     public void setUp() {
@@ -65,8 +68,8 @@ public class EksporteringServiceMockTest {
                 sykefraværsstatistikkTilEksporteringRepository,
               sykefraværsRepository,
                 kafkaService,
-                true
-        );
+                true,
+              bransjeEllerNæringService);
     }
 
     @Test
@@ -238,7 +241,7 @@ public class EksporteringServiceMockTest {
                 næringSykefraværArgumentCaptor.capture(),
                 sektorSykefraværArgumentCaptor.capture(),
                 landSykefraværArgumentCaptor.capture(),
-                statistikkDtoListLandArgumentCaptor.capture()
+                statistikkDtoListArgumentCaptor.capture()
         );
         assertThat(årstallOgKvartalArgumentCaptor.getValue()).isEqualTo(__2020_2);
         assertEqualsVirksomhetSykefravær(virksomhetSykefravær, virksomhetSykefraværArgumentCaptor.getValue());
@@ -253,7 +256,7 @@ public class EksporteringServiceMockTest {
         assertEqualsSykefraværMedKategori(
               statistikkDtoList(
                     SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)).get(0),
-                    statistikkDtoListLandArgumentCaptor.getValue().get(0)
+                    statistikkDtoListArgumentCaptor.getValue().get(0)
         );
         assertThat(antallEksporterte).isEqualTo(1);
     }

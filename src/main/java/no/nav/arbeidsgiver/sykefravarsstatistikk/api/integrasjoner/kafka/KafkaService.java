@@ -60,7 +60,7 @@ public class KafkaService {
           SykefraværMedKategori næringSykefravær,
           SykefraværMedKategori sektorSykefravær,
           SykefraværMedKategori landSykefravær,
-          List<StatistikkDto> landSykefraværSiste4Kvartaler // TODO endre til generellstatistikkDTO Eller Liste av statistikkDTO
+          List<StatistikkDto> landSykefraværSiste4Kvartaler
           // TODO: Legge til prosent her???
     ) {
         // TODO bytt til Prometheus

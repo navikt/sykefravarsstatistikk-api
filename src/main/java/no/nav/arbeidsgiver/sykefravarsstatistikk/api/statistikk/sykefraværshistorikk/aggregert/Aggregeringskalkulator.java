@@ -25,7 +25,7 @@ public class Aggregeringskalkulator {
     }
 
 
-    Either<StatistikkException, StatistikkDto> fraværsprosentBransjeEllerNæring(
+    public Either<StatistikkException, StatistikkDto> fraværsprosentBransjeEllerNæring(
             BransjeEllerNæring bransjeEllerNæring) {
         return summerOppSisteFireKvartaler(
                 sykefraværsdata.filtrerPåKategori(bransjeEllerNæring.getStatistikkategori()))

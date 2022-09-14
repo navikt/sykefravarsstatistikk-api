@@ -103,6 +103,7 @@ public class SykefraværsstatistikkTilEksporteringRepository {
         }
     }
 
+    @Deprecated
     public List<SykefraværsstatistikkNæring5Siffer> hentSykefraværprosentAlleNæringer5Siffer(
             ÅrstallOgKvartal årstallOgKvartal) {
         try {
@@ -110,6 +111,26 @@ public class SykefraværsstatistikkTilEksporteringRepository {
                     "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk " +
                             "from sykefravar_statistikk_naring5siffer " +
                             "where arstall = :arstall and kvartal = :kvartal order by arstall, kvartal, naring_kode",
+                    new MapSqlParameterSource()
+                            .addValue("arstall", årstallOgKvartal.getÅrstall())
+                            .addValue("kvartal", årstallOgKvartal.getKvartal()),
+                    (rs, rowNum) -> mapTilSykefraværsstatistikkNæring5Siffer(rs)
+            );
+        } catch (EmptyResultDataAccessException e) {
+            return Collections.emptyList();
+        }
+    }
+    public List<SykefraværsstatistikkNæring5Siffer> hentSykefraværprosentAlleNæringer5SifferSiste4Kvartaler(
+            ÅrstallOgKvartal årstallOgKvartal) {
+        try {
+            return namedParameterJdbcTemplate.query(
+                    "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk " +
+                            "from sykefravar_statistikk_naring5siffer " +
+                          " where " +
+                          " (arstall = :arstall and kvartal >= :kvartal) " +
+                          "  or " +
+                          " (arstall > :arstall) " +
+                          "order by (arstall, kvartal) desc, naring_kode",
                     new MapSqlParameterSource()
                             .addValue("arstall", årstallOgKvartal.getÅrstall())
                             .addValue("kvartal", årstallOgKvartal.getKvartal()),
