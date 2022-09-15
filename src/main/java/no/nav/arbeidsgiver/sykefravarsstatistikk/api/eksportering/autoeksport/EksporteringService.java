@@ -35,6 +35,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.CollectionUtils.concat;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
 
 @Slf4j
@@ -154,10 +155,6 @@ public class EksporteringService {
               mapToSykefraværsstatistikkLand(
                     hentSistePubliserteKvartal(umaskertSykefraværsstatistikkSiste4KvartalerLand))
         );
-        /*SykefraværMedKategori landSykefravær = getSykefraværMedKategoriForLand(
-                årstallOgKvartal,
-                sykefraværsstatistikkLand
-        );*/
 
         Map<String, VirksomhetMetadata> virksomhetMetadataMap = getVirksomhetMetadataHashMap(virksomhetMetadataListe);
 
@@ -279,15 +276,16 @@ public class EksporteringService {
                                   sykefraværsstatistikkSektor
                             ),
                             landSykefravær,
-                           Stream.concat( EitherUtils.filterRights(statistikkDtoLand).stream(),
-                            getSykefraværMedKategoriForBransjeEllerNæringSiste4Kvartaler(
-                                  virksomhetMetadata,
-                                  sykefraværsstatistikkNæring,
-                                  sykefraværsstatistikkNæring5Siffer,
-                                  årstallOgKvartal.minusKvartaler(3),
-                                  bransjeEllerNæring
-
-                            ).stream()).collect(Collectors.toList())
+                            concat(
+                                  EitherUtils.filterRights(statistikkDtoLand),
+                                  getSykefraværMedKategoriForBransjeEllerNæringSiste4Kvartaler(
+                                        virksomhetMetadata,
+                                        sykefraværsstatistikkNæring,
+                                        sykefraværsstatistikkNæring5Siffer,
+                                        årstallOgKvartal.minusKvartaler(3),
+                                        bransjeEllerNæring
+                                  )
+                            )
                       );
 
                       long stopUtsendingProcess = System.nanoTime();

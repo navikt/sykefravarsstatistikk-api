@@ -401,27 +401,30 @@ public class EksporteringServiceTest {
         ).size()).isEqualTo(0);
     }
 
-    // TODO fikse de tester
     @Test
-    public void getSykefraværMedKategoriForBransjeSiste4Kvartaler__skalHenteNæringForSistePubliserteKvartal(){
+    public void getSykefraværMedKategoriForBransjeSiste4Kvartaler__skalHenteBransjeForSistePubliserteKvartal(){
         assertThat(EksporteringService.getSykefraværMedKategoriForBransjeEllerNæringSiste4Kvartaler(
-              virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, List.of(byggSykefraværStatistikkNæring(
+              virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,
+              List.of(byggSykefraværStatistikkNæring(
                     virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL
-              )), List.of(
-                    byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, "11000")
+              )),
+              List.of(
+                    byggSykefraværStatistikkNæring5Siffer(virksomhet1_TilHørerBransjeMetadata__SISTE_PUBLISERTE_KVARTAL, "86102")
               ),
-              SISTE_PUBLISERTE_KVARTAL, new BransjeEllerNæring(new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS,"Sykehus", "86101","86102","86104"))
+              SISTE_PUBLISERTE_KVARTAL,
+              new BransjeEllerNæring(new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS,"Sykehus", "86101","86102","86104"))
         ).get(0)).isEqualTo(StatistikkDto.builder()
-              .statistikkategori(Statistikkategori.NÆRING)
-              .label("Industri")
-              .verdi("2.0")
-              .antallPersonerIBeregningen(156)
+              .statistikkategori(Statistikkategori.BRANSJE)
+              .label("Sykehus")
+              .verdi("1.0")
+              .antallPersonerIBeregningen(100)
               .kvartalerIBeregningen(List.of(SISTE_PUBLISERTE_KVARTAL)
               ).build());
     }
 
+    // TODO fikse de tester
     @Test
-    public void getSykefraværMedKategoriForBransjeSiste4Kvartaler__skalHenteNæringFor4SisteKvartaler(){
+    public void getSykefraværMedKategoriForBransjeSiste4Kvartaler__skalHenteBransjeFor4SisteKvartaler(){
         assertThat(EksporteringService.getSykefraværMedKategoriForBransjeEllerNæringSiste4Kvartaler(
               virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,
               List.of(
@@ -432,14 +435,22 @@ public class EksporteringServiceTest {
                     byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,SISTE_PUBLISERTE_KVARTAL.minusEttÅr())
               ),
               List.of(
-                    byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, "11000")
+                    byggSykefraværStatistikkNæring5Siffer(virksomhet1_TilHørerBransjeMetadata__SISTE_PUBLISERTE_KVARTAL, "86104"),
+                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), "86104"),
+                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), "86106"),
+                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2), "86104"),
+                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2), "86106"),
+                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3), "86106"),
+                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL.minusEttÅr(), "86104"),
+                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL.minusEttÅr(), "86106")
               ),
-              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3), new BransjeEllerNæring(new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS,"11", "Industri"))
+              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3),
+              new BransjeEllerNæring(new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS,"Sykehus", "86101","86102","86104","86106"))
         ).get(0)).isEqualTo(StatistikkDto.builder()
-              .statistikkategori(Statistikkategori.NÆRING)
-              .label("Industri")
-              .verdi("2.0")
-              .antallPersonerIBeregningen(624)
+              .statistikkategori(Statistikkategori.BRANSJE)
+              .label("Sykehus")
+              .verdi("2.3")
+              .antallPersonerIBeregningen(1100)
               .kvartalerIBeregningen(
                     List.of(
                           SISTE_PUBLISERTE_KVARTAL,
@@ -451,28 +462,28 @@ public class EksporteringServiceTest {
     }
 
     @Test
-    public void getSykefraværMedKategoriForBransjeSiste4Kvartaler__skalHenteNæringForKunRiktigeKvartaler(){
+    public void getSykefraværMedKategoriForBransjeSiste4Kvartaler__skalHenteBransjeForKunRiktigeKvartaler(){
         assertThat(EksporteringService.getSykefraværMedKategoriForBransjeEllerNæringSiste4Kvartaler(
               virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,
               List.of(
-                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL),
-                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,SISTE_PUBLISERTE_KVARTAL.plussKvartaler(1)),
-                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)),
-                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,SISTE_PUBLISERTE_KVARTAL.minusEttÅr())
+                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL)
               ),
               List.of(
-                    byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, "11000")
+                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL.minusEttÅr(), "86101"),
+                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3), "86101"),
+                    byggSykefraværStatistikkNæring5Siffer(virksomhet1_TilHørerBransjeMetadata__SISTE_PUBLISERTE_KVARTAL, "86101")
               ),
-              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3), new BransjeEllerNæring(new Næring("11", "Industri"))
+              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3),
+              new BransjeEllerNæring(new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS,"Sykehus", "86101","86102","86104","86106"))
         ).get(0)).isEqualTo(StatistikkDto.builder()
-              .statistikkategori(Statistikkategori.NÆRING)
-              .label("Industri")
-              .verdi("2.0")
-              .antallPersonerIBeregningen(312)
+              .statistikkategori(Statistikkategori.BRANSJE)
+              .label("Sykehus")
+              .verdi("1.6")
+              .antallPersonerIBeregningen(300)
               .kvartalerIBeregningen(
                     List.of(
-                          SISTE_PUBLISERTE_KVARTAL,
-                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)
+                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3),
+                          SISTE_PUBLISERTE_KVARTAL
                     )
               ).build());
     }

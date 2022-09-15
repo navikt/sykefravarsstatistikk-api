@@ -86,7 +86,21 @@ public class EksporteringServiceTestUtils {
                           årstallOgKvartal.plussKvartaler(3)
                     )
               )
-              .build());
+              .build(),
+              StatistikkDto.builder()
+                    .statistikkategori(Statistikkategori.BRANSJE)
+                    .label("Sykehus")
+                    .verdi("2.3")
+                    .antallPersonerIBeregningen(1100)
+                    .kvartalerIBeregningen(
+                          List.of(
+                                SISTE_PUBLISERTE_KVARTAL,
+                                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2),
+                                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)
+                          )
+                    ).build()
+        );
     }
 
     public static VirksomhetMetadata virksomhet1Metadata_2020_4 = new VirksomhetMetadata(
@@ -246,6 +260,18 @@ public class EksporteringServiceTestUtils {
                 100,
                 new BigDecimal(250),
                 new BigDecimal(25000)
+        );
+    }
+
+    public static SykefraværsstatistikkNæring5Siffer byggSykefraværStatistikkNæring5Siffer(ÅrstallOgKvartal statistikkÅrstallOgKvartal,
+                                                                                           String næringskode5Siffer) {
+        return new SykefraværsstatistikkNæring5Siffer(
+              statistikkÅrstallOgKvartal.getÅrstall(),
+              statistikkÅrstallOgKvartal.getKvartal(),
+              næringskode5Siffer,
+              200,
+              new BigDecimal(300),
+              new BigDecimal(10000)
         );
     }
 
