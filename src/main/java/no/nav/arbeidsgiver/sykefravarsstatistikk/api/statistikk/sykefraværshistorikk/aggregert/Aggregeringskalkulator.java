@@ -36,7 +36,7 @@ public class Aggregeringskalkulator {
     }
 
 
-    Either<StatistikkException, StatistikkDto> fraværsprosentVirksomhet(String virksomhetsnavn) {
+    public Either<StatistikkException, StatistikkDto> fraværsprosentVirksomhet(String virksomhetsnavn) {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(VIRKSOMHET))
                 .regnUtProsentOgMapTilDto(VIRKSOMHET, virksomhetsnavn);
     }

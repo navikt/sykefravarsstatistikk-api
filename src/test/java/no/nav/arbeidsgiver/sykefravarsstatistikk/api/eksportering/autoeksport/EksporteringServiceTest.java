@@ -13,11 +13,13 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværssta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.StatistikkDto;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.*;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
@@ -422,7 +424,6 @@ public class EksporteringServiceTest {
               ).build());
     }
 
-    // TODO fikse de tester
     @Test
     public void getSykefraværMedKategoriForBransjeSiste4Kvartaler__skalHenteBransjeFor4SisteKvartaler(){
         assertThat(EksporteringService.getSykefraværMedKategoriForBransjeEllerNæringSiste4Kvartaler(
@@ -488,6 +489,88 @@ public class EksporteringServiceTest {
               ).build());
     }
 
+    @Test
+    public void filterByKvartal_skalIkkeFeile(){
+        assertThat(EksporteringService.filterByKvartal(
+              SISTE_PUBLISERTE_KVARTAL,
+              List.of(byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2020_4)))).isEmpty();
+    }
+
+    @Test
+    public void filterByKvartal_skalReturnereRiktigKvartal(){
+        List<SykefraværsstatistikkVirksomhetUtenVarighet> ønskedeResultat__2021_2 = List.of(byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2021_2));
+        List<SykefraværsstatistikkVirksomhetUtenVarighet> actual__2021_2 = EksporteringService.filterByKvartal(
+              __2021_2,
+              List.of(
+                    byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2020_4),
+                    byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2021_1),
+                    byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2021_2)
+              ));
+        assertThat(actual__2021_2).size().isEqualTo(1);
+        assertThat(actual__2021_2).containsExactlyInAnyOrderElementsOf(
+              ønskedeResultat__2021_2
+        );
+    }
+
+    @Test
+    public void filterByKvartal_skalReturnereAlleVirksomheterForØnskedeKvartal(){
+        List<SykefraværsstatistikkVirksomhetUtenVarighet> ønskedeResultat__2020_4 =
+              List.of(
+                    byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2020_4),
+                    byggSykefraværsstatistikkVirksomhet(virksomhet2Metadata_2020_4)
+              );
+        List<SykefraværsstatistikkVirksomhetUtenVarighet> actual__2020_4 = EksporteringService.filterByKvartal(
+              __2020_4,
+              List.of(
+                    byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2020_4),
+                    byggSykefraværsstatistikkVirksomhet(virksomhet2Metadata_2020_4),
+                    byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2021_1),
+                    byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2021_2)
+              ));
+        assertThat(actual__2020_4).size().isEqualTo(2);
+        assertThat(actual__2020_4).containsExactlyInAnyOrderElementsOf(
+              ønskedeResultat__2020_4
+        );
+    }
+
+
+    @Test
+    public void getSykefraværMedKategoriVirksomhetSiste4Kvartaler__skalIkkeFeileVedManglendeData(){
+        assertThat( EksporteringService.getSykefraværMedKategoriVirksomhetSiste4Kvartaler(
+              virksomhet1Metadata_2020_4,Collections.emptyList(),
+              SISTE_PUBLISERTE_KVARTAL)
+        ).isEmpty();
+    }
+
+    @Test
+    public void getSykefraværMedKategoriVirksomhetSiste4Kvartaler__skalHenteTomtListe(){
+        assertThat(EksporteringService.getSykefraværMedKategoriVirksomhetSiste4Kvartaler(
+              virksomhet1Metadata_2020_4, List.of(byggVirksomhetSykefravær(
+                    virksomhet1Metadata_2020_4
+              )).stream().map(v-> new SykefraværsstatistikkVirksomhetUtenVarighet(
+                    v.getÅrstall(),v.getKvartal(),v.getOrgnr(),v.getAntallPersoner(),v.getMuligeDagsverk(),v.getMuligeDagsverk()
+              )).collect(Collectors.toList()),
+              SISTE_PUBLISERTE_KVARTAL
+        ).size()).isEqualTo(0);
+    }
+// TODO fikse den testen
+    /*@Test
+    public void getSykefraværMedKategoriForBransjeEllerNæringSiste4Kvartaler__skalHenteNæringForSistePubliserteKvartal(){
+        assertThat(EksporteringService.getSykefraværMedKategoriForBransjeEllerNæringSiste4Kvartaler(
+              virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, List.of(byggSykefraværStatistikkNæring(
+                    virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL
+              )), List.of(
+                    byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, "11000")
+              ),
+              SISTE_PUBLISERTE_KVARTAL, new BransjeEllerNæring(new Næring("11", "Industri"))
+        ).get(0)).isEqualTo(StatistikkDto.builder()
+              .statistikkategori(Statistikkategori.NÆRING)
+              .label("Industri")
+              .verdi("2.0")
+              .antallPersonerIBeregningen(156)
+              .kvartalerIBeregningen(List.of(SISTE_PUBLISERTE_KVARTAL)
+              ).build());
+    }*/
 
     private static Map<String, SykefraværsstatistikkVirksomhetUtenVarighet>
     buildMapAvSykefraværsstatistikkPerVirksomhet(

@@ -167,22 +167,58 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     }
 
     @Test
-    void hentSykefraværprosentAlleVirksomheter__skal_hente_alle_virksomheter_for_ett_kvartal() {
-        opprettStatistikkVirksomhetTestData();
+    void  hentSykefraværprosentAlleNæringer5SifferForSiste4Kvartaler__skal_returnere_riktig_data_til_alle_næringer() {
+        opprettStatistikkNæring5SifferTestData();
 
-        List<SykefraværsstatistikkVirksomhetUtenVarighet> resultat =
-                repository.hentSykefraværprosentAlleVirksomheter(new ÅrstallOgKvartal(2019, 2));
+        List<SykefraværsstatistikkNæring5Siffer> resultat =
+                repository.hentSykefraværprosentAlleNæringer5SifferSiste4Kvartaler(new ÅrstallOgKvartal(2019, 2));
+
+        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat, 2019, 2, 10,produksjonAvKlær, 2, 100);
+        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat, 2019, 2, 10, undervisning, 5, 100);
+
+        List<SykefraværsstatistikkNæring5Siffer> resultat_2019_1 =
+                repository.hentSykefraværprosentAlleNæringer5SifferSiste4Kvartaler(new ÅrstallOgKvartal(2019, 1));
 
         assertThat(resultat.size()).isEqualTo(2);
-        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat, 2019, 2, 3, VIRKSOMHET_1, 1, 60);
-        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat, 2019, 2, 4, VIRKSOMHET_2, 9, 100);
+        assertThat(resultat_2019_1.size()).isEqualTo(4);
+        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat_2019_1, 2019, 1, 10, produksjonAvKlær, 3, 100);
+        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat_2019_1, 2019, 1, 10, undervisning, 8, 100);
+        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat_2019_1, 2019, 1, 10, produksjonAvKlær, 3, 100);
+        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat_2019_1, 2019, 1, 10, undervisning, 8, 100);
+    }
+
+    @Test
+    void hentSykefraværprosentAlleVirksomheter__skal_hente_alle_virksomheter_for_ett_eller_flere_kvartaler() {
+        opprettStatistikkVirksomhetTestData();
+
+        List<SykefraværsstatistikkVirksomhetUtenVarighet> resultat_2019_2 =
+                repository.hentSykefraværprosentAlleVirksomheter(new ÅrstallOgKvartal(2019, 2));
+
+        assertThat(resultat_2019_2.size()).isEqualTo(2);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2019_2, 2019, 2, 3, VIRKSOMHET_1, 1, 60);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2019_2, 2019, 2, 4, VIRKSOMHET_2, 9, 100);
 
         List<SykefraværsstatistikkVirksomhetUtenVarighet> resultat_2019_1 =
                 repository.hentSykefraværprosentAlleVirksomheter(new ÅrstallOgKvartal(2019, 1));
 
-        assertThat(resultat_2019_1.size()).isEqualTo(2);
+        assertThat(resultat_2019_1.size()).isEqualTo(4);
         assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2019_1, 2019, 1, 40, VIRKSOMHET_1, 20, 115);
         assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2019_1, 2019, 1, 7, VIRKSOMHET_2, 12, 100);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2019_1, 2019, 2, 3, VIRKSOMHET_1, 1, 60);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2019_1, 2019, 2, 4, VIRKSOMHET_2, 9, 100);
+
+        List<SykefraværsstatistikkVirksomhetUtenVarighet> resultat_2018_3 =
+                repository.hentSykefraværprosentAlleVirksomheter(new ÅrstallOgKvartal(2018, 3));
+
+        assertThat(resultat_2018_3.size()).isEqualTo(8);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3, 2018, 4, 40, VIRKSOMHET_1, 20, 115);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3, 2018, 4, 7, VIRKSOMHET_2, 12, 100);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3, 2018, 3, 3, VIRKSOMHET_1, 1, 60);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3, 2018, 3, 4, VIRKSOMHET_2, 9, 100);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3, 2019, 1, 40, VIRKSOMHET_1, 20, 115);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3, 2019, 1, 7, VIRKSOMHET_2, 12, 100);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3, 2019, 2, 3, VIRKSOMHET_1, 1, 60);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3, 2019, 2, 4, VIRKSOMHET_2, 9, 100);
     }
 
 
@@ -238,9 +274,14 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
             int tapteDagsverk,
             int muligeDagsverk
     ) {
-        List<SykefraværsstatistikkVirksomhetUtenVarighet> statistikkForVirksomhet = actual.stream()
-                .filter(sfVirksomhet ->
-                        sfVirksomhet.getOrgnr().equals(orgnr)).collect(Collectors.toList());
+        List<SykefraværsstatistikkVirksomhetUtenVarighet> statistikkForVirksomhet =
+              actual
+                    .stream()
+                    .filter(sfVirksomhet ->
+                          sfVirksomhet.getOrgnr().equals(orgnr) &&
+                                sfVirksomhet.getÅrstall() == årstall &&
+                                sfVirksomhet.getKvartal() == kvartal
+                    ).collect(Collectors.toList());
         assertThat(statistikkForVirksomhet.size()).isEqualTo(1);
         assertSykefraværsstatistikkIsEqual(
                 statistikkForVirksomhet.get(0),
@@ -284,9 +325,13 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
             int tapteDagsverk,
             int muligeDagsverk
     ) {
-        List<SykefraværsstatistikkNæring5Siffer> statistikkForNæring5Siffer = actual.stream()
-                .filter(sfNæring ->
-                        sfNæring.getNæringkode5siffer().equals(næringskode5Siffer.getKode())).collect(Collectors.toList());
+        List<SykefraværsstatistikkNæring5Siffer> statistikkForNæring5Siffer =
+              actual
+                    .stream()
+                    .filter(sfNæring ->
+                    sfNæring.getNæringkode5siffer().equals(næringskode5Siffer.getKode()) &&
+                          sfNæring.getÅrstall() == årstall && sfNæring.getKvartal() == kvartal)
+                    .collect(Collectors.toList());
         assertThat(statistikkForNæring5Siffer.size()).isEqualTo(1);
         assertSykefraværsstatistikkIsEqual(
                 statistikkForNæring5Siffer.get(0),
@@ -327,6 +372,12 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     }
 
     private void opprettStatistikkVirksomhetTestData() {
+        createStatistikkVirksomhet(VIRKSOMHET_1, 2018, 2, 3, 1, 60);
+        createStatistikkVirksomhet(VIRKSOMHET_2, 2018, 2, 4, 9, 100);
+        createStatistikkVirksomhet(VIRKSOMHET_1, 2018, 3, 3, 1, 60);
+        createStatistikkVirksomhet(VIRKSOMHET_1, 2018, 4, 40, 20, 115);
+        createStatistikkVirksomhet(VIRKSOMHET_2, 2018, 3, 4, 9, 100);
+        createStatistikkVirksomhet(VIRKSOMHET_2, 2018, 4, 7, 12, 100);
         createStatistikkVirksomhet(VIRKSOMHET_1, 2019, 2, 3, 1, 60);
         createStatistikkVirksomhet(VIRKSOMHET_1, 2019, 1, 40, 20, 115);
         createStatistikkVirksomhet(VIRKSOMHET_2, 2019, 2, 4, 9, 100);

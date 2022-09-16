@@ -142,7 +142,7 @@ public class SykefraværsstatistikkTilEksporteringRepository {
     }
 
     public List<SykefraværsstatistikkVirksomhetUtenVarighet> hentSykefraværprosentAlleVirksomheter(
-            ÅrstallOgKvartal årstallOgKvartal) {
+            ÅrstallOgKvartal fraÅrstallOgKvartal) {
         try {
             return namedParameterJdbcTemplate.query(
                     "select arstall, kvartal, orgnr, " +
@@ -150,11 +150,14 @@ public class SykefraværsstatistikkTilEksporteringRepository {
                             "sum(mulige_dagsverk) as mulige_dagsverk, " +
                             "sum(antall_personer) as antall_personer " +
                             "from sykefravar_statistikk_virksomhet " +
-                            "where arstall = :arstall and kvartal = :kvartal " +
-                            "group by arstall, kvartal, orgnr",
+                          " where " +
+                          " (arstall = :arstall and kvartal >= :kvartal) " +
+                          "  or " +
+                          " (arstall > :arstall) " +
+                          "group by arstall, kvartal, orgnr",
                     new MapSqlParameterSource()
-                            .addValue("arstall", årstallOgKvartal.getÅrstall())
-                            .addValue("kvartal", årstallOgKvartal.getKvartal()),
+                            .addValue("arstall", fraÅrstallOgKvartal.getÅrstall())
+                            .addValue("kvartal", fraÅrstallOgKvartal.getKvartal()),
                     (rs, rowNum) -> mapTilSykefraværsstatistikkVirksomhet(rs)
             );
         } catch (EmptyResultDataAccessException e) {

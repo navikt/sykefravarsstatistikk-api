@@ -26,10 +26,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.KafkaException;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -136,7 +133,6 @@ public class EksporteringService {
         // Sektor trenger IKKE noe endring nå
         List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor =
               sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(årstallOgKvartal);
-        // TODO her skal vi endre til å bruke den nye uthenting
         List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring =
               sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringerSiste4Kvartaler(årstallOgKvartal.minusKvartaler(3));
 
@@ -145,11 +141,9 @@ public class EksporteringService {
                     årstallOgKvartal
               );
         List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet =
-              sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(årstallOgKvartal);
+              sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(årstallOgKvartal.minusKvartaler(3));
 
-        Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighetMap =
-              toMap(sykefraværsstatistikkVirksomhetUtenVarighet);
-
+        
         SykefraværMedKategori landSykefravær = getSykefraværMedKategoriForLand(
               årstallOgKvartal,
               mapToSykefraværsstatistikkLand(
@@ -177,7 +171,7 @@ public class EksporteringService {
                         sykefraværsstatistikkSektor,
                         sykefraværsstatistikkNæring,
                         sykefraværsstatistikkNæring5Siffer,
-                        sykefraværsstatistikkVirksomhetUtenVarighetMap,
+                        sykefraværsstatistikkVirksomhetUtenVarighet,
                         landSykefravær,
                         aggregeringskalkulatorLand.fraværsprosentNorge(),
                         antallEksportert,
@@ -202,6 +196,15 @@ public class EksporteringService {
         );
 
         return antallEksportert.get();
+    }
+
+    @NotNull
+    protected static List<SykefraværsstatistikkVirksomhetUtenVarighet> filterByKvartal(ÅrstallOgKvartal årstallOgKvartal, List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet) {
+        return sykefraværsstatistikkVirksomhetUtenVarighet.stream().filter(
+              sfVirksomhet ->
+                    sfVirksomhet.getÅrstall() == årstallOgKvartal.getÅrstall() &&
+                          sfVirksomhet.getKvartal() == årstallOgKvartal.getKvartal()
+        ).collect(Collectors.toList());
     }
 
     private UmaskertSykefraværForEttKvartal hentSistePubliserteKvartal(
@@ -238,7 +241,7 @@ public class EksporteringService {
           List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor,
           List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring,
           List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer,
-          Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet,
+          List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet,
           SykefraværMedKategori landSykefravær,
           Either<StatistikkException, StatistikkDto> statistikkDtoLand,
           AtomicInteger antallEksportert,
@@ -247,6 +250,9 @@ public class EksporteringService {
         AtomicInteger antallSentTilEksport = new AtomicInteger();
         AtomicInteger antallVirksomheterLagretSomEksportertIDb = new AtomicInteger();
         List<String> eksporterteVirksomheterListe = new ArrayList<>();
+        Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetForEttKvartalUtenVarighetMap =
+              toMap(filterByKvartal(årstallOgKvartal, sykefraværsstatistikkVirksomhetUtenVarighet));
+
         // TODO har starter utregning og utsending
         //  har bør vi endre til å bruke Kalkurer for utregning av prosent.
         //  husk å TA MED KvartalerIBeregningen, siden her har vi endret til at de er med.
@@ -261,7 +267,7 @@ public class EksporteringService {
                             årstallOgKvartal,
                             getVirksomhetSykefravær(
                                   virksomhetMetadata,
-                                  sykefraværsstatistikkVirksomhetUtenVarighet
+                                  sykefraværsstatistikkVirksomhetForEttKvartalUtenVarighetMap
                             ),
                             getSykefraværMedKategoriForNæring5Siffer(
                                   virksomhetMetadata,
@@ -284,6 +290,11 @@ public class EksporteringService {
                                         sykefraværsstatistikkNæring5Siffer,
                                         årstallOgKvartal.minusKvartaler(3),
                                         bransjeEllerNæring
+                                  ),
+                                  getSykefraværMedKategoriVirksomhetSiste4Kvartaler(
+                                        virksomhetMetadata,
+                                        sykefraværsstatistikkVirksomhetUtenVarighet,
+                                        årstallOgKvartal.minusKvartaler(3)
                                   )
                             )
                       );
@@ -561,56 +572,18 @@ public class EksporteringService {
                   = sykefraværsstatistikkNæring5Siffer.stream().filter(
                         br -> bransjeEllerNæring.getBransje().getKoderSomSpesifisererNæringer()
                               .contains(br.getNæringkode5siffer())
-                              && (
-                              (br.getÅrstall() > fraÅrstallOgKvartal.getÅrstall())
-                                    ||
-                                    (
-                                          br.getÅrstall() == fraÅrstallOgKvartal.getÅrstall()
-                                                && br.getKvartal() >= fraÅrstallOgKvartal.getKvartal()
-                                    )
-                        )
+                              && erIKvartalerIberegningen(fraÅrstallOgKvartal, br)
                   ).map(EksporteringService::mapTilUmaskertSykefraværForEttKvartal)
                   .collect(Collectors.toList());
             aggregeringskalkulator = new Aggregeringskalkulator(
                   new Sykefraværsdata(Map.of(Statistikkategori.BRANSJE, sykefraværsstatistikkBransje))
             );
-            // TODO hente og returnere statistikkDTO for bransje
-        } else { // TODO sjekk om det er riktig henting for næring/næringer
-        /*SykefraværsstatistikkNæring sfNæring =
-              sykefraværsstatistikkNæring.stream().filter(
-                    v -> v.getNæringkode().equals(virksomhetMetadata.getNæring())
-                          && v.getÅrstall() == virksomhetMetadata.getÅrstall()
-                          && v.getKvartal() == virksomhetMetadata.getKvartal()
-                          && (
-                                (v.getÅrstall() > fraÅrstallOgKvartal.getÅrstall())
-                                      ||
-                                      (
-                                            v.getÅrstall() == fraÅrstallOgKvartal.getÅrstall()
-                                            && v.getKvartal() >= fraÅrstallOgKvartal.getKvartal()
-                                      )
-                    )
-              ).collect(toSingleton(
-                    new SykefraværsstatistikkNæring(
-                          virksomhetMetadata.getÅrstall(),
-                          virksomhetMetadata.getKvartal(),
-                          virksomhetMetadata.getNæring(),
-                          0,
-                          null,
-                          null
-                    )
-              ));
-*/
+
+        } else {
             List<UmaskertSykefraværForEttKvartal> umaskertSykefraværForEttKvartaler =
                   sykefraværsstatistikkNæring.stream().filter(
                         v -> v.getNæringkode().equals(virksomhetMetadata.getNæring())
-                              && (
-                              (v.getÅrstall() > fraÅrstallOgKvartal.getÅrstall())
-                                    ||
-                                    (
-                                          v.getÅrstall() == fraÅrstallOgKvartal.getÅrstall()
-                                                && v.getKvartal() >= fraÅrstallOgKvartal.getKvartal()
-                                    )
-                        )
+                              && erIKvartalerIberegningen(fraÅrstallOgKvartal, v)
                   ).map(
                         EksporteringService::mapTilUmaskertSykefraværForEttKvartal
                   ).collect(Collectors.toList());
@@ -654,6 +627,25 @@ public class EksporteringService {
         return resultatList;
     }
 
+    protected static List<StatistikkDto> getSykefraværMedKategoriVirksomhetSiste4Kvartaler(
+          VirksomhetMetadata virksomhetMetadata,
+          List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet,
+          ÅrstallOgKvartal fraÅrstallOgKvartal
+    ) {
+        List<UmaskertSykefraværForEttKvartal> umaskertSykefraværForEttKvartal
+              = sykefraværsstatistikkVirksomhetUtenVarighet.stream().filter(
+                    u -> Objects.equals(u.getOrgnr(), virksomhetMetadata.getOrgnr()) &&
+                          erIKvartalerIberegningen(fraÅrstallOgKvartal, u)
+              ).map(EksporteringService::mapTilUmaskertSykefraværForEttKvartal)
+              .collect(Collectors.toList());
+        Aggregeringskalkulator aggregeringskalkulatorVirksomhet
+              = new Aggregeringskalkulator(
+              new Sykefraværsdata(Map.of(Statistikkategori.VIRKSOMHET, umaskertSykefraværForEttKvartal)));
+        return EitherUtils.filterRights(
+              aggregeringskalkulatorVirksomhet.fraværsprosentVirksomhet(virksomhetMetadata.getNavn())
+        );
+    }
+
     @NotNull
     protected static List<SykefraværsstatistikkNæring5Siffer> getSykefraværsstatistikkNæring5Siffers(
           VirksomhetMetadata virksomhetMetadata,
@@ -668,6 +660,15 @@ public class EksporteringService {
               )
               .collect(Collectors.toList());
         return filteredList;
+    }
+
+    private static boolean erIKvartalerIberegningen(ÅrstallOgKvartal fraÅrstallOgKvartal, Sykefraværsstatistikk v) {
+        return (v.getÅrstall() > fraÅrstallOgKvartal.getÅrstall())
+              ||
+              (
+                    v.getÅrstall() == fraÅrstallOgKvartal.getÅrstall()
+                          && v.getKvartal() >= fraÅrstallOgKvartal.getKvartal()
+              );
     }
 
     private static <T> Collector<T, ?, T> toSingleton(T emptySykefraværsstatistikk) {
@@ -692,6 +693,15 @@ public class EksporteringService {
     }
 
     private static UmaskertSykefraværForEttKvartal mapTilUmaskertSykefraværForEttKvartal(SykefraværsstatistikkNæring5Siffer sfsNæring) {
+        return new UmaskertSykefraværForEttKvartal(
+              new ÅrstallOgKvartal(sfsNæring.getÅrstall(), sfsNæring.getKvartal()),
+              sfsNæring.getTapteDagsverk(),
+              sfsNæring.getMuligeDagsverk(),
+              sfsNæring.getAntallPersoner()
+        );
+    }
+
+    private static UmaskertSykefraværForEttKvartal mapTilUmaskertSykefraværForEttKvartal(SykefraværsstatistikkVirksomhetUtenVarighet sfsNæring) {
         return new UmaskertSykefraværForEttKvartal(
               new ÅrstallOgKvartal(sfsNæring.getÅrstall(), sfsNæring.getKvartal()),
               sfsNæring.getTapteDagsverk(),
