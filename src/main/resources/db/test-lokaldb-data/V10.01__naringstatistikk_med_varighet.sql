@@ -70,10 +70,4 @@ insert into sykefravar_statistikk_naring_med_varighet (naring_kode, varighet, ar
 insert into sykefravar_statistikk_naring_med_varighet (naring_kode, varighet, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values ('10', 'F', 2022, 1, 10, 55.445251, 0);
 insert into sykefravar_statistikk_naring_med_varighet (naring_kode, varighet, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values ('10', 'X', 2022, 1, 10, 0, 999.123456);
 
-insert into sykefravar_statistikk_naring_med_varighet (naring_kode, varighet, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values ('10', 'A', 2022, 1, 10, 33.18843, 0);
-insert into sykefravar_statistikk_naring_med_varighet (naring_kode, varighet, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values ('10', 'C', 2022, 1, 10, 65.39951, 0);
-insert into sykefravar_statistikk_naring_med_varighet (naring_kode, varighet, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values ('10', 'D', 2022, 1, 10, 15.456451, 0);
-insert into sykefravar_statistikk_naring_med_varighet (naring_kode, varighet, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values ('10', 'E', 2022, 1, 10, 1.544551, 0);
-insert into sykefravar_statistikk_naring_med_varighet (naring_kode, varighet, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values ('10', 'F', 2022, 1, 10, 55.445251, 0);
-insert into sykefravar_statistikk_naring_med_varighet (naring_kode, varighet, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values ('10', 'X', 2022, 1, 10, 0, 999.123456);
 commit

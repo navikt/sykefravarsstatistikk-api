@@ -73,14 +73,15 @@ public class PubliseringsdatoerRepository {
 
 
   public void oppdaterSisteImporttidspunkt(ÅrstallOgKvartal årstallOgKvartal) {
-    jdbcTemplate.update(
+    log.info("Oppdaterert tidspunkt for import av sykefraværstatistikk for " + årstallOgKvartal);
+    int updatedRows = jdbcTemplate.update(
         "insert into importtidspunkt (aarstall, kvartal, importert) values "
             + "(:aarstall, :kvartal, :importert)",
         new MapSqlParameterSource()
             .addValue("aarstall", årstallOgKvartal.getÅrstall())
             .addValue("kvartal", årstallOgKvartal.getKvartal())
             .addValue("importert", LocalDateTime.now()));
-    log.info("Oppdaterte tidspunkt for import av sykefraværstatistikk for " + årstallOgKvartal);
+    log.info("Opprettet " + updatedRows + " rader");
   }
 
   public Option<ImporttidspunktDto> hentSisteImporttidspunkt() {

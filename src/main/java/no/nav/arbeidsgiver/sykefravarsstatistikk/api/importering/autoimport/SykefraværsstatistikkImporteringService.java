@@ -95,12 +95,12 @@ public class SykefraværsstatistikkImporteringService {
 
 
     protected boolean kanImportStartes(
-          List<ÅrstallOgKvartal> årstallOgKvartalForSykefraværsstatistikk,
+          List<ÅrstallOgKvartal> årstallOgKvartalForSfsDb,
           List<ÅrstallOgKvartal> årstallOgKvartalForDvh
     ) {
 
         boolean allImportertStatistikkHarSammeÅrstallOgKvartal =
-              alleErLike(årstallOgKvartalForSykefraværsstatistikk);
+              alleErLike(årstallOgKvartalForSfsDb);
         boolean allStatistikkFraDvhHarSammeÅrstallOgKvartal = alleErLike(årstallOgKvartalForDvh);
 
         if (!allImportertStatistikkHarSammeÅrstallOgKvartal
@@ -109,17 +109,17 @@ public class SykefraværsstatistikkImporteringService {
                   "Kunne ikke importere ny statistikk, statistikk hadde forskjellige årstall og "
                         + "kvartal. "
                         +
-                        "Har importert statistikk samme årstall og kvartal? {}. " +
-                        "Har statistikk fra Dvh samme årstall og kvartal? {}",
-                  allImportertStatistikkHarSammeÅrstallOgKvartal,
-                  allStatistikkFraDvhHarSammeÅrstallOgKvartal
+                        "Kvartaler Sykefraværsstatistikk-DB: {}. " +
+                        "Kvartaler DVH: {}",
+                  årstallOgKvartalForSfsDb,
+                  årstallOgKvartalForDvh
             );
             return false;
         }
 
         ÅrstallOgKvartal sisteÅrstallOgKvartalForDvh = årstallOgKvartalForDvh.get(0);
         ÅrstallOgKvartal sisteÅrstallOgKvartalForSykefraværsstatistikk =
-              årstallOgKvartalForSykefraværsstatistikk.get(0);
+              årstallOgKvartalForSfsDb.get(0);
 
         boolean importertStatistikkLiggerEttKvartalBakDvh =
               sisteÅrstallOgKvartalForDvh.minusKvartaler(1)

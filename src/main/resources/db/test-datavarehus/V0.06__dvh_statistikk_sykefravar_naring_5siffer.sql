@@ -60,3 +60,17 @@ insert into dt_p.agg_ia_sykefravar_naring_kode
   'F', 'K',
   824.019285, 195301.687778, 438
  );
+insert into dt_p.agg_ia_sykefravar_naring_kode
+(
+    arstall, kvartal,
+    naering_kode,
+    alder, kjonn,
+    taptedv, muligedv, antpers
+)
+values
+    (
+        '2022','2',
+        '01112',
+        'F', 'K',
+        824.019285, 195301.687778, 438
+    );
