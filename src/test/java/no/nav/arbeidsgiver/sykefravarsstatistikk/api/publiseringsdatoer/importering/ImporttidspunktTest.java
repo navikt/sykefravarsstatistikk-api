@@ -40,16 +40,19 @@ public class ImporttidspunktTest extends SpringIntegrationTestbase {
 
   @Test
   public void importerHvisDetFinnesNyStatistikk_oppdatererImporttidspunkt() {
+    // Denne testen er avhengig av at nyeste records i alle statistikktabellene i
+    // Sykefraværsstatistikk-databasen ligger nøyaktig ett kvartal bak den nyeste statistikken i
+    // datavarehuset. Ellers vil ikke importjobben kjøre.
 
-    ImporttidspunktDto gammeltImporttidspunkt = new ImporttidspunktDto(
+    ImporttidspunktDto sisteImporttidspunkt = new ImporttidspunktDto(
         Timestamp.valueOf("2022-06-02 00:00:00"),
         new ÅrstallOgKvartal(2022, 1));
-    TestUtils.skrivImporttidspunktTilDb(jdbcTemplate, gammeltImporttidspunkt);
+    TestUtils.skrivImporttidspunktTilDb(jdbcTemplate, sisteImporttidspunkt);
 
     ImporttidspunktDto sistePubliseringsdatoPreImport =
         publiseringsdatoerRepository.hentSisteImporttidspunkt().get();
 
-    assertThat(sistePubliseringsdatoPreImport).isEqualTo(gammeltImporttidspunkt);
+    assertThat(sistePubliseringsdatoPreImport).isEqualTo(sisteImporttidspunkt);
 
     sykefraværsstatistikkImporteringService.importerHvisDetFinnesNyStatistikk();
 
