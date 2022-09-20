@@ -208,7 +208,8 @@ public class TestUtils {
         jdbcTemplate.update("delete from importtidspunkt", new MapSqlParameterSource());
     }
 
-    public static void skrivImporttidspunkt(NamedParameterJdbcTemplate jdbcTemplate,
+    public static void skrivImporttidspunktTilDb(
+        NamedParameterJdbcTemplate jdbcTemplate,
         ImporttidspunktDto importtidspunkt) {
         jdbcTemplate.update(
             "insert into importtidspunkt (aarstall, kvartal, importert) values "
