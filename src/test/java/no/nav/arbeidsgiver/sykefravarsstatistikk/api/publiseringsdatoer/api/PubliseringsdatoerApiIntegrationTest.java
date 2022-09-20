@@ -30,9 +30,9 @@ public class PubliseringsdatoerApiIntegrationTest extends SpringIntegrationTestb
         ofString());
 
     String forventetRespons = ""
-        + "{\"sistePubliseringsdato\":\"2022-09-08\","
-        + "\"nestePubliseringsdato\":\"2022-12-01\","
-        + "\"gjeldendePeriode\":{\"årstall\":2022,\"kvartal\":2}}";
+        + "{\"sistePubliseringsdato\":\"2022-06-02\","
+        + "\"nestePubliseringsdato\":\"2022-09-08\","
+        + "\"gjeldendePeriode\":{\"årstall\":2022,\"kvartal\":1}}";
 
     assertThat(response.body()).isEqualTo(forventetRespons);
   }
