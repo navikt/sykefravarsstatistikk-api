@@ -45,9 +45,9 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
         return new ÅrstallOgKvartal(this.årstall - 1, this.kvartal);
     }
 
-    public static List<ÅrstallOgKvartal> sisteFireKvartaler() {
+    public static List<ÅrstallOgKvartal> sisteFireKvartaler(ÅrstallOgKvartal årstallOgKvartal) {
         return IntStream.range(0, 4)
-                .mapToObj(SISTE_PUBLISERTE_KVARTAL::minusKvartaler)
+                .mapToObj(årstallOgKvartal::minusKvartaler)
                 .collect(Collectors.toList());
     }
 

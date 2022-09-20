@@ -1,23 +1,32 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
+import io.vavr.control.Either;
+import lombok.AllArgsConstructor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.StatistikkException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.sisteFireKvartaler;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.LAND;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.VIRKSOMHET;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.SumAvSykefraværOverFlereKvartaler.NULLPUNKT;
 
-import io.vavr.control.Either;
-import java.util.List;
-import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.StatistikkException;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
-
 @AllArgsConstructor
 public class Aggregeringskalkulator {
 
+    public Aggregeringskalkulator(
+          Sykefraværsdata sykefraværsdata
+    ) {
+        this.sykefraværsdata = sykefraværsdata;
+    }
     public Sykefraværsdata sykefraværsdata;
+    public ÅrstallOgKvartal årstallOgKvartal=SISTE_PUBLISERTE_KVARTAL;
 
     public Either<StatistikkException, StatistikkDto> fraværsprosentNorge() {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(LAND))
@@ -72,7 +81,7 @@ public class Aggregeringskalkulator {
             return List.of();
         }
         return statistikk.stream()
-                .filter(datapunkt -> sisteFireKvartaler().contains(datapunkt.getÅrstallOgKvartal()))
+                .filter(datapunkt -> sisteFireKvartaler(this.årstallOgKvartal).contains(datapunkt.getÅrstallOgKvartal()))
                 .collect(Collectors.toList());
     }
 }

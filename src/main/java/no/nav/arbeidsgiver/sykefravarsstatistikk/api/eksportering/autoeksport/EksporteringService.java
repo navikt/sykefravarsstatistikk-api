@@ -128,7 +128,7 @@ public class EksporteringService {
         Aggregeringskalkulator aggregeringskalkulatorLand = new Aggregeringskalkulator(
               new Sykefraværsdata(
                     Map.of(Statistikkategori.LAND, umaskertSykefraværsstatistikkSiste4KvartalerLand)
-              )
+              ),årstallOgKvartal
         );
         // Sektor trenger IKKE noe endring nå
         List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor =
@@ -576,7 +576,7 @@ public class EksporteringService {
                   ).map(EksporteringService::mapTilUmaskertSykefraværForEttKvartal)
                   .collect(Collectors.toList());
             aggregeringskalkulator = new Aggregeringskalkulator(
-                  new Sykefraværsdata(Map.of(Statistikkategori.BRANSJE, sykefraværsstatistikkBransje))
+                  new Sykefraværsdata(Map.of(Statistikkategori.BRANSJE, sykefraværsstatistikkBransje)),fraÅrstallOgKvartal.plussKvartaler(3)
             );
 
         } else {
@@ -590,7 +590,7 @@ public class EksporteringService {
             aggregeringskalkulator = new Aggregeringskalkulator(
                   new Sykefraværsdata(
                         Map.of(Statistikkategori.NÆRING, umaskertSykefraværForEttKvartaler)
-                  )
+                  ),fraÅrstallOgKvartal.plussKvartaler(3)
             );
         }
         return EitherUtils.filterRights(aggregeringskalkulator.fraværsprosentBransjeEllerNæring(bransjeEllerNæring));

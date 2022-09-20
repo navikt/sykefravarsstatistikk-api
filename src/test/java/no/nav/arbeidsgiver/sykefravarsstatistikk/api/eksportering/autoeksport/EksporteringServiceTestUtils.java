@@ -13,7 +13,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.StatistikkDto;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils.assertBigDecimalIsEqual;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
@@ -329,6 +332,14 @@ public class EksporteringServiceTestUtils {
         );
     }
 
+    public static List<SykefraværsstatistikkVirksomhetUtenVarighet> byggVirksomhetSykefraværUtenVarighet(
+          VirksomhetMetadata virksomhetMetadata,
+          List<ÅrstallOgKvartal> årstallOgKvartaler) {
+        return årstallOgKvartaler.stream().map(
+              vv-> new SykefraværsstatistikkVirksomhetUtenVarighet(vv.getÅrstall(), vv.getKvartal(), virksomhetMetadata.getOrgnr(), 10, new BigDecimal(15), new BigDecimal(1000)
+              )).collect(Collectors.toList());
+    }
+
     public static SykefraværsstatistikkVirksomhetUtenVarighet sykefraværsstatistikkVirksomhet =
             new SykefraværsstatistikkVirksomhetUtenVarighet(
                     __2020_2.getÅrstall(),
@@ -401,6 +412,20 @@ public class EksporteringServiceTestUtils {
             new BigDecimal(100),
             new BigDecimal(5000)
     );
+
+    public static SykefraværsstatistikkNæring sykefraværsstatistikkNæring(
+          ÅrstallOgKvartal årstallOgKvartal) {
+                    return new SykefraværsstatistikkNæring(
+                          årstallOgKvartal.getÅrstall(),
+                          årstallOgKvartal.getKvartal(),
+                          "11",
+                          150,
+                          new BigDecimal(100),
+                          new BigDecimal(5000)
+
+        );
+    }
+
     public static SykefraværsstatistikkNæring5Siffer sykefraværsstatistikkNæring5Siffer = new SykefraværsstatistikkNæring5Siffer(
             __2020_2.getÅrstall(),
             __2020_2.getKvartal(),
@@ -409,7 +434,12 @@ public class EksporteringServiceTestUtils {
             new BigDecimal(40),
             new BigDecimal(4000)
     );
-
+    public static List<ÅrstallOgKvartal> Siste4PubliserteKvartaler = List.of(
+          SISTE_PUBLISERTE_KVARTAL,
+          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2),
+          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)
+    );
     // Assert methods
     // Assertions
 

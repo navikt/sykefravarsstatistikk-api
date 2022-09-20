@@ -8,18 +8,19 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.CollectionUtils;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.StatistikkDto;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.*;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
@@ -545,32 +546,28 @@ public class EksporteringServiceTest {
     @Test
     public void getSykefraværMedKategoriVirksomhetSiste4Kvartaler__skalHenteTomtListe(){
         assertThat(EksporteringService.getSykefraværMedKategoriVirksomhetSiste4Kvartaler(
-              virksomhet1Metadata_2020_4, List.of(byggVirksomhetSykefravær(
-                    virksomhet1Metadata_2020_4
-              )).stream().map(v-> new SykefraværsstatistikkVirksomhetUtenVarighet(
-                    v.getÅrstall(),v.getKvartal(),v.getOrgnr(),v.getAntallPersoner(),v.getMuligeDagsverk(),v.getMuligeDagsverk()
-              )).collect(Collectors.toList()),
-              SISTE_PUBLISERTE_KVARTAL
+              virksomhet1Metadata_2020_4,
+              byggVirksomhetSykefraværUtenVarighet(virksomhet1Metadata_2020_4,List.of(__2020_4)),
+              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)
         ).size()).isEqualTo(0);
     }
-// TODO fikse den testen
-    /*@Test
-    public void getSykefraværMedKategoriForBransjeEllerNæringSiste4Kvartaler__skalHenteNæringForSistePubliserteKvartal(){
-        assertThat(EksporteringService.getSykefraværMedKategoriForBransjeEllerNæringSiste4Kvartaler(
-              virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, List.of(byggSykefraværStatistikkNæring(
-                    virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL
-              )), List.of(
-                    byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, "11000")
-              ),
-              SISTE_PUBLISERTE_KVARTAL, new BransjeEllerNæring(new Næring("11", "Industri"))
+
+    @Test
+    public void getSykefraværMedKategoriForVirksomhetSiste4Kvartaler__skalHenteVirksomhetForSistePubliserteKvartal(){
+        assertThat(EksporteringService.getSykefraværMedKategoriVirksomhetSiste4Kvartaler(
+              virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,
+              byggVirksomhetSykefraværUtenVarighet(
+                    virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,
+                    Siste4PubliserteKvartaler),
+              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)
         ).get(0)).isEqualTo(StatistikkDto.builder()
-              .statistikkategori(Statistikkategori.NÆRING)
-              .label("Industri")
-              .verdi("2.0")
-              .antallPersonerIBeregningen(156)
-              .kvartalerIBeregningen(List.of(SISTE_PUBLISERTE_KVARTAL)
-              ).build());
-    }*/
+              .statistikkategori(Statistikkategori.VIRKSOMHET)
+              .label("Virksomhet 1")
+              .verdi("1.5")
+              .antallPersonerIBeregningen(40)
+              .kvartalerIBeregningen(Siste4PubliserteKvartaler)
+              .build());
+    }
 
     private static Map<String, SykefraværsstatistikkVirksomhetUtenVarighet>
     buildMapAvSykefraværsstatistikkPerVirksomhet(
