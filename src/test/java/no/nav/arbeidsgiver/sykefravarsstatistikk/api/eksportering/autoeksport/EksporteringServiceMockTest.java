@@ -3,10 +3,14 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.StatistikkDto;
@@ -237,9 +241,14 @@ public class EksporteringServiceMockTest {
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5SifferSiste4Kvartaler(__2020_2))
                 .thenReturn(Arrays.asList(sykefraværsstatistikkNæring5Siffer));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(fraÅrstallOgKvartal))
-                .thenReturn(Arrays.asList(sykefraværsstatistikkVirksomhet));
+                .thenReturn(Arrays.asList(
+                      sykefraværsstatistikkVirksomhet(fraÅrstallOgKvartal),
+                      sykefraværsstatistikkVirksomhet(fraÅrstallOgKvartal.plussKvartaler(1)),
+                      sykefraværsstatistikkVirksomhet(fraÅrstallOgKvartal.plussKvartaler(2)),
+                      sykefraværsstatistikkVirksomhet(fraÅrstallOgKvartal.plussKvartaler(3))
+                ));
         when(sykefraværsRepository.hentUmaskertSykefraværForNorge(any()))
-                .thenReturn(sykefraværsstatistikkLandSiste4Kvartaler(SISTE_PUBLISERTE_KVARTAL));
+                .thenReturn(sykefraværsstatistikkLandSiste4Kvartaler(__2020_2));
         when(bransjeEllerNæringService.finnBransjeFraMetadata(virksomhetMetadata)).thenReturn(
               new BransjeEllerNæring(new Næring("11","Industri"))
         );
@@ -265,11 +274,144 @@ public class EksporteringServiceMockTest {
         assertEqualsSykefraværMedKategori(næringSykefravær, næringSykefraværArgumentCaptor.getValue());
         assertEqualsSykefraværMedKategori(sektorSykefravær, sektorSykefraværArgumentCaptor.getValue());
         assertEqualsSykefraværMedKategori(landSykefravær, landSykefraværArgumentCaptor.getValue());
-        /*assertEqualsSykefraværMedKategori(
-              statistikkDtoList(
-                    SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)).get(0),
-                    statistikkDtoListArgumentCaptor.getValue().get(0)
-        );*/
+        assertEqualsSykefraværMedKategori(
+              List.of(
+                    StatistikkDto.builder()
+                          .statistikkategori(Statistikkategori.LAND)
+                          .label("Norge")
+                          .verdi("1.9")
+                          .antallPersonerIBeregningen(10000000)
+                          .kvartalerIBeregningen(
+                                List.of(
+                                      fraÅrstallOgKvartal.plussKvartaler(3),
+                                      fraÅrstallOgKvartal.plussKvartaler(2),
+                                      fraÅrstallOgKvartal.plussKvartaler(1),
+                                      fraÅrstallOgKvartal
+                                )
+                          )
+                          .build(),
+                    StatistikkDto.builder()
+                          .statistikkategori(Statistikkategori.NÆRING)
+                          .label("Industri")
+                          .verdi("2.0")
+                          .antallPersonerIBeregningen(600)
+                          .kvartalerIBeregningen(
+                                List.of(
+                                      fraÅrstallOgKvartal,
+                                      fraÅrstallOgKvartal.plussKvartaler(1),
+                                      fraÅrstallOgKvartal.plussKvartaler(2),
+                                      fraÅrstallOgKvartal.plussKvartaler(3)
+                                )
+                          )
+                          .build(),
+                    StatistikkDto.builder()
+                          .statistikkategori(Statistikkategori.VIRKSOMHET)
+                          .label("Virksomhet 1")
+                          .verdi("2.0")
+                          .antallPersonerIBeregningen(24)
+                          .kvartalerIBeregningen(
+                                List.of(
+                                      fraÅrstallOgKvartal,
+                                      fraÅrstallOgKvartal.plussKvartaler(1),
+                                      fraÅrstallOgKvartal.plussKvartaler(2),
+                                      fraÅrstallOgKvartal.plussKvartaler(3)
+                                )
+                          )
+                          .build()
+              ),
+              statistikkDtoListArgumentCaptor.getAllValues().get(0)
+        );
+        assertThat(antallEksporterte).isEqualTo(1);
+    }
+
+
+    @Test
+    public void eksporter_sender_riktig_melding_til_kafka_inkluderer_bransje_ved_tilhørighet_bransejprogram() throws Exception {
+        ÅrstallOgKvartal årstallOgKvartal = __2020_2;
+        ÅrstallOgKvartal fraÅrstallOgKvartal = __2020_2.minusKvartaler(3);
+        VirksomhetMetadata virksomhet1_TilHørerBransjeMetadata = virksomhet1_TilHørerBransjeMetadata(årstallOgKvartal);
+        virksomhet1_TilHørerBransjeMetadata.leggTilNæringOgNæringskode5siffer(Arrays.asList(
+              new NæringOgNæringskode5siffer("86", "86101"),
+              new NæringOgNæringskode5siffer("86", "86102")
+        ));
+
+        when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2))
+                .thenReturn(Arrays.asList(virksomhetEksportPerKvartal));
+
+        when(virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal))
+                .thenReturn(Arrays.asList(virksomhet1_TilHørerBransjeMetadata));
+        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(årstallOgKvartal))
+                .thenReturn(Arrays.asList(sykefraværsstatistikkSektor));
+        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringerSiste4Kvartaler(fraÅrstallOgKvartal))
+              .thenReturn(Arrays.asList(
+                    sykefraværsstatistikkNæring(fraÅrstallOgKvartal),
+                    sykefraværsstatistikkNæring(fraÅrstallOgKvartal.plussKvartaler(1)),
+                    sykefraværsstatistikkNæring(fraÅrstallOgKvartal.plussKvartaler(2)),
+                    sykefraværsstatistikkNæring(fraÅrstallOgKvartal.plussKvartaler(3)))
+              );
+        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5SifferSiste4Kvartaler(__2020_2))
+                .thenReturn(
+                      Arrays.asList(
+                            sykefraværsstatistikkNæring5SifferBransjeprogram("86101",årstallOgKvartal),
+                            sykefraværsstatistikkNæring5SifferBransjeprogram("86101",årstallOgKvartal.minusKvartaler(1)),
+                            sykefraværsstatistikkNæring5SifferBransjeprogram("86101",årstallOgKvartal.minusKvartaler(2)),
+                            sykefraværsstatistikkNæring5SifferBransjeprogram("86101",årstallOgKvartal.minusKvartaler(3)),
+                            sykefraværsstatistikkNæring5SifferBransjeprogram("86102",årstallOgKvartal),
+                            sykefraværsstatistikkNæring5SifferBransjeprogram("86102",årstallOgKvartal.minusKvartaler(1)),
+                            sykefraværsstatistikkNæring5SifferBransjeprogram("86102",årstallOgKvartal.minusKvartaler(2)),
+                            sykefraværsstatistikkNæring5SifferBransjeprogram("86102",årstallOgKvartal.minusKvartaler(3))
+                            )
+                );
+        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(fraÅrstallOgKvartal))
+                .thenReturn(Arrays.asList(
+                      sykefraværsstatistikkVirksomhet(fraÅrstallOgKvartal),
+                      sykefraværsstatistikkVirksomhet(fraÅrstallOgKvartal.plussKvartaler(1)),
+                      sykefraværsstatistikkVirksomhet(fraÅrstallOgKvartal.plussKvartaler(2)),
+                      sykefraværsstatistikkVirksomhet(fraÅrstallOgKvartal.plussKvartaler(3))
+                ));
+        when(sykefraværsRepository.hentUmaskertSykefraværForNorge(any()))
+                .thenReturn(sykefraværsstatistikkLandSiste4Kvartaler(årstallOgKvartal));
+        when(bransjeEllerNæringService.finnBransjeFraMetadata(virksomhet1_TilHørerBransjeMetadata)).thenReturn(
+              new BransjeEllerNæring(
+                    new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS,"Sykehus","86101","86102"))
+        );
+
+        int antallEksporterte = service.eksporter(årstallOgKvartal, EksporteringBegrensning.build().utenBegrensning());
+
+        verify(kafkaService).send(
+                årstallOgKvartalArgumentCaptor.capture(),
+                virksomhetSykefraværArgumentCaptor.capture(),
+                næring5SifferSykefraværArgumentCaptor.capture(),
+                næringSykefraværArgumentCaptor.capture(),
+                sektorSykefraværArgumentCaptor.capture(),
+                landSykefraværArgumentCaptor.capture(),
+                statistikkDtoListArgumentCaptor.capture()
+        );
+        assertThat(årstallOgKvartalArgumentCaptor.getValue()).isEqualTo(årstallOgKvartal);
+        assertEqualsVirksomhetSykefravær(virksomhetSykefravær, virksomhetSykefraværArgumentCaptor.getValue());
+        assertThat(næring5SifferSykefraværArgumentCaptor.getValue().size()).isEqualTo(2);
+        assertEqualsSykefraværMedKategori(
+                næring5SifferSykefraværArgumentCaptor.getValue().get(0),
+              næring5SifferSykefraværTilhørerBransje
+        );
+        assertEqualsSykefraværMedKategori(
+                    StatistikkDto.builder()
+                          .statistikkategori(Statistikkategori.BRANSJE)
+                          .label("Sykehus")
+                          .verdi("1.3")
+                          .antallPersonerIBeregningen(8000)
+                          .kvartalerIBeregningen(
+                                List.of(
+                                      fraÅrstallOgKvartal,
+                                      fraÅrstallOgKvartal.plussKvartaler(1),
+                                      fraÅrstallOgKvartal.plussKvartaler(2),
+                                      fraÅrstallOgKvartal.plussKvartaler(3)
+                                )
+                          )
+                          .build(),
+
+              statistikkDtoListArgumentCaptor.getValue().get(1)
+        );
         assertThat(antallEksporterte).isEqualTo(1);
     }
 

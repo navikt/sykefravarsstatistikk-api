@@ -8,7 +8,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.CollectionUtils;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
@@ -19,8 +18,6 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.*;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
@@ -398,7 +395,7 @@ public class EksporteringServiceTest {
               virksomhet1Metadata_2020_4, List.of(byggSykefraværStatistikkNæring(
                     virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL
               )), List.of(
-                    byggSykefraværStatistikkNæring5Siffer(virksomhet1_TilHørerBransjeMetadata__2021_2, "86101")
+                    byggSykefraværStatistikkNæring5Siffer(virksomhet1_TilHørerBransjeMetadata(__2021_2), "86101")
               ),
               SISTE_PUBLISERTE_KVARTAL, new BransjeEllerNæring(new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS,"86101", "86101","86102","86104"))
         ).size()).isEqualTo(0);

@@ -13,8 +13,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.StatistikkDto;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,6 +56,14 @@ public class EksporteringServiceTestUtils {
             new BigDecimal(40),
             new BigDecimal(4000),
             1250
+    );
+    public static SykefraværMedKategori næring5SifferSykefraværTilhørerBransje = new SykefraværMedKategori(
+            Statistikkategori.NÆRING5SIFFER,
+            "86101",
+            __2020_2,
+            new BigDecimal(80),
+            new BigDecimal(6000),
+            1000
     );
     public static SykefraværMedKategori sektorSykefravær = new SykefraværMedKategori(
             Statistikkategori.SEKTOR,
@@ -160,15 +166,16 @@ public class EksporteringServiceTestUtils {
             SISTE_PUBLISERTE_KVARTAL
     );
 
-    public static VirksomhetMetadata virksomhet1_TilHørerBransjeMetadata__2021_2 = new VirksomhetMetadata(
-            ORGNR_VIRKSOMHET_1,
-            "Virksomhet 1",
-            RECTYPE_FOR_VIRKSOMHET,
-            "1",
-            "86",
-            __2021_2
-    );
-
+    public static VirksomhetMetadata virksomhet1_TilHørerBransjeMetadata(ÅrstallOgKvartal årstallOgKvartal) {
+       return new VirksomhetMetadata(
+              ORGNR_VIRKSOMHET_1,
+              "Virksomhet 1",
+              RECTYPE_FOR_VIRKSOMHET,
+              "1",
+              "86",
+              årstallOgKvartal
+        );
+    }
     public static VirksomhetMetadata virksomhet1_TilHørerBransjeMetadata__SISTE_PUBLISERTE_KVARTAL = new VirksomhetMetadata(
             ORGNR_VIRKSOMHET_1,
             "Virksomhet 1",
@@ -340,16 +347,16 @@ public class EksporteringServiceTestUtils {
               )).collect(Collectors.toList());
     }
 
-    public static SykefraværsstatistikkVirksomhetUtenVarighet sykefraværsstatistikkVirksomhet =
-            new SykefraværsstatistikkVirksomhetUtenVarighet(
-                    __2020_2.getÅrstall(),
-                    __2020_2.getKvartal(),
-                    "987654321",
-                    6,
-                    new BigDecimal(10),
-                    new BigDecimal(500)
-            );
-
+    public static SykefraværsstatistikkVirksomhetUtenVarighet sykefraværsstatistikkVirksomhet(ÅrstallOgKvartal årstallOgKvartal) {
+        return new SykefraværsstatistikkVirksomhetUtenVarighet(
+              årstallOgKvartal.getÅrstall(),
+              årstallOgKvartal.getKvartal(),
+              "987654321",
+              6,
+              new BigDecimal(10),
+              new BigDecimal(500)
+        );
+    }
     public static VirksomhetEksportPerKvartal virksomhetEksportPerKvartal = new VirksomhetEksportPerKvartal(
             new Orgnr("987654321"),
             __2020_2,
@@ -434,6 +441,19 @@ public class EksporteringServiceTestUtils {
             new BigDecimal(40),
             new BigDecimal(4000)
     );
+
+    public static SykefraværsstatistikkNæring5Siffer sykefraværsstatistikkNæring5SifferBransjeprogram
+          (String næringskode5Siffer, ÅrstallOgKvartal årstallOgKvartal) {
+        return new SykefraværsstatistikkNæring5Siffer(
+              årstallOgKvartal.getÅrstall(),
+              årstallOgKvartal.getKvartal(),
+              næringskode5Siffer,
+              1000,
+              new BigDecimal(80),
+              new BigDecimal(6000)
+        );
+    }
+
     public static List<ÅrstallOgKvartal> Siste4PubliserteKvartaler = List.of(
           SISTE_PUBLISERTE_KVARTAL,
           SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
@@ -476,10 +496,24 @@ public class EksporteringServiceTestUtils {
         assertBigDecimalIsEqual(actual.getMuligeDagsverk(), expected.getMuligeDagsverk());
         assertBigDecimalIsEqual(actual.getTapteDagsverk(), expected.getTapteDagsverk());
     }
-public static void assertEqualsSykefraværMedKategori(
+    public static void assertEqualsSykefraværMedKategori(
+            List<StatistikkDto> expected,
+            List<StatistikkDto> actual
+    ) {
+        assertThat(actual).containsExactlyInAnyOrderElementsOf(
+              expected
+        );
+        /*assertThat(actual.get().getStatistikkategori()).as("Sjekk Statistikkategori").isEqualTo(expected.getStatistikkategori());
+        assertThat(actual.getLabel()).as("Sjekk label").isEqualTo(expected.getLabel());
+        assertThat(actual.getKvartalerIBeregningen()).as("Sjekk kvartaler i beregningen").containsExactlyInAnyOrderElementsOf(expected.getKvartalerIBeregningen());
+        assertThat(actual.getVerdi()).as("Sjekk verdi").isEqualTo( expected.getVerdi());
+        assertThat(actual.getAntallPersonerIBeregningen()).as("Sjekk antall personer").isEqualTo( expected.getAntallPersonerIBeregningen());*/
+    }
+    public static void assertEqualsSykefraværMedKategori(
             StatistikkDto expected,
             StatistikkDto actual
     ) {
+
         assertThat(actual.getStatistikkategori()).as("Sjekk Statistikkategori").isEqualTo(expected.getStatistikkategori());
         assertThat(actual.getLabel()).as("Sjekk label").isEqualTo(expected.getLabel());
         assertThat(actual.getKvartalerIBeregningen()).as("Sjekk kvartaler i beregningen").containsExactlyInAnyOrderElementsOf(expected.getKvartalerIBeregningen());

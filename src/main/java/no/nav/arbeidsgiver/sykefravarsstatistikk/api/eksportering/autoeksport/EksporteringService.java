@@ -147,7 +147,7 @@ public class EksporteringService {
         SykefraværMedKategori landSykefravær = getSykefraværMedKategoriForLand(
               årstallOgKvartal,
               mapToSykefraværsstatistikkLand(
-                    hentSistePubliserteKvartal(umaskertSykefraværsstatistikkSiste4KvartalerLand))
+                    hentSisteKvartalIBeregningen(umaskertSykefraværsstatistikkSiste4KvartalerLand,årstallOgKvartal))
         );
 
         Map<String, VirksomhetMetadata> virksomhetMetadataMap = getVirksomhetMetadataHashMap(virksomhetMetadataListe);
@@ -207,12 +207,12 @@ public class EksporteringService {
         ).collect(Collectors.toList());
     }
 
-    private UmaskertSykefraværForEttKvartal hentSistePubliserteKvartal(
-          List<UmaskertSykefraværForEttKvartal> umaskertSykefraværsstatistikkSiste4KvartalerLand) {
+    private UmaskertSykefraværForEttKvartal hentSisteKvartalIBeregningen(
+          List<UmaskertSykefraværForEttKvartal> umaskertSykefraværsstatistikkSiste4KvartalerLand, ÅrstallOgKvartal årstallOgKvartal) {
         return umaskertSykefraværsstatistikkSiste4KvartalerLand.
               stream().
               filter(u ->
-                    u.getÅrstallOgKvartal().equals(SISTE_PUBLISERTE_KVARTAL)
+                    u.getÅrstallOgKvartal().equals(årstallOgKvartal)
               ).findFirst().orElse(null);
     }
 
@@ -640,7 +640,7 @@ public class EksporteringService {
               .collect(Collectors.toList());
         Aggregeringskalkulator aggregeringskalkulatorVirksomhet
               = new Aggregeringskalkulator(
-              new Sykefraværsdata(Map.of(Statistikkategori.VIRKSOMHET, umaskertSykefraværForEttKvartal)));
+              new Sykefraværsdata(Map.of(Statistikkategori.VIRKSOMHET, umaskertSykefraværForEttKvartal)),fraÅrstallOgKvartal.plussKvartaler(3));
         return EitherUtils.filterRights(
               aggregeringskalkulatorVirksomhet.fraværsprosentVirksomhet(virksomhetMetadata.getNavn())
         );
@@ -657,6 +657,8 @@ public class EksporteringService {
                                 virksomhetNæring5Siffer.getNæringskode5Siffer()
                           )
                     )
+                    && næring5Siffer.getÅrstall() == virksomhetMetadata.getÅrstall()
+                    && næring5Siffer.getKvartal() == virksomhetMetadata.getKvartal()
               )
               .collect(Collectors.toList());
         return filteredList;
