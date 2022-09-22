@@ -39,8 +39,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-
 public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
+
 
     private final static String ORGNR_UNDERENHET = "910969439";
     private final static String ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER = "910825518";

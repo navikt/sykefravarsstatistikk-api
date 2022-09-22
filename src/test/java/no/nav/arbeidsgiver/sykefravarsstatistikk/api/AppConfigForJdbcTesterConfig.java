@@ -5,7 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.Ek
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.ImporteringController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.ImporteringScheduler;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.ImporteringService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.SykefraværsstatistikkImporteringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.PostImporteringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.klassifikasjoner.KlassifikasjonsimporteringController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.MockServer;
@@ -49,7 +49,7 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
                                 EksporteringService.class,
                                 EksporteringScheduler.class,
                                 ImporteringScheduler.class,
-                                ImporteringService.class,
+                                SykefraværsstatistikkImporteringService.class,
                                 PostImporteringService.class,
                                 OrganisasjonerController.class,
                                 ImporteringController.class, EksporteringController.class,

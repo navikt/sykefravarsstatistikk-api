@@ -19,12 +19,12 @@ import java.util.List;
 @Profile({"local", "dev", "prod"})
 public class ImporteringController {
 
-    private final ImporteringService importeringService;
+    private final SykefraværsstatistikkImporteringService importeringService;
     private final ImporteringKvalitetssjekkService importeringKvalitetssjekkService;
     private final PostImporteringService postImporteringService;
 
     public ImporteringController(
-            ImporteringService importeringService,
+            SykefraværsstatistikkImporteringService importeringService,
             ImporteringKvalitetssjekkService importeringKvalitetssjekkService,
             PostImporteringService postImporteringService
     ) {
