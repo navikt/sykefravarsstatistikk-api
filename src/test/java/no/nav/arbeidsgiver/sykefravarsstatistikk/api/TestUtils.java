@@ -1,11 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
-
 import java.math.BigDecimal;
 import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.statistikk.SykefraværsstatistikkSektorUtils;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.ImporttidspunktDto;
@@ -17,7 +16,9 @@ public class TestUtils {
     public static final Næring PRODUKSJON_NYTELSESMIDLER =
         new Næring("10", "Produksjon av nærings- og nytelsesmidler");
 
+    public static final ÅrstallOgKvartal SISTE_PUBLISERTE_KVARTAL_MOCK = new ÅrstallOgKvartal(2022, 2);
 
+    
     public static MapSqlParameterSource parametreForStatistikk(
         int årstall,
         int kvartal,
@@ -67,8 +68,8 @@ public class TestUtils {
                 + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, "
                 + ":mulige_dagsverk)",
             parametreForStatistikk(
-                SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
-                SISTE_PUBLISERTE_KVARTAL.getKvartal(),
+                SISTE_PUBLISERTE_KVARTAL_MOCK.getÅrstall(),
+                SISTE_PUBLISERTE_KVARTAL_MOCK.getKvartal(),
                 10,
                 4,
                 100
@@ -80,8 +81,8 @@ public class TestUtils {
                 + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, "
                 + ":mulige_dagsverk)",
             parametreForStatistikk(
-                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getÅrstall(),
-                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getKvartal(),
+                SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1).getÅrstall(),
+                SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1).getKvartal(),
                 10,
                 5,
                 100
@@ -93,8 +94,8 @@ public class TestUtils {
                 + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, "
                 + ":mulige_dagsverk)",
             parametreForStatistikk(
-                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getÅrstall(),
-                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getKvartal(),
+                SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(2).getÅrstall(),
+                SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(2).getKvartal(),
                 10,
                 6,
                 100
@@ -108,8 +109,8 @@ public class TestUtils {
         new SykefraværsstatistikkSektorUtils(jdbcTemplate).getBatchCreateFunction(
             List.of(
                 new SykefraværsstatistikkSektor(
-                    SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
-                    SISTE_PUBLISERTE_KVARTAL.getKvartal(),
+                    SISTE_PUBLISERTE_KVARTAL_MOCK.getÅrstall(),
+                    SISTE_PUBLISERTE_KVARTAL_MOCK.getKvartal(),
                     "1", 10, new BigDecimal("657853.346702"),
                     new BigDecimal("13558710.866603")
                 )

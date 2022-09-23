@@ -28,6 +28,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL_MOCK;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
@@ -61,7 +62,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
         List<SykefraværForEttKvartal> resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand();
         assertThat(resultat.size()).isEqualTo(3);
         assertThat(resultat.get(0)).isEqualTo(new SykefraværForEttKvartal(
-                ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2),
+                SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(2),
                 new BigDecimal(6),
                 new BigDecimal(100),
                 10

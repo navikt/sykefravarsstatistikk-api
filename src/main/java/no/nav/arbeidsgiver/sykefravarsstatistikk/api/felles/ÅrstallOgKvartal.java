@@ -11,8 +11,6 @@ import org.jetbrains.annotations.NotNull;
 @Data
 public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
 
-    // TODO: Disse verdiene må oppdateres hver gang vi publiserer statistikk for nytt kvartal.
-    // Det bør automatiseres bort på et vis.
     public static ÅrstallOgKvartal SISTE_PUBLISERTE_KVARTAL = new ÅrstallOgKvartal(2022, 2);
 
     private int årstall;

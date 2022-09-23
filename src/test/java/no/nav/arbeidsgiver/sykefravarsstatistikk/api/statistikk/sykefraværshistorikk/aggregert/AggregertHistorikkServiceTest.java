@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL_MOCK;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje.BARNEHAGER;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.BRANSJE;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.LAND;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.NÆRING;
@@ -220,14 +220,14 @@ class AggregertHistorikkServiceTest {
     void kalkulerTrend_returnereNegativTrend_dersomSykefraværetMinker() {
         List<UmaskertSykefraværForEttKvartal> kvartalstall =
               List.of(
-                    umaskertSykefravær(SISTE_PUBLISERTE_KVARTAL, 8, 1),
+                    umaskertSykefravær(SISTE_PUBLISERTE_KVARTAL_MOCK, 8, 1),
                     umaskertSykefravær(new ÅrstallOgKvartal(2020, 2), 13, 2),
-                    umaskertSykefravær(SISTE_PUBLISERTE_KVARTAL.minusEttÅr(), 10, 3)
+                    umaskertSykefravær(SISTE_PUBLISERTE_KVARTAL_MOCK.minusEttÅr(), 10, 3)
               );
         Trend forventetTrend = new Trend(
               new BigDecimal("-2.0"),
               4,
-              List.of(SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusEttÅr()));
+              List.of(SISTE_PUBLISERTE_KVARTAL_MOCK, SISTE_PUBLISERTE_KVARTAL_MOCK.minusEttÅr()));
 
         assertThat(new Trendkalkulator(kvartalstall).kalkulerTrend()
               .get())
@@ -261,19 +261,19 @@ class AggregertHistorikkServiceTest {
         when(mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any()))
               .thenReturn(
                     Map.of(VIRKSOMHET, List.of(
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 10, 0, 1,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL_MOCK, 10, 0, 1,
                                 Varighetskategori._20_UKER_TIL_39_UKER),
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 40, 0, 1,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL_MOCK, 40, 0, 1,
                                 Varighetskategori._17_DAGER_TIL_8_UKER),
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 20, 0, 2,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL_MOCK, 20, 0, 2,
                                 Varighetskategori._8_UKER_TIL_20_UKER),
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 5, 0, 2,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL_MOCK, 5, 0, 2,
                                 Varighetskategori._8_DAGER_TIL_16_DAGER),
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 0, 100, 0,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL_MOCK, 0, 100, 0,
                                 Varighetskategori.TOTAL),
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 10, 0, 1,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1), 10, 0, 1,
                                 Varighetskategori._20_UKER_TIL_39_UKER),
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 0, 100, 0,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1), 0, 100, 0,
                                 Varighetskategori.TOTAL)
                     ))
               );
@@ -285,8 +285,8 @@ class AggregertHistorikkServiceTest {
                     "40.0",
                     5,
                     List.of(
-                          SISTE_PUBLISERTE_KVARTAL,
-                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1)
+                          SISTE_PUBLISERTE_KVARTAL_MOCK,
+                          SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1)
                     ));
         assertThat(
               serviceUnderTest.hentAggregertStatistikk(etOrgnr)
@@ -313,15 +313,15 @@ class AggregertHistorikkServiceTest {
         when(mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any()))
               .thenReturn(
                     Map.of(VIRKSOMHET, List.of(
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 40, 0, 2,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL_MOCK, 40, 0, 2,
                                 Varighetskategori._1_DAG_TIL_7_DAGER),
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 5, 0, 2,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL_MOCK, 5, 0, 2,
                                 Varighetskategori._8_DAGER_TIL_16_DAGER),
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 0, 100, 0,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL_MOCK, 0, 100, 0,
                                 Varighetskategori.TOTAL),
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 10, 0, 1,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1), 10, 0, 1,
                                 Varighetskategori._8_DAGER_TIL_16_DAGER),
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 0, 100, 0,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1), 0, 100, 0,
                                 Varighetskategori.TOTAL)
                     ))
               );
@@ -333,8 +333,8 @@ class AggregertHistorikkServiceTest {
                     "27.5",
                     5,
                     List.of(
-                          SISTE_PUBLISERTE_KVARTAL,
-                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1)
+                          SISTE_PUBLISERTE_KVARTAL_MOCK,
+                          SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1)
                     ));
         assertThat(
               serviceUnderTest.hentAggregertStatistikk(etOrgnr)
@@ -366,17 +366,17 @@ class AggregertHistorikkServiceTest {
         when(mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any()))
               .thenReturn(
                     Map.of(VIRKSOMHET, List.of(
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 10, 0, 1,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL_MOCK, 10, 0, 1,
                                 Varighetskategori._20_UKER_TIL_39_UKER),
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 20, 0, 2,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL_MOCK, 20, 0, 2,
                                 Varighetskategori._8_UKER_TIL_20_UKER),
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 5, 0, 4,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL_MOCK, 5, 0, 4,
                                 Varighetskategori._8_DAGER_TIL_16_DAGER),
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL, 0, 100, 0,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL_MOCK, 0, 100, 0,
                                 Varighetskategori.TOTAL),
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 10, 0, 1,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1), 10, 0, 1,
                                 Varighetskategori._20_UKER_TIL_39_UKER),
-                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 0, 100, 0,
+                          fraværMedVarighet(SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1), 0, 100, 0,
                                 Varighetskategori.TOTAL)
                     ))
               );
