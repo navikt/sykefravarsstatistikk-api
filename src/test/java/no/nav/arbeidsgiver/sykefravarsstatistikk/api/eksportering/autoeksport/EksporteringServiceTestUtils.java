@@ -108,6 +108,19 @@ public class EksporteringServiceTestUtils {
                                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2),
                                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)
                           )
+                    ).build(),
+              StatistikkDto.builder()
+                    .statistikkategori(Statistikkategori.VIRKSOMHET)
+                    .label("Virksomhet 1")
+                    .verdi("2.1")
+                    .antallPersonerIBeregningen(100)
+                    .kvartalerIBeregningen(
+                          List.of(
+                                SISTE_PUBLISERTE_KVARTAL,
+                                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2),
+                                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)
+                          )
                     ).build()
         );
     }
@@ -503,11 +516,6 @@ public class EksporteringServiceTestUtils {
         assertThat(actual).containsExactlyInAnyOrderElementsOf(
               expected
         );
-        /*assertThat(actual.get().getStatistikkategori()).as("Sjekk Statistikkategori").isEqualTo(expected.getStatistikkategori());
-        assertThat(actual.getLabel()).as("Sjekk label").isEqualTo(expected.getLabel());
-        assertThat(actual.getKvartalerIBeregningen()).as("Sjekk kvartaler i beregningen").containsExactlyInAnyOrderElementsOf(expected.getKvartalerIBeregningen());
-        assertThat(actual.getVerdi()).as("Sjekk verdi").isEqualTo( expected.getVerdi());
-        assertThat(actual.getAntallPersonerIBeregningen()).as("Sjekk antall personer").isEqualTo( expected.getAntallPersonerIBeregningen());*/
     }
     public static void assertEqualsSykefraværMedKategori(
             StatistikkDto expected,
@@ -587,8 +595,82 @@ public class EksporteringServiceTestUtils {
                 "    \"kode\": \"NO\"," +
                 "    \"antallPersoner\": 2500000," +
                 "    \"årstall\": 2020," +
-                "    \"kvartal\": 2" +
-                "  }" +
+              "    \"kvartal\": 2" +
+              "  }," +
+              "  \"statistikkDtoList\": [" +
+              "    {" +
+              "      \"statistikkategori\": \"LAND\"," +
+              "      \"label\": \"Norge\"," +
+              "      \"verdi\": \"1.9\"," +
+              "      \"antallPersonerIBeregningen\": 10000000," +
+              "      \"kvartalerIBeregningen\": [" +
+              "        {" +
+              "          \"årstall\": 2020," +
+              "          \"kvartal\": 2" +
+              "        }," +
+              "        {" +
+              "          \"årstall\": 2020," +
+              "          \"kvartal\": 3" +
+              "        }," +
+              "        {" +
+              "          \"årstall\": 2020," +
+              "          \"kvartal\": 4" +
+              "        }," +
+              "        {" +
+              "          \"årstall\": 2021," +
+              "          \"kvartal\": 1" +
+              "        }" +
+              "      ]" +
+              "    }," +
+              "    {" +
+              "      \"statistikkategori\": \"BRANSJE\"," +
+              "      \"label\": \"Sykehus\"," +
+              "      \"verdi\": \"2.3\"," +
+              "      \"antallPersonerIBeregningen\": 1100," +
+              "      \"kvartalerIBeregningen\": [" +
+              "        {" +
+              "          \"årstall\": 2022," +
+              "          \"kvartal\": 1" +
+              "        }," +
+              "        {" +
+              "          \"årstall\": 2021," +
+              "          \"kvartal\": 4" +
+              "        }," +
+              "        {" +
+              "          \"årstall\": 2021," +
+              "          \"kvartal\": 3" +
+              "        }," +
+              "        {" +
+              "          \"årstall\": 2021," +
+              "          \"kvartal\": 2" +
+              "        }" +
+              "      ]" +
+              "    }," +
+              "    {" +
+              "      \"statistikkategori\": \"VIRKSOMHET\"," +
+              "      \"label\": \"Virksomhet 1\"," +
+              "      \"verdi\": \"2.1\"," +
+              "      \"antallPersonerIBeregningen\": 100," +
+              "      \"kvartalerIBeregningen\": [" +
+              "        {" +
+              "          \"årstall\": 2022," +
+              "          \"kvartal\": 1" +
+              "        }," +
+              "        {" +
+              "          \"årstall\": 2021," +
+              "          \"kvartal\": 4" +
+              "        }," +
+              "        {" +
+              "          \"årstall\": 2021," +
+              "          \"kvartal\": 3" +
+              "        }," +
+              "        {" +
+              "          \"årstall\": 2021," +
+              "          \"kvartal\": 2" +
+              "        }" +
+              "      ]" +
+              "    }" +
+              "  ]" +
                 "}").replaceAll("\\s+", "");
     }
 
