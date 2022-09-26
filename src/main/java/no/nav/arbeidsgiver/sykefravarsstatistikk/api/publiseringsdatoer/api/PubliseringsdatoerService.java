@@ -5,9 +5,14 @@ import io.vavr.control.Try;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.DatauthentingFeil;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.ImporttidspunktDto;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoDbDto;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoerRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -20,6 +25,17 @@ public class PubliseringsdatoerService {
       PubliseringsdatoerRepository publiseringsdatoerRepository
   ) {
     this.publiseringsdatoerRepository = publiseringsdatoerRepository;
+  }
+
+  @Cacheable(value = "sistePubliserteKvartal")
+  public ÅrstallOgKvartal hentSistePubliserteKvartal() {
+
+    return publiseringsdatoerRepository.hentSisteImporttidspunkt()
+        .map(ImporttidspunktDto::getGjeldendePeriode)
+        .getOrElseThrow(
+            () -> new DatauthentingFeil("Klarte ikke hente ut sistePubliserteKvartal")
+        );
+
   }
 
   public Option<Publiseringsdatoer> hentPubliseringsdatoer() {
@@ -35,7 +51,7 @@ public class PubliseringsdatoerService {
                 .nestePubliseringsdato(
                     finnNestePubliseringsdato(publiseringsdatoer, forrigeImport.getImportertDato())
                         .map(LocalDate::toString)
-                        .getOrElse("Ingen kommende publiseringsdatoer er tilgjengelige"))
+                        .getOrElse("Siste publiseringsdato er utilgjengelig"))
                 .build()
         );
   }

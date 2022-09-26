@@ -25,6 +25,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Brans
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api.PubliseringsdatoerService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
@@ -69,19 +70,25 @@ class AggregertHistorikkServiceTest {
     private BransjeEllerNæringService mockBransjeEllerNæringService;
     @Mock
     private VarighetRepository mockVarighetRepository;
+    @Mock
+    private PubliseringsdatoerService publiseringsdatoerService;
+
 
 
     @BeforeEach
     public void setUp() {
 
+        when(publiseringsdatoerService.hentSistePubliserteKvartal())
+            .thenReturn(SISTE_PUBLISERTE_KVARTAL_MOCK);
+
         serviceUnderTest = new AggregertStatistikkService(
-              mockSykefraværRepository,
-              mockGraderingRepository,
-              mockVarighetRepository,
-              mockBransjeEllerNæringService,
-              mockTilgangskontrollService,
-              mockEnhetsregisteretClient
-        );
+            mockSykefraværRepository,
+            mockGraderingRepository,
+            mockVarighetRepository,
+            mockBransjeEllerNæringService,
+            mockTilgangskontrollService,
+            mockEnhetsregisteretClient,
+            publiseringsdatoerService);
     }
 
 
@@ -193,11 +200,13 @@ class AggregertHistorikkServiceTest {
     @Test
     void kalkulerTrend_returnererManglendeDataException_nårEtKvartalMangler() {
         assertThat(new Trendkalkulator(
-              List.of(umaskertSykefravær(new ÅrstallOgKvartal(2021, 2), 11, 1),
-                    umaskertSykefravær(new ÅrstallOgKvartal(2021, 1), 10, 3)
-              )).kalkulerTrend()
-              .getLeft())
-              .isExactlyInstanceOf(UtilstrekkeligDataException.class);
+            List.of(
+                umaskertSykefravær(new ÅrstallOgKvartal(2021, 2), 11, 1),
+                umaskertSykefravær(new ÅrstallOgKvartal(2021, 1), 10, 3)
+            ), SISTE_PUBLISERTE_KVARTAL_MOCK)
+            .kalkulerTrend()
+            .getLeft())
+            .isExactlyInstanceOf(UtilstrekkeligDataException.class);
     }
 
 
@@ -206,13 +215,14 @@ class AggregertHistorikkServiceTest {
         ÅrstallOgKvartal k1 = new ÅrstallOgKvartal(2022, 2);
         ÅrstallOgKvartal k2 = new ÅrstallOgKvartal(2021, 2);
         assertThat(new Trendkalkulator(
-              List.of(
-                    umaskertSykefravær(k1, 3, 10),
-                    umaskertSykefravær(k2, 2, 10)
-              )).kalkulerTrend()
-              .get())
-              .isEqualTo(
-                    new Trend(new BigDecimal("1.0"), 20, List.of(k1, k2)));
+            List.of(
+                umaskertSykefravær(k1, 3, 10),
+                umaskertSykefravær(k2, 2, 10)
+            ), SISTE_PUBLISERTE_KVARTAL_MOCK)
+            .kalkulerTrend()
+            .get())
+            .isEqualTo(
+                new Trend(new BigDecimal("1.0"), 20, List.of(k1, k2)));
     }
 
 
@@ -229,7 +239,7 @@ class AggregertHistorikkServiceTest {
               4,
               List.of(SISTE_PUBLISERTE_KVARTAL_MOCK, SISTE_PUBLISERTE_KVARTAL_MOCK.minusEttÅr()));
 
-        assertThat(new Trendkalkulator(kvartalstall).kalkulerTrend()
+        assertThat(new Trendkalkulator(kvartalstall, SISTE_PUBLISERTE_KVARTAL_MOCK).kalkulerTrend()
               .get())
               .isEqualTo(forventetTrend);
     }
@@ -237,7 +247,7 @@ class AggregertHistorikkServiceTest {
 
     @Test
     void kalkulerTrend_girUtrilstrekkeligDataException_vedTomtDatagrunnlag() {
-        assertThat(new Trendkalkulator(List.of()).kalkulerTrend()
+        assertThat(new Trendkalkulator(List.of(), SISTE_PUBLISERTE_KVARTAL_MOCK).kalkulerTrend()
               .getLeft())
               .isExactlyInstanceOf(UtilstrekkeligDataException.class);
     }

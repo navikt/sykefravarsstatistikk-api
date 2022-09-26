@@ -18,6 +18,9 @@ public class TestUtils {
 
     public static final ÅrstallOgKvartal SISTE_PUBLISERTE_KVARTAL_MOCK = new ÅrstallOgKvartal(2022, 2);
 
+    public static ÅrstallOgKvartal sisteKvartalMinus(int n) {
+        return SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(n);
+    }
     
     public static MapSqlParameterSource parametreForStatistikk(
         int årstall,
