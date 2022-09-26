@@ -90,13 +90,6 @@ public class PubliseringsdatoerRepository {
         .toOption();
   }
 
-  public ÅrstallOgKvartal hentSistePubliserteKvartal() {
-    return hentSisteImporttidspunkt()
-        .map(ImporttidspunktDto::getGjeldendePeriode)
-        .getOrElseThrow(() -> new DatauthentingFeil(
-            "Alvorlig feil: kunne ikke hente ut siste publiseringstidspunkt fra databasen"));
-  }
-
 
   private ImporttidspunktDto hentSisteImporttidspunktFraDb() {
     return jdbcTemplate

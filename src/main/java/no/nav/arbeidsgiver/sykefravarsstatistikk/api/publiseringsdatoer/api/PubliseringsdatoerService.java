@@ -33,7 +33,7 @@ public class PubliseringsdatoerService {
     return publiseringsdatoerRepository.hentSisteImporttidspunkt()
         .map(ImporttidspunktDto::getGjeldendePeriode)
         .getOrElseThrow(
-            () -> new DatauthentingFeil("Klarte ikke hente ut sistePubliserteKvartal")
+            () -> new DatauthentingFeil("Kunne ikke hente ut siste publiseringstidspunkt")
         );
 
   }

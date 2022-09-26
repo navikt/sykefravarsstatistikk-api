@@ -62,8 +62,8 @@ public class Aggregeringskalkulator {
       BransjeEllerNæring bransjeEllerNæring) {
     Either<UtilstrekkeligDataException, Trend> maybeTrend =
         new Trendkalkulator(
-            sykefraværsdata.filtrerPåKategori(
-                bransjeEllerNæring.getStatistikkategori()), sistePubliserteKvartal)
+            sykefraværsdata.filtrerPåKategori(bransjeEllerNæring.getStatistikkategori()),
+            sistePubliserteKvartal)
             .kalkulerTrend();
 
     return maybeTrend.map(r -> r.tilAggregertHistorikkDto(

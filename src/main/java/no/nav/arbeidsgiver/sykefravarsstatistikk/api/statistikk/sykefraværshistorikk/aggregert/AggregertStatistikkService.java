@@ -38,8 +38,6 @@ public class AggregertStatistikkService {
   private final PubliseringsdatoerService publiseringsdatoerService;
 
 
-  private final ÅrstallOgKvartal sistePubliserteKvartal;
-
   public AggregertStatistikkService(
       SykefraværRepository sykefraværprosentRepository,
       GraderingRepository graderingRepository,
@@ -55,8 +53,6 @@ public class AggregertStatistikkService {
     this.tilgangskontrollService = tilgangskontrollService;
     this.enhetsregisteretClient = enhetsregisteretClient;
     this.publiseringsdatoerService = publiseringsdatoerService;
-
-    this.sistePubliserteKvartal = publiseringsdatoerService.hentSistePubliserteKvartal();
   }
 
 
@@ -93,6 +89,9 @@ public class AggregertStatistikkService {
       Sykefraværsdata korttidsfravær,
       Sykefraværsdata langtidsfravær
   ) {
+    ÅrstallOgKvartal sistePubliserteKvartal
+        = publiseringsdatoerService.hentSistePubliserteKvartal();
+
     Aggregeringskalkulator kalkulatorTotal =
         new Aggregeringskalkulator(totalfravær, sistePubliserteKvartal);
     Aggregeringskalkulator kalkulatorGradert =
@@ -160,16 +159,18 @@ public class AggregertStatistikkService {
 
   private Sykefraværsdata hentKorttidsfravær(Underenhet virksomhet) {
     return hentLangtidsEllerKorttidsfravær(
-        virksomhet, datapunkt -> datapunkt.getVarighet().erKorttidVarighet()
-            || datapunkt.getVarighet().erTotalvarighet()
+        virksomhet,
+        datapunkt ->
+            datapunkt.getVarighet().erKorttidVarighet() || datapunkt.getVarighet().erTotalvarighet()
     );
   }
 
 
   private Sykefraværsdata hentLangtidsfravær(Underenhet virksomhet) {
     return hentLangtidsEllerKorttidsfravær(
-        virksomhet, datapunkt -> datapunkt.getVarighet().erLangtidVarighet()
-            || datapunkt.getVarighet().erTotalvarighet()
+        virksomhet,
+        datapunkt ->
+            datapunkt.getVarighet().erLangtidVarighet() || datapunkt.getVarighet().erTotalvarighet()
     );
   }
 
@@ -182,13 +183,16 @@ public class AggregertStatistikkService {
         = new HashMap<>();
 
     varighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(virksomhet)
-        .forEach((statistikkategori, fravær) ->
-            filtrertFravær.put(statistikkategori, fravær.stream()
-                .filter(entenLangtidEllerKorttid).collect(
+        .forEach((statistikkategori, fravær) -> filtrertFravær.put(
+            statistikkategori,
+            fravær.stream()
+                .filter(entenLangtidEllerKorttid)
+                .collect(
                     Collectors.groupingBy(
                         UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal,
                         Collectors.reducing(UmaskertSykefraværForEttKvartal::add)))
-                .values().stream()
+                .values()
+                .stream()
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList())));

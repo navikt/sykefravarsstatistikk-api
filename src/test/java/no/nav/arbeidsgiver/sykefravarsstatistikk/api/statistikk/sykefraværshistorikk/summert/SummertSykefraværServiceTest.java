@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils.assertBigDecimalIsEqual;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL_MOCK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -66,13 +67,12 @@ public class SummertSykefraværServiceTest {
         graderingRepository,
         bransjeEllerNæringService,
         publiseringsdatoerService);
-    barnehage = Underenhet.builder().orgnr(new Orgnr("999999999"))
+    barnehage = Underenhet.builder()
+        .orgnr(new Orgnr("999999999"))
         .navn("test Barnehage")
         .næringskode(new Næringskode5Siffer("88911", "Barnehage"))
         .antallAnsatte(10)
         .overordnetEnhetOrgnr(new Orgnr("1111111111")).build();
-    when(publiseringsdatoerService.hentSistePubliserteKvartal())
-        .thenReturn(new ÅrstallOgKvartal(2020, 1));
   }
 
   @Test
@@ -134,8 +134,11 @@ public class SummertSykefraværServiceTest {
             Varighetskategori.TOTAL
         )
     );
-    when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any(Bransje.class))).thenReturn(
-        sykefraværMed1Kvartal);
+
+    when(publiseringsdatoerService.hentSistePubliserteKvartal())
+        .thenReturn(SISTE_PUBLISERTE_KVARTAL_MOCK);
+    when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any(Bransje.class)))
+        .thenReturn(sykefraværMed1Kvartal);
 
     SummertSykefraværshistorikk summertSykefraværshistorikk =
         summertSykefraværService.hentSummertSykefraværshistorikkForBransjeEllerNæring(

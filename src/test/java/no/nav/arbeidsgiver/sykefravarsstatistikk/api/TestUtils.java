@@ -16,7 +16,7 @@ public class TestUtils {
     public static final Næring PRODUKSJON_NYTELSESMIDLER =
         new Næring("10", "Produksjon av nærings- og nytelsesmidler");
 
-    public static final ÅrstallOgKvartal SISTE_PUBLISERTE_KVARTAL_MOCK = new ÅrstallOgKvartal(2022, 2);
+    public static final ÅrstallOgKvartal SISTE_PUBLISERTE_KVARTAL_MOCK = new ÅrstallOgKvartal(2022, 1);
 
     public static ÅrstallOgKvartal sisteKvartalMinus(int n) {
         return SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(n);

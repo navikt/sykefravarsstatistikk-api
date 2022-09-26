@@ -28,7 +28,7 @@ public class UmaskertSykefraværForEttKvartalMedVarighet extends UmaskertSykefra
         return new UmaskertSykefraværForEttKvartal(
                 super.getÅrstallOgKvartal(),
                 super.getTapteDagsverk(),
-                super. getMuligeDagsverk(),
+                super.getMuligeDagsverk(),
                 super.getAntallPersoner());
     }
 

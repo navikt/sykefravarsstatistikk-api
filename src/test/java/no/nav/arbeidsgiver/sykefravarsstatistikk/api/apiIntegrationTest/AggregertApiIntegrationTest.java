@@ -183,40 +183,40 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
 
     @Test
     public void hentAggregertStatistikk_returnererLangtidOgKorttidForVirksomhetOgBransje()
-          throws Exception {
+        throws Exception {
         VarighetTestUtils.leggTilVirksomhetsstatistikkMedVarighet(
-              jdbcTemplate,
-              ORGNR_UNDERENHET,
-              new ÅrstallOgKvartal(2022, 1),
-              Varighetskategori._1_DAG_TIL_7_DAGER,
-              0, 2, 0
+            jdbcTemplate,
+            ORGNR_UNDERENHET,
+            new ÅrstallOgKvartal(2022, 1),
+            Varighetskategori._1_DAG_TIL_7_DAGER,
+            0, 2, 0
         );
         VarighetTestUtils.leggTilVirksomhetsstatistikkMedVarighet(
-              jdbcTemplate,
-              ORGNR_UNDERENHET,
-              new ÅrstallOgKvartal(2022, 1),
-              Varighetskategori._8_UKER_TIL_20_UKER,
-              0, 4, 0
+            jdbcTemplate,
+            ORGNR_UNDERENHET,
+            new ÅrstallOgKvartal(2022, 1),
+            Varighetskategori._8_UKER_TIL_20_UKER,
+            0, 4, 0
         );
         VarighetTestUtils.leggTilVirksomhetsstatistikkMedVarighet(
-              jdbcTemplate,
-              ORGNR_UNDERENHET,
-              new ÅrstallOgKvartal(2022, 1),
-              Varighetskategori.TOTAL,
-              10, 0, 100
+            jdbcTemplate,
+            ORGNR_UNDERENHET,
+            new ÅrstallOgKvartal(2022, 1),
+            Varighetskategori.TOTAL,
+            10, 0, 100
         );
         VarighetTestUtils.leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
-              jdbcTemplate,
-              new Næringskode5Siffer("10300", ""),
-              SISTE_PUBLISERTE_KVARTAL_MOCK,
-              10, 100
+            jdbcTemplate,
+            new Næringskode5Siffer("10300", ""),
+            new ÅrstallOgKvartal(2022, 1),
+            10, 100
         );
         VarighetTestUtils.leggTilStatisitkkNæringMedVarighet(
-              jdbcTemplate,
-              new Næringskode5Siffer("10300", ""),
-              SISTE_PUBLISERTE_KVARTAL_MOCK,
-              Varighetskategori._1_DAG_TIL_7_DAGER,
-              10
+            jdbcTemplate,
+            new Næringskode5Siffer("10300", ""),
+            new ÅrstallOgKvartal(2022, 1),
+            Varighetskategori._1_DAG_TIL_7_DAGER,
+            10
         );
         HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET);
         assertThat(response.statusCode()).isEqualTo(200);
@@ -226,17 +226,17 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
         JsonNode LangtidProsentSiste4Kvartaler = responseBody.get("prosentSiste4KvartalerLangtid");
 
         assertThat(korttidProsentSiste4Kvartaler.findValuesAsText("statistikkategori"))
-              .containsExactlyInAnyOrderElementsOf(
-                    List.of(
-                          VIRKSOMHET.toString(),
-                          BRANSJE.toString()
-                    ));
+            .containsExactlyInAnyOrderElementsOf(
+                List.of(
+                    VIRKSOMHET.toString(),
+                    BRANSJE.toString()
+                ));
         assertThat(LangtidProsentSiste4Kvartaler.findValuesAsText("statistikkategori"))
-              .containsExactlyInAnyOrderElementsOf(
-                    List.of(
-                          VIRKSOMHET.toString(),
-                          BRANSJE.toString()
-                    ));
+            .containsExactlyInAnyOrderElementsOf(
+                List.of(
+                    VIRKSOMHET.toString(),
+                    BRANSJE.toString()
+                ));
     }
 
 
