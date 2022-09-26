@@ -1,5 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.VIRKSOMHET;
+
 import io.vavr.control.Either;
 import java.math.BigDecimal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
@@ -13,14 +15,14 @@ class SumAvSykefraværOverFlereKvartalerTest {
 
     @Test
     void kalkulerFraværsprosentMedMaskering_maskererDataHvisAntallTilfellerErUnderFem() {
-        Either<StatistikkException, BigDecimal> maskertSykefravær =
+        Either<StatistikkException, StatistikkDto> maskertSykefravær =
                 new SumAvSykefraværOverFlereKvartaler(
                         new UmaskertSykefraværForEttKvartal(
                                 new ÅrstallOgKvartal(2022, 1),
                                 new BigDecimal(100),
                                 new BigDecimal(200),
                                 4)
-                ).kalkulerFraværsprosentMedMaskering();
+                ).regnUtProsentOgMapTilDto(VIRKSOMHET, "");
 
         Assertions.assertThat(maskertSykefravær.getLeft())
                 .isExactlyInstanceOf(MaskerteDataException.class);
@@ -29,27 +31,25 @@ class SumAvSykefraværOverFlereKvartalerTest {
 
     @Test
     void kalkulerFraværsprosentMedMaskering_returnerProsentHvisAntallTilfellerErFemEllerMer() {
-        Either<StatistikkException, BigDecimal> sykefraværFemTilfeller =
+        Either<StatistikkException, StatistikkDto> sykefraværFemTilfeller =
                 new SumAvSykefraværOverFlereKvartaler(
                         new UmaskertSykefraværForEttKvartal(
                                 new ÅrstallOgKvartal(2022, 1),
                                 new BigDecimal(100),
                                 new BigDecimal(200),
                                 5)
-                ).kalkulerFraværsprosentMedMaskering();
+                ).regnUtProsentOgMapTilDto(VIRKSOMHET, "");
 
-        Either<StatistikkException, BigDecimal> sykefraværTiTilfeller =
+        Either<StatistikkException, StatistikkDto> sykefraværTiTilfeller =
                 new SumAvSykefraværOverFlereKvartaler(
                         new UmaskertSykefraværForEttKvartal(
                                 new ÅrstallOgKvartal(2022, 1),
                                 new BigDecimal(100),
                                 new BigDecimal(200),
                                 10)
-                ).kalkulerFraværsprosentMedMaskering();
+                ).regnUtProsentOgMapTilDto(VIRKSOMHET, "");
 
-        Assertions.assertThat(sykefraværFemTilfeller.get())
-                .isEqualTo(new BigDecimal("50.0"));
-        Assertions.assertThat(sykefraværTiTilfeller.get())
-                .isEqualTo(new BigDecimal("50.0"));
+        Assertions.assertThat(sykefraværFemTilfeller.get().getVerdi()).isEqualTo("50.0");
+        Assertions.assertThat(sykefraværTiTilfeller.get().getVerdi()).isEqualTo("50.0");
     }
 }

@@ -61,4 +61,20 @@ values
     'A', 'M',
     332.240185, 0, 0
 );
+insert into dt_p.v_agg_ia_sykefravar_naring
+(
+    arstall, kvartal,
+    naring,
+    alder, kjonn,
+    taptedv, muligedv, antpers
+)
+values
+    (
+        '2022','2',
+        '10',
+        'A', 'M',
+        332.240185, 0, 0
+    );
+
+
 

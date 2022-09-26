@@ -44,4 +44,9 @@
         <logger name="org.springframework.web" level="info"/>
     </springProfile>
 
+    <appender name="static-appender" class="common.StaticAppender" />
+    <root level="error">
+        <appender-ref ref="static-appender" />
+    </root>
+
 </configuration>

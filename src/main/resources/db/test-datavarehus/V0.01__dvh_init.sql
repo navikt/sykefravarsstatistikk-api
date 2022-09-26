@@ -1,5 +1,6 @@
 -- Tabeller fra datavarehus
 create schema dt_p;
+create schema dk_p;
 
 create table dt_p.v_dim_ia_sektor
 (
@@ -117,3 +118,21 @@ create table dt_p.agg_ia_sykefravar_v_2
     mulige_dv decimal(15,6),
     antpers decimal(7,0)
 );
+
+
+create table dk_p.publiseringstabell
+(
+    TABELL_NAVN        char(30),
+    PERIODE_TYPE       char(20),
+    RAPPORT_PERIODE    decimal(38),
+    PREOFFENTLIG_DATO  DATE,
+    PREOFFENTLIG_FLAGG decimal(1),
+    OFFENTLIG_DATO     DATE,
+    OFFENTLIG_FLAGG    decimal(1),
+    AKTIVITET          char(120),
+    LASTET_DATO        DATE,
+    OPPDATERT_DATO     DATE,
+    LASTET_AV          char(10),
+    OPPDATERT_AV       char(10),
+    KOMMENTAR          char(120)
+)
