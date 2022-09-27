@@ -124,7 +124,7 @@ public class EksporteringService {
                 sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentLand(årstallOgKvartal);
 */
         List<UmaskertSykefraværForEttKvartal> umaskertSykefraværsstatistikkSiste4KvartalerLand =
-              sykefraværRepository.hentUmaskertSykefraværForNorge(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3));
+              sykefraværRepository.hentUmaskertSykefraværForNorge(årstallOgKvartal.minusKvartaler(3));
         Aggregeringskalkulator aggregeringskalkulatorLand = new Aggregeringskalkulator(
               new Sykefraværsdata(
                     Map.of(Statistikkategori.LAND, umaskertSykefraværsstatistikkSiste4KvartalerLand)
