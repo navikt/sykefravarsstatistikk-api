@@ -116,13 +116,7 @@ public class EksporteringService {
 
         List<VirksomhetMetadata> virksomhetMetadataListe =
               virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal);
-        // TODO har starter endringer, bør vi hente siste fire kvartaler(her skjer ikke noe utregning  av
-        //  prosent eller maskering , OG vi må legge til kvartaler i beregningen.
-/*
 
-        SykefraværsstatistikkLand sykefraværsstatistikkLand =
-                sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentLand(årstallOgKvartal);
-*/
         List<UmaskertSykefraværForEttKvartal> umaskertSykefraværsstatistikkSiste4KvartalerLand =
               sykefraværRepository.hentUmaskertSykefraværForNorge(årstallOgKvartal.minusKvartaler(3));
         Aggregeringskalkulator aggregeringskalkulatorLand = new Aggregeringskalkulator(
@@ -130,7 +124,6 @@ public class EksporteringService {
                     Map.of(Statistikkategori.LAND, umaskertSykefraværsstatistikkSiste4KvartalerLand)
               ),årstallOgKvartal
         );
-        // Sektor trenger IKKE noe endring nå
         List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor =
               sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(årstallOgKvartal);
         List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring =

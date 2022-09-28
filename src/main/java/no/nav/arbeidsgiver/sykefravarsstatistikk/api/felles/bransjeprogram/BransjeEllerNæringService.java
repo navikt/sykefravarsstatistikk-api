@@ -60,10 +60,9 @@ public class BransjeEllerNæringService {
               new Orgnr(""),
               virksomhetMetaData.getNavn(),
               new Næringskode5Siffer(
-
                     virksomhetMetaData.getNæringOgNæringskode5siffer().stream().findFirst().isPresent()
                           ? virksomhetMetaData.getNæringOgNæringskode5siffer().stream().findFirst().get().getNæringskode5Siffer()
-                          : "",
+                          : "00000",
                     virksomhetMetaData.getNæringOgNæringskode5siffer().stream().findFirst().isPresent()
                           ? virksomhetMetaData.getNæringOgNæringskode5siffer().stream().findFirst().get().getNæring()
                           : ""
