@@ -30,8 +30,8 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExtension;
 
 /**
- * Med denne config filen skal Spring kunne sette opp en applikasjon som bare inneholder de
- * nødvendige beans for Jdbc testing Alt annet (servlet, filters, RestTemplate, ...osv) blir ikke
+ * Med denne configfilen skal Spring kunne sette opp en applikasjon som bare inneholder de
+ * nødvendige beans for Jdbc-testing Alt annet (servlet, filters, RestTemplate, ...osv) blir ikke
  * opprettet
  */
 @SpringBootConfiguration

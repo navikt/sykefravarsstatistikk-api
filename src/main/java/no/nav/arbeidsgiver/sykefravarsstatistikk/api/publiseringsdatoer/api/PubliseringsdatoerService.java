@@ -14,9 +14,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.Publiser
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoerRepository;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 @Slf4j
-@Component
+@Service
 public class PubliseringsdatoerService {
 
   private final PubliseringsdatoerRepository publiseringsdatoerRepository;
