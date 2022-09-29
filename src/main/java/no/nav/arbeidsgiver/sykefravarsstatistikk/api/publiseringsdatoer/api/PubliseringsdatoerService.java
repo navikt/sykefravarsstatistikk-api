@@ -27,7 +27,6 @@ public class PubliseringsdatoerService {
     this.publiseringsdatoerRepository = publiseringsdatoerRepository;
   }
 
-  @Cacheable(value = "sistePubliserteKvartal")
   public ÅrstallOgKvartal hentSistePubliserteKvartal() {
 
     return publiseringsdatoerRepository.hentSisteImporttidspunkt()
