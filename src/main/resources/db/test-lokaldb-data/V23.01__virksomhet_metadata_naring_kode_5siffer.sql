@@ -1,2 +1,0 @@
---insert into virksomhet_metadata_naring_kode_5siffer (orgnr, naring_kode, naring_kode_5siffer, arstall, kvartal) values ('999999999', '71', '71121', 2020, 3);
---insert into virksomhet_metadata_naring_kode_5siffer (orgnr, naring_kode, naring_kode_5siffer, arstall, kvartal) values ('987654321', '72', '72121', 2020, 3);

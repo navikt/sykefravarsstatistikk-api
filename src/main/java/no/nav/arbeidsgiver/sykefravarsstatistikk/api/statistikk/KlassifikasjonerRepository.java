@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 @Component
 public class KlassifikasjonerRepository {
@@ -41,6 +42,17 @@ public class KlassifikasjonerRepository {
         return namedParameterJdbcTemplate.queryForObject(
                 "SELECT * FROM naring WHERE kode = :kode",
                 namedParameters,
+                (rs, rowNum) -> new Næring(
+                        rs.getString("kode"),
+                        rs.getString("navn")
+                )
+        );
+    }
+
+    public List<Næring> hentAlleNæringer() {
+
+        return namedParameterJdbcTemplate.query(
+                "SELECT * FROM naring ",
                 (rs, rowNum) -> new Næring(
                         rs.getString("kode"),
                         rs.getString("navn")

@@ -8,8 +8,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Brans
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
@@ -27,7 +27,6 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.*;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -44,6 +43,8 @@ public class EksporteringServiceMockTest {
     private SykefraværsstatistikkTilEksporteringRepository sykefraværsstatistikkTilEksporteringRepository;
     @Mock
     private SykefraværRepository sykefraværsRepository;
+    @Mock
+    private KlassifikasjonerRepository klassifikasjonerRepository;
     @Mock
     private KafkaService kafkaService;
     @Mock
@@ -73,7 +74,7 @@ public class EksporteringServiceMockTest {
                 virksomhetMetadataRepository,
                 sykefraværsstatistikkTilEksporteringRepository,
               sykefraværsRepository,
-                kafkaService,
+              klassifikasjonerRepository, kafkaService,
                 true,
               bransjeEllerNæringService);
     }
@@ -249,7 +250,7 @@ public class EksporteringServiceMockTest {
                 ));
         when(sykefraværsRepository.hentUmaskertSykefraværForNorge(any()))
                 .thenReturn(sykefraværsstatistikkLandSiste4Kvartaler(__2020_2));
-        when(bransjeEllerNæringService.finnBransjeFraMetadata(virksomhetMetadata)).thenReturn(
+        when(bransjeEllerNæringService.finnBransjeFraMetadata(virksomhetMetadata,List.of())).thenReturn(
               new BransjeEllerNæring(new Næring("11","Industri"))
         );
 
@@ -371,7 +372,7 @@ public class EksporteringServiceMockTest {
                 ));
         when(sykefraværsRepository.hentUmaskertSykefraværForNorge(any()))
                 .thenReturn(sykefraværsstatistikkLandSiste4Kvartaler(årstallOgKvartal));
-        when(bransjeEllerNæringService.finnBransjeFraMetadata(virksomhet1_TilHørerBransjeMetadata)).thenReturn(
+        when(bransjeEllerNæringService.finnBransjeFraMetadata(virksomhet1_TilHørerBransjeMetadata,List.of())).thenReturn(
               new BransjeEllerNæring(
                     new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS,"Sykehus","86101","86102"))
         );

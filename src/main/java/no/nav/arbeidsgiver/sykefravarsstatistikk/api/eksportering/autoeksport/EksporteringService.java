@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import io.vavr.control.Either;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.*;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
@@ -12,6 +13,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUtsendingException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
@@ -33,7 +35,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.CollectionUtils.concat;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
 
 @Slf4j
 @Component
@@ -43,6 +44,7 @@ public class EksporteringService {
     private final VirksomhetMetadataRepository virksomhetMetadataRepository;
     private final SykefraværsstatistikkTilEksporteringRepository sykefraværsstatistikkTilEksporteringRepository;
     private final SykefraværRepository sykefraværRepository;
+    private final KlassifikasjonerRepository klassifikasjonerRepository;
     private final KafkaService kafkaService;
     private final boolean erEksporteringAktivert;
     private final BransjeEllerNæringService bransjeEllerNæringService;
@@ -54,13 +56,14 @@ public class EksporteringService {
           EksporteringRepository eksporteringRepository,
           VirksomhetMetadataRepository virksomhetMetadataRepository,
           SykefraværsstatistikkTilEksporteringRepository sykefraværsstatistikkTilEksporteringRepository,
-          SykefraværRepository sykefraværRepository, KafkaService kafkaService,
+          SykefraværRepository sykefraværRepository, KlassifikasjonerRepository klassifikasjonerRepository, KafkaService kafkaService,
           @Value("${statistikk.eksportering.aktivert}") Boolean erEksporteringAktivert,
           BransjeEllerNæringService bransjeEllerNæringService) {
         this.eksporteringRepository = eksporteringRepository;
         this.virksomhetMetadataRepository = virksomhetMetadataRepository;
         this.sykefraværsstatistikkTilEksporteringRepository = sykefraværsstatistikkTilEksporteringRepository;
         this.sykefraværRepository = sykefraværRepository;
+        this.klassifikasjonerRepository = klassifikasjonerRepository;
         this.kafkaService = kafkaService;
         this.erEksporteringAktivert = erEksporteringAktivert;
         this.bransjeEllerNæringService = bransjeEllerNæringService;
@@ -126,8 +129,10 @@ public class EksporteringService {
         );
         List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor =
               sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(årstallOgKvartal);
+
         List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring =
               sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringerSiste4Kvartaler(årstallOgKvartal.minusKvartaler(3));
+        List<Næring> alleNæringer= klassifikasjonerRepository.hentAlleNæringer();
 
         List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer =
               sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5SifferSiste4Kvartaler(
@@ -163,6 +168,7 @@ public class EksporteringService {
                         årstallOgKvartal,
                         sykefraværsstatistikkSektor,
                         sykefraværsstatistikkNæring,
+                        alleNæringer,
                         sykefraværsstatistikkNæring5Siffer,
                         sykefraværsstatistikkVirksomhetUtenVarighet,
                         landSykefravær,
@@ -233,7 +239,7 @@ public class EksporteringService {
           ÅrstallOgKvartal årstallOgKvartal,
           List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor,
           List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring,
-          List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer,
+          List<Næring> alleNæringer, List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer,
           List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet,
           SykefraværMedKategori landSykefravær,
           Either<StatistikkException, StatistikkDto> statistikkDtoLand,
@@ -246,14 +252,12 @@ public class EksporteringService {
         Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetForEttKvartalUtenVarighetMap =
               toMap(filterByKvartal(årstallOgKvartal, sykefraværsstatistikkVirksomhetUtenVarighet));
 
-        // TODO har starter utregning og utsending
-        //  har bør vi endre til å bruke Kalkurer for utregning av prosent.
-        //  husk å TA MED KvartalerIBeregningen, siden her har vi endret til at de er med.
+
         virksomheterMetadata.stream().forEach(
               virksomhetMetadata -> {
                   long startUtsendingProcess = System.nanoTime();
                   BransjeEllerNæring bransjeEllerNæring = bransjeEllerNæringService
-                        .finnBransjeFraMetadata(virksomhetMetadata);
+                        .finnBransjeFraMetadata(virksomhetMetadata,alleNæringer);
 
                   if (virksomhetMetadata != null) {
                       kafkaService.send(
