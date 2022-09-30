@@ -22,6 +22,6 @@ public class ImporttidspunktDto {
   }
 
   public LocalDate getImportertDato() {
-    return this.getSistImportertTidspunkt().toLocalDateTime().toLocalDate();
+    return sistImportertTidspunkt.toLocalDateTime().toLocalDate();
   }
 }

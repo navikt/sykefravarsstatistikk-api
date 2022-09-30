@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StaticAppender extends AppenderBase<ILoggingEvent> {
+
   static List<ILoggingEvent> events = new ArrayList<>();
 
   @Override
@@ -19,5 +20,9 @@ public class StaticAppender extends AppenderBase<ILoggingEvent> {
 
   public static void clearEvents() {
     events.clear();
+  }
+
+  public static ILoggingEvent getLastLoggedEvent() {
+    return getEvents().get(0);
   }
 }
