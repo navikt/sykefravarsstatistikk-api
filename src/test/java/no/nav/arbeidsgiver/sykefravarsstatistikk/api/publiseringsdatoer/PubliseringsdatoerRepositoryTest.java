@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 import ch.qos.logback.classic.Level;
@@ -11,6 +12,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import common.StaticAppender;
 import io.vavr.control.Option;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,20 +24,20 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @ExtendWith(MockitoExtension.class)
 class PubliseringsdatoerRepositoryTest {
-
   PubliseringsdatoerRepository publiseringsdatoerRepository;
 
   @Mock
   NamedParameterJdbcTemplate mockJdbcTemplate;
 
   @BeforeEach
-  public void clearLoggingStatements() {
+  void setUp() {
+    publiseringsdatoerRepository = new PubliseringsdatoerRepository(mockJdbcTemplate);
     StaticAppender.clearEvents();
   }
 
-  @BeforeEach
-  void setUp() {
-    publiseringsdatoerRepository = new PubliseringsdatoerRepository(mockJdbcTemplate);
+  @AfterEach
+  void tearDown() {
+    reset(mockJdbcTemplate);
   }
 
   @Test
@@ -44,7 +46,7 @@ class PubliseringsdatoerRepositoryTest {
 
     Option<ImporttidspunktDto> faktisk = publiseringsdatoerRepository.hentSisteImporttidspunkt();
     assertTrue(faktisk.isEmpty());
-    ILoggingEvent errormelding = StaticAppender.getEvents().get(0);
+    ILoggingEvent errormelding = StaticAppender.getLastLoggedEvent();
 
     assertThat(errormelding.getLevel()).isEqualTo(Level.ERROR);
     assertThat(errormelding.getMessage()).isEqualTo(

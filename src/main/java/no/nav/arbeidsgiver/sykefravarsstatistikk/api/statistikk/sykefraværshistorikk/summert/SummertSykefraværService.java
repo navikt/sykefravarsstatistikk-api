@@ -1,5 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
@@ -7,14 +9,12 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Brans
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api.PubliseringsdatoerService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SummertSykefravær;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -23,19 +23,21 @@ public class SummertSykefraværService {
     private final VarighetRepository varighetRepository;
     private final GraderingRepository graderingRepository;
     private final BransjeEllerNæringService bransjeEllerNæringService;
+    private final PubliseringsdatoerService publiseringsdatoerService;
 
     public SummertSykefraværService(
-            VarighetRepository varighetRepository,
-            GraderingRepository graderingRepository,
-            BransjeEllerNæringService bransjeEllerNæringService) {
+        VarighetRepository varighetRepository,
+        GraderingRepository graderingRepository,
+        BransjeEllerNæringService bransjeEllerNæringService,
+        PubliseringsdatoerService publiseringsdatoerService) {
         this.varighetRepository = varighetRepository;
         this.graderingRepository = graderingRepository;
         this.bransjeEllerNæringService = bransjeEllerNæringService;
+        this.publiseringsdatoerService = publiseringsdatoerService;
     }
 
     public SummertSykefraværshistorikk hentSummertSykefraværshistorikkForBransjeEllerNæring(
             Underenhet underenhet,
-            ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal,
             int antallKvartalerSomSkalSummeres
     ) {
         if (antallKvartalerSomSkalSummeres < 1) {
@@ -65,16 +67,16 @@ public class SummertSykefraværService {
         }
 
         SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
-                SummertKorttidsOgLangtidsfravær.getSummertKorttidsOgLangtidsfravær(
-                        sistePubliserteÅrstallOgKvartal,
-                        antallKvartalerSomSkalSummeres,
-                        sykefraværVarighet
-                );
+            SummertKorttidsOgLangtidsfravær.getSummertKorttidsOgLangtidsfravær(
+                publiseringsdatoerService.hentSistePubliserteKvartal(),
+                antallKvartalerSomSkalSummeres,
+                sykefraværVarighet
+            );
 
         SummertSykefravær summertSykefraværGradering = getSummerSykefraværGradering(
-                sistePubliserteÅrstallOgKvartal,
-                antallKvartalerSomSkalSummeres,
-                sykefraværGradering
+            publiseringsdatoerService.hentSistePubliserteKvartal(),
+            antallKvartalerSomSkalSummeres,
+            sykefraværGradering
         );
 
         return SummertSykefraværshistorikk.builder()

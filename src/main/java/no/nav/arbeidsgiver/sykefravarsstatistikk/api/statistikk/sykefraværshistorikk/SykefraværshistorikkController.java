@@ -1,7 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
-
 import java.util.Arrays;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +9,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.IngenNæringException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api.PubliseringsdatoerService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.AggregertStatistikkDto;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.AggregertStatistikkService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikk;
@@ -39,25 +38,30 @@ public class SykefraværshistorikkController {
     private final EnhetsregisteretClient enhetsregisteretClient;
     private final SummertSykefraværService summertSykefraværService;
     private final AggregertStatistikkService aggregertHistorikkService;
+    private final PubliseringsdatoerService publiseringsdatoerService;
+
 
     //TODO: Fjern når "aggregert"-endepunktet har blitt tatt i bruk
     private final SummertLegemeldtSykefraværService summertLegemeldtSykefraværService;
 
 
     public SykefraværshistorikkController(
-            KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService,
-            TilgangskontrollService tilgangskontrollService,
-            EnhetsregisteretClient enhetsregisteretClient,
-            SummertSykefraværService summertSykefraværService,
-            AggregertStatistikkService aggregertHistorikkService,
-            SummertLegemeldtSykefraværService summertLegemeldtSykefraværService
+        KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService,
+        TilgangskontrollService tilgangskontrollService,
+        EnhetsregisteretClient enhetsregisteretClient,
+        SummertSykefraværService summertSykefraværService,
+        AggregertStatistikkService aggregertHistorikkService,
+        PubliseringsdatoerService publiseringsdatoerService,
+        SummertLegemeldtSykefraværService summertLegemeldtSykefraværService
     ) {
         this.kvartalsvisSykefraværshistorikkService = kvartalsvisSykefraværshistorikkService;
         this.tilgangskontrollService = tilgangskontrollService;
         this.enhetsregisteretClient = enhetsregisteretClient;
         this.summertSykefraværService = summertSykefraværService;
         this.aggregertHistorikkService = aggregertHistorikkService;
+        this.publiseringsdatoerService = publiseringsdatoerService;
         this.summertLegemeldtSykefraværService = summertLegemeldtSykefraværService;
+
     }
 
 
@@ -128,16 +132,15 @@ public class SykefraværshistorikkController {
         }
 
         SummertSykefraværshistorikk summertSykefraværshistorikkVirksomhet =
-                summertSykefraværService.hentSummertSykefraværshistorikk(
-                        underenhet,
-                        SISTE_PUBLISERTE_KVARTAL,
-                        antallKvartaler
-                );
+            summertSykefraværService.hentSummertSykefraværshistorikk(
+                underenhet,
+                publiseringsdatoerService.hentSistePubliserteKvartal(),
+                antallKvartaler
+            );
 
         SummertSykefraværshistorikk summertSykefraværshistorikkBransjeEllerNæring =
                 summertSykefraværService.hentSummertSykefraværshistorikkForBransjeEllerNæring(
                         underenhet,
-                        SISTE_PUBLISERTE_KVARTAL,
                         antallKvartaler
                 );
 
@@ -172,10 +175,9 @@ public class SykefraværshistorikkController {
         }
 
         LegemeldtSykefraværsprosent legemeldtSykefraværsprosent =
-                summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
-                        underenhet,
-                        SISTE_PUBLISERTE_KVARTAL
-                );
+            summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
+                underenhet, publiseringsdatoerService.hentSistePubliserteKvartal()
+            );
 
         if (legemeldtSykefraværsprosent.getProsent() == null) {
             log.info(
