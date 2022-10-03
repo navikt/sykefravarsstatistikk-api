@@ -45,16 +45,17 @@ Bygg image
 
 Kjør container
 `docker run -d -p 8080:8080 sykefravarsstatistikk-api`
----------
+
+---
 
 # Henvendelser
 
 ## For Nav-ansatte
-* Dette Git-repositoriet eies av [Team IA i Produktområde arbeidsgiver](https://navno.sharepoint.com/sites/intranett-prosjekter-og-utvikling/SitePages/Produktomr%C3%A5de-arbeidsgiver.aspx).
+* Dette Git-repositoriet eies av [Team IA i Produktområde Arbeidsgiver](https://navno.sharepoint.com/sites/intranett-prosjekter-og-utvikling/SitePages/Produktomr%C3%A5de-arbeidsgiver.aspx).
 * Slack-kanaler:
- * [#arbeidsgiver-teamia-utvikling](https://nav-it.slack.com/archives/C016KJA7CFK)
- * [#arbeidsgiver-general](https://nav-it.slack.com/archives/CCM649PDH)
- * [#arbeidsgiver-utvikling](https://nav-it.slack.com/archives/CD4MES6BB)
+  * [#arbeidsgiver-teamia-utvikling](https://nav-it.slack.com/archives/C016KJA7CFK)
+  * [#arbeidsgiver-general](https://nav-it.slack.com/archives/CCM649PDH)
+  * [#arbeidsgiver-utvikling](https://nav-it.slack.com/archives/CD4MES6BB)
 
 ## For folk utenfor Nav
 * Opprett gjerne en issue i Github for alle typer spørsmål
