@@ -14,7 +14,13 @@ Helsesjekk (åpnes i browser): [http://localhost:8080/sykefravarsstatistikk-api/
 Default spring-profil er local, og da er alle avhengigheter mocket på localhost:8081.
 
 ## Koble til H2-database lokalt
-Åpne H2-konsollen på `http://localhost:8080/sykefravarsstatistikk-api/h2` og fyll inn det som står under `applikasjon.datasource` i `application.yaml`.
+Åpne H2-konsollen på `http://localhost:8080/sykefravarsstatistikk-api/h2` og fyll inn det som står under `applikasjon.datasource` i `application.yaml`:
+```
+url: jdbc:h2:mem:db-local;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+username: SA
+password:
+driver-class-name: org.h2.Driver
+```
 
 ## Grafisk fremstilling av API-ene (swagger-ui)
 API-et kan sees og testes på: 
