@@ -24,9 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils.assertBigDecimalIsEqual;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæringer2Siffer;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -124,15 +122,15 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     void hentUmaskertSykefraværForNæringerSiste4Kvartaler_skal_hente_riktig_data() {
         opprettStatistikkForNæringer2Siffer(jdbcTemplate);
         List<SykefraværsstatistikkNæring> forventet= List.of(
-               new SykefraværsstatistikkNæring(SISTE_PUBLISERTE_KVARTAL.getÅrstall(),SISTE_PUBLISERTE_KVARTAL.getKvartal(),"10",50,new BigDecimal(20000),new BigDecimal(1000000)),
-               new SykefraværsstatistikkNæring(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getÅrstall(),SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getKvartal(),"10",50,new BigDecimal(30000),new BigDecimal(1000000)),
-               new SykefraværsstatistikkNæring(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getÅrstall(),SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getKvartal(),"10",50,new BigDecimal(40000),new BigDecimal(1000000)),
-               new SykefraværsstatistikkNæring(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getÅrstall(),SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getKvartal(),"10",50,new BigDecimal(50000),new BigDecimal(1000000)),
-               new SykefraværsstatistikkNæring(SISTE_PUBLISERTE_KVARTAL.getÅrstall(),SISTE_PUBLISERTE_KVARTAL.getKvartal(),"88",50,new BigDecimal(25000),new BigDecimal(1000000))
+               new SykefraværsstatistikkNæring(SISTE_PUBLISERTE_KVARTAL_MOCK.getÅrstall(),SISTE_PUBLISERTE_KVARTAL_MOCK.getKvartal(),"10",50,new BigDecimal(20000),new BigDecimal(1000000)),
+               new SykefraværsstatistikkNæring(SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1).getÅrstall(),SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1).getKvartal(),"10",50,new BigDecimal(30000),new BigDecimal(1000000)),
+               new SykefraværsstatistikkNæring(SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(2).getÅrstall(),SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(2).getKvartal(),"10",50,new BigDecimal(40000),new BigDecimal(1000000)),
+               new SykefraværsstatistikkNæring(SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3).getÅrstall(),SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3).getKvartal(),"10",50,new BigDecimal(50000),new BigDecimal(1000000)),
+               new SykefraværsstatistikkNæring(SISTE_PUBLISERTE_KVARTAL_MOCK.getÅrstall(),SISTE_PUBLISERTE_KVARTAL_MOCK.getKvartal(),"88",50,new BigDecimal(25000),new BigDecimal(1000000))
         );
         List<SykefraværsstatistikkNæring> resultat =
               repository.hentSykefraværprosentAlleNæringerSiste4Kvartaler(
-                    SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3));
+                    SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3));
         assertThat(resultat.size()).isEqualTo(5);
         assertThat(resultat).containsExactlyInAnyOrderElementsOf(
               forventet);
@@ -142,7 +140,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     void hentUmaskertSykefraværForNæringerSiste4Kvartaler_skalIkkeKrasjeVedManglendeData() {
         List<SykefraværsstatistikkNæring> resultat =
               repository.hentSykefraværprosentAlleNæringerSiste4Kvartaler(
-                    SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3));
+                    SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3));
         assertThat(resultat.size()).isEqualTo(0);
         assertThat(resultat).containsExactlyInAnyOrderElementsOf(
               List.of());

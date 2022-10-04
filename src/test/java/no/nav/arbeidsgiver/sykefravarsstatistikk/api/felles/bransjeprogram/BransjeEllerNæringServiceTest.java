@@ -13,9 +13,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL_MOCK;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.ORGNR_VIRKSOMHET_1;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.ORGNR_VIRKSOMHET_2;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal.SISTE_PUBLISERTE_KVARTAL;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -35,7 +35,7 @@ public class BransjeEllerNæringServiceTest {
         RECTYPE_FOR_VIRKSOMHET,
         "1",
         "88",
-        SISTE_PUBLISERTE_KVARTAL
+        SISTE_PUBLISERTE_KVARTAL_MOCK
   );
   @BeforeEach
   public void setUp() {
@@ -92,7 +92,7 @@ public class BransjeEllerNæringServiceTest {
           RECTYPE_FOR_VIRKSOMHET,
           "1",
           "11",
-          SISTE_PUBLISERTE_KVARTAL
+          SISTE_PUBLISERTE_KVARTAL_MOCK
     );
     BransjeEllerNæring resultat=bransjeEllerNæringService.finnBransjeFraMetadata(
           virksomhetMetadata2,
