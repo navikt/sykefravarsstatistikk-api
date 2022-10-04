@@ -83,7 +83,7 @@ public class SummertKorttidsOgLangtidsfravær {
 
         BigDecimal totalTaptedagsverk = kvartalsvisSykefravær
                 .stream()
-                .map(e -> e.getTapteDagsverk())
+                .map(UmaskertSykefraværForEttKvartal::getDagsverkTeller)
                 .reduce(
                         new BigDecimal(0),
                         BigDecimal::add
@@ -91,7 +91,7 @@ public class SummertKorttidsOgLangtidsfravær {
 
         BigDecimal totalMuligedagsverk = kvartalsvisSykefravær
                 .stream()
-                .map(e -> e.getMuligeDagsverk())
+                .map(UmaskertSykefraværForEttKvartal::getDagsverkNevner)
                 .reduce(
                         new BigDecimal(0),
                         BigDecimal::add
