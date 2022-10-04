@@ -14,8 +14,6 @@ public class GraderingTestUtils {
             String næringskodeFemSiffer,
             String rectype,
             ÅrstallOgKvartal årstallOgKvartal,
-            int antallGraderteSykemeldinger,
-            int antallSykemeldinger,
             int antallPersoner,
             BigDecimal tapteDagsverkGradertSykemelding,
             BigDecimal tapteDagsverk,
@@ -55,10 +53,10 @@ public class GraderingTestUtils {
                         .addValue("rectype", rectype)
                         .addValue("arstall", årstallOgKvartal.getÅrstall())
                         .addValue("kvartal", årstallOgKvartal.getKvartal())
-                        .addValue("antall_graderte_sykemeldinger", antallGraderteSykemeldinger)
+                        .addValue("antall_graderte_sykemeldinger", 0)
                         .addValue("tapte_dagsverk_gradert_sykemelding",
                                 tapteDagsverkGradertSykemelding)
-                        .addValue("antall_sykemeldinger", antallSykemeldinger)
+                        .addValue("antall_sykemeldinger", 0)
                         .addValue("antall_personer", antallPersoner)
                         .addValue("tapte_dagsverk", tapteDagsverk)
                         .addValue("mulige_dagsverk", muligeDagsverk)

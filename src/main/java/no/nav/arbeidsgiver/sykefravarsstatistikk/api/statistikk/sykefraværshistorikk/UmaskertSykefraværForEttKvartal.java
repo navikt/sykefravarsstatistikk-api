@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collection;
@@ -15,31 +14,30 @@ import org.jetbrains.annotations.NotNull;
 public class UmaskertSykefraværForEttKvartal implements
         Comparable<UmaskertSykefraværForEttKvartal> {
 
-    protected final BigDecimal tapteDagsverk;
-    protected final BigDecimal muligeDagsverk;
+    protected final BigDecimal dagsverkTeller;
+    protected final BigDecimal dagsverkNevner;
     protected final int antallPersoner;
-    @JsonIgnore
     private final ÅrstallOgKvartal årstallOgKvartal;
 
     public UmaskertSykefraværForEttKvartal(
             ÅrstallOgKvartal årstallOgKvartal,
-            BigDecimal tapteDagsverk,
-            BigDecimal muligeDagsverk,
+            BigDecimal dagsverkTeller,
+            BigDecimal dagsverkNevner,
             int antallPersoner) {
         this.årstallOgKvartal = årstallOgKvartal;
-        this.tapteDagsverk = tapteDagsverk.setScale(1, RoundingMode.HALF_UP);
-        this.muligeDagsverk = muligeDagsverk.setScale(1, RoundingMode.HALF_UP);
+        this.dagsverkTeller = dagsverkTeller.setScale(1, RoundingMode.HALF_UP);
+        this.dagsverkNevner = dagsverkNevner.setScale(1, RoundingMode.HALF_UP);
         this.antallPersoner = antallPersoner;
     }
 
     public UmaskertSykefraværForEttKvartal(
             ÅrstallOgKvartal kvartal,
-            int tapteDagsverk,
-            int muligeDagsverk,
+            int dagsverkTeller,
+            int dagsverkNevner,
             int antallPersoner) {
         this.årstallOgKvartal = kvartal;
-        this.tapteDagsverk = new BigDecimal(String.valueOf(tapteDagsverk));
-        this.muligeDagsverk = new BigDecimal(String.valueOf(muligeDagsverk));
+        this.dagsverkTeller = new BigDecimal(String.valueOf(dagsverkTeller));
+        this.dagsverkNevner = new BigDecimal(String.valueOf(dagsverkNevner));
         this.antallPersoner = antallPersoner;
     }
 
@@ -62,11 +60,11 @@ public class UmaskertSykefraværForEttKvartal implements
     }
 
     public BigDecimal kalkulerSykefraværsprosent() {
-        return StatistikkUtils.kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk);
+        return StatistikkUtils.kalkulerSykefraværsprosent(dagsverkTeller, dagsverkNevner);
     }
 
     public boolean harAntallMuligeDagsverkLikNull() {
-        return muligeDagsverk.equals(BigDecimal.ZERO);
+        return dagsverkNevner.equals(BigDecimal.ZERO);
     }
 
     public UmaskertSykefraværForEttKvartal add(
@@ -78,8 +76,8 @@ public class UmaskertSykefraværForEttKvartal implements
         }
         return new UmaskertSykefraværForEttKvartal(
                 årstallOgKvartal,
-                tapteDagsverk.add(sykefravær.getTapteDagsverk()),
-                muligeDagsverk.add(sykefravær.getMuligeDagsverk()),
+                dagsverkTeller.add(sykefravær.getDagsverkTeller()),
+                dagsverkNevner.add(sykefravær.getDagsverkNevner()),
                 antallPersoner + sykefravær.getAntallPersoner()
         );
     }
