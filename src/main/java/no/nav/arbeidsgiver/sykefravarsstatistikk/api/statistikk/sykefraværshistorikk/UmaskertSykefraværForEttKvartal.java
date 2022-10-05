@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
+import io.vavr.control.Either;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collection;
@@ -59,13 +60,10 @@ public class UmaskertSykefraværForEttKvartal implements
         return årstallOgKvartal != null ? årstallOgKvartal.getÅrstall() : 0;
     }
 
-    public BigDecimal kalkulerSykefraværsprosent() {
+    public Either<StatistikkException, BigDecimal> kalkulerSykefraværsprosent() {
         return StatistikkUtils.kalkulerSykefraværsprosent(dagsverkTeller, dagsverkNevner);
     }
 
-    public boolean harAntallMuligeDagsverkLikNull() {
-        return dagsverkNevner.equals(BigDecimal.ZERO);
-    }
 
     public UmaskertSykefraværForEttKvartal add(
             UmaskertSykefraværForEttKvartal sykefravær

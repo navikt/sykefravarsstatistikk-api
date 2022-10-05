@@ -66,7 +66,7 @@ SumAvSykefraværOverFlereKvartaler(@NotNull UmaskertSykefraværForEttKvartal dat
                   "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."));
         }
 
-        return Either.right(kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk));
+        return kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk);
     }
 
 
