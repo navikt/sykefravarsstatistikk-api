@@ -29,6 +29,3 @@ spec:
     - team: pia
       application: lydia-api
       access: read
-    - team: teamia
-      application: teamia-devops
-      access: read

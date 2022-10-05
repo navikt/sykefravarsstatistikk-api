@@ -220,8 +220,8 @@ public class EksporteringService {
               umaskertSykefraværForEttKvartal.getÅrstall(),
               umaskertSykefraværForEttKvartal.getKvartal(),
               umaskertSykefraværForEttKvartal.getAntallPersoner(),
-              umaskertSykefraværForEttKvartal.getTapteDagsverk(),
-              umaskertSykefraværForEttKvartal.getMuligeDagsverk()
+              umaskertSykefraværForEttKvartal.getDagsverkTeller(),
+              umaskertSykefraværForEttKvartal.getDagsverkNevner()
         );
     }
 
