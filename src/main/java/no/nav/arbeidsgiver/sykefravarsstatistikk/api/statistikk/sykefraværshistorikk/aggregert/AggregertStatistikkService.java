@@ -103,33 +103,33 @@ public class AggregertStatistikkService {
 
     BransjeEllerNæring bransjeEllerNæring = bransjeEllerNæringService.finnBransje(virksomhet);
 
-    List<StatistikkDto> prosentSisteFireKvartalerTotalt = EitherUtils.filterRights(
+    List<StatistikkDto> prosentSisteFireKvartalerTotalt = EitherUtils.getRightsAndLogLefts(
         kalkulatorTotal.fraværsprosentVirksomhet(virksomhet.getNavn()),
         kalkulatorTotal.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
         kalkulatorTotal.fraværsprosentNorge()
     );
-    List<StatistikkDto> prosentSisteFireKvartalerGradert = EitherUtils.filterRights(
+    List<StatistikkDto> prosentSisteFireKvartalerGradert = EitherUtils.getRightsAndLogLefts(
         kalkulatorGradert.fraværsprosentVirksomhet(virksomhet.getNavn()),
         kalkulatorGradert.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
     );
-    List<StatistikkDto> prosentSisteFireKvartalerKorttid = EitherUtils.filterRights(
+    List<StatistikkDto> prosentSisteFireKvartalerKorttid = EitherUtils.getRightsAndLogLefts(
         kalkulatorKorttid.fraværsprosentVirksomhet(virksomhet.getNavn()),
         kalkulatorKorttid.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
     );
-    List<StatistikkDto> prosentSisteFireKvartalerLangtid = EitherUtils.filterRights(
+    List<StatistikkDto> prosentSisteFireKvartalerLangtid = EitherUtils.getRightsAndLogLefts(
         kalkulatorLangtid.fraværsprosentVirksomhet(virksomhet.getNavn()),
         kalkulatorLangtid.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
     );
 
-    List<StatistikkDto> trendTotalt = EitherUtils.filterRights(
+    List<StatistikkDto> trendTotalt = EitherUtils.getRightsAndLogLefts(
         kalkulatorTotal.trendBransjeEllerNæring(bransjeEllerNæring)
     );
 
-    List<StatistikkDto> tapteDagsverkTotalt = EitherUtils.filterRights(
+    List<StatistikkDto> tapteDagsverkTotalt = EitherUtils.getRightsAndLogLefts(
         kalkulatorTotal.tapteDagsverkVirksomhet(virksomhet.getNavn())
     );
 
-    List<StatistikkDto> muligeDagsverkTotalt = EitherUtils.filterRights(
+    List<StatistikkDto> muligeDagsverkTotalt = EitherUtils.getRightsAndLogLefts(
         kalkulatorTotal.muligeDagsverkVirksomhet(virksomhet.getNavn())
     );
 
