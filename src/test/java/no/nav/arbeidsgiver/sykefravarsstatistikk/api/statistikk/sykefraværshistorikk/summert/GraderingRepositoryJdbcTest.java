@@ -87,8 +87,6 @@ public class GraderingRepositoryJdbcTest {
                 UNDERENHET_1_NÆRING_14.getOrgnr().getVerdi(),
                 PRODUKSJON_AV_KLÆR.getKode(), "14100",
                 RECTYPE_FOR_VIRKSOMHET, _2019_4,
-                5,
-                9,
                 7,
                 new BigDecimal(10),
                 new BigDecimal(20),
@@ -99,8 +97,6 @@ public class GraderingRepositoryJdbcTest {
                 UNDERENHET_1_NÆRING_14.getOrgnr().getVerdi(),
                 PRODUKSJON_AV_KLÆR.getKode(), "14222",
                 RECTYPE_FOR_VIRKSOMHET, _2019_4,
-                2,
-                9,
                 7,
                 new BigDecimal(12),
                 new BigDecimal(20),
@@ -111,8 +107,6 @@ public class GraderingRepositoryJdbcTest {
                 UNDERENHET_1_NÆRING_14.getOrgnr().getVerdi(),
                 PRODUKSJON_AV_KLÆR.getKode(), "14222",
                 RECTYPE_FOR_VIRKSOMHET, _2020_1,
-                19,
-                30,
                 15,
                 new BigDecimal(25),
                 new BigDecimal(50),
@@ -127,7 +121,7 @@ public class GraderingRepositoryJdbcTest {
                 new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2019, 4),
                         new BigDecimal(22),
-                        new BigDecimal(200),
+                        new BigDecimal(40),
                         14
                 )
         );
@@ -135,7 +129,7 @@ public class GraderingRepositoryJdbcTest {
                 new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2020, 1),
                         new BigDecimal(25),
-                        new BigDecimal(300),
+                        new BigDecimal(50),
                         15
                 )
         );
@@ -149,8 +143,6 @@ public class GraderingRepositoryJdbcTest {
                 PRODUKSJON_AV_KLÆR.getKode(),
                 UNDERENHET_1_NÆRING_14.getNæringskode().getKode(),
                 RECTYPE_FOR_VIRKSOMHET, _2019_4,
-                5,
-                9,
                 7,
                 new BigDecimal(10),
                 new BigDecimal(20),
@@ -161,8 +153,6 @@ public class GraderingRepositoryJdbcTest {
                 UNDERENHET_1_NÆRING_14.getOrgnr().getVerdi(),
                 PRODUKSJON_AV_KLÆR.getKode(), "14222",
                 RECTYPE_FOR_VIRKSOMHET, _2020_1,
-                2,
-                9,
                 7,
                 new BigDecimal(12),
                 new BigDecimal(20),
@@ -173,8 +163,6 @@ public class GraderingRepositoryJdbcTest {
                 UNDERENHET_3_NÆRING_14.getOrgnr().getVerdi(),
                 PRODUKSJON_AV_KLÆR.getKode(), "14222",
                 RECTYPE_FOR_VIRKSOMHET, _2020_1,
-                19,
-                30,
                 15,
                 new BigDecimal(25),
                 new BigDecimal(50),
@@ -188,7 +176,7 @@ public class GraderingRepositoryJdbcTest {
                 new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2019, 4),
                         new BigDecimal(10),
-                        new BigDecimal(100),
+                        new BigDecimal(20),
                         7
                 )
         );
@@ -196,7 +184,7 @@ public class GraderingRepositoryJdbcTest {
                 new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2020, 1),
                         new BigDecimal(12),
-                        new BigDecimal(100),
+                        new BigDecimal(20),
                         7
                 )
         );
@@ -212,8 +200,6 @@ public class GraderingRepositoryJdbcTest {
                 PRODUKSJON_AV_KLÆR.getKode(),
                 UNDERENHET_1_NÆRING_14.getNæringskode().getKode(),
                 RECTYPE_FOR_VIRKSOMHET, _2019_4,
-                5,
-                9,
                 7,
                 new BigDecimal(10),
                 new BigDecimal(20),
@@ -225,8 +211,6 @@ public class GraderingRepositoryJdbcTest {
                 PRODUKSJON_AV_KLÆR.getKode(),
                 "14222",
                 RECTYPE_FOR_VIRKSOMHET, _2020_1,
-                2,
-                9,
                 7,
                 new BigDecimal(12),
                 new BigDecimal(20),
@@ -238,8 +222,6 @@ public class GraderingRepositoryJdbcTest {
                 PRODUKSJON_AV_LÆR_OG_LÆRVARER.getKode(),
                 "15333",
                 RECTYPE_FOR_VIRKSOMHET, _2020_1,
-                19,
-                30,
                 15,
                 new BigDecimal(25),
                 new BigDecimal(50),
@@ -253,7 +235,7 @@ public class GraderingRepositoryJdbcTest {
                 new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2019, 4),
                         new BigDecimal(10),
-                        new BigDecimal(100),
+                        new BigDecimal(20),
                         7
                 )
         );
@@ -261,7 +243,7 @@ public class GraderingRepositoryJdbcTest {
                 new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2020, 1),
                         new BigDecimal(12),
-                        new BigDecimal(100),
+                        new BigDecimal(20),
                         7
                 )
         );
@@ -279,8 +261,6 @@ public class GraderingRepositoryJdbcTest {
                 HELSETJENESTER.getKode(),
                 sykehus.getKode(),
                 RECTYPE_FOR_VIRKSOMHET, _2019_4,
-                5,
-                9,
                 7,
                 new BigDecimal(10),
                 new BigDecimal(20),
@@ -292,8 +272,6 @@ public class GraderingRepositoryJdbcTest {
                 HELSETJENESTER.getKode(),
                 sykehus.getKode(),
                 RECTYPE_FOR_VIRKSOMHET, _2020_1,
-                2,
-                9,
                 7,
                 new BigDecimal(12),
                 new BigDecimal(20),
@@ -305,8 +283,6 @@ public class GraderingRepositoryJdbcTest {
                 HELSETJENESTER.getKode(),
                 legetjeneste.getKode(),
                 RECTYPE_FOR_VIRKSOMHET, _2020_1,
-                19,
-                30,
                 15,
                 new BigDecimal(25),
                 new BigDecimal(50),
@@ -318,8 +294,6 @@ public class GraderingRepositoryJdbcTest {
                 HELSETJENESTER.getKode(),
                 næringskodeIkkeErFraBransje.getKode(),
                 RECTYPE_FOR_VIRKSOMHET, _2020_1,
-                35,
-                1,
                 4,
                 new BigDecimal(55),
                 new BigDecimal(66),
@@ -334,7 +308,7 @@ public class GraderingRepositoryJdbcTest {
                 new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2019, 4),
                         new BigDecimal(10),
-                        new BigDecimal(100),
+                        new BigDecimal(20),
                         7
                 )
         );
@@ -342,14 +316,14 @@ public class GraderingRepositoryJdbcTest {
                 new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2020, 1),
                         new BigDecimal(37),
-                        new BigDecimal(400),
+                        new BigDecimal(70),
                         22
                 )
         );
     }
 
     @Test
-    public void hentSykefraværForEttKvartalMedGradering__skal_returnere_riktig_sykefravær_for_virksomheter_i_bransjen() {
+    public void hentSykefraværForEttKvartalMedGradering__henterIkkeUtGradertSykefraværForOverordnetEnhet() {
         Næringskode5Siffer sykehus = new Næringskode5Siffer("86101", "Alminnelige somatiske sykehus");
 
         insertDataMedGradering(
@@ -359,8 +333,6 @@ public class GraderingRepositoryJdbcTest {
                 sykehus.getKode(),
                 RECTYPE_FOR_FORETAK,
                 _2020_1,
-                5,
-                9,
                 7,
                 new BigDecimal(10),
                 new BigDecimal(20),
@@ -373,8 +345,6 @@ public class GraderingRepositoryJdbcTest {
                 sykehus.getKode(),
                 RECTYPE_FOR_VIRKSOMHET,
                 _2020_1,
-                2,
-                9,
                 7,
                 new BigDecimal(12),
                 new BigDecimal(20),
@@ -389,7 +359,7 @@ public class GraderingRepositoryJdbcTest {
                 new UmaskertSykefraværForEttKvartal(
                         new ÅrstallOgKvartal(2020, 1),
                         new BigDecimal(12),
-                        new BigDecimal(100),
+                        new BigDecimal(20),
                         7
                 )
         );

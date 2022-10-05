@@ -39,8 +39,8 @@ class SumAvSykefraværOverFlereKvartaler {
 
 
 SumAvSykefraværOverFlereKvartaler(@NotNull UmaskertSykefraværForEttKvartal data) {
-        this.muligeDagsverk = data.getMuligeDagsverk();
-        this.tapteDagsverk = data.getTapteDagsverk();
+        this.muligeDagsverk = data.getDagsverkNevner();
+        this.tapteDagsverk = data.getDagsverkTeller();
         this.antallPersoner = data.getAntallPersoner();
         this.kvartaler = List.of(data.getÅrstallOgKvartal());
     }

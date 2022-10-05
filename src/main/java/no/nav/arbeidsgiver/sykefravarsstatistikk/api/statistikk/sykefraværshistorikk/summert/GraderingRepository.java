@@ -80,7 +80,7 @@ public class GraderingRepository {
                             " sum(tapte_dagsverk_gradert_sykemelding) as "
                             + "sum_tapte_dagsverk_gradert_sykemelding, "
                             +
-                            " sum(mulige_dagsverk) as sum_mulige_dagsverk, " +
+                            " sum(tapte_dagsverk) as sum_tapte_dagsverk, " +
                             " sum(antall_personer) as sum_antall_personer " +
                             " from sykefravar_statistikk_virksomhet_med_gradering " +
                             " where " +
@@ -128,7 +128,7 @@ public class GraderingRepository {
                             " sum(tapte_dagsverk_gradert_sykemelding) as "
                             + "sum_tapte_dagsverk_gradert_sykemelding, "
                             +
-                            " sum(mulige_dagsverk) as sum_mulige_dagsverk, " +
+                            " sum(tapte_dagsverk) as sum_tapte_dagsverk, " +
                             " sum(antall_personer) as sum_antall_personer " +
                             " from sykefravar_statistikk_virksomhet_med_gradering " +
                             " where " +
@@ -155,7 +155,7 @@ public class GraderingRepository {
                             " sum(tapte_dagsverk_gradert_sykemelding) as "
                             + "sum_tapte_dagsverk_gradert_sykemelding, "
                             +
-                            " sum(mulige_dagsverk) as sum_mulige_dagsverk, " +
+                            " sum(tapte_dagsverk) as sum_tapte_dagsverk, " +
                             " sum(antall_personer) as sum_antall_personer " +
                             " from sykefravar_statistikk_virksomhet_med_gradering " +
                             " where " +
@@ -182,7 +182,7 @@ public class GraderingRepository {
                         rs.getInt("kvartal")
                 ),
                 rs.getBigDecimal("sum_tapte_dagsverk_gradert_sykemelding"),
-                rs.getBigDecimal("sum_mulige_dagsverk"),
+                rs.getBigDecimal("sum_tapte_dagsverk"),
                 rs.getInt("sum_antall_personer")
         );
     }
