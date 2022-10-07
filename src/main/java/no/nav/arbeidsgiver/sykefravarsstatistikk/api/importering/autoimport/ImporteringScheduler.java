@@ -26,7 +26,8 @@ public class ImporteringScheduler {
     this.counter = registry.counter("sykefravarstatistikk_vellykket_import");
   }
 
-  @Scheduled(cron = "0 5 8 * * ?")
+  //@Scheduled(cron = "0 5 8 * * ?")
+  @Scheduled(cron = "0 50 16 * * ?")
   public void scheduledImportering() {
     Duration lockAtMostFor = Duration.of(10, ChronoUnit.MINUTES);
     Duration lockAtLeastFor = Duration.of(1, ChronoUnit.MINUTES);
