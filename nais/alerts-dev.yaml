@@ -27,4 +27,5 @@ spec:
       expr: sum(increase(sykefravarstatistikk_vellykket_import_total{log_app="sykefravarsstatistikk-api"}[10m])) > 0
       for: 10s
       description: "import av sykefraværsstatistikk var vellykket"
+      action: ""
       severity: good
