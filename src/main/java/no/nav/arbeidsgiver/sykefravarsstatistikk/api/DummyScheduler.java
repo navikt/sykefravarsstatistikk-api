@@ -16,10 +16,9 @@ public class DummyScheduler {
     this.counter = registry.counter("dummy_counter");
   }
 
-  @Scheduled(cron = "* */15 * * * ?")
+  @Scheduled(cron = "* * * * * ?")
   public void scheduledImportering() {
     log.info("Kjører dummy-jobb, og inkrementerer counter ");
-    log.info("Counter er nå (pre-increment): {}", counter.count());
     counter.increment();
     log.info("Counter er nå (post-increment): {}", counter.count());
   }
