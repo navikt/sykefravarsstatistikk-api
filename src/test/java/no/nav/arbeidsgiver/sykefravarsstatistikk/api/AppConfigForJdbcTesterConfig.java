@@ -63,6 +63,7 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
                 TilgangskontrollService.class,
                 OffentligSykefraværshistorikkController.class,
                 AggregertStatistikkService.class,
+                DummyScheduler.class,
             })
     })
 public class AppConfigForJdbcTesterConfig extends JdbcRepositoryConfigExtension {
