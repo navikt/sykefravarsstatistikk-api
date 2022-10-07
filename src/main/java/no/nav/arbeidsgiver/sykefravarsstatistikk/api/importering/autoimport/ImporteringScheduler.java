@@ -23,7 +23,7 @@ public class ImporteringScheduler {
       SykefraværsstatistikkImporteringService importeringService, MeterRegistry registry) {
     this.taskExecutor = taskExecutor;
     this.importeringService = importeringService;
-    this.counter = registry.counter("sykefravarstatistikk_import");
+    this.counter = registry.counter("sykefravarstatistikk_vellykket_import");
   }
 
   @Scheduled(cron = "0 5 8 * * ?")
