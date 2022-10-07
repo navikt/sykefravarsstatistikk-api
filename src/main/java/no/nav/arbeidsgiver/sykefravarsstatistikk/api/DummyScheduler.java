@@ -13,12 +13,12 @@ public class DummyScheduler {
   private final Counter counter;
 
   public DummyScheduler(MeterRegistry registry) {
-    this.counter = registry.counter("dummy_counter_3");
+    this.counter = registry.counter("dummy_counter_4");
   }
 
-  @Scheduled(cron = "* */15 * * * ?")
+  @Scheduled(cron = "0 */15 * * * ?")
   public void scheduledImportering() {
-    log.info("Kjører dummy-jobb, og inkrementerer dummy_counter_3");
+    log.info("Kjører dummy-jobb, og inkrementerer dummy_counter_4");
     counter.increment();
     log.info("Counter er nå (post-increment): {}", counter.count());
   }
