@@ -15,11 +15,13 @@ public class ImporteringScheduler {
 
   private final LockingTaskExecutor taskExecutor;
   private final SykefraværsstatistikkImporteringService importeringService;
+  private final Counter counter;
 
   public ImporteringScheduler(LockingTaskExecutor taskExecutor,
-      SykefraværsstatistikkImporteringService importeringService) {
+      SykefraværsstatistikkImporteringService importeringService, MeterRegistry registry) {
     this.taskExecutor = taskExecutor;
     this.importeringService = importeringService;
+    this.counter = registry.counter("importering.scheduler");
   }
 
   @Scheduled(cron = "0 5 8 * * ?")
@@ -36,7 +38,9 @@ public class ImporteringScheduler {
   private void importering() {
     log.info("Jobb for å importere sykefraværsstatistikk er startet.");
     importeringService.importerHvisDetFinnesNyStatistikk();
-
+    if (importert) {
+        counter.increment(); // eller noe annet lurt
+    }
   }
 
 }
