@@ -1,5 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -15,11 +17,13 @@ public class ImporteringScheduler {
 
   private final LockingTaskExecutor taskExecutor;
   private final SykefraværsstatistikkImporteringService importeringService;
+  private final Counter counter;
 
   public ImporteringScheduler(LockingTaskExecutor taskExecutor,
-      SykefraværsstatistikkImporteringService importeringService) {
+      SykefraværsstatistikkImporteringService importeringService, MeterRegistry registry) {
     this.taskExecutor = taskExecutor;
     this.importeringService = importeringService;
+    this.counter = registry.counter("sykefravarstatistikk_import");
   }
 
   @Scheduled(cron = "0 5 8 * * ?")
@@ -35,8 +39,10 @@ public class ImporteringScheduler {
 
   private void importering() {
     log.info("Jobb for å importere sykefraværsstatistikk er startet.");
-    importeringService.importerHvisDetFinnesNyStatistikk();
-
+    Importeringstatus importeringstatus = importeringService.importerHvisDetFinnesNyStatistikk();
+    if (importeringstatus.equals(Importeringstatus.IMPORTERT)) {
+      counter.increment();
+    }
   }
 
 }
