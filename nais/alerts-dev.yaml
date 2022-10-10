@@ -24,7 +24,7 @@ spec:
       action: "Sjekk logs.adeo.no for logger, og Grafana-dashboardet vårt: https://grafana.nais.io/dashboards/f/cvOhCMUnz/team-ia"
 
     - alert: import av sykefraværsstatistikk har kjørt vellykket i sykefraværsstatistikk-api
-      expr: sum(increase(sykefravarstatistikk_vellykket_import_total{log_app="sykefravarsstatistikk-api"}[10m])) > 0
+      expr: sum(increase(sykefravarstatistikk_vellykket_import_total{app="sykefravarsstatistikk-api"}[10m])) > 0
       for: 10s
       description: "import av sykefraværsstatistikk var vellykket"
       action: ""
