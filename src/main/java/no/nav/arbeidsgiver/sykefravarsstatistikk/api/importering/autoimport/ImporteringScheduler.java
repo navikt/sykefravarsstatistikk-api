@@ -26,7 +26,7 @@ public class ImporteringScheduler {
     this.counter = registry.counter("sykefravarstatistikk_vellykket_import");
   }
 
-  @Scheduled(cron = "0 55 10 * * ?")
+  @Scheduled(cron = "0 30 12 * * ?")
   public void scheduledImportering() {
     Duration lockAtMostFor = Duration.of(10, ChronoUnit.MINUTES);
     Duration lockAtLeastFor = Duration.of(1, ChronoUnit.MINUTES);
@@ -41,7 +41,9 @@ public class ImporteringScheduler {
     log.info("Jobb for å importere sykefraværsstatistikk er startet.");
     Importeringstatus importeringstatus = importeringService.importerHvisDetFinnesNyStatistikk();
     if (importeringstatus.equals(Importeringstatus.IMPORTERT)) {
+      log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_import'");
       counter.increment();
+      log.info("Counter er nå: {}", counter.count());
     }
   }
 
