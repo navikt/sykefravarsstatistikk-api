@@ -44,7 +44,9 @@ nais.cluster.name: mvc-test
 
 kafka:
   outbound:
-    topic: arbeidsgiver.sykefravarsstatistikk-v1
+    topic:
+      - arbeidsgiver.sykefravarsstatistikk-v1
+      - arbeidsgiver.sykefravarsstatistikk-land-v1
     bootstrapServers: localhost:9092
     securityProtocol: PLAINTEXT
 

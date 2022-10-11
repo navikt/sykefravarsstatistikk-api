@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -23,7 +24,7 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "kafka.outbound")
 @Component
 public class KafkaProperties {
-	private String topic;
+	private List<String> topic;
 	private String bootstrapServers;
 	private String caPath;
 	private String truststorePath;

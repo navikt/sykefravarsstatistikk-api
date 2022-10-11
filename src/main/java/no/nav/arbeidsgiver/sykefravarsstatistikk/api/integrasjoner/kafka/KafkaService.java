@@ -91,6 +91,10 @@ public class KafkaService {
                 landSykefravær,
                 landSykefraværSiste4Kvartaler
                 );
+       /* KafkaTopicLandValue valueLand = new KafkaTopicLandValue(
+                landSykefravær,
+                landSykefraværSiste4Kvartaler
+                );*/
 
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
@@ -111,7 +115,7 @@ public class KafkaService {
         }
 
         ListenableFuture<SendResult<String, String>> futureResult = kafkaTemplate.send(
-                kafkaProperties.getTopic(),
+                kafkaProperties.getTopic().get(1),
                 keyAsJsonString,
                 dataAsJsonString
         );

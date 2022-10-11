@@ -24,6 +24,7 @@ import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -41,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @EnableMockOAuth2Server
 @EmbeddedKafka(
         controlledShutdown = true,
-        topics = {"arbeidsgiver.sykefravarsstatistikk-v1"},
+        topics = {"arbeidsgiver.sykefravarsstatistikk-v1","arbeidsgiver.sykefravarsstatistikk-land-v1"},
         brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"}
 )
 public class KafkaServiceIntegrasjonTest {
@@ -51,7 +52,8 @@ public class KafkaServiceIntegrasjonTest {
     @Autowired
     private EmbeddedKafkaBroker embeddedKafkaBroker;
 
-    private static String TOPIC_NAME = "arbeidsgiver.sykefravarsstatistikk-v1";
+    private static String[] TOPIC_NAME = {"arbeidsgiver.sykefravarsstatistikk-v1",
+          "arbeidsgiver.sykefravarsstatistikk-land-v1"};
     private KafkaMessageListenerContainer<String, String> container;
     private BlockingQueue<ConsumerRecord<String, String>> consumerRecords;
     private final static ObjectMapper objectMapper = new ObjectMapper();
@@ -90,7 +92,7 @@ public class KafkaServiceIntegrasjonTest {
     @Test
     public void send__sender_en_KafkaTopicValue_til__riktig_topic() throws Exception {
         container.start();
-        ContainerTestUtils.waitForAssignment(container, embeddedKafkaBroker.getPartitionsPerTopic());
+        ContainerTestUtils.waitForAssignment(container, embeddedKafkaBroker.getPartitionsPerTopic("topicname"));
 
         kafkaService.send(
                 __2020_2,
