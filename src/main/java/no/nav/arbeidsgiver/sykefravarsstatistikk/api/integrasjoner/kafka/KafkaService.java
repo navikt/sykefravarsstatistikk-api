@@ -91,18 +91,20 @@ public class KafkaService {
                 landSykefravær,
                 landSykefraværSiste4Kvartaler
                 );
-       /* KafkaTopicLandValue valueLand = new KafkaTopicLandValue(
+        KafkaTopicLandValue valueLand = new KafkaTopicLandValue(
                 landSykefravær,
                 landSykefraværSiste4Kvartaler
-                );*/
+                );
 
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
         String keyAsJsonString;
         String dataAsJsonString;
+        String dataLandAsJsonString;
         try {
             keyAsJsonString = objectMapper.writeValueAsString(key);
             dataAsJsonString = objectMapper.writeValueAsString(value);
+            dataLandAsJsonString = objectMapper.writeValueAsString(valueLand);
         } catch (JsonProcessingException e) {
             kafkaUtsendingRapport.leggTilError(
                     String.format(
@@ -115,12 +117,48 @@ public class KafkaService {
         }
 
         ListenableFuture<SendResult<String, String>> futureResult = kafkaTemplate.send(
-                kafkaProperties.getTopic().get(1),
+                kafkaProperties.getTopic().get(0),
                 keyAsJsonString,
                 dataAsJsonString
         );
 
         futureResult.addCallback(new ListenableFutureCallback<>() {
+            @Override
+            public void onFailure(Throwable throwable) {
+                kafkaUtsendingRapport.leggTilError(
+                        String.format(
+                                "Utsending feilet for orgnr '%s' med melding '%s'",
+                                virksomhetSykefravær.getOrgnr(),
+                                throwable.getMessage()
+                        ),
+                        new Orgnr(virksomhetSykefravær.getOrgnr())
+                );
+            }
+
+            @Override
+            public void onSuccess(SendResult<String, String> res) {
+                kafkaUtsendingRapport.leggTilUtsendingSuksess(new Orgnr(virksomhetSykefravær.getOrgnr()));
+                log.debug(
+                        "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
+                        kafkaProperties.getTopic(),
+                        res.getProducerRecord().key(),
+                        res.getRecordMetadata().offset()
+                );
+                kafkaUtsendingHistorikkRepository.opprettHistorikk(
+                        virksomhetSykefravær.getOrgnr(),
+                        keyAsJsonString,
+                        dataAsJsonString
+                );
+            }
+        });
+
+        ListenableFuture<SendResult<String, String>> futureResultLand = kafkaTemplate.send(
+                kafkaProperties.getTopic().get(1),
+                keyAsJsonString,
+                dataLandAsJsonString
+        );
+
+        futureResultLand.addCallback(new ListenableFutureCallback<>() {
             @Override
             public void onFailure(Throwable throwable) {
                 kafkaUtsendingRapport.leggTilError(

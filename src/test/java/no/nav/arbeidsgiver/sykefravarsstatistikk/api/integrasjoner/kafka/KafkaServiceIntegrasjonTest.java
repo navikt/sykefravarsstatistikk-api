@@ -92,7 +92,7 @@ public class KafkaServiceIntegrasjonTest {
     @Test
     public void send__sender_en_KafkaTopicValue_til__riktig_topic() throws Exception {
         container.start();
-        ContainerTestUtils.waitForAssignment(container, embeddedKafkaBroker.getPartitionsPerTopic("topicname"));
+        ContainerTestUtils.waitForAssignment(container, 4);
 
         kafkaService.send(
                 __2020_2,
