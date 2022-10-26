@@ -84,7 +84,7 @@ public class KafkaService {
         }
 
         ListenableFuture<SendResult<String, String>> futureResult = kafkaTemplate.send(
-                kafkaProperties.getTopic().get(0),
+                kafkaProperties.getTopic().get(1),
                 keyAsJsonString,
                 dataAsJsonString
         );
