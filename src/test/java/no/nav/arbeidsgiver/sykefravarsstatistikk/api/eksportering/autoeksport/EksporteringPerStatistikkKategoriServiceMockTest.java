@@ -44,6 +44,8 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
     ArgumentCaptor<SykefraværMedKategori> landSykefraværArgumentCaptor;
     @Captor
     ArgumentCaptor<List<StatistikkDto>> statistikkDtoListArgumentCaptor;
+    @Captor
+    ArgumentCaptor<StatistikkDto> statistikkDtoArgumentCaptor;
 
     @BeforeEach
     public void setUp() {
@@ -55,7 +57,7 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
 
 
     @Test
-    public void eksportV2_statistikk_LAND_sender_riktig_melding_til_kafka_og_returnerer_antall_meldinger_sendt() {
+    public void eksport_statistikk_LAND_sender_riktig_melding_til_kafka_og_returnerer_antall_meldinger_sendt() {
         ÅrstallOgKvartal fraÅrstallOgKvartal = __2020_2.minusKvartaler(3);
 
         // 1- Mock det database og repositories returnerer. Samme med KafkaService
@@ -70,13 +72,12 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
         verify(kafkaService).sendTilSykefraværsstatistikkLandTopic(
                 årstallOgKvartalArgumentCaptor.capture(),
                 landSykefraværArgumentCaptor.capture(),
-                statistikkDtoListArgumentCaptor.capture()
+                statistikkDtoArgumentCaptor.capture()
         );
 
         assertThat(årstallOgKvartalArgumentCaptor.getValue()).isEqualTo(__2020_2);
         assertEqualsSykefraværMedKategori(landSykefravær, landSykefraværArgumentCaptor.getValue());
         assertEqualsSykefraværMedKategori(
-                List.of(
                         StatistikkDto.builder()
                                 .statistikkategori(Statistikkategori.LAND)
                                 .label("Norge")
@@ -91,8 +92,7 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
                                         )
                                 )
                                 .build()
-                ),
-                statistikkDtoListArgumentCaptor.getAllValues().get(0)
+                , statistikkDtoArgumentCaptor.getValue()
         );
         assertThat(antallEksporterte).isEqualTo(1);
     }

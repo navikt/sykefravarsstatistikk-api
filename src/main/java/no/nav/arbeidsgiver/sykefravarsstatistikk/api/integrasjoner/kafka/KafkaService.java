@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaProperties;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.StatistikkDto;
@@ -18,7 +19,6 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -53,6 +53,71 @@ public class KafkaService {
         return kafkaUtsendingRapport.getAntallMeldingerMottattForUtsending();
     }
 
+    public int sendTilSykefraværsstatistikkLandTopic(
+            ÅrstallOgKvartal årstallOgKvartal,                 // f.eks 2022-3
+            SykefraværMedKategori landSykefraværSisteKvartal,  // Statistikk for LAND (Norge) for kvartal 2022-3
+            StatistikkDto landSykefraværSiste12Måneder         // Statistikk for LAND (Norge) for de siste 12 måneder
+                                                               // (fra kvartal 2022-3 ned til kvartal 2021-4)
+    ) {
+        kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
+        KafkaStatistikkategoriTopicKey key = new KafkaStatistikkategoriTopicKey(
+                Statistikkategori.LAND,
+                "NO",
+                årstallOgKvartal.getKvartal(),
+                årstallOgKvartal.getÅrstall()
+        );
+
+        KafkaStatistikkKategoriTopicValue value = new KafkaStatistikkKategoriTopicValue(
+                landSykefraværSisteKvartal,
+                landSykefraværSiste12Måneder
+        );
+
+        String keyAsJsonString;
+        String dataAsJsonString;
+
+        try {
+            keyAsJsonString = objectMapper.writeValueAsString(key);
+            dataAsJsonString = objectMapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+            kafkaUtsendingRapport.leggTilError("Kunne ikke parse statistikk 'LAND' til Json. Statistikk ikke sent");
+            return 0;
+        }
+
+        ListenableFuture<SendResult<String, String>> futureResult = kafkaTemplate.send(
+                kafkaProperties.getTopic().get(0),
+                keyAsJsonString,
+                dataAsJsonString
+        );
+
+        futureResult.addCallback(new ListenableFutureCallback<>() {
+            @Override
+            public void onFailure(Throwable throwable) {
+                kafkaUtsendingRapport.leggTilError(
+                        String.format(
+                                "Utsending feilet for statistikk kategori '%s' og kode '%s',  med melding '%s'",
+                                landSykefraværSisteKvartal.getKategori().name(),
+                                landSykefraværSisteKvartal.getKode(),
+                                throwable.getMessage()
+                        )
+                );
+            }
+
+            @Override
+            public void onSuccess(SendResult<String, String> res) {
+                kafkaUtsendingRapport.leggTilUtsendingSuksess();
+                log.debug(
+                        "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
+                        kafkaProperties.getTopic(),
+                        res.getProducerRecord().key(),
+                        res.getRecordMetadata().offset()
+                );
+            }
+        });
+
+        return 1;
+    }
+
+
     public void send(
           ÅrstallOgKvartal årstallOgKvartal,
           VirksomhetSykefravær virksomhetSykefravær,
@@ -60,8 +125,7 @@ public class KafkaService {
           SykefraværMedKategori næringSykefravær,
           SykefraværMedKategori sektorSykefravær,
           SykefraværMedKategori landSykefravær,
-          List<StatistikkDto> landSykefraværSiste4Kvartaler
-          // TODO: Legge til prosent her???
+          List<StatistikkDto> landSykefraværSiste4Kvartaler // TODO: Dette skal bort (vi skal ikke endre data på eksisterende topic)
     ) {
         // TODO bytt til Prometheus
         kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
@@ -207,14 +271,5 @@ public class KafkaService {
 
     public void addDBOppdateringProcessingTime(long startDBOppdateringProcess, long stopDBOppdateringProcess) {
         kafkaUtsendingRapport.addDBOppdateringProcessingTime(startDBOppdateringProcess, stopDBOppdateringProcess);
-    }
-
-
-    public int sendTilSykefraværsstatistikkLandTopic(
-            ÅrstallOgKvartal årstallOgKvartal,
-            SykefraværMedKategori landSykefraværSisteKvartal,
-            List<StatistikkDto> statistikkDtosSiste12Måneder
-    ) {
-        return 1;
     }
 }

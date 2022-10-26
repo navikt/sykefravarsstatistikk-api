@@ -5,6 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMeta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaStatistikkKategoriTopicValue;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaTopicValue;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
@@ -81,6 +82,7 @@ public class EksporteringServiceTestUtils {
             new BigDecimal(500000000),
             2500000
     );
+
     public static List<StatistikkDto> statistikkDtoList(ÅrstallOgKvartal årstallOgKvartal) {
         return List.of(StatistikkDto.builder()
               .statistikkategori(Statistikkategori.LAND)
@@ -537,6 +539,14 @@ public class EksporteringServiceTestUtils {
         assertEqualsVirksomhetSykefravær(actual.getVirksomhetSykefravær(), expected.getVirksomhetSykefravær());
     }
 
+    public static void assertKafkaStatistikkKategoriTopicValueEquals(
+            KafkaStatistikkKategoriTopicValue expected,
+            KafkaStatistikkKategoriTopicValue actual
+    ) {
+        assertEqualsSykefraværMedKategori(expected.getSisteKvartal(), actual.getSisteKvartal());
+        assertEqualsSykefraværMedKategori(expected.getSiste4Kvartal(), actual.getSiste4Kvartal());
+    }
+
     // Assert metoder og 'expected' verdier
 
     public static String getKafkaTopicValueAsJsonString() {
@@ -600,7 +610,7 @@ public class EksporteringServiceTestUtils {
               "  \"statistikkDtoList\": [" +
               "    {" +
               "      \"statistikkategori\": \"LAND\"," +
-              "      \"label\": \"Norge\"," +
+              "      \"label\": \"NO\"," +
               "      \"verdi\": \"1.9\"," +
               "      \"antallPersonerIBeregningen\": 10000000," +
               "      \"kvartalerIBeregningen\": [" +

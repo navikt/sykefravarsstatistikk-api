@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 @Component
 public class EksporteringServiceUtils {
 
-    public EksporteringServiceUtils() {}
 
     @NotNull
     protected static List<SykefraværsstatistikkVirksomhetUtenVarighet> filterByKvartal(

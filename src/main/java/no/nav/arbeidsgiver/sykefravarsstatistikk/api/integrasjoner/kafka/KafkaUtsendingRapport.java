@@ -15,8 +15,8 @@ public class KafkaUtsendingRapport {
     private final AtomicInteger antallMeldingerSent;
     private final AtomicInteger antallMeldingerIError;
     private final List<String> meldinger;
-    private final List<Orgnr> sentVirksomheter;
-    private final List<Orgnr> ikkeSentVirksomheter;
+    private final List<Orgnr> sentVirksomheter; // TODO: delete me --> not in use
+    private final List<Orgnr> ikkeSentVirksomheter; // TODO: delete me --> not in use
     private AtomicInteger antallUtsendigerMålet;
     private AtomicInteger antallDBOppdateringerMålet;
     private AtomicLong totaltTidUtsendingTilKafka;
@@ -57,15 +57,22 @@ public class KafkaUtsendingRapport {
     }
 
     public void leggTilUtsendingSuksess(Orgnr orgnr) {
-        antallMeldingerSent.incrementAndGet();
         sentVirksomheter.add(orgnr);
+        leggTilUtsendingSuksess();
+    }
 
+    public void leggTilUtsendingSuksess() {
+        antallMeldingerSent.incrementAndGet();
         loggVedSisteMelding();
     }
 
     public void leggTilError(String errorMelding, Orgnr orgnr) {
-        antallMeldingerIError.incrementAndGet();
         ikkeSentVirksomheter.add(orgnr);
+        leggTilError(errorMelding);
+    }
+
+    public void leggTilError(String errorMelding) {
+        antallMeldingerIError.incrementAndGet();
         meldinger.add(errorMelding);
 
         loggVedSisteMelding();
