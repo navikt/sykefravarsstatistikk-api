@@ -209,4 +209,12 @@ public class KafkaService {
         kafkaUtsendingRapport.addDBOppdateringProcessingTime(startDBOppdateringProcess, stopDBOppdateringProcess);
     }
 
+
+    public int sendTilSykefraværsstatistikkLandTopic(
+            ÅrstallOgKvartal årstallOgKvartal,
+            SykefraværMedKategori landSykefraværSisteKvartal,
+            List<StatistikkDto> statistikkDtosSiste12Måneder
+    ) {
+        return 1;
+    }
 }
