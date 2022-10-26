@@ -107,8 +107,7 @@ public class KafkaServiceIntegrasjonTest {
                 Arrays.asList(næring5SifferSykefravær),
                 næringSykefravær,
                 sektorSykefravær,
-                landSykefravær,
-                statistikkDtoList(__2020_2)
+                landSykefravær
         );
 
         ConsumerRecord<String, String> message = consumerRecords.poll(10, TimeUnit.SECONDS);

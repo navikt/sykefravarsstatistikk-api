@@ -124,8 +124,7 @@ public class KafkaService {
           List<SykefraværMedKategori> næring5SifferSykefravær,
           SykefraværMedKategori næringSykefravær,
           SykefraværMedKategori sektorSykefravær,
-          SykefraværMedKategori landSykefravær,
-          List<StatistikkDto> landSykefraværSiste4Kvartaler // TODO: Dette skal bort (vi skal ikke endre data på eksisterende topic)
+          SykefraværMedKategori landSykefravær
     ) {
         // TODO bytt til Prometheus
         kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
@@ -152,23 +151,16 @@ public class KafkaService {
                 næring5SifferSykefravær,
                 næringSykefravær,
                 sektorSykefravær,
-                landSykefravær,
-                landSykefraværSiste4Kvartaler
-                );
-        KafkaTopicLandValue valueLand = new KafkaTopicLandValue(
-                landSykefravær,
-                landSykefraværSiste4Kvartaler
+                landSykefravær
                 );
 
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
         String keyAsJsonString;
         String dataAsJsonString;
-        String dataLandAsJsonString;
         try {
             keyAsJsonString = objectMapper.writeValueAsString(key);
             dataAsJsonString = objectMapper.writeValueAsString(value);
-            dataLandAsJsonString = objectMapper.writeValueAsString(valueLand);
         } catch (JsonProcessingException e) {
             kafkaUtsendingRapport.leggTilError(
                     String.format(
@@ -187,42 +179,6 @@ public class KafkaService {
         );
 
         futureResult.addCallback(new ListenableFutureCallback<>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-                kafkaUtsendingRapport.leggTilError(
-                        String.format(
-                                "Utsending feilet for orgnr '%s' med melding '%s'",
-                                virksomhetSykefravær.getOrgnr(),
-                                throwable.getMessage()
-                        ),
-                        new Orgnr(virksomhetSykefravær.getOrgnr())
-                );
-            }
-
-            @Override
-            public void onSuccess(SendResult<String, String> res) {
-                kafkaUtsendingRapport.leggTilUtsendingSuksess(new Orgnr(virksomhetSykefravær.getOrgnr()));
-                log.debug(
-                        "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
-                        kafkaProperties.getTopic(),
-                        res.getProducerRecord().key(),
-                        res.getRecordMetadata().offset()
-                );
-                kafkaUtsendingHistorikkRepository.opprettHistorikk(
-                        virksomhetSykefravær.getOrgnr(),
-                        keyAsJsonString,
-                        dataAsJsonString
-                );
-            }
-        });
-
-        ListenableFuture<SendResult<String, String>> futureResultLand = kafkaTemplate.send(
-                kafkaProperties.getTopic().get(1),
-                keyAsJsonString,
-                dataLandAsJsonString
-        );
-
-        futureResultLand.addCallback(new ListenableFutureCallback<>() {
             @Override
             public void onFailure(Throwable throwable) {
                 kafkaUtsendingRapport.leggTilError(

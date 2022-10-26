@@ -11,7 +11,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMeta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.EitherUtils;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
@@ -41,19 +40,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.filterByKvartal;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForBransjeEllerNæringSiste4Kvartaler;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForLand;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForNæring;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForNæring5Siffer;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForSektor;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriVirksomhetSiste4Kvartaler;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getVirksomhetMetadataHashMap;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getVirksomhetSykefravær;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getVirksomheterMetadataFraSubset;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.hentSisteKvartalIBeregningen;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.mapToSykefraværsstatistikkLand;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.toMap;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.CollectionUtils.concat;
 
 @Slf4j
 @Component
@@ -261,22 +257,7 @@ public class EksporteringService {
                                   virksomhetMetadata,
                                   sykefraværsstatistikkSektor
                             ),
-                            landSykefravær,
-                            concat(
-                                  EitherUtils.filterRights(statistikkDtoLand),
-                                  getSykefraværMedKategoriForBransjeEllerNæringSiste4Kvartaler(
-                                        virksomhetMetadata,
-                                        sykefraværsstatistikkNæring,
-                                        sykefraværsstatistikkNæring5Siffer,
-                                        årstallOgKvartal.minusKvartaler(3),
-                                        bransjeEllerNæring
-                                  ),
-                                  getSykefraværMedKategoriVirksomhetSiste4Kvartaler(
-                                        virksomhetMetadata,
-                                        sykefraværsstatistikkVirksomhetUtenVarighet,
-                                        årstallOgKvartal.minusKvartaler(3)
-                                  )
-                            )
+                            landSykefravær
                       );
 
                       long stopUtsendingProcess = System.nanoTime();

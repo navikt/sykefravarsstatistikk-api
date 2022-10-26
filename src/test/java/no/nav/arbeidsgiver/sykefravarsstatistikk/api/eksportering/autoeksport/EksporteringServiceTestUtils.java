@@ -605,82 +605,8 @@ public class EksporteringServiceTestUtils {
                 "    \"kode\": \"NO\"," +
                 "    \"antallPersoner\": 2500000," +
                 "    \"årstall\": 2020," +
-              "    \"kvartal\": 2" +
-              "  }," +
-              "  \"statistikkDtoList\": [" +
-              "    {" +
-              "      \"statistikkategori\": \"LAND\"," +
-              "      \"label\": \"NO\"," +
-              "      \"verdi\": \"1.9\"," +
-              "      \"antallPersonerIBeregningen\": 10000000," +
-              "      \"kvartalerIBeregningen\": [" +
-              "        {" +
-              "          \"årstall\": 2020," +
-              "          \"kvartal\": 2" +
-              "        }," +
-              "        {" +
-              "          \"årstall\": 2020," +
-              "          \"kvartal\": 3" +
-              "        }," +
-              "        {" +
-              "          \"årstall\": 2020," +
-              "          \"kvartal\": 4" +
-              "        }," +
-              "        {" +
-              "          \"årstall\": 2021," +
-              "          \"kvartal\": 1" +
-              "        }" +
-              "      ]" +
-              "    }," +
-              "    {" +
-              "      \"statistikkategori\": \"BRANSJE\"," +
-              "      \"label\": \"Sykehus\"," +
-              "      \"verdi\": \"2.3\"," +
-              "      \"antallPersonerIBeregningen\": 1100," +
-              "      \"kvartalerIBeregningen\": [" +
-              "        {" +
-              "          \"årstall\": 2022," +
-              "          \"kvartal\": 1" +
-              "        }," +
-              "        {" +
-              "          \"årstall\": 2021," +
-              "          \"kvartal\": 4" +
-              "        }," +
-              "        {" +
-              "          \"årstall\": 2021," +
-              "          \"kvartal\": 3" +
-              "        }," +
-              "        {" +
-              "          \"årstall\": 2021," +
-              "          \"kvartal\": 2" +
-              "        }" +
-              "      ]" +
-              "    }," +
-              "    {" +
-              "      \"statistikkategori\": \"VIRKSOMHET\"," +
-              "      \"label\": \"Virksomhet 1\"," +
-              "      \"verdi\": \"2.1\"," +
-              "      \"antallPersonerIBeregningen\": 100," +
-              "      \"kvartalerIBeregningen\": [" +
-              "        {" +
-              "          \"årstall\": 2022," +
-              "          \"kvartal\": 1" +
-              "        }," +
-              "        {" +
-              "          \"årstall\": 2021," +
-              "          \"kvartal\": 4" +
-              "        }," +
-              "        {" +
-              "          \"årstall\": 2021," +
-              "          \"kvartal\": 3" +
-              "        }," +
-              "        {" +
-              "          \"årstall\": 2021," +
-              "          \"kvartal\": 2" +
-              "        }" +
-              "      ]" +
-              "    }" +
-              "  ]" +
+                "    \"kvartal\": 2" +
+                "  }" +
                 "}").replaceAll("\\s+", "");
     }
 

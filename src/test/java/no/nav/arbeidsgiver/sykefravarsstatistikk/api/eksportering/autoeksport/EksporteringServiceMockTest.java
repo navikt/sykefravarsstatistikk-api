@@ -262,8 +262,7 @@ public class EksporteringServiceMockTest {
                 næring5SifferSykefraværArgumentCaptor.capture(),
                 næringSykefraværArgumentCaptor.capture(),
                 sektorSykefraværArgumentCaptor.capture(),
-                landSykefraværArgumentCaptor.capture(),
-                statistikkDtoListArgumentCaptor.capture()
+                landSykefraværArgumentCaptor.capture()
         );
         assertThat(årstallOgKvartalArgumentCaptor.getValue()).isEqualTo(__2020_2);
         assertEqualsVirksomhetSykefravær(virksomhetSykefravær, virksomhetSykefraværArgumentCaptor.getValue());
@@ -275,53 +274,6 @@ public class EksporteringServiceMockTest {
         assertEqualsSykefraværMedKategori(næringSykefravær, næringSykefraværArgumentCaptor.getValue());
         assertEqualsSykefraværMedKategori(sektorSykefravær, sektorSykefraværArgumentCaptor.getValue());
         assertEqualsSykefraværMedKategori(landSykefravær, landSykefraværArgumentCaptor.getValue());
-        assertEqualsSykefraværMedKategori(
-              List.of(
-                    StatistikkDto.builder()
-                          .statistikkategori(Statistikkategori.LAND)
-                          .label("Norge")
-                          .verdi("1.9")
-                          .antallPersonerIBeregningen(10000000)
-                          .kvartalerIBeregningen(
-                                List.of(
-                                      fraÅrstallOgKvartal.plussKvartaler(3),
-                                      fraÅrstallOgKvartal.plussKvartaler(2),
-                                      fraÅrstallOgKvartal.plussKvartaler(1),
-                                      fraÅrstallOgKvartal
-                                )
-                          )
-                          .build(),
-                    StatistikkDto.builder()
-                          .statistikkategori(Statistikkategori.NÆRING)
-                          .label("Industri")
-                          .verdi("2.0")
-                          .antallPersonerIBeregningen(600)
-                          .kvartalerIBeregningen(
-                                List.of(
-                                      fraÅrstallOgKvartal,
-                                      fraÅrstallOgKvartal.plussKvartaler(1),
-                                      fraÅrstallOgKvartal.plussKvartaler(2),
-                                      fraÅrstallOgKvartal.plussKvartaler(3)
-                                )
-                          )
-                          .build(),
-                    StatistikkDto.builder()
-                          .statistikkategori(Statistikkategori.VIRKSOMHET)
-                          .label("Virksomhet 1")
-                          .verdi("2.0")
-                          .antallPersonerIBeregningen(24)
-                          .kvartalerIBeregningen(
-                                List.of(
-                                      fraÅrstallOgKvartal,
-                                      fraÅrstallOgKvartal.plussKvartaler(1),
-                                      fraÅrstallOgKvartal.plussKvartaler(2),
-                                      fraÅrstallOgKvartal.plussKvartaler(3)
-                                )
-                          )
-                          .build()
-              ),
-              statistikkDtoListArgumentCaptor.getAllValues().get(0)
-        );
         assertThat(antallEksporterte).isEqualTo(1);
     }
 
@@ -385,8 +337,7 @@ public class EksporteringServiceMockTest {
                 næring5SifferSykefraværArgumentCaptor.capture(),
                 næringSykefraværArgumentCaptor.capture(),
                 sektorSykefraværArgumentCaptor.capture(),
-                landSykefraværArgumentCaptor.capture(),
-                statistikkDtoListArgumentCaptor.capture()
+                landSykefraværArgumentCaptor.capture()
         );
         assertThat(årstallOgKvartalArgumentCaptor.getValue()).isEqualTo(årstallOgKvartal);
         assertEqualsVirksomhetSykefravær(virksomhetSykefravær, virksomhetSykefraværArgumentCaptor.getValue());
@@ -394,24 +345,6 @@ public class EksporteringServiceMockTest {
         assertEqualsSykefraværMedKategori(
                 næring5SifferSykefraværArgumentCaptor.getValue().get(0),
               næring5SifferSykefraværTilhørerBransje
-        );
-        assertEqualsSykefraværMedKategori(
-                    StatistikkDto.builder()
-                          .statistikkategori(Statistikkategori.BRANSJE)
-                          .label("Sykehus")
-                          .verdi("1.3")
-                          .antallPersonerIBeregningen(8000)
-                          .kvartalerIBeregningen(
-                                List.of(
-                                      fraÅrstallOgKvartal,
-                                      fraÅrstallOgKvartal.plussKvartaler(1),
-                                      fraÅrstallOgKvartal.plussKvartaler(2),
-                                      fraÅrstallOgKvartal.plussKvartaler(3)
-                                )
-                          )
-                          .build(),
-
-              statistikkDtoListArgumentCaptor.getValue().get(1)
         );
         assertThat(antallEksporterte).isEqualTo(1);
     }

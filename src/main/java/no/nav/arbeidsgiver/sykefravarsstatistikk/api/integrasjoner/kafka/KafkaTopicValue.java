@@ -12,22 +12,19 @@ public class KafkaTopicValue {
     private final  SykefraværMedKategori næringSykefravær;
     private final  SykefraværMedKategori sektorSykefravær;
     private final  SykefraværMedKategori landSykefravær;
-    private final  List<StatistikkDto> statistikkDtoList;
 
     public KafkaTopicValue(
             VirksomhetSykefravær virksomhetSykefravær,
             List<SykefraværMedKategori> næring5SifferSykefravær,
             SykefraværMedKategori næringSykefravær,
             SykefraværMedKategori sektorSykefravær,
-            SykefraværMedKategori landSykefravær,
-            List<StatistikkDto> statistikkDtoList
+            SykefraværMedKategori landSykefravær
     ) {
         this.virksomhetSykefravær = virksomhetSykefravær;
         this.næring5SifferSykefravær = næring5SifferSykefravær;
         this.næringSykefravær = næringSykefravær;
         this.sektorSykefravær = sektorSykefravær;
         this.landSykefravær = landSykefravær;
-        this.statistikkDtoList=statistikkDtoList;
     }
 
     @Override
@@ -41,7 +38,6 @@ public class KafkaTopicValue {
         if (!næring5SifferSykefravær.equals(that.næring5SifferSykefravær)) return false;
         if (!næringSykefravær.equals(that.næringSykefravær)) return false;
         if (!sektorSykefravær.equals(that.sektorSykefravær)) return false;
-        if(!statistikkDtoList.equals(that.statistikkDtoList)) return false;
         return landSykefravær.equals(that.landSykefravær);
     }
 
@@ -52,15 +48,12 @@ public class KafkaTopicValue {
         result = 31 * result + næringSykefravær.hashCode();
         result = 31 * result + sektorSykefravær.hashCode();
         result = 31 * result + landSykefravær.hashCode();
-        result = 31 * result + ( statistikkDtoList != null ? statistikkDtoList.hashCode() : 0);
         return result;
     }
-
 
     public VirksomhetSykefravær getVirksomhetSykefravær() { return virksomhetSykefravær; }
     public List<SykefraværMedKategori> getNæring5SifferSykefravær() { return næring5SifferSykefravær; }
     public SykefraværMedKategori getNæringSykefravær() { return næringSykefravær; }
     public SykefraværMedKategori getSektorSykefravær() { return sektorSykefravær; }
     public SykefraværMedKategori getLandSykefravær() { return landSykefravær; }
-    public List<StatistikkDto> getStatistikkDtoList() { return statistikkDtoList; }
 }
