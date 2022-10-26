@@ -21,4 +21,13 @@ public class EitherUtils {
         .map(Either::get)
         .collect(toList());
   }
+
+  @SafeVarargs
+  public static <L, R> List<R> filterRights(Either<L, R>... leftsAndRights) {
+    return Stream.of(leftsAndRights)
+            .filter(Either::isRight)
+            .map(Either::get)
+            .collect(toList());
+  }
+
 }
