@@ -10,6 +10,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaTo
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværOverFlereKvartaler;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.StatistikkDto;
 
@@ -26,10 +27,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class EksporteringServiceTestUtils {
 
     // Data for testing & Utilities
+    public static ÅrstallOgKvartal __2021_2 = new ÅrstallOgKvartal(2021, 2);
+    public static ÅrstallOgKvartal __2021_1 = new ÅrstallOgKvartal(2021, 1);
     public static ÅrstallOgKvartal __2020_4 = new ÅrstallOgKvartal(2020, 4);
     public static ÅrstallOgKvartal __2020_2 = new ÅrstallOgKvartal(2020, 2);
-    public static ÅrstallOgKvartal __2021_1 = new ÅrstallOgKvartal(2021, 1);
-    public static ÅrstallOgKvartal __2021_2 = new ÅrstallOgKvartal(2021, 2);
+    public static ÅrstallOgKvartal __2020_1 = new ÅrstallOgKvartal(2020, 1);
+    public static ÅrstallOgKvartal __2019_4 = new ÅrstallOgKvartal(2019, 4);
+    public static ÅrstallOgKvartal __2019_3 = new ÅrstallOgKvartal(2019, 3);
     public static Orgnr ORGNR_VIRKSOMHET_1 = new Orgnr("987654321");
     public static Orgnr ORGNR_VIRKSOMHET_2 = new Orgnr("912345678");
     public static Orgnr ORGNR_VIRKSOMHET_3 = new Orgnr("999966633");
@@ -478,6 +482,17 @@ public class EksporteringServiceTestUtils {
     // Assert methods
     // Assertions
 
+    public static void assertEqualsSykefraværOverFlereKvartaler(
+            SykefraværOverFlereKvartaler expected,
+            SykefraværOverFlereKvartaler actual
+    ) {
+        assertThat(actual.getProsent()).as("Sjekk prosent").isEqualByComparingTo(expected.getProsent());
+        assertThat(actual.getKvartaler()).as("Sjekk listen av kvartaler").isEqualTo(expected.getKvartaler());
+        assertBigDecimalIsEqual(actual.getMuligeDagsverk(), expected.getMuligeDagsverk());
+        assertBigDecimalIsEqual(actual.getTapteDagsverk(), expected.getTapteDagsverk());
+    }
+
+
     public static void assertEqualsVirksomhetSykefravær(VirksomhetSykefravær expected, VirksomhetSykefravær actual) {
         assertThat(actual.getÅrstall()).isEqualTo(expected.getÅrstall());
         assertThat(actual.getKvartal()).isEqualTo(expected.getKvartal());
@@ -511,7 +526,8 @@ public class EksporteringServiceTestUtils {
         assertBigDecimalIsEqual(actual.getMuligeDagsverk(), expected.getMuligeDagsverk());
         assertBigDecimalIsEqual(actual.getTapteDagsverk(), expected.getTapteDagsverk());
     }
-    public static void assertEqualsSykefraværMedKategori(
+
+    public static void assertEqualsStatistikkDto(
             List<StatistikkDto> expected,
             List<StatistikkDto> actual
     ) {
@@ -519,7 +535,7 @@ public class EksporteringServiceTestUtils {
               expected
         );
     }
-    public static void assertEqualsSykefraværMedKategori(
+    public static void assertEqualsStatistikkDto(
             StatistikkDto expected,
             StatistikkDto actual
     ) {
@@ -539,13 +555,6 @@ public class EksporteringServiceTestUtils {
         assertEqualsVirksomhetSykefravær(actual.getVirksomhetSykefravær(), expected.getVirksomhetSykefravær());
     }
 
-    public static void assertKafkaStatistikkKategoriTopicValueEquals(
-            KafkaStatistikkKategoriTopicValue expected,
-            KafkaStatistikkKategoriTopicValue actual
-    ) {
-        assertEqualsSykefraværMedKategori(expected.getSisteKvartal(), actual.getSisteKvartal());
-        assertEqualsSykefraværMedKategori(expected.getSiste4Kvartal(), actual.getSiste4Kvartal());
-    }
 
     // Assert metoder og 'expected' verdier
 

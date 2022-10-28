@@ -25,11 +25,9 @@ public abstract class MaskerbartSykefraværOverFlereKvartaler {
             List<SykefraværForEttKvartal> sykefraværForEttKvartalList,
             boolean harSykefraværData
     ) {
-        // TODO: vi må lande på regelen om maskering.
-        //  Foreløpig tar vi et strengt forhold til det: er det 1 kvartal som er maskert, maskerer vi det hele
         erMaskert =
                 harSykefraværData &&
-                        sykefraværForEttKvartalList.stream().anyMatch(MaskerbartSykefravær::isErMaskert);
+                        sykefraværForEttKvartalList.stream().allMatch(MaskerbartSykefravær::isErMaskert);
 
         if (!erMaskert && harSykefraværData) {
             prosent = tapteDagsverk

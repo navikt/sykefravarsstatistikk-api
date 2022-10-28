@@ -5,6 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværOverFlereKvartaler;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.StatistikkDto;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2020_2;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.assertEqualsStatistikkDto;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.landSykefravær;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.sykefraværsstatistikkLandSiste4Kvartaler;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,7 +44,7 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
     @Captor
     ArgumentCaptor<SykefraværMedKategori> landSykefraværArgumentCaptor;
     @Captor
-    ArgumentCaptor<List<StatistikkDto>> statistikkDtoListArgumentCaptor;
+    ArgumentCaptor<SykefraværOverFlereKvartaler> sykefraværOverFlereKvartalerArgumentCaptor;
     @Captor
     ArgumentCaptor<StatistikkDto> statistikkDtoArgumentCaptor;
 
@@ -72,12 +73,12 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
         verify(kafkaService).sendTilStatistikkKategoriTopic(
                 årstallOgKvartalArgumentCaptor.capture(),
                 landSykefraværArgumentCaptor.capture(),
-                statistikkDtoArgumentCaptor.capture()
+                sykefraværOverFlereKvartalerArgumentCaptor.capture()
         );
 
         assertThat(årstallOgKvartalArgumentCaptor.getValue()).isEqualTo(__2020_2);
-        assertEqualsSykefraværMedKategori(landSykefravær, landSykefraværArgumentCaptor.getValue());
-        assertEqualsSykefraværMedKategori(
+        EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(landSykefravær, landSykefraværArgumentCaptor.getValue());
+        EksporteringServiceTestUtils.assertEqualsStatistikkDto(
                         StatistikkDto.builder()
                                 .statistikkategori(Statistikkategori.LAND)
                                 .label("Norge")

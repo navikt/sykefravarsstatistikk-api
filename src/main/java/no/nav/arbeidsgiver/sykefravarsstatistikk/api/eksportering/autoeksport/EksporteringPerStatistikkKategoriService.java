@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
+import io.vavr.control.Either;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.EitherUtils;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
@@ -7,6 +8,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaSe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUtsendingException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.StatistikkException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværOverFlereKvartaler;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.Aggregeringskalkulator;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.StatistikkDto;
@@ -60,8 +63,12 @@ public class EksporteringPerStatistikkKategoriService {
                 )
         );
 
+        // Her vil vi ikke ha StatistikkDto men noe annet .....
         List<StatistikkDto> statistikkDtos = EitherUtils.filterRights(aggregeringskalkulatorLand.fraværsprosentNorge());
+        List<SykefraværOverFlereKvartaler> sykefraværForFlereKvartaler =
+                EitherUtils.filterRights(aggregeringskalkulatorLand.getSykefraværForFlereKvartaler(Statistikkategori.LAND));
 
+        SykefraværOverFlereKvartaler sykefraværOverFlereKvartalerLand = sykefraværForFlereKvartaler.get(0);
         kafkaService.nullstillUtsendingRapport(1);
         long startUtsendingProcess = System.nanoTime();
 
@@ -70,7 +77,7 @@ public class EksporteringPerStatistikkKategoriService {
             antallEksportert = kafkaService.sendTilStatistikkKategoriTopic(
                     årstallOgKvartal,
                     landSykefravær,
-                    statistikkDtos.get(0)
+                    sykefraværOverFlereKvartalerLand
             );
         } catch (KafkaUtsendingException | KafkaException e) {
             log.warn("Fikk Exception fra Kafka med melding:'{}'. Avbryter prosess.", e.getMessage(), e);

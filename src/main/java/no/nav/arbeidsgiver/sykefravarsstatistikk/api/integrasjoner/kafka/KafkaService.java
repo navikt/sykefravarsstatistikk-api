@@ -11,7 +11,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaP
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.StatistikkDto;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværOverFlereKvartaler;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
@@ -56,8 +56,8 @@ public class KafkaService {
     public int sendTilStatistikkKategoriTopic(
             ÅrstallOgKvartal årstallOgKvartal,                 // f.eks 2022-3
             SykefraværMedKategori landSykefraværSisteKvartal,  // Statistikk for LAND (Norge) for kvartal 2022-3
-            StatistikkDto landSykefraværSiste12Måneder         // Statistikk for LAND (Norge) for de siste 12 måneder
-                                                               // (fra kvartal 2022-3 ned til kvartal 2021-4)
+            SykefraværOverFlereKvartaler landSykefraværSiste12Måneder         // Statistikk for LAND (Norge) for de siste 12 måneder
+            // (fra kvartal 2022-3 ned til kvartal 2021-4)
     ) {
         kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
         KafkaStatistikkategoriTopicKey key = new KafkaStatistikkategoriTopicKey(

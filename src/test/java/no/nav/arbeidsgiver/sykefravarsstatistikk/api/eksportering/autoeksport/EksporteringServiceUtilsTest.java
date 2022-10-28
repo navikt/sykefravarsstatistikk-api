@@ -30,7 +30,7 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeks
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2020_4;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2021_1;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2021_2;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.assertEqualsStatistikkDto;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.assertEqualsVirksomhetSykefravær;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.byggSykefraværStatistikkNæring;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.byggSykefraværStatistikkNæring5Siffer;
@@ -245,7 +245,7 @@ public class EksporteringServiceUtilsTest {
                 )
         );
 
-        assertEqualsSykefraværMedKategori(
+        EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(
                 byggSykefraværStatistikkSektor(virksomhet1Metadata_2020_4, 10, 156, 22233), resultat,
                 Statistikkategori.SEKTOR,
                 virksomhet1Metadata_2020_4.getSektor()
@@ -262,7 +262,7 @@ public class EksporteringServiceUtilsTest {
                 )
         );
 
-        assertEqualsSykefraværMedKategori(
+        EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(
                 byggSykefraværStatistikkNæring(virksomhet1Metadata_2020_4, 10, 156, 22233), resultat,
                 Statistikkategori.NÆRING2SIFFER,
                 virksomhet1Metadata_2020_4.getNæring()
@@ -288,7 +288,7 @@ public class EksporteringServiceUtilsTest {
                 filter(r -> "85000".equals(r.getKode()))
                 .findFirst().get();
 
-        assertEqualsSykefraværMedKategori(
+        EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(
                 byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "85000"), sykefraværMedKategori85000,
                 Statistikkategori.NÆRING5SIFFER,
                 virksomhet1Metadata_2020_4.getNæringOgNæringskode5siffer().get(0).getNæringskode5Siffer()
@@ -297,7 +297,7 @@ public class EksporteringServiceUtilsTest {
                 filter(r -> "11000".equals(r.getKode()))
                 .findFirst().get();
 
-        assertEqualsSykefraværMedKategori(
+        EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(
                 byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "11000"), sykefraværMedKategori11000,
                 Statistikkategori.NÆRING5SIFFER,
                 virksomhet1Metadata_2020_4.getNæringOgNæringskode5siffer().get(1).getNæringskode5Siffer()
