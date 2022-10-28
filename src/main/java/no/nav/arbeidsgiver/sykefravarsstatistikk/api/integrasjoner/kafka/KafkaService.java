@@ -53,7 +53,7 @@ public class KafkaService {
         return kafkaUtsendingRapport.getAntallMeldingerMottattForUtsending();
     }
 
-    public int sendTilSykefraværsstatistikkLandTopic(
+    public int sendTilStatistikkKategoriTopic(
             ÅrstallOgKvartal årstallOgKvartal,                 // f.eks 2022-3
             SykefraværMedKategori landSykefraværSisteKvartal,  // Statistikk for LAND (Norge) for kvartal 2022-3
             StatistikkDto landSykefraværSiste12Måneder         // Statistikk for LAND (Norge) for de siste 12 måneder

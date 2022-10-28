@@ -67,7 +67,7 @@ public class EksporteringPerStatistikkKategoriService {
 
         int antallEksportert = 0;
         try {
-            antallEksportert = kafkaService.sendTilSykefraværsstatistikkLandTopic(
+            antallEksportert = kafkaService.sendTilStatistikkKategoriTopic(
                     årstallOgKvartal,
                     landSykefravær,
                     statistikkDtos.get(0)

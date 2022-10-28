@@ -63,13 +63,13 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
         // 1- Mock det database og repositories returnerer. Samme med KafkaService
         when(sykefraværsRepository.hentUmaskertSykefraværForNorge(any()))
                 .thenReturn(sykefraværsstatistikkLandSiste4Kvartaler(__2020_2));
-        when(kafkaService.sendTilSykefraværsstatistikkLandTopic(any(), any(), any())).thenReturn(1);
+        when(kafkaService.sendTilStatistikkKategoriTopic(any(), any(), any())).thenReturn(1);
 
         // 2- Kall tjenesten
         int antallEksporterte = service.eksporterSykefraværsstatistikkLand(__2020_2);
 
         // 3- Sjekk hva Kafka har fått
-        verify(kafkaService).sendTilSykefraværsstatistikkLandTopic(
+        verify(kafkaService).sendTilStatistikkKategoriTopic(
                 årstallOgKvartalArgumentCaptor.capture(),
                 landSykefraværArgumentCaptor.capture(),
                 statistikkDtoArgumentCaptor.capture()

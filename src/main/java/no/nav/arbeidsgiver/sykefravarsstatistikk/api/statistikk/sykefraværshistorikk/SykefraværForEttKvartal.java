@@ -12,6 +12,9 @@ public class SykefraværForEttKvartal extends MaskerbartSykefravær implements C
     @JsonIgnore
     private final ÅrstallOgKvartal årstallOgKvartal;
 
+    @JsonIgnore
+    private final int antallPersoner; // TODO: trenger vi det?
+
     public SykefraværForEttKvartal(
             ÅrstallOgKvartal årstallOgKvartal,
             BigDecimal tapteDagsverk,
@@ -25,6 +28,7 @@ public class SykefraværForEttKvartal extends MaskerbartSykefravær implements C
                 årstallOgKvartal != null
         );
         this.årstallOgKvartal = årstallOgKvartal;
+        this.antallPersoner = antallPersoner;
     }
 
     public int getKvartal() {
@@ -35,6 +39,9 @@ public class SykefraværForEttKvartal extends MaskerbartSykefravær implements C
         return årstallOgKvartal != null ? årstallOgKvartal.getÅrstall() : 0;
     }
 
+    public int getAntallPersoner() {
+        return antallPersoner;
+    }
 
     @Override
     public int compareTo(SykefraværForEttKvartal sykefraværForEttKvartal) {
