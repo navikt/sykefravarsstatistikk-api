@@ -41,6 +41,7 @@ public class EksporteringPerStatistikkKategoriService {
     }
 
     public int eksporterSykefraværsstatistikkLand(ÅrstallOgKvartal årstallOgKvartal) {
+
         List<UmaskertSykefraværForEttKvartal> umaskertSykefraværsstatistikkSiste4KvartalerLand =
                 sykefraværRepository.hentUmaskertSykefraværForNorge(
                         årstallOgKvartal.minusKvartaler(3)
@@ -63,8 +64,6 @@ public class EksporteringPerStatistikkKategoriService {
                 )
         );
 
-        // Her vil vi ikke ha StatistikkDto men noe annet .....
-        List<StatistikkDto> statistikkDtos = EitherUtils.filterRights(aggregeringskalkulatorLand.fraværsprosentNorge());
         List<SykefraværOverFlereKvartaler> sykefraværForFlereKvartaler =
                 EitherUtils.filterRights(aggregeringskalkulatorLand.getSykefraværForFlereKvartaler(Statistikkategori.LAND));
 

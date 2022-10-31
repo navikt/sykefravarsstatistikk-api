@@ -249,9 +249,6 @@ public class EksporteringServiceMockTest {
                 ));
         when(sykefraværsRepository.hentUmaskertSykefraværForNorge(any()))
                 .thenReturn(sykefraværsstatistikkLandSiste4Kvartaler(__2020_2));
-        when(bransjeEllerNæringService.finnBransjeFraMetadata(virksomhetMetadata,List.of())).thenReturn(
-              new BransjeEllerNæring(new Næring("11","Industri"))
-        );
 
         int antallEksporterte = service.eksporter(__2020_2, EksporteringBegrensning.build().utenBegrensning());
 
@@ -323,10 +320,6 @@ public class EksporteringServiceMockTest {
                 ));
         when(sykefraværsRepository.hentUmaskertSykefraværForNorge(any()))
                 .thenReturn(sykefraværsstatistikkLandSiste4Kvartaler(årstallOgKvartal));
-        when(bransjeEllerNæringService.finnBransjeFraMetadata(virksomhet1_TilHørerBransjeMetadata,List.of())).thenReturn(
-              new BransjeEllerNæring(
-                    new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS,"Sykehus","86101","86102"))
-        );
 
         int antallEksporterte = service.eksporter(årstallOgKvartal, EksporteringBegrensning.build().utenBegrensning());
 

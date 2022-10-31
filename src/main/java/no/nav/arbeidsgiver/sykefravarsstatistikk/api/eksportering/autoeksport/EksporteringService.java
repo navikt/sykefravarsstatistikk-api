@@ -94,7 +94,6 @@ public class EksporteringService {
         List<VirksomhetEksportPerKvartal> virksomheterTilEksport =
               getListeAvVirksomhetEksportPerKvartal(årstallOgKvartal, eksporteringBegrensning);
 
-
         int antallStatistikkSomSkalEksporteres = virksomheterTilEksport.isEmpty() ?
               0 :
               virksomheterTilEksport.size();
@@ -137,11 +136,7 @@ public class EksporteringService {
 
         List<UmaskertSykefraværForEttKvartal> umaskertSykefraværsstatistikkSiste4KvartalerLand =
               sykefraværRepository.hentUmaskertSykefraværForNorge(årstallOgKvartal.minusKvartaler(3));
-        Aggregeringskalkulator aggregeringskalkulatorLand = new Aggregeringskalkulator(
-              new Sykefraværsdata(
-                    Map.of(Statistikkategori.LAND, umaskertSykefraværsstatistikkSiste4KvartalerLand)
-              ),årstallOgKvartal
-        );
+
         List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor =
               sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(årstallOgKvartal);
 
@@ -187,7 +182,6 @@ public class EksporteringService {
                         sykefraværsstatistikkNæring5Siffer,
                         sykefraværsstatistikkVirksomhetUtenVarighet,
                         landSykefravær,
-                        aggregeringskalkulatorLand.fraværsprosentNorge(),
                         antallEksportert,
                         virksomheterTilEksport.size()
                   );
@@ -221,7 +215,6 @@ public class EksporteringService {
           List<Næring> alleNæringer, List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer,
           List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet,
           SykefraværMedKategori landSykefravær,
-          Either<StatistikkException, StatistikkDto> statistikkDtoLand,
           AtomicInteger antallEksportert,
           int antallTotaltStatistikk
     ) {
@@ -235,8 +228,6 @@ public class EksporteringService {
         virksomheterMetadata.stream().forEach(
               virksomhetMetadata -> {
                   long startUtsendingProcess = System.nanoTime();
-                  BransjeEllerNæring bransjeEllerNæring = bransjeEllerNæringService
-                        .finnBransjeFraMetadata(virksomhetMetadata,alleNæringer);
 
                   if (virksomhetMetadata != null) {
                       kafkaService.send(
