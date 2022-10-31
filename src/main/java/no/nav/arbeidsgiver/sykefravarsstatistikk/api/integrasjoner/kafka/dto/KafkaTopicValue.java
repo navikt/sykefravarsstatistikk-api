@@ -1,8 +1,7 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.StatistikkDto;
 
 import java.util.List;
 

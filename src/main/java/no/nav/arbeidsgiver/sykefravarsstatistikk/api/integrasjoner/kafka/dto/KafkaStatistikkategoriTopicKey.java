@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

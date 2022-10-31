@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.SykefraværsstatistikkLocalTestApplication;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaStatistikkKategoriTopicValue;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaTopicValue;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
@@ -39,6 +41,7 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeks
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2019_4;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2020_1;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2020_2;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.assertKafkaStatistikkKategoriTopicValueEquals;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.assertKafkaTopicValueEquals;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.getKafkaTopicValueAsJsonString;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.landSykefravær;
@@ -136,8 +139,8 @@ public class KafkaServiceIntegrasjonTest {
     public void send_til_LAND_topic___sender_en_KafkaTopicValue_til__riktig_topic() throws Exception {
         SykefraværOverFlereKvartaler sykefraværOverFlereKvartaler = new SykefraværOverFlereKvartaler(
                 List.of(__2020_2, __2020_1, __2019_4, __2019_3),
-                new BigDecimal(3500),
-                new BigDecimal(35000),
+                new BigDecimal(11000),
+                new BigDecimal(110000),
                 List.of(
                         new SykefraværForEttKvartal(
                                 __2020_2,
@@ -194,11 +197,9 @@ public class KafkaServiceIntegrasjonTest {
         objectMapper.registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));
         String value = message.value();
         KafkaStatistikkKategoriTopicValue actual = objectMapper.readValue(value, KafkaStatistikkKategoriTopicValue.class);
-        System.out.println("[DEBUG] --------------------------------");
-        System.out.println("[DEBUG] message: " + value);
-        /*assertKafkaStatistikkKategoriTopicValueEquals(
+        assertKafkaStatistikkKategoriTopicValueEquals(
                 expectedTopicValue,
                 actual
-        );*/
+        );
     }
 }
