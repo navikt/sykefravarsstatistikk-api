@@ -4,12 +4,12 @@ metadata:
   annotations:
     kafka.nais.io/removeDataWhenResourceIsDeleted: "true"
   name: sykefravarsstatistikk-land-v1
-  namespace: teamia
+  namespace: arbeidsgiver
   labels:
-    team: teamia
+    team: arbeidsgiver
 spec:
-  pool: nav-prod
-  config: # optional; all fields are optional too; defaults shown
+  pool: nav-dev
+  config:  # optional; all fields are optional too; defaults shown
     cleanupPolicy: delete  # delete, compact
     minimumInSyncReplicas: 1
     partitions: 1

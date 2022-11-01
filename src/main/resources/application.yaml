@@ -16,7 +16,7 @@ kafka:
   outbound:
     topic:
       - arbeidsgiver.sykefravarsstatistikk-v1
-      - teamia.sykefravarsstatistikk-land-v1
+      - arbeidsgiver.sykefravarsstatistikk-land-v1
     bootstrapServers: ${KAFKA_BROKERS:localhost:9092}
     securityProtocol: SSL
     caPath: ${KAFKA_CA_PATH}
