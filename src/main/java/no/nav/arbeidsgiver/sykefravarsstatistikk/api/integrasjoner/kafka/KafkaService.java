@@ -45,9 +45,9 @@ public class KafkaService {
         this.kafkaUtsendingHistorikkRepository = kafkaUtsendingHistorikkRepository;
     }
 
-    public void nullstillUtsendingRapport(int totalMeldingerTilUtsending) {
+    public void nullstillUtsendingRapport(int totalMeldingerTilUtsending, String eksportNavn) {
         log.info("Gjør utsendingrapport klar før utsending på Kafka topic '{}'. '{}' meldinger vil bli sendt.",
-                kafkaProperties.getTopic(),
+                kafkaProperties.getTopicNavn(eksportNavn),
                 totalMeldingerTilUtsending
         );
         kafkaUtsendingRapport.reset(totalMeldingerTilUtsending);
@@ -58,10 +58,9 @@ public class KafkaService {
     }
 
     public int sendTilStatistikkKategoriTopic(
-            ÅrstallOgKvartal årstallOgKvartal,                 // f.eks 2022-3
-            SykefraværMedKategori landSykefraværSisteKvartal,  // Statistikk for LAND (Norge) for kvartal 2022-3
-            SykefraværOverFlereKvartaler landSykefraværSiste12Måneder         // Statistikk for LAND (Norge) for de siste 12 måneder
-            // (fra kvartal 2022-3 ned til kvartal 2021-4)
+            ÅrstallOgKvartal årstallOgKvartal,
+            SykefraværMedKategori landSykefraværSisteKvartal,
+            SykefraværOverFlereKvartaler landSykefraværSiste12Måneder
     ) {
         kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
         KafkaStatistikkategoriTopicKey key = new KafkaStatistikkategoriTopicKey(
@@ -88,7 +87,7 @@ public class KafkaService {
         }
 
         ListenableFuture<SendResult<String, String>> futureResult = kafkaTemplate.send(
-                kafkaProperties.getTopic().get(1),
+                kafkaProperties.getTopicNavn(Statistikkategori.LAND.name()),
                 keyAsJsonString,
                 dataAsJsonString
         );
@@ -111,7 +110,7 @@ public class KafkaService {
                 kafkaUtsendingRapport.leggTilUtsendingSuksess();
                 log.debug(
                         "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
-                        kafkaProperties.getTopic(),
+                        kafkaProperties.getTopicNavn(Statistikkategori.LAND.name()),
                         res.getProducerRecord().key(),
                         res.getRecordMetadata().offset()
                 );
@@ -177,7 +176,7 @@ public class KafkaService {
         }
 
         ListenableFuture<SendResult<String, String>> futureResult = kafkaTemplate.send(
-                kafkaProperties.getTopic().get(0),
+                kafkaProperties.getTopicNavn(KafkaProperties.EKSPORT_ALLE_KATEGORIER),
                 keyAsJsonString,
                 dataAsJsonString
         );
@@ -200,7 +199,7 @@ public class KafkaService {
                 kafkaUtsendingRapport.leggTilUtsendingSuksess(new Orgnr(virksomhetSykefravær.getOrgnr()));
                 log.debug(
                         "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
-                        kafkaProperties.getTopic(),
+                        kafkaProperties.getTopicNavn(KafkaProperties.EKSPORT_ALLE_KATEGORIER),
                         res.getProducerRecord().key(),
                         res.getRecordMetadata().offset()
                 );

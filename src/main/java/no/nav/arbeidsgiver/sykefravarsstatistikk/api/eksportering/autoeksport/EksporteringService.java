@@ -16,6 +16,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværssta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaProperties;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUtsendingException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
@@ -129,7 +130,7 @@ public class EksporteringService {
           ÅrstallOgKvartal årstallOgKvartal
     ) throws KafkaUtsendingException {
         long startEksportering = System.currentTimeMillis();
-        kafkaService.nullstillUtsendingRapport(virksomheterTilEksport.size());
+        kafkaService.nullstillUtsendingRapport(virksomheterTilEksport.size(), KafkaProperties.EKSPORT_ALLE_KATEGORIER);
 
         List<VirksomhetMetadata> virksomhetMetadataListe =
               virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal);

@@ -68,7 +68,7 @@ public class EksporteringPerStatistikkKategoriService {
                 EitherUtils.filterRights(aggregeringskalkulatorLand.getSykefraværForFlereKvartaler(Statistikkategori.LAND));
 
         SykefraværOverFlereKvartaler sykefraværOverFlereKvartalerLand = sykefraværForFlereKvartaler.get(0);
-        kafkaService.nullstillUtsendingRapport(1);
+        kafkaService.nullstillUtsendingRapport(1, Statistikkategori.LAND.name());
         long startUtsendingProcess = System.nanoTime();
 
         int antallEksportert = 0;
