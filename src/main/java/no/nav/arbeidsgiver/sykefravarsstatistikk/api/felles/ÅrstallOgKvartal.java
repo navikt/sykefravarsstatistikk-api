@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
@@ -38,6 +40,13 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
   public ÅrstallOgKvartal minusEttÅr() {
     return new ÅrstallOgKvartal(this.årstall - 1, this.kvartal);
   }
+
+    public static List<ÅrstallOgKvartal> sisteFireKvartaler(ÅrstallOgKvartal årstallOgKvartal) {
+        return IntStream.range(0, 4)
+                .mapToObj(årstallOgKvartal::minusKvartaler)
+                .collect(Collectors.toList());
+    }
+
 
   public ÅrstallOgKvartal plussKvartaler(int antallKvartaler) {
     if (antallKvartaler < 0) {

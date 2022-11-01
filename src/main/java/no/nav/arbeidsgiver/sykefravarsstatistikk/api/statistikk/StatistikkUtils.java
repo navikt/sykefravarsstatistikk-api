@@ -15,7 +15,9 @@ public class StatistikkUtils {
    * dagsverk.
    */
   public static Either<StatistikkException, BigDecimal> kalkulerSykefraværsprosent(
-      @NotNull BigDecimal dagsverkTeller, @NotNull BigDecimal dagsverkNevner) {
+      @NotNull BigDecimal dagsverkTeller,
+      @NotNull BigDecimal dagsverkNevner
+  ) {
 
     final int ANTALL_SIFRE_I_UTREGNING = 3;
     final int ANTALL_SIFRE_I_RESULTAT = 1;

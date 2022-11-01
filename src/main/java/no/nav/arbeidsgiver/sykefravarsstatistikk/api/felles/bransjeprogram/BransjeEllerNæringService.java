@@ -1,10 +1,15 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram;
 
-import java.util.Optional;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Optional;
 
 @Component
 public class BransjeEllerNæringService {
@@ -49,5 +54,39 @@ public class BransjeEllerNæringService {
                 klassifikasjonerRepository.hentNæring(
                         virksomhet.getNæringskode().hentNæringskode2Siffer())
         );
+    }
+
+    public BransjeEllerNæring finnBransjeFraMetadata(VirksomhetMetadata virksomhetMetaData, List<Næring> alleNæringer) {
+        Underenhet virksomhet = new Underenhet(
+              new Orgnr(virksomhetMetaData.getOrgnr()),
+              new Orgnr(""),
+              virksomhetMetaData.getNavn(),
+              new Næringskode5Siffer(
+                    virksomhetMetaData.getNæringOgNæringskode5siffer().stream().findFirst().isPresent()
+                          ? virksomhetMetaData.getNæringOgNæringskode5siffer().stream().findFirst().get().getNæringskode5Siffer()
+                          : "00000",
+                    virksomhetMetaData.getNæringOgNæringskode5siffer().stream().findFirst().isPresent()
+                          ? virksomhetMetaData.getNæringOgNæringskode5siffer().stream().findFirst().get().getNæring()
+                          : ""
+              )
+              ,
+
+              0
+        );
+
+        Optional<Bransje> bransje = bransjeprogram.finnBransje(virksomhet);
+
+        if (bransje.isPresent()) {
+            return new BransjeEllerNæring(bransje.get());
+        }
+        return new BransjeEllerNæring(hentNæringForVirksomhet(virksomhetMetaData, alleNæringer));
+
+    }
+
+    private Næring hentNæringForVirksomhet(VirksomhetMetadata virksomhetMetadata, List<Næring> næringer){
+        return næringer.stream()
+              .filter(næring -> næring.getKode().equals(virksomhetMetadata.getNæring()))
+              .findFirst()
+              .orElse(new Næring(virksomhetMetadata.getNæring(), "Ukjent næring"));
     }
 }

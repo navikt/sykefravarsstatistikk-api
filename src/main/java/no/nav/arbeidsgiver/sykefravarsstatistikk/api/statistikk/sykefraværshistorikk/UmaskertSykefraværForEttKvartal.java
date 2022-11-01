@@ -15,8 +15,8 @@ import org.jetbrains.annotations.NotNull;
 public class UmaskertSykefraværForEttKvartal implements
         Comparable<UmaskertSykefraværForEttKvartal> {
 
-    protected final BigDecimal dagsverkTeller;
-    protected final BigDecimal dagsverkNevner;
+    protected final BigDecimal dagsverkTeller; // TODO: hvorfor er det ikke tapteDagsverk lenger?
+    protected final BigDecimal dagsverkNevner; // TODO: hvorfor er det ikke muligeDagsverk lenger?
     protected final int antallPersoner;
     private final ÅrstallOgKvartal årstallOgKvartal;
 

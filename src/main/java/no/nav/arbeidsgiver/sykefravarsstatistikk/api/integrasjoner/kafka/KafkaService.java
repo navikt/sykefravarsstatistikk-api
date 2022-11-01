@@ -8,8 +8,14 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaProperties;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaStatistikkKategoriTopicValue;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaStatistikkategoriTopicKey;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaTopicKey;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaTopicValue;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværOverFlereKvartaler;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
@@ -39,9 +45,9 @@ public class KafkaService {
         this.kafkaUtsendingHistorikkRepository = kafkaUtsendingHistorikkRepository;
     }
 
-    public void nullstillUtsendingRapport(int totalMeldingerTilUtsending) {
+    public void nullstillUtsendingRapport(int totalMeldingerTilUtsending, String eksportNavn) {
         log.info("Gjør utsendingrapport klar før utsending på Kafka topic '{}'. '{}' meldinger vil bli sendt.",
-                kafkaProperties.getTopic(),
+                kafkaProperties.getTopicNavn(eksportNavn),
                 totalMeldingerTilUtsending
         );
         kafkaUtsendingRapport.reset(totalMeldingerTilUtsending);
@@ -51,13 +57,77 @@ public class KafkaService {
         return kafkaUtsendingRapport.getAntallMeldingerMottattForUtsending();
     }
 
-    public void send(
+    public int sendTilStatistikkKategoriTopic(
             ÅrstallOgKvartal årstallOgKvartal,
-            VirksomhetSykefravær virksomhetSykefravær,
-            List<SykefraværMedKategori> næring5SifferSykefravær,
-            SykefraværMedKategori næringSykefravær,
-            SykefraværMedKategori sektorSykefravær,
-            SykefraværMedKategori landSykefravær
+            SykefraværMedKategori landSykefraværSisteKvartal,
+            SykefraværOverFlereKvartaler landSykefraværSiste12Måneder
+    ) {
+        kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
+        KafkaStatistikkategoriTopicKey key = new KafkaStatistikkategoriTopicKey(
+                Statistikkategori.LAND,
+                "NO",
+                årstallOgKvartal.getKvartal(),
+                årstallOgKvartal.getÅrstall()
+        );
+
+        KafkaStatistikkKategoriTopicValue value = new KafkaStatistikkKategoriTopicValue(
+                landSykefraværSisteKvartal,
+                landSykefraværSiste12Måneder
+        );
+
+        String keyAsJsonString;
+        String dataAsJsonString;
+
+        try {
+            keyAsJsonString = objectMapper.writeValueAsString(key);
+            dataAsJsonString = objectMapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+            kafkaUtsendingRapport.leggTilError("Kunne ikke parse statistikk 'LAND' til Json. Statistikk ikke sent");
+            return 0;
+        }
+
+        ListenableFuture<SendResult<String, String>> futureResult = kafkaTemplate.send(
+                kafkaProperties.getTopicNavn(Statistikkategori.LAND.name()),
+                keyAsJsonString,
+                dataAsJsonString
+        );
+
+        futureResult.addCallback(new ListenableFutureCallback<>() {
+            @Override
+            public void onFailure(Throwable throwable) {
+                kafkaUtsendingRapport.leggTilError(
+                        String.format(
+                                "Utsending feilet for statistikk kategori '%s' og kode '%s',  med melding '%s'",
+                                landSykefraværSisteKvartal.getKategori().name(),
+                                landSykefraværSisteKvartal.getKode(),
+                                throwable.getMessage()
+                        )
+                );
+            }
+
+            @Override
+            public void onSuccess(SendResult<String, String> res) {
+                kafkaUtsendingRapport.leggTilUtsendingSuksess();
+                log.debug(
+                        "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
+                        kafkaProperties.getTopicNavn(Statistikkategori.LAND.name()),
+                        res.getProducerRecord().key(),
+                        res.getRecordMetadata().offset()
+                );
+            }
+        });
+
+        return 1;
+    }
+
+
+    public void send(
+          ÅrstallOgKvartal årstallOgKvartal,
+          VirksomhetSykefravær virksomhetSykefravær,
+          List<SykefraværMedKategori> næring5SifferSykefravær,
+          SykefraværMedKategori næringSykefravær,
+          SykefraværMedKategori sektorSykefravær,
+          SykefraværMedKategori landSykefravær
     ) {
         // TODO bytt til Prometheus
         kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
@@ -84,7 +154,8 @@ public class KafkaService {
                 næring5SifferSykefravær,
                 næringSykefravær,
                 sektorSykefravær,
-                landSykefravær);
+                landSykefravær
+                );
 
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
@@ -105,7 +176,7 @@ public class KafkaService {
         }
 
         ListenableFuture<SendResult<String, String>> futureResult = kafkaTemplate.send(
-                kafkaProperties.getTopic(),
+                kafkaProperties.getTopicNavn(KafkaProperties.EKSPORT_ALLE_KATEGORIER),
                 keyAsJsonString,
                 dataAsJsonString
         );
@@ -128,7 +199,7 @@ public class KafkaService {
                 kafkaUtsendingRapport.leggTilUtsendingSuksess(new Orgnr(virksomhetSykefravær.getOrgnr()));
                 log.debug(
                         "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
-                        kafkaProperties.getTopic(),
+                        kafkaProperties.getTopicNavn(KafkaProperties.EKSPORT_ALLE_KATEGORIER),
                         res.getProducerRecord().key(),
                         res.getRecordMetadata().offset()
                 );
@@ -160,5 +231,4 @@ public class KafkaService {
     public void addDBOppdateringProcessingTime(long startDBOppdateringProcess, long stopDBOppdateringProcess) {
         kafkaUtsendingRapport.addDBOppdateringProcessingTime(startDBOppdateringProcess, stopDBOppdateringProcess);
     }
-
 }
