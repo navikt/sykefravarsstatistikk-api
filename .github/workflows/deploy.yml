@@ -113,3 +113,31 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-fss
           RESOURCE: nais/alerts-prod.yaml
+
+  deployTopicsToDev:
+    name: "Deploy topics to dev"
+    runs-on: "ubuntu-latest"
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/kan-slette-saker-med-status-vurderes'
+    steps:
+      - name: "Checkout code"
+        uses: "actions/checkout@v3"
+      - name: "Deploy topics to dev-gcp"
+        uses: "nais/deploy/actions/deploy@master"
+        env:
+          APIKEY: "${{ secrets.NAIS_DEPLOY_APIKEY }}"
+          CLUSTER: "dev-gcp"
+          RESOURCE: "nais/topics/topic-arbeidsgiver-sykefravaer-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravaer-land-dev.yaml"
+
+  deployTopicsToProd:
+    name: "Deploy topics to prod"
+    runs-on: "ubuntu-latest"
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: "Checkout code"
+        uses: "actions/checkout@v3"
+      - name: "Deploy topics to prod-gcp"
+        uses: "nais/deploy/actions/deploy@master"
+        env:
+          APIKEY: "${{ secrets.NAIS_DEPLOY_APIKEY }}"
+          CLUSTER: "prod-gcp"
+          RESOURCE: "nais/topics/topic-arbeidsgiver-sykefravaer-prod.yaml,nais/topics/topic-arbeidsgiver-sykefravaer-land-prod.yaml"
