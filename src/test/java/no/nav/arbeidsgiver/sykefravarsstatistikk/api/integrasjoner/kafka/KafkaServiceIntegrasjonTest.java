@@ -60,7 +60,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @EnableMockOAuth2Server
 @EmbeddedKafka(
         controlledShutdown = true,
-        topics = {"arbeidsgiver.sykefravarsstatistikk-v1", "teamia.sykefravarsstatistikk-land-v1"},
+        topics = {"arbeidsgiver.sykefravarsstatistikk-v1", "arbeidsgiver.sykefravarsstatistikk-land-v1"},
         brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"}
 )
 public class KafkaServiceIntegrasjonTest {
@@ -72,7 +72,7 @@ public class KafkaServiceIntegrasjonTest {
 
     private static String[] TOPIC_NAME = {
             "arbeidsgiver.sykefravarsstatistikk-v1",
-            "teamia.sykefravarsstatistikk-land-v1"
+            "arbeidsgiver.sykefravarsstatistikk-land-v1"
     };
     private KafkaMessageListenerContainer<String, String> container;
     private BlockingQueue<ConsumerRecord<String, String>> consumerRecords;
