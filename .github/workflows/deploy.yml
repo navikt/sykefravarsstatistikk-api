@@ -117,7 +117,7 @@ jobs:
   deployTopicsToDev:
     name: "Deploy topics to dev"
     runs-on: "ubuntu-latest"
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/kan-slette-saker-med-status-vurderes'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/legge-til-siste-4-kvartaler-i-eksport'
     steps:
       - name: "Checkout code"
         uses: "actions/checkout@v3"
@@ -131,7 +131,7 @@ jobs:
   deployTopicsToProd:
     name: "Deploy topics to prod"
     runs-on: "ubuntu-latest"
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
     steps:
       - name: "Checkout code"
         uses: "actions/checkout@v3"
