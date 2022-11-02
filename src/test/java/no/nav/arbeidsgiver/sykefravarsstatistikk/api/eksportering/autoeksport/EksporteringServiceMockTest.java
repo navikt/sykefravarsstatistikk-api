@@ -231,7 +231,7 @@ public class EksporteringServiceMockTest {
                 .thenReturn(Arrays.asList(virksomhetMetadata));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(__2020_2))
                 .thenReturn(Arrays.asList(sykefraværsstatistikkSektor));
-        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringerSiste4Kvartaler(fraÅrstallOgKvartal))
+        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringerSiste4Kvartaler(__2020_2))
               .thenReturn(Arrays.asList(
                     sykefraværsstatistikkNæring(fraÅrstallOgKvartal),
                     sykefraværsstatistikkNæring(fraÅrstallOgKvartal.plussKvartaler(1)),
@@ -240,7 +240,7 @@ public class EksporteringServiceMockTest {
               );
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5SifferSiste4Kvartaler(__2020_2))
                 .thenReturn(Arrays.asList(sykefraværsstatistikkNæring5Siffer));
-        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(fraÅrstallOgKvartal))
+        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(__2020_2))
                 .thenReturn(Arrays.asList(
                       sykefraværsstatistikkVirksomhet(fraÅrstallOgKvartal),
                       sykefraværsstatistikkVirksomhet(fraÅrstallOgKvartal.plussKvartaler(1)),
@@ -291,7 +291,7 @@ public class EksporteringServiceMockTest {
                 .thenReturn(Arrays.asList(virksomhet1_TilHørerBransjeMetadata));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(årstallOgKvartal))
                 .thenReturn(Arrays.asList(sykefraværsstatistikkSektor));
-        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringerSiste4Kvartaler(fraÅrstallOgKvartal))
+        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringerSiste4Kvartaler(__2020_2))
               .thenReturn(Arrays.asList(
                     sykefraværsstatistikkNæring(fraÅrstallOgKvartal),
                     sykefraværsstatistikkNæring(fraÅrstallOgKvartal.plussKvartaler(1)),
@@ -311,7 +311,7 @@ public class EksporteringServiceMockTest {
                             sykefraværsstatistikkNæring5SifferBransjeprogram("86102",årstallOgKvartal.minusKvartaler(3))
                             )
                 );
-        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(fraÅrstallOgKvartal))
+        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(__2020_2))
                 .thenReturn(Arrays.asList(
                       sykefraværsstatistikkVirksomhet(fraÅrstallOgKvartal),
                       sykefraværsstatistikkVirksomhet(fraÅrstallOgKvartal.plussKvartaler(1)),

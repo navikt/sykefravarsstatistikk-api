@@ -136,13 +136,13 @@ public class EksporteringService {
               virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal);
 
         List<UmaskertSykefraværForEttKvartal> umaskertSykefraværsstatistikkSiste4KvartalerLand =
-              sykefraværRepository.hentUmaskertSykefraværForNorge(årstallOgKvartal.minusKvartaler(3));
+              sykefraværRepository.hentUmaskertSykefraværForNorge(årstallOgKvartal);
 
         List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor =
               sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(årstallOgKvartal);
 
         List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring =
-              sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringerSiste4Kvartaler(årstallOgKvartal.minusKvartaler(3));
+              sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringerSiste4Kvartaler(årstallOgKvartal);
         List<Næring> alleNæringer= klassifikasjonerRepository.hentAlleNæringer();
 
         List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer =
@@ -150,7 +150,7 @@ public class EksporteringService {
                     årstallOgKvartal
               );
         List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet =
-              sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(årstallOgKvartal.minusKvartaler(3));
+              sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(årstallOgKvartal);
 
 
         SykefraværMedKategori landSykefravær = getSykefraværMedKategoriForLand(
