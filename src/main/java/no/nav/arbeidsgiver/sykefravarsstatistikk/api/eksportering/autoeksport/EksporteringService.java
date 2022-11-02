@@ -2,13 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
@@ -17,7 +11,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværssta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaProperties;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUtsendingException;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
@@ -33,17 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.filterByKvartal;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForLand;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForNæring;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForNæring5Siffer;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForSektor;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getVirksomhetMetadataHashMap;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getVirksomhetSykefravær;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getVirksomheterMetadataFraSubset;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.hentSisteKvartalIBeregningen;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.mapToSykefraværsstatistikkLand;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.toMap;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.*;
 
 @Slf4j
 @Component
@@ -53,10 +36,8 @@ public class EksporteringService {
     private final VirksomhetMetadataRepository virksomhetMetadataRepository;
     private final SykefraværsstatistikkTilEksporteringRepository sykefraværsstatistikkTilEksporteringRepository;
     private final SykefraværRepository sykefraværRepository;
-    private final KlassifikasjonerRepository klassifikasjonerRepository;
     private final KafkaService kafkaService;
     private final boolean erEksporteringAktivert;
-    private final BransjeEllerNæringService bransjeEllerNæringService;
 
     public static final int OPPDATER_VIRKSOMHETER_SOM_ER_EKSPORTERT_BATCH_STØRRELSE = 1000;
     public static final int EKSPORT_BATCH_STØRRELSE = 10000;
@@ -65,17 +46,14 @@ public class EksporteringService {
           EksporteringRepository eksporteringRepository,
           VirksomhetMetadataRepository virksomhetMetadataRepository,
           SykefraværsstatistikkTilEksporteringRepository sykefraværsstatistikkTilEksporteringRepository,
-          SykefraværRepository sykefraværRepository, KlassifikasjonerRepository klassifikasjonerRepository, KafkaService kafkaService,
-          @Value("${statistikk.eksportering.aktivert}") Boolean erEksporteringAktivert,
-          BransjeEllerNæringService bransjeEllerNæringService) {
+          SykefraværRepository sykefraværRepository, KafkaService kafkaService,
+          @Value("${statistikk.eksportering.aktivert}") Boolean erEksporteringAktivert) {
         this.eksporteringRepository = eksporteringRepository;
         this.virksomhetMetadataRepository = virksomhetMetadataRepository;
         this.sykefraværsstatistikkTilEksporteringRepository = sykefraværsstatistikkTilEksporteringRepository;
         this.sykefraværRepository = sykefraværRepository;
-        this.klassifikasjonerRepository = klassifikasjonerRepository;
         this.kafkaService = kafkaService;
         this.erEksporteringAktivert = erEksporteringAktivert;
-        this.bransjeEllerNæringService = bransjeEllerNæringService;
     }
 
 
@@ -136,10 +114,9 @@ public class EksporteringService {
 
         List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring =
               sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(årstallOgKvartal);
-        List<Næring> alleNæringer= klassifikasjonerRepository.hentAlleNæringer();
 
         List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer =
-              sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5SifferSiste4Kvartaler(
+              sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5Siffer(
                     årstallOgKvartal
               );
         List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet =
@@ -176,7 +153,6 @@ public class EksporteringService {
                         årstallOgKvartal,
                         sykefraværsstatistikkSektor,
                         sykefraværsstatistikkNæring,
-                        alleNæringer,
                         sykefraværsstatistikkNæring5Siffer,
                         sykefraværsstatistikkVirksomhetUtenVarighet,
                         landSykefravær,
@@ -210,7 +186,7 @@ public class EksporteringService {
           ÅrstallOgKvartal årstallOgKvartal,
           List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor,
           List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring,
-          List<Næring> alleNæringer, List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer,
+          List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer,
           List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet,
           SykefraværMedKategori landSykefravær,
           AtomicInteger antallEksportert,

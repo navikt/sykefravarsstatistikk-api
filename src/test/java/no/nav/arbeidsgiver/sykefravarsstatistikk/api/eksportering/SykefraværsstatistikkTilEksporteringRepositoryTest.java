@@ -167,41 +167,47 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
     @Test
     void hentSykefraværprosentAlleNæringer5SifferForEttKvartal__skal_returnere_riktig_data_til_alle_næringer() {
-        opprettStatistikkNæring5SifferTestData();
+        opprettStatistikkNæring5SifferTestData(
+              new ÅrstallOgKvartal(2019, 2),
+              new ÅrstallOgKvartal(2019, 1)
+        );
 
         List<SykefraværsstatistikkNæring5Siffer> resultat =
                 repository.hentSykefraværprosentAlleNæringer5Siffer(new ÅrstallOgKvartal(2019, 2));
 
-        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat, 2019, 2, 10, produksjonAvKlær, 2, 100);
-        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat, 2019, 2, 10, undervisning, 5, 100);
+        assertSykefraværsstatistikkForNæringskode5SifferContains(resultat, 2019, 2, 10, produksjonAvKlær, 3, 100);
+        assertSykefraværsstatistikkForNæringskode5SifferContains(resultat, 2019, 2, 10, undervisning, 5, 100);
 
         List<SykefraværsstatistikkNæring5Siffer> resultat_2019_1 =
                 repository.hentSykefraværprosentAlleNæringer5Siffer(new ÅrstallOgKvartal(2019, 1));
 
         assertThat(resultat_2019_1.size()).isEqualTo(2);
-        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat_2019_1, 2019, 1, 10, produksjonAvKlær, 3, 100);
-        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat_2019_1, 2019, 1, 10, undervisning, 8, 100);
+        assertSykefraværsstatistikkForNæringskode5SifferContains(resultat_2019_1, 2019, 1, 10, produksjonAvKlær, 3, 100);
+        assertSykefraværsstatistikkForNæringskode5SifferContains(resultat_2019_1, 2019, 1, 10, undervisning, 5, 100);
     }
 
     @Test
     void hentSykefraværprosentAlleNæringer5SifferForSiste4Kvartaler__skal_returnere_riktig_data_til_alle_næringer() {
-        opprettStatistikkNæring5SifferTestData();
+        opprettStatistikkNæring5SifferTestData(
+              new ÅrstallOgKvartal(2019, 2),
+              new ÅrstallOgKvartal(2019, 1)
+        );
 
         List<SykefraværsstatistikkNæring5Siffer> resultat =
-                repository.hentSykefraværprosentAlleNæringer5SifferSiste4Kvartaler(new ÅrstallOgKvartal(2019, 2));
+                repository.hentSykefraværprosentAlleNæringer5Siffer(new ÅrstallOgKvartal(2019, 2));
 
-        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat, 2019, 2, 10, produksjonAvKlær, 2, 100);
-        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat, 2019, 2, 10, undervisning, 5, 100);
+        assertSykefraværsstatistikkForNæringskode5SifferContains(resultat, 2019, 2, 10, produksjonAvKlær, 3, 100);
+        assertSykefraværsstatistikkForNæringskode5SifferContains(resultat, 2019, 2, 10, undervisning, 5, 100);
 
-        List<SykefraværsstatistikkNæring5Siffer> resultat_2019_1 =
-                repository.hentSykefraværprosentAlleNæringer5SifferSiste4Kvartaler(new ÅrstallOgKvartal(2019, 1));
+        List<SykefraværsstatistikkNæring5Siffer> resultat_2019_1_til_2019_2 =
+                repository.hentSykefraværprosentAlleNæringer5Siffer(new ÅrstallOgKvartal(2019, 1), new ÅrstallOgKvartal(2019,2));
 
         assertThat(resultat.size()).isEqualTo(2);
-        assertThat(resultat_2019_1.size()).isEqualTo(4);
-        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat_2019_1, 2019, 1, 10, produksjonAvKlær, 3, 100);
-        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat_2019_1, 2019, 1, 10, undervisning, 8, 100);
-        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat_2019_1, 2019, 1, 10, produksjonAvKlær, 3, 100);
-        assertSykefraværsstatistikkForNæringskode5SifferIsEqual(resultat_2019_1, 2019, 1, 10, undervisning, 8, 100);
+        assertThat(resultat_2019_1_til_2019_2.size()).isEqualTo(4);
+        assertSykefraværsstatistikkForNæringskode5SifferContains(resultat_2019_1_til_2019_2, 2019, 1, 10, produksjonAvKlær, 3, 100);
+        assertSykefraværsstatistikkForNæringskode5SifferContains(resultat_2019_1_til_2019_2, 2019, 1, 10, undervisning, 5, 100);
+        assertSykefraværsstatistikkForNæringskode5SifferContains(resultat_2019_1_til_2019_2, 2019, 2, 10, produksjonAvKlær, 3, 100);
+        assertSykefraværsstatistikkForNæringskode5SifferContains(resultat_2019_1_til_2019_2, 2019, 2, 10, undervisning, 5, 100);
     }
 
     @Test
@@ -333,7 +339,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
         );
     }
 
-    private void assertSykefraværsstatistikkForNæringskode5SifferIsEqual(
+    private void assertSykefraværsstatistikkForNæringskode5SifferContains(
             List<SykefraværsstatistikkNæring5Siffer> actual,
             int årstall,
             int kvartal,
@@ -408,18 +414,16 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                     createStatistikkNæring(utdanning, item.getÅrstall(), item.getKvartal(), 8, 5, 100);
                 }
         );
-        /*
-        createStatistikkNæring(produksjon, 2019, 2, 10, 2, 100);
-        createStatistikkNæring(produksjon, 2019, 1, 10, 3, 100);
-        createStatistikkNæring(utdanning, 2019, 2, 10, 5, 100);
-        createStatistikkNæring(utdanning, 2019, 1, 10, 8, 100);*/
+
     }
 
-    private void opprettStatistikkNæring5SifferTestData() {
-        createStatistikkNæring5Siffer(produksjonAvKlær, 2019, 2, 10, 2, 100);
-        createStatistikkNæring5Siffer(produksjonAvKlær, 2019, 1, 10, 3, 100);
-        createStatistikkNæring5Siffer(undervisning, 2019, 2, 10, 5, 100);
-        createStatistikkNæring5Siffer(undervisning, 2019, 1, 10, 8, 100);
+    private void opprettStatistikkNæring5SifferTestData(ÅrstallOgKvartal... årstallOgKvartals) {
+        Arrays.stream(årstallOgKvartals).forEach(
+              item -> {
+                  createStatistikkNæring5Siffer(produksjonAvKlær, item.getÅrstall(), item.getKvartal(), 10, 3, 100);
+                  createStatistikkNæring5Siffer(undervisning, item.getÅrstall(), item.getKvartal(), 10, 5, 100);
+              }
+        );
     }
 
     private void createStatistikkLand(

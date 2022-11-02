@@ -68,10 +68,9 @@ public class EksporteringServiceMockTest {
                 eksporteringRepository,
                 virksomhetMetadataRepository,
                 sykefraværsstatistikkTilEksporteringRepository,
-              sykefraværsRepository,
-              klassifikasjonerRepository, kafkaService,
-                true,
-              bransjeEllerNæringService);
+                sykefraværsRepository,
+                kafkaService,
+                true);
     }
 
     @Test
@@ -234,7 +233,7 @@ public class EksporteringServiceMockTest {
                     sykefraværsstatistikkNæring(fraÅrstallOgKvartal.plussKvartaler(2)),
                     sykefraværsstatistikkNæring(fraÅrstallOgKvartal.plussKvartaler(3)))
               );
-        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5SifferSiste4Kvartaler(__2020_2))
+        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5Siffer(__2020_2))
                 .thenReturn(Arrays.asList(sykefraværsstatistikkNæring5Siffer));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(__2020_2))
                 .thenReturn(Arrays.asList(
@@ -294,7 +293,7 @@ public class EksporteringServiceMockTest {
                     sykefraværsstatistikkNæring(fraÅrstallOgKvartal.plussKvartaler(2)),
                     sykefraværsstatistikkNæring(fraÅrstallOgKvartal.plussKvartaler(3)))
               );
-        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5SifferSiste4Kvartaler(__2020_2))
+        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5Siffer(__2020_2))
                 .thenReturn(
                       Arrays.asList(
                             sykefraværsstatistikkNæring5SifferBransjeprogram("86101",årstallOgKvartal),
