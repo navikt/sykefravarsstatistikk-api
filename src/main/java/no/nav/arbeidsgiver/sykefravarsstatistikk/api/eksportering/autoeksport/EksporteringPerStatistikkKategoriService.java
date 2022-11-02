@@ -87,4 +87,8 @@ public class EksporteringPerStatistikkKategoriService {
 
         return antallEksportert;
     }
+
+    public int eksporterSykefraværsstatistikkVirksomhet(ÅrstallOgKvartal årstallOgKvartal) {
+        return 0;
+    }
 }

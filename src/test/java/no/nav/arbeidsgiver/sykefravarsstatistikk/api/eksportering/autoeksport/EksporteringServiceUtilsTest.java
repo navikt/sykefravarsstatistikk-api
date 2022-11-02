@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL_MOCK;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.ORGNR_VIRKSOMHET_1;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.ORGNR_VIRKSOMHET_2;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.Siste4PubliserteKvartaler;
@@ -339,7 +339,7 @@ public class EksporteringServiceUtilsTest {
     public void getSykefraværMedKategoriForBransjeEllerNæringSiste4Kvartaler__skalIkkeFeileVedManglendeData(){
         assertThat( getSykefraværMedKategoriForBransjeEllerNæringSiste4Kvartaler(
               virksomhet1Metadata_2020_4,Collections.emptyList(),Collections.emptyList(),
-              SISTE_PUBLISERTE_KVARTAL_MOCK,new BransjeEllerNæring(new Næring("11","Industri"))
+                SISTE_PUBLISERTE_KVARTAL,new BransjeEllerNæring(new Næring("11","Industri"))
         )).isEmpty();
     }
 
@@ -351,7 +351,7 @@ public class EksporteringServiceUtilsTest {
               )), List.of(
                     byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "11000")
               ),
-              SISTE_PUBLISERTE_KVARTAL_MOCK, new BransjeEllerNæring(new Næring("11", "Industri"))
+                SISTE_PUBLISERTE_KVARTAL, new BransjeEllerNæring(new Næring("11", "Industri"))
         ).size()).isEqualTo(0);
     }
 
@@ -363,13 +363,13 @@ public class EksporteringServiceUtilsTest {
               )), List.of(
                     byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, "11000")
               ),
-              SISTE_PUBLISERTE_KVARTAL_MOCK, new BransjeEllerNæring(new Næring("11", "Industri"))
+                SISTE_PUBLISERTE_KVARTAL, new BransjeEllerNæring(new Næring("11", "Industri"))
         ).get(0)).isEqualTo(StatistikkDto.builder()
               .statistikkategori(Statistikkategori.NÆRING)
               .label("Industri")
               .verdi("2.0")
               .antallPersonerIBeregningen(156)
-              .kvartalerIBeregningen(List.of(SISTE_PUBLISERTE_KVARTAL_MOCK)
+              .kvartalerIBeregningen(List.of(SISTE_PUBLISERTE_KVARTAL)
               ).build());
     }
 
@@ -379,15 +379,15 @@ public class EksporteringServiceUtilsTest {
               virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,
               List.of(
                     byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL),
-                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1)),
-                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(2)),
-                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3)),
-                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,SISTE_PUBLISERTE_KVARTAL_MOCK.minusEttÅr())
+                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1)),
+                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2)),
+                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)),
+                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusEttÅr())
               ),
               List.of(
                     byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, "11000")
               ),
-              SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3), new BransjeEllerNæring(new Næring("11", "Industri"))
+              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3), new BransjeEllerNæring(new Næring("11", "Industri"))
         ).get(0)).isEqualTo(StatistikkDto.builder()
               .statistikkategori(Statistikkategori.NÆRING)
               .label("Industri")
@@ -395,10 +395,10 @@ public class EksporteringServiceUtilsTest {
               .antallPersonerIBeregningen(624)
               .kvartalerIBeregningen(
                     List.of(
-                          SISTE_PUBLISERTE_KVARTAL_MOCK,
-                          SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1),
-                          SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(2),
-                          SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3)
+                            SISTE_PUBLISERTE_KVARTAL,
+                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2),
+                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)
                     )
               ).build());
     }
@@ -409,14 +409,14 @@ public class EksporteringServiceUtilsTest {
               virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,
               List.of(
                     byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL),
-                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,SISTE_PUBLISERTE_KVARTAL_MOCK.plussKvartaler(1)),
-                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3)),
-                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,SISTE_PUBLISERTE_KVARTAL_MOCK.minusEttÅr())
+                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.plussKvartaler(1)),
+                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)),
+                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusEttÅr())
               ),
               List.of(
                     byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, "11000")
               ),
-              SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3), new BransjeEllerNæring(new Næring("11", "Industri"))
+              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3), new BransjeEllerNæring(new Næring("11", "Industri"))
         ).get(0)).isEqualTo(StatistikkDto.builder()
               .statistikkategori(Statistikkategori.NÆRING)
               .label("Industri")
@@ -424,8 +424,8 @@ public class EksporteringServiceUtilsTest {
               .antallPersonerIBeregningen(312)
               .kvartalerIBeregningen(
                     List.of(
-                          SISTE_PUBLISERTE_KVARTAL_MOCK,
-                          SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3)
+                            SISTE_PUBLISERTE_KVARTAL,
+                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)
                     )
               ).build());
     }
@@ -437,7 +437,7 @@ public class EksporteringServiceUtilsTest {
               )), List.of(
                     byggSykefraværStatistikkNæring5Siffer(virksomhet1_TilHørerBransjeMetadata(__2021_2), "86101")
               ),
-              SISTE_PUBLISERTE_KVARTAL_MOCK, new BransjeEllerNæring(new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS,"86101", "86101","86102","86104"))
+                SISTE_PUBLISERTE_KVARTAL, new BransjeEllerNæring(new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS,"86101", "86101","86102","86104"))
         ).size()).isEqualTo(0);
     }
 
@@ -451,14 +451,14 @@ public class EksporteringServiceUtilsTest {
               List.of(
                     byggSykefraværStatistikkNæring5Siffer(virksomhet1_TilHørerBransjeMetadata__SISTE_PUBLISERTE_KVARTAL, "86102")
               ),
-              SISTE_PUBLISERTE_KVARTAL_MOCK,
+                SISTE_PUBLISERTE_KVARTAL,
               new BransjeEllerNæring(new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS,"Sykehus", "86101","86102","86104"))
         ).get(0)).isEqualTo(StatistikkDto.builder()
               .statistikkategori(Statistikkategori.BRANSJE)
               .label("Sykehus")
               .verdi("1.0")
               .antallPersonerIBeregningen(100)
-              .kvartalerIBeregningen(List.of(SISTE_PUBLISERTE_KVARTAL_MOCK)
+              .kvartalerIBeregningen(List.of(SISTE_PUBLISERTE_KVARTAL)
               ).build());
     }
 
@@ -468,22 +468,22 @@ public class EksporteringServiceUtilsTest {
               virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,
               List.of(
                     byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL),
-                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1)),
-                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(2)),
-                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3)),
-                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,SISTE_PUBLISERTE_KVARTAL_MOCK.minusEttÅr())
+                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1)),
+                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2)),
+                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)),
+                    byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusEttÅr())
               ),
               List.of(
                     byggSykefraværStatistikkNæring5Siffer(virksomhet1_TilHørerBransjeMetadata__SISTE_PUBLISERTE_KVARTAL, "86104"),
-                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1), "86104"),
-                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1), "86106"),
-                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(2), "86104"),
-                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(2), "86106"),
-                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3), "86106"),
-                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL_MOCK.minusEttÅr(), "86104"),
-                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL_MOCK.minusEttÅr(), "86106")
+                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), "86104"),
+                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), "86106"),
+                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2), "86104"),
+                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2), "86106"),
+                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3), "86106"),
+                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL.minusEttÅr(), "86104"),
+                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL.minusEttÅr(), "86106")
               ),
-              SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3),
+              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3),
               new BransjeEllerNæring(new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS,"Sykehus", "86101","86102","86104","86106"))
         ).get(0)).isEqualTo(StatistikkDto.builder()
               .statistikkategori(Statistikkategori.BRANSJE)
@@ -492,10 +492,10 @@ public class EksporteringServiceUtilsTest {
               .antallPersonerIBeregningen(1100)
               .kvartalerIBeregningen(
                     List.of(
-                          SISTE_PUBLISERTE_KVARTAL_MOCK,
-                          SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1),
-                          SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(2),
-                          SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3)
+                            SISTE_PUBLISERTE_KVARTAL,
+                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2),
+                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)
                     )
               ).build());
     }
@@ -508,11 +508,11 @@ public class EksporteringServiceUtilsTest {
                     byggSykefraværStatistikkNæring(virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL)
               ),
               List.of(
-                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL_MOCK.minusEttÅr(), "86101"),
-                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3), "86101"),
+                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL.minusEttÅr(), "86101"),
+                    byggSykefraværStatistikkNæring5Siffer(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3), "86101"),
                     byggSykefraværStatistikkNæring5Siffer(virksomhet1_TilHørerBransjeMetadata__SISTE_PUBLISERTE_KVARTAL, "86101")
               ),
-              SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3),
+              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3),
               new BransjeEllerNæring(new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS,"Sykehus", "86101","86102","86104","86106"))
         ).get(0)).isEqualTo(StatistikkDto.builder()
               .statistikkategori(Statistikkategori.BRANSJE)
@@ -521,8 +521,8 @@ public class EksporteringServiceUtilsTest {
               .antallPersonerIBeregningen(300)
               .kvartalerIBeregningen(
                     List.of(
-                          SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3),
-                          SISTE_PUBLISERTE_KVARTAL_MOCK
+                          SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3),
+                            SISTE_PUBLISERTE_KVARTAL
                     )
               ).build());
     }
@@ -530,7 +530,7 @@ public class EksporteringServiceUtilsTest {
     @Test
     public void filterByKvartal_skalIkkeFeile(){
         assertThat(filterByKvartal(
-              SISTE_PUBLISERTE_KVARTAL_MOCK,
+                SISTE_PUBLISERTE_KVARTAL,
               List.of(byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2020_4)))).isEmpty();
     }
 
@@ -576,7 +576,7 @@ public class EksporteringServiceUtilsTest {
     public void getSykefraværMedKategoriVirksomhetSiste4Kvartaler__skalIkkeFeileVedManglendeData(){
         assertThat(getSykefraværMedKategoriVirksomhetSiste4Kvartaler(
               virksomhet1Metadata_2020_4,Collections.emptyList(),
-              SISTE_PUBLISERTE_KVARTAL_MOCK)
+                SISTE_PUBLISERTE_KVARTAL)
         ).isEmpty();
     }
 
@@ -585,7 +585,7 @@ public class EksporteringServiceUtilsTest {
         assertThat(getSykefraværMedKategoriVirksomhetSiste4Kvartaler(
               virksomhet1Metadata_2020_4,
               byggVirksomhetSykefraværUtenVarighet(virksomhet1Metadata_2020_4,List.of(__2020_4)),
-              SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3)
+              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)
         ).size()).isEqualTo(0);
     }
 
@@ -596,7 +596,7 @@ public class EksporteringServiceUtilsTest {
               byggVirksomhetSykefraværUtenVarighet(
                     virksomhet1Metadata_SISTE_PUBLISERTE_KVARTAL,
                     Siste4PubliserteKvartaler),
-              SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3)
+              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)
         ).get(0)).isEqualTo(StatistikkDto.builder()
               .statistikkategori(Statistikkategori.VIRKSOMHET)
               .label("Virksomhet 1")

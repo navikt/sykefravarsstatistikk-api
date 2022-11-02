@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
 import com.google.common.collect.Lists;
-import io.vavr.control.Either;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository;
@@ -9,7 +8,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksp
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
@@ -20,13 +18,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaP
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUtsendingException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.StatistikkException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.Aggregeringskalkulator;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.StatistikkDto;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.Sykefraværsdata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -135,14 +128,14 @@ public class EksporteringService {
         List<VirksomhetMetadata> virksomhetMetadataListe =
               virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal);
 
-        List<UmaskertSykefraværForEttKvartal> umaskertSykefraværsstatistikkSiste4KvartalerLand =
+        List<UmaskertSykefraværForEttKvartal> umaskertSykefraværsstatistikkSistePublisertKvartalLand =
               sykefraværRepository.hentUmaskertSykefraværForNorge(årstallOgKvartal);
 
         List<SykefraværsstatistikkSektor> sykefraværsstatistikkSektor =
               sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(årstallOgKvartal);
 
         List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring =
-              sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringerSiste4Kvartaler(årstallOgKvartal);
+              sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(årstallOgKvartal);
         List<Næring> alleNæringer= klassifikasjonerRepository.hentAlleNæringer();
 
         List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer =
@@ -156,7 +149,11 @@ public class EksporteringService {
         SykefraværMedKategori landSykefravær = getSykefraværMedKategoriForLand(
               årstallOgKvartal,
               mapToSykefraværsstatistikkLand(
-                    hentSisteKvartalIBeregningen(umaskertSykefraværsstatistikkSiste4KvartalerLand,årstallOgKvartal))
+                    hentSisteKvartalIBeregningen(
+                            umaskertSykefraværsstatistikkSistePublisertKvartalLand,
+                            årstallOgKvartal
+                    )
+              )
         );
 
         Map<String, VirksomhetMetadata> virksomhetMetadataMap = getVirksomhetMetadataHashMap(virksomhetMetadataListe);

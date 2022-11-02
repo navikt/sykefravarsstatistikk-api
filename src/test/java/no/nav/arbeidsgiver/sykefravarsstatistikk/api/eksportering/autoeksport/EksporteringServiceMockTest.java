@@ -1,11 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.*;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
@@ -231,7 +227,7 @@ public class EksporteringServiceMockTest {
                 .thenReturn(Arrays.asList(virksomhetMetadata));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(__2020_2))
                 .thenReturn(Arrays.asList(sykefraværsstatistikkSektor));
-        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringerSiste4Kvartaler(__2020_2))
+        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(__2020_2))
               .thenReturn(Arrays.asList(
                     sykefraværsstatistikkNæring(fraÅrstallOgKvartal),
                     sykefraværsstatistikkNæring(fraÅrstallOgKvartal.plussKvartaler(1)),
@@ -291,7 +287,7 @@ public class EksporteringServiceMockTest {
                 .thenReturn(Arrays.asList(virksomhet1_TilHørerBransjeMetadata));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(årstallOgKvartal))
                 .thenReturn(Arrays.asList(sykefraværsstatistikkSektor));
-        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringerSiste4Kvartaler(__2020_2))
+        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(__2020_2))
               .thenReturn(Arrays.asList(
                     sykefraværsstatistikkNæring(fraÅrstallOgKvartal),
                     sykefraværsstatistikkNæring(fraÅrstallOgKvartal.plussKvartaler(1)),

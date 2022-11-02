@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class SykefraværsstatistikkTilEksporteringRepository {
@@ -19,7 +20,7 @@ public class SykefraværsstatistikkTilEksporteringRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     public SykefraværsstatistikkTilEksporteringRepository(@Qualifier("sykefravarsstatistikkJdbcTemplate")
-                                               NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+                                                                  NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
@@ -64,38 +65,49 @@ public class SykefraværsstatistikkTilEksporteringRepository {
         }
     }
 
-    @Deprecated
+    /* Sykefraværsprosent Næring */
+
     public List<SykefraværsstatistikkNæring> hentSykefraværprosentAlleNæringer(
-            ÅrstallOgKvartal årstallOgKvartal) {
+            ÅrstallOgKvartal sisteÅrstallOgKvartal,
+            int antallKvartaler
+    ) {
+        if (antallKvartaler == 1) {
+            return hentSykefraværprosentAlleNæringer(sisteÅrstallOgKvartal);
+        }
+
+        return hentSykefraværprosentAlleNæringer(
+                sisteÅrstallOgKvartal,
+                sisteÅrstallOgKvartal.minusKvartaler(antallKvartaler - 1)
+        );
+    }
+
+    public List<SykefraværsstatistikkNæring> hentSykefraværprosentAlleNæringer(
+            ÅrstallOgKvartal årstallOgKvartal
+    ) {
+        return hentSykefraværprosentAlleNæringer(årstallOgKvartal, årstallOgKvartal);
+    }
+
+    public List<SykefraværsstatistikkNæring> hentSykefraværprosentAlleNæringer(
+            ÅrstallOgKvartal fraÅrstallOgKvartal,
+            ÅrstallOgKvartal tilÅrstallOgKvartal
+    ) {
+
+        List<ÅrstallOgKvartal> årstallOgKvartalListe = ÅrstallOgKvartal.range(fraÅrstallOgKvartal, tilÅrstallOgKvartal);
+        String whereClause = årstallOgKvartalListe
+                .stream()
+                .map(årstallOgKvartal -> String.format(
+                        "(arstall = %d and kvartal = %d) ",
+                        årstallOgKvartal.getÅrstall(),
+                        årstallOgKvartal.getKvartal()
+                ))
+                .collect(Collectors.joining("or "));
+
         try {
             return namedParameterJdbcTemplate.query(
                     "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk " +
                             "from sykefravar_statistikk_naring " +
-                            "where arstall = :arstall and kvartal = :kvartal order by arstall, kvartal, naring_kode",
-                    new MapSqlParameterSource()
-                            .addValue("arstall", årstallOgKvartal.getÅrstall())
-                            .addValue("kvartal", årstallOgKvartal.getKvartal()),
-                    (rs, rowNum) -> mapTilSykefraværsstatistikkNæring(rs)
-            );
-        } catch (EmptyResultDataAccessException e) {
-            return Collections.emptyList();
-        }
-    }
-
-    public List<SykefraværsstatistikkNæring> hentSykefraværprosentAlleNæringerSiste4Kvartaler(
-            ÅrstallOgKvartal fraÅrstallOgKvartal) {
-        try {
-            return namedParameterJdbcTemplate.query(
-                  "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk " +
-                        "from sykefravar_statistikk_naring " +
-                        " where " +
-                        " (arstall = :arstall and kvartal >= :kvartal) " +
-                        "  or " +
-                        " (arstall > :arstall) " +
-                        "order by (arstall, kvartal) desc, naring_kode",
-                  new MapSqlParameterSource()
-                            .addValue("arstall", fraÅrstallOgKvartal.getÅrstall())
-                            .addValue("kvartal", fraÅrstallOgKvartal.getKvartal()),
+                            " where " + whereClause +
+                            "order by (arstall, kvartal) desc, naring_kode",
                     (rs, rowNum) -> mapTilSykefraværsstatistikkNæring(rs)
             );
         } catch (EmptyResultDataAccessException e) {
@@ -120,17 +132,18 @@ public class SykefraværsstatistikkTilEksporteringRepository {
             return Collections.emptyList();
         }
     }
+
     public List<SykefraværsstatistikkNæring5Siffer> hentSykefraværprosentAlleNæringer5SifferSiste4Kvartaler(
             ÅrstallOgKvartal fraÅrstallOgKvartal) {
         try {
             return namedParameterJdbcTemplate.query(
                     "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk " +
                             "from sykefravar_statistikk_naring5siffer " +
-                          " where " +
-                          " (arstall = :arstall and kvartal >= :kvartal) " +
-                          "  or " +
-                          " (arstall > :arstall) " +
-                          "order by (arstall, kvartal) desc, naring_kode",
+                            " where " +
+                            " (arstall = :arstall and kvartal >= :kvartal) " +
+                            "  or " +
+                            " (arstall > :arstall) " +
+                            "order by (arstall, kvartal) desc, naring_kode",
                     new MapSqlParameterSource()
                             .addValue("arstall", fraÅrstallOgKvartal.getÅrstall())
                             .addValue("kvartal", fraÅrstallOgKvartal.getKvartal()),
@@ -150,11 +163,11 @@ public class SykefraværsstatistikkTilEksporteringRepository {
                             "sum(mulige_dagsverk) as mulige_dagsverk, " +
                             "sum(antall_personer) as antall_personer " +
                             "from sykefravar_statistikk_virksomhet " +
-                          " where " +
-                          " (arstall = :arstall and kvartal >= :kvartal) " +
-                          "  or " +
-                          " (arstall > :arstall) " +
-                          "group by arstall, kvartal, orgnr",
+                            " where " +
+                            " (arstall = :arstall and kvartal >= :kvartal) " +
+                            "  or " +
+                            " (arstall > :arstall) " +
+                            "group by arstall, kvartal, orgnr",
                     new MapSqlParameterSource()
                             .addValue("arstall", fraÅrstallOgKvartal.getÅrstall())
                             .addValue("kvartal", fraÅrstallOgKvartal.getKvartal()),

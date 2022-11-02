@@ -17,11 +17,11 @@ public class TestUtils {
   public static final Næring PRODUKSJON_NYTELSESMIDLER =
       new Næring("10", "Produksjon av nærings- og nytelsesmidler");
 
-  public static final ÅrstallOgKvartal SISTE_PUBLISERTE_KVARTAL_MOCK = new ÅrstallOgKvartal(2022,
+  public static final ÅrstallOgKvartal SISTE_PUBLISERTE_KVARTAL = new ÅrstallOgKvartal(2022,
       1);
 
   public static ÅrstallOgKvartal sisteKvartalMinus(int n) {
-    return SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(n);
+    return SISTE_PUBLISERTE_KVARTAL.minusKvartaler(n);
   }
 
   public static MapSqlParameterSource parametreForStatistikk(
@@ -73,8 +73,8 @@ public class TestUtils {
             + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, "
             + ":mulige_dagsverk)",
         parametreForStatistikk(
-            SISTE_PUBLISERTE_KVARTAL_MOCK.getÅrstall(),
-            SISTE_PUBLISERTE_KVARTAL_MOCK.getKvartal(),
+            SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
+            SISTE_PUBLISERTE_KVARTAL.getKvartal(),
             10,
             4,
             100
@@ -86,8 +86,8 @@ public class TestUtils {
             + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, "
             + ":mulige_dagsverk)",
         parametreForStatistikk(
-            SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1).getÅrstall(),
-            SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1).getKvartal(),
+            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getÅrstall(),
+            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getKvartal(),
             10,
             5,
             100
@@ -99,8 +99,8 @@ public class TestUtils {
             + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, "
             + ":mulige_dagsverk)",
         parametreForStatistikk(
-            SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(2).getÅrstall(),
-            SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(2).getKvartal(),
+            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getÅrstall(),
+            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getKvartal(),
             10,
             6,
             100
@@ -114,8 +114,8 @@ public class TestUtils {
     new SykefraværsstatistikkSektorUtils(jdbcTemplate).getBatchCreateFunction(
         List.of(
             new SykefraværsstatistikkSektor(
-                SISTE_PUBLISERTE_KVARTAL_MOCK.getÅrstall(),
-                SISTE_PUBLISERTE_KVARTAL_MOCK.getKvartal(),
+                SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
+                SISTE_PUBLISERTE_KVARTAL.getKvartal(),
                 "1", 10, new BigDecimal("657853.346702"),
                 new BigDecimal("13558710.866603")
             )
@@ -155,19 +155,19 @@ public class TestUtils {
 
     public static void opprettStatistikkForNæringer2Siffer(NamedParameterJdbcTemplate jdbcTemplate){
         opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("10",""),
-              SISTE_PUBLISERTE_KVARTAL_MOCK.getÅrstall(), SISTE_PUBLISERTE_KVARTAL_MOCK.getKvartal(), 20000,1000000,50);
+              SISTE_PUBLISERTE_KVARTAL.getÅrstall(), SISTE_PUBLISERTE_KVARTAL.getKvartal(), 20000,1000000,50);
         opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("10",""),
-              SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1).getÅrstall(), SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1).getKvartal(), 30000,1000000,50);
+              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getÅrstall(), SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getKvartal(), 30000,1000000,50);
         opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("10",""),
-              SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(2).getÅrstall(), SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(2).getKvartal(), 40000,1000000,50);
+              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getÅrstall(), SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getKvartal(), 40000,1000000,50);
         opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("10",""),
-              SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3).getÅrstall(), SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3).getKvartal(), 50000,1000000,50);
+              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getÅrstall(), SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getKvartal(), 50000,1000000,50);
         opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("10",""),
-              SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(4).getÅrstall(), SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(4).getKvartal(), 60000,1000000,50);
+              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4).getÅrstall(), SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4).getKvartal(), 60000,1000000,50);
         opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("88",""),
-              SISTE_PUBLISERTE_KVARTAL_MOCK.getÅrstall(), SISTE_PUBLISERTE_KVARTAL_MOCK.getKvartal(), 25000,1000000,50);
+              SISTE_PUBLISERTE_KVARTAL.getÅrstall(), SISTE_PUBLISERTE_KVARTAL.getKvartal(), 25000,1000000,50);
         opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("88",""),
-              SISTE_PUBLISERTE_KVARTAL_MOCK.minusEttÅr().getÅrstall(), SISTE_PUBLISERTE_KVARTAL_MOCK.minusEttÅr().getKvartal(), 30000,1000000,50);
+              SISTE_PUBLISERTE_KVARTAL.minusEttÅr().getÅrstall(), SISTE_PUBLISERTE_KVARTAL.minusEttÅr().getKvartal(), 30000,1000000,50);
     }
     public static void opprettStatistikkForNæring2Siffer(
         NamedParameterJdbcTemplate jdbcTemplate,
@@ -234,7 +234,7 @@ public class TestUtils {
     skrivImporttidspunktTilDb(
         jdbcTemplate,
         new ImporttidspunktDto(
-            Timestamp.valueOf("2022-06-02 10:00:00.0"), SISTE_PUBLISERTE_KVARTAL_MOCK));
+            Timestamp.valueOf("2022-06-02 10:00:00.0"), SISTE_PUBLISERTE_KVARTAL));
   }
 
   private static void skrivImporttidspunktTilDb(

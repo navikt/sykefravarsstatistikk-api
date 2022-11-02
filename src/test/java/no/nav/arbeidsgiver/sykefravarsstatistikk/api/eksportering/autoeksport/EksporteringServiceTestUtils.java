@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils.assertBigDecimalIsEqual;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL_MOCK;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -112,10 +112,10 @@ public class EksporteringServiceTestUtils {
                         .antallPersonerIBeregningen(1100)
                         .kvartalerIBeregningen(
                                 List.of(
-                                        SISTE_PUBLISERTE_KVARTAL_MOCK,
-                                        SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1),
-                                        SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(2),
-                                        SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3)
+                                        SISTE_PUBLISERTE_KVARTAL,
+                                        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                                        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2),
+                                        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)
                                 )
                         ).build(),
                 StatistikkDto.builder()
@@ -125,10 +125,10 @@ public class EksporteringServiceTestUtils {
                         .antallPersonerIBeregningen(100)
                         .kvartalerIBeregningen(
                                 List.of(
-                                        SISTE_PUBLISERTE_KVARTAL_MOCK,
-                                        SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1),
-                                        SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(2),
-                                        SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3)
+                                        SISTE_PUBLISERTE_KVARTAL,
+                                        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                                        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2),
+                                        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)
                                 )
                         ).build()
         );
@@ -185,7 +185,7 @@ public class EksporteringServiceTestUtils {
             RECTYPE_FOR_VIRKSOMHET,
             "1",
             "11",
-            SISTE_PUBLISERTE_KVARTAL_MOCK
+            SISTE_PUBLISERTE_KVARTAL
     );
 
     public static VirksomhetMetadata virksomhet1_TilHørerBransjeMetadata(ÅrstallOgKvartal årstallOgKvartal) {
@@ -205,7 +205,7 @@ public class EksporteringServiceTestUtils {
             RECTYPE_FOR_VIRKSOMHET,
             "1",
             "86",
-            SISTE_PUBLISERTE_KVARTAL_MOCK
+            SISTE_PUBLISERTE_KVARTAL
     );
 
     public static SykefraværsstatistikkVirksomhetUtenVarighet byggSykefraværsstatistikkVirksomhet(
@@ -491,10 +491,10 @@ public class EksporteringServiceTestUtils {
     }
 
     public static List<ÅrstallOgKvartal> Siste4PubliserteKvartaler = List.of(
-            SISTE_PUBLISERTE_KVARTAL_MOCK,
-            SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1),
-            SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(2),
-            SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3)
+            SISTE_PUBLISERTE_KVARTAL,
+            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2),
+            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)
     );
     // Assert methods
     // Assertions
