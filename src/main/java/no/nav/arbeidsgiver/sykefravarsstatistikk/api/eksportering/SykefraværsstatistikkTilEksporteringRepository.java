@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -92,21 +93,11 @@ public class SykefraværsstatistikkTilEksporteringRepository {
             ÅrstallOgKvartal tilÅrstallOgKvartal
     ) {
 
-        List<ÅrstallOgKvartal> årstallOgKvartalListe = ÅrstallOgKvartal.range(fraÅrstallOgKvartal, tilÅrstallOgKvartal);
-        String whereClause = årstallOgKvartalListe
-                .stream()
-                .map(årstallOgKvartal -> String.format(
-                        "(arstall = %d and kvartal = %d) ",
-                        årstallOgKvartal.getÅrstall(),
-                        årstallOgKvartal.getKvartal()
-                ))
-                .collect(Collectors.joining("or "));
-
         try {
             return namedParameterJdbcTemplate.query(
                     "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk " +
                             "from sykefravar_statistikk_naring " +
-                            " where " + whereClause +
+                            " where " + getWhereClause(fraÅrstallOgKvartal, tilÅrstallOgKvartal) +
                             "order by (arstall, kvartal) desc, naring_kode",
                     (rs, rowNum) -> mapTilSykefraværsstatistikkNæring(rs)
             );
@@ -116,26 +107,21 @@ public class SykefraværsstatistikkTilEksporteringRepository {
     }
 
 
-    public List<SykefraværsstatistikkNæring5Siffer> hentSykefraværprosentAlleNæringer5Siffer(ÅrstallOgKvartal årstallOgKvartal){
+    public List<SykefraværsstatistikkNæring5Siffer> hentSykefraværprosentAlleNæringer5Siffer(
+            ÅrstallOgKvartal årstallOgKvartal
+    ){
         return hentSykefraværprosentAlleNæringer5Siffer(årstallOgKvartal,årstallOgKvartal);
     }
     public List<SykefraværsstatistikkNæring5Siffer> hentSykefraværprosentAlleNæringer5Siffer(
-            ÅrstallOgKvartal fraÅrstallOgKvartal, ÅrstallOgKvartal tilÅrstallOgKvartal) {
-        List<ÅrstallOgKvartal> årstallOgKvartalListe = ÅrstallOgKvartal.range(fraÅrstallOgKvartal, tilÅrstallOgKvartal);
-        String whereClause = årstallOgKvartalListe
-              .stream()
-              .map(årstallOgKvartal -> String.format(
-                    "(arstall = %d and kvartal = %d) ",
-                    årstallOgKvartal.getÅrstall(),
-                    årstallOgKvartal.getKvartal()
-              ))
-              .collect(Collectors.joining("or "));
+            ÅrstallOgKvartal fraÅrstallOgKvartal,
+            ÅrstallOgKvartal tilÅrstallOgKvartal
+    ) {
 
         try {
             return namedParameterJdbcTemplate.query(
                     "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk " +
                             "from sykefravar_statistikk_naring5siffer " +
-                            " where " + whereClause +
+                            " where " + getWhereClause(fraÅrstallOgKvartal, tilÅrstallOgKvartal) +
                             "order by (arstall, kvartal) desc, naring_kode",
                     new MapSqlParameterSource()
                             .addValue("arstall", fraÅrstallOgKvartal.getÅrstall())
@@ -173,6 +159,20 @@ public class SykefraværsstatistikkTilEksporteringRepository {
 
 
     // Utilities
+    @NotNull
+    private static String getWhereClause(ÅrstallOgKvartal fraÅrstallOgKvartal, ÅrstallOgKvartal tilÅrstallOgKvartal) {
+        List<ÅrstallOgKvartal> årstallOgKvartalListe = ÅrstallOgKvartal.range(fraÅrstallOgKvartal, tilÅrstallOgKvartal);
+        String whereClause = årstallOgKvartalListe
+                .stream()
+                .map(årstallOgKvartal -> String.format(
+                        "(arstall = %d and kvartal = %d) ",
+                        årstallOgKvartal.getÅrstall(),
+                        årstallOgKvartal.getKvartal()
+                ))
+                .collect(Collectors.joining("or "));
+        return whereClause;
+    }
+
     private SykefraværsstatistikkLand mapTilSykefraværsstatistikkLand(ResultSet rs) throws SQLException {
         return new SykefraværsstatistikkLand(
                 rs.getInt("arstall"),
