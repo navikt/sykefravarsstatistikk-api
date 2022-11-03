@@ -134,7 +134,7 @@ public class EksporteringService {
                     årstallOgKvartal
               );
         List<SykefraværsstatistikkVirksomhetUtenVarighet> sykefraværsstatistikkVirksomhetUtenVarighet =
-              sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleVirksomheter(årstallOgKvartal);
+              sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleVirksomheter(årstallOgKvartal);
 
 
         SykefraværMedKategori landSykefravær = getSykefraværMedKategoriForLand(

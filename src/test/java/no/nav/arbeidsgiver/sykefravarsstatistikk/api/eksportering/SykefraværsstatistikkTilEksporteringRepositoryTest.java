@@ -215,33 +215,33 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
         opprettStatistikkVirksomhetTestData();
 
         List<SykefraværsstatistikkVirksomhetUtenVarighet> resultat_2019_2 =
-                repository.hentSykefraværprosentAlleVirksomheter(new ÅrstallOgKvartal(2019, 2));
+                repository.hentSykefraværAlleVirksomheter(new ÅrstallOgKvartal(2019, 2));
 
         assertThat(resultat_2019_2.size()).isEqualTo(2);
         assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2019_2, 2019, 2, 3, VIRKSOMHET_1, 1, 60);
         assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2019_2, 2019, 2, 4, VIRKSOMHET_2, 9, 100);
 
-        List<SykefraværsstatistikkVirksomhetUtenVarighet> resultat_2019_1 =
-                repository.hentSykefraværprosentAlleVirksomheter(new ÅrstallOgKvartal(2019, 1));
+        List<SykefraværsstatistikkVirksomhetUtenVarighet> resultat_2019_1_TIL_2019_2 =
+                repository.hentSykefraværAlleVirksomheter(new ÅrstallOgKvartal(2019, 1), new ÅrstallOgKvartal(2019, 2));
 
-        assertThat(resultat_2019_1.size()).isEqualTo(4);
-        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2019_1, 2019, 1, 40, VIRKSOMHET_1, 20, 115);
-        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2019_1, 2019, 1, 7, VIRKSOMHET_2, 12, 100);
-        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2019_1, 2019, 2, 3, VIRKSOMHET_1, 1, 60);
-        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2019_1, 2019, 2, 4, VIRKSOMHET_2, 9, 100);
+        assertThat(resultat_2019_1_TIL_2019_2.size()).isEqualTo(4);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2019_1_TIL_2019_2, 2019, 1, 40, VIRKSOMHET_1, 20, 115);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2019_1_TIL_2019_2, 2019, 1, 7, VIRKSOMHET_2, 12, 100);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2019_1_TIL_2019_2, 2019, 2, 3, VIRKSOMHET_1, 1, 60);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2019_1_TIL_2019_2, 2019, 2, 4, VIRKSOMHET_2, 9, 100);
 
-        List<SykefraværsstatistikkVirksomhetUtenVarighet> resultat_2018_3 =
-                repository.hentSykefraværprosentAlleVirksomheter(new ÅrstallOgKvartal(2018, 3));
+        List<SykefraværsstatistikkVirksomhetUtenVarighet> resultat_2018_3_TIL_2019_2 =
+                repository.hentSykefraværAlleVirksomheter(new ÅrstallOgKvartal(2018, 3), new ÅrstallOgKvartal(2019, 2));
 
-        assertThat(resultat_2018_3.size()).isEqualTo(8);
-        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3, 2018, 4, 40, VIRKSOMHET_1, 20, 115);
-        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3, 2018, 4, 7, VIRKSOMHET_2, 12, 100);
-        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3, 2018, 3, 3, VIRKSOMHET_1, 1, 60);
-        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3, 2018, 3, 4, VIRKSOMHET_2, 9, 100);
-        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3, 2019, 1, 40, VIRKSOMHET_1, 20, 115);
-        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3, 2019, 1, 7, VIRKSOMHET_2, 12, 100);
-        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3, 2019, 2, 3, VIRKSOMHET_1, 1, 60);
-        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3, 2019, 2, 4, VIRKSOMHET_2, 9, 100);
+        assertThat(resultat_2018_3_TIL_2019_2.size()).isEqualTo(8);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3_TIL_2019_2, 2018, 4, 40, VIRKSOMHET_1, 20, 115);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3_TIL_2019_2, 2018, 4, 7, VIRKSOMHET_2, 12, 100);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3_TIL_2019_2, 2018, 3, 3, VIRKSOMHET_1, 1, 60);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3_TIL_2019_2, 2018, 3, 4, VIRKSOMHET_2, 9, 100);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3_TIL_2019_2, 2019, 1, 40, VIRKSOMHET_1, 20, 115);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3_TIL_2019_2, 2019, 1, 7, VIRKSOMHET_2, 12, 100);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3_TIL_2019_2, 2019, 2, 3, VIRKSOMHET_1, 1, 60);
+        assertSykefraværsstatistikkForVirksomhetIsEqual(resultat_2018_3_TIL_2019_2, 2019, 2, 4, VIRKSOMHET_2, 9, 100);
     }
 
 

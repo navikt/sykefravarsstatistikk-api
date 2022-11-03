@@ -133,8 +133,17 @@ public class SykefraværsstatistikkTilEksporteringRepository {
         }
     }
 
-    public List<SykefraværsstatistikkVirksomhetUtenVarighet> hentSykefraværprosentAlleVirksomheter(
-            ÅrstallOgKvartal fraÅrstallOgKvartal) {
+    // OBS her kommer potensielt 2,2 Millioner i lista
+    public List<SykefraværsstatistikkVirksomhetUtenVarighet> hentSykefraværAlleVirksomheter(
+            ÅrstallOgKvartal fraÅrstallOgKvartal // Tharald sitt forslag: la oss ta alt sammen med en gang
+    ) {
+        return hentSykefraværAlleVirksomheter(fraÅrstallOgKvartal, fraÅrstallOgKvartal);
+    }
+
+    public List<SykefraværsstatistikkVirksomhetUtenVarighet> hentSykefraværAlleVirksomheter(
+            ÅrstallOgKvartal fraÅrstallOgKvartal,
+            ÅrstallOgKvartal tilÅrstallOgKvartal
+    ) {
         try {
             return namedParameterJdbcTemplate.query(
                     "select arstall, kvartal, orgnr, " +
@@ -142,14 +151,8 @@ public class SykefraværsstatistikkTilEksporteringRepository {
                             "sum(mulige_dagsverk) as mulige_dagsverk, " +
                             "sum(antall_personer) as antall_personer " +
                             "from sykefravar_statistikk_virksomhet " +
-                            " where " +
-                            " (arstall = :arstall and kvartal >= :kvartal) " +
-                            "  or " +
-                            " (arstall > :arstall) " +
-                            "group by arstall, kvartal, orgnr",
-                    new MapSqlParameterSource()
-                            .addValue("arstall", fraÅrstallOgKvartal.getÅrstall())
-                            .addValue("kvartal", fraÅrstallOgKvartal.getKvartal()),
+                            " where " + getWhereClause(fraÅrstallOgKvartal, tilÅrstallOgKvartal) +
+                            " group by arstall, kvartal, orgnr",
                     (rs, rowNum) -> mapTilSykefraværsstatistikkVirksomhet(rs)
             );
         } catch (EmptyResultDataAccessException e) {
@@ -159,6 +162,7 @@ public class SykefraværsstatistikkTilEksporteringRepository {
 
 
     // Utilities
+    // TODO: gjør dette SQL injection proof ved å bruke MapSqlParameterSource().addValue() i stedet
     @NotNull
     private static String getWhereClause(ÅrstallOgKvartal fraÅrstallOgKvartal, ÅrstallOgKvartal tilÅrstallOgKvartal) {
         List<ÅrstallOgKvartal> årstallOgKvartalListe = ÅrstallOgKvartal.range(fraÅrstallOgKvartal, tilÅrstallOgKvartal);

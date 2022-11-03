@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
@@ -38,6 +39,9 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
     @Mock
     private SykefraværRepository sykefraværRepository;
     @Mock
+    private EksporteringRepository eksporteringRepository;
+
+    @Mock
     private KafkaService kafkaService;
 
     private EksporteringPerStatistikkKategoriService service;
@@ -53,6 +57,8 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
     public void setUp() {
         service = new EksporteringPerStatistikkKategoriService(
                 sykefraværRepository,
+                sykefraværsstatistikkTilEksporteringRepository,
+                eksporteringRepository,
                 kafkaService
         );
     }
@@ -112,58 +118,4 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
         assertThat(antallEksporterte).isEqualTo(1);
     }
 
-    /*
-    @Test
-    public void eksporterSykefraværsstatistikkVirksomhet__sender_riktig_melding_til_kafka_og_returnerer_antall_meldinger_sendt() {
-        // 1- Mock det database og repositories returnerer. Samme med KafkaService
-        List<UmaskertSykefraværForEttKvartal> umaskertSykefraværForEttKvartalListe =
-                sykefraværsstatistikkLandSiste4Kvartaler(__2020_2);
-        when(sykefraværRepository.hentUmaskertSykefraværForNorge(any()))
-                .thenReturn(umaskertSykefraværForEttKvartalListe);
-        when(kafkaService.sendTilStatistikkKategoriTopic(any(), any(), any())).thenReturn(1);
-
-        // 2- Kall tjenesten
-        int antallEksporterte = service.eksporterSykefraværsstatistikkVirksomhet(__2020_2);
-
-        // 3- Sjekk hva Kafka har fått
-        verify(kafkaService).sendTilStatistikkKategoriTopic(
-                årstallOgKvartalArgumentCaptor.capture(),
-                landSykefraværArgumentCaptor.capture(),
-                sykefraværOverFlereKvartalerArgumentCaptor.capture()
-        );
-
-        assertThat(årstallOgKvartalArgumentCaptor.getValue()).isEqualTo(__2020_2);
-        EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(
-                landSykefravær,
-                landSykefraværArgumentCaptor.getValue()
-        );
-        BigDecimal sumAvTapteDagsverk =
-                umaskertSykefraværForEttKvartalListe.stream()
-                        .map(
-                                item -> item.getDagsverkTeller()
-                        )
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal sumAvMuligeDagsverk =
-                umaskertSykefraværForEttKvartalListe.stream()
-                        .map(
-                                item -> item.getDagsverkNevner()
-                        )
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        EksporteringServiceTestUtils.assertEqualsSykefraværOverFlereKvartaler(
-                new SykefraværOverFlereKvartaler(
-                        List.of(
-                                __2020_2,
-                                __2020_2.minusKvartaler(1),
-                                __2020_2.minusKvartaler(2),
-                                __2020_2.minusKvartaler(3)
-                        ),
-                        sumAvTapteDagsverk,
-                        sumAvMuligeDagsverk,
-                        convertToSykefraværForEttKvartal(umaskertSykefraværForEttKvartalListe)
-                ),
-                sykefraværOverFlereKvartalerArgumentCaptor.getValue()
-        );
-        assertThat(antallEksporterte).isEqualTo(1);
-    }*/
 }

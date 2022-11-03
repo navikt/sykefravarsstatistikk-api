@@ -59,8 +59,8 @@ public class KafkaService {
 
     public int sendTilStatistikkKategoriTopic(
             ÅrstallOgKvartal årstallOgKvartal,
-            SykefraværMedKategori landSykefraværSisteKvartal,
-            SykefraværOverFlereKvartaler landSykefraværSiste12Måneder
+            SykefraværMedKategori sykefraværMedKategori,
+            SykefraværOverFlereKvartaler sykefraværOverFlereKvartaler
     ) {
         kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
         KafkaStatistikkategoriTopicKey key = new KafkaStatistikkategoriTopicKey(
@@ -71,8 +71,8 @@ public class KafkaService {
         );
 
         KafkaStatistikkKategoriTopicValue value = new KafkaStatistikkKategoriTopicValue(
-                landSykefraværSisteKvartal,
-                landSykefraværSiste12Måneder
+                sykefraværMedKategori,
+                sykefraværOverFlereKvartaler
         );
 
         String keyAsJsonString;
@@ -98,8 +98,8 @@ public class KafkaService {
                 kafkaUtsendingRapport.leggTilError(
                         String.format(
                                 "Utsending feilet for statistikk kategori '%s' og kode '%s',  med melding '%s'",
-                                landSykefraværSisteKvartal.getKategori().name(),
-                                landSykefraværSisteKvartal.getKode(),
+                                sykefraværMedKategori.getKategori().name(),
+                                sykefraværMedKategori.getKode(),
                                 throwable.getMessage()
                         )
                 );
