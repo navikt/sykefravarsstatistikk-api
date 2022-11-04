@@ -40,6 +40,7 @@ public class EksporteringServiceTestUtils {
     public static Orgnr ORGNR_VIRKSOMHET_1 = new Orgnr("987654321");
     public static Orgnr ORGNR_VIRKSOMHET_2 = new Orgnr("912345678");
     public static Orgnr ORGNR_VIRKSOMHET_3 = new Orgnr("999966633");
+
     public static VirksomhetSykefravær virksomhetSykefravær = new VirksomhetSykefravær(
             "987654321",
             "Virksomhet 1",
@@ -87,6 +88,14 @@ public class EksporteringServiceTestUtils {
             __2020_2,
             new BigDecimal(10000000),
             new BigDecimal(500000000),
+            2500000
+    );
+    public static SykefraværMedKategori virksomhetSykefraværMedKategori = new SykefraværMedKategori(
+            Statistikkategori.VIRKSOMHET,
+            "987654321",
+            __2020_2,
+            new BigDecimal(10),
+            new BigDecimal(500),
             2500000
     );
 

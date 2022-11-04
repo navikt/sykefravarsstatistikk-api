@@ -2,13 +2,14 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværOverFlereKvartaler;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.StatistikkDto;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,11 +22,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2019_3;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2019_4;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2020_1;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2020_2;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.assertEqualsStatistikkDto;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.convertToSykefraværForEttKvartal;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.landSykefravær;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.sykefraværsstatistikkLandSiste4Kvartaler;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.virksomhetSykefravær;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.virksomhetSykefraværMedKategori;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -49,7 +56,7 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
     @Captor
     ArgumentCaptor<ÅrstallOgKvartal> årstallOgKvartalArgumentCaptor;
     @Captor
-    ArgumentCaptor<SykefraværMedKategori> landSykefraværArgumentCaptor;
+    ArgumentCaptor<SykefraværMedKategori> sykefraværMedKategoriArgumentCaptor;
     @Captor
     ArgumentCaptor<SykefraværOverFlereKvartaler> sykefraværOverFlereKvartalerArgumentCaptor;
 
@@ -79,14 +86,14 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
         // 3- Sjekk hva Kafka har fått
         verify(kafkaService).sendTilStatistikkKategoriTopic(
                 årstallOgKvartalArgumentCaptor.capture(),
-                landSykefraværArgumentCaptor.capture(),
+                sykefraværMedKategoriArgumentCaptor.capture(),
                 sykefraværOverFlereKvartalerArgumentCaptor.capture()
         );
 
         assertThat(årstallOgKvartalArgumentCaptor.getValue()).isEqualTo(__2020_2);
         EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(
                 landSykefravær,
-                landSykefraværArgumentCaptor.getValue()
+                sykefraværMedKategoriArgumentCaptor.getValue()
         );
         BigDecimal sumAvTapteDagsverk =
                 umaskertSykefraværForEttKvartalListe.stream()
@@ -118,4 +125,39 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
         assertThat(antallEksporterte).isEqualTo(1);
     }
 
+    @Test
+    public void eksporterSykefraværsstatistikkVirksomhet__sender_riktig_melding_til_kafka_og_returnerer_antall_meldinger_sendt() {
+        // 1- Mock det database og repositories returnerer. Samme med KafkaService
+        List<SykefraværsstatistikkVirksomhetUtenVarighet> allData = List.of(
+                sykefraværsstatistikkVirksomhet(__2020_2),
+                sykefraværsstatistikkVirksomhet(__2020_1),
+                sykefraværsstatistikkVirksomhet(__2019_4),
+                sykefraværsstatistikkVirksomhet(__2019_3)
+        );
+                ;
+        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleVirksomheter(__2019_3, __2020_2))
+                .thenReturn(allData);
+        when( eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2)).thenReturn(
+                List.of(new VirksomhetEksportPerKvartal(new Orgnr("987654321"), __2020_2, false))
+        );
+
+        when(kafkaService.sendTilStatistikkKategoriTopic(any(), any(), any())).thenReturn(1);
+
+        // 2- Kall tjenesten
+        int antallEksporterte = service.eksporterSykefraværsstatistikkVirksomhet(__2020_2);
+
+        // 3- Sjekk hva Kafka har fått
+        verify(kafkaService).sendTilStatistikkKategoriTopic(
+                årstallOgKvartalArgumentCaptor.capture(),
+                sykefraværMedKategoriArgumentCaptor.capture(),
+                sykefraværOverFlereKvartalerArgumentCaptor.capture()
+        );
+
+        assertThat(årstallOgKvartalArgumentCaptor.getValue()).isEqualTo(__2020_2);
+        EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(
+                virksomhetSykefraværMedKategori,
+                sykefraværMedKategoriArgumentCaptor.getValue()
+        );
+        assertThat(antallEksporterte).isEqualTo(0); // TODO: implement me!
+    }
 }
