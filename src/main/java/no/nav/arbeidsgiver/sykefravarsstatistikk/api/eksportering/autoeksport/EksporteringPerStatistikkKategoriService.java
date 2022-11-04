@@ -150,7 +150,7 @@ public class EksporteringPerStatistikkKategoriService {
               .get();
           SykefraværMedKategori sykefraværMedKategori = new SykefraværMedKategori(
               Statistikkategori.VIRKSOMHET,
-              "kode", // todo: hvor kommer dette fra?
+              sykefraværSisteKvartal.getOrgnr(),
               new ÅrstallOgKvartal(sykefraværSisteKvartal.getÅrstall(),
                   sykefraværSisteKvartal.getKvartal()),
               sykefraværSisteKvartal.getTapteDagsverk(),
