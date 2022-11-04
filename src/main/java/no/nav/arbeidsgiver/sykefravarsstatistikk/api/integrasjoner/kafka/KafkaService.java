@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.SykefraværFlereKvartalerForEksport;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaProperties;
@@ -16,7 +17,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.Kaf
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværOverFlereKvartaler;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
@@ -61,7 +61,7 @@ public class KafkaService {
   public int sendTilStatistikkKategoriTopic(
       ÅrstallOgKvartal årstallOgKvartal,
       SykefraværMedKategori sykefraværMedKategori, // siste kvartal
-      SykefraværOverFlereKvartaler sykefraværOverFlereKvartaler
+      SykefraværFlereKvartalerForEksport sykefraværOverFlereKvartaler
   ) {
     kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
     KafkaStatistikkategoriTopicKey key = new KafkaStatistikkategoriTopicKey(

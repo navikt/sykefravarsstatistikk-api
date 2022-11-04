@@ -4,7 +4,6 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeks
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.hentSisteKvartalIBeregningen;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.mapToSykefraværsstatistikkLand;
 
-import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +20,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaSe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUtsendingException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværOverFlereKvartaler;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.Aggregeringskalkulator;
@@ -116,7 +114,7 @@ public class EksporteringPerStatistikkKategoriService {
     Map<String, SykefraværMedKategori> sykefraværMedKategoriSisteKvartalMap =
         createSykefraværMedKategoriMap(sykefraværGruppertEtterOrgNr);
 
-    Map<String, SykefraværOverFlereKvartaler> sykefraværOverFlereKvartalerMap =
+    Map<String, SykefraværFlereKvartalerForEksport> sykefraværOverFlereKvartalerMap =
         createSykefraværOverFlereKvartalerMap(sykefraværGruppertEtterOrgNr);
 
     // #1 Vi tar utgangspunktet fra en liste av virksomheter vi skal eksportere (som vi gjør i EksporteringService)
@@ -143,8 +141,9 @@ public class EksporteringPerStatistikkKategoriService {
     Map<String, SykefraværMedKategori> sykefraværSisteKvartalPerOrg = new HashMap<String, SykefraværMedKategori>();
 
     sykefraværGruppertEtterOrgNr.forEach(
-        (k, v) -> {
-          SykefraværsstatistikkVirksomhetUtenVarighet sykefraværSisteKvartal = v.stream().max(
+        (orgnr, sykefravær) -> {
+          SykefraværsstatistikkVirksomhetUtenVarighet sykefraværSisteKvartal = sykefravær.stream()
+              .max(
                   Comparator.comparing(
                       kvartal -> new ÅrstallOgKvartal(kvartal.getÅrstall(), kvartal.getKvartal())))
               .get();
@@ -157,35 +156,26 @@ public class EksporteringPerStatistikkKategoriService {
               sykefraværSisteKvartal.getMuligeDagsverk(),
               sykefraværSisteKvartal.getAntallPersoner()
           );
-          sykefraværSisteKvartalPerOrg.put(k, sykefraværMedKategori);
+          sykefraværSisteKvartalPerOrg.put(orgnr, sykefraværMedKategori);
         });
 
     return sykefraværSisteKvartalPerOrg;
   }
 
-  private Map<String, SykefraværOverFlereKvartaler> createSykefraværOverFlereKvartalerMap(
+  private Map<String, SykefraværFlereKvartalerForEksport> createSykefraværOverFlereKvartalerMap(
       Map<String, List<SykefraværsstatistikkVirksomhetUtenVarighet>> sykefraværGruppertEtterOrgNr) {
-    Map<String, SykefraværOverFlereKvartaler> sykefraværOverFlereKvartalerPerOrgNr = new HashMap<String, SykefraværOverFlereKvartaler>();
-    sykefraværGruppertEtterOrgNr.forEach((k, v) -> {
-      List<ÅrstallOgKvartal> kvartaler = v.stream().map(
-              sykefravær -> new ÅrstallOgKvartal(sykefravær.getÅrstall(), sykefravær.getKvartal()))
-          .collect(
-              Collectors.toList());
-      BigDecimal tapteDagsverkTotalt = v.stream()
-          .map(SykefraværsstatistikkVirksomhetUtenVarighet::getTapteDagsverk)
-          .reduce(BigDecimal.ZERO, BigDecimal::add);
-      BigDecimal muligeDagsverkTotalt = v.stream()
-          .map(SykefraværsstatistikkVirksomhetUtenVarighet::getMuligeDagsverk)
-          .reduce(BigDecimal.ZERO, BigDecimal::add);
-      List<SykefraværForEttKvartal> sykefraværList = v.stream()
-          .map(sykefravær -> new SykefraværForEttKvartal(
-              new ÅrstallOgKvartal(sykefravær.getÅrstall(), sykefravær.getKvartal()),
-              sykefravær.getTapteDagsverk(), sykefravær.getMuligeDagsverk(),
-              sykefravær.getAntallPersoner()
+    Map<String, SykefraværFlereKvartalerForEksport> sykefraværOverFlereKvartalerPerOrgNr = new HashMap<>();
+    sykefraværGruppertEtterOrgNr.forEach((orgnr, sykefravær) -> {
+      List<UmaskertSykefraværForEttKvartal> umaskertSykefravær = sykefravær.stream()
+          .map(item -> new UmaskertSykefraværForEttKvartal(
+              new ÅrstallOgKvartal(item.getÅrstall(), item.getKvartal()),
+              item.getTapteDagsverk(),
+              item.getMuligeDagsverk(),
+              item.getAntallPersoner()
           )).collect(Collectors.toList());
-      sykefraværOverFlereKvartalerPerOrgNr.put(k, new SykefraværOverFlereKvartaler(
-          kvartaler, tapteDagsverkTotalt, muligeDagsverkTotalt, sykefraværList
-      ));
+
+      sykefraværOverFlereKvartalerPerOrgNr.put(orgnr,
+          new SykefraværFlereKvartalerForEksport(umaskertSykefravær));
     });
 
     return sykefraværOverFlereKvartalerPerOrgNr;
