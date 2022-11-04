@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.SykefraværsstatistikkLocalTestApplication;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.SykefraværFlereKvartalerForEksport;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaStatistikkKategoriTopicValue;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaTopicValue;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværOverFlereKvartaler;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -137,30 +139,27 @@ public class KafkaServiceIntegrasjonTest {
 
     @Test
     public void send_til_LAND_topic___sender_en_KafkaTopicValue_til__riktig_topic() throws Exception {
-        SykefraværOverFlereKvartaler sykefraværOverFlereKvartaler = new SykefraværOverFlereKvartaler(
-                List.of(__2020_2, __2020_1, __2019_4, __2019_3),
-                new BigDecimal(11000),
-                new BigDecimal(110000),
+        SykefraværFlereKvartalerForEksport sykefraværFlereKvartaler =  new SykefraværFlereKvartalerForEksport(
                 List.of(
-                        new SykefraværForEttKvartal(
+                        new UmaskertSykefraværForEttKvartal(
                                 __2020_2,
                                 new BigDecimal(1100),
                                 new BigDecimal(11000),
                                 5
                         ),
-                        new SykefraværForEttKvartal(
+                        new UmaskertSykefraværForEttKvartal(
                                 __2020_1,
                                 new BigDecimal(2200),
                                 new BigDecimal(22000),
                                 5
                         ),
-                        new SykefraværForEttKvartal(
+                        new UmaskertSykefraværForEttKvartal(
                                 __2019_4,
                                 new BigDecimal(3300),
                                 new BigDecimal(33000),
                                 5
                         ),
-                        new SykefraværForEttKvartal(
+                        new UmaskertSykefraværForEttKvartal(
                                 __2019_3,
                                 new BigDecimal(4400),
                                 new BigDecimal(44000),
@@ -178,7 +177,7 @@ public class KafkaServiceIntegrasjonTest {
                         landSykefravær.getMuligeDagsverk(),
                         landSykefravær.getAntallPersoner()
                 ),
-                sykefraværOverFlereKvartaler
+                sykefraværFlereKvartaler
         );
 
         container.start();
@@ -187,7 +186,7 @@ public class KafkaServiceIntegrasjonTest {
         kafkaService.sendTilStatistikkKategoriTopic(
                 __2020_2,
                 landSykefravær,
-                sykefraværOverFlereKvartaler
+                sykefraværFlereKvartaler
         );
 
         ConsumerRecord<String, String> message = consumerRecords.poll(10, TimeUnit.SECONDS);

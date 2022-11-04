@@ -1,32 +1,29 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForLand;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.hentSisteKvartalIBeregningen;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.mapToSykefraværsstatistikkLand;
-
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.EitherUtils;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUtsendingException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværOverFlereKvartaler;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.Aggregeringskalkulator;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.Sykefraværsdata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
 import org.springframework.kafka.KafkaException;
 import org.springframework.stereotype.Component;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForLand;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.hentSisteKvartalIBeregningen;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.mapToSykefraværsstatistikkLand;
 
 @Slf4j
 @Component
@@ -56,13 +53,6 @@ public class EksporteringPerStatistikkKategoriService {
             årstallOgKvartal.minusKvartaler(3)
         );
 
-    Aggregeringskalkulator aggregeringskalkulatorLand = new Aggregeringskalkulator(
-        new Sykefraværsdata(
-            Map.of(Statistikkategori.LAND, umaskertSykefraværsstatistikkSiste4KvartalerLand)
-        ),
-        årstallOgKvartal
-    );
-
     SykefraværMedKategori landSykefravær = getSykefraværMedKategoriForLand(
         årstallOgKvartal,
         mapToSykefraværsstatistikkLand(
@@ -73,21 +63,19 @@ public class EksporteringPerStatistikkKategoriService {
         )
     );
 
-    List<SykefraværOverFlereKvartaler> sykefraværForFlereKvartaler =
-        EitherUtils.filterRights(
-            aggregeringskalkulatorLand.getSykefraværForFlereKvartaler(Statistikkategori.LAND));
-
-    SykefraværOverFlereKvartaler sykefraværOverFlereKvartalerLand = sykefraværForFlereKvartaler.get(
-        0);
     kafkaService.nullstillUtsendingRapport(1, Statistikkategori.LAND.name());
     long startUtsendingProcess = System.nanoTime();
 
     int antallEksportert = 0;
     try {
+      SykefraværFlereKvartalerForEksport sykefraværOverFlereKvartaler = new SykefraværFlereKvartalerForEksport(
+              umaskertSykefraværsstatistikkSiste4KvartalerLand
+      );
+
       antallEksportert = kafkaService.sendTilStatistikkKategoriTopic(
           årstallOgKvartal,
           landSykefravær,
-          sykefraværOverFlereKvartalerLand
+          sykefraværOverFlereKvartaler
       );
     } catch (KafkaUtsendingException | KafkaException e) {
       log.warn("Fikk Exception fra Kafka med melding:'{}'. Avbryter prosess.", e.getMessage(), e);
@@ -99,6 +87,7 @@ public class EksporteringPerStatistikkKategoriService {
     return antallEksportert;
   }
 
+  // Felles metode exportIBatch()
   public int eksporterSykefraværsstatistikkVirksomhet(ÅrstallOgKvartal årstallOgKvartal) {
     // Hente data
     List<SykefraværsstatistikkVirksomhetUtenVarighet> alleKvartal =

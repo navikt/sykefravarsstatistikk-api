@@ -518,6 +518,16 @@ public class EksporteringServiceTestUtils {
         assertBigDecimalIsEqual(actual.getTapteDagsverk(), expected.getTapteDagsverk());
     }
 
+    public static void assertEqualsSykefraværFlereKvartalerForEksport(
+            SykefraværFlereKvartalerForEksport expected,
+            SykefraværFlereKvartalerForEksport actual
+    ) {
+        assertThat(actual.getProsent()).as("Sjekk prosent").isEqualByComparingTo(expected.getProsent());
+        assertThat(actual.getKvartaler()).as("Sjekk listen av kvartaler").isEqualTo(expected.getKvartaler());
+        assertBigDecimalIsEqual(actual.getMuligeDagsverk(), expected.getMuligeDagsverk());
+        assertBigDecimalIsEqual(actual.getTapteDagsverk(), expected.getTapteDagsverk());
+    }
+
 
     public static void assertEqualsVirksomhetSykefravær(VirksomhetSykefravær expected, VirksomhetSykefravær actual) {
         assertThat(actual.getÅrstall()).isEqualTo(expected.getÅrstall());
