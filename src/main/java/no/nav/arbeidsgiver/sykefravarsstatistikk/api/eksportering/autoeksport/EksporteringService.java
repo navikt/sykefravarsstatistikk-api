@@ -30,6 +30,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.EKSPORT_BATCH_STØRRELSE;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.OPPDATER_VIRKSOMHETER_SOM_ER_EKSPORTERT_BATCH_STØRRELSE;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.filterByKvartal;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForLand;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForNæring;
@@ -53,15 +55,14 @@ public class EksporteringService {
     private final KafkaService kafkaService;
     private final boolean erEksporteringAktivert;
 
-    public static final int OPPDATER_VIRKSOMHETER_SOM_ER_EKSPORTERT_BATCH_STØRRELSE = 1000;
-    public static final int EKSPORT_BATCH_STØRRELSE = 10000;
 
     public EksporteringService(
           EksporteringRepository eksporteringRepository,
           VirksomhetMetadataRepository virksomhetMetadataRepository,
           SykefraværsstatistikkTilEksporteringRepository sykefraværsstatistikkTilEksporteringRepository,
           SykefraværRepository sykefraværRepository, KafkaService kafkaService,
-          @Value("${statistikk.eksportering.aktivert}") Boolean erEksporteringAktivert) {
+          @Value("${statistikk.eksportering.aktivert}") Boolean erEksporteringAktivert
+    ) {
         this.eksporteringRepository = eksporteringRepository;
         this.virksomhetMetadataRepository = virksomhetMetadataRepository;
         this.sykefraværsstatistikkTilEksporteringRepository = sykefraværsstatistikkTilEksporteringRepository;
@@ -78,7 +79,11 @@ public class EksporteringService {
             return 0;
         }
         List<VirksomhetEksportPerKvartal> virksomheterTilEksport =
-              getListeAvVirksomhetEksportPerKvartal(årstallOgKvartal, eksporteringBegrensning);
+              getListeAvVirksomhetEksportPerKvartal(
+                      årstallOgKvartal,
+                      eksporteringBegrensning,
+                      eksporteringRepository
+              );
 
         int antallStatistikkSomSkalEksporteres = virksomheterTilEksport.isEmpty() ?
               0 :
@@ -312,13 +317,13 @@ public class EksporteringService {
 
 
     @NotNull
-    protected List<VirksomhetEksportPerKvartal> getListeAvVirksomhetEksportPerKvartal(
+    protected static List<VirksomhetEksportPerKvartal> getListeAvVirksomhetEksportPerKvartal(
           ÅrstallOgKvartal årstallOgKvartal,
-          EksporteringBegrensning eksporteringBegrensning
+          EksporteringBegrensning eksporteringBegrensning,
+          EksporteringRepository eksporteringRepository
     ) {
         List<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartal =
               eksporteringRepository.hentVirksomhetEksportPerKvartal(årstallOgKvartal);
-
 
         Stream<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartalStream = virksomhetEksportPerKvartal
               .stream()

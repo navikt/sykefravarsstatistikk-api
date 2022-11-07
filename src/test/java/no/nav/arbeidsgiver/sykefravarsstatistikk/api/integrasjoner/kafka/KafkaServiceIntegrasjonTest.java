@@ -9,8 +9,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.Kaf
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaTopicValue;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværOverFlereKvartaler;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -185,6 +183,8 @@ public class KafkaServiceIntegrasjonTest {
 
         kafkaService.sendTilStatistikkKategoriTopic(
                 __2020_2,
+                Statistikkategori.LAND,
+                "NO",
                 landSykefravær,
                 sykefraværFlereKvartaler
         );

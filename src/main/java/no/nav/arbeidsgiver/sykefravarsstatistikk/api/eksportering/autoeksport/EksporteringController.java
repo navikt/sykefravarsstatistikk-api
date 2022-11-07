@@ -52,15 +52,20 @@ public class EksporteringController {
     public ResponseEntity<HttpStatus> reeksportMedKafka(
             @RequestParam int årstall,
             @RequestParam int kvartal,
-            @RequestParam Statistikkategori kategori
+            @RequestParam Statistikkategori kategori,
+            @RequestParam(required = false, defaultValue = "0") int begrensningTil
     ) {
-        if (Statistikkategori.LAND != kategori) {
+        if (Statistikkategori.LAND != kategori && Statistikkategori.VIRKSOMHET != kategori) {
             return ResponseEntity.badRequest().build();
         }
 
         ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
         int antallEksportert =
-                eksporteringPerStatistikkKategoriService.eksporterSykefraværsstatistikkLand(årstallOgKvartal);
+                eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(
+                        årstallOgKvartal,
+                        kategori,
+                        getBegrensning(begrensningTil)
+                );
 
         if (antallEksportert >= 0) {
             return ResponseEntity.ok(HttpStatus.CREATED);

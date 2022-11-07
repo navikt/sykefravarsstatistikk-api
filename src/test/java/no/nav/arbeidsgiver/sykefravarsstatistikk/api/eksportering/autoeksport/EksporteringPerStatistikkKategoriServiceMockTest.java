@@ -7,6 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
@@ -51,6 +52,10 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
     @Captor
     ArgumentCaptor<ÅrstallOgKvartal> årstallOgKvartalArgumentCaptor;
     @Captor
+    ArgumentCaptor<Statistikkategori> statistikkategoriArgumentCaptor;
+    @Captor
+    ArgumentCaptor<String> identifikatorArgumentCaptor;
+    @Captor
     ArgumentCaptor<SykefraværMedKategori> sykefraværMedKategoriArgumentCaptor;
     @Captor
     ArgumentCaptor<SykefraværFlereKvartalerForEksport>  sykefraværFlereKvartalerForEksportArgumentCaptor;
@@ -61,7 +66,8 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
                 sykefraværRepository,
                 sykefraværsstatistikkTilEksporteringRepository,
                 eksporteringRepository,
-                kafkaService
+                kafkaService,
+                true
         );
     }
 
@@ -72,17 +78,21 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
                 sykefraværsstatistikkLandSiste4Kvartaler(__2020_2);
         when(sykefraværRepository.hentUmaskertSykefraværForNorge(any()))
                 .thenReturn(umaskertSykefraværForEttKvartalListe);
-        when(kafkaService.sendTilStatistikkKategoriTopic(any(), any(), any())).thenReturn(1);
+        when(kafkaService.sendTilStatistikkKategoriTopic(any(), any(), any(), any(), any())).thenReturn(true);
 
         int antallEksporterte = service.eksporterSykefraværsstatistikkLand(__2020_2);
 
         verify(kafkaService).sendTilStatistikkKategoriTopic(
                 årstallOgKvartalArgumentCaptor.capture(),
+                statistikkategoriArgumentCaptor.capture(),
+                identifikatorArgumentCaptor.capture(),
                 sykefraværMedKategoriArgumentCaptor.capture(),
                 sykefraværFlereKvartalerForEksportArgumentCaptor.capture()
         );
 
         assertThat(årstallOgKvartalArgumentCaptor.getValue()).isEqualTo(__2020_2);
+        assertThat(statistikkategoriArgumentCaptor.getValue()).isEqualTo(Statistikkategori.LAND);
+        assertThat(identifikatorArgumentCaptor.getValue()).isEqualTo("NO");
         EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(
                 landSykefravær,
                 sykefraværMedKategoriArgumentCaptor.getValue()
@@ -106,27 +116,35 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
                 ;
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleVirksomheter(__2019_3, __2020_2))
                 .thenReturn(allData);
-        when( eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2)).thenReturn(
-                List.of(new VirksomhetEksportPerKvartal(new Orgnr("987654321"), __2020_2, false))
-        );
-
-        when(kafkaService.sendTilStatistikkKategoriTopic(any(), any(), any())).thenReturn(1);
+        when(kafkaService.sendTilStatistikkKategoriTopic(any(), any(), any(), any(), any())).thenReturn(true);
 
         // 2- Kall tjenesten
-        int antallEksporterte = service.eksporterSykefraværsstatistikkVirksomhet(__2020_2);
+        int antallEksporterte = service.eksporterSykefraværsstatistikkVirksomhet(
+                List.of(new VirksomhetEksportPerKvartal(
+                        new Orgnr("987654321"),
+                        __2020_2,
+                        false
+                )),
+                __2020_2
+        );
 
         // 3- Sjekk hva Kafka har fått
         verify(kafkaService).sendTilStatistikkKategoriTopic(
                 årstallOgKvartalArgumentCaptor.capture(),
+                statistikkategoriArgumentCaptor.capture(),
+                identifikatorArgumentCaptor.capture(),
                 sykefraværMedKategoriArgumentCaptor.capture(),
                 sykefraværFlereKvartalerForEksportArgumentCaptor.capture()
         );
 
         assertThat(årstallOgKvartalArgumentCaptor.getValue()).isEqualTo(__2020_2);
+        assertThat(statistikkategoriArgumentCaptor.getValue()).isEqualTo(Statistikkategori.VIRKSOMHET);
+        assertThat(identifikatorArgumentCaptor.getValue()).isEqualTo("987654321");
+
         EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(
                 virksomhetSykefraværMedKategori,
                 sykefraværMedKategoriArgumentCaptor.getValue()
         );
-        assertThat(antallEksporterte).isEqualTo(0); // TODO: implement me!
+        assertThat(antallEksporterte).isEqualTo(1);
     }
 }

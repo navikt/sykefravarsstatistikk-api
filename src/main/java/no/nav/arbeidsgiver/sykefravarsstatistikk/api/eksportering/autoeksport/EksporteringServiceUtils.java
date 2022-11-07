@@ -36,6 +36,9 @@ import java.util.stream.Collectors;
 public class EksporteringServiceUtils {
 
 
+    public static final int OPPDATER_VIRKSOMHETER_SOM_ER_EKSPORTERT_BATCH_STØRRELSE = 1000;
+    public static final int EKSPORT_BATCH_STØRRELSE = 10000;
+
     @NotNull
     protected static List<SykefraværsstatistikkVirksomhetUtenVarighet> filterByKvartal(
             ÅrstallOgKvartal årstallOgKvartal,

@@ -58,15 +58,17 @@ public class KafkaService {
     return kafkaUtsendingRapport.getAntallMeldingerMottattForUtsending();
   }
 
-  public int sendTilStatistikkKategoriTopic(
+  public boolean sendTilStatistikkKategoriTopic(
       ÅrstallOgKvartal årstallOgKvartal,
-      SykefraværMedKategori sykefraværMedKategori, // siste kvartal
+      Statistikkategori statistikkategori,
+      String identifikator,
+      SykefraværMedKategori sykefraværMedKategori,
       SykefraværFlereKvartalerForEksport sykefraværOverFlereKvartaler
   ) {
     kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
     KafkaStatistikkategoriTopicKey key = new KafkaStatistikkategoriTopicKey(
-        Statistikkategori.LAND,
-        "NO",
+        statistikkategori,
+        identifikator,
         årstallOgKvartal.getKvartal(),
         årstallOgKvartal.getÅrstall()
     );
@@ -85,7 +87,7 @@ public class KafkaService {
     } catch (JsonProcessingException e) {
       kafkaUtsendingRapport.leggTilError(
           "Kunne ikke parse statistikk 'LAND' til Json. Statistikk ikke sent");
-      return 0;
+      return false;
     }
 
     ListenableFuture<SendResult<String, String>> futureResult = kafkaTemplate.send(
@@ -119,7 +121,7 @@ public class KafkaService {
       }
     });
 
-    return 1;
+    return true;
   }
 
 

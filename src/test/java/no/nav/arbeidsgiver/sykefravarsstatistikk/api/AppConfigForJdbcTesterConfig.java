@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringController;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringPerStatistikkKategoriService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringScheduler;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.ImporteringController;
@@ -48,6 +49,7 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
                 FeatureToggleController.class,
                 TilgangskontrollUtils.class,
                 EksporteringService.class,
+                EksporteringPerStatistikkKategoriService.class,
                 EksporteringScheduler.class,
                 ImporteringScheduler.class,
                 SykefraværsstatistikkImporteringService.class,

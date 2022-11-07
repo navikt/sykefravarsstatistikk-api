@@ -80,12 +80,14 @@ public class EksporteringServiceMockTest {
         List<VirksomhetEksportPerKvartal> emptyList1 =
                 service.getListeAvVirksomhetEksportPerKvartal(
                         __2020_2,
-                        EksporteringBegrensning.build().utenBegrensning()
+                        EksporteringBegrensning.build().utenBegrensning(),
+                        eksporteringRepository
                 );
         List<VirksomhetEksportPerKvartal> emptyList2 =
                 service.getListeAvVirksomhetEksportPerKvartal(
                         __2020_2,
-                        EksporteringBegrensning.build().medBegrensning(100)
+                        EksporteringBegrensning.build().medBegrensning(100),
+                        eksporteringRepository
                 );
 
 
@@ -117,22 +119,26 @@ public class EksporteringServiceMockTest {
         List<VirksomhetEksportPerKvartal> list1 =
                 service.getListeAvVirksomhetEksportPerKvartal(
                         __2020_2,
-                        EksporteringBegrensning.build().utenBegrensning()
+                        EksporteringBegrensning.build().utenBegrensning(),
+                        eksporteringRepository
                 );
         List<VirksomhetEksportPerKvartal> list2 =
                 service.getListeAvVirksomhetEksportPerKvartal(
                         __2020_2,
-                        EksporteringBegrensning.build().medBegrensning(2)
+                        EksporteringBegrensning.build().medBegrensning(2),
+                        eksporteringRepository
                 );
         List<VirksomhetEksportPerKvartal> list3 =
                 service.getListeAvVirksomhetEksportPerKvartal(
                         __2020_2,
-                        EksporteringBegrensning.build().medBegrensning(3)
+                        EksporteringBegrensning.build().medBegrensning(3),
+                        eksporteringRepository
                 );
         List<VirksomhetEksportPerKvartal> list4 =
                 service.getListeAvVirksomhetEksportPerKvartal(
                         __2020_2,
-                        EksporteringBegrensning.build().medBegrensning(100)
+                        EksporteringBegrensning.build().medBegrensning(100),
+                        eksporteringRepository
                 );
 
         assertThat(list1.size()).isEqualTo(3);
@@ -149,14 +155,16 @@ public class EksporteringServiceMockTest {
         List<VirksomhetEksportPerKvartal> ikkeBegrenset =
                 service.getListeAvVirksomhetEksportPerKvartal(
                         __2020_2,
-                        EksporteringBegrensning.build().utenBegrensning()
+                        EksporteringBegrensning.build().utenBegrensning(),
+                        eksporteringRepository
                 );
         assertThat(ikkeBegrenset.size()).isEqualTo(430000);
 
         List<VirksomhetEksportPerKvartal> begrensetTil10 =
                 service.getListeAvVirksomhetEksportPerKvartal(
                         __2020_2,
-                        EksporteringBegrensning.build().medBegrensning(10)
+                        EksporteringBegrensning.build().medBegrensning(10),
+                        eksporteringRepository
                 );
         assertThat(begrensetTil10.size()).isEqualTo(10);
     }
@@ -185,17 +193,20 @@ public class EksporteringServiceMockTest {
         List<VirksomhetEksportPerKvartal> ikkeBegrenset =
                 service.getListeAvVirksomhetEksportPerKvartal(
                         __2020_2,
-                        EksporteringBegrensning.build().utenBegrensning()
+                        EksporteringBegrensning.build().utenBegrensning(),
+                        eksporteringRepository
                 );
         List<VirksomhetEksportPerKvartal> begrensetMed1 =
                 service.getListeAvVirksomhetEksportPerKvartal(
                         __2020_2,
-                        EksporteringBegrensning.build().medBegrensning(1)
+                        EksporteringBegrensning.build().medBegrensning(1),
+                        eksporteringRepository
                 );
         List<VirksomhetEksportPerKvartal> begrensetMed100 =
                 service.getListeAvVirksomhetEksportPerKvartal(
                         __2020_2,
-                        EksporteringBegrensning.build().medBegrensning(100)
+                        EksporteringBegrensning.build().medBegrensning(100),
+                        eksporteringRepository
                 );
 
         assertThat(ikkeBegrenset.size()).isEqualTo(2);
