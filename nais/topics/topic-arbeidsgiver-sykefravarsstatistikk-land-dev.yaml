@@ -20,12 +20,6 @@ spec:
     - team: arbeidsgiver
       application: sykefravarsstatistikk-api
       access: readwrite   # read, write, readwrite
-    - team: teamcrm
-      application: sf-sykefravaersstatistikk
-      access: read
-    - team: team-dialog
-      application: sf-sykefravaersstatistikk
-      access: read
     - team: pia
       application: lydia-api
       access: read

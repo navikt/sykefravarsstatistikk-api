@@ -91,7 +91,7 @@ public class KafkaService {
     }
 
     ListenableFuture<SendResult<String, String>> futureResult = kafkaTemplate.send(
-        kafkaProperties.getTopicNavn(Statistikkategori.LAND.name()),
+        kafkaProperties.getTopicNavn(statistikkategori.name()),
         keyAsJsonString,
         dataAsJsonString
     );
@@ -114,7 +114,7 @@ public class KafkaService {
         kafkaUtsendingRapport.leggTilUtsendingSuksess();
         log.debug(
             "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
-            kafkaProperties.getTopicNavn(Statistikkategori.LAND.name()),
+            kafkaProperties.getTopicNavn(statistikkategori.name()),
             res.getProducerRecord().key(),
             res.getRecordMetadata().offset()
         );

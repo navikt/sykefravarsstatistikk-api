@@ -83,9 +83,12 @@ public class KafkaProperties {
     }
 
     public String getTopicNavn(String eksportNavn) {
-        if (Statistikkategori.LAND.name().equals(eksportNavn)) {
+        if (Statistikkategori.LAND.name().equals(eksportNavn) && topic.size()>1) {
             return topic.get(1);
-        } else {
+        } else if(Statistikkategori.VIRKSOMHET.name().equals(eksportNavn) && topic.size()>2){
+            return topic.get(2);
+        }
+        else {
             return topic.get(0);
         }
     }
