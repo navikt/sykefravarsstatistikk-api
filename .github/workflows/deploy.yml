@@ -117,7 +117,7 @@ jobs:
   deployTopicsToDev:
     name: "Deploy topics to dev"
     runs-on: "ubuntu-latest"
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/legge-til-siste-4-kvartaler-i-eksport'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/eksport-av-virksomhet-sykefraværsstatistikk-kategori'
     steps:
       - name: "Checkout code"
         uses: "actions/checkout@v3"
@@ -126,7 +126,7 @@ jobs:
         env:
           APIKEY: "${{ secrets.NAIS_DEPLOY_APIKEY }}"
           CLUSTER: "dev-gcp"
-          RESOURCE: "nais/topics/topic-arbeidsgiver-sykefravaer-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-dev.yaml"
+          RESOURCE: "nais/topics/topic-arbeidsgiver-sykefravaer-dev.yaml, nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-dev.yaml, nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-virksomhet-dev.yaml"
 
   deployTopicsToProd:
     name: "Deploy topics to prod"
@@ -140,4 +140,4 @@ jobs:
         env:
           APIKEY: "${{ secrets.NAIS_DEPLOY_APIKEY }}"
           CLUSTER: "prod-gcp"
-          RESOURCE: "nais/topics/topic-arbeidsgiver-sykefravaer-prod.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-prod.yaml"
+          RESOURCE: "nais/topics/topic-arbeidsgiver-sykefravaer-prod.yaml, nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-prod.yaml, ais/topics/topic-arbeidsgiver-sykefravarsstatistikk-virksomhet-prod.yaml"
