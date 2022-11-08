@@ -70,7 +70,7 @@ public class KafkaServiceIntegrasjonTest {
     @Autowired
     private EmbeddedKafkaBroker embeddedKafkaBroker;
 
-    private static String[] TOPIC_NAME = {
+    private static String[] TOPIC_NAMES = {
             "arbeidsgiver.sykefravarsstatistikk-v1",
             "arbeidsgiver.sykefravarsstatistikk-land-v1",
             "arbeidsgiver.sykefravarsstatistikk-virksomhet-v1"
@@ -84,7 +84,7 @@ public class KafkaServiceIntegrasjonTest {
     public void setUp() {
         consumerRecords = new LinkedBlockingQueue<>();
 
-        ContainerProperties containerProperties = new ContainerProperties(TOPIC_NAME);
+        ContainerProperties containerProperties = new ContainerProperties(TOPIC_NAMES);
         Map<String, Object> consumerProperties =
                 KafkaTestUtils.consumerProps(
                         "consumer",
@@ -113,7 +113,7 @@ public class KafkaServiceIntegrasjonTest {
     @Test
     public void send__sender_en_KafkaTopicValue_til__riktig_topic() throws Exception {
         container.start();
-        ContainerTestUtils.waitForAssignment(container, 4);
+        ContainerTestUtils.waitForAssignment(container, embeddedKafkaBroker.getPartitionsPerTopic() * TOPIC_NAMES.length);
 
         kafkaService.send(
                 __2020_2,
@@ -180,7 +180,7 @@ public class KafkaServiceIntegrasjonTest {
         );
 
         container.start();
-        ContainerTestUtils.waitForAssignment(container, 4);
+        ContainerTestUtils.waitForAssignment(container, embeddedKafkaBroker.getPartitionsPerTopic() * TOPIC_NAMES.length);
 
         kafkaService.sendTilStatistikkKategoriTopic(
                 __2020_2,
