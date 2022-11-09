@@ -22,7 +22,7 @@ public class KafkaStatistikkKategoriTopicValue {
       SykefraværFlereKvartalerForEksport siste4Kvartal
   ) {
     this.kategori = sisteKvartal.getKategori();
-    this.kode = "NO";
+    this.kode = sisteKvartal.getKode();
     sistePubliserteKvartal = new SistePubliserteKvartal(
         sisteKvartal.getÅrstall(),
         sisteKvartal.getKvartal(),
