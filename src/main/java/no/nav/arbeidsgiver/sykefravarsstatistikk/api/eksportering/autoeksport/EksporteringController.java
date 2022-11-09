@@ -7,6 +7,7 @@ import no.nav.security.token.support.core.api.Protected;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequestMapping(value = "eksportering")
-@Profile({"local", "dev", "prod"})
+@Profile({"local", "dev", "prod", "mvc-test"})
 public class EksporteringController {
 
     private final EksporteringService eksporteringService;
@@ -74,6 +75,11 @@ public class EksporteringController {
         }
     }
 
+    @PostMapping("/reeksport/statistikkkategori2")
+    public ResponseEntity<HttpStatus> reeksportMedKafka2() {
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
 
     private EksporteringBegrensning getBegrensning(int begrensningTil) {
         EksporteringBegrensning eksporteringBegrensning = begrensningTil == 0 ?
@@ -81,4 +87,10 @@ public class EksporteringController {
                 EksporteringBegrensning.build().medBegrensning(begrensningTil);
         return eksporteringBegrensning;
     }
+
+    @GetMapping("/reeksport/hello")
+    public ResponseEntity<HttpStatus> getHello() {
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
 }

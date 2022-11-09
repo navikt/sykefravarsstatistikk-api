@@ -56,9 +56,9 @@ public class EksporteringPerStatistikkKategoriService {
   }
 
   public int eksporterPerStatistikkKategori(
-          ÅrstallOgKvartal årstallOgKvartal,
-          Statistikkategori statistikkategori,
-          EksporteringBegrensning eksporteringBegrensning
+      ÅrstallOgKvartal årstallOgKvartal,
+      Statistikkategori statistikkategori,
+      EksporteringBegrensning eksporteringBegrensning
   ) {
 
     if (!erEksporteringAktivert) {
@@ -66,10 +66,10 @@ public class EksporteringPerStatistikkKategoriService {
       return 0;
     }
     log.info(
-            "Starting eksportering av '{}' for årstall '{}' og kvartal '{}'.",
-            statistikkategori.name(),
-            årstallOgKvartal.getÅrstall(),
-            årstallOgKvartal.getKvartal()
+        "Starting eksportering av '{}' for årstall '{}' og kvartal '{}'.",
+        statistikkategori.name(),
+        årstallOgKvartal.getÅrstall(),
+        årstallOgKvartal.getKvartal()
     );
 
     if (Statistikkategori.LAND == statistikkategori) {
@@ -77,29 +77,30 @@ public class EksporteringPerStatistikkKategoriService {
     }
 
     List<VirksomhetEksportPerKvartal> virksomheterTilEksport =
-            getListeAvVirksomhetEksportPerKvartal(årstallOgKvartal, eksporteringBegrensning, eksporteringRepository);
+        getListeAvVirksomhetEksportPerKvartal(årstallOgKvartal, eksporteringBegrensning,
+            eksporteringRepository);
 
     if (virksomheterTilEksport.size() == 0) {
       log.info("Ingen statistikk å eksportere for årstall '{}' og kvartal '{}'.",
-              årstallOgKvartal.getÅrstall(),
-              årstallOgKvartal.getKvartal()
+          årstallOgKvartal.getÅrstall(),
+          årstallOgKvartal.getKvartal()
       );
       return 0;
     }
 
     log.info(
-            "Eksportering av '{}' for årstall '{}' og kvartal '{}'. Skal eksportere '{}' rader med statistikk.",
-            statistikkategori.name(),
-            årstallOgKvartal.getÅrstall(),
-            årstallOgKvartal.getKvartal(),
-            virksomheterTilEksport.size()
+        "Eksportering av '{}' for årstall '{}' og kvartal '{}'. Skal eksportere '{}' rader med statistikk.",
+        statistikkategori.name(),
+        årstallOgKvartal.getÅrstall(),
+        årstallOgKvartal.getKvartal(),
+        virksomheterTilEksport.size()
     );
     int antallEksporterteVirksomheter = 0;
 
     try {
       antallEksporterteVirksomheter = eksporterSykefraværsstatistikkVirksomhet(
-              virksomheterTilEksport,
-              årstallOgKvartal
+          virksomheterTilEksport,
+          årstallOgKvartal
       );
     } catch (KafkaUtsendingException | KafkaException e) {
       log.warn("Fikk Exception fra Kafka med melding:'{}'. Avbryter prosess.", e.getMessage(), e);
@@ -131,7 +132,7 @@ public class EksporteringPerStatistikkKategoriService {
     boolean erSent = false;
     try {
       SykefraværFlereKvartalerForEksport sykefraværOverFlereKvartaler = new SykefraværFlereKvartalerForEksport(
-              umaskertSykefraværsstatistikkSiste4KvartalerLand
+          umaskertSykefraværsstatistikkSiste4KvartalerLand
       );
 
       erSent = kafkaService.sendTilStatistikkKategoriTopic(
@@ -148,15 +149,15 @@ public class EksporteringPerStatistikkKategoriService {
     long stopUtsendingProcess = System.nanoTime();
     kafkaService.addUtsendingTilKafkaProcessingTime(startUtsendingProcess, stopUtsendingProcess);
 
-    return erSent? 1 : 0;
+    return erSent ? 1 : 0;
   }
 
   public int eksporterSykefraværsstatistikkVirksomhet(
-          List<VirksomhetEksportPerKvartal> virksomheterTilEksport,
-          ÅrstallOgKvartal årstallOgKvartal
+      List<VirksomhetEksportPerKvartal> virksomheterTilEksport,
+      ÅrstallOgKvartal årstallOgKvartal
   ) {
     // Hente data
-      log.info("Starting utregning av statistikk");
+    log.info("Starting utregning av statistikk");
     List<SykefraværsstatistikkVirksomhetUtenVarighet> alleKvartal =
         sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleVirksomheter(
             årstallOgKvartal.minusKvartaler(3),
@@ -174,42 +175,64 @@ public class EksporteringPerStatistikkKategoriService {
         createSykefraværOverFlereKvartalerMap(sykefraværGruppertEtterOrgNr);
 
     // #2 Split i subsets
-      log.info(format("Starting utsending av statistikk. '%d' meldinger vil bli sendt", virksomheterTilEksport.size()));
-      List<? extends List<VirksomhetEksportPerKvartal>> subsets =
-              Lists.partition(virksomheterTilEksport, EKSPORT_BATCH_STØRRELSE);
-      int totalBatchAntall = subsets.size();
-      log.info(format("Deler utsending av statistikk i '%d' batch ", totalBatchAntall));
+    log.info(format("Starting utsending av statistikk. '%d' meldinger vil bli sendt",
+        virksomheterTilEksport.size()));
+    List<? extends List<VirksomhetEksportPerKvartal>> subsets =
+        Lists.partition(virksomheterTilEksport, EKSPORT_BATCH_STØRRELSE);
+    int totalBatchAntall = subsets.size();
+    log.info(format("Deler utsending av statistikk i '%d' batch ", totalBatchAntall));
 
-      // #3 send til kafka
-      AtomicInteger batchAntallProsessert = new AtomicInteger();
-      AtomicInteger antallEksportert = new AtomicInteger();
-      subsets.forEach(subset -> {
-                  long startUtsendingProcessForSubset = System.nanoTime();
-                  subset.stream().forEach(
-                          virksomhet -> {
-                            boolean erSent = kafkaService.sendTilStatistikkKategoriTopic(
-                                  årstallOgKvartal,
-                                  Statistikkategori.VIRKSOMHET,
-                                  virksomhet.getOrgnr(),
-                                  sykefraværMedKategoriSisteKvartalMap.get(virksomhet.getOrgnr()),
-                                  sykefraværOverFlereKvartalerMap.get(virksomhet.getOrgnr())
-                          );
-                            if (erSent) {
-                              antallEksportert.incrementAndGet();
-                            }
-                          }
+    // #3 send til kafka
+    AtomicInteger batchAntallProsessert = new AtomicInteger();
+    AtomicInteger antallEksportert = new AtomicInteger();
+    AtomicInteger antallIkkeEksportert = new AtomicInteger();
+    AtomicInteger antallUtenStatistikk = new AtomicInteger();
+    subsets.forEach(subset -> {
+          long startUtsendingProcessForSubset = System.nanoTime();
+          subset.stream().forEach(
+              virksomhet -> {
+                SykefraværMedKategori sykefraværMedKategori = sykefraværMedKategoriSisteKvartalMap.get(
+                    virksomhet.getOrgnr());
+                SykefraværFlereKvartalerForEksport sykefraværOverFlereKvartaler = sykefraværOverFlereKvartalerMap.get(
+                    virksomhet.getOrgnr());
+
+                if (sykefraværMedKategori != null && sykefraværOverFlereKvartaler != null) {
+                  boolean erSent = kafkaService.sendTilStatistikkKategoriTopic(
+                      årstallOgKvartal,
+                      Statistikkategori.VIRKSOMHET,
+                      virksomhet.getOrgnr(),
+                      sykefraværMedKategori,
+                      sykefraværOverFlereKvartaler
                   );
-                  long stopUtsendingProcessForSubset = System.nanoTime();
-                  long prosesseringtid = stopUtsendingProcessForSubset - startUtsendingProcessForSubset;
-                  batchAntallProsessert.incrementAndGet();
-                  log.info(format("Ferdig med å sende subset '%d' av '%d'. Utsending tid var: '%d' ",
-                          batchAntallProsessert.get(),
-                          totalBatchAntall,
-                          prosesseringtid
-                  ));
+                  if (erSent) {
+                    antallEksportert.incrementAndGet();
+                  } else {
+                    antallIkkeEksportert.incrementAndGet();
+                  }
+                } else {
+                  antallUtenStatistikk.incrementAndGet();
+                }
               }
-      );
-      log.info("Ferdig med utsending av alle meldinger til Kafka for Virksomhet statistikk");
+          );
+          long stopUtsendingProcessForSubset = System.nanoTime();
+          long prosesseringtid = stopUtsendingProcessForSubset - startUtsendingProcessForSubset;
+          batchAntallProsessert.incrementAndGet();
+          log.info(format("Ferdig med å sende subset %d av %d. Utsending tid var: %d ",
+              batchAntallProsessert.get(),
+              totalBatchAntall,
+              prosesseringtid
+          ));
+        }
+    );
+    log.info(format("Ferdig med utsending av alle meldinger til Kafka for Virksomhet statistikk. "
+            + "Antall eksportert er: %d, "
+            + "antall ikke eksportert er: %d "
+            + "og antall virksomhet uten statistikk er: %d",
+        antallEksportert.get(),
+        antallIkkeEksportert.get(),
+        antallUtenStatistikk.get()
+    ));
+
     return antallEksportert.get();
   }
 

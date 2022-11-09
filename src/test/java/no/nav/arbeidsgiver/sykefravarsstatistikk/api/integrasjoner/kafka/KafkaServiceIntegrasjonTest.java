@@ -14,6 +14,7 @@ import no.nav.security.token.support.spring.test.EnableMockOAuth2Server;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.junit.AfterClass;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -108,6 +109,12 @@ public class KafkaServiceIntegrasjonTest {
     @AfterEach
     public void tearDown() {
         container.stop();
+    }
+
+    @AfterClass
+    public void tearDownClass() {
+        container.destroy();
+        embeddedKafkaBroker.destroy();
     }
 
     @Test

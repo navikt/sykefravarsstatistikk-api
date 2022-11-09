@@ -11,6 +11,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.stat
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.ImporttidspunktDto;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 public class TestUtils {
 
@@ -65,6 +66,27 @@ public class TestUtils {
         new MapSqlParameterSource());
   }
 
+  public static void opprettTestVirksomhetMetaData(NamedParameterJdbcTemplate jdbcTemplate,
+      int årstall, int kvartal, String orgnr) {
+    opprettTestVirksomhetMetaData(jdbcTemplate, årstall, kvartal, orgnr, false);
+  }
+
+  public static int opprettTestVirksomhetMetaData(NamedParameterJdbcTemplate jdbcTemplate,
+      int årstall, int kvartal, String orgnr, boolean eksportert) {
+    SqlParameterSource parametre =
+        new MapSqlParameterSource()
+            .addValue("orgnr", orgnr)
+            .addValue("årstall", årstall)
+            .addValue("kvartal", kvartal)
+            .addValue("eksportert", eksportert);
+    return jdbcTemplate.update(
+        "insert into eksport_per_kvartal " +
+            "(orgnr, arstall, kvartal, eksportert) " +
+            "values " +
+            "(:orgnr, :årstall, :kvartal, :eksportert)",
+        parametre
+    );
+  }
 
   public static void opprettStatistikkForLand(NamedParameterJdbcTemplate jdbcTemplate) {
     jdbcTemplate.update(
@@ -153,31 +175,39 @@ public class TestUtils {
   }
 
 
-    public static void opprettStatistikkForNæringer2Siffer(NamedParameterJdbcTemplate jdbcTemplate){
-        opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("10",""),
-              SISTE_PUBLISERTE_KVARTAL.getÅrstall(), SISTE_PUBLISERTE_KVARTAL.getKvartal(), 20000,1000000,50);
-        opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("10",""),
-              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getÅrstall(), SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getKvartal(), 30000,1000000,50);
-        opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("10",""),
-              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getÅrstall(), SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getKvartal(), 40000,1000000,50);
-        opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("10",""),
-              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getÅrstall(), SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getKvartal(), 50000,1000000,50);
-        opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("10",""),
-              SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4).getÅrstall(), SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4).getKvartal(), 60000,1000000,50);
-        opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("88",""),
-              SISTE_PUBLISERTE_KVARTAL.getÅrstall(), SISTE_PUBLISERTE_KVARTAL.getKvartal(), 25000,1000000,50);
-        opprettStatistikkForNæring2Siffer(jdbcTemplate,new Næring("88",""),
-              SISTE_PUBLISERTE_KVARTAL.minusEttÅr().getÅrstall(), SISTE_PUBLISERTE_KVARTAL.minusEttÅr().getKvartal(), 30000,1000000,50);
-    }
-    public static void opprettStatistikkForNæring2Siffer(
-        NamedParameterJdbcTemplate jdbcTemplate,
-        Næring næring,
-        int årstall,
-        int kvartal,
-        int tapteDagsverk,
-        int muligeDagsverk,
-        int antallPersoner
-    ) {
+  public static void opprettStatistikkForNæringer2Siffer(NamedParameterJdbcTemplate jdbcTemplate) {
+    opprettStatistikkForNæring2Siffer(jdbcTemplate, new Næring("10", ""),
+        SISTE_PUBLISERTE_KVARTAL.getÅrstall(), SISTE_PUBLISERTE_KVARTAL.getKvartal(), 20000,
+        1000000, 50);
+    opprettStatistikkForNæring2Siffer(jdbcTemplate, new Næring("10", ""),
+        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getÅrstall(),
+        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getKvartal(), 30000, 1000000, 50);
+    opprettStatistikkForNæring2Siffer(jdbcTemplate, new Næring("10", ""),
+        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getÅrstall(),
+        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getKvartal(), 40000, 1000000, 50);
+    opprettStatistikkForNæring2Siffer(jdbcTemplate, new Næring("10", ""),
+        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getÅrstall(),
+        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getKvartal(), 50000, 1000000, 50);
+    opprettStatistikkForNæring2Siffer(jdbcTemplate, new Næring("10", ""),
+        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4).getÅrstall(),
+        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4).getKvartal(), 60000, 1000000, 50);
+    opprettStatistikkForNæring2Siffer(jdbcTemplate, new Næring("88", ""),
+        SISTE_PUBLISERTE_KVARTAL.getÅrstall(), SISTE_PUBLISERTE_KVARTAL.getKvartal(), 25000,
+        1000000, 50);
+    opprettStatistikkForNæring2Siffer(jdbcTemplate, new Næring("88", ""),
+        SISTE_PUBLISERTE_KVARTAL.minusEttÅr().getÅrstall(),
+        SISTE_PUBLISERTE_KVARTAL.minusEttÅr().getKvartal(), 30000, 1000000, 50);
+  }
+
+  public static void opprettStatistikkForNæring2Siffer(
+      NamedParameterJdbcTemplate jdbcTemplate,
+      Næring næring,
+      int årstall,
+      int kvartal,
+      int tapteDagsverk,
+      int muligeDagsverk,
+      int antallPersoner
+  ) {
 
     MapSqlParameterSource parametre = parametreForStatistikk(
         årstall,
