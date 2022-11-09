@@ -27,12 +27,28 @@ public class SykefraværFlereKvartalerForEksport {
   ) {
     erMaskert = umaskertSykefravær.stream().allMatch(v -> v.getAntallPersoner()
         < Konstanter.MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER);
-    tapteDagsverk = umaskertSykefravær.stream()
-        .map(UmaskertSykefraværForEttKvartal::getDagsverkTeller)
-        .reduce(BigDecimal.ZERO, BigDecimal::add);
-    muligeDagsverk = umaskertSykefravær.stream()
-        .map(UmaskertSykefraværForEttKvartal::getDagsverkNevner)
-        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    if (!erMaskert) {
+      tapteDagsverk = umaskertSykefravær.stream()
+          .map(UmaskertSykefraværForEttKvartal::getDagsverkTeller)
+          .reduce(BigDecimal.ZERO, BigDecimal::add);
+      muligeDagsverk = umaskertSykefravær.stream()
+          .map(UmaskertSykefraværForEttKvartal::getDagsverkNevner)
+          .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+      Either<StatistikkException, BigDecimal> prosentEither = StatistikkUtils.kalkulerSykefraværsprosent(
+          this.tapteDagsverk, this.muligeDagsverk);
+      if (prosentEither.isLeft()) {
+        prosent = null;
+      } else {
+        prosent = prosentEither.get();
+      }
+    } else {
+      tapteDagsverk = null;
+      muligeDagsverk = null;
+      prosent = null;
+    }
+
     kvartaler = umaskertSykefravær.stream()
         .map(UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal)
         .collect(
@@ -40,13 +56,5 @@ public class SykefraværFlereKvartalerForEksport {
     antallPersoner = umaskertSykefravær.stream()
         .max(Comparator.comparing(UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal)).get()
         .getAntallPersoner();
-
-    Either<StatistikkException, BigDecimal> prosentEither = StatistikkUtils.kalkulerSykefraværsprosent(
-        this.tapteDagsverk, this.muligeDagsverk);
-    if (prosentEither.isLeft()) {
-      prosent = null;
-    } else {
-      prosent = prosentEither.get();
-    }
   }
 }
