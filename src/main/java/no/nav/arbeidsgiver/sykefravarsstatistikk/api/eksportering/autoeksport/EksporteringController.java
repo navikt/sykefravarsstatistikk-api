@@ -74,23 +74,4 @@ public class EksporteringController {
             return ResponseEntity.ok(HttpStatus.OK);
         }
     }
-
-    @PostMapping("/reeksport/statistikkkategori2")
-    public ResponseEntity<HttpStatus> reeksportMedKafka2() {
-        return ResponseEntity.ok(HttpStatus.OK);
-    }
-
-
-    private EksporteringBegrensning getBegrensning(int begrensningTil) {
-        EksporteringBegrensning eksporteringBegrensning = begrensningTil == 0 ?
-                EksporteringBegrensning.build().utenBegrensning() :
-                EksporteringBegrensning.build().medBegrensning(begrensningTil);
-        return eksporteringBegrensning;
-    }
-
-    @GetMapping("/reeksport/hello")
-    public ResponseEntity<HttpStatus> getHello() {
-        return ResponseEntity.ok(HttpStatus.OK);
-    }
-
 }
