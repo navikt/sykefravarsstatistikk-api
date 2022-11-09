@@ -28,10 +28,10 @@ public class SykefraværFlereKvartalerForEksport {
     erMaskert = umaskertSykefravær.stream().allMatch(v -> v.getAntallPersoner()
         < Konstanter.MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER);
     tapteDagsverk = umaskertSykefravær.stream()
-        .map(UmaskertSykefraværForEttKvartal::getDagsverkNevner)
+        .map(UmaskertSykefraværForEttKvartal::getDagsverkTeller)
         .reduce(BigDecimal.ZERO, BigDecimal::add);
     muligeDagsverk = umaskertSykefravær.stream()
-        .map(UmaskertSykefraværForEttKvartal::getDagsverkTeller)
+        .map(UmaskertSykefraværForEttKvartal::getDagsverkNevner)
         .reduce(BigDecimal.ZERO, BigDecimal::add);
     kvartaler = umaskertSykefravær.stream()
         .map(UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal)
