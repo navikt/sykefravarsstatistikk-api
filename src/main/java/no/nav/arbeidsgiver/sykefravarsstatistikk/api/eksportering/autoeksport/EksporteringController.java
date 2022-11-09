@@ -74,4 +74,11 @@ public class EksporteringController {
             return ResponseEntity.ok(HttpStatus.OK);
         }
     }
+
+    private EksporteringBegrensning getBegrensning(int begrensningTil) {
+        EksporteringBegrensning eksporteringBegrensning = begrensningTil == 0 ?
+                EksporteringBegrensning.build().utenBegrensning() :
+                EksporteringBegrensning.build().medBegrensning(begrensningTil);
+        return eksporteringBegrensning;
+    }
 }
