@@ -1,6 +1,19 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
+import static java.lang.String.format;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringService.getListeAvVirksomhetEksportPerKvartal;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.EKSPORT_BATCH_STØRRELSE;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForLand;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.hentSisteKvartalIBeregningen;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.mapToSykefraværsstatistikkLand;
+
 import com.google.common.collect.Lists;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository;
@@ -16,20 +29,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.KafkaException;
 import org.springframework.stereotype.Component;
-
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-
-import static java.lang.String.format;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringService.getListeAvVirksomhetEksportPerKvartal;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.EKSPORT_BATCH_STØRRELSE;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForLand;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.hentSisteKvartalIBeregningen;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.mapToSykefraværsstatistikkLand;
 
 @Slf4j
 @Component
@@ -191,8 +190,9 @@ public class EksporteringPerStatistikkKategoriService {
           long startUtsendingProcessForSubset = System.nanoTime();
           subset.stream().forEach(
               virksomhet -> {
-                SykefraværMedKategori sykefraværMedKategori = sykefraværMedKategoriSisteKvartalMap.get(
-                    virksomhet.getOrgnr());
+                SykefraværMedKategori sykefraværMedKategori = getSykefraværMedKategori(
+                    sykefraværMedKategoriSisteKvartalMap, Statistikkategori.VIRKSOMHET,
+                    virksomhet.getOrgnr(), virksomhet.getÅrstallOgKvartal());
                 SykefraværFlereKvartalerForEksport sykefraværOverFlereKvartaler = sykefraværOverFlereKvartalerMap.get(
                     virksomhet.getOrgnr());
 
@@ -234,6 +234,21 @@ public class EksporteringPerStatistikkKategoriService {
     ));
 
     return antallEksportert.get();
+  }
+
+  private static SykefraværMedKategori getSykefraværMedKategori(
+      Map<String, SykefraværMedKategori> sykefraværMedKategoriSisteKvartalMap,
+      Statistikkategori statistikkategori,
+      String identifikator,
+      ÅrstallOgKvartal årstallOgKvartal) {
+    SykefraværMedKategori sykefraværMedKategori = sykefraværMedKategoriSisteKvartalMap.get(
+        identifikator);
+    if (sykefraværMedKategori == null) {
+      return new SykefraværMedKategori(statistikkategori, identifikator, årstallOgKvartal, null,
+          null, 0);
+    } else {
+      return sykefraværMedKategori;
+    }
   }
 
   private Map<String, SykefraværMedKategori> createSykefraværMedKategoriMap(
