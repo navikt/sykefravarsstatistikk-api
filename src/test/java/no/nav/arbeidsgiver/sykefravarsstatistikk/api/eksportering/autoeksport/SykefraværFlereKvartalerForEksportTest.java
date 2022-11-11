@@ -89,4 +89,17 @@ class SykefraværFlereKvartalerForEksportTest {
     assertThat(sykefraværFlereKvartalerForEksport.getProsent()).isNull();
 
   }
+
+  @Test
+  public void kan_være_tom_for_statistikk() {
+    List<UmaskertSykefraværForEttKvartal> sykefravær = List.of();
+
+    SykefraværFlereKvartalerForEksport sykefraværFlereKvartalerForEksport =
+        new SykefraværFlereKvartalerForEksport(sykefravær);
+
+    assertThat(sykefraværFlereKvartalerForEksport.getTapteDagsverk()).isNull();
+    assertThat(sykefraværFlereKvartalerForEksport.getMuligeDagsverk()).isNull();
+    assertThat(sykefraværFlereKvartalerForEksport.getProsent()).isNull();
+    assertThat(sykefraværFlereKvartalerForEksport.isErMaskert()).isFalse();
+  }
 }

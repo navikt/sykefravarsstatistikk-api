@@ -25,23 +25,28 @@ public class SykefraværFlereKvartalerForEksport {
   public SykefraværFlereKvartalerForEksport(
       List<UmaskertSykefraværForEttKvartal> umaskertSykefravær
   ) {
-    erMaskert = umaskertSykefravær.stream().allMatch(v -> v.getAntallPersoner()
-        < Konstanter.MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER);
+    erMaskert = umaskertSykefravær.size() != 0 && umaskertSykefravær.stream()
+        .allMatch(v -> v.getAntallPersoner()
+            < Konstanter.MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER);
 
     if (!erMaskert) {
-      tapteDagsverk = umaskertSykefravær.stream()
+      tapteDagsverk = umaskertSykefravær.size() != 0 ? umaskertSykefravær.stream()
           .map(UmaskertSykefraværForEttKvartal::getDagsverkTeller)
-          .reduce(BigDecimal.ZERO, BigDecimal::add);
-      muligeDagsverk = umaskertSykefravær.stream()
+          .reduce(BigDecimal.ZERO, BigDecimal::add) : null;
+      muligeDagsverk = umaskertSykefravær.size() != 0 ? umaskertSykefravær.stream()
           .map(UmaskertSykefraværForEttKvartal::getDagsverkNevner)
-          .reduce(BigDecimal.ZERO, BigDecimal::add);
+          .reduce(BigDecimal.ZERO, BigDecimal::add) : null;
 
-      Either<StatistikkException, BigDecimal> prosentEither = StatistikkUtils.kalkulerSykefraværsprosent(
-          this.tapteDagsverk, this.muligeDagsverk);
-      if (prosentEither.isLeft()) {
-        prosent = null;
+      if (umaskertSykefravær.size() != 0) {
+        Either<StatistikkException, BigDecimal> prosentEither = StatistikkUtils.kalkulerSykefraværsprosent(
+            this.tapteDagsverk, this.muligeDagsverk);
+        if (prosentEither.isLeft()) {
+          prosent = null;
+        } else {
+          prosent = prosentEither.get();
+        }
       } else {
-        prosent = prosentEither.get();
+        prosent = null;
       }
     } else {
       tapteDagsverk = null;
@@ -53,8 +58,12 @@ public class SykefraværFlereKvartalerForEksport {
         .map(UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal)
         .collect(
             Collectors.toList());
-    antallPersoner = umaskertSykefravær.stream()
+    antallPersoner = umaskertSykefravær.size() == 0 ? 0 : umaskertSykefravær.stream()
         .max(Comparator.comparing(UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal)).get()
         .getAntallPersoner();
+  }
+
+  public static SykefraværFlereKvartalerForEksport utenStatistikk() {
+    return new SykefraværFlereKvartalerForEksport(List.of());
   }
 }

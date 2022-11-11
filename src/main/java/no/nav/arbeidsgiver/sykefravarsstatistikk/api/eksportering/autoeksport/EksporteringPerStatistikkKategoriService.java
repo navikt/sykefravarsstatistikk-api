@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -191,29 +192,44 @@ public class EksporteringPerStatistikkKategoriService {
           subset.stream().forEach(
               virksomhet -> {
                 SykefraværMedKategori sykefraværMedKategori = getSykefraværMedKategori(
-                    sykefraværMedKategoriSisteKvartalMap, Statistikkategori.VIRKSOMHET,
-                    virksomhet.getOrgnr(), virksomhet.getÅrstallOgKvartal());
-                SykefraværFlereKvartalerForEksport sykefraværOverFlereKvartaler = sykefraværOverFlereKvartalerMap.get(
-                    virksomhet.getOrgnr());
+                    sykefraværMedKategoriSisteKvartalMap,
+                    Statistikkategori.VIRKSOMHET,
+                    virksomhet.getOrgnr(),
+                    virksomhet.getÅrstallOgKvartal());
+                SykefraværFlereKvartalerForEksport sykefraværOverFlereKvartaler =
+                    getSykefraværOverFlereKvartaler(
+                        sykefraværOverFlereKvartalerMap,
+                        virksomhet.getOrgnr()
+                    );
 
-                if (sykefraværMedKategori != null && sykefraværOverFlereKvartaler != null) {
-                  boolean erSent = kafkaService.sendTilStatistikkKategoriTopic(
-                      årstallOgKvartal,
-                      Statistikkategori.VIRKSOMHET,
-                      virksomhet.getOrgnr(),
-                      sykefraværMedKategori,
-                      sykefraværOverFlereKvartaler
-                  );
-                  if (erSent) {
-                    antallEksportert.incrementAndGet();
-                  } else {
-                    antallIkkeEksportert.incrementAndGet();
-                  }
-                } else {
+                if (Objects.equals(
+                    sykefraværMedKategori,
+                    SykefraværMedKategori.utenStatistikk(
+                        Statistikkategori.VIRKSOMHET,
+                        virksomhet.getOrgnr(),
+                        årstallOgKvartal
+                    )) && Objects.equals(
+                    sykefraværOverFlereKvartaler,
+                    SykefraværFlereKvartalerForEksport.utenStatistikk())
+                ) {
                   antallUtenStatistikk.incrementAndGet();
+                }
+
+                boolean erSent = kafkaService.sendTilStatistikkKategoriTopic(
+                    årstallOgKvartal,
+                    Statistikkategori.VIRKSOMHET,
+                    virksomhet.getOrgnr(),
+                    sykefraværMedKategori,
+                    sykefraværOverFlereKvartaler
+                );
+                if (erSent) {
+                  antallEksportert.incrementAndGet();
+                } else {
+                  antallIkkeEksportert.incrementAndGet();
                 }
               }
           );
+
           long stopUtsendingProcessForSubset = System.nanoTime();
           long prosesseringtid = stopUtsendingProcessForSubset - startUtsendingProcessForSubset;
           batchAntallProsessert.incrementAndGet();
@@ -236,6 +252,16 @@ public class EksporteringPerStatistikkKategoriService {
     return antallEksportert.get();
   }
 
+  private SykefraværFlereKvartalerForEksport getSykefraværOverFlereKvartaler(
+      Map<String, SykefraværFlereKvartalerForEksport> sykefraværOverFlereKvartalerMap,
+      String identifikator) {
+
+    SykefraværFlereKvartalerForEksport sykefraværFlereKvartalerForEksport =
+        sykefraværOverFlereKvartalerMap.get(identifikator);
+    return Objects.requireNonNullElseGet(sykefraværFlereKvartalerForEksport,
+        () -> SykefraværFlereKvartalerForEksport.utenStatistikk());
+  }
+
   private static SykefraværMedKategori getSykefraværMedKategori(
       Map<String, SykefraværMedKategori> sykefraværMedKategoriSisteKvartalMap,
       Statistikkategori statistikkategori,
@@ -243,12 +269,12 @@ public class EksporteringPerStatistikkKategoriService {
       ÅrstallOgKvartal årstallOgKvartal) {
     SykefraværMedKategori sykefraværMedKategori = sykefraværMedKategoriSisteKvartalMap.get(
         identifikator);
-    if (sykefraværMedKategori == null) {
-      return new SykefraværMedKategori(statistikkategori, identifikator, årstallOgKvartal, null,
-          null, 0);
-    } else {
-      return sykefraværMedKategori;
-    }
+    return Objects.requireNonNullElseGet(sykefraværMedKategori,
+        () -> SykefraværMedKategori.utenStatistikk(
+            statistikkategori,
+            identifikator,
+            årstallOgKvartal
+        ));
   }
 
   private Map<String, SykefraværMedKategori> createSykefraværMedKategoriMap(

@@ -8,6 +8,7 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeks
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.sykefraværsstatistikkLandSiste4Kvartaler;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.virksomhetSykefraværMedKategori;
+import static org.assertj.core.api.Assertions.anyOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -166,6 +167,40 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
         .thenReturn(allData);
     when(kafkaService.sendTilStatistikkKategoriTopic(any(), any(), any(), any(), any())).thenReturn(
         true);
+
+    int antallEksporterte = service.eksporterSykefraværsstatistikkVirksomhet(
+        List.of(new VirksomhetEksportPerKvartal(
+            new Orgnr("987654321"),
+            __2020_2,
+            false
+        ), new VirksomhetEksportPerKvartal(
+            new Orgnr("987654322"),
+            __2020_2,
+            false
+        )),
+        __2020_2
+    );
+
+    assertThat(antallEksporterte).isEqualTo(2);
+  }
+
+  @Test
+  public void eksporterSykefraværsstatistikkVirksomhet__eksporterer_til_og_med_bedrifter_uten_statistikk() {
+    List<SykefraværsstatistikkVirksomhetUtenVarighet> allData = List.of(
+        sykefraværsstatistikkVirksomhet(__2020_2, "987654321"),
+        sykefraværsstatistikkVirksomhet(__2020_1, "987654321")
+    );
+
+    when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleVirksomheter(__2019_3,
+        __2020_2))
+        .thenReturn(allData);
+    when(kafkaService.sendTilStatistikkKategoriTopic(
+        any(),
+        any(),
+        any(),
+        any(SykefraværMedKategori.class),
+        any(SykefraværFlereKvartalerForEksport.class))
+    ).thenReturn(true);
 
     int antallEksporterte = service.eksporterSykefraværsstatistikkVirksomhet(
         List.of(new VirksomhetEksportPerKvartal(
