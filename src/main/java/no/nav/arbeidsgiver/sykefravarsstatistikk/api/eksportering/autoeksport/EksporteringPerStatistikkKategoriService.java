@@ -198,12 +198,16 @@ public class EksporteringPerStatistikkKategoriService {
         createSykefraværOverFlereKvartalerMap(sykefraværGruppertEtterOrgNr);
 
     // #2 Split i subsets
+    // TODO: DELETE ME
+    long startSplitISubset = System.currentTimeMillis();
     log.info(format("Starting utsending av statistikk. '%d' meldinger vil bli sendt",
         virksomheterTilEksport.size()));
     List<? extends List<VirksomhetEksportPerKvartal>> subsets =
         Lists.partition(virksomheterTilEksport, EKSPORT_BATCH_STØRRELSE);
     int totalBatchAntall = subsets.size();
     log.info(format("Deler utsending av statistikk i '%d' batch ", totalBatchAntall));
+    long stopSplitISubset = System.currentTimeMillis();
+    log.info(format("[Måling] Det tok '%d' millis for å dele i batch ", stopSplitISubset - startSplitISubset));
 
     // #3 send til kafka
     AtomicInteger batchAntallProsessert = new AtomicInteger();
@@ -217,6 +221,7 @@ public class EksporteringPerStatistikkKategoriService {
     // TODO: deleteme
     AtomicLong antallTidGetSykefraværMedKategori = new AtomicLong();
     AtomicLong antallTidGetSykefraværOverFlereKvartaler = new AtomicLong();
+    AtomicLong antallTidCheckEquals = new AtomicLong();
 
     subsets.forEach(subset -> {
           long startUtsendingProcessForSubset = System.nanoTime();
@@ -249,6 +254,7 @@ public class EksporteringPerStatistikkKategoriService {
                     stopGetSykefraværOverFlereKvartaler - startGetSykefraværOverFlereKvartaler
                 );
 
+                long startCheckEquals = System.currentTimeMillis();
                 if (Objects.equals(
                     sykefraværMedKategori,
                     SykefraværMedKategori.utenStatistikk(
@@ -261,6 +267,8 @@ public class EksporteringPerStatistikkKategoriService {
                 ) {
                   antallUtenStatistikk.incrementAndGet();
                 }
+                long stopCheckEquals = System.currentTimeMillis();
+                antallTidCheckEquals.addAndGet(stopCheckEquals - startCheckEquals);
 
                 boolean erSent = kafkaService.sendTilStatistikkKategoriTopic(
                     årstallOgKvartal,
@@ -316,10 +324,13 @@ public class EksporteringPerStatistikkKategoriService {
 
           // TODO: Delete me
           log.info(format("[Måling] det tok (total) %d millis ved getSykefraværMedKategori(), "
-                  + "og %d millis ved getSykefraværOverFlereKvartaler() for %d statistikk prosessert. ",
+                  + "%d millis ved getSykefraværOverFlereKvartaler(), "
+                  + "og %d millis ved checkEquals"
+                  + " for %d statistikk prosessert. ",
               antallTidGetSykefraværMedKategori.get(),
               antallTidGetSykefraværOverFlereKvartaler.get(),
-              batchAntallProsessert.get()
+              antallTidCheckEquals.get(),
+              antallEksportert.get() + antallIkkeEksportert.get()
           ));
 
         }
