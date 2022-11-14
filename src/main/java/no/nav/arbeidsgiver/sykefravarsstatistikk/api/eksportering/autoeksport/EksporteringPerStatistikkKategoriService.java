@@ -207,7 +207,8 @@ public class EksporteringPerStatistikkKategoriService {
     int totalBatchAntall = subsets.size();
     log.info(format("Deler utsending av statistikk i '%d' batch ", totalBatchAntall));
     long stopSplitISubset = System.currentTimeMillis();
-    log.info(format("[Måling] Det tok '%d' millis for å dele i batch ", stopSplitISubset - startSplitISubset));
+    log.info(format("[Måling] Det tok '%d' millis for å dele i batch ",
+        stopSplitISubset - startSplitISubset));
 
     // #3 send til kafka
     AtomicInteger batchAntallProsessert = new AtomicInteger();
@@ -223,9 +224,10 @@ public class EksporteringPerStatistikkKategoriService {
     AtomicLong antallTidGetSykefraværOverFlereKvartaler = new AtomicLong();
     AtomicLong antallTidCheckEquals = new AtomicLong();
 
-    subsets.forEach(subset -> {
+    subsets.forEach(virksomheter -> {
           long startUtsendingProcessForSubset = System.nanoTime();
-          subset.stream().forEach(
+
+          virksomheter.forEach(
               virksomhet -> {
                 long startUtsendingProcess = System.nanoTime();
 
@@ -296,17 +298,17 @@ public class EksporteringPerStatistikkKategoriService {
                   antallIkkeEksportert.incrementAndGet();
                 }
 
-                int antallRestendeOppdatert = lagreEksporterteVirksomheterOgNullstillLista(
-                    årstallOgKvartal,
-                    eksporterteVirksomheterListe,
-                    eksporteringRepository,
-                    kafkaService
-                );
-                antallVirksomheterLagretSomEksportertIDb.addAndGet(antallRestendeOppdatert);
-
-                cleanUpEtterBatch(eksporteringRepository);
               }
           );
+
+          int antallRestendeOppdatert = lagreEksporterteVirksomheterOgNullstillLista(
+              årstallOgKvartal,
+              eksporterteVirksomheterListe,
+              eksporteringRepository,
+              kafkaService
+          );
+          antallVirksomheterLagretSomEksportertIDb.addAndGet(antallRestendeOppdatert);
+          cleanUpEtterBatch(eksporteringRepository);
 
           int eksportertHittilNå = antallEksportert.addAndGet(antallSentTilEksport.get());
           long stopUtsendingProcessForSubset = System.nanoTime();
