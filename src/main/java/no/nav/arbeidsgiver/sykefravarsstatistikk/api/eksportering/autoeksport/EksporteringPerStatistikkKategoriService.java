@@ -2,12 +2,16 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
 import static java.lang.String.format;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.EKSPORT_BATCH_STØRRELSE;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.cleanUpEtterBatch;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForLand;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.hentSisteKvartalIBeregningen;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.lagreEksporterteVirksomheterOgNullstillLista;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.mapToSykefraværsstatistikkLand;
 
 import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -171,7 +175,8 @@ public class EksporteringPerStatistikkKategoriService {
       ÅrstallOgKvartal årstallOgKvartal
   ) {
     long startEksportering = System.currentTimeMillis();
-    kafkaService.nullstillUtsendingRapport(virksomheterTilEksport.size(), KafkaProperties.EKSPORT_ALLE_KATEGORIER);
+    kafkaService.nullstillUtsendingRapport(virksomheterTilEksport.size(),
+        KafkaProperties.EKSPORT_ALLE_KATEGORIER);
 
     // Hente data
     log.info("Starting utregning av statistikk");
@@ -202,13 +207,17 @@ public class EksporteringPerStatistikkKategoriService {
     // #3 send til kafka
     AtomicInteger batchAntallProsessert = new AtomicInteger();
     AtomicInteger antallEksportert = new AtomicInteger();
+    AtomicInteger antallSentTilEksport = new AtomicInteger();
     AtomicInteger antallIkkeEksportert = new AtomicInteger();
     AtomicInteger antallUtenStatistikk = new AtomicInteger();
+    AtomicInteger antallVirksomheterLagretSomEksportertIDb = new AtomicInteger();
+    List<String> eksporterteVirksomheterListe = new ArrayList<>();
 
     subsets.forEach(subset -> {
           long startUtsendingProcessForSubset = System.nanoTime();
           subset.stream().forEach(
               virksomhet -> {
+                long startUtsendingProcess = System.nanoTime();
                 SykefraværMedKategori sykefraværMedKategori = getSykefraværMedKategori(
                     sykefraværMedKategoriSisteKvartalMap,
                     Statistikkategori.VIRKSOMHET,
@@ -240,21 +249,48 @@ public class EksporteringPerStatistikkKategoriService {
                     sykefraværMedKategori,
                     sykefraværOverFlereKvartaler
                 );
+                long stopUtsendingProcess = System.nanoTime();
+                kafkaService.addUtsendingTilKafkaProcessingTime(startUtsendingProcess, stopUtsendingProcess);
                 if (erSent) {
                   antallEksportert.incrementAndGet();
+                  int antallVirksomhetertLagretSomEksportert =
+                      leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
+                          virksomhet.getOrgnr(),
+                          årstallOgKvartal,
+                          eksporterteVirksomheterListe,
+                          eksporteringRepository,
+                          kafkaService
+                      );
+                  antallVirksomheterLagretSomEksportertIDb.addAndGet(
+                      antallVirksomhetertLagretSomEksportert);
                 } else {
                   antallIkkeEksportert.incrementAndGet();
                 }
+
+                int antallRestendeOppdatert = lagreEksporterteVirksomheterOgNullstillLista(
+                    årstallOgKvartal,
+                    eksporterteVirksomheterListe,
+                    eksporteringRepository,
+                    kafkaService
+                );
+                antallVirksomheterLagretSomEksportertIDb.addAndGet(antallRestendeOppdatert);
+
+                cleanUpEtterBatch(eksporteringRepository);
               }
           );
 
+          int eksportertHittilNå = antallEksportert.addAndGet(antallSentTilEksport.get());
           long stopUtsendingProcessForSubset = System.nanoTime();
           long prosesseringtid = stopUtsendingProcessForSubset - startUtsendingProcessForSubset;
           batchAntallProsessert.incrementAndGet();
-          log.info(format("Ferdig med å sende subset %d av %d. Utsending tid var: %d ",
+
+          log.info(format("Ferdig med å prosessere subset %d av %d. "
+                  + "Antall statistikk sent frem til nå er: %d. "
+                  + "Utsending tid var (i millis): %d ",
               batchAntallProsessert.get(),
               totalBatchAntall,
-              prosesseringtid
+              eksportertHittilNå,
+              (prosesseringtid / 1000000)
           ));
         }
     );
@@ -273,13 +309,13 @@ public class EksporteringPerStatistikkKategoriService {
     log.info("Eksportering per statistikk kategori er ferdig med: " +
             "antall statistikk for {} prosessert='{}', " +
             "Eksportering tok '{}' sekunder totalt. " +
-            "Snitt prossesseringstid ved utsending til Kafka er: '{}'. " +
-            "Snitt prossesseringstid for å oppdatere DB er: '{}'.",
+            "Snitt prossesseringstid (i millis) ved utsending til Kafka er: '{}'. " +
+            "Snitt prossesseringstid (i millis) for å oppdatere DB er: '{}'.",
         Statistikkategori.VIRKSOMHET.name(),
         kafkaService.getAntallMeldingerMottattForUtsending(),
         totalProsesseringTidISekunder,
-        kafkaService.getSnittTidUtsendingTilKafka(),
-        kafkaService.getSnittTidOppdateringIDB()
+        kafkaService.getSnittTidUtsendingTilKafka() / 1000000,
+        kafkaService.getSnittTidOppdateringIDB() / 1000000
     );
     log.info("[Måling] Rå data ved detaljert måling: {}",
         kafkaService.getRåDataVedDetaljertMåling()

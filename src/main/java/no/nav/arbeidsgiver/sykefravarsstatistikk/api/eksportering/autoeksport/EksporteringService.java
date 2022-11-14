@@ -249,11 +249,13 @@ public class EksporteringService {
                       kafkaService.addUtsendingTilKafkaProcessingTime(startUtsendingProcess, stopUtsendingProcess);
 
                       int antallVirksomhetertLagretSomEksportert =
-                            leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
-                                  virksomhetMetadata.getOrgnr(),
-                                  årstallOgKvartal,
-                                  eksporterteVirksomheterListe, eksporteringRepository, kafkaService
-                            );
+                          leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
+                              virksomhetMetadata.getOrgnr(),
+                              årstallOgKvartal,
+                              eksporterteVirksomheterListe,
+                              eksporteringRepository,
+                              kafkaService
+                          );
                       antallVirksomheterLagretSomEksportertIDb.addAndGet(antallVirksomhetertLagretSomEksportert);
                   }
               }
