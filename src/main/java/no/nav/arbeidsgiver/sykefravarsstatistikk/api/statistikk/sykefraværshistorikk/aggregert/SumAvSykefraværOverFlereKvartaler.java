@@ -69,7 +69,7 @@ class SumAvSykefraværOverFlereKvartaler {
     }
 
     public Either<StatistikkException, SykefraværOverFlereKvartaler> regnUtProsentOgMapTilSykefraværForFlereKvartaler() {
-        if (muligeDagsverk.equals(ZERO)) {
+        if (muligeDagsverk.compareTo(ZERO) == 0) {
             return Either.left(new UtilstrekkeligDataException(
                     "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."));
         }
@@ -77,7 +77,7 @@ class SumAvSykefraværOverFlereKvartaler {
         Either<StatistikkException, BigDecimal> prosent = kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk);
 
         if (prosent.isLeft()) {
-            Either.left(prosent.getLeft());
+            return Either.left(prosent.getLeft());
         }
 
         SykefraværOverFlereKvartaler sykefraværForFlereKvartaler = new SykefraværOverFlereKvartaler(
@@ -105,7 +105,7 @@ class SumAvSykefraværOverFlereKvartaler {
         if (dataMåMaskeres()) {
             return Either.left(new MaskerteDataException());
         }
-        if (muligeDagsverk.equals(ZERO)) {
+        if (muligeDagsverk.compareTo(ZERO) == 0) {
             return Either.left(new UtilstrekkeligDataException(
                     "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."));
         }

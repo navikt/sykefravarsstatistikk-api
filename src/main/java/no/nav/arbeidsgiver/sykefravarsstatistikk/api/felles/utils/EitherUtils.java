@@ -29,5 +29,4 @@ public class EitherUtils {
             .map(Either::get)
             .collect(toList());
   }
-
 }
