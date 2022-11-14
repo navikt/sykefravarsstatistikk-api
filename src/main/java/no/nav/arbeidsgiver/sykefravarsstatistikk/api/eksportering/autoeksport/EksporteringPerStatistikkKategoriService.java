@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
@@ -213,21 +214,40 @@ public class EksporteringPerStatistikkKategoriService {
     AtomicInteger antallVirksomheterLagretSomEksportertIDb = new AtomicInteger();
     List<String> eksporterteVirksomheterListe = new ArrayList<>();
 
+    // TODO: deleteme
+    AtomicLong antallTidGetSykefraværMedKategori = new AtomicLong();
+    AtomicLong antallTidGetSykefraværOverFlereKvartaler = new AtomicLong();
+
     subsets.forEach(subset -> {
           long startUtsendingProcessForSubset = System.nanoTime();
           subset.stream().forEach(
               virksomhet -> {
                 long startUtsendingProcess = System.nanoTime();
+
+                // TODO: deleteme
+                long startGetSykefraværMedKategori = System.currentTimeMillis();
                 SykefraværMedKategori sykefraværMedKategori = getSykefraværMedKategori(
                     sykefraværMedKategoriSisteKvartalMap,
                     Statistikkategori.VIRKSOMHET,
                     virksomhet.getOrgnr(),
                     virksomhet.getÅrstallOgKvartal());
+                long stopGetSykefraværMedKategori = System.currentTimeMillis();
+                antallTidGetSykefraværMedKategori.addAndGet(
+                    stopGetSykefraværMedKategori - startGetSykefraværMedKategori
+                );
+
+                // TODO: deleteme
+                long startGetSykefraværOverFlereKvartaler = System.currentTimeMillis();
+
                 SykefraværFlereKvartalerForEksport sykefraværOverFlereKvartaler =
                     getSykefraværOverFlereKvartaler(
                         sykefraværOverFlereKvartalerMap,
                         virksomhet.getOrgnr()
                     );
+                long stopGetSykefraværOverFlereKvartaler = System.currentTimeMillis();
+                antallTidGetSykefraværOverFlereKvartaler.addAndGet(
+                    stopGetSykefraværOverFlereKvartaler - startGetSykefraværOverFlereKvartaler
+                );
 
                 if (Objects.equals(
                     sykefraværMedKategori,
@@ -293,6 +313,15 @@ public class EksporteringPerStatistikkKategoriService {
               eksportertHittilNå,
               (prosesseringtid / 1000000)
           ));
+
+          // TODO: Delete me
+          log.info(format("[Måling] det tok (total) %d millis ved getSykefraværMedKategori(), "
+                  + "og %d millis ved getSykefraværOverFlereKvartaler() for %d statistikk prosessert. ",
+              antallTidGetSykefraværMedKategori.get(),
+              antallTidGetSykefraværOverFlereKvartaler.get(),
+              batchAntallProsessert.get()
+          ));
+
         }
     );
 
