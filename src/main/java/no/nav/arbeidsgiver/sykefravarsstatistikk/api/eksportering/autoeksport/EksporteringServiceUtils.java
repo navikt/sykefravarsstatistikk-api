@@ -1,6 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
@@ -13,6 +15,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværssta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
@@ -355,6 +358,78 @@ public class EksporteringServiceUtils {
               )
               .collect(Collectors.toList());
         return filteredList;
+    }
+
+    @NotNull
+    protected static void cleanUpEtterBatch(EksporteringRepository eksporteringRepository) {
+        eksporteringRepository.oppdaterAlleVirksomheterIEksportTabellSomErBekrreftetEksportert();
+        eksporteringRepository.slettVirksomheterBekreftetEksportert();
+    }
+
+    @NotNull
+    protected static int leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
+        String orgnr,
+        ÅrstallOgKvartal årstallOgKvartal,
+        @NotNull List<String> virksomheterSomSkalFlaggesSomEksportert,
+        EksporteringRepository eksporteringRepository,
+        KafkaService kafkaService
+    ) {
+        virksomheterSomSkalFlaggesSomEksportert.add(orgnr);
+
+        if (virksomheterSomSkalFlaggesSomEksportert.size()
+            == OPPDATER_VIRKSOMHETER_SOM_ER_EKSPORTERT_BATCH_STØRRELSE
+        ) {
+            return lagreEksporterteVirksomheterOgNullstillLista(
+                årstallOgKvartal,
+                virksomheterSomSkalFlaggesSomEksportert,
+                eksporteringRepository,
+                kafkaService
+            );
+        } else {
+            return 0;
+        }
+    }
+
+    @NotNull
+    protected static int lagreEksporterteVirksomheterOgNullstillLista(
+        ÅrstallOgKvartal årstallOgKvartal,
+        List<String> virksomheterSomSkalFlaggesSomEksportert,
+        EksporteringRepository eksporteringRepository,
+        KafkaService kafkaService
+    ) {
+        int antallSomSkalOppdateres = virksomheterSomSkalFlaggesSomEksportert.size();
+        long startWriteToDB = System.nanoTime();
+        eksporteringRepository.batchOpprettVirksomheterBekreftetEksportert(
+            virksomheterSomSkalFlaggesSomEksportert,
+            årstallOgKvartal
+        );
+        virksomheterSomSkalFlaggesSomEksportert.clear();
+        long stopWriteToDB = System.nanoTime();
+
+        kafkaService.addDBOppdateringProcessingTime(startWriteToDB, stopWriteToDB);
+
+        return antallSomSkalOppdateres;
+    }
+
+
+    @NotNull
+    protected static List<VirksomhetEksportPerKvartal> getListeAvVirksomhetEksportPerKvartal(
+        ÅrstallOgKvartal årstallOgKvartal,
+        EksporteringBegrensning eksporteringBegrensning,
+        EksporteringRepository eksporteringRepository
+    ) {
+        List<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartal =
+            eksporteringRepository.hentVirksomhetEksportPerKvartal(årstallOgKvartal);
+
+        Stream<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartalStream = virksomhetEksportPerKvartal
+            .stream()
+            .filter(v -> !v.eksportert());
+
+        return eksporteringBegrensning.erBegrenset() ?
+            virksomhetEksportPerKvartalStream.
+                limit(eksporteringBegrensning.getAntallSomSkalEksporteres())
+                .collect(Collectors.toList()) :
+            virksomhetEksportPerKvartalStream.collect(Collectors.toList());
     }
 
     private static boolean erIKvartalerIberegningen(ÅrstallOgKvartal fraÅrstallOgKvartal, Sykefraværsstatistikk v) {

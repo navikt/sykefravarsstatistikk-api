@@ -1,6 +1,27 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.EKSPORT_BATCH_STØRRELSE;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.cleanUpEtterBatch;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.filterByKvartal;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForLand;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForNæring;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForNæring5Siffer;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForSektor;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getVirksomhetMetadataHashMap;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getVirksomhetSykefravær;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getVirksomheterMetadataFraSubset;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.hentSisteKvartalIBeregningen;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.lagreEksporterteVirksomheterOgNullstillLista;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.mapToSykefraværsstatistikkLand;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.toMap;
+
 import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository;
@@ -18,31 +39,9 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUt
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.KafkaException;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.EKSPORT_BATCH_STØRRELSE;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.OPPDATER_VIRKSOMHETER_SOM_ER_EKSPORTERT_BATCH_STØRRELSE;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.filterByKvartal;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForLand;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForNæring;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForNæring5Siffer;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForSektor;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getVirksomhetMetadataHashMap;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getVirksomhetSykefravær;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getVirksomheterMetadataFraSubset;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.hentSisteKvartalIBeregningen;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.mapToSykefraværsstatistikkLand;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.toMap;
 
 @Slf4j
 @Component
@@ -57,11 +56,12 @@ public class EksporteringService {
 
 
     public EksporteringService(
-          EksporteringRepository eksporteringRepository,
-          VirksomhetMetadataRepository virksomhetMetadataRepository,
-          SykefraværsstatistikkTilEksporteringRepository sykefraværsstatistikkTilEksporteringRepository,
-          SykefraværRepository sykefraværRepository, KafkaService kafkaService,
-          @Value("${statistikk.eksportering.aktivert}") Boolean erEksporteringAktivert
+        EksporteringRepository eksporteringRepository,
+        VirksomhetMetadataRepository virksomhetMetadataRepository,
+        SykefraværsstatistikkTilEksporteringRepository sykefraværsstatistikkTilEksporteringRepository,
+        SykefraværRepository sykefraværRepository,
+        KafkaService kafkaService,
+        @Value("${statistikk.eksportering.aktivert}") Boolean erEksporteringAktivert
     ) {
         this.eksporteringRepository = eksporteringRepository;
         this.virksomhetMetadataRepository = virksomhetMetadataRepository;
@@ -252,7 +252,7 @@ public class EksporteringService {
                             leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
                                   virksomhetMetadata.getOrgnr(),
                                   årstallOgKvartal,
-                                  eksporterteVirksomheterListe
+                                  eksporterteVirksomheterListe, eksporteringRepository, kafkaService
                             );
                       antallVirksomheterLagretSomEksportertIDb.addAndGet(antallVirksomhetertLagretSomEksportert);
                   }
@@ -260,13 +260,15 @@ public class EksporteringService {
         );
 
         int antallRestendeOppdatert = lagreEksporterteVirksomheterOgNullstillLista(
-              årstallOgKvartal,
-              eksporterteVirksomheterListe
+            årstallOgKvartal,
+            eksporterteVirksomheterListe,
+            eksporteringRepository,
+            kafkaService
         );
         antallVirksomheterLagretSomEksportertIDb.addAndGet(antallRestendeOppdatert);
         int eksportertHittilNå = antallEksportert.addAndGet(antallSentTilEksport.get());
 
-        cleanUpEtterBatch();
+        cleanUpEtterBatch(eksporteringRepository);
 
         log.info(
               String.format(
@@ -276,63 +278,5 @@ public class EksporteringService {
                     antallVirksomheterLagretSomEksportertIDb.get()
               )
         );
-    }
-
-    private void cleanUpEtterBatch() {
-        eksporteringRepository.oppdaterAlleVirksomheterIEksportTabellSomErBekrreftetEksportert();
-        eksporteringRepository.slettVirksomheterBekreftetEksportert();
-    }
-
-    private int leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
-          String orgnr,
-          ÅrstallOgKvartal årstallOgKvartal,
-          @NotNull List<String> virksomheterSomSkalFlaggesSomEksportert
-    ) {
-        virksomheterSomSkalFlaggesSomEksportert.add(orgnr);
-
-        if (virksomheterSomSkalFlaggesSomEksportert.size() == OPPDATER_VIRKSOMHETER_SOM_ER_EKSPORTERT_BATCH_STØRRELSE) {
-            return lagreEksporterteVirksomheterOgNullstillLista(årstallOgKvartal, virksomheterSomSkalFlaggesSomEksportert);
-        } else {
-            return 0;
-        }
-    }
-
-    private int lagreEksporterteVirksomheterOgNullstillLista(
-          ÅrstallOgKvartal årstallOgKvartal,
-          List<String> virksomheterSomSkalFlaggesSomEksportert
-    ) {
-        int antallSomSkalOppdateres = virksomheterSomSkalFlaggesSomEksportert.size();
-        long startWriteToDB = System.nanoTime();
-        eksporteringRepository.batchOpprettVirksomheterBekreftetEksportert(
-              virksomheterSomSkalFlaggesSomEksportert,
-              årstallOgKvartal
-        );
-        virksomheterSomSkalFlaggesSomEksportert.clear();
-        long stopWriteToDB = System.nanoTime();
-
-        kafkaService.addDBOppdateringProcessingTime(startWriteToDB, stopWriteToDB);
-
-        return antallSomSkalOppdateres;
-    }
-
-
-    @NotNull
-    protected static List<VirksomhetEksportPerKvartal> getListeAvVirksomhetEksportPerKvartal(
-          ÅrstallOgKvartal årstallOgKvartal,
-          EksporteringBegrensning eksporteringBegrensning,
-          EksporteringRepository eksporteringRepository
-    ) {
-        List<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartal =
-              eksporteringRepository.hentVirksomhetEksportPerKvartal(årstallOgKvartal);
-
-        Stream<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartalStream = virksomhetEksportPerKvartal
-              .stream()
-              .filter(v -> !v.eksportert());
-
-        return eksporteringBegrensning.erBegrenset() ?
-              virksomhetEksportPerKvartalStream.
-                    limit(eksporteringBegrensning.getAntallSomSkalEksporteres())
-                    .collect(Collectors.toList()) :
-              virksomhetEksportPerKvartalStream.collect(Collectors.toList());
     }
 }
