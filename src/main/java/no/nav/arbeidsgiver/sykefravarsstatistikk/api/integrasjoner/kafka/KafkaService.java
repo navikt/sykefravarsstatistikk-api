@@ -86,7 +86,9 @@ public class KafkaService {
       dataAsJsonString = objectMapper.writeValueAsString(value);
     } catch (JsonProcessingException e) {
       kafkaUtsendingRapport.leggTilError(
-          "Kunne ikke parse statistikk 'LAND' til Json. Statistikk ikke sent");
+          String.format("Kunne ikke parse statistikk '%s' til Json. Statistikk ikke sent",
+              statistikkategori.name())
+      );
       return false;
     }
 
