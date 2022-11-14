@@ -161,7 +161,7 @@ public class EksporteringPerStatistikkKategoriService {
             + "Antall statistikk eksportert er: %d, "
             + "antall ikke eksportert er: %d. "
             + "Tid for eksportering : %d",
-        Statistikkategori.VIRKSOMHET.name(),
+        Statistikkategori.LAND.name(),
         antallEksportert.get(),
         antallIkkeEksportert.get(),
         tidsbrukt
@@ -250,7 +250,8 @@ public class EksporteringPerStatistikkKategoriService {
                     sykefraværOverFlereKvartaler
                 );
                 long stopUtsendingProcess = System.nanoTime();
-                kafkaService.addUtsendingTilKafkaProcessingTime(startUtsendingProcess, stopUtsendingProcess);
+                kafkaService.addUtsendingTilKafkaProcessingTime(startUtsendingProcess,
+                    stopUtsendingProcess);
                 if (erSent) {
                   antallEksportert.incrementAndGet();
                   int antallVirksomhetertLagretSomEksportert =
