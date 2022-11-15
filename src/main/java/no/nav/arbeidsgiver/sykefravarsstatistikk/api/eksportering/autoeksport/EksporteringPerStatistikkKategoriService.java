@@ -10,6 +10,9 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeks
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.mapToSykefraværsstatistikkLand;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -257,18 +260,30 @@ public class EksporteringPerStatistikkKategoriService {
                 );
 
                 long startCheckEquals = System.currentTimeMillis();
-                if (Objects.equals(
-                    sykefraværMedKategori,
-                    SykefraværMedKategori.utenStatistikk(
-                        Statistikkategori.VIRKSOMHET,
-                        virksomhet.getOrgnr(),
-                        årstallOgKvartal
-                    )) && Objects.equals(
-                    sykefraværOverFlereKvartaler,
-                    SykefraværFlereKvartalerForEksport.utenStatistikk())
-                ) {
-                  antallUtenStatistikk.incrementAndGet();
+
+                try {
+                  if (Objects.equals(
+                      sykefraværMedKategori,
+                      SykefraværMedKategori.utenStatistikk(
+                          Statistikkategori.VIRKSOMHET,
+                          virksomhet.getOrgnr(),
+                          årstallOgKvartal
+                      )) && Objects.equals(
+                      sykefraværOverFlereKvartaler,
+                      SykefraværFlereKvartalerForEksport.utenStatistikk())
+                  ) {
+                    antallUtenStatistikk.incrementAndGet();
+                  }
+                } catch (Exception e) {
+                  log.warn("Fikk exception '{}' på denne sykefraværMedKategori: '{}', "
+                          + "og sykefraværOverFlereKvartaler: '{}'",
+                      e.getMessage(),
+                      getStringOutput(sykefraværMedKategori),
+                      getStringOutput(sykefraværOverFlereKvartaler)
+                  );
+                  throw (e);
                 }
+
                 long stopCheckEquals = System.currentTimeMillis();
                 antallTidCheckEquals.addAndGet(stopCheckEquals - startCheckEquals);
 
@@ -365,6 +380,28 @@ public class EksporteringPerStatistikkKategoriService {
     );
 
     return antallEksportert.get();
+  }
+
+  private String getStringOutput(SykefraværFlereKvartalerForEksport sykefraværOverFlereKvartaler) {
+    ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+    String json = null;
+    try {
+      json = ow.writeValueAsString(sykefraværOverFlereKvartaler);
+    } catch (JsonProcessingException e) {
+      json = "Failed to parse";
+    }
+    return json;
+  }
+
+  private String getStringOutput(SykefraværMedKategori sykefraværMedKategori) {
+    ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+    String json = null;
+    try {
+      json = ow.writeValueAsString(sykefraværMedKategori);
+    } catch (JsonProcessingException e) {
+      json = "Failed to parse";
+    }
+    return json;
   }
 
   private SykefraværFlereKvartalerForEksport getSykefraværOverFlereKvartaler(

@@ -68,13 +68,19 @@ public class SykefraværForEttKvartal extends MaskerbartSykefravær implements
     }
     SykefraværForEttKvartal that = (SykefraværForEttKvartal) o;
 
-    return (årstallOgKvartal.equals(that.årstallOgKvartal)
-        && getProsent() == null ?
-        that.getProsent() == null : getProsent().equals(that.getProsent())
-        && getTapteDagsverk() == null ?
-        that.getTapteDagsverk() == null : getTapteDagsverk().equals(that.getTapteDagsverk())
-        && getMuligeDagsverk() == null ?
-        that.getMuligeDagsverk() == null : getMuligeDagsverk().equals(that.getMuligeDagsverk())
+    boolean erÅrstallOgKvartalLike = this.årstallOgKvartal.equals(that.årstallOgKvartal);
+    boolean erProsentLike = this.getProsent() == null ?
+        that.getProsent() == null : this.getProsent().equals(that.getProsent());
+    boolean erTapteDagsverkLike = this.getTapteDagsverk() == null ?
+        that.getTapteDagsverk() == null : this.getTapteDagsverk().equals(that.getTapteDagsverk());
+    boolean erMuligeDagsverkLike = this.getMuligeDagsverk() == null ?
+        that.getMuligeDagsverk() == null : this.getMuligeDagsverk().equals(that.getMuligeDagsverk());
+
+    return (
+        erÅrstallOgKvartalLike
+            && erProsentLike
+            && erTapteDagsverkLike
+            && erMuligeDagsverkLike
     );
   }
 
