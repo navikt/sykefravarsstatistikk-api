@@ -29,7 +29,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.VarighetTestUtils;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
@@ -267,6 +266,24 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
 
     assertThat(responseBody.get("trendTotalt").findValuesAsText("statistikkategori"))
         .containsExactly(BRANSJE.toString());
+  }
+
+  @Test
+  public void hentAgreggertStatistikk_kræsjerIkkeDersomMuligeDagsverkErZero()
+      throws Exception {
+    opprettStatistikkForVirksomhet(jdbcTemplate, ORGNR_UNDERENHET,
+        SISTE_PUBLISERTE_KVARTAL_MOCK.getÅrstall(),
+        SISTE_PUBLISERTE_KVARTAL_MOCK.getKvartal(),
+        5,
+        0,
+        10);
+
+    HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET);
+    JsonNode responseBody = objectMapper.readTree(response.body());
+
+    assertThat(
+        responseBody.get("prosentSiste4KvartalerTotalt")
+            .findValuesAsText("statistikkategori")).isEmpty();
   }
 
 

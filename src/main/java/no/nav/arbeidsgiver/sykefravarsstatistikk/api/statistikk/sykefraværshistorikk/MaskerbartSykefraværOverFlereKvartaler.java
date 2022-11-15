@@ -30,6 +30,7 @@ public abstract class MaskerbartSykefraværOverFlereKvartaler {
                         sykefraværForEttKvartalList.stream().allMatch(MaskerbartSykefravær::isErMaskert);
 
         if (!erMaskert && harSykefraværData) {
+            // TODO: Bruk kalkulerSykefraværsprosent I StatistikkUtils til å regne ut prosenten!!!!
             prosent = tapteDagsverk
                     .multiply(new BigDecimal(100))
                     .divide(muligeDagsverk, 1, RoundingMode.HALF_UP);
