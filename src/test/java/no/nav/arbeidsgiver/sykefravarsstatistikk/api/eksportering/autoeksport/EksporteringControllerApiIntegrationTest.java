@@ -1,41 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import common.SpringIntegrationTestbase;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil;
-import no.nav.security.mock.oauth2.MockOAuth2Server;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.jetbrains.annotations.NotNull;
-import org.junit.AfterClass;
-import org.junit.Ignore;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.listener.ContainerProperties;
-import org.springframework.kafka.listener.KafkaMessageListenerContainer;
-import org.springframework.kafka.listener.MessageListener;
-import org.springframework.kafka.test.EmbeddedKafkaBroker;
-import org.springframework.kafka.test.context.EmbeddedKafka;
-import org.springframework.kafka.test.utils.KafkaTestUtils;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.web.context.WebApplicationContext;
-
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static java.net.http.HttpClient.newBuilder;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
@@ -48,6 +12,38 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.skrivSiste
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAlleImporttidspunkt;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import common.SpringIntegrationTestbase;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil;
+import no.nav.security.mock.oauth2.MockOAuth2Server;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.jetbrains.annotations.NotNull;
+import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.listener.KafkaMessageListenerContainer;
+import org.springframework.kafka.listener.MessageListener;
+import org.springframework.kafka.test.EmbeddedKafkaBroker;
+import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.kafka.test.utils.KafkaTestUtils;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.web.context.WebApplicationContext;
 
 @DirtiesContext
 @EmbeddedKafka(
@@ -82,13 +78,7 @@ public class EksporteringControllerApiIntegrationTest extends SpringIntegrationT
 
   @LocalServerPort
   private String port;
-
-  private final ObjectMapper objectMapper = new ObjectMapper();
-
-  private final static String ORGNR_UNDERENHET = "910969439";
-  private final static String ORGNR_OVERORDNET_ENHET = "999263550";
-  private final static String ORGNR_UNDERENHET_INGEN_TILGANG = "777777777";
-
+  
 
   @BeforeEach
   public void setUp() {
