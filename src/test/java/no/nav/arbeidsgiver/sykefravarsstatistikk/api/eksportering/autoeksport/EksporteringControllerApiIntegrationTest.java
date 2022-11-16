@@ -78,7 +78,7 @@ public class EksporteringControllerApiIntegrationTest extends SpringIntegrationT
 
   @LocalServerPort
   private String port;
-  
+
 
   @BeforeEach
   public void setUp() {

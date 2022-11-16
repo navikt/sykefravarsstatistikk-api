@@ -272,8 +272,8 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
   public void hentAgreggertStatistikk_kræsjerIkkeDersomMuligeDagsverkErZero()
       throws Exception {
     opprettStatistikkForVirksomhet(jdbcTemplate, ORGNR_UNDERENHET,
-        SISTE_PUBLISERTE_KVARTAL_MOCK.getÅrstall(),
-        SISTE_PUBLISERTE_KVARTAL_MOCK.getKvartal(),
+        SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
+        SISTE_PUBLISERTE_KVARTAL.getKvartal(),
         5,
         0,
         10);

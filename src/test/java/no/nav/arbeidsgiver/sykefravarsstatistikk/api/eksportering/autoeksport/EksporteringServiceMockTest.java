@@ -84,8 +84,6 @@ public class EksporteringServiceMockTest {
   ArgumentCaptor<SykefraværMedKategori> sektorSykefraværArgumentCaptor;
   @Captor
   ArgumentCaptor<SykefraværMedKategori> landSykefraværArgumentCaptor;
-  @Captor
-  ArgumentCaptor<List<StatistikkDto>> statistikkDtoListArgumentCaptor;
 
   @BeforeEach
   public void setUp() {
