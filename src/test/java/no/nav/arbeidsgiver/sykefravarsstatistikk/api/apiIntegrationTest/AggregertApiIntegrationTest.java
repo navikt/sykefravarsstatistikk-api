@@ -268,6 +268,24 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
         .containsExactly(BRANSJE.toString());
   }
 
+  @Test
+  public void hentAgreggertStatistikk_kræsjerIkkeDersomMuligeDagsverkErZero()
+      throws Exception {
+    opprettStatistikkForVirksomhet(jdbcTemplate, ORGNR_UNDERENHET,
+        SISTE_PUBLISERTE_KVARTAL_MOCK.getÅrstall(),
+        SISTE_PUBLISERTE_KVARTAL_MOCK.getKvartal(),
+        5,
+        0,
+        10);
+
+    HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET);
+    JsonNode responseBody = objectMapper.readTree(response.body());
+
+    assertThat(
+        responseBody.get("prosentSiste4KvartalerTotalt")
+            .findValuesAsText("statistikkategori")).isEmpty();
+  }
+
 
   @Test
   public void hentAgreggertStatistikk_viserNavnetTilBransjenEllerNæringenSomLabel()
