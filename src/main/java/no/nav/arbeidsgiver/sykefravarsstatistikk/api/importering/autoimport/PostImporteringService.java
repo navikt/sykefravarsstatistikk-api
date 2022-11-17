@@ -129,8 +129,12 @@ public class PostImporteringService {
 
     if (antallIkkeEksportertSykefaværsstatistikk > 0) {
       log.warn(
-          "Det finnes '{}' rader  som IKKE er ferdig eksportert. " +
-              "Skal ikke importerer på nytt (slett eksisterende data manuelt før ny import)",
+          "Det finnes '{}' rader som IKKE er ferdig eksportert (eksportert=false). " +
+              "Skal ikke importere en ny liste av virksomheter i 'eksport_per_kvartal' da det ligger "
+              + "fortsatt noen rader markert som ikke eksportert. "
+              + "Du kan enten kjøre ferdig siste eksport eller oppdatere manuelt gjenstående rader "
+              + "med 'eksportert=true' i tabell 'eksport_per_kvartal'. "
+              + "Etter det kan du kjøre denne prosessen (forbered neste eksport) på nytt. ",
           antallIkkeEksportertSykefaværsstatistikk
       );
       return 0;
