@@ -156,15 +156,16 @@ public class EksporteringPerStatistikkKategoriService {
     } else {
       antallIkkeEksportert.incrementAndGet();
     }
-    long tidsbrukt = System.nanoTime() - startProcess;
+
+    long tidsbruktIMillisekund = (System.nanoTime() - startProcess) / 1000000;
     log.info(format("Eksport av statistikk for kategori %s er ferdig. "
             + "Antall statistikk eksportert er: %d, "
             + "antall ikke eksportert er: %d. "
-            + "Tid for eksportering : %d",
+            + "Tid for eksportering (i millis): %d",
         Statistikkategori.LAND.name(),
         antallEksportert.get(),
         antallIkkeEksportert.get(),
-        tidsbrukt
+        tidsbruktIMillisekund
     ));
 
     return antallEksportert.get();
