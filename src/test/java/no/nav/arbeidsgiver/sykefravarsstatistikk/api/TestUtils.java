@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
@@ -281,6 +282,22 @@ public class TestUtils {
                 resultSet.getString("value_json"),
                 resultSet.getTimestamp("opprettet").toLocalDateTime()
             )
+    );
+  }
+
+  public static void opprettUtsendingHistorikk(
+      NamedParameterJdbcTemplate jdbcTemplate,
+      KafkaUtsendingHistorikkData kafkaUtsendingHistorikkData
+  ) {
+    MapSqlParameterSource parametre = new MapSqlParameterSource();
+    parametre.addValue("orgnr", kafkaUtsendingHistorikkData.orgnr);
+    parametre.addValue("key", kafkaUtsendingHistorikkData.key);
+    parametre.addValue("value", kafkaUtsendingHistorikkData.value);
+
+    jdbcTemplate.update(
+        "insert into kafka_utsending_historikk (orgnr, key_json, value_json) "
+            + "VALUES (:orgnr, :key, :value)",
+        parametre
     );
   }
 

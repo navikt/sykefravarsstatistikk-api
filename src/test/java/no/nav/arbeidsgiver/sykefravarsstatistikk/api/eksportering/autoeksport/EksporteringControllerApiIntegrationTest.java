@@ -53,7 +53,7 @@ import org.springframework.web.context.WebApplicationContext;
     brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"}
 )
 
-@Disabled
+@Disabled // TODO: spiller dårlig sammen med KafkaServiceIntegrasjonTest (pga "adress already in use når EmbeddedKafkaBroker starter")
 public class EksporteringControllerApiIntegrationTest extends SpringIntegrationTestbase {
 
   @Autowired

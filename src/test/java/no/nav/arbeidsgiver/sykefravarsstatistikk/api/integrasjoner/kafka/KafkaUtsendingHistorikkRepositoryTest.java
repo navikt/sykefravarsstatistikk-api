@@ -18,7 +18,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static java.time.LocalDateTime.now;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.hentAlleKafkaUtsendingHistorikkData;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettUtsendingHistorikk;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllEksportDataFraDatabase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -48,7 +50,7 @@ class KafkaUtsendingHistorikkRepositoryTest {
 
     @Test
     void opprettHistorikk__oppretter_historikk() {
-        LocalDateTime startTime = LocalDateTime.now();
+        LocalDateTime startTime = now();
 
         kafkaUtsendingHistorikkRepository.opprettHistorikk(
                 "987654321",
@@ -64,5 +66,25 @@ class KafkaUtsendingHistorikkRepositoryTest {
         assertEquals("{\"orgnr\": \"987654321\"}", kafkaUtsendingHistorikkData.key);
         assertEquals("{\"statistikk\": \"....\"}", kafkaUtsendingHistorikkData.value);
         assertTrue(kafkaUtsendingHistorikkData.opprettet.isAfter(startTime));
+    }
+
+    @Test
+    void slettHistorikk__sletter_historikk() {
+        opprettUtsendingHistorikk(
+            jdbcTemplate,
+            new KafkaUtsendingHistorikkData("988777999", "key", "value", now())
+        );
+        opprettUtsendingHistorikk(
+            jdbcTemplate,
+            new KafkaUtsendingHistorikkData("988999777", "key", "value", now())
+        );
+        assertEquals(2, hentAlleKafkaUtsendingHistorikkData(jdbcTemplate).size());
+
+        kafkaUtsendingHistorikkRepository.slettHistorikk();
+
+        List<KafkaUtsendingHistorikkData> results = hentAlleKafkaUtsendingHistorikkData(
+            jdbcTemplate
+        );
+        assertEquals(0, results.size());
     }
 }
