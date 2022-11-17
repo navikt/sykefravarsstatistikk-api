@@ -75,10 +75,11 @@ public class ImporteringController {
     @PostMapping("/forberedNesteEksport")
     public ResponseEntity<HttpStatus> forberedNesteEksport(
             @RequestParam int årstall,
-            @RequestParam int kvartal
+            @RequestParam int kvartal,
+            @RequestParam(required = false) boolean slettHistorikk
     ) {
         ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
-        int antallOpprettet = postImporteringService.forberedNesteEksport(årstallOgKvartal);
+        int antallOpprettet = postImporteringService.forberedNesteEksport(årstallOgKvartal, slettHistorikk);
 
         if (antallOpprettet >= 0) {
             return ResponseEntity.ok(HttpStatus.CREATED);

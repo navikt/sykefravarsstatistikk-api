@@ -80,11 +80,12 @@ class KafkaUtsendingHistorikkRepositoryTest {
         );
         assertEquals(2, hentAlleKafkaUtsendingHistorikkData(jdbcTemplate).size());
 
-        kafkaUtsendingHistorikkRepository.slettHistorikk();
+        int antallSlettet = kafkaUtsendingHistorikkRepository.slettHistorikk();
 
         List<KafkaUtsendingHistorikkData> results = hentAlleKafkaUtsendingHistorikkData(
             jdbcTemplate
         );
         assertEquals(0, results.size());
+        assertEquals(2, antallSlettet);
     }
 }

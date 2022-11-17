@@ -70,7 +70,7 @@ public class PostImporteringService {
       );
     }
 
-    int antallRaderTilNesteEksportering = forberedNesteEksport(årstallOgKvartal);
+    int antallRaderTilNesteEksportering = forberedNesteEksport(årstallOgKvartal, true);
 
     log.info(
         "Forberedelse til neste eksport er ferdig, med '{}' rader klare til neste eksportering " +
@@ -107,7 +107,10 @@ public class PostImporteringService {
   }
 
   // Kall fra Controller / backdoor
-  protected int forberedNesteEksport(ÅrstallOgKvartal årstallOgKvartal) {
+  protected int forberedNesteEksport(
+      ÅrstallOgKvartal årstallOgKvartal,
+      boolean slettHistorikk
+  ) {
     if (!erEksporteringAktivert) {
       log.info(
           "Eksportering er ikke aktivert. " +
@@ -119,11 +122,17 @@ public class PostImporteringService {
     }
 
     log.info("Forberede neste eksport: prosessen starter.");
-    int antallRaderSlettetIUtsendingHistorikk = kafkaUtsendingHistorikkRepository.slettHistorikk();
-    log.info("Forberede neste eksport: utsending historikk (working table) har blitt nullstilt. "
-            + "{} rader har blitt slettet",
-        antallRaderSlettetIUtsendingHistorikk
-    );
+    if (slettHistorikk) {
+      long slettUtsendingHistorikkStart = System.currentTimeMillis();
+      int antallRaderSlettetIUtsendingHistorikk = kafkaUtsendingHistorikkRepository.slettHistorikk();
+      log.info("Forberede neste eksport: utsending historikk (working table) har blitt nullstilt. "
+              + "{} rader har blitt slettet. Tok {} millis. ",
+          antallRaderSlettetIUtsendingHistorikk,
+          System.currentTimeMillis() - slettUtsendingHistorikkStart
+      );
+    } else {
+      log.info("Forberede neste eksport: skal ikke slette historikk.");
+    }
 
     int antallIkkeEksportertSykefaværsstatistikk = eksporteringRepository.hentAntallIkkeFerdigEksportert();
 
