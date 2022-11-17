@@ -17,6 +17,16 @@ import org.junit.jupiter.api.Test;
 public class SykefraværForEttKvartalTest {
 
   @Test
+  public void sykefraværprosent__uten_data_er_ikke_maskert() {
+    assertThat(new SykefraværForEttKvartal(
+        etÅrstallOgKvartal(),
+        null,
+        null,
+        0
+    ).isErMaskert()).isFalse();
+  }
+
+  @Test
   public void sykefraværprosent__equals_test() {
     SykefraværForEttKvartal sykefravær = new SykefraværForEttKvartal(
         etÅrstallOgKvartal(),

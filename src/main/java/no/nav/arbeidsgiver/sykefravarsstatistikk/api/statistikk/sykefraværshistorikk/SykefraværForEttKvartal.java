@@ -26,7 +26,7 @@ public class SykefraværForEttKvartal extends MaskerbartSykefravær implements
         tapteDagsverk,
         muligeDagsverk,
         antallPersoner,
-        årstallOgKvartal != null
+        årstallOgKvartal != null && tapteDagsverk != null && muligeDagsverk != null
     );
     this.årstallOgKvartal = årstallOgKvartal;
     this.antallPersoner = antallPersoner;
@@ -74,7 +74,8 @@ public class SykefraværForEttKvartal extends MaskerbartSykefravær implements
     boolean erTapteDagsverkLike = this.getTapteDagsverk() == null ?
         that.getTapteDagsverk() == null : this.getTapteDagsverk().equals(that.getTapteDagsverk());
     boolean erMuligeDagsverkLike = this.getMuligeDagsverk() == null ?
-        that.getMuligeDagsverk() == null : this.getMuligeDagsverk().equals(that.getMuligeDagsverk());
+        that.getMuligeDagsverk() == null
+        : this.getMuligeDagsverk().equals(that.getMuligeDagsverk());
 
     return (
         erÅrstallOgKvartalLike
