@@ -120,6 +120,14 @@ public class KafkaService {
             res.getProducerRecord().key(),
             res.getRecordMetadata().offset()
         );
+
+        if (Statistikkategori.VIRKSOMHET == statistikkategori) {
+          kafkaUtsendingHistorikkRepository.opprettHistorikk(
+              identifikator, // for Statistikkategori.VIRKSOMHET er identifikator et orgnr
+              keyAsJsonString,
+              dataAsJsonString
+          );
+        }
       }
     });
 

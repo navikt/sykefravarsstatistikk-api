@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.KafkaUtsendingHistorikkData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.hentAlleKafkaUtsendingHistorikkData;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllEksportDataFraDatabase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -54,47 +56,13 @@ class KafkaUtsendingHistorikkRepositoryTest {
                 "{\"statistikk\": \"....\"}"
         );
 
-        List<KafkaUtsendingHistorikkData> results = hentAlleKafkaUtsendingHistorikkData();
+        List<KafkaUtsendingHistorikkData> results = hentAlleKafkaUtsendingHistorikkData(
+            jdbcTemplate
+        );
         KafkaUtsendingHistorikkData kafkaUtsendingHistorikkData = results.get(0);
         assertEquals("987654321", kafkaUtsendingHistorikkData.orgnr);
         assertEquals("{\"orgnr\": \"987654321\"}", kafkaUtsendingHistorikkData.key);
         assertEquals("{\"statistikk\": \"....\"}", kafkaUtsendingHistorikkData.value);
         assertTrue(kafkaUtsendingHistorikkData.opprettet.isAfter(startTime));
     }
-
-
-    private List<KafkaUtsendingHistorikkData> hentAlleKafkaUtsendingHistorikkData() {
-        return jdbcTemplate.query(
-                "select orgnr, key_json, value_json, opprettet " +
-                        "from kafka_utsending_historikk ",
-                new MapSqlParameterSource(),
-                (resultSet, rowNum) ->
-                        new KafkaUtsendingHistorikkData(
-                                resultSet.getString("orgnr"),
-                                resultSet.getString("key_json"),
-                                resultSet.getString("value_json"),
-                                resultSet.getTimestamp("opprettet").toLocalDateTime()
-                        )
-        );
-    }
-
-    class KafkaUtsendingHistorikkData {
-        String orgnr;
-        String key;
-        String value;
-        LocalDateTime opprettet;
-
-        public KafkaUtsendingHistorikkData(
-                String orgnr,
-                String key,
-                String value,
-                LocalDateTime opprettet
-        ) {
-            this.orgnr = orgnr;
-            this.key = key;
-            this.value = value;
-            this.opprettet = opprettet;
-        }
-    }
-
 }

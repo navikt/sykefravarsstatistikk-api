@@ -267,6 +267,23 @@ public class TestUtils {
             Timestamp.valueOf("2022-06-02 10:00:00.0"), SISTE_PUBLISERTE_KVARTAL));
   }
 
+  public static List<KafkaUtsendingHistorikkData> hentAlleKafkaUtsendingHistorikkData(
+      NamedParameterJdbcTemplate jdbcTemplate
+  ) {
+    return jdbcTemplate.query(
+        "select orgnr, key_json, value_json, opprettet " +
+            "from kafka_utsending_historikk ",
+        new MapSqlParameterSource(),
+        (resultSet, rowNum) ->
+            new KafkaUtsendingHistorikkData(
+                resultSet.getString("orgnr"),
+                resultSet.getString("key_json"),
+                resultSet.getString("value_json"),
+                resultSet.getTimestamp("opprettet").toLocalDateTime()
+            )
+    );
+  }
+
   private static void skrivImporttidspunktTilDb(
       NamedParameterJdbcTemplate jdbcTemplate,
       ImporttidspunktDto importtidspunkt) {

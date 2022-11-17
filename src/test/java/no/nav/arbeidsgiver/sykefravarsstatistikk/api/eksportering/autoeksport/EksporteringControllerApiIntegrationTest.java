@@ -9,11 +9,11 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettSta
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForVirksomhet;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettTestVirksomhetMetaData;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.skrivSisteImporttidspunktTilDb;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllEksportDataFraDatabase;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAlleImporttidspunkt;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import common.SpringIntegrationTestbase;
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -84,6 +84,7 @@ public class EksporteringControllerApiIntegrationTest extends SpringIntegrationT
   public void setUp() {
     slettAllStatistikkFraDatabase(jdbcTemplate);
     slettAlleImporttidspunkt(jdbcTemplate);
+    slettAllEksportDataFraDatabase(jdbcTemplate);
     skrivSisteImporttidspunktTilDb(jdbcTemplate);
 
     consumerRecords = new LinkedBlockingQueue<>();
@@ -200,7 +201,8 @@ public class EksporteringControllerApiIntegrationTest extends SpringIntegrationT
   }
 
   @Test
-  public void start_eksport_for_virksomhet__skal_ikke_feile_dersom_virksomhet_har_ingen_statistikk() throws Exception {
+  public void start_eksport_for_virksomhet__skal_ikke_feile_dersom_virksomhet_har_ingen_statistikk()
+      throws Exception {
     opprettTestVirksomhetMetaData(
         jdbcTemplate,
         SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
