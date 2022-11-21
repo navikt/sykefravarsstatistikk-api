@@ -3,8 +3,11 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import lombok.Getter;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetMedGradering;
 
+@Getter
 public class SykefraværsstatistikkImporteringUtils {
 
   private final List<SykefraværsstatistikkVirksomhet> sykefraværsstatistikkVirksomhetsTestdata = Arrays.asList(
@@ -275,6 +278,10 @@ public class SykefraværsstatistikkImporteringUtils {
           BigDecimal.valueOf(108.990000), BigDecimal.valueOf(0.000000)),
       new SykefraværsstatistikkVirksomhet(2022, 1, "910562436", "X", "2", 496,
           BigDecimal.valueOf(0.000000), BigDecimal.valueOf(30725.212200))
+  );
+
+  private final List<SykefraværsstatistikkVirksomhetMedGradering> sykefraværsstatistikkVirksomhetMedVarighetTestdata = Arrays.asList(
+
   );
 
   List<SykefraværsstatistikkVirksomhet> getSykefraværsstatistikkVirksomhetsTestdata() {
