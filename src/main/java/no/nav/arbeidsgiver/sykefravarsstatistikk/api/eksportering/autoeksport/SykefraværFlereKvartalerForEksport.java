@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
-import io.vavr.control.Either;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
@@ -9,7 +8,6 @@ import lombok.Getter;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.StatistikkUtils;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.StatistikkException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 
 @Getter
@@ -29,25 +27,16 @@ public class SykefraværFlereKvartalerForEksport {
         .allMatch(v -> v.getAntallPersoner()
             < Konstanter.MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER);
 
-    if (!erMaskert) {
-      tapteDagsverk = umaskertSykefravær.size() != 0 ? umaskertSykefravær.stream()
+    if (!erMaskert && umaskertSykefravær.size() != 0) {
+      tapteDagsverk = umaskertSykefravær.stream()
           .map(UmaskertSykefraværForEttKvartal::getDagsverkTeller)
-          .reduce(BigDecimal.ZERO, BigDecimal::add) : null;
-      muligeDagsverk = umaskertSykefravær.size() != 0 ? umaskertSykefravær.stream()
+          .reduce(BigDecimal.ZERO, BigDecimal::add);
+      muligeDagsverk = umaskertSykefravær.stream()
           .map(UmaskertSykefraværForEttKvartal::getDagsverkNevner)
-          .reduce(BigDecimal.ZERO, BigDecimal::add) : null;
+          .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-      if (umaskertSykefravær.size() != 0) {
-        Either<StatistikkException, BigDecimal> prosentEither = StatistikkUtils.kalkulerSykefraværsprosent(
-            this.tapteDagsverk, this.muligeDagsverk);
-        if (prosentEither.isLeft()) {
-          prosent = null;
-        } else {
-          prosent = prosentEither.get();
-        }
-      } else {
-        prosent = null;
-      }
+      prosent = StatistikkUtils.kalkulerSykefraværsprosent(
+          this.tapteDagsverk, this.muligeDagsverk).getOrNull();
     } else {
       tapteDagsverk = null;
       muligeDagsverk = null;

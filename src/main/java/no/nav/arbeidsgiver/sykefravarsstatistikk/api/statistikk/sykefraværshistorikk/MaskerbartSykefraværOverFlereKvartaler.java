@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
-import io.vavr.control.Either;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -28,13 +27,9 @@ public abstract class MaskerbartSykefraværOverFlereKvartaler {
             sykefraværForEttKvartalList.stream().allMatch(MaskerbartSykefravær::isErMaskert);
 
     if (!erMaskert && harSykefraværData) {
-      Either<StatistikkException, BigDecimal> prosentEither = StatistikkUtils.kalkulerSykefraværsprosent(
-          tapteDagsverk, muligeDagsverk);
-      if (prosentEither.isLeft()) {
-        prosent = null;
-      } else {
-        prosent = prosentEither.get();
-      }
+      prosent = StatistikkUtils.kalkulerSykefraværsprosent(
+          tapteDagsverk, muligeDagsverk).getOrNull();
+
       this.tapteDagsverk = tapteDagsverk.setScale(1, RoundingMode.HALF_UP);
       this.muligeDagsverk = muligeDagsverk.setScale(1, RoundingMode.HALF_UP);
     } else {
