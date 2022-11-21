@@ -133,7 +133,7 @@ class SumAvSykefraværOverFlereKvartaler {
         return new SumAvSykefraværOverFlereKvartaler(
                 this.muligeDagsverk.add(other.muligeDagsverk),
                 this.tapteDagsverk.add(other.tapteDagsverk),
-                this.antallPersoner + other.antallPersoner,
+                Math.max(this.antallPersoner, other.antallPersoner),
                 Stream.concat(kvartaler.stream(), other.kvartaler.stream()).distinct().collect(Collectors.toList()),
                 Stream.concat(
                         umaskertSykefraværList.stream(),
