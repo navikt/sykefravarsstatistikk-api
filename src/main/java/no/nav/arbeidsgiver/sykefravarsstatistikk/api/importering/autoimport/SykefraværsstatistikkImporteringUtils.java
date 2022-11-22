@@ -280,7 +280,7 @@ public class SykefraværsstatistikkImporteringUtils {
           BigDecimal.valueOf(0.000000), BigDecimal.valueOf(30725.212200))
   );
 
-  private final List<SykefraværsstatistikkVirksomhetMedGradering> sykefraværsstatistikkVirksomhetMedVarighetTestdata = Arrays.asList(
+  private final List<SykefraværsstatistikkVirksomhetMedGradering> sykefraværsstatistikkVirksomhetMedGraderingTestdata = Arrays.asList(
       new SykefraværsstatistikkVirksomhetMedGradering(2022, 1, "910562452", "88", "88911", "2", 5,
           new BigDecimal(176.120111), 30, 39, new BigDecimal(403.529011),
           new BigDecimal(2200.347300)),

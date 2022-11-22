@@ -194,7 +194,7 @@ public class SykefraværsstatistikkImporteringService {
       importSykefraværsstatistikkNæring5siffer(årstallOgKvartal);
     }
 
-    // returnerer fiktiv testdata for virksomheter i dev
+    // importerer fiktiv testdata for virksomheter i dev
     if (importeringsobjekter.contains(Importeringsobjekt.VIRKSOMHET)) {
       if (Arrays.asList(environment.getActiveProfiles()).contains("dev")
           || Arrays.asList(environment.getActiveProfiles()).contains("mvc-test")) {
@@ -208,8 +208,14 @@ public class SykefraværsstatistikkImporteringService {
       importSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal);
     }
 
+    // importerer fiktiv testdata for virksomheter i dev
     if (importeringsobjekter.contains(Importeringsobjekt.GRADERING)) {
-      importSykefraværsstatistikkMedGradering(årstallOgKvartal);
+      if (Arrays.asList(environment.getActiveProfiles()).contains("dev")
+          || Arrays.asList(environment.getActiveProfiles()).contains("mvc-test")) {
+        importerGenerertSykefraværsstatistikkMedGraderingTestmiljøer(årstallOgKvartal);
+      } else {
+        importSykefraværsstatistikkMedGradering(årstallOgKvartal);
+      }
     }
   }
 
@@ -318,7 +324,7 @@ public class SykefraværsstatistikkImporteringService {
             sykefraværsstatistikkVirksomhet,
             årstallOgKvartal
         );
-    loggResultat(årstallOgKvartal, resultat, "virksomhet");
+    loggResultat(årstallOgKvartal, resultat, "virksomhet (testdata)");
 
     return resultat;
   }
@@ -337,6 +343,23 @@ public class SykefraværsstatistikkImporteringService {
             årstallOgKvartal
         );
     loggResultat(årstallOgKvartal, resultat, "virksomhet gradert sykemelding");
+
+    return resultat;
+  }
+
+  private SlettOgOpprettResultat importerGenerertSykefraværsstatistikkMedGraderingTestmiljøer(
+      ÅrstallOgKvartal årstallOgKvartal
+  ) {
+    SykefraværsstatistikkImporteringUtils sykefraværsstatistikkImporteringUtils = new SykefraværsstatistikkImporteringUtils();
+    List<SykefraværsstatistikkVirksomhetMedGradering>
+        sykefraværsstatistikkVirksomhetMedGradering = sykefraværsstatistikkImporteringUtils.getSykefraværsstatistikkVirksomhetMedGraderingTestdata();
+
+    SlettOgOpprettResultat resultat =
+        statistikkRepository.importSykefraværsstatistikkVirksomhetMedGradering(
+            sykefraværsstatistikkVirksomhetMedGradering,
+            årstallOgKvartal
+        );
+    loggResultat(årstallOgKvartal, resultat, "virksomhet gradert sykemelding (testdata)");
 
     return resultat;
   }
