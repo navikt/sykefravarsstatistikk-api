@@ -14,7 +14,7 @@ public class EitherUtils {
   public static <L, R> List<R> getRightsAndLogLefts(Either<L, R>... leftsAndRights) {
     Stream.of(leftsAndRights)
         .filter(Either::isLeft)
-        .forEach(feil -> log.warn("Følgende feilmeldinger ble registrert: " + feil.getLeft()));
+        .forEach(feil -> log.warn("Følgende avvik ble registrert: " + feil.getLeft()));
 
     return Stream.of(leftsAndRights)
         .filter(Either::isRight)

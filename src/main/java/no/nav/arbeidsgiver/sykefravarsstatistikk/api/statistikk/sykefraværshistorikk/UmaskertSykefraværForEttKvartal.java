@@ -65,18 +65,16 @@ public class UmaskertSykefraværForEttKvartal implements
     }
 
 
-    public UmaskertSykefraværForEttKvartal add(
-            UmaskertSykefraværForEttKvartal sykefravær
-    ) {
-        if (!sykefravær.getÅrstallOgKvartal().equals(årstallOgKvartal)) {
+    public UmaskertSykefraværForEttKvartal add(UmaskertSykefraværForEttKvartal other) {
+        if (!other.getÅrstallOgKvartal().equals(årstallOgKvartal)) {
             throw new IllegalArgumentException(
                     "Kan ikke summere kvartalsvis sykefravær med forskjellige kvartaler");
         }
         return new UmaskertSykefraværForEttKvartal(
                 årstallOgKvartal,
-                dagsverkTeller.add(sykefravær.getDagsverkTeller()),
-                dagsverkNevner.add(sykefravær.getDagsverkNevner()),
-                antallPersoner + sykefravær.getAntallPersoner()
+                dagsverkTeller.add(other.getDagsverkTeller()),
+                dagsverkNevner.add(other.getDagsverkNevner()),
+                antallPersoner + other.getAntallPersoner()
         );
     }
 

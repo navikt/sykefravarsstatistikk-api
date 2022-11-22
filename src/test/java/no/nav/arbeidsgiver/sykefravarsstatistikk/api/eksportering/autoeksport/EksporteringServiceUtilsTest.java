@@ -392,7 +392,7 @@ public class EksporteringServiceUtilsTest {
               .statistikkategori(Statistikkategori.NÆRING)
               .label("Industri")
               .verdi("2.0")
-              .antallPersonerIBeregningen(624)
+              .antallPersonerIBeregningen(156)
               .kvartalerIBeregningen(
                     List.of(
                           SISTE_PUBLISERTE_KVARTAL_MOCK,
@@ -421,7 +421,7 @@ public class EksporteringServiceUtilsTest {
               .statistikkategori(Statistikkategori.NÆRING)
               .label("Industri")
               .verdi("2.0")
-              .antallPersonerIBeregningen(312)
+              .antallPersonerIBeregningen(156)
               .kvartalerIBeregningen(
                     List.of(
                           SISTE_PUBLISERTE_KVARTAL_MOCK,
@@ -489,7 +489,7 @@ public class EksporteringServiceUtilsTest {
               .statistikkategori(Statistikkategori.BRANSJE)
               .label("Sykehus")
               .verdi("2.3")
-              .antallPersonerIBeregningen(1100)
+              .antallPersonerIBeregningen(200)
               .kvartalerIBeregningen(
                     List.of(
                           SISTE_PUBLISERTE_KVARTAL_MOCK,
@@ -518,7 +518,7 @@ public class EksporteringServiceUtilsTest {
               .statistikkategori(Statistikkategori.BRANSJE)
               .label("Sykehus")
               .verdi("1.6")
-              .antallPersonerIBeregningen(300)
+              .antallPersonerIBeregningen(200)
               .kvartalerIBeregningen(
                     List.of(
                           SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(3),
@@ -601,7 +601,7 @@ public class EksporteringServiceUtilsTest {
               .statistikkategori(Statistikkategori.VIRKSOMHET)
               .label("Virksomhet 1")
               .verdi("1.5")
-              .antallPersonerIBeregningen(40)
+              .antallPersonerIBeregningen(10)
               .kvartalerIBeregningen(Siste4PubliserteKvartaler)
               .build());
     }

@@ -85,10 +85,10 @@ class AggregeringskalkulatorTest {
 
 
   private final List<UmaskertSykefraværForEttKvartal> synkendeSykefravær = List.of(
-      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(0), 2, 100, 1),
-      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(1), 4, 100, 2),
-      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(2), 6, 100, 3),
-      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(3), 8, 100, 4),
-      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(4), 10, 100, 5)
+      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(0), 2, 100, 10),
+      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(1), 4, 100, 10),
+      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(2), 6, 100, 10),
+      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(3), 8, 100, 10),
+      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(4), 10, 100, 10)
   );
 }
