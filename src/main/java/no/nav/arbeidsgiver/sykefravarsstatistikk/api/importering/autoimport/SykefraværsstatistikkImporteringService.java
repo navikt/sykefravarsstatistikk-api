@@ -194,12 +194,14 @@ public class SykefraværsstatistikkImporteringService {
       importSykefraværsstatistikkNæring5siffer(årstallOgKvartal);
     }
 
+    // returnerer fiktiv testdata for virksomheter i dev
     if (importeringsobjekter.contains(Importeringsobjekt.VIRKSOMHET)) {
       if (Arrays.asList(environment.getActiveProfiles()).contains("dev")
           || Arrays.asList(environment.getActiveProfiles()).contains("mvc-test")) {
         importerGenerertSykefraværsstatistikkVirksomhetTestmiljøer(årstallOgKvartal);
+      } else {
+        importSykefraværsstatistikkVirksomhet(årstallOgKvartal);
       }
-      importSykefraværsstatistikkVirksomhet(årstallOgKvartal);
     }
 
     if (importeringsobjekter.contains(Importeringsobjekt.NÆRING_MED_VARIGHET)) {
