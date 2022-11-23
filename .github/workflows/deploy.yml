@@ -30,7 +30,7 @@ jobs:
   build-and-push-image:
     name: Build and push Docker image
     needs: test
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/legge-til-siste-4-kvartaler-i-eksport'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/maskering'
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -61,7 +61,7 @@ jobs:
   deploy-to-dev:
     name: Deploy to dev
     needs: build-and-push-image
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/legge-til-siste-4-kvartaler-i-eksport'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/maskering'
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
