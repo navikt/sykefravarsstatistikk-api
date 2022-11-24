@@ -63,9 +63,12 @@ public class SykefraværsstatistikkImporteringService {
             Statistikkilde.VIRKSOMHET)
     );
 
-    log.info("env profile sier: ", Arrays.asList(environment.getActiveProfiles()));
-    if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
-      log.info("Miljø er dev, genererer testdata for virksomheter.");
+    if (Arrays.asList(environment.getActiveProfiles()).contains("dev")
+        || Arrays.asList(environment.getActiveProfiles()).contains("mvc-test")) {
+      log.info(
+          "Miljø er dev eller test, genererer testdata for virksomheter. Dette skal ikke kjøre i prod!");
+    } else {
+      log.info("Miljø er ikke dev. Dette skal kjøre i prod!");
     }
 
     List<ÅrstallOgKvartal> årstallOgKvartalForDvh = Arrays.asList(
@@ -194,11 +197,12 @@ public class SykefraværsstatistikkImporteringService {
       importSykefraværsstatistikkNæring5siffer(årstallOgKvartal);
     }
 
-    // importerer fiktiv testdata for virksomheter i dev
+    // importerer fiktiv testdata for virksomheter i dev og test
     if (importeringsobjekter.contains(Importeringsobjekt.VIRKSOMHET)) {
       if (Arrays.asList(environment.getActiveProfiles()).contains("dev")
           || Arrays.asList(environment.getActiveProfiles()).contains("mvc-test")) {
-        importerGenerertSykefraværsstatistikkVirksomhetTestmiljøer(årstallOgKvartal);
+        //importerGenerertSykefraværsstatistikkVirksomhetTestmiljøer(årstallOgKvartal);
+        importSykefraværsstatistikkVirksomhet(årstallOgKvartal);
       } else {
         importSykefraværsstatistikkVirksomhet(årstallOgKvartal);
       }
@@ -208,11 +212,12 @@ public class SykefraværsstatistikkImporteringService {
       importSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal);
     }
 
-    // importerer fiktiv testdata for virksomheter i dev
+    // importerer fiktiv testdata for virksomheter i dev og test
     if (importeringsobjekter.contains(Importeringsobjekt.GRADERING)) {
       if (Arrays.asList(environment.getActiveProfiles()).contains("dev")
           || Arrays.asList(environment.getActiveProfiles()).contains("mvc-test")) {
-        importerGenerertSykefraværsstatistikkMedGraderingTestmiljøer(årstallOgKvartal);
+        //importerGenerertSykefraværsstatistikkMedGraderingTestmiljøer(årstallOgKvartal);
+        importSykefraværsstatistikkMedGradering(årstallOgKvartal);
       } else {
         importSykefraværsstatistikkMedGradering(årstallOgKvartal);
       }

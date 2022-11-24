@@ -38,5 +38,4 @@ public class ImporteringScheduler {
     importeringService.importerHvisDetFinnesNyStatistikk();
 
   }
-
 }
