@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,7 +26,7 @@ public class SykefraværsstatistikkTilEksporteringRepository {
 
   public SykefraværsstatistikkTilEksporteringRepository(
       @Qualifier("sykefravarsstatistikkJdbcTemplate")
-      NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+          NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
     this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
   }
 
@@ -170,11 +171,16 @@ public class SykefraværsstatistikkTilEksporteringRepository {
 
   // Utilities
   @NotNull
-  private static String getWhereClause(ÅrstallOgKvartal fraÅrstallOgKvartal,
-      ÅrstallOgKvartal tilÅrstallOgKvartal) {
+  private static String getWhereClause(
+      ÅrstallOgKvartal fraÅrstallOgKvartal,
+      ÅrstallOgKvartal tilÅrstallOgKvartal
+  ) {
+    // Alltid sjekk input før verdi skal til SQL
+    sjekkÅrstallOgKvartal(fraÅrstallOgKvartal, tilÅrstallOgKvartal);
+
     List<ÅrstallOgKvartal> årstallOgKvartalListe = ÅrstallOgKvartal.range(fraÅrstallOgKvartal,
         tilÅrstallOgKvartal);
-    String whereClause = årstallOgKvartalListe
+    return årstallOgKvartalListe
         .stream()
         .map(årstallOgKvartal -> String.format(
             "(arstall = %d and kvartal = %d) ",
@@ -182,7 +188,22 @@ public class SykefraværsstatistikkTilEksporteringRepository {
             årstallOgKvartal.getKvartal()
         ))
         .collect(Collectors.joining("or "));
-    return whereClause;
+  }
+
+  private static void sjekkÅrstallOgKvartal(ÅrstallOgKvartal... årstallOgKvartalListe) {
+    Arrays.stream(årstallOgKvartalListe).forEach(årstallOgKvartal -> {
+      if (årstallOgKvartal.getÅrstall() < 2010 || årstallOgKvartal.getÅrstall() > 2100) {
+        throw new IllegalArgumentException(
+            String.format("Årstall skal være mellom 2010 og 2100. Fikk '%d'",
+                årstallOgKvartal.getÅrstall()));
+      }
+
+      if (årstallOgKvartal.getKvartal() < 1 || årstallOgKvartal.getKvartal() > 4) {
+        throw new IllegalArgumentException(
+            String.format("Kvartal skal være mellom 1 og 4. Fikk '%d'",
+                årstallOgKvartal.getKvartal()));
+      }
+    });
   }
 
   private SykefraværsstatistikkLand mapTilSykefraværsstatistikkLand(ResultSet rs)
