@@ -169,7 +169,6 @@ public class SykefraværsstatistikkTilEksporteringRepository {
 
 
   // Utilities
-  // TODO: gjør dette SQL injection proof ved å bruke MapSqlParameterSource().addValue() i stedet
   @NotNull
   private static String getWhereClause(ÅrstallOgKvartal fraÅrstallOgKvartal,
       ÅrstallOgKvartal tilÅrstallOgKvartal) {
