@@ -30,7 +30,7 @@ jobs:
   build-and-push-image:
     name: Build and push Docker image
     needs: test
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/divide_by_zero_fix'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/legge-til-siste-4-kvartaler-i-eksport'
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -113,3 +113,31 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-fss
           RESOURCE: nais/alerts-prod.yaml
+
+  deployTopicsToDev:
+    name: "Deploy topics to dev"
+    runs-on: "ubuntu-latest"
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/legge-til-siste-4-kvartaler-i-eksport'
+    steps:
+      - name: "Checkout code"
+        uses: "actions/checkout@v3"
+      - name: "Deploy topics to dev-gcp"
+        uses: "nais/deploy/actions/deploy@master"
+        env:
+          APIKEY: "${{ secrets.NAIS_DEPLOY_APIKEY }}"
+          CLUSTER: "dev-gcp"
+          RESOURCE: "nais/topics/topic-arbeidsgiver-sykefravaer-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-dev.yaml"
+
+  deployTopicsToProd:
+    name: "Deploy topics to prod"
+    runs-on: "ubuntu-latest"
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: "Checkout code"
+        uses: "actions/checkout@v3"
+      - name: "Deploy topics to prod-gcp"
+        uses: "nais/deploy/actions/deploy@master"
+        env:
+          APIKEY: "${{ secrets.NAIS_DEPLOY_APIKEY }}"
+          CLUSTER: "prod-gcp"
+          RESOURCE: "nais/topics/topic-arbeidsgiver-sykefravaer-prod.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-prod.yaml"

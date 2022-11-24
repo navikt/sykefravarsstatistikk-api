@@ -4,6 +4,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.SykefraværsstatistikkLocalTestApplication;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaStatistikkKategoriTopicValue;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaTopicValue;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværOverFlereKvartaler;
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -23,13 +29,19 @@ import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2019_3;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2019_4;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2020_1;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2020_2;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.assertKafkaStatistikkKategoriTopicValueEquals;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.assertKafkaTopicValueEquals;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.getKafkaTopicValueAsJsonString;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.landSykefravær;
@@ -48,7 +60,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @EnableMockOAuth2Server
 @EmbeddedKafka(
         controlledShutdown = true,
-        topics = {"arbeidsgiver.sykefravarsstatistikk-v1"},
+        topics = {"arbeidsgiver.sykefravarsstatistikk-v1", "arbeidsgiver.sykefravarsstatistikk-land-v1"},
         brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"}
 )
 public class KafkaServiceIntegrasjonTest {
@@ -58,7 +70,10 @@ public class KafkaServiceIntegrasjonTest {
     @Autowired
     private EmbeddedKafkaBroker embeddedKafkaBroker;
 
-    private static String TOPIC_NAME = "arbeidsgiver.sykefravarsstatistikk-v1";
+    private static String[] TOPIC_NAME = {
+            "arbeidsgiver.sykefravarsstatistikk-v1",
+            "arbeidsgiver.sykefravarsstatistikk-land-v1"
+    };
     private KafkaMessageListenerContainer<String, String> container;
     private BlockingQueue<ConsumerRecord<String, String>> consumerRecords;
     private final static ObjectMapper objectMapper = new ObjectMapper();
@@ -97,7 +112,7 @@ public class KafkaServiceIntegrasjonTest {
     @Test
     public void send__sender_en_KafkaTopicValue_til__riktig_topic() throws Exception {
         container.start();
-        ContainerTestUtils.waitForAssignment(container, embeddedKafkaBroker.getPartitionsPerTopic());
+        ContainerTestUtils.waitForAssignment(container, 4);
 
         kafkaService.send(
                 __2020_2,
@@ -113,9 +128,78 @@ public class KafkaServiceIntegrasjonTest {
         assertNotNull(message);
         assertEquals("{\"orgnr\":\"987654321\",\"kvartal\":2,\"årstall\":2020}", message.key());
         objectMapper.registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));
+
         assertKafkaTopicValueEquals(
-                objectMapper.readValue(message.value(), KafkaTopicValue.class),
-                objectMapper.readValue(getKafkaTopicValueAsJsonString(), KafkaTopicValue.class)
+                objectMapper.readValue(getKafkaTopicValueAsJsonString(), KafkaTopicValue.class),
+                objectMapper.readValue(message.value(), KafkaTopicValue.class)
+        );
+    }
+
+    @Test
+    public void send_til_LAND_topic___sender_en_KafkaTopicValue_til__riktig_topic() throws Exception {
+        SykefraværOverFlereKvartaler sykefraværOverFlereKvartaler = new SykefraværOverFlereKvartaler(
+                List.of(__2020_2, __2020_1, __2019_4, __2019_3),
+                new BigDecimal(11000),
+                new BigDecimal(110000),
+                List.of(
+                        new SykefraværForEttKvartal(
+                                __2020_2,
+                                new BigDecimal(1100),
+                                new BigDecimal(11000),
+                                5
+                        ),
+                        new SykefraværForEttKvartal(
+                                __2020_1,
+                                new BigDecimal(2200),
+                                new BigDecimal(22000),
+                                5
+                        ),
+                        new SykefraværForEttKvartal(
+                                __2019_4,
+                                new BigDecimal(3300),
+                                new BigDecimal(33000),
+                                5
+                        ),
+                        new SykefraværForEttKvartal(
+                                __2019_3,
+                                new BigDecimal(4400),
+                                new BigDecimal(44000),
+                                5
+                        )
+                )
+        );
+
+        KafkaStatistikkKategoriTopicValue expectedTopicValue = new KafkaStatistikkKategoriTopicValue(
+                new SykefraværMedKategori(
+                        Statistikkategori.LAND,
+                        landSykefravær.getKode(),
+                        landSykefravær.getÅrstallOgKvartal(),
+                        landSykefravær.getTapteDagsverk(),
+                        landSykefravær.getMuligeDagsverk(),
+                        landSykefravær.getAntallPersoner()
+                ),
+                sykefraværOverFlereKvartaler
+        );
+
+        container.start();
+        ContainerTestUtils.waitForAssignment(container, 4);
+
+        kafkaService.sendTilStatistikkKategoriTopic(
+                __2020_2,
+                landSykefravær,
+                sykefraværOverFlereKvartaler
+        );
+
+        ConsumerRecord<String, String> message = consumerRecords.poll(10, TimeUnit.SECONDS);
+
+        assertNotNull(message);
+        assertEquals("{\"kategori\":\"LAND\",\"kode\":\"NO\",\"kvartal\":2,\"årstall\":2020}", message.key());
+        objectMapper.registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));
+        String value = message.value();
+        KafkaStatistikkKategoriTopicValue actual = objectMapper.readValue(value, KafkaStatistikkKategoriTopicValue.class);
+        assertKafkaStatistikkKategoriTopicValueEquals(
+                expectedTopicValue,
+                actual
         );
     }
 }

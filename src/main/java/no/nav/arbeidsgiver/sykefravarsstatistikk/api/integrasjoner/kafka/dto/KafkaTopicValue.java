@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
@@ -49,7 +49,6 @@ public class KafkaTopicValue {
         result = 31 * result + landSykefravær.hashCode();
         return result;
     }
-
 
     public VirksomhetSykefravær getVirksomhetSykefravær() { return virksomhetSykefravær; }
     public List<SykefraværMedKategori> getNæring5SifferSykefravær() { return næring5SifferSykefravær; }

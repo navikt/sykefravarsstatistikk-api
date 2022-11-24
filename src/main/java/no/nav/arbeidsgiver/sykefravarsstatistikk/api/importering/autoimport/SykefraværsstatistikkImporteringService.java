@@ -47,7 +47,7 @@ public class SykefraværsstatistikkImporteringService {
   }
 
 
-  public void importerHvisDetFinnesNyStatistikk() {
+  public Importeringstatus importerHvisDetFinnesNyStatistikk() {
     log.info("Er importering aktivert? {}", erImporteringAktivert);
 
     List<ÅrstallOgKvartal> årstallOgKvartalForSykefraværsstatistikk = Arrays.asList(
@@ -88,12 +88,12 @@ public class SykefraværsstatistikkImporteringService {
         log.info("Importerer ny statistikk");
         importerNyStatistikk(gjeldendeÅrstallOgKvartal);
         oppdaterPubliseringsstatus(gjeldendeÅrstallOgKvartal);
-      } else {
+      return Importeringstatus.IMPORTERT;} else {
         log.info("Statistikk er klar til importering men automatisk importering er ikke "
             + "aktivert");
-      }
+      return Importeringstatus.IKKE_AKTIVERT;}
     } else {
-      log.info("Importerer ikke ny statistikk");
+      log.info("Importerer ikke ny statistikk");return Importeringstatus.DATAFEIL;
     }
   }
 
