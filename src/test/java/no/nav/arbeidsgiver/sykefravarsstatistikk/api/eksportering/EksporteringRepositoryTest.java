@@ -26,6 +26,7 @@ import java.util.List;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_1;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_2;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_3;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettTestVirksomhetMetaData;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllEksportDataFraDatabase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -196,9 +197,9 @@ class EksporteringRepositoryTest {
     @Test
     void hentAntallIkkeEksportertRader__skal_retunere_riktig_tall() {
 
-        opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_1);
-        opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_2);
-        opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_3, true);
+        opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_1);
+        opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_2);
+        opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_3, true);
 
         int antallIkkeFerdigEksportert = eksporteringRepository.hentAntallIkkeFerdigEksportert();
         assertEquals(2, antallIkkeFerdigEksportert);
@@ -207,9 +208,9 @@ class EksporteringRepositoryTest {
     @Test
     void slettEksportertPerKvartal__skal_slette_alt() {
 
-        opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_1);
-        opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_2);
-        opprettTestVirksomhetMetaData(2020, 2, ORGNR_VIRKSOMHET_3, true);
+        opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_1);
+        opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_2);
+        opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_3, true);
 
         int antallSlettet = eksporteringRepository.slettEksportertPerKvartal();
         assertEquals(3, antallSlettet);
@@ -264,26 +265,6 @@ class EksporteringRepositoryTest {
                 .findFirst()
                 .get();
         assertEquals(orgnr, actual.orgnr.getVerdi());
-    }
-
-    private void opprettTestVirksomhetMetaData(int årstall, int kvartal, String orgnr) {
-        opprettTestVirksomhetMetaData(årstall, kvartal, orgnr, false);
-    }
-
-    private int opprettTestVirksomhetMetaData(int årstall, int kvartal, String orgnr, boolean eksportert) {
-        SqlParameterSource parametre =
-                new MapSqlParameterSource()
-                        .addValue("orgnr", orgnr)
-                        .addValue("årstall", årstall)
-                        .addValue("kvartal", kvartal)
-                        .addValue("eksportert", eksportert);
-        return jdbcTemplate.update(
-                "insert into eksport_per_kvartal " +
-                        "(orgnr, arstall, kvartal, eksportert) " +
-                        "values " +
-                        "(:orgnr, :årstall, :kvartal, :eksportert)",
-                parametre
-        );
     }
 
     private int createVirksomhetEksportPerKvartal(VirksomhetEksportPerKvartalMedDatoer virksomhet) {

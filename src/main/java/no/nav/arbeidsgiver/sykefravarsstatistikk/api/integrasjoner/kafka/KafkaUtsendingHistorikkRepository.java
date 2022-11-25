@@ -33,4 +33,11 @@ public class KafkaUtsendingHistorikkRepository {
         );
     }
 
+    public int slettHistorikk() {
+        int antallSlettet = namedParameterJdbcTemplate.update(
+            "delete from kafka_utsending_historikk ",
+            new HashMap<>()
+        );
+        return antallSlettet;
+    }
 }

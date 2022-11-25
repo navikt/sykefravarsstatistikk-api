@@ -22,7 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL_MOCK;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -66,13 +66,13 @@ public class SykefraværRepositoryJdbcTest {
         opprettStatistikkForLand(jdbcTemplate);
         List<UmaskertSykefraværForEttKvartal> resultat =
               sykefraværRepository.hentUmaskertSykefraværForNorge(
-                    SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1));
+                    SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1));
         assertThat(resultat.size()).isEqualTo(2);
 
         assertThat(resultat).containsExactlyInAnyOrderElementsOf(
               List.of(
-                    sykefraværForEtÅrstallOgKvartal(SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1).getÅrstall(), SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1).getKvartal(), 5),
-                    sykefraværForEtÅrstallOgKvartal(SISTE_PUBLISERTE_KVARTAL_MOCK.getÅrstall(), SISTE_PUBLISERTE_KVARTAL_MOCK.getKvartal(), 4)
+                    sykefraværForEtÅrstallOgKvartal(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getÅrstall(), SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getKvartal(), 5),
+                    sykefraværForEtÅrstallOgKvartal(SISTE_PUBLISERTE_KVARTAL.getÅrstall(), SISTE_PUBLISERTE_KVARTAL.getKvartal(), 4)
               )
         );
     }

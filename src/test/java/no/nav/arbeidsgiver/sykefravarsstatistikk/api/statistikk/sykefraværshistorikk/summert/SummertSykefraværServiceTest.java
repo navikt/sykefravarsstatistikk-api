@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils.assertBigDecimalIsEqual;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL_MOCK;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -136,7 +136,7 @@ public class SummertSykefraværServiceTest {
     );
 
     when(publiseringsdatoerService.hentSistePubliserteKvartal())
-        .thenReturn(SISTE_PUBLISERTE_KVARTAL_MOCK);
+        .thenReturn(SISTE_PUBLISERTE_KVARTAL);
     when(varighetRepository.hentSykefraværForEttKvartalMedVarighet(any(Bransje.class)))
         .thenReturn(sykefraværMed1Kvartal);
 

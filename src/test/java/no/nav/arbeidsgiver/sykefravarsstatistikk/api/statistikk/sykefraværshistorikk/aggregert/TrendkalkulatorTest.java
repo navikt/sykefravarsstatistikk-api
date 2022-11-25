@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL_MOCK;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
@@ -18,7 +18,7 @@ class TrendkalkulatorTest {
         List.of(
             umaskertSykefravær(new ÅrstallOgKvartal(2021, 2), 11, 1),
             umaskertSykefravær(new ÅrstallOgKvartal(2021, 1), 10, 3)
-        ), SISTE_PUBLISERTE_KVARTAL_MOCK)
+        ), SISTE_PUBLISERTE_KVARTAL)
         .kalkulerTrend()
         .getLeft())
         .isExactlyInstanceOf(UtilstrekkeligDataException.class);
@@ -27,13 +27,13 @@ class TrendkalkulatorTest {
 
   @Test
   void kalkulerTrend_returnererPositivTrend_dersomSykefraværetØker() {
-    ÅrstallOgKvartal k1 = SISTE_PUBLISERTE_KVARTAL_MOCK;
-    ÅrstallOgKvartal k2 = SISTE_PUBLISERTE_KVARTAL_MOCK.minusEttÅr();
+    ÅrstallOgKvartal k1 = SISTE_PUBLISERTE_KVARTAL;
+    ÅrstallOgKvartal k2 = SISTE_PUBLISERTE_KVARTAL.minusEttÅr();
     assertThat(new Trendkalkulator(
         List.of(
             umaskertSykefravær(k1, 3, 10),
             umaskertSykefravær(k2, 2, 10)
-        ), SISTE_PUBLISERTE_KVARTAL_MOCK)
+        ), SISTE_PUBLISERTE_KVARTAL)
         .kalkulerTrend()
         .get())
         .isEqualTo(
@@ -45,16 +45,16 @@ class TrendkalkulatorTest {
   void kalkulerTrend_returnereNegativTrend_dersomSykefraværetMinker() {
     List<UmaskertSykefraværForEttKvartal> kvartalstall =
         List.of(
-            umaskertSykefravær(SISTE_PUBLISERTE_KVARTAL_MOCK, 8, 1),
+            umaskertSykefravær(SISTE_PUBLISERTE_KVARTAL, 8, 1),
             umaskertSykefravær(new ÅrstallOgKvartal(2020, 2), 13, 2),
-            umaskertSykefravær(SISTE_PUBLISERTE_KVARTAL_MOCK.minusEttÅr(), 10, 3)
+            umaskertSykefravær(SISTE_PUBLISERTE_KVARTAL.minusEttÅr(), 10, 3)
         );
     Trend forventetTrend = new Trend(
         new BigDecimal("-2.0"),
         4,
-        List.of(SISTE_PUBLISERTE_KVARTAL_MOCK, SISTE_PUBLISERTE_KVARTAL_MOCK.minusEttÅr()));
+        List.of(SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusEttÅr()));
 
-    assertThat(new Trendkalkulator(kvartalstall, SISTE_PUBLISERTE_KVARTAL_MOCK).kalkulerTrend()
+    assertThat(new Trendkalkulator(kvartalstall, SISTE_PUBLISERTE_KVARTAL).kalkulerTrend()
         .get())
         .isEqualTo(forventetTrend);
   }
@@ -62,7 +62,7 @@ class TrendkalkulatorTest {
 
   @Test
   void kalkulerTrend_girUtrilstrekkeligDataException_vedTomtDatagrunnlag() {
-    assertThat(new Trendkalkulator(List.of(), SISTE_PUBLISERTE_KVARTAL_MOCK).kalkulerTrend()
+    assertThat(new Trendkalkulator(List.of(), SISTE_PUBLISERTE_KVARTAL).kalkulerTrend()
         .getLeft())
         .isExactlyInstanceOf(UtilstrekkeligDataException.class);
   }
