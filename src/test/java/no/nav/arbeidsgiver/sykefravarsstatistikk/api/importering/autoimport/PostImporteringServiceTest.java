@@ -9,6 +9,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMeta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner.Orgenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUtsendingHistorikkRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.GraderingRepository;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +39,8 @@ class PostImporteringServiceTest {
     private GraderingRepository graderingRepository;
     @Mock
     private EksporteringRepository eksporteringRepository;
+    @Mock
+    private KafkaUtsendingHistorikkRepository kafkaUtsendingHistorikkRepository;
 
     private PostImporteringService service;
     private ÅrstallOgKvartal __2020_4 = new ÅrstallOgKvartal(2020, 4);
@@ -49,6 +52,7 @@ class PostImporteringServiceTest {
                 virksomhetMetadataRepository,
                 graderingRepository,
                 eksporteringRepository,
+                kafkaUtsendingHistorikkRepository,
                 true,
                 true
         );

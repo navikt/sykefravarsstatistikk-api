@@ -124,6 +124,7 @@ public class SykefraværRepository {
         }
     }
 
+    // TODO: fungerer ikke hvis 'fra' er eldre enn sisteKvartal.minus(3)
     public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefraværForNorge(
             ÅrstallOgKvartal fra) {
         try {
