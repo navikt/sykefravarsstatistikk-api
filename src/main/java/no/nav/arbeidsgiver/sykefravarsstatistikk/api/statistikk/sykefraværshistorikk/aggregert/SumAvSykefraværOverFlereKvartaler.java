@@ -46,7 +46,7 @@ class SumAvSykefraværOverFlereKvartaler {
     BigDecimal muligeDagsverk;
     @Getter
     BigDecimal tapteDagsverk;
-    private int antallPersoner;
+    private int høyesteAntallPersonerIEtKvartal;
     private List<ÅrstallOgKvartal> kvartaler;
     private List<UmaskertSykefraværForEttKvartal> umaskertSykefraværList;
 
@@ -54,7 +54,7 @@ class SumAvSykefraværOverFlereKvartaler {
     SumAvSykefraværOverFlereKvartaler(@NotNull UmaskertSykefraværForEttKvartal umaskertSykefravær) {
         this.muligeDagsverk = umaskertSykefravær.getDagsverkNevner();
         this.tapteDagsverk = umaskertSykefravær.getDagsverkTeller();
-        this.antallPersoner = umaskertSykefravær.getAntallPersoner();
+        this.høyesteAntallPersonerIEtKvartal = umaskertSykefravær.getAntallPersoner();
         this.kvartaler = List.of(umaskertSykefravær.getÅrstallOgKvartal());
         this.umaskertSykefraværList = List.of(umaskertSykefravær);
     }
@@ -133,7 +133,7 @@ class SumAvSykefraværOverFlereKvartaler {
         return new SumAvSykefraværOverFlereKvartaler(
                 this.muligeDagsverk.add(other.muligeDagsverk),
                 this.tapteDagsverk.add(other.tapteDagsverk),
-                this.antallPersoner + other.antallPersoner,
+                Math.max(this.høyesteAntallPersonerIEtKvartal, other.høyesteAntallPersonerIEtKvartal),
                 Stream.concat(kvartaler.stream(), other.kvartaler.stream()).distinct().collect(Collectors.toList()),
                 Stream.concat(
                         umaskertSykefraværList.stream(),
@@ -167,7 +167,7 @@ class SumAvSykefraværOverFlereKvartaler {
 
 
     private boolean dataMåMaskeres() {
-        return antallPersoner
+        return høyesteAntallPersonerIEtKvartal
                 < MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
     }
 
@@ -177,7 +177,7 @@ class SumAvSykefraværOverFlereKvartaler {
                 .statistikkategori(type)
                 .label(label)
                 .verdi(verdi)
-                .antallPersonerIBeregningen(antallPersoner)
+                .antallPersonerIBeregningen(høyesteAntallPersonerIEtKvartal)
                 .kvartalerIBeregningen(kvartaler)
                 .build();
     }
