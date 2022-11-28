@@ -115,29 +115,29 @@ jobs:
           RESOURCE: nais/alerts-prod.yaml
 
   deployTopicsToDev:
-    name: "Deploy topics to dev"
-    runs-on: "ubuntu-latest"
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/legge-til-siste-4-kvartaler-i-eksport'
+    name: Deploy topics to dev
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/eksport-av-virksomhet-sykefraværsstatistikk-kategori'
     steps:
-      - name: "Checkout code"
-        uses: "actions/checkout@v3"
-      - name: "Deploy topics to dev-gcp"
-        uses: "nais/deploy/actions/deploy@master"
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Deploy topics to dev-gcp
+        uses: nais/deploy/actions/deploy@master
         env:
-          APIKEY: "${{ secrets.NAIS_DEPLOY_APIKEY }}"
-          CLUSTER: "dev-gcp"
-          RESOURCE: "nais/topics/topic-arbeidsgiver-sykefravaer-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-dev.yaml"
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-gcp
+          RESOURCE: "nais/topics/topic-arbeidsgiver-sykefravaer-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-virksomhet-dev.yaml"
 
   deployTopicsToProd:
-    name: "Deploy topics to prod"
-    runs-on: "ubuntu-latest"
+    name: Deploy topics to prod
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     steps:
-      - name: "Checkout code"
-        uses: "actions/checkout@v3"
-      - name: "Deploy topics to prod-gcp"
-        uses: "nais/deploy/actions/deploy@master"
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Deploy topics to prod-gcp
+        uses: nais/deploy/actions/deploy@master
         env:
-          APIKEY: "${{ secrets.NAIS_DEPLOY_APIKEY }}"
-          CLUSTER: "prod-gcp"
-          RESOURCE: "nais/topics/topic-arbeidsgiver-sykefravaer-prod.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-prod.yaml"
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-gcp
+          RESOURCE: "nais/topics/topic-arbeidsgiver-sykefravaer-prod.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-prod.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-virksomhet-prod.yaml"
