@@ -71,7 +71,7 @@ public class SykefraværsstatistikkImporteringService {
     } else {
       log.info(
           "Miljø er ikke prod, genererer testdata for virksomheter. Dette skal ikke kjøre" +
-              "i prod!");
+              " i prod!");
     }
 
     List<ÅrstallOgKvartal> årstallOgKvartalForDvh = Arrays.asList(
