@@ -280,18 +280,17 @@ public class SykefraværsstatistikkImporteringService {
   private void importSykefraværsstatistikkVirksomhet(
       ÅrstallOgKvartal årstallOgKvartal
   ) {
-    List<SykefraværsstatistikkVirksomhet> sykefraværsstatistikkVirksomhet;
+    List<SykefraværsstatistikkVirksomhet> statistikk;
 
     if (currentEnvironmentIsProd()) {
-      sykefraværsstatistikkVirksomhet = datavarehusRepository.hentSykefraværsstatistikkVirksomhet(
-          årstallOgKvartal);
+      statistikk = datavarehusRepository.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal);
     } else {
-      sykefraværsstatistikkVirksomhet = genererSykefraværsstatistikkVirksomhet();
+      statistikk = genererSykefraværsstatistikkVirksomhet(årstallOgKvartal);
     }
 
     SlettOgOpprettResultat resultat =
         statistikkRepository.importSykefraværsstatistikkVirksomhet(
-            sykefraværsstatistikkVirksomhet,
+            statistikk,
             årstallOgKvartal
         );
 
@@ -308,7 +307,7 @@ public class SykefraværsstatistikkImporteringService {
       statistikk =
           datavarehusRepository.hentSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal);
     } else {
-      statistikk = genererSykefraværsstatistikkVirksomhetMedGradering();
+      statistikk = genererSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal);
     }
 
     SlettOgOpprettResultat resultat =
