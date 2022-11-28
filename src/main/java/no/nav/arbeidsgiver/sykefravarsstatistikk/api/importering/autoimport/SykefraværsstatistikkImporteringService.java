@@ -48,7 +48,10 @@ public class SykefraværsstatistikkImporteringService {
 
 
   public Importeringstatus importerHvisDetFinnesNyStatistikk() {
-    log.info("Er importering aktivert? {}", erImporteringAktivert);
+    if (!erImporteringAktivert) {
+      log.info("Automatisk importering er ikke aktivert, avbryter.");
+      return Importeringstatus.IKKE_AKTIVERT;
+    }
 
     List<ÅrstallOgKvartal> årstallOgKvartalForSykefraværsstatistikk = Arrays.asList(
         statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
@@ -63,12 +66,12 @@ public class SykefraværsstatistikkImporteringService {
             Statistikkilde.VIRKSOMHET)
     );
 
-    if (Arrays.asList(environment.getActiveProfiles()).contains("dev")
-        || Arrays.asList(environment.getActiveProfiles()).contains("mvc-test")) {
-      log.info(
-          "Miljø er dev eller test, genererer testdata for virksomheter. Dette skal ikke kjøre i prod!");
+    if (currentEnvironmentIsProd(environment)) {
+      log.info("Miljø er prod. Dette skal kjøre i prod!");
     } else {
-      log.info("Miljø er ikke dev. Dette skal kjøre i prod!");
+      log.info(
+          "Miljø er ikke prod, genererer testdata for virksomheter. Dette skal ikke kjøre" +
+              "i prod!");
     }
 
     List<ÅrstallOgKvartal> årstallOgKvartalForDvh = Arrays.asList(
@@ -83,20 +86,16 @@ public class SykefraværsstatistikkImporteringService {
     );
 
     if (kanImportStartes(årstallOgKvartalForSykefraværsstatistikk, årstallOgKvartalForDvh)) {
-      if (erImporteringAktivert) {
-        final ÅrstallOgKvartal gjeldendeÅrstallOgKvartal = årstallOgKvartalForDvh.get(0);
-        log.info("Importerer ny statistikk");
-        importerNyStatistikk(gjeldendeÅrstallOgKvartal);
-        oppdaterPubliseringsstatus(gjeldendeÅrstallOgKvartal);
-      return Importeringstatus.IMPORTERT;} else {
-        log.info("Statistikk er klar til importering men automatisk importering er ikke "
-            + "aktivert");
-      return Importeringstatus.IKKE_AKTIVERT;}
+      final ÅrstallOgKvartal gjeldendeÅrstallOgKvartal = årstallOgKvartalForDvh.get(0);
+      log.info("Importerer ny statistikk");
+      importerNyStatistikk(gjeldendeÅrstallOgKvartal);
+      oppdaterPubliseringsstatus(gjeldendeÅrstallOgKvartal);
+      return Importeringstatus.IMPORTERT;
     } else {
-      log.info("Importerer ikke ny statistikk");return Importeringstatus.DATAFEIL;
+      log.info("Importerer ikke ny statistikk");
+      return Importeringstatus.DATAFEIL;
     }
   }
-
 
   private void oppdaterPubliseringsstatus(ÅrstallOgKvartal gjeldendeÅrstallOgKvartal) {
     publiseringsdatoerRepository.oppdaterSisteImporttidspunkt(gjeldendeÅrstallOgKvartal);
@@ -197,33 +196,25 @@ public class SykefraværsstatistikkImporteringService {
       importSykefraværsstatistikkNæring5siffer(årstallOgKvartal);
     }
 
-    // importerer fiktiv testdata for virksomheter i dev og test
-    if (importeringsobjekter.contains(Importeringsobjekt.VIRKSOMHET)) {
-      if (Arrays.asList(environment.getActiveProfiles()).contains("dev")
-          || Arrays.asList(environment.getActiveProfiles()).contains("mvc-test")) {
-        //importerGenerertSykefraværsstatistikkVirksomhetTestmiljøer(årstallOgKvartal);
-        importSykefraværsstatistikkVirksomhet(årstallOgKvartal);
-      } else {
+    // importerer fiktiv testdata for virksomheter når miljø ikke er prod
+    if (currentEnvironmentIsProd(environment)) {
+      if (importeringsobjekter.contains(Importeringsobjekt.VIRKSOMHET)) {
         importSykefraværsstatistikkVirksomhet(årstallOgKvartal);
       }
-    }
-
-    if (importeringsobjekter.contains(Importeringsobjekt.NÆRING_MED_VARIGHET)) {
-      importSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal);
-    }
-
-    // importerer fiktiv testdata for virksomheter i dev og test
-    if (importeringsobjekter.contains(Importeringsobjekt.GRADERING)) {
-      if (Arrays.asList(environment.getActiveProfiles()).contains("dev")
-          || Arrays.asList(environment.getActiveProfiles()).contains("mvc-test")) {
-        //importerGenerertSykefraværsstatistikkMedGraderingTestmiljøer(årstallOgKvartal);
+      if (importeringsobjekter.contains(Importeringsobjekt.GRADERING)) {
         importSykefraværsstatistikkMedGradering(årstallOgKvartal);
-      } else {
+      }
+    } else {
+      if (importeringsobjekter.contains(Importeringsobjekt.VIRKSOMHET)) {
+        //importerGenerertSykefraværsstatistikkMedGraderingTestmiljøer(årstallOgKvartal);
+        importSykefraværsstatistikkVirksomhet(årstallOgKvartal);
+      }
+      if (importeringsobjekter.contains(Importeringsobjekt.GRADERING)) {
+        //importerGenerertSykefraværsstatistikkMedGraderingTestmiljøer(årstallOgKvartal);
         importSykefraværsstatistikkMedGradering(årstallOgKvartal);
       }
     }
   }
-
 
   private void importerNyStatistikk(ÅrstallOgKvartal årstallOgKvartal) {
     importSykefraværsstatistikkLand(årstallOgKvartal);
@@ -411,9 +402,12 @@ public class SykefraværsstatistikkImporteringService {
     );
   }
 
-
   private boolean alleErLike(List<ÅrstallOgKvartal> årstallOgKvartal) {
     ÅrstallOgKvartal førsteÅrstallOgKvartal = årstallOgKvartal.get(0);
     return årstallOgKvartal.stream().allMatch(p -> p.equals(førsteÅrstallOgKvartal));
+  }
+
+  private boolean currentEnvironmentIsProd(Environment environment) {
+    return Arrays.asList(environment.getActiveProfiles()).contains("prod");
   }
 }
