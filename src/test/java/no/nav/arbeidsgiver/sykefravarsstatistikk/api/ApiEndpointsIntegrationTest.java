@@ -6,7 +6,7 @@ import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.SELVBETJENING_ISSUER_ID;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.TOKENX_ISSUER_ID;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.PRODUKSJON_NYTELSESMIDLER;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL_MOCK;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring2Siffer;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForSektor;
@@ -24,11 +24,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.ImporttidspunktDto;
+
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.security.mock.oauth2.MockOAuth2Server;
 import org.jetbrains.annotations.NotNull;
@@ -41,8 +40,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
 
-    private final int SISTE_ÅRSTALL = SISTE_PUBLISERTE_KVARTAL_MOCK.getÅrstall();
-    private final int SISTE_KVARTAL = SISTE_PUBLISERTE_KVARTAL_MOCK.getKvartal();
+    private final int SISTE_ÅRSTALL = SISTE_PUBLISERTE_KVARTAL.getÅrstall();
+    private final int SISTE_KVARTAL = SISTE_PUBLISERTE_KVARTAL.getKvartal();
 
     @Autowired
     private WebApplicationContext webApplicationContext;

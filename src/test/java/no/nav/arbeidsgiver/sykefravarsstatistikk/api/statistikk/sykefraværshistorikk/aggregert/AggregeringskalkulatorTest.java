@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL_MOCK;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.sisteKvartalMinus;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje.BARNEHAGER;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -20,7 +20,7 @@ class AggregeringskalkulatorTest {
   void fraværsprosentLand_regnerUtRiktigFraværsprosent() {
     Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(
         new Sykefraværsdata(Map.of(Statistikkategori.VIRKSOMHET, synkendeSykefravær)),
-        SISTE_PUBLISERTE_KVARTAL_MOCK
+            SISTE_PUBLISERTE_KVARTAL
     );
 
     assertThat(kalkulator.fraværsprosentVirksomhet("dummynavn").get().getVerdi())
@@ -32,7 +32,7 @@ class AggregeringskalkulatorTest {
   void fraværsprosentBransjeEllerNæring_regnerUtRiktigFraværsprosentForBransje() {
     Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(
         new Sykefraværsdata(Map.of(Statistikkategori.BRANSJE, synkendeSykefravær)),
-        SISTE_PUBLISERTE_KVARTAL_MOCK
+            SISTE_PUBLISERTE_KVARTAL
     );
 
     BransjeEllerNæring bransje = new BransjeEllerNæring(
@@ -47,7 +47,7 @@ class AggregeringskalkulatorTest {
   void fraværsprosentBransjeEllerNæring_regnerUtRiktigFraværsprosentForNæring() {
     Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(
         new Sykefraværsdata(Map.of(Statistikkategori.NÆRING, synkendeSykefravær)),
-        SISTE_PUBLISERTE_KVARTAL_MOCK
+            SISTE_PUBLISERTE_KVARTAL
     );
 
     BransjeEllerNæring dummynæring = new BransjeEllerNæring(new Næring("00000", "Dummynæring"));
@@ -61,7 +61,7 @@ class AggregeringskalkulatorTest {
   void fraværsprosentNorge_regnerUtRiktigFraværsprosent() {
     Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(
         new Sykefraværsdata(Map.of(Statistikkategori.LAND, synkendeSykefravær)),
-        SISTE_PUBLISERTE_KVARTAL_MOCK
+            SISTE_PUBLISERTE_KVARTAL
     );
 
     assertThat(kalkulator.fraværsprosentNorge().get().getVerdi())
@@ -73,7 +73,7 @@ class AggregeringskalkulatorTest {
   void trendBransjeEllerNæring_regnerUtRiktigTrendForNæring() {
     Aggregeringskalkulator kalkulator = new Aggregeringskalkulator(
         new Sykefraværsdata(Map.of(Statistikkategori.NÆRING, synkendeSykefravær)),
-        SISTE_PUBLISERTE_KVARTAL_MOCK
+            SISTE_PUBLISERTE_KVARTAL
     );
 
     BransjeEllerNæring dummynæring
@@ -85,10 +85,10 @@ class AggregeringskalkulatorTest {
 
 
   private final List<UmaskertSykefraværForEttKvartal> synkendeSykefravær = List.of(
-      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(0), 2, 100, 1),
-      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(1), 4, 100, 2),
-      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(2), 6, 100, 3),
-      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(3), 8, 100, 4),
-      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(4), 10, 100, 5)
+      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(0), 2, 100, 10),
+      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(1), 4, 100, 10),
+      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(2), 6, 100, 10),
+      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(3), 8, 100, 10),
+      new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(4), 10, 100, 10)
   );
 }

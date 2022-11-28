@@ -4,16 +4,17 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.SykefraværsstatistikkLocalTestApplication;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.SykefraværFlereKvartalerForEksport;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaStatistikkKategoriTopicValue;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaTopicValue;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværOverFlereKvartaler;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.junit.AfterClass;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,7 +61,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @EnableMockOAuth2Server
 @EmbeddedKafka(
         controlledShutdown = true,
-        topics = {"arbeidsgiver.sykefravarsstatistikk-v1", "arbeidsgiver.sykefravarsstatistikk-land-v1"},
+        topics = {"arbeidsgiver.sykefravarsstatistikk-v1", "arbeidsgiver.sykefravarsstatistikk-land-v1", "arbeidsgiver.sykefravarsstatistikk-virksomhet-v1"},
         brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"}
 )
 public class KafkaServiceIntegrasjonTest {
@@ -70,9 +71,10 @@ public class KafkaServiceIntegrasjonTest {
     @Autowired
     private EmbeddedKafkaBroker embeddedKafkaBroker;
 
-    private static String[] TOPIC_NAME = {
+    private static String[] TOPIC_NAMES = {
             "arbeidsgiver.sykefravarsstatistikk-v1",
-            "arbeidsgiver.sykefravarsstatistikk-land-v1"
+            "arbeidsgiver.sykefravarsstatistikk-land-v1",
+            "arbeidsgiver.sykefravarsstatistikk-virksomhet-v1"
     };
     private KafkaMessageListenerContainer<String, String> container;
     private BlockingQueue<ConsumerRecord<String, String>> consumerRecords;
@@ -83,7 +85,7 @@ public class KafkaServiceIntegrasjonTest {
     public void setUp() {
         consumerRecords = new LinkedBlockingQueue<>();
 
-        ContainerProperties containerProperties = new ContainerProperties(TOPIC_NAME);
+        ContainerProperties containerProperties = new ContainerProperties(TOPIC_NAMES);
         Map<String, Object> consumerProperties =
                 KafkaTestUtils.consumerProps(
                         "consumer",
@@ -109,10 +111,16 @@ public class KafkaServiceIntegrasjonTest {
         container.stop();
     }
 
+    @AfterClass
+    public void tearDownClass() {
+        container.destroy();
+        embeddedKafkaBroker.destroy();
+    }
+
     @Test
     public void send__sender_en_KafkaTopicValue_til__riktig_topic() throws Exception {
         container.start();
-        ContainerTestUtils.waitForAssignment(container, 4);
+        ContainerTestUtils.waitForAssignment(container, embeddedKafkaBroker.getPartitionsPerTopic() * TOPIC_NAMES.length);
 
         kafkaService.send(
                 __2020_2,
@@ -137,30 +145,27 @@ public class KafkaServiceIntegrasjonTest {
 
     @Test
     public void send_til_LAND_topic___sender_en_KafkaTopicValue_til__riktig_topic() throws Exception {
-        SykefraværOverFlereKvartaler sykefraværOverFlereKvartaler = new SykefraværOverFlereKvartaler(
-                List.of(__2020_2, __2020_1, __2019_4, __2019_3),
-                new BigDecimal(11000),
-                new BigDecimal(110000),
+        SykefraværFlereKvartalerForEksport sykefraværFlereKvartaler =  new SykefraværFlereKvartalerForEksport(
                 List.of(
-                        new SykefraværForEttKvartal(
+                        new UmaskertSykefraværForEttKvartal(
                                 __2020_2,
                                 new BigDecimal(1100),
                                 new BigDecimal(11000),
                                 5
                         ),
-                        new SykefraværForEttKvartal(
+                        new UmaskertSykefraværForEttKvartal(
                                 __2020_1,
                                 new BigDecimal(2200),
                                 new BigDecimal(22000),
                                 5
                         ),
-                        new SykefraværForEttKvartal(
+                        new UmaskertSykefraværForEttKvartal(
                                 __2019_4,
                                 new BigDecimal(3300),
                                 new BigDecimal(33000),
                                 5
                         ),
-                        new SykefraværForEttKvartal(
+                        new UmaskertSykefraværForEttKvartal(
                                 __2019_3,
                                 new BigDecimal(4400),
                                 new BigDecimal(44000),
@@ -178,16 +183,18 @@ public class KafkaServiceIntegrasjonTest {
                         landSykefravær.getMuligeDagsverk(),
                         landSykefravær.getAntallPersoner()
                 ),
-                sykefraværOverFlereKvartaler
+                sykefraværFlereKvartaler
         );
 
         container.start();
-        ContainerTestUtils.waitForAssignment(container, 4);
+        ContainerTestUtils.waitForAssignment(container, embeddedKafkaBroker.getPartitionsPerTopic() * TOPIC_NAMES.length);
 
         kafkaService.sendTilStatistikkKategoriTopic(
                 __2020_2,
+                Statistikkategori.LAND,
+                "NO",
                 landSykefravær,
-                sykefraværOverFlereKvartaler
+                sykefraværFlereKvartaler
         );
 
         ConsumerRecord<String, String> message = consumerRecords.poll(10, TimeUnit.SECONDS);

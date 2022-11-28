@@ -57,6 +57,21 @@ public class SykefraværMedKategori extends SykefraværForEttKvartal {
         return antallPersoner;
     }
 
+    public static SykefraværMedKategori utenStatistikk(
+        Statistikkategori kategori,
+        String kode,
+        ÅrstallOgKvartal årstallOgKvartal
+    ) {
+        return new SykefraværMedKategori(
+            kategori,
+            kode,
+            årstallOgKvartal,
+            null,
+            null,
+            0
+        );
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

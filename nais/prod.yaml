@@ -26,6 +26,9 @@ spec:
         - application: min-ia
           namespace: teamia
           cluster: prod-gcp
+        - application: forebyggingsplan-frontend
+          namespace: pia
+          cluster: prod-gcp
     outbound:
       rules:
         - application: altinn-rettigheter-proxy

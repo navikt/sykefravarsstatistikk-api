@@ -5,7 +5,7 @@ import static java.net.http.HttpClient.newBuilder;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.GraderingTestUtils.insertDataMedGradering;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.PRODUKSJON_NYTELSESMIDLER;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL_MOCK;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring2Siffer;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring5Siffer;
@@ -29,7 +29,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.VarighetTestUtils;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
@@ -108,17 +107,17 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
   @Test
   public void hentAgreggertStatistikk_returnererForventedeTyperForBedriftSomHarAlleTyperData()
       throws Exception {
-    ÅrstallOgKvartal ettÅrSiden = SISTE_PUBLISERTE_KVARTAL_MOCK.minusEttÅr();
+    ÅrstallOgKvartal ettÅrSiden = SISTE_PUBLISERTE_KVARTAL.minusEttÅr();
     opprettStatistikkForLand(jdbcTemplate);
     opprettStatistikkForNæring2Siffer(jdbcTemplate, PRODUKSJON_NYTELSESMIDLER,
-        SISTE_PUBLISERTE_KVARTAL_MOCK.getÅrstall(), SISTE_PUBLISERTE_KVARTAL_MOCK.getKvartal(), 5,
+        SISTE_PUBLISERTE_KVARTAL.getÅrstall(), SISTE_PUBLISERTE_KVARTAL.getKvartal(), 5,
         100,
         10);
     opprettStatistikkForNæring2Siffer(jdbcTemplate, PRODUKSJON_NYTELSESMIDLER,
         ettÅrSiden.getÅrstall(), ettÅrSiden.getKvartal(), 20, 100,
         10);
     opprettStatistikkForVirksomhet(jdbcTemplate, ORGNR_UNDERENHET,
-        SISTE_PUBLISERTE_KVARTAL_MOCK.getÅrstall(), SISTE_PUBLISERTE_KVARTAL_MOCK.getKvartal(), 5,
+        SISTE_PUBLISERTE_KVARTAL.getÅrstall(), SISTE_PUBLISERTE_KVARTAL.getKvartal(), 5,
         100,
         10);
 
@@ -126,7 +125,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
         jdbcTemplate,
         ORGNR_UNDERENHET,
         "10", "10300",
-        RECTYPE_FOR_VIRKSOMHET, SISTE_PUBLISERTE_KVARTAL_MOCK,
+        RECTYPE_FOR_VIRKSOMHET, SISTE_PUBLISERTE_KVARTAL,
         7,
         new BigDecimal(10),
         new BigDecimal(20),
@@ -136,7 +135,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
         jdbcTemplate,
         ORGNR_UNDERENHET,
         "10", "10300",
-        RECTYPE_FOR_VIRKSOMHET, SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(1),
+        RECTYPE_FOR_VIRKSOMHET, SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
         7,
         new BigDecimal(12),
         new BigDecimal(20),
@@ -146,7 +145,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
         jdbcTemplate,
         ORGNR_UNDERENHET,
         "10", "10300",
-        RECTYPE_FOR_VIRKSOMHET, SISTE_PUBLISERTE_KVARTAL_MOCK.minusKvartaler(2),
+        RECTYPE_FOR_VIRKSOMHET, SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2),
         15,
         new BigDecimal(25),
         new BigDecimal(50),
@@ -245,9 +244,9 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
   @Test
   public void hentAgreggertStatistikk_returnererIkkeVirksomhetstatistikkTilBrukerSomManglerIaRettigheter()
       throws Exception {
-    ÅrstallOgKvartal ettÅrSiden = SISTE_PUBLISERTE_KVARTAL_MOCK.minusEttÅr();
+    ÅrstallOgKvartal ettÅrSiden = SISTE_PUBLISERTE_KVARTAL.minusEttÅr();
     opprettStatistikkForNæring5Siffer(jdbcTemplate, BARNEHAGER,
-        SISTE_PUBLISERTE_KVARTAL_MOCK.getÅrstall(), SISTE_PUBLISERTE_KVARTAL_MOCK.getKvartal(), 5,
+        SISTE_PUBLISERTE_KVARTAL.getÅrstall(), SISTE_PUBLISERTE_KVARTAL.getKvartal(), 5,
         100,
         10);
     opprettStatistikkForNæring5Siffer(jdbcTemplate, BARNEHAGER, ettÅrSiden.getÅrstall(),
@@ -267,6 +266,24 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
 
     assertThat(responseBody.get("trendTotalt").findValuesAsText("statistikkategori"))
         .containsExactly(BRANSJE.toString());
+  }
+
+  @Test
+  public void hentAgreggertStatistikk_kræsjerIkkeDersomMuligeDagsverkErZero()
+      throws Exception {
+    opprettStatistikkForVirksomhet(jdbcTemplate, ORGNR_UNDERENHET,
+        SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
+        SISTE_PUBLISERTE_KVARTAL.getKvartal(),
+        5,
+        0,
+        10);
+
+    HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET);
+    JsonNode responseBody = objectMapper.readTree(response.body());
+
+    assertThat(
+        responseBody.get("prosentSiste4KvartalerTotalt")
+            .findValuesAsText("statistikkategori")).isEmpty();
   }
 
 
