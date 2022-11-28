@@ -30,7 +30,7 @@ jobs:
   build-and-push-image:
     name: Build and push Docker image
     needs: test
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/legge-til-siste-4-kvartaler-i-eksport'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/generere-testdata-for-virksomhet'
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
