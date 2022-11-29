@@ -1,8 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhet;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhetMedGradering;
-
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -285,7 +282,9 @@ public class SykefraværsstatistikkImporteringService {
     if (currentEnvironmentIsProd()) {
       statistikk = datavarehusRepository.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal);
     } else {
-      statistikk = genererSykefraværsstatistikkVirksomhet(årstallOgKvartal);
+      //statistikk = genererSykefraværsstatistikkVirksomhet(årstallOgKvartal);
+      statistikk = datavarehusRepository.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal);
+
     }
 
     SlettOgOpprettResultat resultat =
@@ -307,7 +306,9 @@ public class SykefraværsstatistikkImporteringService {
       statistikk =
           datavarehusRepository.hentSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal);
     } else {
-      statistikk = genererSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal);
+      //statistikk = genererSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal);
+      statistikk =
+          datavarehusRepository.hentSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal);
     }
 
     SlettOgOpprettResultat resultat =
