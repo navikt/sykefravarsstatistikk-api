@@ -1,5 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhet;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhetMedGradering;
+
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -85,7 +88,7 @@ public class SykefraværsstatistikkImporteringService {
       oppdaterPubliseringsstatus(gjeldendeÅrstallOgKvartal);
       return Importeringstatus.IMPORTERT;
     } else {
-      log.info("Importerer ikke ny statistikk");
+      log.info("Importerer ikke statistikk");
       return Importeringstatus.DATAFEIL;
     }
   }
@@ -121,11 +124,8 @@ public class SykefraværsstatistikkImporteringService {
     if (!allImportertStatistikkHarSammeÅrstallOgKvartal
         || !allStatistikkFraDvhHarSammeÅrstallOgKvartal) {
       log.warn(
-          "Kunne ikke importere ny statistikk, statistikk hadde forskjellige årstall og "
-              + "kvartal. "
-              +
-              "Kvartaler Sykefraværsstatistikk-DB: {}. " +
-              "Kvartaler DVH: {}",
+          "Kunne ikke importere ny statistikk, tabellene hadde forskjellige årstall og kvartal. "
+              + "Kvartaler Sykefraværsstatistikk-DB: {}. Kvartaler DVH: {}",
           årstallOgKvartalForSfsDb,
           årstallOgKvartalForDvh
       );
@@ -156,10 +156,8 @@ public class SykefraværsstatistikkImporteringService {
       return false;
     } else {
       log.warn(
-          "Kunne ikke importere ny statistikk fra Dvh fordi årstall {} og kvartal {} ikke"
-              + " ligger nøyaktig "
-              +
-              "ett kvartal foran vår statistikk som har årstall {} og kvartal {}.",
+          "Kunne ikke importere ny statistikk fra Dvh fordi årstall {} og kvartal {} ikke ligger "
+              + "nøyaktig ett kvartal foran vår statistikk som har årstall {} og kvartal {}.",
           sisteÅrstallOgKvartalForDvh.getÅrstall(),
           sisteÅrstallOgKvartalForDvh.getKvartal(),
           sisteÅrstallOgKvartalForSykefraværsstatistikk.getÅrstall(),
@@ -282,8 +280,7 @@ public class SykefraværsstatistikkImporteringService {
     if (currentEnvironmentIsProd()) {
       statistikk = datavarehusRepository.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal);
     } else {
-      //statistikk = genererSykefraværsstatistikkVirksomhet(årstallOgKvartal);
-      statistikk = datavarehusRepository.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal);
+      statistikk = genererSykefraværsstatistikkVirksomhet(årstallOgKvartal);
 
     }
 
@@ -306,9 +303,7 @@ public class SykefraværsstatistikkImporteringService {
       statistikk =
           datavarehusRepository.hentSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal);
     } else {
-      //statistikk = genererSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal);
-      statistikk =
-          datavarehusRepository.hentSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal);
+      statistikk = genererSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal);
     }
 
     SlettOgOpprettResultat resultat =
