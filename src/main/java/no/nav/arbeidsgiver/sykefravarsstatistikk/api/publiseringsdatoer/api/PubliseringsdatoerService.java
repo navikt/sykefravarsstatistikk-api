@@ -51,7 +51,7 @@ public class PubliseringsdatoerService {
                 .nestePubliseringsdato(
                     finnNestePubliseringsdato(publiseringsdatoer, forrigeImport.getImportertDato())
                         .map(LocalDate::toString)
-                        .getOrElse("Siste publiseringsdato er utilgjengelig"))
+                        .getOrElse("Neste publiseringsdato er utilgjengelig"))
                 .build()
         );
   }
