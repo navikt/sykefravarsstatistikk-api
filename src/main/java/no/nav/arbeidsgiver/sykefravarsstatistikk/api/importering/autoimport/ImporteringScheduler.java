@@ -46,5 +46,4 @@ public class ImporteringScheduler {
       log.info("Counter er nå: {}", counter.count());
     }
   }
-
 }
