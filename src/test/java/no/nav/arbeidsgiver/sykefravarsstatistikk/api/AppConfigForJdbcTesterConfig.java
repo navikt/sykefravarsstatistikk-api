@@ -14,7 +14,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.featuretoggli
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.UnleashFeatureToggleConfig;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.UnleashService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.BedriftsmetrikkerController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.besøksstatistikk.BesøksstatistikkEventListener;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.organisasjoner.OrganisasjonerController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.OffentligSykefraværshistorikkController;
@@ -58,7 +57,6 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
                 ImporteringController.class, EksporteringController.class,
                 KlassifikasjonsimporteringController.class,
                 SykefraværshistorikkController.class,
-                BedriftsmetrikkerController.class,
                 OrganisasjonerController.class,
                 TilgangskontrollService.class,
                 OffentligSykefraværshistorikkController.class,
