@@ -10,7 +10,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.Post
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.SykefraværsstatistikkImporteringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.klassifikasjoner.KlassifikasjonsimporteringController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.MockServer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.featuretoggling.FeatureToggleController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.UnleashFeatureToggleConfig;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.UnleashService;
@@ -43,7 +42,6 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
                 AltinnClient.class,
                 UnleashFeatureToggleConfig.class,
                 UnleashService.class,
-                FeatureToggleController.class,
                 TilgangskontrollUtils.class,
                 EksporteringService.class,
                 EksporteringPerStatistikkKategoriService.class,
