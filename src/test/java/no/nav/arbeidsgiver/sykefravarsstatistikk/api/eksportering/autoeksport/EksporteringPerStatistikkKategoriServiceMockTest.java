@@ -8,12 +8,12 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeks
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.sykefraværsstatistikkLandSiste4Kvartaler;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.virksomhetSykefraværMedKategori;
-import static org.assertj.core.api.Assertions.anyOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository;
@@ -119,15 +119,18 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
         .thenReturn(allData);
     when(kafkaService.sendTilStatistikkKategoriTopic(any(), any(), any(), any(), any())).thenReturn(
         true);
+    when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2)).thenReturn(
+        Arrays.asList(new VirksomhetEksportPerKvartal(
+                new Orgnr("987654321"),
+                new ÅrstallOgKvartal(2022, 2),
+                false
+            )
+        ));
 
     // 2- Kall tjenesten
     int antallEksporterte = service.eksporterSykefraværsstatistikkVirksomhet(
-        List.of(new VirksomhetEksportPerKvartal(
-            new Orgnr("987654321"),
-            __2020_2,
-            false
-        )),
-        __2020_2
+        __2020_2,
+        EksporteringBegrensning.build().utenBegrensning()
     );
 
     // 3- Sjekk hva Kafka har fått
@@ -167,18 +170,23 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
         .thenReturn(allData);
     when(kafkaService.sendTilStatistikkKategoriTopic(any(), any(), any(), any(), any())).thenReturn(
         true);
+    when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2)).thenReturn(
+        Arrays.asList(
+            new VirksomhetEksportPerKvartal(
+                new Orgnr("987654321"),
+                new ÅrstallOgKvartal(2022, 2),
+                false
+            ),
+            new VirksomhetEksportPerKvartal(
+                new Orgnr("987654322"),
+                new ÅrstallOgKvartal(2022, 2),
+                false
+            )
+        ));
 
     int antallEksporterte = service.eksporterSykefraværsstatistikkVirksomhet(
-        List.of(new VirksomhetEksportPerKvartal(
-            new Orgnr("987654321"),
-            __2020_2,
-            false
-        ), new VirksomhetEksportPerKvartal(
-            new Orgnr("987654322"),
-            __2020_2,
-            false
-        )),
-        __2020_2
+        __2020_2,
+        EksporteringBegrensning.build().utenBegrensning()
     );
 
     assertThat(antallEksporterte).isEqualTo(2);
@@ -201,18 +209,23 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
         any(SykefraværMedKategori.class),
         any(SykefraværFlereKvartalerForEksport.class))
     ).thenReturn(true);
+    when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2)).thenReturn(
+        Arrays.asList(
+            new VirksomhetEksportPerKvartal(
+                new Orgnr("987654321"),
+                new ÅrstallOgKvartal(2022, 2),
+                false
+            ),
+            new VirksomhetEksportPerKvartal(
+                new Orgnr("987654322"),
+                new ÅrstallOgKvartal(2022, 2),
+                false
+            )
+        ));
 
     int antallEksporterte = service.eksporterSykefraværsstatistikkVirksomhet(
-        List.of(new VirksomhetEksportPerKvartal(
-            new Orgnr("987654321"),
-            __2020_2,
-            false
-        ), new VirksomhetEksportPerKvartal(
-            new Orgnr("987654322"),
-            __2020_2,
-            false
-        )),
-        __2020_2
+        __2020_2,
+        EksporteringBegrensning.build().utenBegrensning()
     );
 
     assertThat(antallEksporterte).isEqualTo(2);
