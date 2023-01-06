@@ -10,12 +10,9 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.Post
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.SykefraværsstatistikkImporteringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.klassifikasjoner.KlassifikasjonsimporteringController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.MockServer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.featuretoggling.FeatureToggleController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.UnleashFeatureToggleConfig;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.UnleashService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.BedriftsmetrikkerController;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.besøksstatistikk.BesøksstatistikkEventListener;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.organisasjoner.OrganisasjonerController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.OffentligSykefraværshistorikkController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværshistorikkController;
@@ -43,10 +40,8 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
             value = {
                 MockServer.class,
                 AltinnClient.class,
-                BesøksstatistikkEventListener.class,
                 UnleashFeatureToggleConfig.class,
                 UnleashService.class,
-                FeatureToggleController.class,
                 TilgangskontrollUtils.class,
                 EksporteringService.class,
                 EksporteringPerStatistikkKategoriService.class,
@@ -58,7 +53,6 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
                 ImporteringController.class, EksporteringController.class,
                 KlassifikasjonsimporteringController.class,
                 SykefraværshistorikkController.class,
-                BedriftsmetrikkerController.class,
                 OrganisasjonerController.class,
                 TilgangskontrollService.class,
                 OffentligSykefraværshistorikkController.class,
