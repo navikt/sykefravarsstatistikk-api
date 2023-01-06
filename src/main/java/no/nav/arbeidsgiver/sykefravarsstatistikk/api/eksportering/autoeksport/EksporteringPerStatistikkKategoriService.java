@@ -67,7 +67,7 @@ public class EksporteringPerStatistikkKategoriService {
   ) {
 
     if (!erEksporteringAktivert) {
-      log.info("Eksportering er ikke aktivert. Avbrytter. ");
+      log.info("Eksportering er ikke aktivert. Avbryter. ");
       return 0;
     }
     log.info(
@@ -99,6 +99,13 @@ public class EksporteringPerStatistikkKategoriService {
     return antallEksporterteVirksomheter;
   }
 
+  protected int eksporterSykefraværsstatistikkNaring(ÅrstallOgKvartal årstallOgKvartal) {
+    long startProcess = System.nanoTime();
+    List<UmaskertSykefraværForEttKvartal> umaskertSykefraværsstatistikkSiste4KvartalerNaring =
+        sykefraværRepository.hentSy(
+            årstallOgKvartal.minusKvartaler(3)
+        );
+  }
 
   protected int eksporterSykefraværsstatistikkLand(ÅrstallOgKvartal årstallOgKvartal) {
     long startProcess = System.nanoTime();
