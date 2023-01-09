@@ -12,8 +12,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.StatistikkUtils;
 import org.jetbrains.annotations.NotNull;
 
 @Data
-public class UmaskertSykefraværForEttKvartal implements
-    Comparable<UmaskertSykefraværForEttKvartal> {
+public class UmaskertSykefraværForEttKvartal
+    implements Comparable<UmaskertSykefraværForEttKvartal> {
 
   protected final BigDecimal dagsverkTeller;
   protected final BigDecimal dagsverkNevner;
@@ -74,8 +74,8 @@ public class UmaskertSykefraværForEttKvartal implements
         årstallOgKvartal,
         dagsverkTeller.add(other.getDagsverkTeller()),
         dagsverkNevner.add(other.getDagsverkNevner()),
-        antallPersoner + other.getAntallPersoner()
-    );
+        antallPersoner + other.getAntallPersoner());
+
   }
 
   @Override

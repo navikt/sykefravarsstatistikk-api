@@ -18,43 +18,41 @@ public class KafkaStatistikkKategoriTopicValue {
   private Siste4Kvartaler siste4Kvartal;
 
   public KafkaStatistikkKategoriTopicValue(
-      SykefraværMedKategori sisteKvartal,
-      SykefraværFlereKvartalerForEksport siste4Kvartal
-  ) {
+      SykefraværMedKategori sisteKvartal, SykefraværFlereKvartalerForEksport siste4Kvartal) {
     this.kategori = sisteKvartal.getKategori();
     this.kode = sisteKvartal.getKode();
-    sistePubliserteKvartal = new SistePubliserteKvartal(
-        sisteKvartal.getÅrstall(),
-        sisteKvartal.getKvartal(),
-        sisteKvartal.getProsent(),
-        sisteKvartal.getTapteDagsverk(),
-        sisteKvartal.getMuligeDagsverk(),
-        sisteKvartal.getAntallPersoner(),
-        sisteKvartal.isErMaskert()
-    );
-    this.siste4Kvartal = new Siste4Kvartaler(
-        siste4Kvartal.getProsent(),
-        siste4Kvartal.getTapteDagsverk(),
-        siste4Kvartal.getMuligeDagsverk(),
-        siste4Kvartal.isErMaskert(),
-        siste4Kvartal.getKvartaler()
-    );
+    sistePubliserteKvartal =
+        new SistePubliserteKvartal(
+            sisteKvartal.getÅrstall(),
+            sisteKvartal.getKvartal(),
+            sisteKvartal.getProsent(),
+            sisteKvartal.getTapteDagsverk(),
+            sisteKvartal.getMuligeDagsverk(),
+            sisteKvartal.getAntallPersoner(),
+            sisteKvartal.isErMaskert());
+    this.siste4Kvartal =
+        new Siste4Kvartaler(
+            siste4Kvartal.getProsent(),
+            siste4Kvartal.getTapteDagsverk(),
+            siste4Kvartal.getMuligeDagsverk(),
+            siste4Kvartal.isErMaskert(),
+            siste4Kvartal.getKvartaler());
   }
 
   @Override
   public boolean equals(Object o) {
-      if (this == o) {
-          return true;
-      }
-      if (o == null || getClass() != o.getClass()) {
-          return false;
-      }
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     KafkaStatistikkKategoriTopicValue that = (KafkaStatistikkKategoriTopicValue) o;
 
-      if (!siste4Kvartal.equals(that.siste4Kvartal)) {
-          return false;
-      }
+    if (!siste4Kvartal.equals(that.siste4Kvartal)) {
+      return false;
+    }
     return sistePubliserteKvartal.equals(that.sistePubliserteKvartal);
   }
 
@@ -65,10 +63,7 @@ public class KafkaStatistikkKategoriTopicValue {
     return result;
   }
 
-
-    /*
-    public SykefraværMedKategori getSisteKvartal() { return sistePubliserteKvartal; }
-    public SykefraværOverFlereKvartaler getSiste4Kvartal() { return siste4Kvartal; }*/
+  /*
+  public SykefraværMedKategori getSisteKvartal() { return sistePubliserteKvartal; }
+  public SykefraværOverFlereKvartaler getSiste4Kvartal() { return siste4Kvartal; }*/
 }
-
-

@@ -13,6 +13,8 @@ Helsesjekk (åpnes i browser): [http://localhost:8080/sykefravarsstatistikk-api/
 
 Default spring-profil er local, og da er alle avhengigheter mocket på localhost:8081.
 
+Koden er formatert med Google Java Format. Anbefaler å installere Google Java Format plugin for IntelliJ.
+
 ## Koble til H2-database lokalt
 Åpne H2-konsollen på `http://localhost:8080/sykefravarsstatistikk-api/h2` og fyll inn det som står under `applikasjon.datasource` i `application.yaml`:
 ```

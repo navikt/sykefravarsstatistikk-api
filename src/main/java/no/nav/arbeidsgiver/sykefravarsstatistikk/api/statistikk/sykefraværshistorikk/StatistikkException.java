@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 public class StatistikkException extends RuntimeException {
 
-    public StatistikkException(String message) {
-        super(message);
-    }
+  public StatistikkException(String message) {
+    super(message);
+  }
 }

@@ -4,5 +4,5 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 
 @FunctionalInterface
 public interface DeleteSykefraværsstatistikkFunction {
-    int apply(ÅrstallOgKvartal årstallOgKvartal);
+  int apply(ÅrstallOgKvartal årstallOgKvartal);
 }

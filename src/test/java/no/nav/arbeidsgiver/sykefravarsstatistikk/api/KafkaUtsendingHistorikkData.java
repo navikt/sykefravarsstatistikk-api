@@ -10,11 +10,7 @@ public class KafkaUtsendingHistorikkData {
   public LocalDateTime opprettet;
 
   public KafkaUtsendingHistorikkData(
-      String orgnr,
-      String key,
-      String value,
-      LocalDateTime opprettet
-  ) {
+      String orgnr, String key, String value, LocalDateTime opprettet) {
     this.orgnr = orgnr;
     this.key = key;
     this.value = value;

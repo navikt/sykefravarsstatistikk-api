@@ -12,23 +12,20 @@ import java.util.List;
 @Component
 public class PubliseringsdatoerImportService {
 
-    private final PubliseringsdatoerRepository publiseringsdatoerRepository;
-    private final DatavarehusRepository datavarehusRepository;
+  private final PubliseringsdatoerRepository publiseringsdatoerRepository;
+  private final DatavarehusRepository datavarehusRepository;
 
+  public PubliseringsdatoerImportService(
+      PubliseringsdatoerRepository publiseringsdatoerRepository,
+      DatavarehusRepository datavarehusRepository) {
+    this.publiseringsdatoerRepository = publiseringsdatoerRepository;
+    this.datavarehusRepository = datavarehusRepository;
+  }
 
-    public PubliseringsdatoerImportService(
-          PubliseringsdatoerRepository publiseringsdatoerRepository,
-          DatavarehusRepository datavarehusRepository
-    ) {
-        this.publiseringsdatoerRepository = publiseringsdatoerRepository;
-        this.datavarehusRepository = datavarehusRepository;
-    }
+  public void importerDatoerFraDatavarehus() {
+    List<PubliseringsdatoDbDto> publiseringsdatoerFraDvh =
+        datavarehusRepository.hentPubliseringsdatoerFraDvh();
 
-
-    public void importerDatoerFraDatavarehus() {
-        List<PubliseringsdatoDbDto> publiseringsdatoerFraDvh =
-              datavarehusRepository.hentPubliseringsdatoerFraDvh();
-
-        publiseringsdatoerRepository.oppdaterPubliseringsdatoer(publiseringsdatoerFraDvh);
-    }
+    publiseringsdatoerRepository.oppdaterPubliseringsdatoer(publiseringsdatoerFraDvh);
+  }
 }

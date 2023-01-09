@@ -19,7 +19,7 @@ public class PubliseringsdatoDbDto {
       Date offentligDato, // dato for offentliggjøring
       Date oppdatertDato,
       String aktivitet // beskrivelse, typ "Sykefravær pr 3. kvartal 2022"
-  ) {
+      ) {
     this.rapportPeriode = rapportPeriode;
     this.offentligDato = offentligDato;
     this.oppdatertDato = oppdatertDato;
@@ -27,8 +27,6 @@ public class PubliseringsdatoDbDto {
   }
 
   public int sammenlignPubliseringsdatoer(@NotNull PubliseringsdatoDbDto annen) {
-    return this.getOffentligDato()
-        .toLocalDate()
-        .compareTo(annen.getOffentligDato().toLocalDate());
+    return this.getOffentligDato().toLocalDate().compareTo(annen.getOffentligDato().toLocalDate());
   }
 }

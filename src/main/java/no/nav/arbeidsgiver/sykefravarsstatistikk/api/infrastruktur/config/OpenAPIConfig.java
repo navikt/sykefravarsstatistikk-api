@@ -9,12 +9,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenAPIConfig {
 
-    @Bean
-    public OpenAPI openAPI() {
-        return new OpenAPI()
-                .info(new Info().title("API for sykefraværsstatistikk"))
-                .externalDocs(new ExternalDocumentation()
-                        .description("Repo på github")
-                        .url("https://github.com/navikt/sykefravarsstatistikk-api"));
-    }
+  @Bean
+  public OpenAPI openAPI() {
+    return new OpenAPI()
+        .info(new Info().title("API for sykefraværsstatistikk"))
+        .externalDocs(
+            new ExternalDocumentation()
+                .description("Repo på github")
+                .url("https://github.com/navikt/sykefravarsstatistikk-api"));
+  }
 }

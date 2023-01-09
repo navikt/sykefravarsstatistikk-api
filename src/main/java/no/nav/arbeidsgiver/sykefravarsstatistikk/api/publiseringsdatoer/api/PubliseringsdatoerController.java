@@ -7,7 +7,6 @@ import no.nav.security.token.support.core.api.Unprotected;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @Slf4j
 @Unprotected
 @RestController
@@ -15,22 +14,16 @@ public class PubliseringsdatoerController {
 
   private final PubliseringsdatoerService publiseringsdatoerService;
 
-
-  public PubliseringsdatoerController(
-      PubliseringsdatoerService publiseringsdatoerService
-  ) {
+  public PubliseringsdatoerController(PubliseringsdatoerService publiseringsdatoerService) {
     this.publiseringsdatoerService = publiseringsdatoerService;
   }
 
-
   @GetMapping(value = "/publiseringsdato")
-  public Publiseringsdatoer hentPubliseringsdatoInfo(
-      HttpServletRequest request
-  ) {
+  public Publiseringsdatoer hentPubliseringsdatoInfo(HttpServletRequest request) {
 
-    return publiseringsdatoerService.hentPubliseringsdatoer()
+    return publiseringsdatoerService
+        .hentPubliseringsdatoer()
         .getOrElseThrow(
-            () -> new DatauthentingFeil("Klarte ikke hente publiseringsdatoer, prøv igjen senere")
-        );
+            () -> new DatauthentingFeil("Klarte ikke hente publiseringsdatoer, prøv igjen senere"));
   }
 }

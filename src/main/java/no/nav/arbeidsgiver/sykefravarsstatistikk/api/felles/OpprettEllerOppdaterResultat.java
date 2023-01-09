@@ -9,12 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OpprettEllerOppdaterResultat {
 
-    private int antallRadOpprettet;
-    private int antallRadOppdatert;
+  private int antallRadOpprettet;
+  private int antallRadOppdatert;
 
-    public OpprettEllerOppdaterResultat add(OpprettEllerOppdaterResultat resultat) {
-        antallRadOpprettet = antallRadOpprettet + resultat.getAntallRadOpprettet();
-        antallRadOppdatert = antallRadOppdatert + resultat.getAntallRadOppdatert();
-        return this;
-    }
+  public OpprettEllerOppdaterResultat add(OpprettEllerOppdaterResultat resultat) {
+    antallRadOpprettet = antallRadOpprettet + resultat.getAntallRadOpprettet();
+    antallRadOppdatert = antallRadOppdatert + resultat.getAntallRadOppdatert();
+    return this;
+  }
 }

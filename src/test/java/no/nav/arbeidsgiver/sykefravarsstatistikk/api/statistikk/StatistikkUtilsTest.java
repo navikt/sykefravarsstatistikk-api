@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 class StatistikkUtilsTest {
 
-
   @Test
   public void kalkulerSykefraværsprosent_girÉnDesimalISvaret() {
     assertThat(kalkulerSykefraværsprosent(BigDecimal.ONE, BigDecimal.ONE).get())
@@ -21,7 +20,6 @@ class StatistikkUtilsTest {
     assertThat(kalkulerSykefraværsprosent(new BigDecimal("1.000"), new BigDecimal("1.0")).get())
         .isEqualTo(new BigDecimal("100.0"));
   }
-
 
   @Test
   public void kalkulerSykefraværsprosent_regnerUtKorrektProsent() {
@@ -40,15 +38,12 @@ class StatistikkUtilsTest {
 
   @Test
   public void kalkulerSykefraværsprosent_returnererStatistikkException_dersomNevnerErZero() {
-    assertThat(kalkulerSykefraværsprosent(new BigDecimal("5"), BigDecimal.ZERO)
-        .getLeft())
+    assertThat(kalkulerSykefraværsprosent(new BigDecimal("5"), BigDecimal.ZERO).getLeft())
         .isInstanceOf(StatistikkException.class);
 
-    assertThat(kalkulerSykefraværsprosent(new BigDecimal("5"), new BigDecimal("0.0"))
-        .getLeft())
+    assertThat(kalkulerSykefraværsprosent(new BigDecimal("5"), new BigDecimal("0.0")).getLeft())
         .isInstanceOf(StatistikkException.class);
   }
-
 
   @Test
   public void kalkulerSykefraværsprosent_runderOppKorrekt() {
@@ -73,7 +68,6 @@ class StatistikkUtilsTest {
     assertThat(kalkulerSykefraværsprosent(new BigDecimal("0.00005"), BigDecimal.ONE).get())
         .isEqualTo(new BigDecimal("0.0"));
   }
-
 
   @Test
   public void kalkulerSykefraværsprosent_runderNedKorrekt() {

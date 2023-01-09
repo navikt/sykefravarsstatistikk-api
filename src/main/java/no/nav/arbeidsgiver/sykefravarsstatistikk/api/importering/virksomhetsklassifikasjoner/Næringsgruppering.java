@@ -11,15 +11,15 @@ Muligens kan vi fjerne hele Næring-klassen og bare bruke Næringsgruppering(?)
 @EqualsAndHashCode
 @Value
 public class Næringsgruppering {
-    private final String kode5siffer;
-    private final String beskrivelse5siffer;
-    private final String kode4siffer;
-    private final String beskrivelse4siffer;
-    private final String kode3siffer;
-    private final String beskrivelse3siffer;
-    private final String kode2siffer;
-    private final String beskrivelse2siffer;
+  private final String kode5siffer;
+  private final String beskrivelse5siffer;
+  private final String kode4siffer;
+  private final String beskrivelse4siffer;
+  private final String kode3siffer;
+  private final String beskrivelse3siffer;
+  private final String kode2siffer;
+  private final String beskrivelse2siffer;
 
-    private final String kodeHovedområde;
-    private final String beskrivelseHovedområde;
+  private final String kodeHovedområde;
+  private final String beskrivelseHovedområde;
 }

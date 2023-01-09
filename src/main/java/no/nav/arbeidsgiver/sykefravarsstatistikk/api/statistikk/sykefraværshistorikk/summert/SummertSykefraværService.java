@@ -20,125 +20,114 @@ import org.springframework.stereotype.Component;
 @Component
 public class SummertSykefraværService {
 
-    private final VarighetRepository varighetRepository;
-    private final GraderingRepository graderingRepository;
-    private final BransjeEllerNæringService bransjeEllerNæringService;
-    private final PubliseringsdatoerService publiseringsdatoerService;
+  private final VarighetRepository varighetRepository;
+  private final GraderingRepository graderingRepository;
+  private final BransjeEllerNæringService bransjeEllerNæringService;
+  private final PubliseringsdatoerService publiseringsdatoerService;
 
-    public SummertSykefraværService(
-        VarighetRepository varighetRepository,
-        GraderingRepository graderingRepository,
-        BransjeEllerNæringService bransjeEllerNæringService,
-        PubliseringsdatoerService publiseringsdatoerService) {
-        this.varighetRepository = varighetRepository;
-        this.graderingRepository = graderingRepository;
-        this.bransjeEllerNæringService = bransjeEllerNæringService;
-        this.publiseringsdatoerService = publiseringsdatoerService;
+  public SummertSykefraværService(
+      VarighetRepository varighetRepository,
+      GraderingRepository graderingRepository,
+      BransjeEllerNæringService bransjeEllerNæringService,
+      PubliseringsdatoerService publiseringsdatoerService) {
+    this.varighetRepository = varighetRepository;
+    this.graderingRepository = graderingRepository;
+    this.bransjeEllerNæringService = bransjeEllerNæringService;
+    this.publiseringsdatoerService = publiseringsdatoerService;
+  }
+
+  public SummertSykefraværshistorikk hentSummertSykefraværshistorikkForBransjeEllerNæring(
+      Underenhet underenhet, int antallKvartalerSomSkalSummeres) {
+    if (antallKvartalerSomSkalSummeres < 1) {
+      throw new IllegalArgumentException("Kan ikke summere færre enn ett kvartal");
     }
 
-    public SummertSykefraværshistorikk hentSummertSykefraværshistorikkForBransjeEllerNæring(
-            Underenhet underenhet,
-            int antallKvartalerSomSkalSummeres
-    ) {
-        if (antallKvartalerSomSkalSummeres < 1) {
-            throw new IllegalArgumentException("Kan ikke summere færre enn ett kvartal");
-        }
+    List<UmaskertSykefraværForEttKvartalMedVarighet> sykefraværVarighet;
+    Statistikkategori type;
+    String label;
+    List<UmaskertSykefraværForEttKvartal> sykefraværGradering;
 
-        List<UmaskertSykefraværForEttKvartalMedVarighet> sykefraværVarighet;
-        Statistikkategori type;
-        String label;
-        List<UmaskertSykefraværForEttKvartal> sykefraværGradering;
+    BransjeEllerNæring bransjeEllerNæring =
+        bransjeEllerNæringService.bestemFraNæringskode(underenhet.getNæringskode());
 
-        BransjeEllerNæring bransjeEllerNæring =
-                bransjeEllerNæringService.bestemFraNæringskode(underenhet.getNæringskode());
+    if (!bransjeEllerNæring.isBransje()) {
+      type = Statistikkategori.NÆRING;
+      Næring næring = bransjeEllerNæring.getNæring();
+      label = næring.getNavn();
+      sykefraværVarighet = varighetRepository.hentSykefraværForEttKvartalMedVarighet(næring);
+      sykefraværGradering = graderingRepository.hentSykefraværMedGradering(næring);
+    } else {
+      type = Statistikkategori.BRANSJE;
+      Bransje bransje = bransjeEllerNæring.getBransje();
+      label = bransjeEllerNæring.getBransje().getNavn();
+      sykefraværVarighet = varighetRepository.hentSykefraværForEttKvartalMedVarighet(bransje);
+      sykefraværGradering = graderingRepository.hentSykefraværMedGradering(bransje);
+    }
 
-        if (!bransjeEllerNæring.isBransje()) {
-            type = Statistikkategori.NÆRING;
-            Næring næring = bransjeEllerNæring.getNæring();
-            label = næring.getNavn();
-            sykefraværVarighet = varighetRepository.hentSykefraværForEttKvartalMedVarighet(næring);
-            sykefraværGradering = graderingRepository.hentSykefraværMedGradering(næring);
-        } else {
-            type = Statistikkategori.BRANSJE;
-            Bransje bransje = bransjeEllerNæring.getBransje();
-            label = bransjeEllerNæring.getBransje().getNavn();
-            sykefraværVarighet = varighetRepository.hentSykefraværForEttKvartalMedVarighet(bransje);
-            sykefraværGradering = graderingRepository.hentSykefraværMedGradering(bransje);
-        }
-
-        SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
-            SummertKorttidsOgLangtidsfravær.getSummertKorttidsOgLangtidsfravær(
-                publiseringsdatoerService.hentSistePubliserteKvartal(),
-                antallKvartalerSomSkalSummeres,
-                sykefraværVarighet
-            );
-
-        SummertSykefravær summertSykefraværGradering = getSummerSykefraværGradering(
+    SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
+        SummertKorttidsOgLangtidsfravær.getSummertKorttidsOgLangtidsfravær(
             publiseringsdatoerService.hentSistePubliserteKvartal(),
             antallKvartalerSomSkalSummeres,
-            sykefraværGradering
-        );
+            sykefraværVarighet);
 
-        return SummertSykefraværshistorikk.builder()
-                .type(type)
-                .label(label)
-                .summertKorttidsOgLangtidsfravær(summertKorttidsOgLangtidsfravær)
-                .summertGradertFravær(summertSykefraværGradering)
-                .build();
+    SummertSykefravær summertSykefraværGradering =
+        getSummerSykefraværGradering(
+            publiseringsdatoerService.hentSistePubliserteKvartal(),
+            antallKvartalerSomSkalSummeres,
+            sykefraværGradering);
+
+    return SummertSykefraværshistorikk.builder()
+        .type(type)
+        .label(label)
+        .summertKorttidsOgLangtidsfravær(summertKorttidsOgLangtidsfravær)
+        .summertGradertFravær(summertSykefraværGradering)
+        .build();
+  }
+
+  public SummertSykefraværshistorikk hentSummertSykefraværshistorikk(
+      Underenhet underenhet,
+      ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal,
+      int antallKvartalerSomSkalSummeres) {
+    if (antallKvartalerSomSkalSummeres < 1) {
+      throw new IllegalArgumentException("Kan ikke summere færre enn ett kvartal");
     }
 
-    public SummertSykefraværshistorikk hentSummertSykefraværshistorikk(
-            Underenhet underenhet,
-            ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal,
-            int antallKvartalerSomSkalSummeres
-    ) {
-        if (antallKvartalerSomSkalSummeres < 1) {
-            throw new IllegalArgumentException("Kan ikke summere færre enn ett kvartal");
-        }
+    List<UmaskertSykefraværForEttKvartalMedVarighet> sykefraværVarighet =
+        varighetRepository.hentSykefraværForEttKvartalMedVarighet(underenhet);
+    List<UmaskertSykefraværForEttKvartal> sykefraværGradering =
+        graderingRepository.hentSykefraværMedGradering(underenhet);
 
-        List<UmaskertSykefraværForEttKvartalMedVarighet> sykefraværVarighet =
-                varighetRepository.hentSykefraværForEttKvartalMedVarighet(underenhet);
-        List<UmaskertSykefraværForEttKvartal> sykefraværGradering =
-                graderingRepository.hentSykefraværMedGradering(underenhet);
+    SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
+        SummertKorttidsOgLangtidsfravær.getSummertKorttidsOgLangtidsfravær(
+            sistePubliserteÅrstallOgKvartal, antallKvartalerSomSkalSummeres, sykefraværVarighet);
 
-        SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær =
-                SummertKorttidsOgLangtidsfravær.getSummertKorttidsOgLangtidsfravær(
-                        sistePubliserteÅrstallOgKvartal,
-                        antallKvartalerSomSkalSummeres,
-                        sykefraværVarighet
-                );
+    SummertSykefravær summertSykefraværGradering =
+        getSummerSykefraværGradering(
+            sistePubliserteÅrstallOgKvartal, antallKvartalerSomSkalSummeres, sykefraværGradering);
 
-        SummertSykefravær summertSykefraværGradering = getSummerSykefraværGradering(
-                sistePubliserteÅrstallOgKvartal,
-                antallKvartalerSomSkalSummeres,
-                sykefraværGradering
-        );
+    return SummertSykefraværshistorikk.builder()
+        .type(Statistikkategori.VIRKSOMHET)
+        .label(underenhet.getNavn())
+        .summertKorttidsOgLangtidsfravær(summertKorttidsOgLangtidsfravær)
+        .summertGradertFravær(summertSykefraværGradering)
+        .build();
+  }
 
-        return SummertSykefraværshistorikk.builder()
-                .type(Statistikkategori.VIRKSOMHET)
-                .label(underenhet.getNavn())
-                .summertKorttidsOgLangtidsfravær(summertKorttidsOgLangtidsfravær)
-                .summertGradertFravær(summertSykefraværGradering)
-                .build();
-    }
+  protected SummertSykefravær getSummerSykefraværGradering(
+      ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal,
+      int antallKvartalerSomSkalSummeres,
+      List<UmaskertSykefraværForEttKvartal> sykefraværGradering) {
+    List<ÅrstallOgKvartal> kvartalerSomSkalSummeres =
+        ÅrstallOgKvartal.range(
+            sistePubliserteÅrstallOgKvartal.minusKvartaler(antallKvartalerSomSkalSummeres - 1),
+            sistePubliserteÅrstallOgKvartal);
 
+    List<UmaskertSykefraværForEttKvartal> gradertSykefraværForDeKvartaleneSomSkalSummeres =
+        sykefraværGradering.stream()
+            .filter(v -> kvartalerSomSkalSummeres.contains(v.getÅrstallOgKvartal()))
+            .sorted(UmaskertSykefraværForEttKvartal::compareTo)
+            .collect(Collectors.toList());
 
-    protected SummertSykefravær getSummerSykefraværGradering(
-            ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal,
-            int antallKvartalerSomSkalSummeres,
-            List<UmaskertSykefraværForEttKvartal> sykefraværGradering
-    ) {
-        List<ÅrstallOgKvartal> kvartalerSomSkalSummeres = ÅrstallOgKvartal.range(
-                sistePubliserteÅrstallOgKvartal.minusKvartaler(antallKvartalerSomSkalSummeres - 1),
-                sistePubliserteÅrstallOgKvartal
-        );
-
-        List<UmaskertSykefraværForEttKvartal> gradertSykefraværForDeKvartaleneSomSkalSummeres =
-                sykefraværGradering.stream()
-                        .filter(v -> kvartalerSomSkalSummeres.contains(v.getÅrstallOgKvartal()))
-                        .sorted(UmaskertSykefraværForEttKvartal::compareTo)
-                        .collect(Collectors.toList());
-
-        return SummertSykefravær.getSummertSykefravær(gradertSykefraværForDeKvartaleneSomSkalSummeres);
-    }
+    return SummertSykefravær.getSummertSykefravær(gradertSykefraværForDeKvartaleneSomSkalSummeres);
+  }
 }

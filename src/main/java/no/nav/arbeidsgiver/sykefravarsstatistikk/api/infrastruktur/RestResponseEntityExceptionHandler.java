@@ -31,21 +31,18 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
   @ExceptionHandler(value = {EnhetsregisteretMappingException.class})
   @ResponseBody
-  protected ResponseEntity<Object> handleEnhetsregisteretMappingException(RuntimeException e,
-      WebRequest webRequest) {
-    return getResponseEntity(e,
-        "Kunne ikke lese informasjon om enheten fra Enhetsregisteret",
-        HttpStatus.BAD_REQUEST);
+  protected ResponseEntity<Object> handleEnhetsregisteretMappingException(
+      RuntimeException e, WebRequest webRequest) {
+    return getResponseEntity(
+        e, "Kunne ikke lese informasjon om enheten fra Enhetsregisteret", HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler(value = {OrgnrEksistererIkkeException.class})
   @ResponseBody
-  protected ResponseEntity<Object> handleOrgnrEksistererIkkeException(RuntimeException e,
-      WebRequest webRequest) {
+  protected ResponseEntity<Object> handleOrgnrEksistererIkkeException(
+      RuntimeException e, WebRequest webRequest) {
     logger.warn("Orgnr finnes ikke i Enhetsregisteret", e);
-    return getResponseEntity(e,
-        "Orgnr finnes ikke i Enhetsregisteret",
-        HttpStatus.NOT_FOUND);
+    return getResponseEntity(e, "Orgnr finnes ikke i Enhetsregisteret", HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(value = {EnhetsregisteretIkkeTilgjengeligException.class})
@@ -56,13 +53,12 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         "Kunne ikke hente informasjon om enheten fra Enhetsregisteret fordi Enhetsregisteret ikke er tilgjengelig",
         e);
     return getResponseEntity(e, "Internal error", HttpStatus.INTERNAL_SERVER_ERROR);
-
   }
 
   @ExceptionHandler(value = {IngenNæringException.class})
   @ResponseBody
-  protected ResponseEntity<Object> handleIngenNæringException(RuntimeException e,
-      WebRequest webRequest) {
+  protected ResponseEntity<Object> handleIngenNæringException(
+      RuntimeException e, WebRequest webRequest) {
     logger.info(
         "Kunne ikke lese informasjon om enheten fra Enhetsregisteret fordi enheten ikke har næring",
         e);
@@ -70,61 +66,54 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         e,
         "Internal error",
         HttpStatus.INTERNAL_SERVER_ERROR,
-        Collections.singletonMap("causedBy", INGEN_NÆRING)
-    );
-
+        Collections.singletonMap("causedBy", INGEN_NÆRING));
   }
 
   @ExceptionHandler(value = {TilgangskontrollException.class})
   @ResponseBody
-  protected ResponseEntity<Object> handleTilgangskontrollException(RuntimeException e,
-      WebRequest webRequest) {
+  protected ResponseEntity<Object> handleTilgangskontrollException(
+      RuntimeException e, WebRequest webRequest) {
     return getResponseEntity(e, "You don't have access to this resource", HttpStatus.FORBIDDEN);
   }
 
   @ExceptionHandler(value = {JwtTokenUnauthorizedException.class, AccessDeniedException.class})
   @ResponseBody
-  protected ResponseEntity<Object> handleUnauthorizedException(RuntimeException e,
-      WebRequest webRequest) {
-    return getResponseEntity(e, "You are not authorized to access this resource",
-        HttpStatus.UNAUTHORIZED);
+  protected ResponseEntity<Object> handleUnauthorizedException(
+      RuntimeException e, WebRequest webRequest) {
+    return getResponseEntity(
+        e, "You are not authorized to access this resource", HttpStatus.UNAUTHORIZED);
   }
 
   @ExceptionHandler(value = {AltinnException.class})
   @ResponseBody
-  protected ResponseEntity<Object> handleAltinnException(RuntimeException e,
-      WebRequest webRequest) {
+  protected ResponseEntity<Object> handleAltinnException(
+      RuntimeException e, WebRequest webRequest) {
     logger.warn("Feil ved Altinn integrasjon", e);
     return getResponseEntity(e, "Internal error", HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @ExceptionHandler(value = {Exception.class})
   @ResponseBody
-  protected ResponseEntity<Object> handleGenerellException(RuntimeException e,
-      WebRequest webRequest) {
+  protected ResponseEntity<Object> handleGenerellException(
+      RuntimeException e, WebRequest webRequest) {
     logger.error("Uhåndtert feil", e);
     return getResponseEntity(e, "Internal error", HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
-  private ResponseEntity<Object> getResponseEntity(RuntimeException e, String melding,
-      HttpStatus status) {
+  private ResponseEntity<Object> getResponseEntity(
+      RuntimeException e, String melding, HttpStatus status) {
     return getResponseEntity(e, melding, status, new HashMap<>());
   }
 
-  private ResponseEntity<Object> getResponseEntity(RuntimeException e, String melding,
-      HttpStatus status, Map<String, String> bodyTillegg) {
+  private ResponseEntity<Object> getResponseEntity(
+      RuntimeException e, String melding, HttpStatus status, Map<String, String> bodyTillegg) {
     HashMap<String, String> body = new HashMap<>(bodyTillegg);
     body.put("message", melding);
     logger.info(
         String.format(
             "Returnerer følgende HttpStatus '%s' med melding '%s' pga exception '%s'",
-            status.toString(),
-            melding,
-            e.getMessage()
-        )
-    );
+            status.toString(), melding, e.getMessage()));
 
     return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON_UTF8).body(body);
   }
-
 }

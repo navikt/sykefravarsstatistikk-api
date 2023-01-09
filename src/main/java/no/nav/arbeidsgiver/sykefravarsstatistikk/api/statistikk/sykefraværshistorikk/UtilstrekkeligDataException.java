@@ -1,11 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
 public class UtilstrekkeligDataException extends StatistikkException {
-    public UtilstrekkeligDataException(String message) {
-        super("Mangler data for å gjennomføre kalkuleringen: " + message);
-    }
+  public UtilstrekkeligDataException(String message) {
+    super("Mangler data for å gjennomføre kalkuleringen: " + message);
+  }
 
-    public UtilstrekkeligDataException() {
-        this("ingen sykefraværsdata ble funnet.");
-    }
+  public UtilstrekkeligDataException() {
+    this("ingen sykefraværsdata ble funnet.");
+  }
 }

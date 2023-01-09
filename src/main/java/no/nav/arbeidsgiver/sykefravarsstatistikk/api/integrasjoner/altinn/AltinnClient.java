@@ -24,75 +24,77 @@ import static java.lang.String.format;
 @Slf4j
 @Component
 public class AltinnClient {
-    private final RestTemplate restTemplate;
+  private final RestTemplate restTemplate;
 
-    private final String altinnUrl;
-    private final String altinnProxyUrl;
-    private final String altinnAPIGWApikey;
-    private final String altinnHeader;
+  private final String altinnUrl;
+  private final String altinnProxyUrl;
+  private final String altinnAPIGWApikey;
+  private final String altinnHeader;
 
-    private final String iawebServiceCode;
-    private final String iawebServiceEdition;
+  private final String iawebServiceCode;
+  private final String iawebServiceEdition;
 
-    private final TilgangskontrollUtils tilgangskontrollUtils;
-    private final UnleashService featureToggles;
+  private final TilgangskontrollUtils tilgangskontrollUtils;
+  private final UnleashService featureToggles;
 
-    public AltinnClient(
-            RestTemplate restTemplate,
-            @Value("${altinn.url}") String altinnUrl,
-            @Value("${altinn.proxy.url}") String altinnProxyUrl,
-            @Value("${altinn.apigw.apikey}") String altinnAPIGWApikey,
-            @Value("${altinn.apikey}") String altinnApikey,
-            @Value("${altinn.iaweb.service.code}") String iawebServiceCode,
-            @Value("${altinn.iaweb.service.edition}") String iawebServiceEdition,
-            TilgangskontrollUtils tilgangskontrollUtils,
-            UnleashService featureToggles
-    ) {
-        this.restTemplate = restTemplate;
-        this.altinnUrl = altinnUrl;
-        this.altinnProxyUrl = altinnProxyUrl;
-        this.altinnAPIGWApikey = altinnAPIGWApikey;
-        this.altinnHeader = altinnApikey;
-        this.iawebServiceCode = iawebServiceCode;
-        this.iawebServiceEdition = iawebServiceEdition;
-        this.tilgangskontrollUtils = tilgangskontrollUtils;
-        this.featureToggles = featureToggles;
+  public AltinnClient(
+      RestTemplate restTemplate,
+      @Value("${altinn.url}") String altinnUrl,
+      @Value("${altinn.proxy.url}") String altinnProxyUrl,
+      @Value("${altinn.apigw.apikey}") String altinnAPIGWApikey,
+      @Value("${altinn.apikey}") String altinnApikey,
+      @Value("${altinn.iaweb.service.code}") String iawebServiceCode,
+      @Value("${altinn.iaweb.service.edition}") String iawebServiceEdition,
+      TilgangskontrollUtils tilgangskontrollUtils,
+      UnleashService featureToggles) {
+    this.restTemplate = restTemplate;
+    this.altinnUrl = altinnUrl;
+    this.altinnProxyUrl = altinnProxyUrl;
+    this.altinnAPIGWApikey = altinnAPIGWApikey;
+    this.altinnHeader = altinnApikey;
+    this.iawebServiceCode = iawebServiceCode;
+    this.iawebServiceEdition = iawebServiceEdition;
+    this.tilgangskontrollUtils = tilgangskontrollUtils;
+    this.featureToggles = featureToggles;
+  }
+
+  public List<AltinnRolle> hentRoller(Fnr fnr, Orgnr orgnr) {
+    URI uri =
+        UriComponentsBuilder.fromUriString(altinnUrl)
+            .pathSegment("ekstern", "altinn", "api", "serviceowner", "authorization", "roles")
+            .queryParam("ForceEIAuthentication")
+            .queryParam("subject", fnr.getVerdi())
+            .queryParam("reportee", orgnr.getVerdi())
+            .build()
+            .toUri();
+    try {
+      Optional<List<AltinnRolle>> respons =
+          Optional.ofNullable(
+              restTemplate
+                  .exchange(
+                      uri,
+                      HttpMethod.GET,
+                      new HttpEntity<>(getAuthHeadersMotAltinn()),
+                      new ParameterizedTypeReference<List<AltinnRolle>>() {})
+                  .getBody());
+
+      if (respons.isPresent()) {
+        List<AltinnRolle> altinnRoller = respons.get();
+        log.info(format("Hentet %d roller fra Altinn", altinnRoller.size()));
+        return altinnRoller;
+      } else {
+        throw new AltinnException("Feil ved kall til Altinn. Response body er null.");
+      }
+
+    } catch (RestClientException e) {
+      throw new AltinnException("Feil ved kall til Altinn", e);
     }
+  }
 
-    public List<AltinnRolle> hentRoller(Fnr fnr, Orgnr orgnr) {
-        URI uri = UriComponentsBuilder.fromUriString(altinnUrl)
-                .pathSegment("ekstern", "altinn", "api", "serviceowner", "authorization", "roles")
-                .queryParam("ForceEIAuthentication")
-                .queryParam("subject", fnr.getVerdi())
-                .queryParam("reportee", orgnr.getVerdi())
-                .build()
-                .toUri();
-        try {
-            Optional<List<AltinnRolle>> respons = Optional.ofNullable(restTemplate.exchange(
-                    uri,
-                    HttpMethod.GET,
-                    new HttpEntity<>(getAuthHeadersMotAltinn()),
-                    new ParameterizedTypeReference<List<AltinnRolle>>() {
-                    }
-            ).getBody());
-
-            if (respons.isPresent()) {
-                List<AltinnRolle> altinnRoller = respons.get();
-                log.info(format("Hentet %d roller fra Altinn", altinnRoller.size()));
-                return altinnRoller;
-            } else {
-                throw new AltinnException("Feil ved kall til Altinn. Response body er null.");
-            }
-
-        } catch (RestClientException e) {
-            throw new AltinnException("Feil ved kall til Altinn", e);
-        }
-    }
-
-    private HttpHeaders getAuthHeadersMotAltinn() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-NAV-APIKEY", altinnAPIGWApikey);
-        headers.set("APIKEY", altinnHeader);
-        return headers;
-    }
+  private HttpHeaders getAuthHeadersMotAltinn() {
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("X-NAV-APIKEY", altinnAPIGWApikey);
+    headers.set("APIKEY", altinnHeader);
+    return headers;
+  }
 }

@@ -9,15 +9,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SlettOgOpprettResultat {
 
-    private int antallRadSlettet;
-    private int antallRadOpprettet;
+  private int antallRadSlettet;
+  private int antallRadOpprettet;
 
-    public void add(SlettOgOpprettResultat resultat) {
-        antallRadOpprettet = antallRadOpprettet + resultat.getAntallRadOpprettet();
-        antallRadSlettet = antallRadSlettet + resultat.getAntallRadSlettet();
-    }
+  public void add(SlettOgOpprettResultat resultat) {
+    antallRadOpprettet = antallRadOpprettet + resultat.getAntallRadOpprettet();
+    antallRadSlettet = antallRadSlettet + resultat.getAntallRadSlettet();
+  }
 
-    public static SlettOgOpprettResultat tomtResultat() {
-        return new SlettOgOpprettResultat(0, 0);
-    }
+  public static SlettOgOpprettResultat tomtResultat() {
+    return new SlettOgOpprettResultat(0, 0);
+  }
 }

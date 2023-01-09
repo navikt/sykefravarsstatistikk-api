@@ -1,37 +1,37 @@
 <configuration scan="true">
-    <springProfile name="dev,prod">
-        <appender name="maskedJsonConsoleAppender" class="no.nav.common.log.MaskingAppender">
-            <appender name="consoleJsonAppender" class="ch.qos.logback.core.ConsoleAppender">
-                <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
-            </appender>
-        </appender>
+  <springProfile name="dev,prod">
+    <appender name="maskedJsonConsoleAppender" class="no.nav.common.log.MaskingAppender">
+      <appender name="consoleJsonAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+      </appender>
+    </appender>
 
-        <appender name="sporbarhetsloggAppender" class="com.papertrailapp.logback.Syslog4jAppender">
-            <layout class="ch.qos.logback.classic.PatternLayout">
-                <pattern>%m%n%xEx</pattern>
-            </layout>
+    <appender name="sporbarhetsloggAppender" class="com.papertrailapp.logback.Syslog4jAppender">
+      <layout class="ch.qos.logback.classic.PatternLayout">
+        <pattern>%m%n%xEx</pattern>
+      </layout>
 
-            <syslogConfig class="org.productivity.java.syslog4j.impl.net.tcp.TCPNetSyslogConfig">
-                <host>audit.nais</host>
-                <port>6514</port>
-                <ident>sykefravarsstatistikk-api</ident>
-                <maxMessageLength>128000</maxMessageLength>
-            </syslogConfig>
-        </appender>
+      <syslogConfig class="org.productivity.java.syslog4j.impl.net.tcp.TCPNetSyslogConfig">
+        <host>audit.nais</host>
+        <port>6514</port>
+        <ident>sykefravarsstatistikk-api</ident>
+        <maxMessageLength>128000</maxMessageLength>
+      </syslogConfig>
+    </appender>
 
-        <logger level="INFO" name="sporbarhetslogger" additivity="false">
-            <appender-ref ref="sporbarhetsloggAppender"/>
-        </logger>
+    <logger level="INFO" name="sporbarhetslogger" additivity="false">
+      <appender-ref ref="sporbarhetsloggAppender"/>
+    </logger>
 
-        <logger name="org.apache.kafka.clients.NetworkClient" level="ERROR"/>
+    <logger name="org.apache.kafka.clients.NetworkClient" level="ERROR"/>
 
-        <root level="INFO">
-            <appender-ref ref="maskedJsonConsoleAppender"/>
-        </root>
-    </springProfile>
-    <springProfile name="local">
-        <include resource="org/springframework/boot/logging/logback/base.xml"/>
-        <logger name="org.springframework.web" level="info"/>
-        <logger name="no.nav.security.token.support.spring.test" level="info"/>
-    </springProfile>
+    <root level="INFO">
+      <appender-ref ref="maskedJsonConsoleAppender"/>
+    </root>
+  </springProfile>
+  <springProfile name="local">
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <logger name="org.springframework.web" level="info"/>
+    <logger name="no.nav.security.token.support.spring.test" level="info"/>
+  </springProfile>
 </configuration>

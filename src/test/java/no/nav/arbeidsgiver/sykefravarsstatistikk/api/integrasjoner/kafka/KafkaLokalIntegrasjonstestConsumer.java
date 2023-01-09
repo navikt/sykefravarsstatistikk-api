@@ -8,28 +8,28 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.CountDownLatch;
 
 @Slf4j
-//@Component
+// @Component
 public class KafkaLokalIntegrasjonstestConsumer {
 
-    private final CountDownLatch latch = new CountDownLatch(1);
-    private String payload = null;
+  private final CountDownLatch latch = new CountDownLatch(1);
+  private String payload = null;
 
-    //@KafkaListener(topics = "arbeidsgiver.sykefravarsstatistikk-v1")
-    public void receive(ConsumerRecord<?, ?> consumerRecord) {
-        log.info("received payload='{}'", consumerRecord.toString());
-        setPayload(consumerRecord.toString());
-        latch.countDown();
-    }
+  // @KafkaListener(topics = "arbeidsgiver.sykefravarsstatistikk-v1")
+  public void receive(ConsumerRecord<?, ?> consumerRecord) {
+    log.info("received payload='{}'", consumerRecord.toString());
+    setPayload(consumerRecord.toString());
+    latch.countDown();
+  }
 
-    private void setPayload(String payload) {
-        this.payload = payload;
-    }
+  private void setPayload(String payload) {
+    this.payload = payload;
+  }
 
-    public CountDownLatch getLatch() {
-        return latch;
-    }
+  public CountDownLatch getLatch() {
+    return latch;
+  }
 
-    public String getPayload() {
-        return payload;
-    }
+  public String getPayload() {
+    return payload;
+  }
 }

@@ -31,202 +31,180 @@ import static java.lang.String.format;
 @Component
 public class KvartalsvisSykefraværshistorikkService {
 
-    public static final int TIMEOUT_UTHENTING_FRA_DB_I_SEKUNDER = 3;
-    public static final String SYKEFRAVÆRPROSENT_LAND_LABEL = "Norge";
+  public static final int TIMEOUT_UTHENTING_FRA_DB_I_SEKUNDER = 3;
+  public static final String SYKEFRAVÆRPROSENT_LAND_LABEL = "Norge";
 
-    private final KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository;
-    private final SektorMappingService sektorMappingService;
-    private final KlassifikasjonerRepository klassifikasjonerRepository;
-    private final Bransjeprogram bransjeprogram;
+  private final KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository;
+  private final SektorMappingService sektorMappingService;
+  private final KlassifikasjonerRepository klassifikasjonerRepository;
+  private final Bransjeprogram bransjeprogram;
 
-    public KvartalsvisSykefraværshistorikkService(
-            KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository,
-            SektorMappingService sektorMappingService,
-            KlassifikasjonerRepository klassifikasjonerRepository,
-            Bransjeprogram bransjeprogram) {
-        this.kvartalsvisSykefraværprosentRepository = kvartalsvisSykefraværprosentRepository;
-        this.sektorMappingService = sektorMappingService;
-        this.klassifikasjonerRepository = klassifikasjonerRepository;
-        this.bransjeprogram = bransjeprogram;
-    }
+  public KvartalsvisSykefraværshistorikkService(
+      KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository,
+      SektorMappingService sektorMappingService,
+      KlassifikasjonerRepository klassifikasjonerRepository,
+      Bransjeprogram bransjeprogram) {
+    this.kvartalsvisSykefraværprosentRepository = kvartalsvisSykefraværprosentRepository;
+    this.sektorMappingService = sektorMappingService;
+    this.klassifikasjonerRepository = klassifikasjonerRepository;
+    this.bransjeprogram = bransjeprogram;
+  }
 
-    public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikk(
-            Underenhet underenhet,
-            InstitusjonellSektorkode institusjonellSektorkode
-    ) {
-        Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
-        boolean skalHenteDataPåNæring2Siffer =
-                bransje.isEmpty()
-                        || bransje.get().erDefinertPåTosiffernivå();
+  public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikk(
+      Underenhet underenhet, InstitusjonellSektorkode institusjonellSektorkode) {
+    Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
+    boolean skalHenteDataPåNæring2Siffer =
+        bransje.isEmpty() || bransje.get().erDefinertPåTosiffernivå();
 
-        Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(institusjonellSektorkode);
+    Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(institusjonellSektorkode);
 
-        List<KvartalsvisSykefraværshistorikk> kvartalsvisSykefraværshistorikkListe =
-                Stream.of(
-                        uthentingMedFeilhåndteringOgTimeout(
-                                () -> hentSykefraværshistorikkLand(),
-                                Statistikkategori.LAND,
-                                SYKEFRAVÆRPROSENT_LAND_LABEL),
-                        uthentingMedFeilhåndteringOgTimeout(
-                                () -> hentSykefraværshistorikkSektor(ssbSektor),
-                                Statistikkategori.SEKTOR,
-                                ssbSektor.getNavn()),
-                        skalHenteDataPåNæring2Siffer ?
-                                uthentingAvSykefraværshistorikkNæring(underenhet)
-                                : uthentingMedFeilhåndteringOgTimeout(
-                                () -> hentSykefraværshistorikkBransje(bransje.get()),
-                                Statistikkategori.BRANSJE,
-                                bransje.get().getNavn()
-                        ),
-                        uthentingMedFeilhåndteringOgTimeout(
-                                () -> hentSykefraværshistorikkVirksomhet(underenhet, Statistikkategori.VIRKSOMHET),
-                                Statistikkategori.VIRKSOMHET,
-                                underenhet.getNavn())
-                )
-                        .map(CompletableFuture::join)
-                        .collect(Collectors.toList());
+    List<KvartalsvisSykefraværshistorikk> kvartalsvisSykefraværshistorikkListe =
+        Stream.of(
+                uthentingMedFeilhåndteringOgTimeout(
+                    () -> hentSykefraværshistorikkLand(),
+                    Statistikkategori.LAND,
+                    SYKEFRAVÆRPROSENT_LAND_LABEL),
+                uthentingMedFeilhåndteringOgTimeout(
+                    () -> hentSykefraværshistorikkSektor(ssbSektor),
+                    Statistikkategori.SEKTOR,
+                    ssbSektor.getNavn()),
+                skalHenteDataPåNæring2Siffer
+                    ? uthentingAvSykefraværshistorikkNæring(underenhet)
+                    : uthentingMedFeilhåndteringOgTimeout(
+                        () -> hentSykefraværshistorikkBransje(bransje.get()),
+                        Statistikkategori.BRANSJE,
+                        bransje.get().getNavn()),
+                uthentingMedFeilhåndteringOgTimeout(
+                    () ->
+                        hentSykefraværshistorikkVirksomhet(
+                            underenhet, Statistikkategori.VIRKSOMHET),
+                    Statistikkategori.VIRKSOMHET,
+                    underenhet.getNavn()))
+            .map(CompletableFuture::join)
+            .collect(Collectors.toList());
 
-        return kvartalsvisSykefraværshistorikkListe;
-    }
+    return kvartalsvisSykefraværshistorikkListe;
+  }
 
-    public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikk(Underenhet underenhet, OverordnetEnhet overordnetEnhet) {
+  public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikk(
+      Underenhet underenhet, OverordnetEnhet overordnetEnhet) {
 
-        KvartalsvisSykefraværshistorikk historikkForOverordnetEnhet = uthentingMedFeilhåndteringOgTimeout(
-                () -> hentSykefraværshistorikkVirksomhet(overordnetEnhet, Statistikkategori.OVERORDNET_ENHET),
+    KvartalsvisSykefraværshistorikk historikkForOverordnetEnhet =
+        uthentingMedFeilhåndteringOgTimeout(
+                () ->
+                    hentSykefraværshistorikkVirksomhet(
+                        overordnetEnhet, Statistikkategori.OVERORDNET_ENHET),
                 Statistikkategori.OVERORDNET_ENHET,
-                underenhet.getNavn()
-        ).join();
+                underenhet.getNavn())
+            .join();
 
-        List<KvartalsvisSykefraværshistorikk> kvartalsvisSykefraværshistorikkListe = hentSykefraværshistorikk(
-                underenhet,
-                overordnetEnhet.getInstitusjonellSektorkode()
-        );
-        kvartalsvisSykefraværshistorikkListe.add(historikkForOverordnetEnhet);
+    List<KvartalsvisSykefraværshistorikk> kvartalsvisSykefraværshistorikkListe =
+        hentSykefraværshistorikk(underenhet, overordnetEnhet.getInstitusjonellSektorkode());
+    kvartalsvisSykefraværshistorikkListe.add(historikkForOverordnetEnhet);
 
-        return kvartalsvisSykefraværshistorikkListe;
-    }
+    return kvartalsvisSykefraværshistorikkListe;
+  }
 
+  protected KvartalsvisSykefraværshistorikk hentSykefraværshistorikkLand() {
+    return byggSykefraværshistorikk(
+        Statistikkategori.LAND,
+        SYKEFRAVÆRPROSENT_LAND_LABEL,
+        kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand());
+  }
 
-    protected KvartalsvisSykefraværshistorikk hentSykefraværshistorikkLand() {
-        return byggSykefraværshistorikk(
-                Statistikkategori.LAND,
-                SYKEFRAVÆRPROSENT_LAND_LABEL,
-                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand()
-        );
-    }
+  private KvartalsvisSykefraværshistorikk hentSykefraværshistorikkSektor(Sektor ssbSektor) {
+    return byggSykefraværshistorikk(
+        Statistikkategori.SEKTOR,
+        ssbSektor.getNavn(),
+        kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(ssbSektor));
+  }
 
-    private KvartalsvisSykefraværshistorikk hentSykefraværshistorikkSektor(Sektor ssbSektor) {
-        return byggSykefraværshistorikk(
-                Statistikkategori.SEKTOR,
-                ssbSektor.getNavn(),
-                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(ssbSektor)
-        );
-    }
+  private KvartalsvisSykefraværshistorikk hentSykefraværshistorikkNæring(Næring næring) {
+    return byggSykefraværshistorikk(
+        Statistikkategori.NÆRING,
+        næring.getNavn(),
+        kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentNæring(næring));
+  }
 
-    private KvartalsvisSykefraværshistorikk hentSykefraværshistorikkNæring(Næring næring) {
-        return byggSykefraværshistorikk(
-                Statistikkategori.NÆRING,
-                næring.getNavn(),
-                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentNæring(næring)
-        );
-    }
+  protected KvartalsvisSykefraværshistorikk hentSykefraværshistorikkBransje(Bransje bransje) {
+    return byggSykefraværshistorikk(
+        Statistikkategori.BRANSJE,
+        bransje.getNavn(),
+        kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentBransje(bransje));
+  }
 
-    protected KvartalsvisSykefraværshistorikk hentSykefraværshistorikkBransje(Bransje bransje) {
-        return byggSykefraværshistorikk(
-                Statistikkategori.BRANSJE,
-                bransje.getNavn(),
-                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentBransje(bransje)
-        );
-    }
+  private KvartalsvisSykefraværshistorikk hentSykefraværshistorikkVirksomhet(
+      Virksomhet virksomhet, Statistikkategori type) {
+    return byggSykefraværshistorikk(
+        type,
+        virksomhet.getNavn(),
+        kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(
+            virksomhet));
+  }
 
-    private KvartalsvisSykefraværshistorikk hentSykefraværshistorikkVirksomhet(
-            Virksomhet virksomhet,
-            Statistikkategori type
-    ) {
-        return byggSykefraværshistorikk(
-                type,
-                virksomhet.getNavn(),
-                kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(virksomhet)
-        );
-    }
+  protected CompletableFuture<KvartalsvisSykefraværshistorikk>
+      uthentingAvSykefraværshistorikkNæring(Underenhet underenhet) {
+    Næringskode5Siffer næring5siffer = underenhet.getNæringskode();
+    return uthentingMedTimeout(
+            () -> klassifikasjonerRepository.hentNæring(næring5siffer.hentNæringskode2Siffer()))
+        .thenCompose(
+            næring ->
+                uthentingMedFeilhåndteringOgTimeout(
+                    () -> hentSykefraværshistorikkNæring(næring),
+                    Statistikkategori.NÆRING,
+                    næring.getNavn()))
+        .handle(
+            (result, throwable) -> {
+              if (throwable == null) {
+                return result;
+              } else {
+                log.warn(
+                    format(
+                        "Fikk '%s' ved uthenting av næring '%s'. " + "Returnerer en tom liste",
+                        throwable.getMessage(), næring5siffer.hentNæringskode2Siffer()),
+                    throwable);
+                return byggSykefraværshistorikk(
+                    Statistikkategori.NÆRING, null, Collections.EMPTY_LIST);
+              }
+            });
+  }
 
-    protected CompletableFuture<KvartalsvisSykefraværshistorikk> uthentingAvSykefraværshistorikkNæring(Underenhet underenhet) {
-        Næringskode5Siffer næring5siffer = underenhet.getNæringskode();
-        return uthentingMedTimeout(
-                () -> klassifikasjonerRepository.hentNæring(næring5siffer.hentNæringskode2Siffer())
+  private static CompletableFuture<Næring> uthentingMedTimeout(
+      Supplier<Næring> hentNæringSupplier) {
+    return CompletableFuture.supplyAsync(hentNæringSupplier)
+        .orTimeout(TIMEOUT_UTHENTING_FRA_DB_I_SEKUNDER, TimeUnit.SECONDS);
+  }
 
-        ).thenCompose(
-                næring ->
-                        uthentingMedFeilhåndteringOgTimeout(
-                                () -> hentSykefraværshistorikkNæring(næring),
-                                Statistikkategori.NÆRING,
-                                næring.getNavn()
-                        )
-        ).handle(
-                (result, throwable) -> {
-                    if (throwable == null) {
-                        return result;
-                    } else {
-                        log.warn(
-                                format("Fikk '%s' ved uthenting av næring '%s'. " +
-                                                "Returnerer en tom liste",
-                                        throwable.getMessage(),
-                                        næring5siffer.hentNæringskode2Siffer()
-                                ),
-                                throwable
-                        );
-                        return byggSykefraværshistorikk(
-                                Statistikkategori.NÆRING,
-                                null,
-                                Collections.EMPTY_LIST
-                        );
-                    }
-                }
-        );
-    }
+  protected static CompletableFuture<KvartalsvisSykefraværshistorikk>
+      uthentingMedFeilhåndteringOgTimeout(
+          Supplier<KvartalsvisSykefraværshistorikk> sykefraværshistorikkSupplier,
+          Statistikkategori statistikkategori,
+          String sykefraværshistorikkLabel) {
+    return CompletableFuture.supplyAsync(sykefraværshistorikkSupplier)
+        .orTimeout(TIMEOUT_UTHENTING_FRA_DB_I_SEKUNDER, TimeUnit.SECONDS)
+        .exceptionally(
+            e -> {
+              log.warn(
+                  format(
+                      "Fikk '%s' ved uthenting av sykefravarsstatistikk '%s'. "
+                          + "Returnerer en tom liste",
+                      e.getMessage(), statistikkategori),
+                  e);
+              return byggSykefraværshistorikk(
+                  statistikkategori, sykefraværshistorikkLabel, Collections.emptyList());
+            });
+  }
 
-    private static CompletableFuture<Næring> uthentingMedTimeout(Supplier<Næring> hentNæringSupplier) {
-        return CompletableFuture
-                .supplyAsync(hentNæringSupplier)
-                .orTimeout(TIMEOUT_UTHENTING_FRA_DB_I_SEKUNDER, TimeUnit.SECONDS);
-    }
+  private static KvartalsvisSykefraværshistorikk byggSykefraværshistorikk(
+      Statistikkategori statistikkategori,
+      String label,
+      List<SykefraværForEttKvartal> sykefraværForEttKvartal) {
+    KvartalsvisSykefraværshistorikk kvartalsvisSykefraværshistorikk =
+        new KvartalsvisSykefraværshistorikk();
+    kvartalsvisSykefraværshistorikk.setType(statistikkategori);
+    kvartalsvisSykefraværshistorikk.setLabel(label);
+    kvartalsvisSykefraværshistorikk.setSykefraværForEttKvartal(sykefraværForEttKvartal);
 
-    protected static CompletableFuture<KvartalsvisSykefraværshistorikk> uthentingMedFeilhåndteringOgTimeout(
-            Supplier<KvartalsvisSykefraværshistorikk> sykefraværshistorikkSupplier,
-            Statistikkategori statistikkategori,
-            String sykefraværshistorikkLabel
-    ) {
-        return CompletableFuture
-                .supplyAsync(sykefraværshistorikkSupplier)
-                .orTimeout(TIMEOUT_UTHENTING_FRA_DB_I_SEKUNDER, TimeUnit.SECONDS)
-                .exceptionally(
-                        e -> {
-                            log.warn(
-                                    format("Fikk '%s' ved uthenting av sykefravarsstatistikk '%s'. " +
-                                                    "Returnerer en tom liste",
-                                            e.getMessage(),
-                                            statistikkategori
-                                    ),
-                                    e
-                            );
-                            return byggSykefraværshistorikk(
-                                    statistikkategori,
-                                    sykefraværshistorikkLabel,
-                                    Collections.emptyList()
-                            );
-                        });
-    }
-
-    private static KvartalsvisSykefraværshistorikk byggSykefraværshistorikk(
-            Statistikkategori statistikkategori,
-            String label,
-            List<SykefraværForEttKvartal> sykefraværForEttKvartal
-    ) {
-        KvartalsvisSykefraværshistorikk kvartalsvisSykefraværshistorikk = new KvartalsvisSykefraværshistorikk();
-        kvartalsvisSykefraværshistorikk.setType(statistikkategori);
-        kvartalsvisSykefraværshistorikk.setLabel(label);
-        kvartalsvisSykefraværshistorikk.setSykefraværForEttKvartal(sykefraværForEttKvartal);
-
-        return kvartalsvisSykefraværshistorikk;
-    }
+    return kvartalsvisSykefraværshistorikk;
+  }
 }

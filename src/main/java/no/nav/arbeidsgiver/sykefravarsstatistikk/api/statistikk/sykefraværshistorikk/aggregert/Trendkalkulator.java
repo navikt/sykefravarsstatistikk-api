@@ -18,7 +18,6 @@ class Trendkalkulator {
   List<UmaskertSykefraværForEttKvartal> datagrunnlag;
   ÅrstallOgKvartal sistePubliserteKvartal;
 
-
   Either<UtilstrekkeligDataException, Trend> kalkulerTrend() {
 
     ÅrstallOgKvartal ettÅrSiden = sistePubliserteKvartal.minusEttÅr();
@@ -34,18 +33,19 @@ class Trendkalkulator {
               "Mangler data for " + sistePubliserteKvartal + " og/eller " + ettÅrSiden));
     }
 
-    Either<StatistikkException, BigDecimal> nyesteSykefraværsprosent
-        = nyesteSykefravær.get().kalkulerSykefraværsprosent();
-    Either<StatistikkException, BigDecimal> sykefraværsprosentEttÅrSiden
-        = sykefraværetEttÅrSiden.get().kalkulerSykefraværsprosent();
+    Either<StatistikkException, BigDecimal> nyesteSykefraværsprosent =
+        nyesteSykefravær.get().kalkulerSykefraværsprosent();
+    Either<StatistikkException, BigDecimal> sykefraværsprosentEttÅrSiden =
+        sykefraværetEttÅrSiden.get().kalkulerSykefraværsprosent();
 
     if (nyesteSykefraværsprosent.isLeft() || sykefraværsprosentEttÅrSiden.isLeft()) {
-      return Either.left(new UtilstrekkeligDataException(
-          "Feil i utregningen av sykefraværsprosenten, kan ikke regne ut trendverdi."));
+      return Either.left(
+          new UtilstrekkeligDataException(
+              "Feil i utregningen av sykefraværsprosenten, kan ikke regne ut trendverdi."));
     }
 
-    BigDecimal trendverdi = nyesteSykefraværsprosent.get()
-        .subtract(sykefraværsprosentEttÅrSiden.get());
+    BigDecimal trendverdi =
+        nyesteSykefraværsprosent.get().subtract(sykefraværsprosentEttÅrSiden.get());
 
     int antallTilfeller =
         nyesteSykefravær.get().getAntallPersoner()

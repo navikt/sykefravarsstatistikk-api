@@ -5,10 +5,10 @@ import lombok.Value;
 
 @Value
 public class Orgnr {
-    private final String verdi;
+  private final String verdi;
 
-    @JsonValue
-    public String asString() {
-        return verdi;
-    }
+  @JsonValue
+  public String asString() {
+    return verdi;
+  }
 }

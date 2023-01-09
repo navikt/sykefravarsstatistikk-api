@@ -14,21 +14,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class HealthcheckControllerTestSpring extends SpringIntegrationTestbase {
 
-    @LocalServerPort
-    private String port;
+  @LocalServerPort private String port;
 
-    @Test
-    public void healthcheck_returnerer_OK__når_applikasjon_kjører() throws Exception {
-        HttpResponse<String> response = newBuilder().build().send(
+  @Test
+  public void healthcheck_returnerer_OK__når_applikasjon_kjører() throws Exception {
+    HttpResponse<String> response =
+        newBuilder()
+            .build()
+            .send(
                 HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api/internal/healthcheck"))
-                        .GET()
-                        .build(),
-                ofString()
-        );
+                    .uri(
+                        URI.create(
+                            "http://localhost:"
+                                + port
+                                + "/sykefravarsstatistikk-api/internal/healthcheck"))
+                    .GET()
+                    .build(),
+                ofString());
 
-        assertThat(response.statusCode()).isEqualTo(200);
-
-    }
-
+    assertThat(response.statusCode()).isEqualTo(200);
+  }
 }

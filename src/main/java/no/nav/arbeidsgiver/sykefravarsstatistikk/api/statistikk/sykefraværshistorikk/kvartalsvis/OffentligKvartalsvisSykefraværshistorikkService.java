@@ -20,53 +20,47 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefrav�
 @Component
 public class OffentligKvartalsvisSykefraværshistorikkService {
 
-    private final KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService;
-    private final Bransjeprogram bransjeprogram;
+  private final KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService;
+  private final Bransjeprogram bransjeprogram;
 
-    public OffentligKvartalsvisSykefraværshistorikkService(
-            KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService,
-            Bransjeprogram bransjeprogram
-    ) {
-        this.kvartalsvisSykefraværshistorikkService = kvartalsvisSykefraværshistorikkService;
-        this.bransjeprogram = bransjeprogram;
-    }
+  public OffentligKvartalsvisSykefraværshistorikkService(
+      KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService,
+      Bransjeprogram bransjeprogram) {
+    this.kvartalsvisSykefraværshistorikkService = kvartalsvisSykefraværshistorikkService;
+    this.bransjeprogram = bransjeprogram;
+  }
 
+  public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikkV1Offentlig(
+      Underenhet underenhet) {
+    Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
+    boolean skalHenteDataPåNæring2Siffer =
+        bransje.isEmpty() || bransje.get().erDefinertPåTosiffernivå();
 
-    public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikkV1Offentlig(
-            Underenhet underenhet) {
-        Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
-        boolean skalHenteDataPåNæring2Siffer =
-                bransje.isEmpty()
-                        || bransje.get().erDefinertPåTosiffernivå();
+    return Stream.of(
+            hentUtForNorge(),
+            skalHenteDataPåNæring2Siffer
+                ? hentUtForNæring(underenhet)
+                : hentUtForBransje(bransje.get()))
+        .map(CompletableFuture::join)
+        .collect(Collectors.toList());
+  }
 
-        return Stream.of(
-                        hentUtForNorge(),
-                        skalHenteDataPåNæring2Siffer ?
-                                hentUtForNæring(underenhet) :
-                                hentUtForBransje(bransje.get())
-                )
-                .map(CompletableFuture::join)
-                .collect(Collectors.toList());
-    }
+  private CompletableFuture<KvartalsvisSykefraværshistorikk> hentUtForNæring(
+      Underenhet underenhet) {
+    return kvartalsvisSykefraværshistorikkService.uthentingAvSykefraværshistorikkNæring(underenhet);
+  }
 
-    private CompletableFuture<KvartalsvisSykefraværshistorikk> hentUtForNæring(Underenhet underenhet) {
-        return kvartalsvisSykefraværshistorikkService
-                .uthentingAvSykefraværshistorikkNæring(underenhet);
-    }
+  private CompletableFuture<KvartalsvisSykefraværshistorikk> hentUtForBransje(Bransje bransje) {
+    return uthentingMedFeilhåndteringOgTimeout(
+        () -> kvartalsvisSykefraværshistorikkService.hentSykefraværshistorikkBransje(bransje),
+        Statistikkategori.BRANSJE,
+        bransje.getNavn());
+  }
 
-    private CompletableFuture<KvartalsvisSykefraværshistorikk> hentUtForBransje(Bransje bransje) {
-        return uthentingMedFeilhåndteringOgTimeout(
-                () -> kvartalsvisSykefraværshistorikkService
-                        .hentSykefraværshistorikkBransje(bransje),
-                Statistikkategori.BRANSJE,
-                bransje.getNavn()
-        );
-    }
-
-    private CompletableFuture<KvartalsvisSykefraværshistorikk> hentUtForNorge() {
-        return uthentingMedFeilhåndteringOgTimeout(
-                kvartalsvisSykefraværshistorikkService::hentSykefraværshistorikkLand,
-                Statistikkategori.LAND,
-                SYKEFRAVÆRPROSENT_LAND_LABEL);
-    }
+  private CompletableFuture<KvartalsvisSykefraværshistorikk> hentUtForNorge() {
+    return uthentingMedFeilhåndteringOgTimeout(
+        kvartalsvisSykefraværshistorikkService::hentSykefraværshistorikkLand,
+        Statistikkategori.LAND,
+        SYKEFRAVÆRPROSENT_LAND_LABEL);
+  }
 }

@@ -15,55 +15,40 @@ import java.util.List;
 @Component
 public class KlassifikasjonerRepository {
 
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+  private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public KlassifikasjonerRepository(
-            @Qualifier("sykefravarsstatistikkJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate
-    ) {
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-    }
+  public KlassifikasjonerRepository(
+      @Qualifier("sykefravarsstatistikkJdbcTemplate")
+          NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+  }
 
+  public Sektor hentSektor(String kode) {
+    SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("kode", kode);
 
-    public Sektor hentSektor(String kode) {
-        SqlParameterSource namedParameters = new MapSqlParameterSource()
-                .addValue("kode", kode);
+    return namedParameterJdbcTemplate.queryForObject(
+        "SELECT * FROM SEKTOR WHERE kode = :kode",
+        namedParameters,
+        (rs, rowNum) -> mapTilSektor(rs));
+  }
 
-        return namedParameterJdbcTemplate.queryForObject(
-                "SELECT * FROM SEKTOR WHERE kode = :kode",
-                namedParameters,
-                (rs, rowNum) -> mapTilSektor(rs)
-        );
-    }
+  public Næring hentNæring(String kode) {
+    SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("kode", kode);
 
-    public Næring hentNæring(String kode) {
-        SqlParameterSource namedParameters = new MapSqlParameterSource()
-                .addValue("kode", kode);
+    return namedParameterJdbcTemplate.queryForObject(
+        "SELECT * FROM naring WHERE kode = :kode",
+        namedParameters,
+        (rs, rowNum) -> new Næring(rs.getString("kode"), rs.getString("navn")));
+  }
 
-        return namedParameterJdbcTemplate.queryForObject(
-                "SELECT * FROM naring WHERE kode = :kode",
-                namedParameters,
-                (rs, rowNum) -> new Næring(
-                        rs.getString("kode"),
-                        rs.getString("navn")
-                )
-        );
-    }
+  public List<Næring> hentAlleNæringer() {
 
-    public List<Næring> hentAlleNæringer() {
+    return namedParameterJdbcTemplate.query(
+        "SELECT * FROM naring ",
+        (rs, rowNum) -> new Næring(rs.getString("kode"), rs.getString("navn")));
+  }
 
-        return namedParameterJdbcTemplate.query(
-                "SELECT * FROM naring ",
-                (rs, rowNum) -> new Næring(
-                        rs.getString("kode"),
-                        rs.getString("navn")
-                )
-        );
-    }
-
-    protected Sektor mapTilSektor(ResultSet rs) throws SQLException {
-        return new Sektor(
-                rs.getString("kode"),
-                rs.getString("navn")
-        );
-    }
+  protected Sektor mapTilSektor(ResultSet rs) throws SQLException {
+    return new Sektor(rs.getString("kode"), rs.getString("navn"));
+  }
 }

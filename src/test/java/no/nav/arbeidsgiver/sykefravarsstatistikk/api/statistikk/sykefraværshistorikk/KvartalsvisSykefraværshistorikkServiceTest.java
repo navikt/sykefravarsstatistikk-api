@@ -31,105 +31,87 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class KvartalsvisSykefraværshistorikkServiceTest {
 
-    @Mock
-    private KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository;
-    @Mock
-    private EnhetsregisteretClient enhetsregisteretClient;
-    @Mock
-    private SektorMappingService sektorMappingService;
-    @Mock
-    private KlassifikasjonerRepository klassifikasjonerRepository;
+  @Mock private KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository;
+  @Mock private EnhetsregisteretClient enhetsregisteretClient;
+  @Mock private SektorMappingService sektorMappingService;
+  @Mock private KlassifikasjonerRepository klassifikasjonerRepository;
 
-    KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService;
+  KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService;
 
-    @BeforeEach
-    public void setUp() {
-        kvartalsvisSykefraværshistorikkService =
-                new KvartalsvisSykefraværshistorikkService(
-                        kvartalsvisSykefraværprosentRepository,
-                        sektorMappingService,
-                        klassifikasjonerRepository,
-                        new Bransjeprogram()
-                );
+  @BeforeEach
+  public void setUp() {
+    kvartalsvisSykefraværshistorikkService =
+        new KvartalsvisSykefraværshistorikkService(
+            kvartalsvisSykefraværprosentRepository,
+            sektorMappingService,
+            klassifikasjonerRepository,
+            new Bransjeprogram());
 
-        when(sektorMappingService.mapTilSSBSektorKode(any()))
-                .thenReturn(
-                        new Sektor("1", "Statlig forvaltning")
-                );
-        when(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand())
-                .thenReturn(
-                        Arrays.asList(sykefraværprosent("Norge"))
-                );
-        when(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(any()))
-                .thenReturn(
-                        Arrays.asList(sykefraværprosent("Statlig forvlatning"))
-                );
-        when(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(any()))
-                .thenReturn(
-                        Arrays.asList(sykefraværprosent("Test Virksomhet"))
-                );
-    }
+    when(sektorMappingService.mapTilSSBSektorKode(any()))
+        .thenReturn(new Sektor("1", "Statlig forvaltning"));
+    when(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand())
+        .thenReturn(Arrays.asList(sykefraværprosent("Norge")));
+    when(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(any()))
+        .thenReturn(Arrays.asList(sykefraværprosent("Statlig forvlatning")));
+    when(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(any()))
+        .thenReturn(Arrays.asList(sykefraværprosent("Test Virksomhet")));
+  }
 
-    @Test
-    public void hentSykefraværshistorikk_skal_ikke_feile_dersom_uthenting_av_en_type_data_feiler() {
-        when(klassifikasjonerRepository.hentNæring(any()))
-                .thenThrow(new EmptyResultDataAccessException(1));
+  @Test
+  public void hentSykefraværshistorikk_skal_ikke_feile_dersom_uthenting_av_en_type_data_feiler() {
+    when(klassifikasjonerRepository.hentNæring(any()))
+        .thenThrow(new EmptyResultDataAccessException(1));
 
-        List<KvartalsvisSykefraværshistorikk> kvartalsvisSykefraværshistorikk =
-                kvartalsvisSykefraværshistorikkService.hentSykefraværshistorikk(
-                        enUnderenhet("999999998"),
-                        enInstitusjonellSektorkode()
-                );
+    List<KvartalsvisSykefraværshistorikk> kvartalsvisSykefraværshistorikk =
+        kvartalsvisSykefraværshistorikkService.hentSykefraværshistorikk(
+            enUnderenhet("999999998"), enInstitusjonellSektorkode());
 
-        verify(kvartalsvisSykefraværprosentRepository, times(0))
-                .hentKvartalsvisSykefraværprosentNæring(any());
-        KvartalsvisSykefraværshistorikk næringSFHistorikk = kvartalsvisSykefraværshistorikk.get(2);
-        assertThat(næringSFHistorikk.getLabel()).isNull();
-    }
+    verify(kvartalsvisSykefraværprosentRepository, times(0))
+        .hentKvartalsvisSykefraværprosentNæring(any());
+    KvartalsvisSykefraværshistorikk næringSFHistorikk = kvartalsvisSykefraværshistorikk.get(2);
+    assertThat(næringSFHistorikk.getLabel()).isNull();
+  }
 
-    @Test
-    public void hentSykefraværshistorikk__skal_returnere_en_næring_dersom_virksomhet_er_i_bransjeprogram_på_2_siffer_nivå() {
-        Underenhet underenhet = Underenhet.builder()
-                .orgnr(etOrgnr())
-                .overordnetEnhetOrgnr(etOrgnr())
-                .navn("Underenhet AS")
-                .næringskode(enNæringskode5Siffer("10300"))
-                .antallAnsatte(40).build();
+  @Test
+  public void
+      hentSykefraværshistorikk__skal_returnere_en_næring_dersom_virksomhet_er_i_bransjeprogram_på_2_siffer_nivå() {
+    Underenhet underenhet =
+        Underenhet.builder()
+            .orgnr(etOrgnr())
+            .overordnetEnhetOrgnr(etOrgnr())
+            .navn("Underenhet AS")
+            .næringskode(enNæringskode5Siffer("10300"))
+            .antallAnsatte(40)
+            .build();
 
-        when(klassifikasjonerRepository.hentNæring(any()))
-                .thenReturn(new Næring("10", "Produksjon av nærings- og nytelsesmidler"));
+    when(klassifikasjonerRepository.hentNæring(any()))
+        .thenReturn(new Næring("10", "Produksjon av nærings- og nytelsesmidler"));
 
-        List<KvartalsvisSykefraværshistorikk> kvartalsvisSykefraværshistorikk =
-                kvartalsvisSykefraværshistorikkService.hentSykefraværshistorikk(
-                        underenhet,
-                        enInstitusjonellSektorkode()
-                );
+    List<KvartalsvisSykefraværshistorikk> kvartalsvisSykefraværshistorikk =
+        kvartalsvisSykefraværshistorikkService.hentSykefraværshistorikk(
+            underenhet, enInstitusjonellSektorkode());
 
-        assertThatHistorikkHarKategori(kvartalsvisSykefraværshistorikk, Statistikkategori.NÆRING, true);
-        assertThatHistorikkHarKategori(kvartalsvisSykefraværshistorikk, Statistikkategori.LAND, true);
-        assertThatHistorikkHarKategori(kvartalsvisSykefraværshistorikk, Statistikkategori.SEKTOR, true);
-        assertThatHistorikkHarKategori(kvartalsvisSykefraværshistorikk, Statistikkategori.VIRKSOMHET, true);
-        assertThatHistorikkHarKategori(kvartalsvisSykefraværshistorikk, Statistikkategori.BRANSJE, false);
-    }
+    assertThatHistorikkHarKategori(kvartalsvisSykefraværshistorikk, Statistikkategori.NÆRING, true);
+    assertThatHistorikkHarKategori(kvartalsvisSykefraværshistorikk, Statistikkategori.LAND, true);
+    assertThatHistorikkHarKategori(kvartalsvisSykefraværshistorikk, Statistikkategori.SEKTOR, true);
+    assertThatHistorikkHarKategori(
+        kvartalsvisSykefraværshistorikk, Statistikkategori.VIRKSOMHET, true);
+    assertThatHistorikkHarKategori(
+        kvartalsvisSykefraværshistorikk, Statistikkategori.BRANSJE, false);
+  }
 
+  private static void assertThatHistorikkHarKategori(
+      List<KvartalsvisSykefraværshistorikk> kvartalsvisSykefraværshistorikk,
+      Statistikkategori statistikkategori,
+      boolean expected) {
+    assertThat(
+            kvartalsvisSykefraværshistorikk.stream()
+                .anyMatch(historikk -> historikk.getType().equals(statistikkategori)))
+        .isEqualTo(expected);
+  }
 
-    private static void assertThatHistorikkHarKategori(
-            List<KvartalsvisSykefraværshistorikk> kvartalsvisSykefraværshistorikk,
-            Statistikkategori statistikkategori,
-            boolean expected
-    ) {
-        assertThat(
-                kvartalsvisSykefraværshistorikk.stream()
-                        .anyMatch(historikk -> historikk.getType().equals(statistikkategori)))
-                .isEqualTo(expected);
-    }
-
-    private static SykefraværForEttKvartal sykefraværprosent(String label) {
-        return new SykefraværForEttKvartal(
-                new ÅrstallOgKvartal(2019, 1),
-                new BigDecimal(50),
-                new BigDecimal(100),
-                10
-        );
-    }
+  private static SykefraværForEttKvartal sykefraværprosent(String label) {
+    return new SykefraværForEttKvartal(
+        new ÅrstallOgKvartal(2019, 1), new BigDecimal(50), new BigDecimal(100), 10);
+  }
 }

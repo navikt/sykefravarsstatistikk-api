@@ -25,45 +25,36 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJdbcTest(excludeAutoConfiguration = {TestDatabaseAutoConfiguration.class})
 class KlassifikasjonerRepositoryTest {
 
-    @Autowired
-    private NamedParameterJdbcTemplate jdbcTemplate;
+  @Autowired private NamedParameterJdbcTemplate jdbcTemplate;
 
-    private KlassifikasjonerRepository klassifikasjonerRepository;
+  private KlassifikasjonerRepository klassifikasjonerRepository;
 
-    @BeforeEach
-    public void setUp(){
-        klassifikasjonerRepository = new KlassifikasjonerRepository(jdbcTemplate);
-    }
-    @Test
-    void hentAlleNæringer() {
-        opprettNæring(jdbcTemplate,"01","Test næring 1");
-        opprettNæring(jdbcTemplate,"02","Test næring 2");
-        opprettNæring(jdbcTemplate,"03","Test næring 3");
-        List<Næring> resultat= klassifikasjonerRepository.hentAlleNæringer();
-        assertThat(resultat.size()).isEqualTo(3);
-        assertThat(resultat).containsExactlyInAnyOrderElementsOf(
-              List.of(
-                    new Næring("01","Test næring 1"),
-                    new Næring("02","Test næring 2"),
-                    new Næring("03","Test næring 3")
-              )
-        );
-    }
+  @BeforeEach
+  public void setUp() {
+    klassifikasjonerRepository = new KlassifikasjonerRepository(jdbcTemplate);
+  }
 
-    // TODO fjerne denne dupliserte metode
-    private static void opprettNæring(
-          NamedParameterJdbcTemplate namedParameterJdbcTemplate,
-          String næringkode,
-          String næringnavn
-    ) {
-        namedParameterJdbcTemplate.update(
-              String.format(
-                    "insert into naring (kode, navn) " +
-                          "values('%s', '%s')",
-                    næringkode,
-                    næringnavn
-              ),
-              new MapSqlParameterSource()
-        );
-    }
+  @Test
+  void hentAlleNæringer() {
+    opprettNæring(jdbcTemplate, "01", "Test næring 1");
+    opprettNæring(jdbcTemplate, "02", "Test næring 2");
+    opprettNæring(jdbcTemplate, "03", "Test næring 3");
+    List<Næring> resultat = klassifikasjonerRepository.hentAlleNæringer();
+    assertThat(resultat.size()).isEqualTo(3);
+    assertThat(resultat)
+        .containsExactlyInAnyOrderElementsOf(
+            List.of(
+                new Næring("01", "Test næring 1"),
+                new Næring("02", "Test næring 2"),
+                new Næring("03", "Test næring 3")));
+  }
+
+  // TODO fjerne denne dupliserte metode
+  private static void opprettNæring(
+      NamedParameterJdbcTemplate namedParameterJdbcTemplate, String næringkode, String næringnavn) {
+    namedParameterJdbcTemplate.update(
+        String.format(
+            "insert into naring (kode, navn) " + "values('%s', '%s')", næringkode, næringnavn),
+        new MapSqlParameterSource());
+  }
 }

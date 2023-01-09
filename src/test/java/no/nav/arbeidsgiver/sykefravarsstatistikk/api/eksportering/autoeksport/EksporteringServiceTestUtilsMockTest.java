@@ -55,26 +55,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class EksporteringServiceTestUtilsMockTest {
 
-  @Mock
-  private EksporteringRepository eksporteringRepository;
+  @Mock private EksporteringRepository eksporteringRepository;
 
   @Test
-  public void getListeAvVirksomhetEksportPerKvartal_tar_hensyn_til_begrensning_i_eksportering_også_med_emptyList() {
-    when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2)).thenReturn(
-        Collections.emptyList());
+  public void
+      getListeAvVirksomhetEksportPerKvartal_tar_hensyn_til_begrensning_i_eksportering_også_med_emptyList() {
+    when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2))
+        .thenReturn(Collections.emptyList());
 
     List<VirksomhetEksportPerKvartal> emptyList1 =
         EksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal(
-            __2020_2,
-            EksporteringBegrensning.build().utenBegrensning(),
-            eksporteringRepository
-        );
+            __2020_2, EksporteringBegrensning.build().utenBegrensning(), eksporteringRepository);
     List<VirksomhetEksportPerKvartal> emptyList2 =
         EksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal(
-            __2020_2,
-            EksporteringBegrensning.build().medBegrensning(100),
-            eksporteringRepository
-        );
+            __2020_2, EksporteringBegrensning.build().medBegrensning(100), eksporteringRepository);
 
     assertThat(emptyList1.size()).isEqualTo(0);
     assertThat(emptyList2.size()).isEqualTo(0);
@@ -85,46 +79,22 @@ public class EksporteringServiceTestUtilsMockTest {
     when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2))
         .thenReturn(
             Arrays.asList(
-                new VirksomhetEksportPerKvartal(
-                    new Orgnr("987654321"),
-                    __2020_2,
-                    false
-                ),
-                new VirksomhetEksportPerKvartal(
-                    new Orgnr("999999999"),
-                    __2020_2,
-                    false
-                ),
-                new VirksomhetEksportPerKvartal(
-                    new Orgnr("888888888"),
-                    __2020_2,
-                    false
-                )));
+                new VirksomhetEksportPerKvartal(new Orgnr("987654321"), __2020_2, false),
+                new VirksomhetEksportPerKvartal(new Orgnr("999999999"), __2020_2, false),
+                new VirksomhetEksportPerKvartal(new Orgnr("888888888"), __2020_2, false)));
 
     List<VirksomhetEksportPerKvartal> list1 =
         EksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal(
-            __2020_2,
-            EksporteringBegrensning.build().utenBegrensning(),
-            eksporteringRepository
-        );
+            __2020_2, EksporteringBegrensning.build().utenBegrensning(), eksporteringRepository);
     List<VirksomhetEksportPerKvartal> list2 =
         EksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal(
-            __2020_2,
-            EksporteringBegrensning.build().medBegrensning(2),
-            eksporteringRepository
-        );
+            __2020_2, EksporteringBegrensning.build().medBegrensning(2), eksporteringRepository);
     List<VirksomhetEksportPerKvartal> list3 =
         EksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal(
-            __2020_2,
-            EksporteringBegrensning.build().medBegrensning(3),
-            eksporteringRepository
-        );
+            __2020_2, EksporteringBegrensning.build().medBegrensning(3), eksporteringRepository);
     List<VirksomhetEksportPerKvartal> list4 =
         EksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal(
-            __2020_2,
-            EksporteringBegrensning.build().medBegrensning(100),
-            eksporteringRepository
-        );
+            __2020_2, EksporteringBegrensning.build().medBegrensning(100), eksporteringRepository);
 
     assertThat(list1.size()).isEqualTo(3);
     assertThat(list2.size()).isEqualTo(2);
@@ -133,93 +103,65 @@ public class EksporteringServiceTestUtilsMockTest {
   }
 
   @Test
-  public void getListeAvVirksomhetEksportPerKvartal_tar_hensyn_til_begrensning_i_eksportering_og_eksportert_flag__med_mye_data() {
+  public void
+      getListeAvVirksomhetEksportPerKvartal_tar_hensyn_til_begrensning_i_eksportering_og_eksportert_flag__med_mye_data() {
     when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2))
         .thenReturn(bigList(90000, 430000));
 
     List<VirksomhetEksportPerKvartal> ikkeBegrenset =
         EksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal(
-            __2020_2,
-            EksporteringBegrensning.build().utenBegrensning(),
-            eksporteringRepository
-        );
+            __2020_2, EksporteringBegrensning.build().utenBegrensning(), eksporteringRepository);
     assertThat(ikkeBegrenset.size()).isEqualTo(430000);
 
     List<VirksomhetEksportPerKvartal> begrensetTil10 =
         EksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal(
-            __2020_2,
-            EksporteringBegrensning.build().medBegrensning(10),
-            eksporteringRepository
-        );
+            __2020_2, EksporteringBegrensning.build().medBegrensning(10), eksporteringRepository);
     assertThat(begrensetTil10.size()).isEqualTo(10);
   }
 
   @Test
-  public void getListeAvVirksomhetEksportPerKvartal_tar_hensyn_til_begrensning_i_eksportering_og_eksportert_flag() {
+  public void
+      getListeAvVirksomhetEksportPerKvartal_tar_hensyn_til_begrensning_i_eksportering_og_eksportert_flag() {
     when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2))
         .thenReturn(
             Arrays.asList(
-                new VirksomhetEksportPerKvartal(
-                    new Orgnr("987654321"),
-                    __2020_2,
-                    false
-                ),
-                new VirksomhetEksportPerKvartal(
-                    new Orgnr("999999999"),
-                    __2020_2,
-                    false
-                ),
-                new VirksomhetEksportPerKvartal(
-                    new Orgnr("888888888"),
-                    __2020_2,
-                    true
-                )));
+                new VirksomhetEksportPerKvartal(new Orgnr("987654321"), __2020_2, false),
+                new VirksomhetEksportPerKvartal(new Orgnr("999999999"), __2020_2, false),
+                new VirksomhetEksportPerKvartal(new Orgnr("888888888"), __2020_2, true)));
 
     List<VirksomhetEksportPerKvartal> ikkeBegrenset =
         EksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal(
-            __2020_2,
-            EksporteringBegrensning.build().utenBegrensning(),
-            eksporteringRepository
-        );
+            __2020_2, EksporteringBegrensning.build().utenBegrensning(), eksporteringRepository);
     List<VirksomhetEksportPerKvartal> begrensetMed1 =
         EksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal(
-            __2020_2,
-            EksporteringBegrensning.build().medBegrensning(1),
-            eksporteringRepository
-        );
+            __2020_2, EksporteringBegrensning.build().medBegrensning(1), eksporteringRepository);
     List<VirksomhetEksportPerKvartal> begrensetMed100 =
         EksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal(
-            __2020_2,
-            EksporteringBegrensning.build().medBegrensning(100),
-            eksporteringRepository
-        );
+            __2020_2, EksporteringBegrensning.build().medBegrensning(100), eksporteringRepository);
 
     assertThat(ikkeBegrenset.size()).isEqualTo(2);
     assertThat(begrensetMed1.size()).isEqualTo(1);
     assertThat(begrensetMed100.size()).isEqualTo(2);
   }
 
-
-
-  private List<VirksomhetEksportPerKvartal> bigList(int antallEksportertIsTrue,
-      int antallEksportertIsFalse) {
+  private List<VirksomhetEksportPerKvartal> bigList(
+      int antallEksportertIsTrue, int antallEksportertIsFalse) {
     List<VirksomhetEksportPerKvartal> list = new ArrayList<>();
 
-    IntStream.range(0, antallEksportertIsTrue).forEach(i ->
-        list.add(new VirksomhetEksportPerKvartal(
-            new Orgnr(UUID.randomUUID().toString().substring(0, 9)),
-            __2020_2,
-            true
-        )));
+    IntStream.range(0, antallEksportertIsTrue)
+        .forEach(
+            i ->
+                list.add(
+                    new VirksomhetEksportPerKvartal(
+                        new Orgnr(UUID.randomUUID().toString().substring(0, 9)), __2020_2, true)));
 
-    IntStream.range(0, antallEksportertIsFalse).forEach(i ->
-        list.add(new VirksomhetEksportPerKvartal(
-            new Orgnr(UUID.randomUUID().toString().substring(0, 9)),
-            __2020_2,
-            false
-        )));
+    IntStream.range(0, antallEksportertIsFalse)
+        .forEach(
+            i ->
+                list.add(
+                    new VirksomhetEksportPerKvartal(
+                        new Orgnr(UUID.randomUUID().toString().substring(0, 9)), __2020_2, false)));
 
     return list;
   }
-
 }

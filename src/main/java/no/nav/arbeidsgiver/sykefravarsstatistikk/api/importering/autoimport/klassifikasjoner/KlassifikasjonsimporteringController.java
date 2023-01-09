@@ -14,21 +14,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "provisjonering/synkronisering")
 public class KlassifikasjonsimporteringController {
 
-    private final KlassifikasjonsimporteringService service;
+  private final KlassifikasjonsimporteringService service;
 
-    @Autowired
-    public KlassifikasjonsimporteringController(KlassifikasjonsimporteringService service) {
-        this.service = service;
-    }
+  @Autowired
+  public KlassifikasjonsimporteringController(KlassifikasjonsimporteringService service) {
+    this.service = service;
+  }
 
-    @PostMapping(value = "/sektorer")
-    public OpprettEllerOppdaterResultat populerSektorer() {
-        return service.populerSektorer();
-    }
+  @PostMapping(value = "/sektorer")
+  public OpprettEllerOppdaterResultat populerSektorer() {
+    return service.populerSektorer();
+  }
 
-    @PostMapping(value = "/naringskoder")
-    public OpprettEllerOppdaterResultat populerNæringskoder() {
-        return service.populerNæringskoder();
-    }
-
+  @PostMapping(value = "/naringskoder")
+  public OpprettEllerOppdaterResultat populerNæringskoder() {
+    return service.populerNæringskoder();
+  }
 }

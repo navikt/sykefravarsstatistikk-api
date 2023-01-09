@@ -20,15 +20,14 @@ public abstract class MaskerbartSykefraværOverFlereKvartaler {
       BigDecimal tapteDagsverk,
       BigDecimal muligeDagsverk,
       List<SykefraværForEttKvartal> sykefraværForEttKvartalList,
-      boolean harSykefraværData
-  ) {
+      boolean harSykefraværData) {
     erMaskert =
-        harSykefraværData &&
-            sykefraværForEttKvartalList.stream().allMatch(MaskerbartSykefravær::isErMaskert);
+        harSykefraværData
+            && sykefraværForEttKvartalList.stream().allMatch(MaskerbartSykefravær::isErMaskert);
 
     if (!erMaskert && harSykefraværData) {
-      prosent = StatistikkUtils.kalkulerSykefraværsprosent(
-          tapteDagsverk, muligeDagsverk).getOrNull();
+      prosent =
+          StatistikkUtils.kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk).getOrNull();
 
       this.tapteDagsverk = tapteDagsverk.setScale(1, RoundingMode.HALF_UP);
       this.muligeDagsverk = muligeDagsverk.setScale(1, RoundingMode.HALF_UP);

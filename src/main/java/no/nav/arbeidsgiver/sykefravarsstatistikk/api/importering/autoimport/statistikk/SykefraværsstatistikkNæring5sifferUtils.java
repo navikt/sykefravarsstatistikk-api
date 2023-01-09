@@ -11,52 +11,51 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SykefraværsstatistikkNæring5sifferUtils extends SykefraværsstatistikkIntegrasjon
-        implements SykefraværsstatistikkIntegrasjonUtils {
+    implements SykefraværsstatistikkIntegrasjonUtils {
 
+  public SykefraværsstatistikkNæring5sifferUtils(
+      NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    super(namedParameterJdbcTemplate);
+  }
 
-    public SykefraværsstatistikkNæring5sifferUtils(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-        super(namedParameterJdbcTemplate);
-    }
+  @Override
+  public DeleteSykefraværsstatistikkFunction getDeleteFunction() {
+    DeleteSykefraværsstatistikkFunction function =
+        (ÅrstallOgKvartal årstallOgKvartal) -> {
+          SqlParameterSource namedParameters =
+              new MapSqlParameterSource()
+                  .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+                  .addValue(KVARTAL, årstallOgKvartal.getKvartal());
 
-    @Override
-    public DeleteSykefraværsstatistikkFunction getDeleteFunction() {
-        DeleteSykefraværsstatistikkFunction function =
-                (ÅrstallOgKvartal årstallOgKvartal) -> {
-                    SqlParameterSource namedParameters =
-                            new MapSqlParameterSource()
-                                    .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
-                                    .addValue(KVARTAL, årstallOgKvartal.getKvartal());
+          int antallSlettet =
+              namedParameterJdbcTemplate.update(
+                  String.format(
+                      "delete from sykefravar_statistikk_naring5siffer where arstall = :%s and kvartal = :%s",
+                      ARSTALL, KVARTAL),
+                  namedParameters);
+          return antallSlettet;
+        };
+    return function;
+  }
 
-                    int antallSlettet =
-                            namedParameterJdbcTemplate.update(
-                                    String.format(
-                                            "delete from sykefravar_statistikk_naring5siffer where arstall = :%s and kvartal = :%s",
-                                            ARSTALL, KVARTAL),
-                                    namedParameters);
-                    return antallSlettet;
-                };
-        return function;
-    }
+  @Override
+  public BatchCreateSykefraværsstatistikkFunction getBatchCreateFunction(
+      List<? extends Sykefraværsstatistikk> statistikk) {
 
-    @Override
-    public BatchCreateSykefraværsstatistikkFunction getBatchCreateFunction(
-            List<? extends Sykefraværsstatistikk> statistikk
-    ) {
+    BatchCreateSykefraværsstatistikkFunction function =
+        () -> {
+          SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(statistikk.toArray());
 
-        BatchCreateSykefraværsstatistikkFunction function =
-                () -> {
-                    SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(statistikk.toArray());
+          int[] results =
+              namedParameterJdbcTemplate.batchUpdate(
+                  "insert into sykefravar_statistikk_naring5siffer "
+                      + "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                      + "values "
+                      + "(:årstall, :kvartal, :næringkode, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
+                  batch);
+          return Arrays.stream(results).sum();
+        };
 
-                    int[] results = namedParameterJdbcTemplate.batchUpdate(
-                            "insert into sykefravar_statistikk_naring5siffer " +
-                                    "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk) " +
-                                    "values " +
-                                    "(:årstall, :kvartal, :næringkode, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
-                            batch);
-                    return Arrays.stream(results).sum();
-                };
-
-        return function;
-    }
-
+    return function;
+  }
 }

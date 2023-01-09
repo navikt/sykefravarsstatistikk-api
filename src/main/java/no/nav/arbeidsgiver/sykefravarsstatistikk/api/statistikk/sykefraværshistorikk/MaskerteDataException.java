@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 public class MaskerteDataException extends StatistikkException {
 
-    public MaskerteDataException() {
-        super("Ikke nok personer i datagrunnlaget - data maskeres.");
-    }
+  public MaskerteDataException() {
+    super("Ikke nok personer i datagrunnlaget - data maskeres.");
+  }
 }

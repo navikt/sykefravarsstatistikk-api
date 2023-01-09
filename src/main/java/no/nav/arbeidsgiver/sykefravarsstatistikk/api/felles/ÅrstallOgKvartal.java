@@ -24,7 +24,6 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
     this.kvartal = kvartal;
   }
 
-
   public ÅrstallOgKvartal minusKvartaler(int antallKvartaler) {
     if (antallKvartaler < 0) {
       return plussKvartaler(-antallKvartaler);
@@ -36,17 +35,15 @@ public class ÅrstallOgKvartal implements Comparable<ÅrstallOgKvartal> {
     return årstallOgKvartal;
   }
 
-
   public ÅrstallOgKvartal minusEttÅr() {
     return new ÅrstallOgKvartal(this.årstall - 1, this.kvartal);
   }
 
-    public static List<ÅrstallOgKvartal> sisteFireKvartaler(ÅrstallOgKvartal årstallOgKvartal) {
-        return IntStream.range(0, 4)
-                .mapToObj(årstallOgKvartal::minusKvartaler)
-                .collect(Collectors.toList());
-    }
-
+  public static List<ÅrstallOgKvartal> sisteFireKvartaler(ÅrstallOgKvartal årstallOgKvartal) {
+    return IntStream.range(0, 4)
+        .mapToObj(årstallOgKvartal::minusKvartaler)
+        .collect(Collectors.toList());
+  }
 
   public ÅrstallOgKvartal plussKvartaler(int antallKvartaler) {
     if (antallKvartaler < 0) {

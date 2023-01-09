@@ -33,24 +33,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class SummertSykefraværServiceTest {
 
-
-  @Mock
-  private VarighetRepository varighetRepository;
-  @Mock
-  private GraderingRepository graderingRepository;
-  @Mock
-  private KlassifikasjonerRepository klassifikasjonerRepository;
-  @Mock
-  private PubliseringsdatoerService publiseringsdatoerService;
-
+  @Mock private VarighetRepository varighetRepository;
+  @Mock private GraderingRepository graderingRepository;
+  @Mock private KlassifikasjonerRepository klassifikasjonerRepository;
+  @Mock private PubliseringsdatoerService publiseringsdatoerService;
 
   private SummertSykefraværService summertSykefraværService;
 
   private BransjeEllerNæringService bransjeEllerNæringService =
-      new BransjeEllerNæringService(
-          new Bransjeprogram(),
-          klassifikasjonerRepository
-      );
+      new BransjeEllerNæringService(new Bransjeprogram(), klassifikasjonerRepository);
 
   private Underenhet barnehage;
   private static final ÅrstallOgKvartal _2020_3 = new ÅrstallOgKvartal(2020, 3);
@@ -62,17 +53,20 @@ public class SummertSykefraværServiceTest {
 
   @BeforeEach
   public void setUp() {
-    summertSykefraværService = new SummertSykefraværService(
-        varighetRepository,
-        graderingRepository,
-        bransjeEllerNæringService,
-        publiseringsdatoerService);
-    barnehage = Underenhet.builder()
-        .orgnr(new Orgnr("999999999"))
-        .navn("test Barnehage")
-        .næringskode(new Næringskode5Siffer("88911", "Barnehage"))
-        .antallAnsatte(10)
-        .overordnetEnhetOrgnr(new Orgnr("1111111111")).build();
+    summertSykefraværService =
+        new SummertSykefraværService(
+            varighetRepository,
+            graderingRepository,
+            bransjeEllerNæringService,
+            publiseringsdatoerService);
+    barnehage =
+        Underenhet.builder()
+            .orgnr(new Orgnr("999999999"))
+            .navn("test Barnehage")
+            .næringskode(new Næringskode5Siffer("88911", "Barnehage"))
+            .antallAnsatte(10)
+            .overordnetEnhetOrgnr(new Orgnr("1111111111"))
+            .build();
   }
 
   @Test
@@ -90,11 +84,9 @@ public class SummertSykefraværServiceTest {
     listeAvGraderteSykemeldinger.add(
         getGradertSykefravær(_2019_3, new BigDecimal(0), new BigDecimal(50), 5));
 
-    SummertSykefravær summerSykefraværGradering = summertSykefraværService.getSummerSykefraværGradering(
-        new ÅrstallOgKvartal(2020, 4),
-        4,
-        listeAvGraderteSykemeldinger
-    );
+    SummertSykefravær summerSykefraværGradering =
+        summertSykefraværService.getSummerSykefraværGradering(
+            new ÅrstallOgKvartal(2020, 4), 4, listeAvGraderteSykemeldinger);
 
     assertThat(summerSykefraværGradering).isNotNull();
     List<ÅrstallOgKvartal> expectedListeAvKvartaler = new ArrayList<>();
@@ -116,24 +108,21 @@ public class SummertSykefraværServiceTest {
         BigDecimal.valueOf(5),
         BigDecimal.valueOf(0),
         0,
-        Varighetskategori._1_DAG_TIL_7_DAGER
-    );
-    List<UmaskertSykefraværForEttKvartalMedVarighet> sykefraværMed1Kvartal = Arrays.asList(
-        new UmaskertSykefraværForEttKvartalMedVarighet(
-            new ÅrstallOgKvartal(2020, 1),
-            BigDecimal.valueOf(5),
-            BigDecimal.valueOf(0),
-            0,
-            Varighetskategori._1_DAG_TIL_7_DAGER
-        ),
-        new UmaskertSykefraværForEttKvartalMedVarighet(
-            new ÅrstallOgKvartal(2020, 1),
-            BigDecimal.valueOf(0),
-            BigDecimal.valueOf(10),
-            2,
-            Varighetskategori.TOTAL
-        )
-    );
+        Varighetskategori._1_DAG_TIL_7_DAGER);
+    List<UmaskertSykefraværForEttKvartalMedVarighet> sykefraværMed1Kvartal =
+        Arrays.asList(
+            new UmaskertSykefraværForEttKvartalMedVarighet(
+                new ÅrstallOgKvartal(2020, 1),
+                BigDecimal.valueOf(5),
+                BigDecimal.valueOf(0),
+                0,
+                Varighetskategori._1_DAG_TIL_7_DAGER),
+            new UmaskertSykefraværForEttKvartalMedVarighet(
+                new ÅrstallOgKvartal(2020, 1),
+                BigDecimal.valueOf(0),
+                BigDecimal.valueOf(10),
+                2,
+                Varighetskategori.TOTAL));
 
     when(publiseringsdatoerService.hentSistePubliserteKvartal())
         .thenReturn(SISTE_PUBLISERTE_KVARTAL);
@@ -141,32 +130,28 @@ public class SummertSykefraværServiceTest {
         .thenReturn(sykefraværMed1Kvartal);
 
     SummertSykefraværshistorikk summertSykefraværshistorikk =
-        summertSykefraværService.hentSummertSykefraværshistorikkForBransjeEllerNæring(
-            barnehage,
-            4
-        );
+        summertSykefraværService.hentSummertSykefraværshistorikkForBransjeEllerNæring(barnehage, 4);
 
     assertThat(summertSykefraværshistorikk.getType()).isEqualTo(Statistikkategori.BRANSJE);
     assertThat(summertSykefraværshistorikk.getLabel()).isEqualTo("Barnehager");
-    assertThat(summertSykefraværshistorikk.getSummertKorttidsOgLangtidsfravær()
-        .getSummertKorttidsfravær()).isNotNull();
-    assertThat(summertSykefraværshistorikk.getSummertKorttidsOgLangtidsfravær()
-        .getSummertLangtidsfravær()).isNotNull();
+    assertThat(
+            summertSykefraværshistorikk
+                .getSummertKorttidsOgLangtidsfravær()
+                .getSummertKorttidsfravær())
+        .isNotNull();
+    assertThat(
+            summertSykefraværshistorikk
+                .getSummertKorttidsOgLangtidsfravær()
+                .getSummertLangtidsfravær())
+        .isNotNull();
   }
-
 
   private UmaskertSykefraværForEttKvartal getGradertSykefravær(
       ÅrstallOgKvartal årstallOgKvartal,
       BigDecimal tapteDagsverkGradertSykemelding,
       BigDecimal muligeDagsverk,
-      int antallPersoner
-  ) {
-    return
-        new UmaskertSykefraværForEttKvartal(
-            årstallOgKvartal,
-            tapteDagsverkGradertSykemelding,
-            muligeDagsverk,
-            antallPersoner
-        );
+      int antallPersoner) {
+    return new UmaskertSykefraværForEttKvartal(
+        årstallOgKvartal, tapteDagsverkGradertSykemelding, muligeDagsverk, antallPersoner);
   }
 }

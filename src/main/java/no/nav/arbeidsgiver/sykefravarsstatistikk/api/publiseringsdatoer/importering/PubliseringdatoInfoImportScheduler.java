@@ -16,14 +16,11 @@ public class PubliseringdatoInfoImportScheduler {
   private final LockingTaskExecutor taskExecutor;
   private final PubliseringsdatoerImportService importService;
 
-
-  public PubliseringdatoInfoImportScheduler(LockingTaskExecutor taskExecutor,
-      PubliseringsdatoerImportService importService
-  ) {
+  public PubliseringdatoInfoImportScheduler(
+      LockingTaskExecutor taskExecutor, PubliseringsdatoerImportService importService) {
     this.taskExecutor = taskExecutor;
     this.importService = importService;
   }
-
 
   @Scheduled(cron = "0 0 2 * * ?")
   public void scheduledImport() {
@@ -32,14 +29,8 @@ public class PubliseringdatoInfoImportScheduler {
 
     taskExecutor.executeWithLock(
         (Runnable) this::importer,
-        new LockConfiguration(
-            Instant.now(),
-            "publiseringsdatoer",
-            lockAtMostFor,
-            lockAtLeastFor)
-    );
+        new LockConfiguration(Instant.now(), "publiseringsdatoer", lockAtMostFor, lockAtLeastFor));
   }
-
 
   private void importer() {
     log.info("Jobb for å importere publiseringsdatoer fra datavarehus er startet.");

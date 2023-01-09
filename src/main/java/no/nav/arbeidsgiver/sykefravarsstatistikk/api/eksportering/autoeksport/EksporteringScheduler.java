@@ -13,31 +13,29 @@ import java.time.temporal.ChronoUnit;
 @Component
 @Slf4j
 public class EksporteringScheduler {
-    private final LockingTaskExecutor taskExecutor;
-    private final EksporteringService eksporteringService;
+  private final LockingTaskExecutor taskExecutor;
+  private final EksporteringService eksporteringService;
 
-    public EksporteringScheduler(LockingTaskExecutor taskExecutor, EksporteringService eksporteringService
-    ) {
-        this.taskExecutor = taskExecutor;
-        this.eksporteringService = eksporteringService;
-    }
+  public EksporteringScheduler(
+      LockingTaskExecutor taskExecutor, EksporteringService eksporteringService) {
+    this.taskExecutor = taskExecutor;
+    this.eksporteringService = eksporteringService;
+  }
 
-    @Scheduled(cron = "0 5 9 * * ?")
-    public void scheduledEksportering() {
-        Duration lockAtMostFor = Duration.of(45, ChronoUnit.MINUTES);
-        Duration lockAtLeastFor = Duration.of(1, ChronoUnit.MINUTES);
+  @Scheduled(cron = "0 5 9 * * ?")
+  public void scheduledEksportering() {
+    Duration lockAtMostFor = Duration.of(45, ChronoUnit.MINUTES);
+    Duration lockAtLeastFor = Duration.of(1, ChronoUnit.MINUTES);
 
-        taskExecutor.executeWithLock(
-                (Runnable) this::eksportering,
-                new LockConfiguration(Instant.now(), "eksportering", lockAtMostFor, lockAtLeastFor)
-        );
-    }
+    taskExecutor.executeWithLock(
+        (Runnable) this::eksportering,
+        new LockConfiguration(Instant.now(), "eksportering", lockAtMostFor, lockAtLeastFor));
+  }
 
-    private void eksportering() {
-        log.info("Jobb for å ekportere sykefraværsstatistikk er startet.");
-        log.info("Jobb er ikke aktivert enda");
-        // Hent ÅrstallOgKvartal som MÅ være unik --> Error ellers
-        //eksporteringService.eksporter(årstallOgKvartal);
-    }
-
+  private void eksportering() {
+    log.info("Jobb for å ekportere sykefraværsstatistikk er startet.");
+    log.info("Jobb er ikke aktivert enda");
+    // Hent ÅrstallOgKvartal som MÅ være unik --> Error ellers
+    // eksporteringService.eksporter(årstallOgKvartal);
+  }
 }

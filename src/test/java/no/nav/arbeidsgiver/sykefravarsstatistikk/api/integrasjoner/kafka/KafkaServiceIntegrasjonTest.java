@@ -55,158 +55,131 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ActiveProfiles("mvc-test")
 @SpringBootTest(
-        classes = SykefraværsstatistikkLocalTestApplication.class,
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
-)
+    classes = SykefraværsstatistikkLocalTestApplication.class,
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableMockOAuth2Server
 @EmbeddedKafka(
-        controlledShutdown = true,
-        topics = {"arbeidsgiver.sykefravarsstatistikk-v1", "arbeidsgiver.sykefravarsstatistikk-land-v1", "arbeidsgiver.sykefravarsstatistikk-virksomhet-v1"},
-        brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"}
-)
+    controlledShutdown = true,
+    topics = {
+      "arbeidsgiver.sykefravarsstatistikk-v1",
+      "arbeidsgiver.sykefravarsstatistikk-land-v1",
+      "arbeidsgiver.sykefravarsstatistikk-virksomhet-v1"
+    },
+    brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
 public class KafkaServiceIntegrasjonTest {
 
-    @Autowired
-    private KafkaService kafkaService;
-    @Autowired
-    private EmbeddedKafkaBroker embeddedKafkaBroker;
+  @Autowired private KafkaService kafkaService;
+  @Autowired private EmbeddedKafkaBroker embeddedKafkaBroker;
 
-    private static String[] TOPIC_NAMES = {
-            "arbeidsgiver.sykefravarsstatistikk-v1",
-            "arbeidsgiver.sykefravarsstatistikk-land-v1",
-            "arbeidsgiver.sykefravarsstatistikk-virksomhet-v1"
-    };
-    private KafkaMessageListenerContainer<String, String> container;
-    private BlockingQueue<ConsumerRecord<String, String>> consumerRecords;
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+  private static String[] TOPIC_NAMES = {
+    "arbeidsgiver.sykefravarsstatistikk-v1",
+    "arbeidsgiver.sykefravarsstatistikk-land-v1",
+    "arbeidsgiver.sykefravarsstatistikk-virksomhet-v1"
+  };
+  private KafkaMessageListenerContainer<String, String> container;
+  private BlockingQueue<ConsumerRecord<String, String>> consumerRecords;
+  private static final ObjectMapper objectMapper = new ObjectMapper();
 
+  @BeforeEach
+  public void setUp() {
+    consumerRecords = new LinkedBlockingQueue<>();
 
-    @BeforeEach
-    public void setUp() {
-        consumerRecords = new LinkedBlockingQueue<>();
+    ContainerProperties containerProperties = new ContainerProperties(TOPIC_NAMES);
+    Map<String, Object> consumerProperties =
+        KafkaTestUtils.consumerProps("consumer", "false", embeddedKafkaBroker);
+    consumerProperties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+    consumerProperties.put(
+        ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+    consumerProperties.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "60000");
+    DefaultKafkaConsumerFactory<String, String> kafkaConsumerFactory =
+        new DefaultKafkaConsumerFactory<>(consumerProperties);
 
-        ContainerProperties containerProperties = new ContainerProperties(TOPIC_NAMES);
-        Map<String, Object> consumerProperties =
-                KafkaTestUtils.consumerProps(
-                        "consumer",
-                        "false",
-                        embeddedKafkaBroker
-                );
-        consumerProperties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        consumerProperties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        consumerProperties.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "60000");
-        DefaultKafkaConsumerFactory<String, String> kafkaConsumerFactory =
-                new DefaultKafkaConsumerFactory<>(consumerProperties);
+    container = new KafkaMessageListenerContainer<>(kafkaConsumerFactory, containerProperties);
+    container.setupMessageListener(
+        (MessageListener<String, String>)
+            record -> {
+              System.out.println("Listened message=" + record.toString());
+              consumerRecords.add(record);
+            });
+  }
 
-        container = new KafkaMessageListenerContainer<>(kafkaConsumerFactory, containerProperties);
-        container.setupMessageListener((MessageListener<String, String>) record -> {
-            System.out.println("Listened message=" + record.toString());
-            consumerRecords.add(record);
-        });
-    }
+  @AfterEach
+  public void tearDown() {
+    container.stop();
+  }
 
+  @AfterClass
+  public void tearDownClass() {
+    container.destroy();
+    embeddedKafkaBroker.destroy();
+  }
 
-    @AfterEach
-    public void tearDown() {
-        container.stop();
-    }
+  @Test
+  public void send__sender_en_KafkaTopicValue_til__riktig_topic() throws Exception {
+    container.start();
+    ContainerTestUtils.waitForAssignment(
+        container, embeddedKafkaBroker.getPartitionsPerTopic() * TOPIC_NAMES.length);
 
-    @AfterClass
-    public void tearDownClass() {
-        container.destroy();
-        embeddedKafkaBroker.destroy();
-    }
+    kafkaService.send(
+        __2020_2,
+        virksomhetSykefravær,
+        Arrays.asList(næring5SifferSykefravær),
+        næringSykefravær,
+        sektorSykefravær,
+        landSykefravær);
 
-    @Test
-    public void send__sender_en_KafkaTopicValue_til__riktig_topic() throws Exception {
-        container.start();
-        ContainerTestUtils.waitForAssignment(container, embeddedKafkaBroker.getPartitionsPerTopic() * TOPIC_NAMES.length);
+    ConsumerRecord<String, String> message = consumerRecords.poll(10, TimeUnit.SECONDS);
 
-        kafkaService.send(
-                __2020_2,
-                virksomhetSykefravær,
-                Arrays.asList(næring5SifferSykefravær),
-                næringSykefravær,
-                sektorSykefravær,
-                landSykefravær
-        );
+    assertNotNull(message);
+    assertEquals("{\"orgnr\":\"987654321\",\"kvartal\":2,\"årstall\":2020}", message.key());
+    objectMapper.registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));
 
-        ConsumerRecord<String, String> message = consumerRecords.poll(10, TimeUnit.SECONDS);
+    assertKafkaTopicValueEquals(
+        objectMapper.readValue(getKafkaTopicValueAsJsonString(), KafkaTopicValue.class),
+        objectMapper.readValue(message.value(), KafkaTopicValue.class));
+  }
 
-        assertNotNull(message);
-        assertEquals("{\"orgnr\":\"987654321\",\"kvartal\":2,\"årstall\":2020}", message.key());
-        objectMapper.registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));
+  @Test
+  public void send_til_LAND_topic___sender_en_KafkaTopicValue_til__riktig_topic() throws Exception {
+    SykefraværFlereKvartalerForEksport sykefraværFlereKvartaler =
+        new SykefraværFlereKvartalerForEksport(
+            List.of(
+                new UmaskertSykefraværForEttKvartal(
+                    __2020_2, new BigDecimal(1100), new BigDecimal(11000), 5),
+                new UmaskertSykefraværForEttKvartal(
+                    __2020_1, new BigDecimal(2200), new BigDecimal(22000), 5),
+                new UmaskertSykefraværForEttKvartal(
+                    __2019_4, new BigDecimal(3300), new BigDecimal(33000), 5),
+                new UmaskertSykefraværForEttKvartal(
+                    __2019_3, new BigDecimal(4400), new BigDecimal(44000), 5)));
 
-        assertKafkaTopicValueEquals(
-                objectMapper.readValue(getKafkaTopicValueAsJsonString(), KafkaTopicValue.class),
-                objectMapper.readValue(message.value(), KafkaTopicValue.class)
-        );
-    }
-
-    @Test
-    public void send_til_LAND_topic___sender_en_KafkaTopicValue_til__riktig_topic() throws Exception {
-        SykefraværFlereKvartalerForEksport sykefraværFlereKvartaler =  new SykefraværFlereKvartalerForEksport(
-                List.of(
-                        new UmaskertSykefraværForEttKvartal(
-                                __2020_2,
-                                new BigDecimal(1100),
-                                new BigDecimal(11000),
-                                5
-                        ),
-                        new UmaskertSykefraværForEttKvartal(
-                                __2020_1,
-                                new BigDecimal(2200),
-                                new BigDecimal(22000),
-                                5
-                        ),
-                        new UmaskertSykefraværForEttKvartal(
-                                __2019_4,
-                                new BigDecimal(3300),
-                                new BigDecimal(33000),
-                                5
-                        ),
-                        new UmaskertSykefraværForEttKvartal(
-                                __2019_3,
-                                new BigDecimal(4400),
-                                new BigDecimal(44000),
-                                5
-                        )
-                )
-        );
-
-        KafkaStatistikkKategoriTopicValue expectedTopicValue = new KafkaStatistikkKategoriTopicValue(
-                new SykefraværMedKategori(
-                        Statistikkategori.LAND,
-                        landSykefravær.getKode(),
-                        landSykefravær.getÅrstallOgKvartal(),
-                        landSykefravær.getTapteDagsverk(),
-                        landSykefravær.getMuligeDagsverk(),
-                        landSykefravær.getAntallPersoner()
-                ),
-                sykefraværFlereKvartaler
-        );
-
-        container.start();
-        ContainerTestUtils.waitForAssignment(container, embeddedKafkaBroker.getPartitionsPerTopic() * TOPIC_NAMES.length);
-
-        kafkaService.sendTilStatistikkKategoriTopic(
-                __2020_2,
+    KafkaStatistikkKategoriTopicValue expectedTopicValue =
+        new KafkaStatistikkKategoriTopicValue(
+            new SykefraværMedKategori(
                 Statistikkategori.LAND,
-                "NO",
-                landSykefravær,
-                sykefraværFlereKvartaler
-        );
+                landSykefravær.getKode(),
+                landSykefravær.getÅrstallOgKvartal(),
+                landSykefravær.getTapteDagsverk(),
+                landSykefravær.getMuligeDagsverk(),
+                landSykefravær.getAntallPersoner()),
+            sykefraværFlereKvartaler);
 
-        ConsumerRecord<String, String> message = consumerRecords.poll(10, TimeUnit.SECONDS);
+    container.start();
+    ContainerTestUtils.waitForAssignment(
+        container, embeddedKafkaBroker.getPartitionsPerTopic() * TOPIC_NAMES.length);
 
-        assertNotNull(message);
-        assertEquals("{\"kategori\":\"LAND\",\"kode\":\"NO\",\"kvartal\":2,\"årstall\":2020}", message.key());
-        objectMapper.registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));
-        String value = message.value();
-        KafkaStatistikkKategoriTopicValue actual = objectMapper.readValue(value, KafkaStatistikkKategoriTopicValue.class);
-        assertKafkaStatistikkKategoriTopicValueEquals(
-                expectedTopicValue,
-                actual
-        );
-    }
+    kafkaService.sendTilStatistikkKategoriTopic(
+        __2020_2, Statistikkategori.LAND, "NO", landSykefravær, sykefraværFlereKvartaler);
+
+    ConsumerRecord<String, String> message = consumerRecords.poll(10, TimeUnit.SECONDS);
+
+    assertNotNull(message);
+    assertEquals(
+        "{\"kategori\":\"LAND\",\"kode\":\"NO\",\"kvartal\":2,\"årstall\":2020}", message.key());
+    objectMapper.registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));
+    String value = message.value();
+    KafkaStatistikkKategoriTopicValue actual =
+        objectMapper.readValue(value, KafkaStatistikkKategoriTopicValue.class);
+    assertKafkaStatistikkKategoriTopicValueEquals(expectedTopicValue, actual);
+  }
 }

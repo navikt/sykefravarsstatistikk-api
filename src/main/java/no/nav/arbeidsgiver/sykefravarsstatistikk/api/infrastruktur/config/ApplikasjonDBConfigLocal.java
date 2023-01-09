@@ -23,66 +23,62 @@ import java.util.List;
 @Profile({"local", "mvc-test", "db-test"})
 public class ApplikasjonDBConfigLocal {
 
-    @Value("${applikasjon.datasource.url}")
-    private String databaseUrl;
+  @Value("${applikasjon.datasource.url}")
+  private String databaseUrl;
 
-    @Value("${applikasjon.datasource.username}")
-    private String username;
+  @Value("${applikasjon.datasource.username}")
+  private String username;
 
-    @Value("${applikasjon.datasource.password}")
-    private String password;
+  @Value("${applikasjon.datasource.password}")
+  private String password;
 
-    @Value("${applikasjon.datasource.driver-class-name}")
-    private String driverClassName;
+  @Value("${applikasjon.datasource.driver-class-name}")
+  private String driverClassName;
 
-    private final Environment environment;
+  private final Environment environment;
 
-    public ApplikasjonDBConfigLocal(Environment environment) {
-        this.environment = environment;
+  public ApplikasjonDBConfigLocal(Environment environment) {
+    this.environment = environment;
+  }
+
+  @Primary
+  @Bean(name = "sykefravarsstatistikkDataSource")
+  public DataSource sykefravarsstatistikkDataSource() {
+    HikariConfig config = new HikariConfig();
+    config.setPoolName("Sykefraværsstatistikk-connection-pool-local");
+    config.setJdbcUrl(databaseUrl);
+    config.setUsername(username);
+    config.setPassword(password);
+    config.setMaximumPoolSize(2);
+    config.setDriverClassName(driverClassName);
+
+    return new HikariDataSource(config);
+  }
+
+  @Primary
+  @Bean(name = "sykefravarsstatistikkJdbcTemplate")
+  public NamedParameterJdbcTemplate sykefravarsstatistikkJdbcTemplate(
+      @Qualifier("sykefravarsstatistikkDataSource") DataSource dataSource) {
+    return new NamedParameterJdbcTemplate(dataSource);
+  }
+
+  @Bean
+  public FlywayMigrationStrategy flywayMigrationStrategy() {
+    List<String> locations = new ArrayList<>();
+    locations.add("/db/migration");
+    locations.add("/db/test-datavarehus");
+
+    String[] profiles = environment.getActiveProfiles();
+    if (Arrays.asList(profiles).contains("mvc-test") || Arrays.asList(profiles).contains("local")) {
+      locations.add("/db/test-lokaldb-data");
     }
 
-    @Primary
-    @Bean(name = "sykefravarsstatistikkDataSource")
-    public DataSource sykefravarsstatistikkDataSource() {
-        HikariConfig config = new HikariConfig();
-        config.setPoolName("Sykefraværsstatistikk-connection-pool-local");
-        config.setJdbcUrl(databaseUrl);
-        config.setUsername(username);
-        config.setPassword(password);
-        config.setMaximumPoolSize(2);
-        config.setDriverClassName(driverClassName);
-
-        return new HikariDataSource(config);
-    }
-
-    @Primary
-    @Bean(name = "sykefravarsstatistikkJdbcTemplate")
-    public NamedParameterJdbcTemplate sykefravarsstatistikkJdbcTemplate(
-            @Qualifier("sykefravarsstatistikkDataSource") DataSource dataSource
-    ) {
-        return new NamedParameterJdbcTemplate(dataSource);
-    }
-
-    @Bean
-    public FlywayMigrationStrategy flywayMigrationStrategy() {
-        List<String> locations = new ArrayList<>();
-        locations.add("/db/migration");
-        locations.add("/db/test-datavarehus");
-
-        String[] profiles = environment.getActiveProfiles();
-        if (
-                Arrays.asList(profiles).contains("mvc-test") ||
-                        Arrays.asList(profiles).contains("local")
-        ) {
-            locations.add("/db/test-lokaldb-data");
-        }
-
-        return flyway -> {
-            Flyway.configure()
-                    .dataSource(sykefravarsstatistikkDataSource())
-                    .locations(locations.toArray(new String[0]))
-                    .load()
-                    .migrate();
-        };
-    }
+    return flyway -> {
+      Flyway.configure()
+          .dataSource(sykefravarsstatistikkDataSource())
+          .locations(locations.toArray(new String[0]))
+          .load()
+          .migrate();
+    };
+  }
 }

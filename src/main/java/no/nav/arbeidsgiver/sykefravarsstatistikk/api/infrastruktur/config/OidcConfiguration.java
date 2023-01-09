@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class OidcConfiguration {
-    @Bean
-    public ProxyAwareResourceRetriever resourceRetriever() {
-        return new ProxyAwareResourceRetriever();
-    }
+  @Bean
+  public ProxyAwareResourceRetriever resourceRetriever() {
+    return new ProxyAwareResourceRetriever();
+  }
 }

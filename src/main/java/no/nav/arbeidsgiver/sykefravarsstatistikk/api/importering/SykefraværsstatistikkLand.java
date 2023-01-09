@@ -10,10 +10,10 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class SykefraværsstatistikkLand implements Sykefraværsstatistikk {
-    private int årstall;
-    private int kvartal;
-    private int antallPersoner;
+  private int årstall;
+  private int kvartal;
+  private int antallPersoner;
 
-    private BigDecimal tapteDagsverk;
-    private BigDecimal muligeDagsverk;
+  private BigDecimal tapteDagsverk;
+  private BigDecimal muligeDagsverk;
 }

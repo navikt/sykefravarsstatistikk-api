@@ -31,164 +31,110 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PostImporteringServiceTest {
 
-    @Mock
-    private DatavarehusRepository datavarehusRepository;
-    @Mock
-    private VirksomhetMetadataRepository virksomhetMetadataRepository;
-    @Mock
-    private GraderingRepository graderingRepository;
-    @Mock
-    private EksporteringRepository eksporteringRepository;
-    @Mock
-    private KafkaUtsendingHistorikkRepository kafkaUtsendingHistorikkRepository;
+  @Mock private DatavarehusRepository datavarehusRepository;
+  @Mock private VirksomhetMetadataRepository virksomhetMetadataRepository;
+  @Mock private GraderingRepository graderingRepository;
+  @Mock private EksporteringRepository eksporteringRepository;
+  @Mock private KafkaUtsendingHistorikkRepository kafkaUtsendingHistorikkRepository;
 
-    private PostImporteringService service;
-    private ÅrstallOgKvartal __2020_4 = new ÅrstallOgKvartal(2020, 4);
+  private PostImporteringService service;
+  private ÅrstallOgKvartal __2020_4 = new ÅrstallOgKvartal(2020, 4);
 
-    @BeforeEach
-    public void setUp() {
-        service = new PostImporteringService(
-                datavarehusRepository,
-                virksomhetMetadataRepository,
-                graderingRepository,
-                eksporteringRepository,
-                kafkaUtsendingHistorikkRepository,
-                true,
-                true
-        );
-    }
+  @BeforeEach
+  public void setUp() {
+    service =
+        new PostImporteringService(
+            datavarehusRepository,
+            virksomhetMetadataRepository,
+            graderingRepository,
+            eksporteringRepository,
+            kafkaUtsendingHistorikkRepository,
+            true,
+            true);
+  }
 
-    @Test
-    public void fullførPostImporteringOgForberedNesteEksport__returnerer_antall_virksomheter_som_skal_til_neste_eksport() {
-        mockImportVirksomhetMetadata(__2020_4, getOrgenhetListe(__2020_4));
-        mockImportVirksomhetNæringskode5sifferMapping(__2020_4, getVirksomhetMetadataNæringskode5sifferListe(__2020_4));
-        mockForberedNesteEksport(
-                __2020_4,
-                getVirksomhetMetadataListe(__2020_4)
-        );
+  @Test
+  public void
+      fullførPostImporteringOgForberedNesteEksport__returnerer_antall_virksomheter_som_skal_til_neste_eksport() {
+    mockImportVirksomhetMetadata(__2020_4, getOrgenhetListe(__2020_4));
+    mockImportVirksomhetNæringskode5sifferMapping(
+        __2020_4, getVirksomhetMetadataNæringskode5sifferListe(__2020_4));
+    mockForberedNesteEksport(__2020_4, getVirksomhetMetadataListe(__2020_4));
 
-        int antall = service.fullførPostImporteringOgForberedNesteEksport(__2020_4);
+    int antall = service.fullførPostImporteringOgForberedNesteEksport(__2020_4);
 
-        assertEquals(2, antall);
-    }
+    assertEquals(2, antall);
+  }
 
-    private void mockForberedNesteEksport(
-            ÅrstallOgKvartal årstallOgKvartal,
-            List<VirksomhetMetadata> virksomhetMetadataListe
-    ) {
-        when(
-                virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal))
-                .thenReturn(virksomhetMetadataListe);
-        when(
-                eksporteringRepository.opprettEksport(any()))
-                .thenReturn(virksomhetMetadataListe.size());
-    }
+  private void mockForberedNesteEksport(
+      ÅrstallOgKvartal årstallOgKvartal, List<VirksomhetMetadata> virksomhetMetadataListe) {
+    when(virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal))
+        .thenReturn(virksomhetMetadataListe);
+    when(eksporteringRepository.opprettEksport(any())).thenReturn(virksomhetMetadataListe.size());
+  }
 
-    private void mockImportVirksomhetMetadata(
-            ÅrstallOgKvartal årstallOgKvartal,
-            List<Orgenhet> orgenhetSomSkalTilVirksomhetMetadata
-    ) {
-        when(
-                datavarehusRepository.hentOrgenhet(årstallOgKvartal, true))
-                .thenReturn(orgenhetSomSkalTilVirksomhetMetadata);
-        when(
-                virksomhetMetadataRepository.opprettVirksomhetMetadata(any()))
-                .thenReturn(orgenhetSomSkalTilVirksomhetMetadata.size());
-    }
+  private void mockImportVirksomhetMetadata(
+      ÅrstallOgKvartal årstallOgKvartal, List<Orgenhet> orgenhetSomSkalTilVirksomhetMetadata) {
+    when(datavarehusRepository.hentOrgenhet(årstallOgKvartal, true))
+        .thenReturn(orgenhetSomSkalTilVirksomhetMetadata);
+    when(virksomhetMetadataRepository.opprettVirksomhetMetadata(any()))
+        .thenReturn(orgenhetSomSkalTilVirksomhetMetadata.size());
+  }
 
-    private void mockImportVirksomhetNæringskode5sifferMapping(
-            ÅrstallOgKvartal årstallOgKvartal,
-            List<VirksomhetMetadataNæringskode5siffer> virksomhetMetadataNæringskode5sifferListe
-    ) {
-        when(
-                graderingRepository.hentVirksomhetMetadataNæringskode5siffer(årstallOgKvartal))
-                .thenReturn(virksomhetMetadataNæringskode5sifferListe);
-        when(
-                virksomhetMetadataRepository.opprettVirksomhetMetadataNæringskode5siffer(any()))
-                .thenReturn(virksomhetMetadataNæringskode5sifferListe.size());
-    }
+  private void mockImportVirksomhetNæringskode5sifferMapping(
+      ÅrstallOgKvartal årstallOgKvartal,
+      List<VirksomhetMetadataNæringskode5siffer> virksomhetMetadataNæringskode5sifferListe) {
+    when(graderingRepository.hentVirksomhetMetadataNæringskode5siffer(årstallOgKvartal))
+        .thenReturn(virksomhetMetadataNæringskode5sifferListe);
+    when(virksomhetMetadataRepository.opprettVirksomhetMetadataNæringskode5siffer(any()))
+        .thenReturn(virksomhetMetadataNæringskode5sifferListe.size());
+  }
 
-    private List<VirksomhetMetadataNæringskode5siffer> getVirksomhetMetadataNæringskode5sifferListe(
-            ÅrstallOgKvartal årstallOgKvartal
-    ) {
-        List<VirksomhetMetadataNæringskode5siffer> virksomhetMetadataNæringskode5siffer = new ArrayList<>();
-        virksomhetMetadataNæringskode5siffer.add(
-                new VirksomhetMetadataNæringskode5siffer(
-                        new Orgnr(ORGNR_VIRKSOMHET_1),
-                        årstallOgKvartal,
-                        new NæringOgNæringskode5siffer(
-                                "10",
-                                "10101"
-                        )
-                ));
-        virksomhetMetadataNæringskode5siffer.add(
-                new VirksomhetMetadataNæringskode5siffer(
-                        new Orgnr(ORGNR_VIRKSOMHET_1),
-                        årstallOgKvartal,
-                        new NæringOgNæringskode5siffer(
-                                "10",
-                                "10102"
-                        )
-                ));
-        virksomhetMetadataNæringskode5siffer.add(
-                new VirksomhetMetadataNæringskode5siffer(
-                        new Orgnr(ORGNR_VIRKSOMHET_1),
-                        årstallOgKvartal,
-                        new NæringOgNæringskode5siffer(
-                                "20",
-                                "20101"
-                        )
-                ));
+  private List<VirksomhetMetadataNæringskode5siffer> getVirksomhetMetadataNæringskode5sifferListe(
+      ÅrstallOgKvartal årstallOgKvartal) {
+    List<VirksomhetMetadataNæringskode5siffer> virksomhetMetadataNæringskode5siffer =
+        new ArrayList<>();
+    virksomhetMetadataNæringskode5siffer.add(
+        new VirksomhetMetadataNæringskode5siffer(
+            new Orgnr(ORGNR_VIRKSOMHET_1),
+            årstallOgKvartal,
+            new NæringOgNæringskode5siffer("10", "10101")));
+    virksomhetMetadataNæringskode5siffer.add(
+        new VirksomhetMetadataNæringskode5siffer(
+            new Orgnr(ORGNR_VIRKSOMHET_1),
+            årstallOgKvartal,
+            new NæringOgNæringskode5siffer("10", "10102")));
+    virksomhetMetadataNæringskode5siffer.add(
+        new VirksomhetMetadataNæringskode5siffer(
+            new Orgnr(ORGNR_VIRKSOMHET_1),
+            årstallOgKvartal,
+            new NæringOgNæringskode5siffer("20", "20101")));
 
-        return virksomhetMetadataNæringskode5siffer;
-    }
+    return virksomhetMetadataNæringskode5siffer;
+  }
 
-    @NotNull
-    private List<Orgenhet> getOrgenhetListe(ÅrstallOgKvartal årstallOgKvartal) {
-        List<Orgenhet> orgenhetSomSkalTilVirksomhetMetadata = new ArrayList<>();
-        orgenhetSomSkalTilVirksomhetMetadata.add(
-                new Orgenhet(
-                        new Orgnr(ORGNR_VIRKSOMHET_1),
-                        "Virksomhet 1",
-                        "2",
-                        "3",
-                        "10",
-                        årstallOgKvartal)
-        );
-        orgenhetSomSkalTilVirksomhetMetadata.add(
-                new Orgenhet(
-                        new Orgnr(ORGNR_VIRKSOMHET_2),
-                        "Virksomhet 2",
-                        "2",
-                        "3",
-                        "20",
-                        årstallOgKvartal)
-        );
+  @NotNull
+  private List<Orgenhet> getOrgenhetListe(ÅrstallOgKvartal årstallOgKvartal) {
+    List<Orgenhet> orgenhetSomSkalTilVirksomhetMetadata = new ArrayList<>();
+    orgenhetSomSkalTilVirksomhetMetadata.add(
+        new Orgenhet(
+            new Orgnr(ORGNR_VIRKSOMHET_1), "Virksomhet 1", "2", "3", "10", årstallOgKvartal));
+    orgenhetSomSkalTilVirksomhetMetadata.add(
+        new Orgenhet(
+            new Orgnr(ORGNR_VIRKSOMHET_2), "Virksomhet 2", "2", "3", "20", årstallOgKvartal));
 
-        return orgenhetSomSkalTilVirksomhetMetadata;
-    }
+    return orgenhetSomSkalTilVirksomhetMetadata;
+  }
 
-    private List<VirksomhetMetadata> getVirksomhetMetadataListe(ÅrstallOgKvartal årstallOgKvartal) {
-        List<VirksomhetMetadata> virksomhetMetadataListe = new ArrayList<>();
-        virksomhetMetadataListe.add(
-                new VirksomhetMetadata(
-                        new Orgnr(ORGNR_VIRKSOMHET_1),
-                        "Virksomhet 1",
-                        "2",
-                        "3",
-                        "10",
-                        årstallOgKvartal
-                ));
-        virksomhetMetadataListe.add(
-                new VirksomhetMetadata(
-                        new Orgnr(ORGNR_VIRKSOMHET_2),
-                        "Virksomhet 2",
-                        "2",
-                        "3",
-                        "20",
-                        årstallOgKvartal
-                ));
+  private List<VirksomhetMetadata> getVirksomhetMetadataListe(ÅrstallOgKvartal årstallOgKvartal) {
+    List<VirksomhetMetadata> virksomhetMetadataListe = new ArrayList<>();
+    virksomhetMetadataListe.add(
+        new VirksomhetMetadata(
+            new Orgnr(ORGNR_VIRKSOMHET_1), "Virksomhet 1", "2", "3", "10", årstallOgKvartal));
+    virksomhetMetadataListe.add(
+        new VirksomhetMetadata(
+            new Orgnr(ORGNR_VIRKSOMHET_2), "Virksomhet 2", "2", "3", "20", årstallOgKvartal));
 
-        return virksomhetMetadataListe;
-    }
+    return virksomhetMetadataListe;
+  }
 }

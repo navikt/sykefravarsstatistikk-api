@@ -13,10 +13,7 @@ public class ImporttidspunktDto {
   private final Timestamp sistImportertTidspunkt;
   private final ÅrstallOgKvartal gjeldendePeriode;
 
-  public ImporttidspunktDto(
-      Timestamp sistImportertTidspunkt,
-      ÅrstallOgKvartal gjeldendePeriode
-  ) {
+  public ImporttidspunktDto(Timestamp sistImportertTidspunkt, ÅrstallOgKvartal gjeldendePeriode) {
     this.sistImportertTidspunkt = sistImportertTidspunkt;
     this.gjeldendePeriode = gjeldendePeriode;
   }

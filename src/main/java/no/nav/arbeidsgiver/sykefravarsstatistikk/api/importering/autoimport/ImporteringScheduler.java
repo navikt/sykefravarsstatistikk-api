@@ -19,8 +19,10 @@ public class ImporteringScheduler {
   private final SykefraværsstatistikkImporteringService importeringService;
   private final Counter counter;
 
-  public ImporteringScheduler(LockingTaskExecutor taskExecutor,
-      SykefraværsstatistikkImporteringService importeringService, MeterRegistry registry) {
+  public ImporteringScheduler(
+      LockingTaskExecutor taskExecutor,
+      SykefraværsstatistikkImporteringService importeringService,
+      MeterRegistry registry) {
     this.taskExecutor = taskExecutor;
     this.importeringService = importeringService;
     this.counter = registry.counter("sykefravarstatistikk_vellykket_import");
@@ -33,8 +35,7 @@ public class ImporteringScheduler {
 
     taskExecutor.executeWithLock(
         (Runnable) this::importering,
-        new LockConfiguration(Instant.now(), "importering", lockAtMostFor, lockAtLeastFor)
-    );
+        new LockConfiguration(Instant.now(), "importering", lockAtMostFor, lockAtLeastFor));
   }
 
   private void importering() {

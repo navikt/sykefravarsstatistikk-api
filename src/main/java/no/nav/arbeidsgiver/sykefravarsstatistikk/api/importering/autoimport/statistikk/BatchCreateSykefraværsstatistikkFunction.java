@@ -2,5 +2,5 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.sta
 
 @FunctionalInterface
 public interface BatchCreateSykefraværsstatistikkFunction {
-    int apply();
+  int apply();
 }
