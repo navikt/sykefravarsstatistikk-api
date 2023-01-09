@@ -1,7 +1,6 @@
 Insert into dk_p.PUBLISERINGSTABELL (TABELL_NAVN, PERIODE_TYPE, RAPPORT_PERIODE, PREOFFENTLIG_DATO,
-                                     PREOFFENTLIG_FLAGG, OFFENTLIG_DATO, OFFENTLIG_FLAGG, AKTIVITET,
-                                     LASTET_DATO, OPPDATERT_DATO, LASTET_AV, OPPDATERT_AV,
-                                     KOMMENTAR)
+                                PREOFFENTLIG_FLAGG, OFFENTLIG_DATO, OFFENTLIG_FLAGG, AKTIVITET,
+                                LASTET_DATO, OPPDATERT_DATO, LASTET_AV, OPPDATERT_AV, KOMMENTAR)
 values ('AGG_FAK_SYKEFRAVAR_DIA', 'KVARTAL', '202203', to_date('30.11.2022', 'DD.MM.RRRR'), '0',
         to_date('01.12.2022', 'DD.MM.RRRR'), '0', 'Sykefravær pr 3. kvartal 2022',
         to_date('03.11.2021', 'DD.MM.RRRR'), to_date('03.11.2021', 'DD.MM.RRRR'), 'H103860',

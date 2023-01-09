@@ -1,2 +1,1 @@
-alter table eksport_per_kvartal
-    add column oppdatert timestamp;
+alter table eksport_per_kvartal add column oppdatert timestamp;

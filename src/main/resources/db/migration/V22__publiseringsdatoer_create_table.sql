@@ -9,7 +9,7 @@ create table publiseringsdatoer
 
 create table importtidspunkt
 (
-    aarstall  varchar   not null,
-    kvartal   varchar   not null,
+    aarstall  varchar not null,
+    kvartal   varchar not null,
     importert timestamp not null
 );
