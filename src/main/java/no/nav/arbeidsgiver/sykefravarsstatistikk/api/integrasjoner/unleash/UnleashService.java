@@ -11,23 +11,23 @@ import java.util.stream.Collectors;
 
 @Service
 public class UnleashService {
-    private final Unleash unleash;
+  private final Unleash unleash;
 
-    @Autowired
-    public UnleashService(Unleash unleash) {
-        this.unleash = unleash;
-    }
+  @Autowired
+  public UnleashService(Unleash unleash) {
+    this.unleash = unleash;
+  }
 
-    public Map<String, Boolean> hentFeatureToggles(List<String> features, String sessionId) {
-        UnleashContext unleashContext = UnleashContext.builder().sessionId(sessionId).build();
+  public Map<String, Boolean> hentFeatureToggles(List<String> features, String sessionId) {
+    UnleashContext unleashContext = UnleashContext.builder().sessionId(sessionId).build();
 
-        return features.stream().collect(Collectors.toMap(
-                feature -> feature,
-                feature -> unleash.isEnabled(feature, unleashContext)
-        ));
-    }
+    return features.stream()
+        .collect(
+            Collectors.toMap(
+                feature -> feature, feature -> unleash.isEnabled(feature, unleashContext)));
+  }
 
-    public boolean erEnabled(String feature) {
-        return unleash.isEnabled(feature);
-    }
+  public boolean erEnabled(String feature) {
+    return unleash.isEnabled(feature);
+  }
 }

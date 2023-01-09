@@ -26,8 +26,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 class PubliseringsdatoerRepositoryTest {
   PubliseringsdatoerRepository publiseringsdatoerRepository;
 
-  @Mock
-  NamedParameterJdbcTemplate mockJdbcTemplate;
+  @Mock NamedParameterJdbcTemplate mockJdbcTemplate;
 
   @BeforeEach
   void setUp() {
@@ -41,7 +40,8 @@ class PubliseringsdatoerRepositoryTest {
   }
 
   @Test
-  void hentSistePubliseringstidspunkt_nårPubliseringsdatoIkkeBlirFunnet_skalReturnereTomOptionalOgLoggeError() {
+  void
+      hentSistePubliseringstidspunkt_nårPubliseringsdatoIkkeBlirFunnet_skalReturnereTomOptionalOgLoggeError() {
     when(mockJdbcTemplate.query(anyString(), anyMap(), anyRowMapper())).thenReturn(List.of());
 
     Option<ImporttidspunktDto> faktisk = publiseringsdatoerRepository.hentSisteImporttidspunkt();
@@ -49,9 +49,10 @@ class PubliseringsdatoerRepositoryTest {
     ILoggingEvent errormelding = StaticAppender.getLastLoggedEvent();
 
     assertThat(errormelding.getLevel()).isEqualTo(Level.ERROR);
-    assertThat(errormelding.getMessage()).isEqualTo(
-        "Klarte ikke hente ut siste importtidspunkt: java.lang.ArrayIndexOutOfBoundsException: "
-            + "Index 0 out of bounds for length 0");
+    assertThat(errormelding.getMessage())
+        .isEqualTo(
+            "Klarte ikke hente ut siste importtidspunkt: java.lang.ArrayIndexOutOfBoundsException: "
+                + "Index 0 out of bounds for length 0");
   }
 
   private RowMapper<?> anyRowMapper() {

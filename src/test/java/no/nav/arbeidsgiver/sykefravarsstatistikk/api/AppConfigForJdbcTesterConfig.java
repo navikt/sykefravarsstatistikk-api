@@ -35,30 +35,29 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
 @ComponentScan(
     basePackages = {"no.nav.arbeidsgiver"},
     excludeFilters = {
-        @ComponentScan.Filter(
-            type = FilterType.ASSIGNABLE_TYPE,
-            value = {
-                MockServer.class,
-                AltinnClient.class,
-                UnleashFeatureToggleConfig.class,
-                UnleashService.class,
-                TilgangskontrollUtils.class,
-                EksporteringService.class,
-                EksporteringPerStatistikkKategoriService.class,
-                EksporteringScheduler.class,
-                ImporteringScheduler.class,
-                SykefraværsstatistikkImporteringService.class,
-                PostImporteringService.class,
-                OrganisasjonerController.class,
-                ImporteringController.class, EksporteringController.class,
-                KlassifikasjonsimporteringController.class,
-                SykefraværshistorikkController.class,
-                OrganisasjonerController.class,
-                TilgangskontrollService.class,
-                OffentligSykefraværshistorikkController.class,
-                AggregertStatistikkService.class,
-            })
+      @ComponentScan.Filter(
+          type = FilterType.ASSIGNABLE_TYPE,
+          value = {
+            MockServer.class,
+            AltinnClient.class,
+            UnleashFeatureToggleConfig.class,
+            UnleashService.class,
+            TilgangskontrollUtils.class,
+            EksporteringService.class,
+            EksporteringPerStatistikkKategoriService.class,
+            EksporteringScheduler.class,
+            ImporteringScheduler.class,
+            SykefraværsstatistikkImporteringService.class,
+            PostImporteringService.class,
+            OrganisasjonerController.class,
+            ImporteringController.class,
+            EksporteringController.class,
+            KlassifikasjonsimporteringController.class,
+            SykefraværshistorikkController.class,
+            OrganisasjonerController.class,
+            TilgangskontrollService.class,
+            OffentligSykefraværshistorikkController.class,
+            AggregertStatistikkService.class,
+          })
     })
-public class AppConfigForJdbcTesterConfig extends JdbcRepositoryConfigExtension {
-
-}
+public class AppConfigForJdbcTesterConfig extends JdbcRepositoryConfigExtension {}

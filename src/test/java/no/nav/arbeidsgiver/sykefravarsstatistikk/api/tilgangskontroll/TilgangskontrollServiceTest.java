@@ -27,103 +27,106 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class TilgangskontrollServiceTest {
-    private static final String FNR = "01082248486";
-    private static final String IAWEB_SERVICE_CODE = "7834";
-    private static final String IAWEB_SERVICE_EDITION = "3";
+  private static final String FNR = "01082248486";
+  private static final String IAWEB_SERVICE_CODE = "7834";
+  private static final String IAWEB_SERVICE_EDITION = "3";
 
-    @Mock
-    private AltinnKlientWrapper altinnKlientWrapper;
-    @Mock
-    private TilgangskontrollService tilgangskontroll;
-    @Mock
-    private TilgangskontrollUtils tokenUtils;
-    @Mock
-    private Sporbarhetslogg sporbarhetslogg;
+  @Mock private AltinnKlientWrapper altinnKlientWrapper;
+  @Mock private TilgangskontrollService tilgangskontroll;
+  @Mock private TilgangskontrollUtils tokenUtils;
+  @Mock private Sporbarhetslogg sporbarhetslogg;
 
-    @Mock
-    private TokenXClient tokenXClient;
+  @Mock private TokenXClient tokenXClient;
 
-    private Fnr fnr;
+  private Fnr fnr;
 
+  @BeforeEach
+  public void setUp() {
+    tilgangskontroll =
+        new TilgangskontrollService(
+            altinnKlientWrapper,
+            tokenUtils,
+            sporbarhetslogg,
+            IAWEB_SERVICE_CODE,
+            IAWEB_SERVICE_EDITION,
+            tokenXClient);
+    fnr = new Fnr(FNR);
+  }
 
-    @BeforeEach
-    public void setUp() {
-        tilgangskontroll = new TilgangskontrollService(
-                altinnKlientWrapper,
-                tokenUtils,
-                sporbarhetslogg,
-                IAWEB_SERVICE_CODE,
-                IAWEB_SERVICE_EDITION,
-                tokenXClient);
-        fnr = new Fnr(FNR);
-    }
+  @Test
+  public void hentInnloggetBruker__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
+    when(tokenUtils.hentInnloggetBruker()).thenReturn(new InnloggetBruker(fnr));
+    when(altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(any(), eq(fnr)))
+        .thenThrow(new AltinnException(""));
 
-    @Test
-    public void hentInnloggetBruker__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
-        when(tokenUtils.hentInnloggetBruker()).thenReturn(new InnloggetBruker(fnr));
-        when(altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(any(), eq(fnr))).thenThrow(new AltinnException(""));
+    assertThrows(AltinnException.class, () -> tilgangskontroll.hentBrukerKunIaRettigheter());
+  }
 
-        assertThrows(AltinnException.class, () -> tilgangskontroll.hentBrukerKunIaRettigheter());
-    }
-    @Test
-    public void hentInnloggetBrukerForAlleTilganger__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
-        when(tokenUtils.hentInnloggetBruker()).thenReturn(new InnloggetBruker(fnr));
-        when(altinnKlientWrapper.hentOrgnumreDerBrukerHarTilgangTil(any(), eq(fnr))).thenThrow(new AltinnException(""));
+  @Test
+  public void
+      hentInnloggetBrukerForAlleTilganger__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
+    when(tokenUtils.hentInnloggetBruker()).thenReturn(new InnloggetBruker(fnr));
+    when(altinnKlientWrapper.hentOrgnumreDerBrukerHarTilgangTil(any(), eq(fnr)))
+        .thenThrow(new AltinnException(""));
 
-        assertThrows(AltinnException.class, () -> tilgangskontroll.hentInnloggetBrukerForAlleRettigheter());
-    }
+    assertThrows(
+        AltinnException.class, () -> tilgangskontroll.hentInnloggetBrukerForAlleRettigheter());
+  }
 
-    @Test
-    public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse__skal_feile_hvis_bruker_ikke_har_tilgang() {
-        InnloggetBruker bruker = getInnloggetBruker(FNR);
-        bruker.setOrganisasjoner(new ArrayList<>());
-        værInnloggetSom(bruker);
+  @Test
+  public void
+      sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse__skal_feile_hvis_bruker_ikke_har_tilgang() {
+    InnloggetBruker bruker = getInnloggetBruker(FNR);
+    bruker.setOrganisasjoner(new ArrayList<>());
+    værInnloggetSom(bruker);
 
-        assertThrows(
-                TilgangskontrollException.class,
-                () -> tilgangskontroll.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(new Orgnr("111111111"), "", "")
-        );
-    }
+    assertThrows(
+        TilgangskontrollException.class,
+        () ->
+            tilgangskontroll.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
+                new Orgnr("111111111"), "", ""));
+  }
 
-    @Test
-    public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse__skal_gi_ok_hvis_bruker_har_tilgang() {
-        InnloggetBruker bruker = getInnloggetBruker(FNR);
-        bruker.setOrganisasjoner(Arrays.asList(
-                getOrganisasjon("999999999")
-        ));
-        værInnloggetSom(bruker);
-        tilgangskontroll.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(new Orgnr("999999999"), "", "");
-    }
+  @Test
+  public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse__skal_gi_ok_hvis_bruker_har_tilgang() {
+    InnloggetBruker bruker = getInnloggetBruker(FNR);
+    bruker.setOrganisasjoner(Arrays.asList(getOrganisasjon("999999999")));
+    værInnloggetSom(bruker);
+    tilgangskontroll.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(new Orgnr("999999999"), "", "");
+  }
 
-    @Test
-    public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse__skal_sende_med_riktig_parametre_til_sporbarhetsloggen() {
-        InnloggetBruker bruker = getInnloggetBruker(FNR);
-        Orgnr orgnr = new Orgnr("999999999");
-        bruker.setOrganisasjoner(Arrays.asList(getOrganisasjon(orgnr.getVerdi())));
-        værInnloggetSom(bruker);
-        String httpMetode = "GET";
-        String requestUrl = "http://localhost:8080/endepunkt";
-        String correlationId = "flfkjdhzdnjb";
-        MDC.put(CorrelationIdFilter.CORRELATION_ID_MDC_NAME, correlationId);
+  @Test
+  public void
+      sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse__skal_sende_med_riktig_parametre_til_sporbarhetsloggen() {
+    InnloggetBruker bruker = getInnloggetBruker(FNR);
+    Orgnr orgnr = new Orgnr("999999999");
+    bruker.setOrganisasjoner(Arrays.asList(getOrganisasjon(orgnr.getVerdi())));
+    værInnloggetSom(bruker);
+    String httpMetode = "GET";
+    String requestUrl = "http://localhost:8080/endepunkt";
+    String correlationId = "flfkjdhzdnjb";
+    MDC.put(CorrelationIdFilter.CORRELATION_ID_MDC_NAME, correlationId);
 
-        tilgangskontroll.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(orgnr, httpMetode, requestUrl);
+    tilgangskontroll.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(orgnr, httpMetode, requestUrl);
 
-        verify(sporbarhetslogg).loggHendelse(new Loggevent(
+    verify(sporbarhetslogg)
+        .loggHendelse(
+            new Loggevent(
                 bruker,
                 orgnr,
                 true,
                 httpMetode,
                 requestUrl,
                 IAWEB_SERVICE_CODE,
-                IAWEB_SERVICE_EDITION
-        ));
+                IAWEB_SERVICE_EDITION));
 
-        MDC.remove(CorrelationIdFilter.CORRELATION_ID_MDC_NAME);
-    }
+    MDC.remove(CorrelationIdFilter.CORRELATION_ID_MDC_NAME);
+  }
 
-    private void værInnloggetSom(InnloggetBruker bruker) {
-        when(tokenUtils.hentInnloggetBruker()).thenReturn(bruker);
-        when(altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(any(), eq(bruker.getFnr()))).thenReturn(bruker.getOrganisasjoner());
-    }
-
+  private void værInnloggetSom(InnloggetBruker bruker) {
+    when(tokenUtils.hentInnloggetBruker()).thenReturn(bruker);
+    when(altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
+            any(), eq(bruker.getFnr())))
+        .thenReturn(bruker.getOrganisasjoner());
+  }
 }

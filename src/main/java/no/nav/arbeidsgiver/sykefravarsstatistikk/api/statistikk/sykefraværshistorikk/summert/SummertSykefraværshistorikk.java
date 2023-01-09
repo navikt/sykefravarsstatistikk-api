@@ -8,8 +8,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 @Data
 @Builder
 public class SummertSykefraværshistorikk {
-    private Statistikkategori type;
-    private String label;
-    private SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær;
-    private SummertSykefravær summertGradertFravær;
+  private Statistikkategori type;
+  private String label;
+  private SummertKorttidsOgLangtidsfravær summertKorttidsOgLangtidsfravær;
+  private SummertSykefravær summertGradertFravær;
 }

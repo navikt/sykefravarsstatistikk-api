@@ -13,21 +13,21 @@ import java.util.Map;
 @RestController
 public class HealthcheckController {
 
-    private final EnhetsregisteretClient enhetsregisteretClient;
+  private final EnhetsregisteretClient enhetsregisteretClient;
 
-    public HealthcheckController(EnhetsregisteretClient enhetsregisteretClient) {
-        this.enhetsregisteretClient = enhetsregisteretClient;
-    }
+  public HealthcheckController(EnhetsregisteretClient enhetsregisteretClient) {
+    this.enhetsregisteretClient = enhetsregisteretClient;
+  }
 
-    @GetMapping("/internal/healthcheck")
-    public String healthcheck() {
-        return "ok";
-    }
+  @GetMapping("/internal/healthcheck")
+  public String healthcheck() {
+    return "ok";
+  }
 
-    @GetMapping("/internal/healthcheck/avhengigheter")
-    public Map<String, HttpStatus> sjekkAvhengigheter() {
-        Map<String, HttpStatus> statuser = new HashMap<>();
-        statuser.put("enhetsregisteret", enhetsregisteretClient.healthcheck());
-        return statuser;
-    }
+  @GetMapping("/internal/healthcheck/avhengigheter")
+  public Map<String, HttpStatus> sjekkAvhengigheter() {
+    Map<String, HttpStatus> statuser = new HashMap<>();
+    statuser.put("enhetsregisteret", enhetsregisteretClient.healthcheck());
+    return statuser;
+  }
 }

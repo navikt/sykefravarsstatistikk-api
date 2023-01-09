@@ -22,67 +22,60 @@ import java.util.stream.Collectors;
 @Component
 public class AltinnKlientWrapper {
 
+  private final AltinnrettigheterProxyKlient klient;
+  private final String serviceCode;
+  private final String serviceEdition;
 
-    private final AltinnrettigheterProxyKlient klient;
-    private final String serviceCode;
-    private final String serviceEdition;
+  public AltinnKlientWrapper(
+      @Value("${altinn.proxy.url}") String altinnProxyUrl,
+      @Value("${altinn.url}") String altinnUrl,
+      @Value("${altinn.apigw.apikey}") String altinnAPIGWApikey,
+      @Value("${altinn.apikey}") String altinnApikey,
+      @Value("${altinn.iaweb.service.code}") String iawebServiceCode,
+      @Value("${altinn.iaweb.service.edition}") String iawebServiceEdition) {
 
-    public AltinnKlientWrapper(
-            @Value("${altinn.proxy.url}") String altinnProxyUrl,
-            @Value("${altinn.url}") String altinnUrl,
-            @Value("${altinn.apigw.apikey}") String altinnAPIGWApikey,
-            @Value("${altinn.apikey}") String altinnApikey,
-            @Value("${altinn.iaweb.service.code}") String iawebServiceCode,
-            @Value("${altinn.iaweb.service.edition}") String iawebServiceEdition
-    ) {
+    this.serviceCode = iawebServiceCode;
+    this.serviceEdition = iawebServiceEdition;
 
-        this.serviceCode = iawebServiceCode;
-        this.serviceEdition = iawebServiceEdition;
+    AltinnrettigheterProxyKlientConfig config =
+        new AltinnrettigheterProxyKlientConfig(
+            new ProxyConfig("sykefraværsstatistikk", altinnProxyUrl),
+            new AltinnConfig(altinnUrl, altinnApikey, altinnAPIGWApikey));
 
-        AltinnrettigheterProxyKlientConfig config =
-                new AltinnrettigheterProxyKlientConfig(
-                        new ProxyConfig("sykefraværsstatistikk", altinnProxyUrl),
-                        new AltinnConfig(altinnUrl, altinnApikey, altinnAPIGWApikey)
-                );
+    this.klient = new AltinnrettigheterProxyKlient(config);
+  }
 
-        this.klient = new AltinnrettigheterProxyKlient(config);
-    }
+  public List<AltinnOrganisasjon> hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
+      JwtToken idToken, Fnr fnr) {
+    return mapTo(
+        klient.hentOrganisasjoner(
+            new SelvbetjeningToken(idToken.getTokenAsString()),
+            new Subject(fnr.getVerdi()),
+            new ServiceCode(serviceCode),
+            new ServiceEdition(serviceEdition),
+            true));
+  }
 
+  public List<AltinnOrganisasjon> hentOrgnumreDerBrukerHarTilgangTil(JwtToken idToken, Fnr fnr) {
+    return mapTo(
+        klient.hentOrganisasjoner(
+            new SelvbetjeningToken(idToken.getTokenAsString()), new Subject(fnr.getVerdi()), true));
+  }
 
-    public List<AltinnOrganisasjon> hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(JwtToken idToken, Fnr fnr) {
-        return mapTo(
-                klient.hentOrganisasjoner(
-                        new SelvbetjeningToken(idToken.getTokenAsString()),
-                        new Subject(fnr.getVerdi()),
-                        new ServiceCode(serviceCode),
-                        new ServiceEdition(serviceEdition),
-                        true
-                )
-        );
-    }
+  private List<AltinnOrganisasjon> mapTo(List<AltinnReportee> altinnReportees) {
+    return altinnReportees.stream()
+        .map(
+            org -> {
+              AltinnOrganisasjon altinnOrganisasjon = new AltinnOrganisasjon();
+              altinnOrganisasjon.setName(org.getName());
+              altinnOrganisasjon.setType(org.getType());
+              altinnOrganisasjon.setParentOrganizationNumber(org.getParentOrganizationNumber());
+              altinnOrganisasjon.setOrganizationNumber(org.getOrganizationNumber());
+              altinnOrganisasjon.setOrganizationForm(org.getOrganizationForm());
+              altinnOrganisasjon.setStatus(org.getStatus());
 
-    public List<AltinnOrganisasjon> hentOrgnumreDerBrukerHarTilgangTil(JwtToken idToken, Fnr fnr) {
-        return mapTo(
-                klient.hentOrganisasjoner(
-                        new SelvbetjeningToken(idToken.getTokenAsString()),
-                        new Subject(fnr.getVerdi()),
-                        true
-                )
-        );
-    }
-
-    private List<AltinnOrganisasjon> mapTo(List<AltinnReportee> altinnReportees) {
-        return altinnReportees.stream().map(org -> {
-                    AltinnOrganisasjon altinnOrganisasjon = new AltinnOrganisasjon();
-                    altinnOrganisasjon.setName(org.getName());
-                    altinnOrganisasjon.setType(org.getType());
-                    altinnOrganisasjon.setParentOrganizationNumber(org.getParentOrganizationNumber());
-                    altinnOrganisasjon.setOrganizationNumber(org.getOrganizationNumber());
-                    altinnOrganisasjon.setOrganizationForm(org.getOrganizationForm());
-                    altinnOrganisasjon.setStatus(org.getStatus());
-
-                    return altinnOrganisasjon;
-                }
-        ).collect(Collectors.toList());
-    }
+              return altinnOrganisasjon;
+            })
+        .collect(Collectors.toList());
+  }
 }

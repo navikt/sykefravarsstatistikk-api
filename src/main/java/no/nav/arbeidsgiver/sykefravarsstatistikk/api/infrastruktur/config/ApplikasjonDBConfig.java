@@ -24,63 +24,62 @@ import static java.lang.String.format;
 @Profile({"dev", "prod"})
 public class ApplikasjonDBConfig {
 
-    // URL hentes i Vault
-    @Value("${spring.datasource.url}")
-    private String databaseUrl;
+  // URL hentes i Vault
+  @Value("${spring.datasource.url}")
+  private String databaseUrl;
 
-    @Value("${database.navn}")
-    private String databaseNavn;
+  @Value("${database.navn}")
+  private String databaseNavn;
 
-    @Value("${vault.mount-path}")
-    private String mountPath;
+  @Value("${vault.mount-path}")
+  private String mountPath;
 
-    private static Logger logger = LoggerFactory.getLogger(ApplikasjonDBConfig.class);
+  private static Logger logger = LoggerFactory.getLogger(ApplikasjonDBConfig.class);
 
+  @Primary
+  @Bean(name = "sykefravarsstatistikkDataSource")
+  public DataSource userDataSource() {
+    return dataSource("admin");
+  }
 
-    @Primary
-    @Bean(name = "sykefravarsstatistikkDataSource")
-    public DataSource userDataSource() {
-        return dataSource("admin");
+  @Primary
+  @Bean(name = "sykefravarsstatistikkJdbcTemplate")
+  public NamedParameterJdbcTemplate sykefravarsstatistikkJdbcTemplate(
+      @Qualifier("sykefravarsstatistikkDataSource") DataSource dataSource) {
+
+    return new NamedParameterJdbcTemplate(dataSource);
+  }
+
+  private HikariDataSource dataSource(String user) {
+    HikariConfig config = new HikariConfig();
+    config.setPoolName("Sykefraværsstatistikk-connection-pool");
+    config.setJdbcUrl(databaseUrl);
+    config.setMaximumPoolSize(8);
+    config.setMinimumIdle(1);
+    HikariDataSource hikariDataSourceWithVaultIntegration = null;
+    try {
+      hikariDataSourceWithVaultIntegration =
+          HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(
+              config, mountPath, dbRole(user));
+    } catch (VaultError vaultError) {
+      logger.warn("[GCP-migrering] Kunne ikke opprette DS. Returnerer null. ", vaultError);
+      return null;
     }
 
-    @Primary
-    @Bean(name = "sykefravarsstatistikkJdbcTemplate")
-    public NamedParameterJdbcTemplate sykefravarsstatistikkJdbcTemplate(
-            @Qualifier("sykefravarsstatistikkDataSource") DataSource dataSource
-    ) {
+    return hikariDataSourceWithVaultIntegration;
+  }
 
-        return new NamedParameterJdbcTemplate(dataSource);
-    }
+  @Bean
+  public FlywayMigrationStrategy flywayMigrationStrategy() {
+    return flyway ->
+        Flyway.configure()
+            .dataSource(dataSource("admin"))
+            .initSql(format("SET ROLE \"%s\"", dbRole("admin")))
+            .load()
+            .migrate();
+  }
 
-
-    private HikariDataSource dataSource(String user) {
-        HikariConfig config = new HikariConfig();
-        config.setPoolName("Sykefraværsstatistikk-connection-pool");
-        config.setJdbcUrl(databaseUrl);
-        config.setMaximumPoolSize(8);
-        config.setMinimumIdle(1);
-        HikariDataSource hikariDataSourceWithVaultIntegration = null;
-        try {
-            hikariDataSourceWithVaultIntegration = HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(config, mountPath, dbRole(user));
-        } catch (VaultError vaultError) {
-            logger.warn("[GCP-migrering] Kunne ikke opprette DS. Returnerer null. ", vaultError);
-            return null;
-        }
-
-        return hikariDataSourceWithVaultIntegration;
-    }
-
-    @Bean
-    public FlywayMigrationStrategy flywayMigrationStrategy() {
-        return flyway -> Flyway.configure()
-                .dataSource(dataSource("admin"))
-                .initSql(format("SET ROLE \"%s\"", dbRole("admin")))
-                .load()
-                .migrate();
-    }
-
-    private String dbRole(String role) {
-        return String.join("-", databaseNavn, role);
-    }
-
+  private String dbRole(String role) {
+    return String.join("-", databaseNavn, role);
+  }
 }

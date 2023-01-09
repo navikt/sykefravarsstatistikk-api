@@ -29,14 +29,15 @@ public class BransjeEllerNæringServiceTest {
   @Mock private KlassifikasjonerRepository klassifikasjonerRepository;
 
   private Næringskode5Siffer barnehage = new Næringskode5Siffer("88911", "Barnehager");
-  private VirksomhetMetadata virksomhetMetadata = new VirksomhetMetadata(
-        ORGNR_VIRKSOMHET_1,
-        "Virksomhet 1",
-        RECTYPE_FOR_VIRKSOMHET,
-        "1",
-        "88",
-          SISTE_PUBLISERTE_KVARTAL
-  );
+  private VirksomhetMetadata virksomhetMetadata =
+      new VirksomhetMetadata(
+          ORGNR_VIRKSOMHET_1,
+          "Virksomhet 1",
+          RECTYPE_FOR_VIRKSOMHET,
+          "1",
+          "88",
+          SISTE_PUBLISERTE_KVARTAL);
+
   @BeforeEach
   public void setUp() {
     bransjeEllerNæringService =
@@ -51,59 +52,58 @@ public class BransjeEllerNæringServiceTest {
   }
 
   @Test
-  public void skalHenteDataPåBransjeEllerNæringsnivå_skalReturnereNæring_forBedriftINæringsmiddelindustrien() {
-    // En bedrift i næringsmiddelindustrien er i bransjeprogrammet, men data hentes likevel på tosiffernivå, aka næringsnivå
-    Næringskode5Siffer næringINæringsmiddelindustriBransjen = new Næringskode5Siffer("10411", "Produksjon av rå fiskeoljer og fett");
-    BransjeEllerNæring actual = bransjeEllerNæringService.bestemFraNæringskode(næringINæringsmiddelindustriBransjen);
+  public void
+      skalHenteDataPåBransjeEllerNæringsnivå_skalReturnereNæring_forBedriftINæringsmiddelindustrien() {
+    // En bedrift i næringsmiddelindustrien er i bransjeprogrammet, men data hentes likevel på
+    // tosiffernivå, aka næringsnivå
+    Næringskode5Siffer næringINæringsmiddelindustriBransjen =
+        new Næringskode5Siffer("10411", "Produksjon av rå fiskeoljer og fett");
+    BransjeEllerNæring actual =
+        bransjeEllerNæringService.bestemFraNæringskode(næringINæringsmiddelindustriBransjen);
 
     assertThat(actual.isBransje()).isFalse();
   }
+
   @Test
-  public void finnBransejFraMetadata__skalFinneRiktigBransjeFraMetadata(){
+  public void finnBransejFraMetadata__skalFinneRiktigBransjeFraMetadata() {
     virksomhetMetadata.leggTilNæringOgNæringskode5siffer(
-          List.of(new NæringOgNæringskode5siffer(barnehage.hentNæringskode2Siffer(), barnehage.getKode()),
-          new NæringOgNæringskode5siffer("00", "00000"))
-    );
-    BransjeEllerNæring resultat=bransjeEllerNæringService.finnBransjeFraMetadata(
-          virksomhetMetadata,
-          List.of()
-    );
+        List.of(
+            new NæringOgNæringskode5siffer(barnehage.hentNæringskode2Siffer(), barnehage.getKode()),
+            new NæringOgNæringskode5siffer("00", "00000")));
+    BransjeEllerNæring resultat =
+        bransjeEllerNæringService.finnBransjeFraMetadata(virksomhetMetadata, List.of());
     assertTrue(resultat.isBransje());
     assertThat(resultat.getBransje().getType()).isEqualTo(ArbeidsmiljøportalenBransje.BARNEHAGER);
     assertThat(resultat.getBransje().getKoderSomSpesifisererNæringer()).isEqualTo(List.of("88911"));
   }
 
   @Test
-  public void finnBransejFraMetadata__skalIkkeFeileVedManglendeAvNæringskode5sifferListe(){
-    BransjeEllerNæring resultat=bransjeEllerNæringService.finnBransjeFraMetadata(
-          virksomhetMetadata,
-          List.of()
-    );
+  public void finnBransejFraMetadata__skalIkkeFeileVedManglendeAvNæringskode5sifferListe() {
+    BransjeEllerNæring resultat =
+        bransjeEllerNæringService.finnBransjeFraMetadata(virksomhetMetadata, List.of());
     assertFalse(resultat.isBransje());
     assertThat(resultat.getNæring().getKode()).isEqualTo("88");
     assertThat(resultat.getNæring().getNavn()).isEqualTo("Ukjent næring");
   }
 
   @Test
-  public void finnBransejFraMetadata__skalReturnereRiktigNæringsbeskrivelse(){
-    VirksomhetMetadata virksomhetMetadata2 = new VirksomhetMetadata(
-          ORGNR_VIRKSOMHET_2,
-          "Virksomhet 2",
-          RECTYPE_FOR_VIRKSOMHET,
-          "1",
-          "11",
-            SISTE_PUBLISERTE_KVARTAL
-    );
-    BransjeEllerNæring resultat=bransjeEllerNæringService.finnBransjeFraMetadata(
-          virksomhetMetadata2,
-          List.of(
-                new Næring("02","Skogbruk og tjenester tilknyttet skogbruk"),
-                new Næring("11","Produksjon av drikkevarer")
-          )
-    );
+  public void finnBransejFraMetadata__skalReturnereRiktigNæringsbeskrivelse() {
+    VirksomhetMetadata virksomhetMetadata2 =
+        new VirksomhetMetadata(
+            ORGNR_VIRKSOMHET_2,
+            "Virksomhet 2",
+            RECTYPE_FOR_VIRKSOMHET,
+            "1",
+            "11",
+            SISTE_PUBLISERTE_KVARTAL);
+    BransjeEllerNæring resultat =
+        bransjeEllerNæringService.finnBransjeFraMetadata(
+            virksomhetMetadata2,
+            List.of(
+                new Næring("02", "Skogbruk og tjenester tilknyttet skogbruk"),
+                new Næring("11", "Produksjon av drikkevarer")));
     assertFalse(resultat.isBransje());
     assertThat(resultat.getNæring().getKode()).isEqualTo("11");
     assertThat(resultat.getNæring().getNavn()).isEqualTo("Produksjon av drikkevarer");
   }
-
 }

@@ -11,25 +11,23 @@ import java.math.BigDecimal;
 @ToString(callSuper = true)
 public class UmaskertSykefraværForEttKvartalMedVarighet extends UmaskertSykefraværForEttKvartal {
 
-    private final Varighetskategori varighet;
+  private final Varighetskategori varighet;
 
-    public UmaskertSykefraværForEttKvartalMedVarighet(
-            ÅrstallOgKvartal årstallOgKvartal,
-            BigDecimal tapteDagsverk,
-            BigDecimal muligeDagsverk,
-            int antallPersoner,
-            Varighetskategori varighet
-    ) {
-        super(årstallOgKvartal, tapteDagsverk, muligeDagsverk, antallPersoner);
-        this.varighet = varighet;
-    }
+  public UmaskertSykefraværForEttKvartalMedVarighet(
+      ÅrstallOgKvartal årstallOgKvartal,
+      BigDecimal tapteDagsverk,
+      BigDecimal muligeDagsverk,
+      int antallPersoner,
+      Varighetskategori varighet) {
+    super(årstallOgKvartal, tapteDagsverk, muligeDagsverk, antallPersoner);
+    this.varighet = varighet;
+  }
 
-    public UmaskertSykefraværForEttKvartal tilUmaskertSykefraværForEttKvartal() {
-        return new UmaskertSykefraværForEttKvartal(
-                super.getÅrstallOgKvartal(),
-                super.getDagsverkTeller(),
-                super.getDagsverkNevner(),
-                super.getAntallPersoner());
-    }
-
+  public UmaskertSykefraværForEttKvartal tilUmaskertSykefraværForEttKvartal() {
+    return new UmaskertSykefraværForEttKvartal(
+        super.getÅrstallOgKvartal(),
+        super.getDagsverkTeller(),
+        super.getDagsverkNevner(),
+        super.getAntallPersoner());
+  }
 }

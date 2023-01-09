@@ -1,4 +1,5 @@
-create table eksport_per_kvartal (
+create table eksport_per_kvartal
+(
     id         serial primary key,
     orgnr      varchar  not null,
     arstall    smallint not null,

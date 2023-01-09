@@ -24,43 +24,40 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJdbcTest(excludeAutoConfiguration = {TestDatabaseAutoConfiguration.class})
 public class KlassifikasjonsimporteringRepositoryJdbcTest {
 
-    @Autowired
-    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+  @Autowired private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    private KlassifikasjonerRepository repository;
+  private KlassifikasjonerRepository repository;
 
-    @BeforeEach
-    public void setUp() {
-        repository = new KlassifikasjonerRepository(namedParameterJdbcTemplate);
-        cleanUpTestDb(namedParameterJdbcTemplate);
-    }
+  @BeforeEach
+  public void setUp() {
+    repository = new KlassifikasjonerRepository(namedParameterJdbcTemplate);
+    cleanUpTestDb(namedParameterJdbcTemplate);
+  }
 
-    @AfterEach
-    public void tearDown() {
-        cleanUpTestDb(namedParameterJdbcTemplate);
-    }
+  @AfterEach
+  public void tearDown() {
+    cleanUpTestDb(namedParameterJdbcTemplate);
+  }
 
+  @Test
+  public void hentSektor_returnerer_eksisterende_Sektor() {
+    insertSektor(namedParameterJdbcTemplate, "9", "Fylkeskommunal forvaltning");
 
-    @Test
-    public void hentSektor_returnerer_eksisterende_Sektor() {
-        insertSektor(namedParameterJdbcTemplate, "9", "Fylkeskommunal forvaltning");
+    Sektor sektor = repository.hentSektor("9");
 
-        Sektor sektor = repository.hentSektor("9");
+    assertThat(sektor.getKode()).isEqualTo("9");
+    assertThat(sektor.getNavn()).isEqualTo("Fylkeskommunal forvaltning");
+  }
 
-        assertThat(sektor.getKode()).isEqualTo("9");
-        assertThat(sektor.getNavn()).isEqualTo("Fylkeskommunal forvaltning");
-    }
+  private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
+    jdbcTemplate.update("delete from sektor", new MapSqlParameterSource());
+  }
 
-    private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
-        jdbcTemplate.update("delete from sektor", new MapSqlParameterSource());
-    }
+  private static void insertSektor(
+      NamedParameterJdbcTemplate jdbcTemplate, String kode, String navn) {
+    MapSqlParameterSource params =
+        new MapSqlParameterSource().addValue("kode", kode).addValue("navn", navn);
 
-    private static void insertSektor(NamedParameterJdbcTemplate jdbcTemplate, String kode, String navn) {
-        MapSqlParameterSource params =
-                new MapSqlParameterSource()
-                        .addValue("kode", kode)
-                        .addValue("navn", navn);
-
-        jdbcTemplate.update("insert into sektor (kode, navn) values (:kode, :navn)", params);
-    }
+    jdbcTemplate.update("insert into sektor (kode, navn) values (:kode, :navn)", params);
+  }
 }

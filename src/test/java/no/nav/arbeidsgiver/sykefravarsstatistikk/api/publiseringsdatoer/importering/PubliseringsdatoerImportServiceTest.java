@@ -22,38 +22,32 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class PubliseringsdatoerImportServiceTest {
 
   private PubliseringsdatoerImportService serviceUnderTest;
-  @Mock
-  private PubliseringsdatoerRepository mockPubliseringsdatoerRepository;
-  @Mock
-  private DatavarehusRepository mockDatavarehusRepository;
-
+  @Mock private PubliseringsdatoerRepository mockPubliseringsdatoerRepository;
+  @Mock private DatavarehusRepository mockDatavarehusRepository;
 
   @BeforeEach
   void setUp() {
-    serviceUnderTest = new PubliseringsdatoerImportService(
-        mockPubliseringsdatoerRepository,
-        mockDatavarehusRepository
-    );
+    serviceUnderTest =
+        new PubliseringsdatoerImportService(
+            mockPubliseringsdatoerRepository, mockDatavarehusRepository);
   }
 
   @AfterEach
   void tearDown() {
-    reset(
-        mockPubliseringsdatoerRepository,
-        mockDatavarehusRepository
-    );
+    reset(mockPubliseringsdatoerRepository, mockDatavarehusRepository);
   }
 
   @Test
   void importerDatoerFraDatavarehus_oppdaterPubliseringsdatoerBlirKjørtEnGang() {
-    List<PubliseringsdatoDbDto> publiseringsdatoDbDtoListe = List.of(new PubliseringsdatoDbDto(
-        202202,
-        Date.valueOf(LocalDate.MIN),
-        Date.valueOf(LocalDate.MIN),
-        "sykefravær for en periode"
-    ));
-    when(mockDatavarehusRepository.hentPubliseringsdatoerFraDvh()).thenReturn(
-        publiseringsdatoDbDtoListe);
+    List<PubliseringsdatoDbDto> publiseringsdatoDbDtoListe =
+        List.of(
+            new PubliseringsdatoDbDto(
+                202202,
+                Date.valueOf(LocalDate.MIN),
+                Date.valueOf(LocalDate.MIN),
+                "sykefravær for en periode"));
+    when(mockDatavarehusRepository.hentPubliseringsdatoerFraDvh())
+        .thenReturn(publiseringsdatoDbDtoListe);
     serviceUnderTest.importerDatoerFraDatavarehus();
     verify(mockPubliseringsdatoerRepository, times(1))
         .oppdaterPubliseringsdatoer(publiseringsdatoDbDtoListe);

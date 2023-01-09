@@ -8,11 +8,11 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetB
 @AllArgsConstructor
 @Data
 public class Loggevent {
-    private InnloggetBruker innloggetBruker;
-    private Orgnr orgnr;
-    private boolean harTilgang;
-    private String requestMethod;
-    private String requestUrl;
-    private String altinnServiceCode;
-    private String altinnServiceEdition;
+  private InnloggetBruker innloggetBruker;
+  private Orgnr orgnr;
+  private boolean harTilgang;
+  private String requestMethod;
+  private String requestUrl;
+  private String altinnServiceCode;
+  private String altinnServiceEdition;
 }

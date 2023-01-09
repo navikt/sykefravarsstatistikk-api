@@ -31,61 +31,48 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DataJdbcTest(excludeAutoConfiguration = {TestDatabaseAutoConfiguration.class})
 class KafkaUtsendingHistorikkRepositoryTest {
 
-    @Autowired
-    private NamedParameterJdbcTemplate jdbcTemplate;
+  @Autowired private NamedParameterJdbcTemplate jdbcTemplate;
 
-    private KafkaUtsendingHistorikkRepository kafkaUtsendingHistorikkRepository;
+  private KafkaUtsendingHistorikkRepository kafkaUtsendingHistorikkRepository;
 
-    @BeforeEach
-    void setUp() {
-        kafkaUtsendingHistorikkRepository = new KafkaUtsendingHistorikkRepository(jdbcTemplate);
-        slettAllEksportDataFraDatabase(jdbcTemplate);
-    }
+  @BeforeEach
+  void setUp() {
+    kafkaUtsendingHistorikkRepository = new KafkaUtsendingHistorikkRepository(jdbcTemplate);
+    slettAllEksportDataFraDatabase(jdbcTemplate);
+  }
 
-    @AfterEach
-    void tearDown() {
-        slettAllEksportDataFraDatabase(jdbcTemplate);
-    }
+  @AfterEach
+  void tearDown() {
+    slettAllEksportDataFraDatabase(jdbcTemplate);
+  }
 
+  @Test
+  void opprettHistorikk__oppretter_historikk() {
+    LocalDateTime startTime = now();
 
-    @Test
-    void opprettHistorikk__oppretter_historikk() {
-        LocalDateTime startTime = now();
+    kafkaUtsendingHistorikkRepository.opprettHistorikk(
+        "987654321", "{\"orgnr\": \"987654321\"}", "{\"statistikk\": \"....\"}");
 
-        kafkaUtsendingHistorikkRepository.opprettHistorikk(
-                "987654321",
-                "{\"orgnr\": \"987654321\"}",
-                "{\"statistikk\": \"....\"}"
-        );
+    List<KafkaUtsendingHistorikkData> results = hentAlleKafkaUtsendingHistorikkData(jdbcTemplate);
+    KafkaUtsendingHistorikkData kafkaUtsendingHistorikkData = results.get(0);
+    assertEquals("987654321", kafkaUtsendingHistorikkData.orgnr);
+    assertEquals("{\"orgnr\": \"987654321\"}", kafkaUtsendingHistorikkData.key);
+    assertEquals("{\"statistikk\": \"....\"}", kafkaUtsendingHistorikkData.value);
+    assertTrue(kafkaUtsendingHistorikkData.opprettet.isAfter(startTime));
+  }
 
-        List<KafkaUtsendingHistorikkData> results = hentAlleKafkaUtsendingHistorikkData(
-            jdbcTemplate
-        );
-        KafkaUtsendingHistorikkData kafkaUtsendingHistorikkData = results.get(0);
-        assertEquals("987654321", kafkaUtsendingHistorikkData.orgnr);
-        assertEquals("{\"orgnr\": \"987654321\"}", kafkaUtsendingHistorikkData.key);
-        assertEquals("{\"statistikk\": \"....\"}", kafkaUtsendingHistorikkData.value);
-        assertTrue(kafkaUtsendingHistorikkData.opprettet.isAfter(startTime));
-    }
+  @Test
+  void slettHistorikk__sletter_historikk() {
+    opprettUtsendingHistorikk(
+        jdbcTemplate, new KafkaUtsendingHistorikkData("988777999", "key", "value", now()));
+    opprettUtsendingHistorikk(
+        jdbcTemplate, new KafkaUtsendingHistorikkData("988999777", "key", "value", now()));
+    assertEquals(2, hentAlleKafkaUtsendingHistorikkData(jdbcTemplate).size());
 
-    @Test
-    void slettHistorikk__sletter_historikk() {
-        opprettUtsendingHistorikk(
-            jdbcTemplate,
-            new KafkaUtsendingHistorikkData("988777999", "key", "value", now())
-        );
-        opprettUtsendingHistorikk(
-            jdbcTemplate,
-            new KafkaUtsendingHistorikkData("988999777", "key", "value", now())
-        );
-        assertEquals(2, hentAlleKafkaUtsendingHistorikkData(jdbcTemplate).size());
+    int antallSlettet = kafkaUtsendingHistorikkRepository.slettHistorikk();
 
-        int antallSlettet = kafkaUtsendingHistorikkRepository.slettHistorikk();
-
-        List<KafkaUtsendingHistorikkData> results = hentAlleKafkaUtsendingHistorikkData(
-            jdbcTemplate
-        );
-        assertEquals(0, results.size());
-        assertEquals(2, antallSlettet);
-    }
+    List<KafkaUtsendingHistorikkData> results = hentAlleKafkaUtsendingHistorikkData(jdbcTemplate);
+    assertEquals(0, results.size());
+    assertEquals(2, antallSlettet);
+  }
 }

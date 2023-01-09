@@ -10,13 +10,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AggregertStatistikkDto {
 
-    public List<StatistikkDto> prosentSiste4KvartalerTotalt = List.of();
-    public List<StatistikkDto> prosentSiste4KvartalerGradert = List.of();
-    public List<StatistikkDto> prosentSiste4KvartalerKorttid = List.of();
-    public List<StatistikkDto> prosentSiste4KvartalerLangtid = List.of();
+  public List<StatistikkDto> prosentSiste4KvartalerTotalt = List.of();
+  public List<StatistikkDto> prosentSiste4KvartalerGradert = List.of();
+  public List<StatistikkDto> prosentSiste4KvartalerKorttid = List.of();
+  public List<StatistikkDto> prosentSiste4KvartalerLangtid = List.of();
 
-    public List<StatistikkDto> trendTotalt = List.of();
+  public List<StatistikkDto> trendTotalt = List.of();
 
-    public List<StatistikkDto> tapteDagsverkTotalt = List.of();
-    public List<StatistikkDto> muligeDagsverkTotalt = List.of();
+  public List<StatistikkDto> tapteDagsverkTotalt = List.of();
+  public List<StatistikkDto> muligeDagsverkTotalt = List.of();
 }

@@ -12,20 +12,22 @@ import java.util.List;
 @Protected
 @RestController
 public class OrganisasjonerController {
-    private final TilgangskontrollService tilgangskontrollService;
+  private final TilgangskontrollService tilgangskontrollService;
 
-    public OrganisasjonerController(TilgangskontrollService tilgangskontrollService) {
-        this.tilgangskontrollService = tilgangskontrollService;
-    }
+  public OrganisasjonerController(TilgangskontrollService tilgangskontrollService) {
+    this.tilgangskontrollService = tilgangskontrollService;
+  }
 
-    @GetMapping("/organisasjoner/statistikk")
-    public List<AltinnOrganisasjon> hentOrganisasjonerMedStatistikktilgang() {
-        InnloggetBruker innloggetBruker = tilgangskontrollService.hentBrukerKunIaRettigheter();
-        return innloggetBruker.getOrganisasjoner();
-    }
-    @GetMapping("/organisasjoner")
-    public List<AltinnOrganisasjon> hentOrganisasjonerMedAlleTilganger() {
-        InnloggetBruker innloggetBruker = tilgangskontrollService.hentInnloggetBrukerForAlleRettigheter();
-        return innloggetBruker.getOrganisasjoner();
-    }
+  @GetMapping("/organisasjoner/statistikk")
+  public List<AltinnOrganisasjon> hentOrganisasjonerMedStatistikktilgang() {
+    InnloggetBruker innloggetBruker = tilgangskontrollService.hentBrukerKunIaRettigheter();
+    return innloggetBruker.getOrganisasjoner();
+  }
+
+  @GetMapping("/organisasjoner")
+  public List<AltinnOrganisasjon> hentOrganisasjonerMedAlleTilganger() {
+    InnloggetBruker innloggetBruker =
+        tilgangskontrollService.hentInnloggetBrukerForAlleRettigheter();
+    return innloggetBruker.getOrganisasjoner();
+  }
 }

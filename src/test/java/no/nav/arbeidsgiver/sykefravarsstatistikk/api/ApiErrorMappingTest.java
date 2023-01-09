@@ -18,43 +18,39 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ApiErrorMappingTest extends SpringIntegrationTestbase {
 
-    @Autowired
-    private MockOAuth2Server mockOAuth2Server;
+  @Autowired private MockOAuth2Server mockOAuth2Server;
 
-    @LocalServerPort
-    private String port;
+  @LocalServerPort private String port;
 
-    private final static String ORGNR_UNDERENHET_UTEN_NÆRING = "555555555";
+  private static final String ORGNR_UNDERENHET_UTEN_NÆRING = "555555555";
 
-
-    @Test
-    public void sykefraværshistorikk__skal_returnere_SERVER_ERROR_med_causedBy_dersom_underenhet_ikke_har_noe_næringskode()
-            throws Exception {
-        HttpResponse<String> response = newBuilder().build().send(
+  @Test
+  public void
+      sykefraværshistorikk__skal_returnere_SERVER_ERROR_med_causedBy_dersom_underenhet_ikke_har_noe_næringskode()
+          throws Exception {
+    HttpResponse<String> response =
+        newBuilder()
+            .build()
+            .send(
                 HttpRequest.newBuilder()
-                        .uri(
-                                URI.create(
-                                        "http://localhost:" + port
-                                                + "/sykefravarsstatistikk-api/" + ORGNR_UNDERENHET_UTEN_NÆRING
-                                                + "/sykefravarshistorikk/summert?antallKvartaler=4"
-                                )
-                        )
-                        .header(
-                                AUTHORIZATION,
-                                "Bearer "
-                                        + TestTokenUtil.createToken(
-                                        mockOAuth2Server,
-                                        "15008462396",
-                                        SELVBETJENING_ISSUER_ID,
-                                        ""
-                                )
-                        )
-                        .GET()
-                        .build(),
-                ofString()
-        );
+                    .uri(
+                        URI.create(
+                            "http://localhost:"
+                                + port
+                                + "/sykefravarsstatistikk-api/"
+                                + ORGNR_UNDERENHET_UTEN_NÆRING
+                                + "/sykefravarshistorikk/summert?antallKvartaler=4"))
+                    .header(
+                        AUTHORIZATION,
+                        "Bearer "
+                            + TestTokenUtil.createToken(
+                                mockOAuth2Server, "15008462396", SELVBETJENING_ISSUER_ID, ""))
+                    .GET()
+                    .build(),
+                ofString());
 
-        assertThat(response.statusCode()).isEqualTo(500);
-        assertThat(response.body()).isEqualTo("{\"message\":\"Internal error\",\"causedBy\":\"INGEN_NÆRING\"}");
-    }
+    assertThat(response.statusCode()).isEqualTo(500);
+    assertThat(response.body())
+        .isEqualTo("{\"message\":\"Internal error\",\"causedBy\":\"INGEN_NÆRING\"}");
+  }
 }

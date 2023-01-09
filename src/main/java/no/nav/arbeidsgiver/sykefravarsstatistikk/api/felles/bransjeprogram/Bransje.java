@@ -9,44 +9,44 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 @Data
 public class Bransje {
 
-    private final ArbeidsmiljøportalenBransje type;
-    private final String navn;
-    private final List<String> koderSomSpesifisererNæringer;
+  private final ArbeidsmiljøportalenBransje type;
+  private final String navn;
+  private final List<String> koderSomSpesifisererNæringer;
 
-    public Bransje(
-            ArbeidsmiljøportalenBransje type, String navn, String... koderSomSpesifisererNæringer) {
-        this.type = type;
-        this.navn = navn;
-        this.koderSomSpesifisererNæringer = Arrays.asList(koderSomSpesifisererNæringer);
-        validerKoder();
-    }
+  public Bransje(
+      ArbeidsmiljøportalenBransje type, String navn, String... koderSomSpesifisererNæringer) {
+    this.type = type;
+    this.navn = navn;
+    this.koderSomSpesifisererNæringer = Arrays.asList(koderSomSpesifisererNæringer);
+    validerKoder();
+  }
 
-    private void validerKoder() {
-        if (inneholderKunKoderMedGittAntallSifre(2) || inneholderKunKoderMedGittAntallSifre(5)) {
-            return;
-        }
-        throw new IllegalArgumentException(
-                "Støtter kun bransjer som er spesifisert av enten 2 eller 5 sifre");
+  private void validerKoder() {
+    if (inneholderKunKoderMedGittAntallSifre(2) || inneholderKunKoderMedGittAntallSifre(5)) {
+      return;
     }
+    throw new IllegalArgumentException(
+        "Støtter kun bransjer som er spesifisert av enten 2 eller 5 sifre");
+  }
 
-    private boolean inneholderKunKoderMedGittAntallSifre(int antallSifre) {
-        return koderSomSpesifisererNæringer.stream().allMatch(kode -> kode.length() == antallSifre);
-    }
+  private boolean inneholderKunKoderMedGittAntallSifre(int antallSifre) {
+    return koderSomSpesifisererNæringer.stream().allMatch(kode -> kode.length() == antallSifre);
+  }
 
-    public boolean erDefinertPåTosiffernivå() {
-        return inneholderKunKoderMedGittAntallSifre(2);
-    }
+  public boolean erDefinertPåTosiffernivå() {
+    return inneholderKunKoderMedGittAntallSifre(2);
+  }
 
-    public boolean erDefinertPåFemsiffernivå() {
-        return inneholderKunKoderMedGittAntallSifre(5);
-    }
+  public boolean erDefinertPåFemsiffernivå() {
+    return inneholderKunKoderMedGittAntallSifre(5);
+  }
 
-    public boolean inkludererVirksomhet(Underenhet underenhet) {
-        return inkludererNæringskode(underenhet.getNæringskode());
-    }
+  public boolean inkludererVirksomhet(Underenhet underenhet) {
+    return inkludererNæringskode(underenhet.getNæringskode());
+  }
 
-    public boolean inkludererNæringskode(Næringskode5Siffer næringskode5Siffer) {
-        String næringskode = næringskode5Siffer.getKode();
-        return koderSomSpesifisererNæringer.stream().anyMatch(næringskode::startsWith);
-    }
+  public boolean inkludererNæringskode(Næringskode5Siffer næringskode5Siffer) {
+    String næringskode = næringskode5Siffer.getKode();
+    return koderSomSpesifisererNæringer.stream().anyMatch(næringskode::startsWith);
+  }
 }

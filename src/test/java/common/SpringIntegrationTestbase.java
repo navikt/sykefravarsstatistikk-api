@@ -7,13 +7,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 /**
- * Baseklasse for å initialisere Spring når en test kjører, slik at Spring ikke starter på nytt når testen skal kjøres.
+ * Baseklasse for å initialisere Spring når en test kjører, slik at Spring ikke starter på nytt når
+ * testen skal kjøres.
  */
 @ActiveProfiles("mvc-test")
 @EnableMockOAuth2Server
 @SpringBootTest(
-        classes = SykefraværsstatistikkLocalTestApplication.class,
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
-)@TestPropertySource(properties = {"wiremock.mock.port=8082", "spring.h2.console.enabled=false"})
-public class SpringIntegrationTestbase {
-}
+    classes = SykefraværsstatistikkLocalTestApplication.class,
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(properties = {"wiremock.mock.port=8082", "spring.h2.console.enabled=false"})
+public class SpringIntegrationTestbase {}

@@ -27,101 +27,77 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class TokenXClientTest {
 
-    @Mock
-    private RestTemplate restTemplate;
-    private TokenXClient tokenClient;
+  @Mock private RestTemplate restTemplate;
+  private TokenXClient tokenClient;
 
-    private final MockOAuth2Server oAuth2Server = new MockOAuth2Server();
+  private final MockOAuth2Server oAuth2Server = new MockOAuth2Server();
 
+  @BeforeEach
+  public void setUp() {
+    tokenClient =
+        new TokenXClient(
+            "fakeTokenJwk",
+            "fakeTokenXClientId",
+            "fakeAlinnRettigheterProxyAudience",
+            "fakeTokenXWellKnownUrl",
+            restTemplate) {
+          @Override
+          protected String getAssertionToken(
+              AuthorizationServerMetadata authorizationServerMetadata) {
+            return "fakeAssertionToken";
+          }
 
-    @BeforeEach
-    public void setUp() {
-        tokenClient = new TokenXClient(
-                "fakeTokenJwk",
-                "fakeTokenXClientId",
-                "fakeAlinnRettigheterProxyAudience",
-                "fakeTokenXWellKnownUrl",
-                restTemplate
-        ){
-            @Override
-            protected String getAssertionToken(AuthorizationServerMetadata authorizationServerMetadata) {
-                return "fakeAssertionToken";
+          @NotNull
+          @Override
+          protected AuthorizationServerMetadata resolveUrlAndGetAuthorizationServerMetadata(
+              String wellKnownUrl) {
+            try {
+              return new AuthorizationServerMetadata(new Issuer(new URI("fake.uri")));
+            } catch (URISyntaxException e) {
+              e.printStackTrace();
             }
-            @NotNull
-            @Override
-            protected AuthorizationServerMetadata resolveUrlAndGetAuthorizationServerMetadata(String wellKnownUrl) {
-                try {
-                    return new AuthorizationServerMetadata(new Issuer(new URI("fake.uri")));
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
+            return null;
+          }
         };
-    }
+  }
 
-    @Test
-    public void wellKnownUrl_skal_trimmes_slik_at_resolveUrl_fungerer() {
-        assertThat(
-                TokenXClient.trimUrl("https://tokendings.dev-gcp.nais.io/.well-known/oauth-authorization-server/")
-        ).isEqualTo("https://tokendings.dev-gcp.nais.io/");
+  @Test
+  public void wellKnownUrl_skal_trimmes_slik_at_resolveUrl_fungerer() {
+    assertThat(
+            TokenXClient.trimUrl(
+                "https://tokendings.dev-gcp.nais.io/.well-known/oauth-authorization-server/"))
+        .isEqualTo("https://tokendings.dev-gcp.nais.io/");
 
-        assertThat(
-                TokenXClient.trimUrl("https://tokendings.dev-gcp.nais.io/.well-known/oauth-authorization-server")
-        ).isEqualTo("https://tokendings.dev-gcp.nais.io");
-    }
+    assertThat(
+            TokenXClient.trimUrl(
+                "https://tokendings.dev-gcp.nais.io/.well-known/oauth-authorization-server"))
+        .isEqualTo("https://tokendings.dev-gcp.nais.io");
+  }
 
-    @Test
-    public void håndterer_400_Bad_Request_Response_fra_TokenX() {
-        when(
-                restTemplate.postForEntity(
-                        any(),
-                        any(),
-                        any()
-                )
-        ).thenThrow(
-                new HttpClientErrorException(
-                        HttpStatus.BAD_REQUEST,
-                        "Some text"
-                )
-        );
+  @Test
+  public void håndterer_400_Bad_Request_Response_fra_TokenX() {
+    when(restTemplate.postForEntity(any(), any(), any()))
+        .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Some text"));
 
-        assertThrows(
-                TokenXException.class,
-                () -> tokenClient.exchangeTokenToAltinnProxy(new JwtToken(getEncodedToken()))
-        );
-    }
+    assertThrows(
+        TokenXException.class,
+        () -> tokenClient.exchangeTokenToAltinnProxy(new JwtToken(getEncodedToken())));
+  }
 
-    @Test
-    public void la_andre_client_error_response_fra_TokenX_blir_kastet_ut_som_exception() {
-        when(
-                restTemplate.postForEntity(
-                        any(),
-                        any(),
-                        any()
-                )
-        ).thenThrow(
-                new HttpClientErrorException(
-                        HttpStatus.NOT_FOUND,
-                        "Some text"
-                )
-        );
+  @Test
+  public void la_andre_client_error_response_fra_TokenX_blir_kastet_ut_som_exception() {
+    when(restTemplate.postForEntity(any(), any(), any()))
+        .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND, "Some text"));
 
-        assertThrows(
-                HttpClientErrorException.class,
-                () -> tokenClient.exchangeTokenToAltinnProxy(new JwtToken(getEncodedToken()))
-        );
-    }
+    assertThrows(
+        HttpClientErrorException.class,
+        () -> tokenClient.exchangeTokenToAltinnProxy(new JwtToken(getEncodedToken())));
+  }
 
-
-    private String getEncodedToken() {
-        String fnr = "01010112345";
-        String encodedToken = oAuth2Server.issueToken(
-                ISSUER_TOKENX,
-                fnr,
-                "default",
-                Map.of("pid", fnr)
-        ).serialize();
-        return encodedToken;
-    }
+  private String getEncodedToken() {
+    String fnr = "01010112345";
+    String encodedToken =
+        oAuth2Server.issueToken(ISSUER_TOKENX, fnr, "default", Map.of("pid", fnr)).serialize();
+    return encodedToken;
+  }
 }

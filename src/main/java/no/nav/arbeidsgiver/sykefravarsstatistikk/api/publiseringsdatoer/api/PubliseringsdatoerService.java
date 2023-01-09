@@ -22,50 +22,46 @@ public class PubliseringsdatoerService {
 
   private final PubliseringsdatoerRepository publiseringsdatoerRepository;
 
-  public PubliseringsdatoerService(
-      PubliseringsdatoerRepository publiseringsdatoerRepository
-  ) {
+  public PubliseringsdatoerService(PubliseringsdatoerRepository publiseringsdatoerRepository) {
     this.publiseringsdatoerRepository = publiseringsdatoerRepository;
   }
 
   public ÅrstallOgKvartal hentSistePubliserteKvartal() {
 
-    return publiseringsdatoerRepository.hentSisteImporttidspunkt()
+    return publiseringsdatoerRepository
+        .hentSisteImporttidspunkt()
         .map(ImporttidspunktDto::getGjeldendePeriode)
         .getOrElseThrow(
-            () -> new DatauthentingFeil("Kunne ikke hente ut siste publiseringstidspunkt")
-        );
-
+            () -> new DatauthentingFeil("Kunne ikke hente ut siste publiseringstidspunkt"));
   }
 
   public Option<Publiseringsdatoer> hentPubliseringsdatoer() {
 
-    List<PubliseringsdatoDbDto> publiseringsdatoer
-        = publiseringsdatoerRepository.hentPubliseringsdatoer();
+    List<PubliseringsdatoDbDto> publiseringsdatoer =
+        publiseringsdatoerRepository.hentPubliseringsdatoer();
 
-    return publiseringsdatoerRepository.hentSisteImporttidspunkt()
+    return publiseringsdatoerRepository
+        .hentSisteImporttidspunkt()
         .map(
-            forrigeImport -> Publiseringsdatoer.builder()
-                .gjeldendePeriode(forrigeImport.getGjeldendePeriode())
-                .sistePubliseringsdato(forrigeImport.getImportertDato().toString())
-                .nestePubliseringsdato(
-                    finnNestePubliseringsdato(publiseringsdatoer, forrigeImport.getImportertDato())
-                        .map(LocalDate::toString)
-                        .getOrElse("Neste publiseringsdato er utilgjengelig"))
-                .build()
-        );
+            forrigeImport ->
+                Publiseringsdatoer.builder()
+                    .gjeldendePeriode(forrigeImport.getGjeldendePeriode())
+                    .sistePubliseringsdato(forrigeImport.getImportertDato().toString())
+                    .nestePubliseringsdato(
+                        finnNestePubliseringsdato(
+                                publiseringsdatoer, forrigeImport.getImportertDato())
+                            .map(LocalDate::toString)
+                            .getOrElse("Neste publiseringsdato er utilgjengelig"))
+                    .build());
   }
 
   private Option<LocalDate> finnNestePubliseringsdato(
-      List<PubliseringsdatoDbDto> publiseringsdatoer,
-      LocalDate forrigeImporttidspunkt
-  ) {
+      List<PubliseringsdatoDbDto> publiseringsdatoer, LocalDate forrigeImporttidspunkt) {
 
-    List<PubliseringsdatoDbDto> fremtidigePubliseringsdatoer = sorterEldsteDatoerFørst(
-        filtrerBortDatoerEldreEnnForrigeLanseringsdato(
-            publiseringsdatoer,
-            forrigeImporttidspunkt
-        ));
+    List<PubliseringsdatoDbDto> fremtidigePubliseringsdatoer =
+        sorterEldsteDatoerFørst(
+            filtrerBortDatoerEldreEnnForrigeLanseringsdato(
+                publiseringsdatoer, forrigeImporttidspunkt));
 
     return Try.of(() -> fremtidigePubliseringsdatoer.get(0).getOffentligDato().toLocalDate())
         .onFailure(e -> log.warn("Ingen senere publiseringsdatoer er tilgjengelige i kalenderen"))
@@ -73,20 +69,17 @@ public class PubliseringsdatoerService {
   }
 
   private List<PubliseringsdatoDbDto> filtrerBortDatoerEldreEnnForrigeLanseringsdato(
-      List<PubliseringsdatoDbDto> publiseringsdatoer,
-      LocalDate forrigePubliseringsdato) {
+      List<PubliseringsdatoDbDto> publiseringsdatoer, LocalDate forrigePubliseringsdato) {
     return publiseringsdatoer.stream()
         .filter(
             publiseringsdato ->
-                publiseringsdato.getOffentligDato().toLocalDate()
-                    .isAfter(forrigePubliseringsdato))
+                publiseringsdato.getOffentligDato().toLocalDate().isAfter(forrigePubliseringsdato))
         .collect(Collectors.toList());
   }
 
   private static List<PubliseringsdatoDbDto> sorterEldsteDatoerFørst(
       List<PubliseringsdatoDbDto> datoer) {
-    return datoer
-        .stream()
+    return datoer.stream()
         .sorted(PubliseringsdatoDbDto::sammenlignPubliseringsdatoer)
         .collect(Collectors.toList());
   }

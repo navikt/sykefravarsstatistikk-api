@@ -21,45 +21,39 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class OffentligSykefraværshistorikkController {
 
-    private final OffentligKvartalsvisSykefraværshistorikkService offentligKvartalsvisSykefraværshistorikkService;
-    private final TilgangskontrollService tilgangskontrollService;
-    private final EnhetsregisteretClient enhetsregisteretClient;
+  private final OffentligKvartalsvisSykefraværshistorikkService
+      offentligKvartalsvisSykefraværshistorikkService;
+  private final TilgangskontrollService tilgangskontrollService;
+  private final EnhetsregisteretClient enhetsregisteretClient;
 
-    public OffentligSykefraværshistorikkController(
-            OffentligKvartalsvisSykefraværshistorikkService offentligKvartalsvisSykefraværshistorikkService,
-            TilgangskontrollService tilgangskontrollService,
-            EnhetsregisteretClient enhetsregisteretClient) {
-        this.offentligKvartalsvisSykefraværshistorikkService =
-                offentligKvartalsvisSykefraværshistorikkService;
-        this.tilgangskontrollService = tilgangskontrollService;
-        this.enhetsregisteretClient = enhetsregisteretClient;
+  public OffentligSykefraværshistorikkController(
+      OffentligKvartalsvisSykefraværshistorikkService
+          offentligKvartalsvisSykefraværshistorikkService,
+      TilgangskontrollService tilgangskontrollService,
+      EnhetsregisteretClient enhetsregisteretClient) {
+    this.offentligKvartalsvisSykefraværshistorikkService =
+        offentligKvartalsvisSykefraværshistorikkService;
+    this.tilgangskontrollService = tilgangskontrollService;
+    this.enhetsregisteretClient = enhetsregisteretClient;
+  }
+
+  @GetMapping(value = "/{orgnr}/v1/offentlig/sykefravarshistorikk/kvartalsvis")
+  public List<KvartalsvisSykefraværshistorikk> hentOffentligeSykefraværsprosenter(
+      @PathVariable("orgnr") String orgnrStr, HttpServletRequest request) {
+    InnloggetBruker bruker = tilgangskontrollService.hentInnloggetBrukerForAlleRettigheter();
+
+    tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
+        new Orgnr(orgnrStr), bruker, request.getMethod(), "" + request.getRequestURL());
+
+    Underenhet underenhet;
+    try {
+      underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr(orgnrStr));
+    } catch (IngenNæringException e) {
+      log.info("Underenhet har ingen næring. Returnerer 204 - No Content");
+      return null;
     }
 
-
-    @GetMapping(value = "/{orgnr}/v1/offentlig/sykefravarshistorikk/kvartalsvis")
-    public List<KvartalsvisSykefraværshistorikk> hentOffentligeSykefraværsprosenter(
-            @PathVariable("orgnr") String orgnrStr,
-            HttpServletRequest request
-    ) {
-        InnloggetBruker bruker = tilgangskontrollService.hentInnloggetBrukerForAlleRettigheter();
-
-        tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
-                new Orgnr(orgnrStr),
-                bruker,
-                request.getMethod(),
-                "" + request.getRequestURL()
-        );
-
-        Underenhet underenhet;
-        try {
-            underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr(orgnrStr));
-        } catch (IngenNæringException e) {
-            log.info("Underenhet har ingen næring. Returnerer 204 - No Content");
-            return null;
-        }
-
-        return offentligKvartalsvisSykefraværshistorikkService.hentSykefraværshistorikkV1Offentlig(
-                underenhet
-        );
-    }
+    return offentligKvartalsvisSykefraværshistorikkService.hentSykefraværshistorikkV1Offentlig(
+        underenhet);
+  }
 }

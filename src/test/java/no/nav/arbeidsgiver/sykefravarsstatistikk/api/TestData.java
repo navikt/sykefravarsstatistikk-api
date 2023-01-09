@@ -20,117 +20,113 @@ import java.util.Arrays;
 
 public class TestData {
 
-    public static final String ORGNR_VIRKSOMHET_1 = "987654321";
-    public static final String ORGNR_VIRKSOMHET_2 = "999999999";
-    public static final String ORGNR_VIRKSOMHET_3 = "999999777";
+  public static final String ORGNR_VIRKSOMHET_1 = "987654321";
+  public static final String ORGNR_VIRKSOMHET_2 = "999999999";
+  public static final String ORGNR_VIRKSOMHET_3 = "999999777";
 
-    public static final String NÆRINGSKODE_5SIFFER = "10062";
-    public static final String NÆRINGSKODE_2SIFFER = "10";
-    public static final String SEKTOR = "3";
+  public static final String NÆRINGSKODE_5SIFFER = "10062";
+  public static final String NÆRINGSKODE_2SIFFER = "10";
+  public static final String SEKTOR = "3";
 
-    public static InnloggetBruker getInnloggetBruker() {
-        return getInnloggetBruker(getFnr().getVerdi());
-    }
+  public static InnloggetBruker getInnloggetBruker() {
+    return getInnloggetBruker(getFnr().getVerdi());
+  }
 
-    public static InnloggetBruker getInnloggetBruker(String fnr) {
-        InnloggetBruker bruker = new InnloggetBruker(new Fnr(fnr));
-        bruker.setOrganisasjoner(Arrays.asList(
-                getOrganisasjon("999999999"),
-                getOrganisasjon("111111111")
-        ));
-        return bruker;
-    }
+  public static InnloggetBruker getInnloggetBruker(String fnr) {
+    InnloggetBruker bruker = new InnloggetBruker(new Fnr(fnr));
+    bruker.setOrganisasjoner(
+        Arrays.asList(getOrganisasjon("999999999"), getOrganisasjon("111111111")));
+    return bruker;
+  }
 
-    public static Næringsgruppering enNæringsgruppering(String kode5siffer) {
-        return new Næringsgruppering(
-                kode5siffer,
-                "Test5",
-                kode5siffer.substring(0, 4),
-                "test4",
-                kode5siffer.substring(0, 3),
-                "test3",
-                kode5siffer.substring(0, 2),
-                "test2",
-                "02",
-                "test1"
-        );
-    }
+  public static Næringsgruppering enNæringsgruppering(String kode5siffer) {
+    return new Næringsgruppering(
+        kode5siffer,
+        "Test5",
+        kode5siffer.substring(0, 4),
+        "test4",
+        kode5siffer.substring(0, 3),
+        "test3",
+        kode5siffer.substring(0, 2),
+        "test2",
+        "02",
+        "test1");
+  }
 
-    public static Næringsgruppering enNæringsgruppering() {
-        return enNæringsgruppering("02123");
-    }
+  public static Næringsgruppering enNæringsgruppering() {
+    return enNæringsgruppering("02123");
+  }
 
-    public static AltinnOrganisasjon getOrganisasjon(String organizationNumber) {
-        AltinnOrganisasjon organisasjon = new AltinnOrganisasjon();
-        organisasjon.setOrganizationNumber(organizationNumber);
-        return organisasjon;
-    }
+  public static AltinnOrganisasjon getOrganisasjon(String organizationNumber) {
+    AltinnOrganisasjon organisasjon = new AltinnOrganisasjon();
+    organisasjon.setOrganizationNumber(organizationNumber);
+    return organisasjon;
+  }
 
   public static Fnr getFnr() {
-        return new Fnr("26070248114");
-    }
+    return new Fnr("26070248114");
+  }
 
-    public static Orgnr etOrgnr() {
-        return new Orgnr("971800534");
-    }
+  public static Orgnr etOrgnr() {
+    return new Orgnr("971800534");
+  }
 
-    public static InstitusjonellSektorkode enInstitusjonellSektorkode() {
-        return new InstitusjonellSektorkode("1234", "sektor!");
-    }
+  public static InstitusjonellSektorkode enInstitusjonellSektorkode() {
+    return new InstitusjonellSektorkode("1234", "sektor!");
+  }
 
-    public static OverordnetEnhet enEnhet() {
-        return OverordnetEnhet.builder()
-                .orgnr(etOrgnr())
-                .antallAnsatte(10)
-                .navn("Enhet AS")
-                .institusjonellSektorkode(enInstitusjonellSektorkode())
-                .næringskode(enNæringskode5Siffer())
-                .build();
-    }
+  public static OverordnetEnhet enEnhet() {
+    return OverordnetEnhet.builder()
+        .orgnr(etOrgnr())
+        .antallAnsatte(10)
+        .navn("Enhet AS")
+        .institusjonellSektorkode(enInstitusjonellSektorkode())
+        .næringskode(enNæringskode5Siffer())
+        .build();
+  }
 
-    public static Underenhet enUnderenhet() {
-        return enUnderenhetBuilder().orgnr(etOrgnr()).build();
-    }
+  public static Underenhet enUnderenhet() {
+    return enUnderenhetBuilder().orgnr(etOrgnr()).build();
+  }
 
-    public static Underenhet enUnderenhet(String orgnr) {
-        return enUnderenhetBuilder().orgnr(new Orgnr(orgnr)).build();
-    }
+  public static Underenhet enUnderenhet(String orgnr) {
+    return enUnderenhetBuilder().orgnr(new Orgnr(orgnr)).build();
+  }
 
-    public static Underenhet.UnderenhetBuilder enUnderenhetBuilder() {
-        return Underenhet.builder()
-                .orgnr(etOrgnr())
-                .overordnetEnhetOrgnr(new Orgnr("053497180"))
-                .navn("Underenhet AS")
-                .næringskode(enNæringskode5Siffer())
-                .antallAnsatte(40);
+  public static Underenhet.UnderenhetBuilder enUnderenhetBuilder() {
+    return Underenhet.builder()
+        .orgnr(etOrgnr())
+        .overordnetEnhetOrgnr(new Orgnr("053497180"))
+        .navn("Underenhet AS")
+        .næringskode(enNæringskode5Siffer())
+        .antallAnsatte(40);
+  }
 
-    }
+  public static Næring enNæring() {
+    return enNæring("12");
+  }
 
-    public static Næring enNæring() {
-        return enNæring("12");
-    }
+  public static Næring enNæring(String kode) {
+    return new Næring(kode, "en næring");
+  }
 
-    public static Næring enNæring(String kode) {
-        return new Næring(kode, "en næring");
-    }
+  public static Næringskode5Siffer enNæringskode5Siffer() {
+    return enNæringskode5Siffer("12345");
+  }
 
-    public static Næringskode5Siffer enNæringskode5Siffer() {
-        return enNæringskode5Siffer("12345");
-    }
-
-    public static Næringskode5Siffer enNæringskode5Siffer(String kode) {
-        return new Næringskode5Siffer(kode, "Spesiell næring");
-    }
+  public static Næringskode5Siffer enNæringskode5Siffer(String kode) {
+    return new Næringskode5Siffer(kode, "Spesiell næring");
+  }
 
   public static Sektor enSektor() {
-        return new Sektor("1", "Statlig forvaltning");
-    }
+    return new Sektor("1", "Statlig forvaltning");
+  }
 
-    public static Bransje enBransje() {
-        return new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "bransje", "12322");
-    }
+  public static Bransje enBransje() {
+    return new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "bransje", "12322");
+  }
 
-    public static ÅrstallOgKvartal etÅrstallOgKvartal() {
-        return new ÅrstallOgKvartal(2019, 4);
-    }
+  public static ÅrstallOgKvartal etÅrstallOgKvartal() {
+    return new ÅrstallOgKvartal(2019, 4);
+  }
 }

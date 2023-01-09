@@ -21,14 +21,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 public class PubliseringsdatoerApiIntegrationTest extends SpringIntegrationTestbase {
 
-  @LocalServerPort
-  private String port;
+  @LocalServerPort private String port;
 
-  @Autowired
-  PubliseringsdatoerRepository publiseringsdatoerRepository;
+  @Autowired PubliseringsdatoerRepository publiseringsdatoerRepository;
 
-  @Autowired
-  NamedParameterJdbcTemplate jdbcTemplate;
+  @Autowired NamedParameterJdbcTemplate jdbcTemplate;
 
   @BeforeEach
   public void setUp() {
@@ -40,27 +37,32 @@ public class PubliseringsdatoerApiIntegrationTest extends SpringIntegrationTestb
     TestUtils.slettAlleImporttidspunkt(jdbcTemplate);
   }
 
-
   @Test
   public void hentPubliseringsdatoer_skalReturnereResponsMedKorrektFormat()
       throws IOException, InterruptedException {
 
     skrivSisteImporttidspunktTilDb(jdbcTemplate);
 
-    HttpResponse<String> response = newBuilder().build().send(
-        HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:" + port
-                + "/sykefravarsstatistikk-api/publiseringsdato"))
-            .GET()
-            .build(),
-        ofString());
+    HttpResponse<String> response =
+        newBuilder()
+            .build()
+            .send(
+                HttpRequest.newBuilder()
+                    .uri(
+                        URI.create(
+                            "http://localhost:"
+                                + port
+                                + "/sykefravarsstatistikk-api/publiseringsdato"))
+                    .GET()
+                    .build(),
+                ofString());
 
-    String forventetRespons = ""
-        + "{\"sistePubliseringsdato\":\"2022-06-02\","
-        + "\"nestePubliseringsdato\":\"2022-09-08\","
-        + "\"gjeldendePeriode\":{\"årstall\":2022,\"kvartal\":1}}";
+    String forventetRespons =
+        ""
+            + "{\"sistePubliseringsdato\":\"2022-06-02\","
+            + "\"nestePubliseringsdato\":\"2022-09-08\","
+            + "\"gjeldendePeriode\":{\"årstall\":2022,\"kvartal\":1}}";
 
     assertThat(response.body()).isEqualTo(forventetRespons);
   }
 }
-

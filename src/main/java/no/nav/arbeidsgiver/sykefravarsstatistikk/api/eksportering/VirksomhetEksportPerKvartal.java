@@ -4,34 +4,34 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 
 public class VirksomhetEksportPerKvartal {
-    private final Orgnr orgnr;
-    private final ÅrstallOgKvartal årstallOgKvartal;
-    private final boolean eksportert;
+  private final Orgnr orgnr;
+  private final ÅrstallOgKvartal årstallOgKvartal;
+  private final boolean eksportert;
 
+  public String getOrgnr() {
+    return orgnr.getVerdi();
+  }
 
-    public String getOrgnr() {
-        return orgnr.getVerdi();
-    }
+  public int getÅrstall() {
+    return årstallOgKvartal.getÅrstall();
+  }
 
-    public int getÅrstall() {
-        return årstallOgKvartal.getÅrstall();
-    }
+  public int getKvartal() {
+    return årstallOgKvartal.getKvartal();
+  }
 
-    public int getKvartal() {
-        return årstallOgKvartal.getKvartal();
-    }
+  public ÅrstallOgKvartal getÅrstallOgKvartal() {
+    return årstallOgKvartal;
+  }
 
-    public ÅrstallOgKvartal getÅrstallOgKvartal() {
-        return årstallOgKvartal;
-    }
+  public boolean eksportert() {
+    return eksportert;
+  }
 
-    public boolean eksportert() {
-        return eksportert;
-    }
-
-    public VirksomhetEksportPerKvartal(Orgnr orgnr, ÅrstallOgKvartal årstallOgKvartal, boolean eksportert) {
-        this.orgnr = orgnr;
-        this.årstallOgKvartal = årstallOgKvartal;
-        this.eksportert = eksportert;
-    }
+  public VirksomhetEksportPerKvartal(
+      Orgnr orgnr, ÅrstallOgKvartal årstallOgKvartal, boolean eksportert) {
+    this.orgnr = orgnr;
+    this.årstallOgKvartal = årstallOgKvartal;
+    this.eksportert = eksportert;
+  }
 }

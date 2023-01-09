@@ -48,37 +48,33 @@ import org.springframework.web.context.WebApplicationContext;
 @DirtiesContext
 @EmbeddedKafka(
     controlledShutdown = true,
-    topics = {"arbeidsgiver.sykefravarsstatistikk-v1", "arbeidsgiver.sykefravarsstatistikk-land-v1",
-        "arbeidsgiver.sykefravarsstatistikk-virksomhet-v1"},
-    brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"}
-)
-
-@Disabled // TODO: spiller dårlig sammen med KafkaServiceIntegrasjonTest (pga "adress already in use når EmbeddedKafkaBroker starter")
-public class EksporteringControllerApiIntegrationTest extends SpringIntegrationTestbase {
-
-  @Autowired
-  private WebApplicationContext webApplicationContext;
-
-  @Autowired
-  MockOAuth2Server mockOAuth2Server;
-
-  @Autowired
-  private EmbeddedKafkaBroker embeddedKafkaBroker;
-
-  @Autowired
-  private NamedParameterJdbcTemplate jdbcTemplate;
-
-  private static String[] TOPIC_NAMES = {
+    topics = {
       "arbeidsgiver.sykefravarsstatistikk-v1",
       "arbeidsgiver.sykefravarsstatistikk-land-v1",
       "arbeidsgiver.sykefravarsstatistikk-virksomhet-v1"
+    },
+    brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
+@Disabled // TODO: spiller dårlig sammen med KafkaServiceIntegrasjonTest (pga "adress already in use
+          // når EmbeddedKafkaBroker starter")
+public class EksporteringControllerApiIntegrationTest extends SpringIntegrationTestbase {
+
+  @Autowired private WebApplicationContext webApplicationContext;
+
+  @Autowired MockOAuth2Server mockOAuth2Server;
+
+  @Autowired private EmbeddedKafkaBroker embeddedKafkaBroker;
+
+  @Autowired private NamedParameterJdbcTemplate jdbcTemplate;
+
+  private static String[] TOPIC_NAMES = {
+    "arbeidsgiver.sykefravarsstatistikk-v1",
+    "arbeidsgiver.sykefravarsstatistikk-land-v1",
+    "arbeidsgiver.sykefravarsstatistikk-virksomhet-v1"
   };
   private KafkaMessageListenerContainer<String, String> container;
   private BlockingQueue<ConsumerRecord<String, String>> consumerRecords;
 
-  @LocalServerPort
-  private String port;
-
+  @LocalServerPort private String port;
 
   @BeforeEach
   public void setUp() {
@@ -91,23 +87,21 @@ public class EksporteringControllerApiIntegrationTest extends SpringIntegrationT
 
     ContainerProperties containerProperties = new ContainerProperties(TOPIC_NAMES);
     Map<String, Object> consumerProperties =
-        KafkaTestUtils.consumerProps(
-            "consumer",
-            "false",
-            embeddedKafkaBroker
-        );
+        KafkaTestUtils.consumerProps("consumer", "false", embeddedKafkaBroker);
     consumerProperties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-    consumerProperties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-        StringDeserializer.class);
+    consumerProperties.put(
+        ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
     consumerProperties.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "60000");
     DefaultKafkaConsumerFactory<String, String> kafkaConsumerFactory =
         new DefaultKafkaConsumerFactory<>(consumerProperties);
 
     container = new KafkaMessageListenerContainer<>(kafkaConsumerFactory, containerProperties);
-    container.setupMessageListener((MessageListener<String, String>) record -> {
-      System.out.println("Listened message=" + record.toString());
-      consumerRecords.add(record);
-    });
+    container.setupMessageListener(
+        (MessageListener<String, String>)
+            record -> {
+              System.out.println("Listened message=" + record.toString());
+              consumerRecords.add(record);
+            });
   }
 
   @AfterEach
@@ -125,23 +119,27 @@ public class EksporteringControllerApiIntegrationTest extends SpringIntegrationT
   @Test
   public void start_eksport_for_land() throws Exception {
     opprettStatistikkForLand(jdbcTemplate);
-    HttpResponse<String> response = newBuilder().build().send(
-        HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api"
-                + "/eksportering/reeksport/statistikkkategori?" +
-                "årstall=" + SISTE_PUBLISERTE_KVARTAL.getÅrstall() +
-                "&kvartal=" + SISTE_PUBLISERTE_KVARTAL.getKvartal() +
-                "&kategori=LAND" +
-                "&begrensningTil=10"
-            ))
-            .header(
-                AUTHORIZATION,
-                getBearerMedJwt()
-            )
-            .POST(HttpRequest.BodyPublishers.noBody())
-            .build(),
-        ofString()
-    );
+    HttpResponse<String> response =
+        newBuilder()
+            .build()
+            .send(
+                HttpRequest.newBuilder()
+                    .uri(
+                        URI.create(
+                            "http://localhost:"
+                                + port
+                                + "/sykefravarsstatistikk-api"
+                                + "/eksportering/reeksport/statistikkkategori?"
+                                + "årstall="
+                                + SISTE_PUBLISERTE_KVARTAL.getÅrstall()
+                                + "&kvartal="
+                                + SISTE_PUBLISERTE_KVARTAL.getKvartal()
+                                + "&kategori=LAND"
+                                + "&begrensningTil=10"))
+                    .header(AUTHORIZATION, getBearerMedJwt())
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build(),
+                ofString());
 
     assertThat(response.statusCode()).isEqualTo(200);
   }
@@ -152,14 +150,12 @@ public class EksporteringControllerApiIntegrationTest extends SpringIntegrationT
         jdbcTemplate,
         SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
         SISTE_PUBLISERTE_KVARTAL.getKvartal(),
-        "987654321"
-    );
+        "987654321");
     opprettTestVirksomhetMetaData(
         jdbcTemplate,
         SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
         SISTE_PUBLISERTE_KVARTAL.getKvartal(),
-        "999999999"
-    );
+        "999999999");
 
     opprettStatistikkForVirksomhet(
         jdbcTemplate,
@@ -168,8 +164,7 @@ public class EksporteringControllerApiIntegrationTest extends SpringIntegrationT
         SISTE_PUBLISERTE_KVARTAL.getKvartal(),
         150,
         1000,
-        10
-    );
+        10);
     opprettStatistikkForVirksomhet(
         jdbcTemplate,
         "999999999",
@@ -177,25 +172,28 @@ public class EksporteringControllerApiIntegrationTest extends SpringIntegrationT
         SISTE_PUBLISERTE_KVARTAL.getKvartal(),
         150,
         1000,
-        10
-    );
-    HttpResponse<String> response = newBuilder().build().send(
-        HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api"
-                + "/eksportering/reeksport/statistikkkategori?" +
-                "årstall=" + SISTE_PUBLISERTE_KVARTAL.getÅrstall() +
-                "&kvartal=" + SISTE_PUBLISERTE_KVARTAL.getKvartal() +
-                "&kategori=VIRKSOMHET" +
-                "&begrensningTil=10"
-            ))
-            .header(
-                AUTHORIZATION,
-                getBearerMedJwt()
-            )
-            .POST(HttpRequest.BodyPublishers.noBody())
-            .build(),
-        ofString()
-    );
+        10);
+    HttpResponse<String> response =
+        newBuilder()
+            .build()
+            .send(
+                HttpRequest.newBuilder()
+                    .uri(
+                        URI.create(
+                            "http://localhost:"
+                                + port
+                                + "/sykefravarsstatistikk-api"
+                                + "/eksportering/reeksport/statistikkkategori?"
+                                + "årstall="
+                                + SISTE_PUBLISERTE_KVARTAL.getÅrstall()
+                                + "&kvartal="
+                                + SISTE_PUBLISERTE_KVARTAL.getKvartal()
+                                + "&kategori=VIRKSOMHET"
+                                + "&begrensningTil=10"))
+                    .header(AUTHORIZATION, getBearerMedJwt())
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build(),
+                ofString());
 
     assertThat(response.statusCode()).isEqualTo(200);
   }
@@ -207,14 +205,12 @@ public class EksporteringControllerApiIntegrationTest extends SpringIntegrationT
         jdbcTemplate,
         SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
         SISTE_PUBLISERTE_KVARTAL.getKvartal(),
-        "987654321"
-    );
+        "987654321");
     opprettTestVirksomhetMetaData(
         jdbcTemplate,
         SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
         SISTE_PUBLISERTE_KVARTAL.getKvartal(),
-        "999999999"
-    );
+        "999999999");
 
     opprettStatistikkForVirksomhet(
         jdbcTemplate,
@@ -223,26 +219,29 @@ public class EksporteringControllerApiIntegrationTest extends SpringIntegrationT
         SISTE_PUBLISERTE_KVARTAL.getKvartal(),
         150,
         1000,
-        10
-    );
+        10);
 
-    HttpResponse<String> response = newBuilder().build().send(
-        HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:" + port + "/sykefravarsstatistikk-api"
-                + "/eksportering/reeksport/statistikkkategori?" +
-                "årstall=" + SISTE_PUBLISERTE_KVARTAL.getÅrstall() +
-                "&kvartal=" + SISTE_PUBLISERTE_KVARTAL.getKvartal() +
-                "&kategori=VIRKSOMHET" +
-                "&begrensningTil=10"
-            ))
-            .header(
-                AUTHORIZATION,
-                getBearerMedJwt()
-            )
-            .POST(HttpRequest.BodyPublishers.noBody())
-            .build(),
-        ofString()
-    );
+    HttpResponse<String> response =
+        newBuilder()
+            .build()
+            .send(
+                HttpRequest.newBuilder()
+                    .uri(
+                        URI.create(
+                            "http://localhost:"
+                                + port
+                                + "/sykefravarsstatistikk-api"
+                                + "/eksportering/reeksport/statistikkkategori?"
+                                + "årstall="
+                                + SISTE_PUBLISERTE_KVARTAL.getÅrstall()
+                                + "&kvartal="
+                                + SISTE_PUBLISERTE_KVARTAL.getKvartal()
+                                + "&kategori=VIRKSOMHET"
+                                + "&begrensningTil=10"))
+                    .header(AUTHORIZATION, getBearerMedJwt())
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build(),
+                ofString());
 
     assertThat(response.statusCode()).isEqualTo(200);
   }
@@ -250,12 +249,6 @@ public class EksporteringControllerApiIntegrationTest extends SpringIntegrationT
   @NotNull
   private String getBearerMedJwt() {
     return "Bearer "
-        + TestTokenUtil.createToken(
-        mockOAuth2Server,
-        "15008462396",
-        SELVBETJENING_ISSUER_ID,
-        ""
-    );
+        + TestTokenUtil.createToken(mockOAuth2Server, "15008462396", SELVBETJENING_ISSUER_ID, "");
   }
-
 }

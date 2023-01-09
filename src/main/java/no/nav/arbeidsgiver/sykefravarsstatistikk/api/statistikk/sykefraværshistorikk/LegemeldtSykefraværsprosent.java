@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Getter
 public class LegemeldtSykefraværsprosent {
-    private final Statistikkategori type;
-    private final String label;
-    private final BigDecimal prosent;
+  private final Statistikkategori type;
+  private final String label;
+  private final BigDecimal prosent;
 }

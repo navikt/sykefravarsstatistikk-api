@@ -9,18 +9,16 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 @AllArgsConstructor
 public class Sykefraværsdata {
 
-    private Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefravær;
+  private Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> sykefravær;
 
-
-    List<UmaskertSykefraværForEttKvartal> filtrerPåKategori(Statistikkategori kategori) {
-        if (sykefravær.containsKey(kategori)) {
-            return sykefravær.get(kategori);
-        }
-        return List.of();
+  List<UmaskertSykefraværForEttKvartal> filtrerPåKategori(Statistikkategori kategori) {
+    if (sykefravær.containsKey(kategori)) {
+      return sykefravær.get(kategori);
     }
+    return List.of();
+  }
 
-
-    void filtrerBortVirksomhetsdata() {
-        sykefravær.remove(Statistikkategori.VIRKSOMHET);
-    }
+  void filtrerBortVirksomhetsdata() {
+    sykefravær.remove(Statistikkategori.VIRKSOMHET);
+  }
 }

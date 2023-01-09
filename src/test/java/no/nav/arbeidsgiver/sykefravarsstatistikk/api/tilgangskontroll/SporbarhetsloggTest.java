@@ -9,28 +9,14 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getInnlogge
 
 public class SporbarhetsloggTest {
 
-    @Test
-    public void loggHendelse__skal_ikke_feile_ved_nullfelter() {
-        Sporbarhetslogg sporbarhetslogg = new Sporbarhetslogg();
+  @Test
+  public void loggHendelse__skal_ikke_feile_ved_nullfelter() {
+    Sporbarhetslogg sporbarhetslogg = new Sporbarhetslogg();
 
-        sporbarhetslogg.loggHendelse(new Loggevent(
-                getInnloggetBruker(),
-                new Orgnr(null),
-                false,
-                null,
-                null,
-                null,
-                null
-        ));
+    sporbarhetslogg.loggHendelse(
+        new Loggevent(getInnloggetBruker(), new Orgnr(null), false, null, null, null, null));
 
-        sporbarhetslogg.loggHendelse(new Loggevent(
-                getInnloggetBruker(),
-                new Orgnr(null),
-                false,
-                null,
-                null,
-                null,
-                null
-        ), null);
-    }
+    sporbarhetslogg.loggHendelse(
+        new Loggevent(getInnloggetBruker(), new Orgnr(null), false, null, null, null, null), null);
+  }
 }

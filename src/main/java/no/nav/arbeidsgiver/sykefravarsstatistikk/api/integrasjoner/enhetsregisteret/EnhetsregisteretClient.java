@@ -26,12 +26,10 @@ public class EnhetsregisteretClient {
   private final RestTemplate restTemplate;
   private final String enhetsregisteretUrl;
 
-  private final static ObjectMapper objectMapper = new ObjectMapper();
+  private static final ObjectMapper objectMapper = new ObjectMapper();
 
   public EnhetsregisteretClient(
-      RestTemplate restTemplate,
-      @Value("${enhetsregisteret.url}") String enhetsregisteretUrl
-  ) {
+      RestTemplate restTemplate, @Value("${enhetsregisteret.url}") String enhetsregisteretUrl) {
     this.restTemplate = restTemplate;
     this.enhetsregisteretUrl = enhetsregisteretUrl;
   }
@@ -82,8 +80,7 @@ public class EnhetsregisteretClient {
           enhetJson.get("navn").textValue(),
           objectMapper.treeToValue(næringskodeJson, Næringskode5Siffer.class),
           objectMapper.treeToValue(sektorJson, InstitusjonellSektorkode.class),
-          enhetJson.get("antallAnsatte").intValue()
-      );
+          enhetJson.get("antallAnsatte").intValue());
 
     } catch (IOException | NullPointerException | IllegalArgumentException e) {
       throw new EnhetsregisteretMappingException(
@@ -97,8 +94,7 @@ public class EnhetsregisteretClient {
           "Orgnr hentet fra Enhetsregisteret samsvarer ikke med det medsendte orgnr. Request: "
               + opprinneligOrgnr.getVerdi()
               + ", response: "
-              + returnertOrgnr.getVerdi()
-      );
+              + returnertOrgnr.getVerdi());
     }
   }
 
@@ -117,8 +113,7 @@ public class EnhetsregisteretClient {
           new Orgnr(enhetJson.get("overordnetEnhet").textValue()),
           enhetJson.get("navn").textValue(),
           objectMapper.treeToValue(næringskodeJson, Næringskode5Siffer.class),
-          enhetJson.get("antallAnsatte").intValue()
-      );
+          enhetJson.get("antallAnsatte").intValue());
 
     } catch (IOException | NullPointerException e) {
       throw new EnhetsregisteretMappingException(
@@ -128,12 +123,9 @@ public class EnhetsregisteretClient {
 
   public HttpStatus healthcheck() {
     try {
-      ResponseEntity<String> response = restTemplate.exchange(
-          enhetsregisteretUrl,
-          HttpMethod.GET,
-          HttpEntity.EMPTY,
-          String.class
-      );
+      ResponseEntity<String> response =
+          restTemplate.exchange(
+              enhetsregisteretUrl, HttpMethod.GET, HttpEntity.EMPTY, String.class);
       return response.getStatusCode();
     } catch (RestClientResponseException e) {
       return HttpStatus.valueOf(e.getRawStatusCode());

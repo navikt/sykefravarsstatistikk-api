@@ -6,12 +6,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Profile;
 
 @SpringBootApplication
-@EnableJwtTokenValidation(ignore = {
-        "org.springdoc",
-        "org.springframework"
-})
+@EnableJwtTokenValidation(ignore = {"org.springdoc", "org.springframework"})
 public class SykefraværsstatistikkApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(SykefraværsstatistikkApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(SykefraværsstatistikkApplication.class, args);
+  }
 }

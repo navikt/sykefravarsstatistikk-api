@@ -7,5 +7,4 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 @Profile("local")
 @EnableMockOAuth2Server
-public class LocalOgUnitTestOidcConfiguration {
-}
+public class LocalOgUnitTestOidcConfiguration {}

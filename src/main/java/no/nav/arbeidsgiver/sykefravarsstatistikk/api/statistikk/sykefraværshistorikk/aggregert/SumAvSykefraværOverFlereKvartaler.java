@@ -22,7 +22,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
 import org.jetbrains.annotations.NotNull;
 
-
 import static java.math.BigDecimal.ZERO;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.CollectionUtils.concat;
@@ -33,153 +32,133 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistik
 @AllArgsConstructor
 class SumAvSykefraværOverFlereKvartaler {
 
-    static SumAvSykefraværOverFlereKvartaler NULLPUNKT =
-            new SumAvSykefraværOverFlereKvartaler(
-                    ZERO,
-                    ZERO,
-                    0,
-                    List.of(),
-                    List.of()
-            );
+  static SumAvSykefraværOverFlereKvartaler NULLPUNKT =
+      new SumAvSykefraværOverFlereKvartaler(ZERO, ZERO, 0, List.of(), List.of());
 
-    @Getter
-    BigDecimal muligeDagsverk;
-    @Getter
-    BigDecimal tapteDagsverk;
-    private int høyesteAntallPersonerIEtKvartal;
-    private List<ÅrstallOgKvartal> kvartaler;
-    private List<UmaskertSykefraværForEttKvartal> umaskertSykefraværList;
+  @Getter BigDecimal muligeDagsverk;
+  @Getter BigDecimal tapteDagsverk;
+  private int høyesteAntallPersonerIEtKvartal;
+  private List<ÅrstallOgKvartal> kvartaler;
+  private List<UmaskertSykefraværForEttKvartal> umaskertSykefraværList;
 
+  SumAvSykefraværOverFlereKvartaler(@NotNull UmaskertSykefraværForEttKvartal umaskertSykefravær) {
+    this.muligeDagsverk = umaskertSykefravær.getDagsverkNevner();
+    this.tapteDagsverk = umaskertSykefravær.getDagsverkTeller();
+    this.høyesteAntallPersonerIEtKvartal = umaskertSykefravær.getAntallPersoner();
+    this.kvartaler = List.of(umaskertSykefravær.getÅrstallOgKvartal());
+    this.umaskertSykefraværList = List.of(umaskertSykefravær);
+  }
 
-    SumAvSykefraværOverFlereKvartaler(@NotNull UmaskertSykefraværForEttKvartal umaskertSykefravær) {
-        this.muligeDagsverk = umaskertSykefravær.getDagsverkNevner();
-        this.tapteDagsverk = umaskertSykefravær.getDagsverkTeller();
-        this.høyesteAntallPersonerIEtKvartal = umaskertSykefravær.getAntallPersoner();
-        this.kvartaler = List.of(umaskertSykefravær.getÅrstallOgKvartal());
-        this.umaskertSykefraværList = List.of(umaskertSykefravær);
+  public Either<StatistikkException, StatistikkDto> regnUtProsentOgMapTilDto(
+      Statistikkategori type, String label) {
+
+    return kalkulerFraværsprosentMedMaskering()
+        .map(prosent -> this.tilStatistikkDto(type, label, prosent.toString()));
+  }
+
+  public Either<StatistikkException, SykefraværOverFlereKvartaler>
+      regnUtProsentOgMapTilSykefraværForFlereKvartaler() {
+    if (muligeDagsverk.compareTo(ZERO) == 0) {
+      return Either.left(
+          new UtilstrekkeligDataException(
+              "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."));
     }
 
+    Either<StatistikkException, BigDecimal> prosent =
+        kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk);
 
-    public Either<StatistikkException, StatistikkDto> regnUtProsentOgMapTilDto
-            (Statistikkategori type, String label) {
-
-        return kalkulerFraværsprosentMedMaskering().map(
-                prosent -> this.tilStatistikkDto(type, label, prosent.toString())
-        );
+    if (prosent.isLeft()) {
+      return Either.left(prosent.getLeft());
     }
 
-    public Either<StatistikkException, SykefraværOverFlereKvartaler> regnUtProsentOgMapTilSykefraværForFlereKvartaler() {
-        if (muligeDagsverk.compareTo(ZERO) == 0) {
-            return Either.left(new UtilstrekkeligDataException(
-                    "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."));
-        }
+    SykefraværOverFlereKvartaler sykefraværForFlereKvartaler =
+        new SykefraværOverFlereKvartaler(
+            kvartaler,
+            tapteDagsverk,
+            muligeDagsverk,
+            umaskertSykefraværList.stream()
+                .map(
+                    sf ->
+                        new SykefraværForEttKvartal(
+                            sf.getÅrstallOgKvartal(),
+                            sf.getDagsverkTeller(),
+                            sf.getDagsverkNevner(),
+                            sf.getAntallPersoner()))
+                .collect(Collectors.toList()));
 
-        Either<StatistikkException, BigDecimal> prosent = kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk);
+    return Either.right(sykefraværForFlereKvartaler);
+  }
 
-        if (prosent.isLeft()) {
-            return Either.left(prosent.getLeft());
-        }
-
-        SykefraværOverFlereKvartaler sykefraværForFlereKvartaler = new SykefraværOverFlereKvartaler(
-                kvartaler,
-                tapteDagsverk,
-                muligeDagsverk,
-                umaskertSykefraværList.stream().map(
-                        sf -> new SykefraværForEttKvartal(
-                                sf.getÅrstallOgKvartal(),
-                                sf.getDagsverkTeller(),
-                                sf.getDagsverkNevner(),
-                                sf.getAntallPersoner()
-                        )
-                ).collect(Collectors.toList())
-
-        );
-        return Either.right(sykefraværForFlereKvartaler);
+  private Either<StatistikkException, BigDecimal> kalkulerFraværsprosentMedMaskering() {
+    if (datagrunnlagetErTomt()) {
+      return Either.left(new UtilstrekkeligDataException());
+    }
+    if (dataMåMaskeres()) {
+      return Either.left(new MaskerteDataException());
+    }
+    if (muligeDagsverk.compareTo(ZERO) == 0) {
+      return Either.left(
+          new UtilstrekkeligDataException(
+              "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."));
     }
 
+    return kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk);
+  }
 
-    private Either<StatistikkException, BigDecimal> kalkulerFraværsprosentMedMaskering() {
-        if (datagrunnlagetErTomt()) {
-            return Either.left(new UtilstrekkeligDataException());
-        }
-        if (dataMåMaskeres()) {
-            return Either.left(new MaskerteDataException());
-        }
-        if (muligeDagsverk.compareTo(ZERO) == 0) {
-            return Either.left(new UtilstrekkeligDataException(
-                    "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."));
-        }
+  Either<StatistikkException, StatistikkDto> getTapteDagsverkOgMapTilDto(
+      Statistikkategori type, String virksomhetsnavn) {
+    return getAntallDagsverkOgMapTilDto(type, virksomhetsnavn, this::getTapteDagsverk);
+  }
 
-        return kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk);
+  Either<StatistikkException, StatistikkDto> getMuligeDagsverkOgMapTilDto(
+      Statistikkategori type, String virksomhetsnavn) {
+    return getAntallDagsverkOgMapTilDto(type, virksomhetsnavn, this::getMuligeDagsverk);
+  }
+
+  SumAvSykefraværOverFlereKvartaler leggSammen(@NotNull SumAvSykefraværOverFlereKvartaler other) {
+
+    return new SumAvSykefraværOverFlereKvartaler(
+        this.muligeDagsverk.add(other.muligeDagsverk),
+        this.tapteDagsverk.add(other.tapteDagsverk),
+        Math.max(this.høyesteAntallPersonerIEtKvartal, other.høyesteAntallPersonerIEtKvartal),
+        Stream.concat(kvartaler.stream(), other.kvartaler.stream())
+            .distinct()
+            .collect(Collectors.toList()),
+        Stream.concat(umaskertSykefraværList.stream(), other.umaskertSykefraværList.stream())
+            .distinct()
+            .collect(Collectors.toList()));
+  }
+
+  private Either<StatistikkException, StatistikkDto> getAntallDagsverkOgMapTilDto(
+      Statistikkategori type,
+      String virksomhetsnavn,
+      Supplier<BigDecimal> tapteEllerMuligeDagsverk) {
+    if (datagrunnlagetErTomt()) {
+      return Either.left(new UtilstrekkeligDataException());
     }
-
-
-    Either<StatistikkException, StatistikkDto> getTapteDagsverkOgMapTilDto(
-            Statistikkategori type, String virksomhetsnavn
-    ) {
-        return getAntallDagsverkOgMapTilDto(type, virksomhetsnavn, this::getTapteDagsverk);
+    if (dataMåMaskeres()) {
+      return Either.left(new MaskerteDataException());
     }
+    return Either.right(
+        this.tilStatistikkDto(type, virksomhetsnavn, tapteEllerMuligeDagsverk.get().toString()));
+  }
 
+  private boolean datagrunnlagetErTomt() {
+    return this.equals(NULLPUNKT);
+  }
 
-    Either<StatistikkException, StatistikkDto> getMuligeDagsverkOgMapTilDto(
-            Statistikkategori type, String virksomhetsnavn
-    ) {
-        return getAntallDagsverkOgMapTilDto(type, virksomhetsnavn, this::getMuligeDagsverk);
-    }
+  private boolean dataMåMaskeres() {
+    return høyesteAntallPersonerIEtKvartal
+        < MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
+  }
 
-
-    SumAvSykefraværOverFlereKvartaler leggSammen(@NotNull SumAvSykefraværOverFlereKvartaler other) {
-
-        return new SumAvSykefraværOverFlereKvartaler(
-                this.muligeDagsverk.add(other.muligeDagsverk),
-                this.tapteDagsverk.add(other.tapteDagsverk),
-                Math.max(this.høyesteAntallPersonerIEtKvartal, other.høyesteAntallPersonerIEtKvartal),
-                Stream.concat(kvartaler.stream(), other.kvartaler.stream()).distinct().collect(Collectors.toList()),
-                Stream.concat(
-                        umaskertSykefraværList.stream(),
-                        other.umaskertSykefraværList.stream())
-                        .distinct()
-                        .collect(Collectors.toList())
-        );
-    }
-
-
-    private Either<StatistikkException, StatistikkDto> getAntallDagsverkOgMapTilDto(
-            Statistikkategori type, String virksomhetsnavn,
-            Supplier<BigDecimal> tapteEllerMuligeDagsverk
-    ) {
-        if (datagrunnlagetErTomt()) {
-            return Either.left(new UtilstrekkeligDataException());
-        }
-        if (dataMåMaskeres()) {
-            return Either.left(new MaskerteDataException());
-        }
-        return Either.right(
-                this.tilStatistikkDto(
-                        type, virksomhetsnavn, tapteEllerMuligeDagsverk.get().toString())
-        );
-    }
-
-
-    private boolean datagrunnlagetErTomt() {
-        return this.equals(NULLPUNKT);
-    }
-
-
-    private boolean dataMåMaskeres() {
-        return høyesteAntallPersonerIEtKvartal
-                < MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
-    }
-
-
-    private StatistikkDto tilStatistikkDto(Statistikkategori type, String label, String verdi) {
-        return StatistikkDto.builder()
-                .statistikkategori(type)
-                .label(label)
-                .verdi(verdi)
-                .antallPersonerIBeregningen(høyesteAntallPersonerIEtKvartal)
-                .kvartalerIBeregningen(kvartaler)
-                .build();
-    }
-
+  private StatistikkDto tilStatistikkDto(Statistikkategori type, String label, String verdi) {
+    return StatistikkDto.builder()
+        .statistikkategori(type)
+        .label(label)
+        .verdi(verdi)
+        .antallPersonerIBeregningen(høyesteAntallPersonerIEtKvartal)
+        .kvartalerIBeregningen(kvartaler)
+        .build();
+  }
 }

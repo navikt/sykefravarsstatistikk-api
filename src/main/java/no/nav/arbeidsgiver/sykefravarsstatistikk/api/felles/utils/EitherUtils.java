@@ -16,17 +16,11 @@ public class EitherUtils {
         .filter(Either::isLeft)
         .forEach(feil -> log.warn("Følgende avvik ble registrert: " + feil.getLeft()));
 
-    return Stream.of(leftsAndRights)
-        .filter(Either::isRight)
-        .map(Either::get)
-        .collect(toList());
+    return Stream.of(leftsAndRights).filter(Either::isRight).map(Either::get).collect(toList());
   }
 
   @SafeVarargs
   public static <L, R> List<R> filterRights(Either<L, R>... leftsAndRights) {
-    return Stream.of(leftsAndRights)
-            .filter(Either::isRight)
-            .map(Either::get)
-            .collect(toList());
+    return Stream.of(leftsAndRights).filter(Either::isRight).map(Either::get).collect(toList());
   }
 }

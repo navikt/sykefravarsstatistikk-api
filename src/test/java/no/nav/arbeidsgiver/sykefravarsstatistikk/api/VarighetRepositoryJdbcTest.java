@@ -35,145 +35,161 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @DataJdbcTest(excludeAutoConfiguration = {TestDatabaseAutoConfiguration.class})
 public class VarighetRepositoryJdbcTest {
 
-    @Autowired
-    private NamedParameterJdbcTemplate jdbcTemplate;
+  @Autowired private NamedParameterJdbcTemplate jdbcTemplate;
 
-    private VarighetRepository varighetRepository;
+  private VarighetRepository varighetRepository;
 
+  @BeforeEach
+  public void setUp() {
+    varighetRepository = new VarighetRepository(jdbcTemplate);
+    slettAllStatistikkFraDatabase(jdbcTemplate);
+  }
 
-    @BeforeEach
-    public void setUp() {
-        varighetRepository = new VarighetRepository(jdbcTemplate);
-        slettAllStatistikkFraDatabase(jdbcTemplate);
-    }
+  @AfterEach
+  public void tearDown() {
+    slettAllStatistikkFraDatabase(jdbcTemplate);
+  }
 
+  @Test
+  public void hentSykefraværForEttKvartalMedVarighet__skal_returnere_riktig_sykefravær() {
+    Underenhet barnehage =
+        Underenhet.builder()
+            .orgnr(new Orgnr("999999999"))
+            .navn("test Barnehage")
+            .næringskode(new Næringskode5Siffer("88911", "Barnehage"))
+            .antallAnsatte(10)
+            .overordnetEnhetOrgnr(new Orgnr("1111111111"))
+            .build();
+    leggTilVirksomhetsstatistikkMedVarighet(
+        jdbcTemplate,
+        barnehage.getOrgnr().getVerdi(),
+        new ÅrstallOgKvartal(2019, 2),
+        Varighetskategori._1_DAG_TIL_7_DAGER,
+        0,
+        4,
+        0);
+    leggTilVirksomhetsstatistikkMedVarighet(
+        jdbcTemplate,
+        barnehage.getOrgnr().getVerdi(),
+        new ÅrstallOgKvartal(2019, 2),
+        Varighetskategori.TOTAL,
+        6,
+        0,
+        100);
 
-    @AfterEach
-    public void tearDown() {
-        slettAllStatistikkFraDatabase(jdbcTemplate);
-    }
+    List<UmaskertSykefraværForEttKvartalMedVarighet> resultat =
+        varighetRepository.hentSykefraværForEttKvartalMedVarighet(barnehage);
 
+    assertThat(resultat.size()).isEqualTo(2);
+    assertThat(resultat.get(0))
+        .isEqualTo(
+            new UmaskertSykefraværForEttKvartalMedVarighet(
+                new ÅrstallOgKvartal(2019, 2),
+                new BigDecimal(4),
+                new BigDecimal(0),
+                0,
+                Varighetskategori._1_DAG_TIL_7_DAGER));
 
-    @Test
-    public void hentSykefraværForEttKvartalMedVarighet__skal_returnere_riktig_sykefravær() {
-        Underenhet barnehage = Underenhet.builder().orgnr(new Orgnr("999999999"))
-              .navn("test Barnehage")
-              .næringskode(new Næringskode5Siffer("88911", "Barnehage"))
-              .antallAnsatte(10)
-              .overordnetEnhetOrgnr(new Orgnr("1111111111")).build();
-        leggTilVirksomhetsstatistikkMedVarighet(jdbcTemplate,
-              barnehage.getOrgnr().getVerdi(),
-              new ÅrstallOgKvartal(2019, 2),
-              Varighetskategori._1_DAG_TIL_7_DAGER,
-              0, 4, 0
-        );
-        leggTilVirksomhetsstatistikkMedVarighet(
-              jdbcTemplate,
-              barnehage.getOrgnr().getVerdi(),
-              new ÅrstallOgKvartal(2019, 2),
-              Varighetskategori.TOTAL,
-              6, 0, 100
-        );
+    assertThat(resultat.get(1))
+        .isEqualTo(
+            new UmaskertSykefraværForEttKvartalMedVarighet(
+                new ÅrstallOgKvartal(2019, 2),
+                new BigDecimal(0),
+                new BigDecimal(100),
+                6,
+                Varighetskategori.TOTAL));
+  }
 
-        List<UmaskertSykefraværForEttKvartalMedVarighet> resultat =
-              varighetRepository.hentSykefraværForEttKvartalMedVarighet(
-                    barnehage);
+  @Test
+  public void
+      hentSykefraværForEttKvartalMedVarighet_for_næring__skal_returnere_riktig_sykefravær() {
+    Næringskode5Siffer barnehager = new Næringskode5Siffer("88911", "Barnehager");
 
-        assertThat(resultat.size()).isEqualTo(2);
-        assertThat(resultat.get(0)).isEqualTo(new UmaskertSykefraværForEttKvartalMedVarighet(
-              new ÅrstallOgKvartal(2019, 2),
-              new BigDecimal(4),
-              new BigDecimal(0),
-              0,
-              Varighetskategori._1_DAG_TIL_7_DAGER
-        ));
+    leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
+        jdbcTemplate, barnehager, new ÅrstallOgKvartal(2019, 2), 1, 10);
+    VarighetTestUtils.leggTilStatisitkkNæringMedVarighet(
+        jdbcTemplate,
+        barnehager,
+        new ÅrstallOgKvartal(2019, 2),
+        Varighetskategori._1_DAG_TIL_7_DAGER,
+        4);
 
-        assertThat(resultat.get(1)).isEqualTo(new UmaskertSykefraværForEttKvartalMedVarighet(
-              new ÅrstallOgKvartal(2019, 2),
-              new BigDecimal(0),
-              new BigDecimal(100),
-              6,
-              Varighetskategori.TOTAL
-        ));
-    }
+    List<UmaskertSykefraværForEttKvartalMedVarighet> resultat =
+        varighetRepository.hentSykefraværForEttKvartalMedVarighet(
+            new Næring(barnehager.getKode(), ""));
 
+    assertThat(resultat.size()).isEqualTo(2);
+    assertThat(resultat.get(0))
+        .isEqualTo(
+            new UmaskertSykefraværForEttKvartalMedVarighet(
+                new ÅrstallOgKvartal(2019, 2),
+                new BigDecimal(4),
+                new BigDecimal(0),
+                0,
+                Varighetskategori._1_DAG_TIL_7_DAGER));
 
-    @Test
-    public void hentSykefraværForEttKvartalMedVarighet_for_næring__skal_returnere_riktig_sykefravær() {
-        Næringskode5Siffer barnehager = new Næringskode5Siffer("88911", "Barnehager");
+    assertThat(resultat.get(1))
+        .isEqualTo(
+            new UmaskertSykefraværForEttKvartalMedVarighet(
+                new ÅrstallOgKvartal(2019, 2),
+                new BigDecimal(0),
+                new BigDecimal(10),
+                1,
+                Varighetskategori.TOTAL));
+  }
 
-        leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
-              jdbcTemplate, barnehager, new ÅrstallOgKvartal(2019, 2), 1, 10);
-        VarighetTestUtils.leggTilStatisitkkNæringMedVarighet(jdbcTemplate, barnehager,
-              new ÅrstallOgKvartal(2019, 2),
-              Varighetskategori._1_DAG_TIL_7_DAGER, 4);
+  @Test
+  public void
+      hentSykefraværForEttKvartalMedVarighet_for_bransje__skal_returnere_riktig_sykefravær() {
+    Næringskode5Siffer sykehus = new Næringskode5Siffer("86101", "Alminnelige somatiske sykehus");
+    Næringskode5Siffer legetjeneste = new Næringskode5Siffer("86211", "Allmenn legetjeneste");
 
-        List<UmaskertSykefraværForEttKvartalMedVarighet> resultat =
-              varighetRepository.hentSykefraværForEttKvartalMedVarighet(
-                    new Næring(barnehager.getKode(), ""));
+    leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
+        jdbcTemplate, sykehus, new ÅrstallOgKvartal(2019, 2), 1, 10);
+    VarighetTestUtils.leggTilStatisitkkNæringMedVarighet(
+        jdbcTemplate,
+        sykehus,
+        new ÅrstallOgKvartal(2019, 2),
+        Varighetskategori._1_DAG_TIL_7_DAGER,
+        4);
+    leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
+        jdbcTemplate, legetjeneste, new ÅrstallOgKvartal(2019, 2), 5, 50);
+    VarighetTestUtils.leggTilStatisitkkNæringMedVarighet(
+        jdbcTemplate,
+        legetjeneste,
+        new ÅrstallOgKvartal(2019, 2),
+        Varighetskategori._1_DAG_TIL_7_DAGER,
+        8);
 
-        assertThat(resultat.size()).isEqualTo(2);
-        assertThat(resultat.get(0)).isEqualTo(new UmaskertSykefraværForEttKvartalMedVarighet(
-              new ÅrstallOgKvartal(2019, 2),
-              new BigDecimal(4),
-              new BigDecimal(0),
-              0,
-              Varighetskategori._1_DAG_TIL_7_DAGER
-        ));
+    List<UmaskertSykefraværForEttKvartalMedVarighet> resultat =
+        varighetRepository.hentSykefraværForEttKvartalMedVarighet(
+            new Bransje(
+                ArbeidsmiljøportalenBransje.SYKEHUS,
+                "Sykehus",
+                "86101",
+                "86102",
+                "86104",
+                "86105",
+                "86106",
+                "86107"));
 
-        assertThat(resultat.get(1)).isEqualTo(new UmaskertSykefraværForEttKvartalMedVarighet(
-              new ÅrstallOgKvartal(2019, 2),
-              new BigDecimal(0),
-              new BigDecimal(10),
-              1,
-              Varighetskategori.TOTAL
-        ));
-    }
+    assertThat(resultat.size()).isEqualTo(2);
+    assertThat(resultat.get(0))
+        .isEqualTo(
+            new UmaskertSykefraværForEttKvartalMedVarighet(
+                new ÅrstallOgKvartal(2019, 2),
+                new BigDecimal(4),
+                new BigDecimal(0),
+                0,
+                Varighetskategori._1_DAG_TIL_7_DAGER));
 
-
-    @Test
-    public void hentSykefraværForEttKvartalMedVarighet_for_bransje__skal_returnere_riktig_sykefravær() {
-        Næringskode5Siffer sykehus = new Næringskode5Siffer("86101",
-              "Alminnelige somatiske sykehus");
-        Næringskode5Siffer legetjeneste = new Næringskode5Siffer("86211", "Allmenn legetjeneste");
-
-        leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(jdbcTemplate, sykehus,
-              new ÅrstallOgKvartal(2019, 2), 1, 10);
-        VarighetTestUtils.leggTilStatisitkkNæringMedVarighet(jdbcTemplate, sykehus,
-              new ÅrstallOgKvartal(2019, 2),
-              Varighetskategori._1_DAG_TIL_7_DAGER, 4);
-        leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(jdbcTemplate, legetjeneste,
-              new ÅrstallOgKvartal(2019, 2),
-              5, 50);
-        VarighetTestUtils.leggTilStatisitkkNæringMedVarighet(jdbcTemplate, legetjeneste,
-              new ÅrstallOgKvartal(2019, 2),
-              Varighetskategori._1_DAG_TIL_7_DAGER, 8);
-
-        List<UmaskertSykefraværForEttKvartalMedVarighet> resultat =
-              varighetRepository.hentSykefraværForEttKvartalMedVarighet(
-                    new Bransje(
-                          ArbeidsmiljøportalenBransje.SYKEHUS,
-                          "Sykehus",
-                          "86101", "86102", "86104", "86105", "86106", "86107"
-                    ));
-
-        assertThat(resultat.size()).isEqualTo(2);
-        assertThat(resultat.get(0)).isEqualTo(new UmaskertSykefraværForEttKvartalMedVarighet(
-              new ÅrstallOgKvartal(2019, 2),
-              new BigDecimal(4),
-              new BigDecimal(0),
-              0,
-              Varighetskategori._1_DAG_TIL_7_DAGER
-        ));
-
-        assertThat(resultat.get(1)).isEqualTo(new UmaskertSykefraværForEttKvartalMedVarighet(
-              new ÅrstallOgKvartal(2019, 2),
-              new BigDecimal(0),
-              new BigDecimal(10),
-              1,
-              Varighetskategori.TOTAL
-        ));
-    }
-
-
+    assertThat(resultat.get(1))
+        .isEqualTo(
+            new UmaskertSykefraværForEttKvartalMedVarighet(
+                new ÅrstallOgKvartal(2019, 2),
+                new BigDecimal(0),
+                new BigDecimal(10),
+                1,
+                Varighetskategori.TOTAL));
+  }
 }

@@ -17,15 +17,14 @@ import javax.sql.DataSource;
 @EnableSchedulerLock(defaultLockAtMostFor = "PT30S")
 public class SchedulerConfig {
 
-    @Bean
-    public LockProvider lockProvider(
-            @Qualifier("sykefravarsstatistikkDataSource") DataSource dataSource
-    ) {
-        return new JdbcTemplateLockProvider(dataSource);
-    }
+  @Bean
+  public LockProvider lockProvider(
+      @Qualifier("sykefravarsstatistikkDataSource") DataSource dataSource) {
+    return new JdbcTemplateLockProvider(dataSource);
+  }
 
-    @Bean
-    public LockingTaskExecutor lockingTaskExecutor(LockProvider lockProvider) {
-        return new DefaultLockingTaskExecutor(lockProvider);
-    }
+  @Bean
+  public LockingTaskExecutor lockingTaskExecutor(LockProvider lockProvider) {
+    return new DefaultLockingTaskExecutor(lockProvider);
+  }
 }

@@ -10,9 +10,9 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategor
 @Builder
 public class StatistikkDto {
 
-    private Statistikkategori statistikkategori;
-    private String label;
-    private String verdi;
-    private Integer antallPersonerIBeregningen;
-    private List<ÅrstallOgKvartal> kvartalerIBeregningen;
+  private Statistikkategori statistikkategori;
+  private String label;
+  private String verdi;
+  private Integer antallPersonerIBeregningen;
+  private List<ÅrstallOgKvartal> kvartalerIBeregningen;
 }

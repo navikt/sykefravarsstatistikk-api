@@ -5,37 +5,37 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 
 public class BransjeEllerNæring {
-    public final Either<Bransje, Næring> verdi;
+  public final Either<Bransje, Næring> verdi;
 
-    public BransjeEllerNæring(Bransje bransje) {
-        this.verdi = Either.left(bransje);
-    }
+  public BransjeEllerNæring(Bransje bransje) {
+    this.verdi = Either.left(bransje);
+  }
 
-    public BransjeEllerNæring(Næring næring) {
-        this.verdi = Either.right(næring);
-    }
+  public BransjeEllerNæring(Næring næring) {
+    this.verdi = Either.right(næring);
+  }
 
-    public Statistikkategori getStatistikkategori() {
-        if (verdi.isLeft()) {
-            return Statistikkategori.BRANSJE;
-        } else {
-            return Statistikkategori.NÆRING;
-        }
+  public Statistikkategori getStatistikkategori() {
+    if (verdi.isLeft()) {
+      return Statistikkategori.BRANSJE;
+    } else {
+      return Statistikkategori.NÆRING;
     }
+  }
 
-    public boolean isBransje() {
-        return verdi.isLeft();
-    }
+  public boolean isBransje() {
+    return verdi.isLeft();
+  }
 
-    public Bransje getBransje() {
-        return verdi.getLeft();
-    }
+  public Bransje getBransje() {
+    return verdi.getLeft();
+  }
 
-    public String navn() {
-        return this.isBransje() ? verdi.getLeft().getNavn() : verdi.get().getNavn();
-    }
+  public String navn() {
+    return this.isBransje() ? verdi.getLeft().getNavn() : verdi.get().getNavn();
+  }
 
-    public Næring getNæring() {
-        return verdi.get();
-    }
+  public Næring getNæring() {
+    return verdi.get();
+  }
 }

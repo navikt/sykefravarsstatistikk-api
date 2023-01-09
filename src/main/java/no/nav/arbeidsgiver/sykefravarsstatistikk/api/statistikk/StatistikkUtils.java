@@ -15,9 +15,7 @@ public class StatistikkUtils {
    * dagsverk.
    */
   public static Either<StatistikkException, BigDecimal> kalkulerSykefraværsprosent(
-      @NotNull BigDecimal dagsverkTeller,
-      @NotNull BigDecimal dagsverkNevner
-  ) {
+      @NotNull BigDecimal dagsverkTeller, @NotNull BigDecimal dagsverkNevner) {
 
     final int ANTALL_SIFRE_I_UTREGNING = 3;
     final int ANTALL_SIFRE_I_RESULTAT = 1;
@@ -29,8 +27,9 @@ public class StatistikkUtils {
               .multiply(new BigDecimal(100))
               .setScale(ANTALL_SIFRE_I_RESULTAT, RoundingMode.HALF_UP));
     } catch (ArithmeticException e) {
-      return Either.left(new StatistikkException(
-          "Kan ikke regne ut prosent når antall dagsverk i nevner er lik " + dagsverkNevner));
+      return Either.left(
+          new StatistikkException(
+              "Kan ikke regne ut prosent når antall dagsverk i nevner er lik " + dagsverkNevner));
     }
   }
 }

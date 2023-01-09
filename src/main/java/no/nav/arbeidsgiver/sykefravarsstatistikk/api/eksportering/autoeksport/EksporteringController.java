@@ -19,65 +19,60 @@ import org.springframework.web.bind.annotation.RestController;
 @Profile({"local", "dev", "prod", "mvc-test"})
 public class EksporteringController {
 
-    private final EksporteringService eksporteringService;
-    private final EksporteringPerStatistikkKategoriService eksporteringPerStatistikkKategoriService;
+  private final EksporteringService eksporteringService;
+  private final EksporteringPerStatistikkKategoriService eksporteringPerStatistikkKategoriService;
 
-    public EksporteringController(
-            EksporteringService eksporteringService,
-            EksporteringPerStatistikkKategoriService eksporteringPerStatistikkKategoriService
-    ) {
-        this.eksporteringService = eksporteringService;
-        this.eksporteringPerStatistikkKategoriService = eksporteringPerStatistikkKategoriService;
+  public EksporteringController(
+      EksporteringService eksporteringService,
+      EksporteringPerStatistikkKategoriService eksporteringPerStatistikkKategoriService) {
+    this.eksporteringService = eksporteringService;
+    this.eksporteringPerStatistikkKategoriService = eksporteringPerStatistikkKategoriService;
+  }
+
+  @PostMapping("/reeksport")
+  public ResponseEntity<HttpStatus> reeksportMedKafka(
+      @RequestParam int årstall,
+      @RequestParam int kvartal,
+      @RequestParam(required = false, defaultValue = "0") int begrensningTil) {
+
+    ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
+    int antallEksportert =
+        eksporteringService.eksporter(årstallOgKvartal, getBegrensning(begrensningTil));
+
+    if (antallEksportert >= 0) {
+      return ResponseEntity.ok(HttpStatus.CREATED);
+    } else {
+      return ResponseEntity.ok(HttpStatus.OK);
+    }
+  }
+
+  @PostMapping("/reeksport/statistikkkategori")
+  public ResponseEntity<HttpStatus> reeksportMedKafka(
+      @RequestParam int årstall,
+      @RequestParam int kvartal,
+      @RequestParam Statistikkategori kategori,
+      @RequestParam(required = false, defaultValue = "0") int begrensningTil) {
+    if (Statistikkategori.LAND != kategori && Statistikkategori.VIRKSOMHET != kategori) {
+      return ResponseEntity.badRequest().build();
     }
 
-    @PostMapping("/reeksport")
-    public ResponseEntity<HttpStatus> reeksportMedKafka(
-            @RequestParam int årstall,
-            @RequestParam int kvartal,
-            @RequestParam(required = false, defaultValue = "0") int begrensningTil
-    ) {
+    ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
+    int antallEksportert =
+        eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(
+            årstallOgKvartal, kategori, getBegrensning(begrensningTil));
 
-        ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
-        int antallEksportert =
-                eksporteringService.eksporter(årstallOgKvartal, getBegrensning(begrensningTil));
-
-        if (antallEksportert >= 0) {
-            return ResponseEntity.ok(HttpStatus.CREATED);
-        } else {
-            return ResponseEntity.ok(HttpStatus.OK);
-        }
+    if (antallEksportert >= 0) {
+      return ResponseEntity.ok(HttpStatus.CREATED);
+    } else {
+      return ResponseEntity.ok(HttpStatus.OK);
     }
+  }
 
-    @PostMapping("/reeksport/statistikkkategori")
-    public ResponseEntity<HttpStatus> reeksportMedKafka(
-            @RequestParam int årstall,
-            @RequestParam int kvartal,
-            @RequestParam Statistikkategori kategori,
-            @RequestParam(required = false, defaultValue = "0") int begrensningTil
-    ) {
-        if (Statistikkategori.LAND != kategori && Statistikkategori.VIRKSOMHET != kategori) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
-        int antallEksportert =
-                eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(
-                        årstallOgKvartal,
-                        kategori,
-                        getBegrensning(begrensningTil)
-                );
-
-        if (antallEksportert >= 0) {
-            return ResponseEntity.ok(HttpStatus.CREATED);
-        } else {
-            return ResponseEntity.ok(HttpStatus.OK);
-        }
-    }
-
-    private EksporteringBegrensning getBegrensning(int begrensningTil) {
-        EksporteringBegrensning eksporteringBegrensning = begrensningTil == 0 ?
-                EksporteringBegrensning.build().utenBegrensning() :
-                EksporteringBegrensning.build().medBegrensning(begrensningTil);
-        return eksporteringBegrensning;
-    }
+  private EksporteringBegrensning getBegrensning(int begrensningTil) {
+    EksporteringBegrensning eksporteringBegrensning =
+        begrensningTil == 0
+            ? EksporteringBegrensning.build().utenBegrensning()
+            : EksporteringBegrensning.build().medBegrensning(begrensningTil);
+    return eksporteringBegrensning;
+  }
 }

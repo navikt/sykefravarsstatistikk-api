@@ -7,8 +7,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategor
 @Getter
 @AllArgsConstructor
 public class KafkaStatistikkategoriTopicKey {
-    Statistikkategori kategori;
-    String kode;
-    int kvartal;
-    int årstall;
+  Statistikkategori kategori;
+  String kode;
+  int kvartal;
+  int årstall;
 }

@@ -9,12 +9,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class SpringApplicationContextLoadTest extends SpringIntegrationTestbase {
 
-    @Autowired
-    private SykefraværshistorikkController controller;
+  @Autowired private SykefraværshistorikkController controller;
 
-    @Test
-    public void contexLoads() {
-        assertThat(controller).isNotNull();
-    }
-
+  @Test
+  public void contexLoads() {
+    assertThat(controller).isNotNull();
+  }
 }
