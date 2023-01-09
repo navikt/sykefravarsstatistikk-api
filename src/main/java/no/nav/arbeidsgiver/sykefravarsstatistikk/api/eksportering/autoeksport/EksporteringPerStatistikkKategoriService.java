@@ -24,6 +24,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaProperties;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
@@ -101,8 +102,8 @@ public class EksporteringPerStatistikkKategoriService {
 
   protected int eksporterSykefraværsstatistikkNaring(ÅrstallOgKvartal årstallOgKvartal) {
     long startProcess = System.nanoTime();
-    List<UmaskertSykefraværForEttKvartal> umaskertSykefraværsstatistikkSiste4KvartalerNaring =
-        sykefraværRepository.hentSy(
+    List<SykefraværsstatistikkNæring> umaskertSykefraværsstatistikkSiste4KvartalerNaring =
+        sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(
             årstallOgKvartal.minusKvartaler(3)
         );
   }
