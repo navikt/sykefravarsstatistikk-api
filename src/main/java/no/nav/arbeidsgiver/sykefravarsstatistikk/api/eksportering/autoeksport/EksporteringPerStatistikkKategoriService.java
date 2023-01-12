@@ -5,6 +5,7 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeks
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.cleanUpEtterBatch;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForLand;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForNæring;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.hentSisteKvartalIBeregningen;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.lagreEksporterteVirksomheterOgNullstillLista;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull;
@@ -72,7 +73,7 @@ public class EksporteringPerStatistikkKategoriService {
       return 0;
     }
     log.info(
-        "Starting eksportering av '{}' for årstall '{}' og kvartal '{}'.",
+        "Starter eksportering av '{}' for årstall '{}' og kvartal '{}'.",
         statistikkategori.name(),
         årstallOgKvartal.getÅrstall(),
         årstallOgKvartal.getKvartal());
@@ -82,7 +83,7 @@ public class EksporteringPerStatistikkKategoriService {
     }
 
     if (Statistikkategori.BRANSJE == statistikkategori) {
-
+      return eksporterSykefraværsstatistikkNæring(årstallOgKvartal);
     }
 
     int antallEksporterteVirksomheter = 0;
@@ -93,18 +94,61 @@ public class EksporteringPerStatistikkKategoriService {
           eksporteringBegrensning
       );
     } catch (KafkaUtsendingException | KafkaException e) {
-      log.warn("Fikk Exception fra Kafka med melding:'{}'. Avbryter prosess.", e.getMessage(), e);
+      log.warn("Fikk exception fra Kafka med melding: '{}'. Avbryter prosess.", e.getMessage(), e);
     }
 
     return antallEksporterteVirksomheter;
   }
 
-  protected int eksporterSykefraværsstatistikkNaring(ÅrstallOgKvartal årstallOgKvartal) {
+  protected int eksporterSykefraværsstatistikkNæring(ÅrstallOgKvartal årstallOgKvartal) {
     long startProcess = System.nanoTime();
-    List<SykefraværsstatistikkNæring> umaskertSykefraværsstatistikkSiste4KvartalerNaring =
-        sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(
-            årstallOgKvartal.minusKvartaler(3)
+    List<SykefraværsstatistikkNæring> sykefraværsstatistikkSiste4KvartalerNæring =
+        sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleNæringer(
+            årstallOgKvartal.minusKvartaler(3));
+
+    SykefraværMedKategori næringSykefravær =
+        getSykefraværMedKategoriForNæring(
+            årstallOgKvartal,
+            sykefraværsstatistikkSiste4KvartalerNæring
         );
+
+    boolean erSent = false;
+    AtomicInteger antallEksportert = new AtomicInteger();
+    AtomicInteger antallIkkeEksportert = new AtomicInteger();
+    try {
+      SykefraværFlereKvartalerForEksport sykefraværOverFlereKvartaler =
+          new SykefraværFlereKvartalerForEksport(umaskertSykefraværsstatistikkSiste4KvartalerLand);
+
+      erSent =
+          kafkaService.sendTilStatistikkKategoriTopic(
+              årstallOgKvartal,
+              Statistikkategori.LAND,
+              "NO",
+              landSykefravær,
+              sykefraværOverFlereKvartaler);
+    } catch (KafkaUtsendingException | KafkaException e) {
+      log.warn("Fikk exception fra Kafka med melding: '{}'. Avbryter prosess.", e.getMessage(), e);
+    }
+
+    if (erSent) {
+      antallEksportert.incrementAndGet();
+    } else {
+      antallIkkeEksportert.incrementAndGet();
+    }
+
+    long tidsbruktIMillisekund = (System.nanoTime() - startProcess) / 1000000;
+    log.info(
+        format(
+            "Eksport av statistikk for kategori %s er ferdig. "
+                + "Antall statistikk eksportert er: %d, "
+                + "antall ikke eksportert er: %d. "
+                + "Tid for eksportering (i millis): %d",
+            Statistikkategori.LAND.name(),
+            antallEksportert.get(),
+            antallIkkeEksportert.get(),
+            tidsbruktIMillisekund));
+
+    return antallEksportert.get();
   }
 
   protected int eksporterSykefraværsstatistikkLand(ÅrstallOgKvartal årstallOgKvartal) {
@@ -134,7 +178,7 @@ public class EksporteringPerStatistikkKategoriService {
               landSykefravær,
               sykefraværOverFlereKvartaler);
     } catch (KafkaUtsendingException | KafkaException e) {
-      log.warn("Fikk Exception fra Kafka med melding:'{}'. Avbryter prosess.", e.getMessage(), e);
+      log.warn("Fikk exception fra Kafka med melding: '{}'. Avbryter prosess.", e.getMessage(), e);
     }
 
     if (erSent) {
@@ -312,11 +356,11 @@ public class EksporteringPerStatistikkKategoriService {
         getSykefraværOverFlereKvartaler(sykefraværOverFlereKvartalerMap, virksomhet.getOrgnr());
 
     if (Objects.equals(
-            sykefraværMedKategori,
-            SykefraværMedKategori.utenStatistikk(
-                Statistikkategori.VIRKSOMHET, virksomhet.getOrgnr(), årstallOgKvartal))
+        sykefraværMedKategori,
+        SykefraværMedKategori.utenStatistikk(
+            Statistikkategori.VIRKSOMHET, virksomhet.getOrgnr(), årstallOgKvartal))
         && Objects.equals(
-            sykefraværOverFlereKvartaler, SykefraværFlereKvartalerForEksport.utenStatistikk())) {
+        sykefraværOverFlereKvartaler, SykefraværFlereKvartalerForEksport.utenStatistikk())) {
       antallUtenStatistikk.incrementAndGet();
     }
 

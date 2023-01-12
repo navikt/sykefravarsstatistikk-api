@@ -71,6 +71,16 @@ public class EksporteringServiceUtils {
         umaskertSykefraværForEttKvartal.getDagsverkNevner());
   }
 
+  protected static SykefraværsstatistikkNæring mapToSykefraværsstatistikkNæring(
+      UmaskertSykefraværForEttKvartal umaskertSykefraværForEttKvartal) {
+    return new SykefraværsstatistikkLand(
+        umaskertSykefraværForEttKvartal.getÅrstall(),
+        umaskertSykefraværForEttKvartal.getKvartal(),
+        umaskertSykefraværForEttKvartal.getAntallPersoner(),
+        umaskertSykefraværForEttKvartal.getDagsverkTeller(),
+        umaskertSykefraværForEttKvartal.getDagsverkNevner());
+  }
+
   protected static Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> toMap(
       List<SykefraværsstatistikkVirksomhetUtenVarighet>
           sykefraværsstatistikkVirksomhetUtenVarighet) {
@@ -257,9 +267,9 @@ public class EksporteringServiceUtils {
               .filter(
                   br ->
                       bransjeEllerNæring
-                              .getBransje()
-                              .getKoderSomSpesifisererNæringer()
-                              .contains(br.getNæringkode5siffer())
+                          .getBransje()
+                          .getKoderSomSpesifisererNæringer()
+                          .contains(br.getNæringkode5siffer())
                           && erIKvartalerIberegningen(fraÅrstallOgKvartal, br))
               .map(EksporteringServiceUtils::mapTilUmaskertSykefraværForEttKvartal)
               .collect(Collectors.toList());
@@ -323,11 +333,11 @@ public class EksporteringServiceUtils {
             .filter(
                 næring5Siffer ->
                     virksomhetMetadata.getNæringOgNæringskode5siffer().stream()
-                            .anyMatch(
-                                virksomhetNæring5Siffer ->
-                                    næring5Siffer
-                                        .getNæringkode5siffer()
-                                        .equals(virksomhetNæring5Siffer.getNæringskode5Siffer()))
+                        .anyMatch(
+                            virksomhetNæring5Siffer ->
+                                næring5Siffer
+                                    .getNæringkode5siffer()
+                                    .equals(virksomhetNæring5Siffer.getNæringskode5Siffer()))
                         && næring5Siffer.getÅrstall() == virksomhetMetadata.getÅrstall()
                         && næring5Siffer.getKvartal() == virksomhetMetadata.getKvartal())
             .collect(Collectors.toList());
@@ -392,8 +402,8 @@ public class EksporteringServiceUtils {
 
     return eksporteringBegrensning.erBegrenset()
         ? virksomhetEksportPerKvartalStream
-            .limit(eksporteringBegrensning.getAntallSomSkalEksporteres())
-            .collect(Collectors.toList())
+        .limit(eksporteringBegrensning.getAntallSomSkalEksporteres())
+        .collect(Collectors.toList())
         : virksomhetEksportPerKvartalStream.collect(Collectors.toList());
   }
 
@@ -401,7 +411,7 @@ public class EksporteringServiceUtils {
       ÅrstallOgKvartal fraÅrstallOgKvartal, Sykefraværsstatistikk v) {
     return (v.getÅrstall() > fraÅrstallOgKvartal.getÅrstall())
         || (v.getÅrstall() == fraÅrstallOgKvartal.getÅrstall()
-            && v.getKvartal() >= fraÅrstallOgKvartal.getKvartal());
+        && v.getKvartal() >= fraÅrstallOgKvartal.getKvartal());
   }
 
   private static <T> Collector<T, ?, T> toSingleton(T emptySykefraværsstatistikk) {

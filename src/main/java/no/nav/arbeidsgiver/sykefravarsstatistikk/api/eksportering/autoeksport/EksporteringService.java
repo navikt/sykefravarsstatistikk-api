@@ -103,7 +103,7 @@ public class EksporteringService {
     try {
       antallEksporterteVirksomheter = eksporter(virksomheterTilEksport, årstallOgKvartal);
     } catch (KafkaUtsendingException | KafkaException e) {
-      log.warn("Fikk Exception fra Kafka med melding:'{}'. Avbryter prosess.", e.getMessage(), e);
+      log.warn("Fikk exception fra Kafka med melding: '{}'. Avbryter prosess.", e.getMessage(), e);
     }
 
     return antallEksporterteVirksomheter;
@@ -204,7 +204,7 @@ public class EksporteringService {
     List<String> eksporterteVirksomheterListe = new ArrayList<>();
     Map<String, SykefraværsstatistikkVirksomhetUtenVarighet>
         sykefraværsstatistikkVirksomhetForEttKvartalUtenVarighetMap =
-            toMap(filterByKvartal(årstallOgKvartal, sykefraværsstatistikkVirksomhetUtenVarighet));
+        toMap(filterByKvartal(årstallOgKvartal, sykefraværsstatistikkVirksomhetUtenVarighet));
 
     virksomheterMetadata.stream()
         .forEach(

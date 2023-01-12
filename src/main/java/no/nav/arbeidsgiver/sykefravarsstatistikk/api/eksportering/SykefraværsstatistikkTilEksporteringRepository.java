@@ -26,7 +26,7 @@ public class SykefraværsstatistikkTilEksporteringRepository {
 
   public SykefraværsstatistikkTilEksporteringRepository(
       @Qualifier("sykefravarsstatistikkJdbcTemplate")
-          NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+      NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
     this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
   }
 
@@ -87,7 +87,6 @@ public class SykefraværsstatistikkTilEksporteringRepository {
 
   public List<SykefraværsstatistikkNæring> hentSykefraværprosentAlleNæringer(
       ÅrstallOgKvartal fraÅrstallOgKvartal, ÅrstallOgKvartal tilÅrstallOgKvartal) {
-
     try {
       return namedParameterJdbcTemplate.query(
           "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk "
@@ -143,6 +142,24 @@ public class SykefraværsstatistikkTilEksporteringRepository {
               + getWhereClause(fraÅrstallOgKvartal, tilÅrstallOgKvartal)
               + " group by arstall, kvartal, orgnr",
           (rs, rowNum) -> mapTilSykefraværsstatistikkVirksomhet(rs));
+    } catch (EmptyResultDataAccessException e) {
+      return Collections.emptyList();
+    }
+  }
+
+  public List<SykefraværsstatistikkNæring> hentSykefraværAlleNæringer(
+      ÅrstallOgKvartal fraÅrstallOgKvartal) {
+    try {
+      return namedParameterJdbcTemplate.query(
+          "select arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk "
+              + "from sykefravar_statistikk_naring "
+              + "where (arstall = :arstall and kvartal >= :kvartal) "
+              + "or (arstall > :arstall) "
+              + "group by arstall, kvartal, id order by arstall, kvartal, naring_kode",
+          new MapSqlParameterSource()
+              .addValue("arstall", fraÅrstallOgKvartal.getÅrstall())
+              .addValue("kvartal", fraÅrstallOgKvartal.getKvartal()),
+          (rs, rowNum) -> mapTilSykefraværsstatistikkNæring(rs));
     } catch (EmptyResultDataAccessException e) {
       return Collections.emptyList();
     }
