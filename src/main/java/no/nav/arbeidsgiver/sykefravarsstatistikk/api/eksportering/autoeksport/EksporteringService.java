@@ -5,9 +5,9 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeks
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.filterByKvartal;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForLand;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForNæring;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForNæring5Siffer;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriForSektor;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getSykefraværMedKategoriNæringForVirksomhet;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getVirksomhetMetadataHashMap;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getVirksomhetSykefravær;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceUtils.getVirksomheterMetadataFraSubset;
@@ -219,7 +219,7 @@ public class EksporteringService {
                         sykefraværsstatistikkVirksomhetForEttKvartalUtenVarighetMap),
                     getSykefraværMedKategoriForNæring5Siffer(
                         virksomhetMetadata, sykefraværsstatistikkNæring5Siffer),
-                    getSykefraværMedKategoriForNæring(
+                    getSykefraværMedKategoriNæringForVirksomhet(
                         virksomhetMetadata, sykefraværsstatistikkNæring),
                     getSykefraværMedKategoriForSektor(
                         virksomhetMetadata, sykefraværsstatistikkSektor),

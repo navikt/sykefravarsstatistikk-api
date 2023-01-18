@@ -52,10 +52,19 @@ public class EksporteringServiceUtils {
         .collect(Collectors.toList());
   }
 
-  protected static UmaskertSykefraværForEttKvartal hentSisteKvartalIBeregningen(
-      List<UmaskertSykefraværForEttKvartal> umaskertSykefraværsstatistikkSiste4KvartalerLand,
+  protected static SykefraværsstatistikkNæring hentSisteKvartalIBeregningenForSykefraværNæring(
+      List<SykefraværsstatistikkNæring> sykefraværNæring,
       ÅrstallOgKvartal årstallOgKvartal) {
-    return umaskertSykefraværsstatistikkSiste4KvartalerLand.stream()
+    return sykefraværNæring.stream()
+        .filter(sykefraværsstatistikkNæring -> new ÅrstallOgKvartal(sykefraværsstatistikkNæring.getÅrstall(), sykefraværsstatistikkNæring.getKvartal()).equals(årstallOgKvartal))
+        .findFirst()
+        .orElse(null);
+  }
+
+  protected static UmaskertSykefraværForEttKvartal hentSisteKvartalIBeregningen(
+      List<UmaskertSykefraværForEttKvartal> umaskertSykefraværsstatistikkSiste4Kvartaler,
+      ÅrstallOgKvartal årstallOgKvartal) {
+    return umaskertSykefraværsstatistikkSiste4Kvartaler.stream()
         .filter(u -> u.getÅrstallOgKvartal().equals(årstallOgKvartal))
         .findFirst()
         .orElse(null);
@@ -73,9 +82,10 @@ public class EksporteringServiceUtils {
 
   protected static SykefraværsstatistikkNæring mapToSykefraværsstatistikkNæring(
       UmaskertSykefraværForEttKvartal umaskertSykefraværForEttKvartal) {
-    return new SykefraværsstatistikkLand(
+    return new SykefraværsstatistikkNæring(
         umaskertSykefraværForEttKvartal.getÅrstall(),
         umaskertSykefraværForEttKvartal.getKvartal(),
+        umaskertSykefraværForEttKvartal.get
         umaskertSykefraværForEttKvartal.getAntallPersoner(),
         umaskertSykefraværForEttKvartal.getDagsverkTeller(),
         umaskertSykefraværForEttKvartal.getDagsverkNevner());
