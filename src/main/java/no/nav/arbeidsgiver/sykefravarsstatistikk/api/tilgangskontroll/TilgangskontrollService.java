@@ -46,7 +46,7 @@ public class TilgangskontrollService {
     try {
       JwtToken exchangedTokenToAltinnProxy =
           tokenXClient.exchangeTokenToAltinnProxy(tokenUtils.hentInnloggetJwtToken());
-      innloggetBruker.setOrganisasjoner(
+      innloggetBruker.setBrukerensOrganisasjoner(
           altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
               exchangedTokenToAltinnProxy, innloggetBruker.getFnr()));
     } catch (ParseException | JOSEException | GeneralException | IOException | TokenXException e) {
@@ -55,7 +55,7 @@ public class TilgangskontrollService {
     return innloggetBruker;
   }
 
-  public boolean brukerHarIaRettigheter(Orgnr tilOrgnr) {
+  public boolean brukerHarIaRettigheterIVirksomheten(Orgnr tilOrgnr) {
     return hentBrukerKunIaRettigheter().harTilgang(tilOrgnr);
   }
 
@@ -69,7 +69,7 @@ public class TilgangskontrollService {
       JwtToken exchangedTokenToAltinnProxy =
           tokenXClient.exchangeTokenToAltinnProxy(tokenUtils.hentInnloggetJwtToken());
 
-      innloggetBruker.setOrganisasjoner(
+      innloggetBruker.setBrukerensOrganisasjoner(
           altinnKlientWrapper.hentOrgnumreDerBrukerHarTilgangTil(
               exchangedTokenToAltinnProxy, innloggetBruker.getFnr()));
     } catch (ParseException | JOSEException | GeneralException | IOException | TokenXException e) {

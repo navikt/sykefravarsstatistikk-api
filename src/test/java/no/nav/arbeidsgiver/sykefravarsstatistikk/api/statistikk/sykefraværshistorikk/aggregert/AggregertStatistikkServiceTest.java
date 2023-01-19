@@ -7,7 +7,6 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistik
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.NÆRING;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.VIRKSOMHET;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
@@ -58,13 +57,20 @@ class AggregertStatistikkServiceTest {
 
   private AggregertStatistikkService serviceUnderTest;
 
-  @Mock private SykefraværRepository mockSykefraværRepository;
-  @Mock private GraderingRepository mockGraderingRepository;
-  @Mock private TilgangskontrollService mockTilgangskontrollService;
-  @Mock private EnhetsregisteretClient mockEnhetsregisteretClient;
-  @Mock private BransjeEllerNæringService mockBransjeEllerNæringService;
-  @Mock private VarighetRepository mockVarighetRepository;
-  @Mock private PubliseringsdatoerService publiseringsdatoerService;
+  @Mock
+  private SykefraværRepository mockSykefraværRepository;
+  @Mock
+  private GraderingRepository mockGraderingRepository;
+  @Mock
+  private TilgangskontrollService mockTilgangskontrollService;
+  @Mock
+  private EnhetsregisteretClient mockEnhetsregisteretClient;
+  @Mock
+  private BransjeEllerNæringService mockBransjeEllerNæringService;
+  @Mock
+  private VarighetRepository mockVarighetRepository;
+  @Mock
+  private PubliseringsdatoerService publiseringsdatoerService;
 
   @BeforeEach
   public void setUp() {
@@ -97,7 +103,7 @@ class AggregertStatistikkServiceTest {
   void hentAggregertHistorikk_kræsjerIkkeVedManglendeData() {
     when(mockTilgangskontrollService.brukerRepresentererVirksomheten(any())).thenReturn(true);
     when(mockEnhetsregisteretClient.hentInformasjonOmUnderenhet(any())).thenReturn(enBarnehage);
-    when(mockTilgangskontrollService.brukerHarIaRettigheter(any())).thenReturn(true);
+    when(mockTilgangskontrollService.brukerHarIaRettigheterIVirksomheten(any())).thenReturn(true);
     when(mockBransjeEllerNæringService.finnBransje(any())).thenReturn(enBransje);
 
     // Helt tomt resultat skal ikke kræsje
@@ -183,7 +189,7 @@ class AggregertStatistikkServiceTest {
 
   @Test
   public void
-      hentAggregertStatistikk_regnerUtLangtidsfravær_dersomAntallPersonerErOverEllerLikFem() {
+  hentAggregertStatistikk_regnerUtLangtidsfravær_dersomAntallPersonerErOverEllerLikFem() {
     mockAvhengigheterForBarnehageMedIaRettigheter();
     when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(), any()))
         .thenReturn(new Sykefraværsdata(Map.of(VIRKSOMHET, genererTestSykefravær(1))));
@@ -225,17 +231,17 @@ class AggregertStatistikkServiceTest {
             200,
             List.of(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), SISTE_PUBLISERTE_KVARTAL));
     assertThat(
-            serviceUnderTest
-                .hentAggregertStatistikk(etOrgnr)
-                .get()
-                .prosentSiste4KvartalerLangtid
-                .get(0))
+        serviceUnderTest
+            .hentAggregertStatistikk(etOrgnr)
+            .get()
+            .prosentSiste4KvartalerLangtid
+            .get(0))
         .isEqualTo(forventet);
   }
 
   @Test
   public void
-      hentAggregertStatistikk_returnererKorttidsfravær_dersomAntallPersonerErOverEllerLikFem() {
+  hentAggregertStatistikk_returnererKorttidsfravær_dersomAntallPersonerErOverEllerLikFem() {
     mockAvhengigheterForBarnehageMedIaRettigheter();
     when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(), any()))
         .thenReturn(new Sykefraværsdata(Map.of(VIRKSOMHET, genererTestSykefravær(1))));
@@ -273,17 +279,17 @@ class AggregertStatistikkServiceTest {
             100,
             List.of(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), SISTE_PUBLISERTE_KVARTAL));
     assertThat(
-            serviceUnderTest
-                .hentAggregertStatistikk(etOrgnr)
-                .get()
-                .prosentSiste4KvartalerKorttid
-                .get(0))
+        serviceUnderTest
+            .hentAggregertStatistikk(etOrgnr)
+            .get()
+            .prosentSiste4KvartalerKorttid
+            .get(0))
         .isEqualTo(forventet);
   }
 
   @Test
   public void
-      hentAggregertStatistikk_maskererKorttidOgLangtid_dersomAntallTilfellerErUnderFemIAlleKvartaler() {
+  hentAggregertStatistikk_maskererKorttidOgLangtid_dersomAntallTilfellerErUnderFemIAlleKvartaler() {
     mockAvhengigheterForBarnehageMedIaRettigheter();
     when(mockSykefraværRepository.hentUmaskertSykefraværAlleKategorier(any(), any()))
         .thenReturn(
@@ -326,10 +332,10 @@ class AggregertStatistikkServiceTest {
                         Varighetskategori.TOTAL))));
 
     assertThat(
-            serviceUnderTest.hentAggregertStatistikk(etOrgnr).get().prosentSiste4KvartalerKorttid)
+        serviceUnderTest.hentAggregertStatistikk(etOrgnr).get().prosentSiste4KvartalerKorttid)
         .isEqualTo(List.of());
     assertThat(
-            serviceUnderTest.hentAggregertStatistikk(etOrgnr).get().prosentSiste4KvartalerLangtid)
+        serviceUnderTest.hentAggregertStatistikk(etOrgnr).get().prosentSiste4KvartalerLangtid)
         .isEqualTo(List.of());
   }
 
@@ -355,7 +361,7 @@ class AggregertStatistikkServiceTest {
   private void mockAvhengigheterForBarnehageMedIaRettigheter() {
     when(mockTilgangskontrollService.brukerRepresentererVirksomheten(any())).thenReturn(true);
     when(mockEnhetsregisteretClient.hentInformasjonOmUnderenhet(any())).thenReturn(enBarnehage);
-    when(mockTilgangskontrollService.brukerHarIaRettigheter(any())).thenReturn(true);
+    when(mockTilgangskontrollService.brukerHarIaRettigheterIVirksomheten(any())).thenReturn(true);
     when(mockBransjeEllerNæringService.finnBransje(any())).thenReturn(enBransje);
   }
 
