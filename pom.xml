@@ -25,10 +25,10 @@
     <java.version>11</java.version>
     <!-- versjon til avhengigheter -->
     <io-vavr.version>0.10.4</io-vavr.version>
-    <oidc-support.version>1.3.9</oidc-support.version>
+    <oidc-support.version>2.0.18</oidc-support.version>
     <oauth2-oidc-sdk.version>9.9.1
     </oauth2-oidc-sdk.version> <!-- TODO: Fjern etter Spring upgrade >= 2.5.x -->
-    <oidc-support.version>1.3.10</oidc-support.version>
+    <oidc-support.version>2.0.18</oidc-support.version>
     <altinn-rettigheter-proxy-klient.version>2.0.7-rc</altinn-rettigheter-proxy-klient.version>
     <micrometer.version>1.8.2</micrometer.version>
     <prometheus.version>0.15.0</prometheus.version>
