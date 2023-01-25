@@ -7,7 +7,7 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.GraderingTestUtils.i
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.PRODUKSJON_NYTELSESMIDLER;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring2Siffer;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring5Siffer;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForVirksomhet;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.skrivSisteImporttidspunktTilDb;
@@ -47,9 +47,11 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
   private static final String ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER = "910825518";
   private static final String ORGNR_UNDERENHET_INGEN_TILGANG = "777777777";
 
-  @Autowired private NamedParameterJdbcTemplate jdbcTemplate;
+  @Autowired
+  private NamedParameterJdbcTemplate jdbcTemplate;
 
-  @Autowired MockOAuth2Server mockOAuth2Server;
+  @Autowired
+  MockOAuth2Server mockOAuth2Server;
 
   @BeforeEach
   public void setUp() {
@@ -64,7 +66,8 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
     slettAlleImporttidspunkt(jdbcTemplate);
   }
 
-  @LocalServerPort private String port;
+  @LocalServerPort
+  private String port;
 
   private final ObjectMapper objectMapper = new ObjectMapper();
   private final Næringskode5Siffer BARNEHAGER = new Næringskode5Siffer("88911", "Barnehager");
@@ -98,7 +101,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
       throws Exception {
     ÅrstallOgKvartal ettÅrSiden = SISTE_PUBLISERTE_KVARTAL.minusEttÅr();
     opprettStatistikkForLand(jdbcTemplate);
-    opprettStatistikkForNæring2Siffer(
+    opprettStatistikkForNæring(
         jdbcTemplate,
         PRODUKSJON_NYTELSESMIDLER,
         SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
@@ -106,7 +109,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
         5,
         100,
         10);
-    opprettStatistikkForNæring2Siffer(
+    opprettStatistikkForNæring(
         jdbcTemplate,
         PRODUKSJON_NYTELSESMIDLER,
         ettÅrSiden.getÅrstall(),
@@ -228,8 +231,8 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
 
   @Test
   public void
-      hentAgreggertStatistikk_returnererIkkeVirksomhetstatistikkTilBrukerSomManglerIaRettigheter()
-          throws Exception {
+  hentAgreggertStatistikk_returnererIkkeVirksomhetstatistikkTilBrukerSomManglerIaRettigheter()
+      throws Exception {
     ÅrstallOgKvartal ettÅrSiden = SISTE_PUBLISERTE_KVARTAL.minusEttÅr();
     opprettStatistikkForNæring5Siffer(
         jdbcTemplate,
@@ -247,7 +250,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
     JsonNode responseBody = objectMapper.readTree(response.body());
 
     assertThat(
-            responseBody.get("prosentSiste4KvartalerTotalt").findValuesAsText("statistikkategori"))
+        responseBody.get("prosentSiste4KvartalerTotalt").findValuesAsText("statistikkategori"))
         .containsExactlyInAnyOrderElementsOf(List.of(BRANSJE.toString(), LAND.toString()));
 
     assertThat(responseBody.get("trendTotalt").findValuesAsText("statistikkategori"))
@@ -269,7 +272,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
     JsonNode responseBody = objectMapper.readTree(response.body());
 
     assertThat(
-            responseBody.get("prosentSiste4KvartalerTotalt").findValuesAsText("statistikkategori"))
+        responseBody.get("prosentSiste4KvartalerTotalt").findValuesAsText("statistikkategori"))
         .isEmpty();
   }
 

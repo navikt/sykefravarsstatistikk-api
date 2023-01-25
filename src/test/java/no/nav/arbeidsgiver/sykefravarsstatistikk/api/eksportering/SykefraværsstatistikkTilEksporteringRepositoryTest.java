@@ -1,11 +1,27 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils.assertBigDecimalIsEqual;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæringer;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,23 +35,14 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils.assertBigDecimalIsEqual;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {AppConfigForJdbcTesterConfig.class})
 @DataJdbcTest(excludeAutoConfiguration = {TestDatabaseAutoConfiguration.class})
 class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
-  @Autowired private NamedParameterJdbcTemplate jdbcTemplate;
+  @Autowired
+  private NamedParameterJdbcTemplate jdbcTemplate;
 
   private SykefraværsstatistikkTilEksporteringRepository repository;
 
@@ -122,7 +129,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
   @Test
   void hentSykefraværprosentAlleNæringer_siste4Kvartaler_skal_hente_riktig_data() {
-    opprettStatistikkForNæringer2Siffer(jdbcTemplate);
+    opprettStatistikkForNæringer(jdbcTemplate);
     List<SykefraværsstatistikkNæring> forventet =
         List.of(
             new SykefraværsstatistikkNæring(
@@ -169,8 +176,8 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
   @Test
   void
-      hentSykefraværprosentAlleNæringer_siste4Kvartaler_kan_likevel_hente_bare_siste_publiserte_kvartal() {
-    opprettStatistikkForNæringer2Siffer(jdbcTemplate);
+  hentSykefraværprosentAlleNæringer_siste4Kvartaler_kan_likevel_hente_bare_siste_publiserte_kvartal() {
+    opprettStatistikkForNæringer(jdbcTemplate);
     List<SykefraværsstatistikkNæring> forventet =
         List.of(
             new SykefraværsstatistikkNæring(
@@ -203,8 +210,89 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
   }
 
   @Test
+  void hentSykefraværAlleNæringer_siste4Kvartaler_skal_hente_riktig_data() {
+    opprettStatistikkForNæringer(jdbcTemplate);
+    List<SykefraværsstatistikkNæring> forventet =
+        List.of(
+            new SykefraværsstatistikkNæring(
+                SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
+                SISTE_PUBLISERTE_KVARTAL.getKvartal(),
+                "10",
+                50,
+                new BigDecimal(20000),
+                new BigDecimal(1000000)),
+            new SykefraværsstatistikkNæring(
+                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getÅrstall(),
+                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getKvartal(),
+                "10",
+                50,
+                new BigDecimal(30000),
+                new BigDecimal(1000000)),
+            new SykefraværsstatistikkNæring(
+                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getÅrstall(),
+                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getKvartal(),
+                "10",
+                50,
+                new BigDecimal(40000),
+                new BigDecimal(1000000)),
+            new SykefraværsstatistikkNæring(
+                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getÅrstall(),
+                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getKvartal(),
+                "10",
+                50,
+                new BigDecimal(50000),
+                new BigDecimal(1000000)),
+            new SykefraværsstatistikkNæring(
+                SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
+                SISTE_PUBLISERTE_KVARTAL.getKvartal(),
+                "88",
+                50,
+                new BigDecimal(25000),
+                new BigDecimal(1000000)));
+    List<SykefraværsstatistikkNæring> resultat =
+        repository.hentSykefraværAlleNæringer(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3));
+    assertThat(resultat.size()).isEqualTo(5);
+    assertThat(resultat).containsExactlyInAnyOrderElementsOf(forventet);
+  }
+
+  @Test
   void
-      hentSykefraværprosentAlleNæringer5SifferForEttKvartal__skal_returnere_riktig_data_til_alle_næringer() {
+  hentSykefraværAlleNæringer_siste4Kvartaler_kan_likevel_hente_bare_siste_publiserte_kvartal() {
+    opprettStatistikkForNæringer(jdbcTemplate);
+    List<SykefraværsstatistikkNæring> forventet =
+        List.of(
+            new SykefraværsstatistikkNæring(
+                SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
+                SISTE_PUBLISERTE_KVARTAL.getKvartal(),
+                "10",
+                50,
+                new BigDecimal(20000),
+                new BigDecimal(1000000)),
+            new SykefraværsstatistikkNæring(
+                SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
+                SISTE_PUBLISERTE_KVARTAL.getKvartal(),
+                "88",
+                50,
+                new BigDecimal(25000),
+                new BigDecimal(1000000)));
+
+    List<SykefraværsstatistikkNæring> resultat = repository.hentSykefraværAlleNæringer(
+        SISTE_PUBLISERTE_KVARTAL);
+    assertThat(resultat.size()).isEqualTo(2);
+    assertThat(resultat).containsExactlyInAnyOrderElementsOf(forventet);
+  }
+
+  @Test
+  void hentSykefraværAlleNæringer_siste4Kvartaler_skalIkkeKrasjeVedManglendeData() {
+    List<SykefraværsstatistikkNæring> resultat =
+        repository.hentSykefraværAlleNæringer(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3));
+    assertThat(resultat.size()).isEqualTo(0);
+    assertThat(resultat).containsExactlyInAnyOrderElementsOf(List.of());
+  }
+
+  @Test
+  void
+  hentSykefraværprosentAlleNæringer5SifferForEttKvartal__skal_returnere_riktig_data_til_alle_næringer() {
     opprettStatistikkNæring5SifferTestData(
         new ÅrstallOgKvartal(2019, 2), new ÅrstallOgKvartal(2019, 1));
 
@@ -228,7 +316,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
   @Test
   void
-      hentSykefraværprosentAlleNæringer5SifferForSiste4Kvartaler__skal_returnere_riktig_data_til_alle_næringer() {
+  hentSykefraværprosentAlleNæringer5SifferForSiste4Kvartaler__skal_returnere_riktig_data_til_alle_næringer() {
     opprettStatistikkNæring5SifferTestData(
         new ÅrstallOgKvartal(2019, 2), new ÅrstallOgKvartal(2019, 1));
 
@@ -258,7 +346,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
   @Test
   void
-      hentSykefraværprosentAlleVirksomheter__skal_hente_alle_virksomheter_for_ett_eller_flere_kvartaler() {
+  hentSykefraværprosentAlleVirksomheter__skal_hente_alle_virksomheter_for_ett_eller_flere_kvartaler() {
     opprettStatistikkVirksomhetTestData();
 
     List<SykefraværsstatistikkVirksomhetUtenVarighet> resultat_2019_2 =
