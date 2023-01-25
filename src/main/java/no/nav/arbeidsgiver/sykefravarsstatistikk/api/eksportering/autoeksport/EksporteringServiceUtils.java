@@ -226,7 +226,7 @@ public class EksporteringServiceUtils {
         sfSektor.getAntallPersoner());
   }
 
-  protected static SykefraværMedKategori getSykefraværMedKategoriForNæring(
+  protected static SykefraværMedKategori getSykefraværMedKategoriNæringForVirksomhet(
       VirksomhetMetadata virksomhetMetadata,
       List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring) {
     SykefraværsstatistikkNæring sfNæring =
@@ -247,7 +247,7 @@ public class EksporteringServiceUtils {
                         null)));
 
     return new SykefraværMedKategori(
-        Statistikkategori.NÆRING2SIFFER,
+        Statistikkategori.NÆRING,
         sfNæring.getNæringkode(),
         new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
         sfNæring.getTapteDagsverk(),

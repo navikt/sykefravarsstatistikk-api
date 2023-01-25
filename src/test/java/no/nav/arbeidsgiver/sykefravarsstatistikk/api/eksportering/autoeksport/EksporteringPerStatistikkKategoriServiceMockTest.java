@@ -5,7 +5,9 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeks
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2020_1;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2020_2;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.landSykefravær;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.næringSykefravær;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.sykefraværsstatistikkLandSiste4Kvartaler;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.sykefraværsstatistikkNæring;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.virksomhetSykefraværMedKategori;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,6 +22,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.Sykefraværsst
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
@@ -178,5 +181,66 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
         EksporteringBegrensning.build().utenBegrensning());
 
     assertThat(antallEksporterte).isEqualTo(2);
+  }
+
+  @Test
+  public void eksporterSykefraværsstatistikkNæring__sender_riktig_melding_til_kafka_og_returnerer_antall_meldinger_sendt() {
+    // 1- Mock det database og repositories returnerer. Samme med KafkaService
+    List<SykefraværsstatistikkNæring> allData = List.of(
+        sykefraværsstatistikkNæring(__2020_2, "11"),
+        sykefraværsstatistikkNæring(__2020_1, "11"),
+        sykefraværsstatistikkNæring(__2019_4, "11"),
+        sykefraværsstatistikkNæring(__2019_3, "11"));
+
+    // #todo: tester for repository-funksjon
+
+    when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleNæringer(
+        __2019_3)).thenReturn(allData);
+    when(kafkaService.sendTilStatistikkKategoriTopic(any(), any(), any(), any(), any())).thenReturn(
+        true);
+
+    // 2- Kall tjenesten
+    int antallEksporterte = service.eksporterSykefraværsstatistikkNæring(__2020_2);
+
+    // 3- Sjekk hva Kafka har fått
+    verify(kafkaService).sendTilStatistikkKategoriTopic(årstallOgKvartalArgumentCaptor.capture(),
+        statistikkategoriArgumentCaptor.capture(), identifikatorArgumentCaptor.capture(),
+        sykefraværMedKategoriArgumentCaptor.capture(),
+        sykefraværFlereKvartalerForEksportArgumentCaptor.capture());
+
+    assertThat(årstallOgKvartalArgumentCaptor.getValue()).isEqualTo(__2020_2);
+    assertThat(statistikkategoriArgumentCaptor.getValue()).isEqualTo(Statistikkategori.NÆRING);
+    assertThat(identifikatorArgumentCaptor.getValue()).isEqualTo("11");
+
+    EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(næringSykefravær,
+        sykefraværMedKategoriArgumentCaptor.getValue());
+    assertThat(antallEksporterte).isEqualTo(1);
+  }
+
+  @Test
+  public void eksporterSykefraværsstatistikkNæring__returnerer_korrekt_antall_meldinger_sendt() {
+    List<SykefraværsstatistikkNæring> allData = List.of(
+        sykefraværsstatistikkNæring(__2020_2, "11"),
+        sykefraværsstatistikkNæring(__2020_1, "11"),
+        sykefraværsstatistikkNæring(__2019_4, "11"),
+        sykefraværsstatistikkNæring(__2019_3, "11"),
+        sykefraværsstatistikkNæring(__2020_2, "12"),
+        sykefraværsstatistikkNæring(__2020_1, "12"),
+        sykefraværsstatistikkNæring(__2019_4, "12"),
+        sykefraværsstatistikkNæring(__2019_3, "12"),
+        sykefraværsstatistikkNæring(__2020_2, "13"),
+        sykefraværsstatistikkNæring(__2020_1, "13"),
+        sykefraværsstatistikkNæring(__2019_4, "13"),
+        sykefraværsstatistikkNæring(__2019_3, "13")
+    );
+
+    when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleNæringer(
+        __2019_3)).thenReturn(allData);
+    when(kafkaService.sendTilStatistikkKategoriTopic(any(), any(), any(), any(), any())).thenReturn(
+        true);
+
+    int antallEksporterte = service.eksporterSykefraværsstatistikkNæring(__2020_2);
+
+    assertThat(antallEksporterte).isEqualTo(3);
   }
 }

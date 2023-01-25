@@ -256,7 +256,7 @@ public class EksporteringServiceUtilsTest {
     EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(
         byggSykefraværStatistikkNæring(virksomhet1Metadata_2020_4, 10, 156, 22233),
         resultat,
-        Statistikkategori.NÆRING2SIFFER,
+        Statistikkategori.NÆRING,
         virksomhet1Metadata_2020_4.getNæring());
   }
 
