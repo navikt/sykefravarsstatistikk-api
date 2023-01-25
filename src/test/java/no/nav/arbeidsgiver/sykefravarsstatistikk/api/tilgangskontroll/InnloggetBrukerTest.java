@@ -1,14 +1,13 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getInnloggetBruker;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnOrganisasjon;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getInnloggetBruker;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class InnloggetBrukerTest {
 
@@ -17,7 +16,7 @@ public class InnloggetBrukerTest {
     InnloggetBruker bruker = getInnloggetBruker("12345678901");
 
     AltinnOrganisasjon organisasjon = TestData.getOrganisasjon("123456789");
-    bruker.setOrganisasjoner(List.of(organisasjon));
+    bruker.setBrukerensOrganisasjoner(List.of(organisasjon));
 
     bruker.sjekkTilgang(new Orgnr(organisasjon.getOrganizationNumber()));
   }
@@ -35,7 +34,7 @@ public class InnloggetBrukerTest {
     InnloggetBruker bruker = getInnloggetBruker("12345678901");
 
     AltinnOrganisasjon organisasjon = TestData.getOrganisasjon("123456789");
-    bruker.setOrganisasjoner(List.of(organisasjon));
+    bruker.setBrukerensOrganisasjoner(List.of(organisasjon));
 
     assertThrows(
         TilgangskontrollException.class, () -> bruker.sjekkTilgang(new Orgnr("987654321")));
@@ -48,7 +47,7 @@ public class InnloggetBrukerTest {
     List<AltinnOrganisasjon> organisasjoner =
         List.of(TestData.getOrganisasjon(null), TestData.getOrganisasjon("987654321"));
 
-    bruker.setOrganisasjoner(organisasjoner);
+    bruker.setBrukerensOrganisasjoner(organisasjoner);
 
     bruker.sjekkTilgang(new Orgnr("987654321"));
   }

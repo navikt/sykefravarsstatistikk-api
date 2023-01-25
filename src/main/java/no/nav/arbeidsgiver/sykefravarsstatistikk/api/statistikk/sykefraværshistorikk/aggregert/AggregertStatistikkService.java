@@ -66,8 +66,11 @@ public class AggregertStatistikkService {
     Sykefraværsdata korttidSykefravær = hentKorttidsfravær(virksomhet);
     Sykefraværsdata langtidsfravær = hentLangtidsfravær(virksomhet);
 
-    if (!tilgangskontrollService.brukerHarIaRettigheter(orgnr)) {
+    if (!tilgangskontrollService.brukerHarIaRettigheterIVirksomheten(orgnr)) {
       totalSykefravær.filtrerBortVirksomhetsdata();
+      gradertSykefravær.filtrerBortVirksomhetsdata();
+      korttidSykefravær.filtrerBortVirksomhetsdata();
+      langtidsfravær.filtrerBortVirksomhetsdata();
     }
     return Either.right(
         aggregerData(

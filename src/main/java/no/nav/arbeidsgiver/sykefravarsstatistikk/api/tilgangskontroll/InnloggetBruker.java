@@ -1,23 +1,23 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.Data;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Fnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnOrganisasjon;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 @Data
 public class InnloggetBruker {
-  private List<AltinnOrganisasjon> organisasjoner;
+
+  private List<AltinnOrganisasjon> brukerensOrganisasjoner;
   private Fnr fnr;
 
   public InnloggetBruker(Fnr fnr) {
     this.fnr = fnr;
-    organisasjoner = new ArrayList<>();
+    brukerensOrganisasjoner = new ArrayList<>();
   }
 
   public void sjekkTilgang(Orgnr orgnr) {
@@ -28,9 +28,9 @@ public class InnloggetBruker {
 
   public boolean harTilgang(Orgnr orgnr) {
     List<String> orgnumreBrukerHarTilgangTil =
-        organisasjoner.stream()
+        brukerensOrganisasjoner.stream()
             .filter(Objects::nonNull)
-            .map(org -> org.getOrganizationNumber())
+            .map(AltinnOrganisasjon::getOrganizationNumber)
             .collect(Collectors.toList());
 
     return orgnumreBrukerHarTilgangTil.contains(orgnr.getVerdi());
