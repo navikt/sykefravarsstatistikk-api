@@ -30,7 +30,7 @@ jobs:
   build-and-push-image:
     name: Build and push Docker image
     needs: test
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/Fjerne/stenge_rest-API'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/egen-topic-for-naring'
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -61,7 +61,7 @@ jobs:
   deploy-to-dev:
     name: Deploy to dev
     needs: build-and-push-image
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/Fjerne/stenge_rest-API'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/egen-topic-for-naring'
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -117,7 +117,7 @@ jobs:
   deployTopicsToDev:
     name: Deploy topics to dev
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/eksport-av-virksomhet-sykefraværsstatistikk-kategori'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/egen-topic-for-naring'
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -126,7 +126,7 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
-          RESOURCE: "nais/topics/topic-arbeidsgiver-sykefravaer-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-virksomhet-dev.yaml"
+          RESOURCE: "nais/topics/topic-arbeidsgiver-sykefravaer-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-virksomhet-dev.yaml,topic-arbeidsgiver-sykefravarsstatistikk-naring-dev.yaml"
 
   deployTopicsToProd:
     name: Deploy topics to prod
