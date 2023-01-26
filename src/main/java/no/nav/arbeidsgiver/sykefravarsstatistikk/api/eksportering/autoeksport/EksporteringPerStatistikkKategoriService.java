@@ -26,7 +26,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksp
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaProperties;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUtsendingException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
@@ -252,7 +251,7 @@ public class EksporteringPerStatistikkKategoriService {
     );
     long startEksportering = System.currentTimeMillis();
     kafkaService.nullstillUtsendingRapport(
-        virksomheterTilEksport.size(), KafkaProperties.EKSPORT_ALLE_KATEGORIER);
+        virksomheterTilEksport.size(), Statistikkategori.VIRKSOMHET.name());
 
     log.info("Starting utregning av statistikk");
     List<SykefraværsstatistikkVirksomhetUtenVarighet> alleKvartal =

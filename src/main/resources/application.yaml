@@ -18,7 +18,6 @@ kafka:
       - arbeidsgiver.sykefravarsstatistikk-v1
       - arbeidsgiver.sykefravarsstatistikk-land-v1
       - arbeidsgiver.sykefravarsstatistikk-virksomhet-v1
-      - arbeidsgiver.sykefravarsstatistikk-bransje-v1
       - arbeidsgiver.sykefravarsstatistikk-naring-v1
     bootstrapServers: ${KAFKA_BROKERS:localhost:9092}
     securityProtocol: SSL

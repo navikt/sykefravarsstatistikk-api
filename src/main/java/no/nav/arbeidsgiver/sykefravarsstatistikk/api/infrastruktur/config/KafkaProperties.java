@@ -1,5 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,16 +18,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 @Getter
 @Setter
 @ToString(onlyExplicitlyIncluded = true)
 @ConfigurationProperties(prefix = "kafka.outbound")
 @Component
 public class KafkaProperties {
+
   private List<String> topic;
   private String bootstrapServers;
   private String caPath;
@@ -44,7 +44,7 @@ public class KafkaProperties {
   private final Integer batchSize =
       16384
           * 10; // størrelse av en melding er mellom 1000 bytes og 20K bytes (virksomhet med 70+
-                // 5siffer næringskoder)
+  // 5siffer næringskoder)
   private final Integer maxInFlightRequestsPerConnection = 5; // default
   public static final String EKSPORT_ALLE_KATEGORIER = "ALLE_KATEGORIER";
 
@@ -91,6 +91,8 @@ public class KafkaProperties {
       return topic.get(1);
     } else if (Statistikkategori.VIRKSOMHET.name().equals(eksportNavn) && topic.size() > 2) {
       return topic.get(2);
+    } else if (Statistikkategori.NÆRING.name().equals(eksportNavn) && topic.size() > 3) {
+      return topic.get(3);
     } else {
       return topic.get(0);
     }
