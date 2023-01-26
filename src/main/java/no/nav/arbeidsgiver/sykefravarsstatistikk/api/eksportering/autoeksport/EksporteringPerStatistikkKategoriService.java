@@ -81,7 +81,7 @@ public class EksporteringPerStatistikkKategoriService {
       return eksporterSykefraværsstatistikkLand(årstallOgKvartal);
     }
 
-    if (Statistikkategori.BRANSJE == statistikkategori) {
+    if (Statistikkategori.NÆRING == statistikkategori) {
       return eksporterSykefraværsstatistikkNæring(årstallOgKvartal);
     }
 
