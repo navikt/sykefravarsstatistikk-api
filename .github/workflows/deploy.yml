@@ -126,7 +126,7 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
-          RESOURCE: "nais/topics/topic-arbeidsgiver-sykefravaer-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-virksomhet-dev.yaml,topic-arbeidsgiver-sykefravarsstatistikk-naring-dev.yaml"
+          RESOURCE: "nais/topics/topic-arbeidsgiver-sykefravaer-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-virksomhet-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-naring-dev.yaml"
 
   deployTopicsToProd:
     name: Deploy topics to prod
