@@ -87,6 +87,7 @@ public class SykefraværshistorikkController {
     }
   }
 
+  // TODO: Fjern har vi har gått over til "aggregert"-endepunktet
   @GetMapping(value = "/{orgnr}/sykefravarshistorikk/summert")
   public List<SummertSykefraværshistorikk> hentSummertKorttidsOgLangtidsfraværV2(
       @PathVariable("orgnr") String orgnrStr,
@@ -114,34 +115,51 @@ public class SykefraværshistorikkController {
         summertSykefraværshistorikkVirksomhet, summertSykefraværshistorikkBransjeEllerNæring);
   }
 
-  // TODO: Fjern har vi har gått over til "aggregert"-endepunktet
   @GetMapping(value = "/{orgnr}/sykefravarshistorikk/legemeldtsykefravarsprosent")
   public ResponseEntity<LegemeldtSykefraværsprosent> hentLegemeldtSykefraværsprosent(
       @PathVariable("orgnr") String orgnrStr, HttpServletRequest request) {
-    InnloggetBruker bruker = tilgangskontrollService.hentBrukerKunIaRettigheter();
+    Orgnr orgnr = new Orgnr(orgnrStr);
+    InnloggetBruker brukerMedIaRettigheter = tilgangskontrollService.hentBrukerKunIaRettigheter();
+    InnloggetBruker brukerMedMinstEnRettighet = tilgangskontrollService.hentInnloggetBrukerForAlleRettigheter();
+    boolean brukerHarSykefraværRettighetTilVirksomhet = brukerMedIaRettigheter.harTilgang(orgnr);
+    boolean brukerRepresentererVirksomheten = tilgangskontrollService.brukerRepresentererVirksomheten(
+        orgnr);
 
     tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
-        new Orgnr(orgnrStr), bruker, request.getMethod(), "" + request.getRequestURL());
+        new Orgnr(orgnrStr), brukerMedMinstEnRettighet, request.getMethod(),
+        "" + request.getRequestURL());
 
     Underenhet underenhet;
     try {
-      underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr(orgnrStr));
+      underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
     } catch (IngenNæringException e) {
-      log.info("Underenhet har ingen næring. Returnerer 204 - No Content");
       return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 
-    LegemeldtSykefraværsprosent legemeldtSykefraværsprosent =
-        summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
-            underenhet, publiseringsdatoerService.hentSistePubliserteKvartal());
+    if (brukerHarSykefraværRettighetTilVirksomhet) {
+      LegemeldtSykefraværsprosent legemeldtSykefraværsprosent =
+          summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
+              underenhet, publiseringsdatoerService.hentSistePubliserteKvartal());
 
-    if (legemeldtSykefraværsprosent.getProsent() == null) {
-      log.info(
-          "Underenhet har ingen sykefraværsprosent tilgjengelig. Returnerer 204 - No " + "Content");
-      return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+      if (legemeldtSykefraværsprosent.getProsent() == null) {
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+      }
+
+      return ResponseEntity.status(HttpStatus.OK).body(legemeldtSykefraværsprosent);
+    } else if (brukerRepresentererVirksomheten) {
+      LegemeldtSykefraværsprosent legemeldtSykefraværsprosentBransjeEllerNæring =
+          summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosentUtenStatistikkForVirksomhet(
+              underenhet, publiseringsdatoerService.hentSistePubliserteKvartal());
+
+      if (legemeldtSykefraværsprosentBransjeEllerNæring.getProsent() == null) {
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+      }
+
+      return ResponseEntity.status(HttpStatus.OK)
+          .body(legemeldtSykefraværsprosentBransjeEllerNæring);
     }
-
-    return ResponseEntity.status(HttpStatus.OK).body(legemeldtSykefraværsprosent);
+    log.error("Brukeren har ikke tilgang til virksomhet, men ble ikke stoppet av tilgangssjekk.");
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
   }
 
   @GetMapping("/{orgnr}/v1/sykefravarshistorikk/aggregert")
