@@ -45,7 +45,16 @@ public class SummertLegemeldtSykefraværService {
     if (harData && !erMaskert) {
       return new LegemeldtSykefraværsprosent(
           Statistikkategori.VIRKSOMHET, underenhet.getNavn(), summertSykefravær.getProsent());
+    } else {
+      return hentLegemeldtSykefraværsprosentUtenStatistikkForVirksomhet(underenhet,
+          sistePubliserteÅrstallOgKvartal);
     }
+  }
+
+  public LegemeldtSykefraværsprosent hentLegemeldtSykefraværsprosentUtenStatistikkForVirksomhet(
+      Underenhet underenhet, ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal) {
+    ÅrstallOgKvartal eldsteÅrstallOgKvartal = sistePubliserteÅrstallOgKvartal.minusKvartaler(3);
+
     BransjeEllerNæring bransjeEllerNæring =
         bransjeEllerNæringService.bestemFraNæringskode(underenhet.getNæringskode());
 
