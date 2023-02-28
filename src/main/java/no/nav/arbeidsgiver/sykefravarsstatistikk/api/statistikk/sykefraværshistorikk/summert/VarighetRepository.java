@@ -1,5 +1,16 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.BRANSJE;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.NÆRING;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.VIRKSOMHET;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
@@ -14,12 +25,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
-
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.*;
-
 @Component
 public class VarighetRepository {
 
@@ -27,7 +32,7 @@ public class VarighetRepository {
 
   public VarighetRepository(
       @Qualifier("sykefravarsstatistikkJdbcTemplate")
-          NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+      NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
     this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
   }
 
@@ -39,10 +44,10 @@ public class VarighetRepository {
           "select tapte_dagsverk, mulige_dagsverk, antall_personer, varighet, arstall, kvartal "
               + " from sykefravar_statistikk_naring_med_varighet "
               + " where "
-              + " naring_kode like :næring2siffer "
+              + " naring_kode like :næring "
               + " and varighet in ('A', 'B', 'C', 'D', 'E', 'F', 'X')"
               + " order by arstall, kvartal, varighet",
-          new MapSqlParameterSource().addValue("næring2siffer", næringKode + "%"),
+          new MapSqlParameterSource().addValue("næring", næringKode + "%"),
           (rs, rowNum) -> mapTilKvartalsvisSykefraværMedVarighet(rs));
     } catch (EmptyResultDataAccessException e) {
       return Collections.emptyList();
@@ -86,7 +91,7 @@ public class VarighetRepository {
   }
 
   public Map<Statistikkategori, List<UmaskertSykefraværForEttKvartalMedVarighet>>
-      hentUmaskertSykefraværMedVarighetAlleKategorier(Virksomhet virksomhet) {
+  hentUmaskertSykefraværMedVarighetAlleKategorier(Virksomhet virksomhet) {
     Næring næring = new Næring(virksomhet.getNæringskode().getKode(), "");
     Optional<Bransje> maybeBransje = new Bransjeprogram().finnBransje(virksomhet.getNæringskode());
 

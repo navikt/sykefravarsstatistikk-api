@@ -8,14 +8,14 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.TOKENX
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.PRODUKSJON_NYTELSESMIDLER;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring2Siffer;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForSektor;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForVirksomhet;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.skrivSisteImporttidspunktTilDb;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAlleImporttidspunkt;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +27,6 @@ import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.security.mock.oauth2.MockOAuth2Server;
 import org.jetbrains.annotations.NotNull;
@@ -43,13 +42,17 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
   private final int SISTE_ÅRSTALL = SISTE_PUBLISERTE_KVARTAL.getÅrstall();
   private final int SISTE_KVARTAL = SISTE_PUBLISERTE_KVARTAL.getKvartal();
 
-  @Autowired private WebApplicationContext webApplicationContext;
+  @Autowired
+  private WebApplicationContext webApplicationContext;
 
-  @Autowired MockOAuth2Server mockOAuth2Server;
+  @Autowired
+  MockOAuth2Server mockOAuth2Server;
 
-  @Autowired private NamedParameterJdbcTemplate jdbcTemplate;
+  @Autowired
+  private NamedParameterJdbcTemplate jdbcTemplate;
 
-  @LocalServerPort private String port;
+  @LocalServerPort
+  private String port;
 
   private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -75,8 +78,8 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
 
   @Test
   public void
-      sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_selvbetjening_token__issued_med_sub()
-          throws Exception {
+  sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_selvbetjening_token__issued_med_sub()
+      throws Exception {
     String jwtTokenIssuedByLoginservice =
         TestTokenUtil.createToken(mockOAuth2Server, "", "15008462396", SELVBETJENING_ISSUER_ID, "");
     opprettGenerellStatistikk();
@@ -85,8 +88,8 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
 
   @Test
   public void
-      sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_idporten()
-          throws Exception {
+  sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_idporten()
+      throws Exception {
     String jwtToken =
         TestTokenUtil.createToken(
             mockOAuth2Server,
@@ -99,8 +102,8 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
 
   @Test
   public void
-      sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_loginservice()
-          throws Exception {
+  sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_loginservice()
+      throws Exception {
     String jwtToken =
         TestTokenUtil.createToken(
             mockOAuth2Server,
@@ -116,7 +119,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
   private void opprettGenerellStatistikk() {
     opprettStatistikkForLand(jdbcTemplate);
     opprettStatistikkForSektor(jdbcTemplate);
-    opprettStatistikkForNæring2Siffer(
+    opprettStatistikkForNæring(
         jdbcTemplate, PRODUKSJON_NYTELSESMIDLER, SISTE_ÅRSTALL, SISTE_KVARTAL, 5, 100, 10);
     opprettStatistikkForVirksomhet(
         jdbcTemplate, ORGNR_UNDERENHET, SISTE_ÅRSTALL, SISTE_KVARTAL, 9, 200, 10);
@@ -146,9 +149,9 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
     JsonNode alleSykefraværshistorikk = objectMapper.readTree(response.body());
 
     assertThat(
-            alleSykefraværshistorikk.findValues("type").stream()
-                .map(v -> v.textValue())
-                .collect(Collectors.toList()))
+        alleSykefraværshistorikk.findValues("type").stream()
+            .map(v -> v.textValue())
+            .collect(Collectors.toList()))
         .containsExactlyInAnyOrderElementsOf(
             Arrays.asList(
                 Statistikkategori.LAND.toString(),

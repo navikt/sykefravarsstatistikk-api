@@ -52,10 +52,21 @@ public class EksporteringServiceUtils {
         .collect(Collectors.toList());
   }
 
-  protected static UmaskertSykefraværForEttKvartal hentSisteKvartalIBeregningen(
-      List<UmaskertSykefraværForEttKvartal> umaskertSykefraværsstatistikkSiste4KvartalerLand,
+  protected static SykefraværsstatistikkNæring hentSisteKvartalIBeregningenForSykefraværNæring(
+      List<SykefraværsstatistikkNæring> sykefraværNæring,
       ÅrstallOgKvartal årstallOgKvartal) {
-    return umaskertSykefraværsstatistikkSiste4KvartalerLand.stream()
+    return sykefraværNæring.stream()
+        .filter(sykefraværsstatistikkNæring -> new ÅrstallOgKvartal(
+            sykefraværsstatistikkNæring.getÅrstall(),
+            sykefraværsstatistikkNæring.getKvartal()).equals(årstallOgKvartal))
+        .findFirst()
+        .orElse(null);
+  }
+
+  protected static UmaskertSykefraværForEttKvartal hentSisteKvartalIBeregningen(
+      List<UmaskertSykefraværForEttKvartal> umaskertSykefraværsstatistikkSiste4Kvartaler,
+      ÅrstallOgKvartal årstallOgKvartal) {
+    return umaskertSykefraværsstatistikkSiste4Kvartaler.stream()
         .filter(u -> u.getÅrstallOgKvartal().equals(årstallOgKvartal))
         .findFirst()
         .orElse(null);
@@ -215,7 +226,7 @@ public class EksporteringServiceUtils {
         sfSektor.getAntallPersoner());
   }
 
-  protected static SykefraværMedKategori getSykefraværMedKategoriForNæring(
+  protected static SykefraværMedKategori getSykefraværMedKategoriNæringForVirksomhet(
       VirksomhetMetadata virksomhetMetadata,
       List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring) {
     SykefraværsstatistikkNæring sfNæring =
@@ -236,7 +247,7 @@ public class EksporteringServiceUtils {
                         null)));
 
     return new SykefraværMedKategori(
-        Statistikkategori.NÆRING2SIFFER,
+        Statistikkategori.NÆRING,
         sfNæring.getNæringkode(),
         new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
         sfNæring.getTapteDagsverk(),
@@ -257,9 +268,9 @@ public class EksporteringServiceUtils {
               .filter(
                   br ->
                       bransjeEllerNæring
-                              .getBransje()
-                              .getKoderSomSpesifisererNæringer()
-                              .contains(br.getNæringkode5siffer())
+                          .getBransje()
+                          .getKoderSomSpesifisererNæringer()
+                          .contains(br.getNæringkode5siffer())
                           && erIKvartalerIberegningen(fraÅrstallOgKvartal, br))
               .map(EksporteringServiceUtils::mapTilUmaskertSykefraværForEttKvartal)
               .collect(Collectors.toList());
@@ -323,11 +334,11 @@ public class EksporteringServiceUtils {
             .filter(
                 næring5Siffer ->
                     virksomhetMetadata.getNæringOgNæringskode5siffer().stream()
-                            .anyMatch(
-                                virksomhetNæring5Siffer ->
-                                    næring5Siffer
-                                        .getNæringkode5siffer()
-                                        .equals(virksomhetNæring5Siffer.getNæringskode5Siffer()))
+                        .anyMatch(
+                            virksomhetNæring5Siffer ->
+                                næring5Siffer
+                                    .getNæringkode5siffer()
+                                    .equals(virksomhetNæring5Siffer.getNæringskode5Siffer()))
                         && næring5Siffer.getÅrstall() == virksomhetMetadata.getÅrstall()
                         && næring5Siffer.getKvartal() == virksomhetMetadata.getKvartal())
             .collect(Collectors.toList());
@@ -392,8 +403,8 @@ public class EksporteringServiceUtils {
 
     return eksporteringBegrensning.erBegrenset()
         ? virksomhetEksportPerKvartalStream
-            .limit(eksporteringBegrensning.getAntallSomSkalEksporteres())
-            .collect(Collectors.toList())
+        .limit(eksporteringBegrensning.getAntallSomSkalEksporteres())
+        .collect(Collectors.toList())
         : virksomhetEksportPerKvartalStream.collect(Collectors.toList());
   }
 
@@ -401,7 +412,7 @@ public class EksporteringServiceUtils {
       ÅrstallOgKvartal fraÅrstallOgKvartal, Sykefraværsstatistikk v) {
     return (v.getÅrstall() > fraÅrstallOgKvartal.getÅrstall())
         || (v.getÅrstall() == fraÅrstallOgKvartal.getÅrstall()
-            && v.getKvartal() >= fraÅrstallOgKvartal.getKvartal());
+        && v.getKvartal() >= fraÅrstallOgKvartal.getKvartal());
   }
 
   private static <T> Collector<T, ?, T> toSingleton(T emptySykefraværsstatistikk) {

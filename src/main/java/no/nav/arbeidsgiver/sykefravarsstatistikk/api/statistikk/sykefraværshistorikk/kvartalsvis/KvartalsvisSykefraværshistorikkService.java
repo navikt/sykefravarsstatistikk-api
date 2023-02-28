@@ -1,5 +1,15 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis;
 
+import static java.lang.String.format;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.InstitusjonellSektorkode;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
@@ -15,17 +25,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.SektorMappingSer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
 import org.springframework.stereotype.Component;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.lang.String.format;
 
 @Slf4j
 @Component
@@ -53,7 +52,7 @@ public class KvartalsvisSykefraværshistorikkService {
   public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikk(
       Underenhet underenhet, InstitusjonellSektorkode institusjonellSektorkode) {
     Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
-    boolean skalHenteDataPåNæring2Siffer =
+    boolean skalHenteDataPåNæring =
         bransje.isEmpty() || bransje.get().erDefinertPåTosiffernivå();
 
     Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(institusjonellSektorkode);
@@ -68,7 +67,7 @@ public class KvartalsvisSykefraværshistorikkService {
                     () -> hentSykefraværshistorikkSektor(ssbSektor),
                     Statistikkategori.SEKTOR,
                     ssbSektor.getNavn()),
-                skalHenteDataPåNæring2Siffer
+                skalHenteDataPåNæring
                     ? uthentingAvSykefraværshistorikkNæring(underenhet)
                     : uthentingMedFeilhåndteringOgTimeout(
                         () -> hentSykefraværshistorikkBransje(bransje.get()),
@@ -91,11 +90,11 @@ public class KvartalsvisSykefraværshistorikkService {
 
     KvartalsvisSykefraværshistorikk historikkForOverordnetEnhet =
         uthentingMedFeilhåndteringOgTimeout(
-                () ->
-                    hentSykefraværshistorikkVirksomhet(
-                        overordnetEnhet, Statistikkategori.OVERORDNET_ENHET),
-                Statistikkategori.OVERORDNET_ENHET,
-                underenhet.getNavn())
+            () ->
+                hentSykefraværshistorikkVirksomhet(
+                    overordnetEnhet, Statistikkategori.OVERORDNET_ENHET),
+            Statistikkategori.OVERORDNET_ENHET,
+            underenhet.getNavn())
             .join();
 
     List<KvartalsvisSykefraværshistorikk> kvartalsvisSykefraværshistorikkListe =
@@ -143,10 +142,10 @@ public class KvartalsvisSykefraværshistorikkService {
   }
 
   protected CompletableFuture<KvartalsvisSykefraværshistorikk>
-      uthentingAvSykefraværshistorikkNæring(Underenhet underenhet) {
+  uthentingAvSykefraværshistorikkNæring(Underenhet underenhet) {
     Næringskode5Siffer næring5siffer = underenhet.getNæringskode();
     return uthentingMedTimeout(
-            () -> klassifikasjonerRepository.hentNæring(næring5siffer.hentNæringskode2Siffer()))
+        () -> klassifikasjonerRepository.hentNæring(næring5siffer.hentNæringskode2Siffer()))
         .thenCompose(
             næring ->
                 uthentingMedFeilhåndteringOgTimeout(
@@ -176,10 +175,10 @@ public class KvartalsvisSykefraværshistorikkService {
   }
 
   protected static CompletableFuture<KvartalsvisSykefraværshistorikk>
-      uthentingMedFeilhåndteringOgTimeout(
-          Supplier<KvartalsvisSykefraværshistorikk> sykefraværshistorikkSupplier,
-          Statistikkategori statistikkategori,
-          String sykefraværshistorikkLabel) {
+  uthentingMedFeilhåndteringOgTimeout(
+      Supplier<KvartalsvisSykefraværshistorikk> sykefraværshistorikkSupplier,
+      Statistikkategori statistikkategori,
+      String sykefraværshistorikkLabel) {
     return CompletableFuture.supplyAsync(sykefraværshistorikkSupplier)
         .orTimeout(TIMEOUT_UTHENTING_FRA_DB_I_SEKUNDER, TimeUnit.SECONDS)
         .exceptionally(

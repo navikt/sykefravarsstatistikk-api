@@ -50,7 +50,7 @@ public class EksporteringServiceTestUtils {
           "987654321", "Virksomhet 1", __2020_2, new BigDecimal(10), new BigDecimal(500), 6);
   public static SykefraværMedKategori næringSykefravær =
       new SykefraværMedKategori(
-          Statistikkategori.NÆRING2SIFFER,
+          Statistikkategori.NÆRING,
           "11",
           __2020_2,
           new BigDecimal(100),
@@ -321,8 +321,8 @@ public class EksporteringServiceTestUtils {
   }
 
   public static List<SykefraværsstatistikkVirksomhetUtenVarighet>
-      byggVirksomhetSykefraværUtenVarighet(
-          VirksomhetMetadata virksomhetMetadata, List<ÅrstallOgKvartal> årstallOgKvartaler) {
+  byggVirksomhetSykefraværUtenVarighet(
+      VirksomhetMetadata virksomhetMetadata, List<ÅrstallOgKvartal> årstallOgKvartaler) {
     return årstallOgKvartaler.stream()
         .map(
             vv ->
@@ -413,10 +413,15 @@ public class EksporteringServiceTestUtils {
 
   public static SykefraværsstatistikkNæring sykefraværsstatistikkNæring(
       ÅrstallOgKvartal årstallOgKvartal) {
+    return sykefraværsstatistikkNæring(årstallOgKvartal, "11");
+  }
+
+  public static SykefraværsstatistikkNæring sykefraværsstatistikkNæring(
+      ÅrstallOgKvartal årstallOgKvartal, String næringskode) {
     return new SykefraværsstatistikkNæring(
         årstallOgKvartal.getÅrstall(),
         årstallOgKvartal.getKvartal(),
-        "11",
+        næringskode,
         150,
         new BigDecimal(100),
         new BigDecimal(5000));
@@ -567,63 +572,63 @@ public class EksporteringServiceTestUtils {
 
   public static String getKafkaTopicValueAsJsonString() {
     return ("{"
-            + "  \"virksomhetSykefravær\": {"
-            + "    \"prosent\": 2.0,"
-            + "    \"tapteDagsverk\": 10.0,"
-            + "    \"muligeDagsverk\": 500.0,"
-            + "    \"erMaskert\": false,"
-            + "    \"kategori\": \"VIRKSOMHET\","
-            + "    \"orgnr\": \"987654321\","
-            + "    \"navn\": \"\","
-            + "    \"antallPersoner\": 6,"
-            + "    \"årstall\": 2020,"
-            + "    \"kvartal\": 2"
-            + "  },"
-            + "  \"næring5SifferSykefravær\": [{"
-            + "    \"prosent\": 1.0,"
-            + "    \"tapteDagsverk\": 40.0,"
-            + "    \"muligeDagsverk\": 4000.0,"
-            + "    \"erMaskert\": false,"
-            + "    \"kategori\": \"NÆRING5SIFFER\","
-            + "    \"kode\": \"11000\","
-            + "    \"antallPersoner\": 1250,"
-            + "    \"årstall\": 2020,"
-            + "    \"kvartal\": 2"
-            + "   }],"
-            + "  \"næringSykefravær\": {"
-            + "    \"prosent\": 2.0,"
-            + "    \"tapteDagsverk\": 100.0,"
-            + "    \"muligeDagsverk\": 5000.0,"
-            + "    \"erMaskert\": false,"
-            + "    \"kategori\": \"NÆRING2SIFFER\","
-            + "    \"kode\": \"11\","
-            + "    \"antallPersoner\": 150,"
-            + "    \"årstall\": 2020,"
-            + "    \"kvartal\": 2"
-            + "  },"
-            + "  \"sektorSykefravær\": {"
-            + "    \"prosent\": 1.5,"
-            + "    \"tapteDagsverk\": 1340.0,"
-            + "    \"muligeDagsverk\": 88000.0,"
-            + "    \"erMaskert\": false,"
-            + "    \"kategori\": \"SEKTOR\","
-            + "    \"kode\": \"1\","
-            + "    \"antallPersoner\": 33000,"
-            + "    \"årstall\": 2020,"
-            + "    \"kvartal\": 2"
-            + "  },"
-            + "  \"landSykefravær\": {"
-            + "    \"prosent\": 2.0,"
-            + "    \"tapteDagsverk\": 10000000.0,"
-            + "    \"muligeDagsverk\": 500000000.0,"
-            + "    \"erMaskert\": false,"
-            + "    \"kategori\": \"LAND\","
-            + "    \"kode\": \"NO\","
-            + "    \"antallPersoner\": 2500000,"
-            + "    \"årstall\": 2020,"
-            + "    \"kvartal\": 2"
-            + "  }"
-            + "}")
+        + "  \"virksomhetSykefravær\": {"
+        + "    \"prosent\": 2.0,"
+        + "    \"tapteDagsverk\": 10.0,"
+        + "    \"muligeDagsverk\": 500.0,"
+        + "    \"erMaskert\": false,"
+        + "    \"kategori\": \"VIRKSOMHET\","
+        + "    \"orgnr\": \"987654321\","
+        + "    \"navn\": \"\","
+        + "    \"antallPersoner\": 6,"
+        + "    \"årstall\": 2020,"
+        + "    \"kvartal\": 2"
+        + "  },"
+        + "  \"næring5SifferSykefravær\": [{"
+        + "    \"prosent\": 1.0,"
+        + "    \"tapteDagsverk\": 40.0,"
+        + "    \"muligeDagsverk\": 4000.0,"
+        + "    \"erMaskert\": false,"
+        + "    \"kategori\": \"NÆRING5SIFFER\","
+        + "    \"kode\": \"11000\","
+        + "    \"antallPersoner\": 1250,"
+        + "    \"årstall\": 2020,"
+        + "    \"kvartal\": 2"
+        + "   }],"
+        + "  \"næringSykefravær\": {"
+        + "    \"prosent\": 2.0,"
+        + "    \"tapteDagsverk\": 100.0,"
+        + "    \"muligeDagsverk\": 5000.0,"
+        + "    \"erMaskert\": false,"
+        + "    \"kategori\": \"NÆRING\","
+        + "    \"kode\": \"11\","
+        + "    \"antallPersoner\": 150,"
+        + "    \"årstall\": 2020,"
+        + "    \"kvartal\": 2"
+        + "  },"
+        + "  \"sektorSykefravær\": {"
+        + "    \"prosent\": 1.5,"
+        + "    \"tapteDagsverk\": 1340.0,"
+        + "    \"muligeDagsverk\": 88000.0,"
+        + "    \"erMaskert\": false,"
+        + "    \"kategori\": \"SEKTOR\","
+        + "    \"kode\": \"1\","
+        + "    \"antallPersoner\": 33000,"
+        + "    \"årstall\": 2020,"
+        + "    \"kvartal\": 2"
+        + "  },"
+        + "  \"landSykefravær\": {"
+        + "    \"prosent\": 2.0,"
+        + "    \"tapteDagsverk\": 10000000.0,"
+        + "    \"muligeDagsverk\": 500000000.0,"
+        + "    \"erMaskert\": false,"
+        + "    \"kategori\": \"LAND\","
+        + "    \"kode\": \"NO\","
+        + "    \"antallPersoner\": 2500000,"
+        + "    \"årstall\": 2020,"
+        + "    \"kvartal\": 2"
+        + "  }"
+        + "}")
         .replaceAll("\\s+", "");
   }
 }

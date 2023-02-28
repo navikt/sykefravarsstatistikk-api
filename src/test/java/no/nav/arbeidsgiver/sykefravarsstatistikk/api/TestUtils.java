@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
@@ -154,8 +153,8 @@ public class TestUtils {
         parametre);
   }
 
-  public static void opprettStatistikkForNæringer2Siffer(NamedParameterJdbcTemplate jdbcTemplate) {
-    opprettStatistikkForNæring2Siffer(
+  public static void opprettStatistikkForNæringer(NamedParameterJdbcTemplate jdbcTemplate) {
+    opprettStatistikkForNæring(
         jdbcTemplate,
         new Næring("10", ""),
         SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
@@ -163,7 +162,7 @@ public class TestUtils {
         20000,
         1000000,
         50);
-    opprettStatistikkForNæring2Siffer(
+    opprettStatistikkForNæring(
         jdbcTemplate,
         new Næring("10", ""),
         SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getÅrstall(),
@@ -171,7 +170,7 @@ public class TestUtils {
         30000,
         1000000,
         50);
-    opprettStatistikkForNæring2Siffer(
+    opprettStatistikkForNæring(
         jdbcTemplate,
         new Næring("10", ""),
         SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getÅrstall(),
@@ -179,7 +178,7 @@ public class TestUtils {
         40000,
         1000000,
         50);
-    opprettStatistikkForNæring2Siffer(
+    opprettStatistikkForNæring(
         jdbcTemplate,
         new Næring("10", ""),
         SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getÅrstall(),
@@ -187,7 +186,7 @@ public class TestUtils {
         50000,
         1000000,
         50);
-    opprettStatistikkForNæring2Siffer(
+    opprettStatistikkForNæring(
         jdbcTemplate,
         new Næring("10", ""),
         SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4).getÅrstall(),
@@ -195,7 +194,7 @@ public class TestUtils {
         60000,
         1000000,
         50);
-    opprettStatistikkForNæring2Siffer(
+    opprettStatistikkForNæring(
         jdbcTemplate,
         new Næring("88", ""),
         SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
@@ -203,7 +202,7 @@ public class TestUtils {
         25000,
         1000000,
         50);
-    opprettStatistikkForNæring2Siffer(
+    opprettStatistikkForNæring(
         jdbcTemplate,
         new Næring("88", ""),
         SISTE_PUBLISERTE_KVARTAL.minusEttÅr().getÅrstall(),
@@ -213,7 +212,7 @@ public class TestUtils {
         50);
   }
 
-  public static void opprettStatistikkForNæring2Siffer(
+  public static void opprettStatistikkForNæring(
       NamedParameterJdbcTemplate jdbcTemplate,
       Næring næring,
       int årstall,

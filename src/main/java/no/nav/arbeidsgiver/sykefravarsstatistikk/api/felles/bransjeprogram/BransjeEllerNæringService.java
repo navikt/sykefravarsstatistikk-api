@@ -1,5 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram;
 
+import java.util.List;
+import java.util.Optional;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
@@ -7,9 +9,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Optional;
 
 @Component
 public class BransjeEllerNæringService {
@@ -27,10 +26,10 @@ public class BransjeEllerNæringService {
   public BransjeEllerNæring bestemFraNæringskode(Næringskode5Siffer næringskode5Siffer) {
     Optional<Bransje> bransje = bransjeprogram.finnBransje(næringskode5Siffer);
 
-    boolean skalHenteDataPåNæring2Siffer =
+    boolean skalHenteDataPåNæring =
         bransje.isEmpty() || bransje.get().erDefinertPåTosiffernivå();
 
-    if (skalHenteDataPåNæring2Siffer) {
+    if (skalHenteDataPåNæring) {
       return new BransjeEllerNæring(
           klassifikasjonerRepository.hentNæring(næringskode5Siffer.hentNæringskode2Siffer()));
     } else {
@@ -59,15 +58,15 @@ public class BransjeEllerNæringService {
             new Næringskode5Siffer(
                 virksomhetMetaData.getNæringOgNæringskode5siffer().stream().findFirst().isPresent()
                     ? virksomhetMetaData.getNæringOgNæringskode5siffer().stream()
-                        .findFirst()
-                        .get()
-                        .getNæringskode5Siffer()
+                    .findFirst()
+                    .get()
+                    .getNæringskode5Siffer()
                     : "00000",
                 virksomhetMetaData.getNæringOgNæringskode5siffer().stream().findFirst().isPresent()
                     ? virksomhetMetaData.getNæringOgNæringskode5siffer().stream()
-                        .findFirst()
-                        .get()
-                        .getNæring()
+                    .findFirst()
+                    .get()
+                    .getNæring()
                     : ""),
             0);
 
