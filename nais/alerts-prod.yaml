@@ -8,7 +8,7 @@ metadata:
 spec:
   receivers:
     slack:
-      channel: '#arbeidsgiver-teamia-alerts'
+      channel: '#teamia-alerts'
       prependText: '<!channel> | '
   alerts:
     - alert: applikasjon nede
