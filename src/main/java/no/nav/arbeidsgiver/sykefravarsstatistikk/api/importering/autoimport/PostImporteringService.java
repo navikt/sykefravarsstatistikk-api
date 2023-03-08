@@ -1,5 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
@@ -15,10 +18,6 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -184,36 +183,14 @@ public class PostImporteringService {
 
   @Nullable
   private List<Orgenhet> hentOrgenhetListeFraDvh(ÅrstallOgKvartal årstallOgKvartal) {
-    List<Orgenhet> orgenhetList = datavarehusRepository.hentOrgenhet(årstallOgKvartal, true);
+    List<Orgenhet> orgenhetList = datavarehusRepository.hentOrgenhet(årstallOgKvartal);
 
     if (orgenhetList.isEmpty()) {
-      List<ÅrstallOgKvartal> alleSisteTilgjengeligKvartal =
-          datavarehusRepository.hentSisteKvartalForOrgenhet();
-
-      if (alleSisteTilgjengeligKvartal == null || alleSisteTilgjengeligKvartal.isEmpty()) {
-        log.warn("Ingen Orgenhet i DVH funnet til import.");
-        return Collections.emptyList();
-      }
-
-      if (alleSisteTilgjengeligKvartal.size() != 1) {
-        log.warn(
-            "Har ikke funnet Orgenhet for årstall '{}' og kvartal '{}'. "
-                + "Flere enn 1 årstal og kvartal funnet i DVH for Orgenhet, antall: '{}'.",
-            årstallOgKvartal.getÅrstall(),
-            årstallOgKvartal.getKvartal(),
-            alleSisteTilgjengeligKvartal.size());
-        return Collections.emptyList();
-      }
-
-      ÅrstallOgKvartal tilgjengeligÅrstallOgKvartal = alleSisteTilgjengeligKvartal.get(0);
-      log.warn(
-          "Har ikke funnet Orgenhet for årstall '{}' og kvartal '{}'. Importerer VirksomhetMetadata "
-              + "med det årstall og kvartal som er tilgjengelig i datavarehus: '{} {}'",
+      log.warn("Har ikke funnet Orgenhet for årstall '{}' og kvartal '{}'. ",
           årstallOgKvartal.getÅrstall(),
-          årstallOgKvartal.getKvartal(),
-          tilgjengeligÅrstallOgKvartal.getÅrstall(),
-          tilgjengeligÅrstallOgKvartal.getKvartal());
-      orgenhetList = datavarehusRepository.hentOrgenhet(årstallOgKvartal);
+          årstallOgKvartal.getKvartal()
+      );
+      return Collections.emptyList();
     }
     return orgenhetList;
   }

@@ -1,8 +1,15 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_1;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_2;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.NæringOgNæringskode5siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataNæringskode5siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataRepository;
@@ -18,24 +25,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_1;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_2;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class PostImporteringServiceTest {
 
-  @Mock private DatavarehusRepository datavarehusRepository;
-  @Mock private VirksomhetMetadataRepository virksomhetMetadataRepository;
-  @Mock private GraderingRepository graderingRepository;
-  @Mock private EksporteringRepository eksporteringRepository;
-  @Mock private KafkaUtsendingHistorikkRepository kafkaUtsendingHistorikkRepository;
+  @Mock
+  private DatavarehusRepository datavarehusRepository;
+  @Mock
+  private VirksomhetMetadataRepository virksomhetMetadataRepository;
+  @Mock
+  private GraderingRepository graderingRepository;
+  @Mock
+  private EksporteringRepository eksporteringRepository;
+  @Mock
+  private KafkaUtsendingHistorikkRepository kafkaUtsendingHistorikkRepository;
 
   private PostImporteringService service;
   private ÅrstallOgKvartal __2020_4 = new ÅrstallOgKvartal(2020, 4);
@@ -55,7 +57,7 @@ class PostImporteringServiceTest {
 
   @Test
   public void
-      fullførPostImporteringOgForberedNesteEksport__returnerer_antall_virksomheter_som_skal_til_neste_eksport() {
+  fullførPostImporteringOgForberedNesteEksport__returnerer_antall_virksomheter_som_skal_til_neste_eksport() {
     mockImportVirksomhetMetadata(__2020_4, getOrgenhetListe(__2020_4));
     mockImportVirksomhetNæringskode5sifferMapping(
         __2020_4, getVirksomhetMetadataNæringskode5sifferListe(__2020_4));
@@ -75,7 +77,7 @@ class PostImporteringServiceTest {
 
   private void mockImportVirksomhetMetadata(
       ÅrstallOgKvartal årstallOgKvartal, List<Orgenhet> orgenhetSomSkalTilVirksomhetMetadata) {
-    when(datavarehusRepository.hentOrgenhet(årstallOgKvartal, true))
+    when(datavarehusRepository.hentOrgenhet(årstallOgKvartal))
         .thenReturn(orgenhetSomSkalTilVirksomhetMetadata);
     when(virksomhetMetadataRepository.opprettVirksomhetMetadata(any()))
         .thenReturn(orgenhetSomSkalTilVirksomhetMetadata.size());

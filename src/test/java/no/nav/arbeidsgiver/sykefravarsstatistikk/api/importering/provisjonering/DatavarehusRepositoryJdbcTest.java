@@ -56,7 +56,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @DataJdbcTest(excludeAutoConfiguration = {TestDatabaseAutoConfiguration.class})
 public class DatavarehusRepositoryJdbcTest {
 
-  @Autowired private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+  @Autowired
+  private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
   private DatavarehusRepository repository;
 
@@ -73,7 +74,7 @@ public class DatavarehusRepositoryJdbcTest {
 
   @Test
   public void
-      hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Land_og_sektor() {
+  hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Land_og_sektor() {
     insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 4, 4, 5, 100);
     insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 4, 6, 10, 100);
     insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2020, 1, 1, 1, 10);
@@ -87,7 +88,7 @@ public class DatavarehusRepositoryJdbcTest {
 
   @Test
   public void
-      hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Næring() {
+  hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Næring() {
     insertSykefraværsstatistikkNæringInDvhTabell(
         namedParameterJdbcTemplate, 2019, 4, 4, "23", "K", 5, 100);
     insertSykefraværsstatistikkNæringInDvhTabell(
@@ -101,7 +102,7 @@ public class DatavarehusRepositoryJdbcTest {
 
   @Test
   public void
-      hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Næring5Siffer() {
+  hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Næring5Siffer() {
     insertSykefraværsstatistikkNærin5SiffergInDvhTabell(
         namedParameterJdbcTemplate, 2022, 3, 4, "01110", "K", 5, 100);
     insertSykefraværsstatistikkNærin5SiffergInDvhTabell(
@@ -116,7 +117,7 @@ public class DatavarehusRepositoryJdbcTest {
 
   @Test
   public void
-      hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Virksomhet() {
+  hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Virksomhet() {
     insertSykefraværsstatistikkVirksomhetInDvhTabell(
         namedParameterJdbcTemplate,
         2018,
@@ -148,7 +149,7 @@ public class DatavarehusRepositoryJdbcTest {
 
   @Test
   public void
-      hentSykefraværsstatistikkSektor__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
+  hentSykefraværsstatistikkSektor__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
     insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 1, 5, 100);
     insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, 10, 100);
     insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
@@ -169,7 +170,7 @@ public class DatavarehusRepositoryJdbcTest {
 
   @Test
   public void
-      hentSykefraværsstatistikkLand__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
+  hentSykefraværsstatistikkLand__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
     insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, 5, 100);
     insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, 10, 100);
     insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
@@ -185,7 +186,7 @@ public class DatavarehusRepositoryJdbcTest {
 
   @Test
   public void
-      hentSykefraværsstatistikkVirksomhet__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
+  hentSykefraværsstatistikkVirksomhet__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
     insertSykefraværsstatistikkVirksomhetInDvhTabell(
         namedParameterJdbcTemplate,
         2018,
@@ -261,7 +262,7 @@ public class DatavarehusRepositoryJdbcTest {
 
   @Test
   public void
-      hentSykefraværsstatistikkNæringMedVarighet__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk_med_varighet() {
+  hentSykefraværsstatistikkNæringMedVarighet__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk_med_varighet() {
     insertSykefraværsstatistikkVirksomhetInDvhTabell(
         namedParameterJdbcTemplate,
         2018,
@@ -371,7 +372,7 @@ public class DatavarehusRepositoryJdbcTest {
 
   @Test
   public void
-      hentSykefraværsstatistikkVirksomhetMedGradering__lager_sum_og_returnerer_antall_tapte_dagsverk_i_gradert_sykemelding_og_mulige_dagsverk() {
+  hentSykefraværsstatistikkVirksomhetMedGradering__lager_sum_og_returnerer_antall_tapte_dagsverk_i_gradert_sykemelding_og_mulige_dagsverk() {
     insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
         namedParameterJdbcTemplate,
         2018,
@@ -451,7 +452,7 @@ public class DatavarehusRepositoryJdbcTest {
 
   @Test
   public void
-      hentSykefraværsstatistikkLand__returnerer_en_tom_liste_dersom_ingen_data_finnes_i_DVH() {
+  hentSykefraværsstatistikkLand__returnerer_en_tom_liste_dersom_ingen_data_finnes_i_DVH() {
     insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10);
 
     List<SykefraværsstatistikkLand> sykefraværsstatistikkLand =
@@ -491,7 +492,6 @@ public class DatavarehusRepositoryJdbcTest {
         ORGNR_VIRKSOMHET_1,
         SEKTOR,
         NÆRINGSKODE_2SIFFER,
-        "Virksomhet 1",
         2020,
         3);
 
@@ -501,7 +501,7 @@ public class DatavarehusRepositoryJdbcTest {
         orgenhetList.contains(
             new Orgenhet(
                 new Orgnr(ORGNR_VIRKSOMHET_1),
-                "Virksomhet 1",
+                "",
                 RECTYPE_FOR_VIRKSOMHET,
                 SEKTOR,
                 NÆRINGSKODE_2SIFFER,
