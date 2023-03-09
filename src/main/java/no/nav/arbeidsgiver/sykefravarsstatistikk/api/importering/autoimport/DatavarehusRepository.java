@@ -1,10 +1,19 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.StatistikkildeDvh;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæringMedVarighet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetMedGradering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner.Orgenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.PubliseringsdatoDbDto;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,10 +22,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 
 @Component
 public class DatavarehusRepository {
@@ -238,7 +243,7 @@ public class DatavarehusRepository {
   }
 
   public List<SykefraværsstatistikkVirksomhetMedGradering>
-      hentSykefraværsstatistikkVirksomhetMedGradering(ÅrstallOgKvartal årstallOgKvartal) {
+  hentSykefraværsstatistikkVirksomhetMedGradering(ÅrstallOgKvartal årstallOgKvartal) {
     SqlParameterSource namedParameters =
         new MapSqlParameterSource()
             .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
@@ -297,50 +302,28 @@ public class DatavarehusRepository {
             new Næring(resultSet.getString(NARINGKODE), resultSet.getString(NARINGNAVN)));
   }
 
-  public List<Orgenhet> hentOrgenhet(ÅrstallOgKvartal årstallOgKvartal) {
-    return hentOrgenhet(årstallOgKvartal, false);
-  }
-
   public List<Orgenhet> hentOrgenhet(
-      ÅrstallOgKvartal årstallOgKvartal, boolean filtrerPåÅrstallOgKvartal) {
+      ÅrstallOgKvartal årstallOgKvartal) {
 
-    MapSqlParameterSource namedParameters = new MapSqlParameterSource();
-    StringBuffer query =
-        new StringBuffer(
-            "select orgnr, offnavn, rectype, sektor, naring, arstall, kvartal "
-                + "from dt_p.v_dim_ia_orgenhet "
-                + "where length(trim(orgnr)) = 9 "
-                + "and offnavn is not null ");
-
-    if (filtrerPåÅrstallOgKvartal) {
-      namedParameters
-          .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
-          .addValue(KVARTAL, årstallOgKvartal.getKvartal());
-      query.append("and arstall = :arstall ");
-      query.append("and kvartal = :kvartal");
-    }
+    MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+        .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+        .addValue(KVARTAL, årstallOgKvartal.getKvartal());
 
     return namedParameterJdbcTemplate.query(
-        query.toString(),
+        "select orgnr, rectype, sektor, naring, arstall, kvartal "
+            + "from dt_p.agg_ia_sykefravar_v_2 "
+            + "where arstall = :arstall and kvartal = :kvartal "
+            + "and length(trim(orgnr)) = 9",
         namedParameters,
         ((resultSet, i) ->
             new Orgenhet(
                 new Orgnr(resultSet.getString(ORGNR)),
-                resultSet.getString(OFFNAVN),
+                "", // henter ikke lenger navn for virksomheter, da dette ikke er i bruk
                 resultSet.getString(RECTYPE),
                 resultSet.getString(SEKTOR),
                 resultSet.getString(NARING),
-                filtrerPåÅrstallOgKvartal
-                    ? new ÅrstallOgKvartal(resultSet.getInt(ARSTALL), resultSet.getInt(KVARTAL))
-                    : årstallOgKvartal)));
-  }
-
-  public List<ÅrstallOgKvartal> hentSisteKvartalForOrgenhet() {
-    return namedParameterJdbcTemplate.query(
-        "select distinct arstall, kvartal from dt_p.v_dim_ia_orgenhet order by arstall, kvartal desc",
-        new MapSqlParameterSource(),
-        ((resultSet, i) ->
-            new ÅrstallOgKvartal(resultSet.getInt(ARSTALL), resultSet.getInt(KVARTAL))));
+                new ÅrstallOgKvartal(resultSet.getInt(ARSTALL), resultSet.getInt(KVARTAL))
+            )));
   }
 
   public List<PubliseringsdatoDbDto> hentPubliseringsdatoerFraDvh() {
