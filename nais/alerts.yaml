@@ -13,7 +13,7 @@ spec:
         expr: sum(up{container="sykefravarsstatistikk-api"}) == 0
         for: 2m
         annotations:
-          consequence: "Applikasjonen er utilgjengelig"
+          consequence: "Sykefravarsstatistikk-api er utilgjengelig"
           action: |-
             Sjekk helsa til applikasjonen ved å kjøre
             `kubectl describe pod <podname> -n arbeidsgiver` og 
