@@ -4,7 +4,7 @@ metadata:
   name: sykefravarsstatistikk-api-alert
   namespace: arbeidsgiver
   labels:
-    team: teamia
+    team: arbeidsgiver
 spec:
   groups:
     - name: sykefravarsstatistikk-api-alerts
@@ -19,7 +19,7 @@ spec:
             `kubectl describe pod <podname> -n arbeidsgiver` og 
             `kubectl logs <podname> -n arbeidsgiver`"
         labels:
-          namespace: arbeidsgiver
+          namespace: teamia
           severity: good
 
       - alert: ApplikasjonNede
@@ -32,7 +32,7 @@ spec:
             `kubectl describe pod <podname> -n arbeidsgiver` og 
             `kubectl logs <podname> -n arbeidsgiver`"
         labels:
-          namespace: arbeidsgiver
+          namespace: teamia
           severity: critical
 
       - alert: ErrorLogRegistrert
@@ -43,7 +43,7 @@ spec:
             Sjekk logs.adeo.no for logger, 
             eller Grafana-dashboardet vårt: https://grafana.nais.io/dashboards/f/cvOhCMUnz/team-ia
         labels:
-          namespace: arbeidsgiver
+          namespace: teamia
           severity: warning
 
       - alert: ImportVellykket
@@ -52,5 +52,5 @@ spec:
           description: "Import av sykefraværsstatistikk var vellykket"
           action: "Sjekk at appene oppfører seg som de skal. Nyt deretter en kopp kaffe!"
         labels:
-          namespace: arbeidsgiver
+          namespace: teamia
           severity: good
