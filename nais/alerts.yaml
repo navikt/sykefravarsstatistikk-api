@@ -9,19 +9,6 @@ spec:
   groups:
     - name: sykefravarsstatistikk-api-alerts
       rules:
-      - alert: ApplikasjonOppeTest
-        expr: sum(up{container="sykefravarsstatistikk-api"}) > 0
-        for: 2m
-        annotations:
-          consequence: "Sykefravarsstatistikk-api er ekstremt tilgjengelig"
-          action: |-
-            Ikke sjekk helsa til applikasjonen ved å kjøre
-            `kubectl describe pod <podname> -n arbeidsgiver` og 
-            `kubectl logs <podname> -n arbeidsgiver`"
-        labels:
-          namespace: teamia
-          severity: good
-
       - alert: ApplikasjonNede
         expr: sum(up{container="sykefravarsstatistikk-api"}) == 0
         for: 2m
