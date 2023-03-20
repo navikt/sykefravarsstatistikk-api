@@ -3,12 +3,12 @@ kind: Topic
 metadata:
   annotations:
     kafka.nais.io/removeDataWhenResourceIsDeleted: "true"
-  name: sykefravarsstatistikk-bransje-v1
+  name: sykefravarsstatistikk-sektor-v1
   namespace: arbeidsgiver
   labels:
     team: arbeidsgiver
 spec:
-  pool: nav-dev
+  pool: nav-prod
   config: # optional; all fields are optional too; defaults shown
     cleanupPolicy: delete  # delete, compact
     minimumInSyncReplicas: 1

@@ -53,7 +53,7 @@ public class EksporteringController {
       @RequestParam Statistikkategori kategori,
       @RequestParam(required = false, defaultValue = "0") int begrensningTil) {
     if (Statistikkategori.LAND != kategori && Statistikkategori.VIRKSOMHET != kategori
-        && Statistikkategori.NÆRING != kategori) {
+        && Statistikkategori.NÆRING != kategori && Statistikkategori.SEKTOR != kategori) {
       return ResponseEntity.badRequest().build();
     }
 

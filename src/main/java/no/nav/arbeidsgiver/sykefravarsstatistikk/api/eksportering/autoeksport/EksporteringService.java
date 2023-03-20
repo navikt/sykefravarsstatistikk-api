@@ -75,7 +75,7 @@ public class EksporteringService {
       ÅrstallOgKvartal årstallOgKvartal, EksporteringBegrensning eksporteringBegrensning) {
 
     if (!erEksporteringAktivert) {
-      log.info("Eksportering er ikke aktivert. Avbrytter. ");
+      log.info("Eksportering er ikke aktivert. Avbryter.");
       return 0;
     }
     List<VirksomhetEksportPerKvartal> virksomheterTilEksport =
@@ -94,7 +94,7 @@ public class EksporteringService {
     }
 
     log.info(
-        "Starting eksportering for årstall '{}' og kvartal '{}'. Skal eksportere '{}' rader med statistikk. ",
+        "Starting eksportering for årstall '{}' og kvartal '{}'. Skal eksportere '{}' rader med statistikk.",
         årstallOgKvartal.getÅrstall(),
         årstallOgKvartal.getKvartal(),
         antallStatistikkSomSkalEksporteres);

@@ -250,7 +250,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 new BigDecimal(25000),
                 new BigDecimal(1000000)));
     List<SykefraværsstatistikkNæring> resultat =
-        repository.hentSykefraværAlleNæringer(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3));
+        repository.hentSykefraværAlleNæringerFraOgMed(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3));
     assertThat(resultat.size()).isEqualTo(5);
     assertThat(resultat).containsExactlyInAnyOrderElementsOf(forventet);
   }
@@ -276,7 +276,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 new BigDecimal(25000),
                 new BigDecimal(1000000)));
 
-    List<SykefraværsstatistikkNæring> resultat = repository.hentSykefraværAlleNæringer(
+    List<SykefraværsstatistikkNæring> resultat = repository.hentSykefraværAlleNæringerFraOgMed(
         SISTE_PUBLISERTE_KVARTAL);
     assertThat(resultat.size()).isEqualTo(2);
     assertThat(resultat).containsExactlyInAnyOrderElementsOf(forventet);
@@ -285,7 +285,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
   @Test
   void hentSykefraværAlleNæringer_siste4Kvartaler_skalIkkeKrasjeVedManglendeData() {
     List<SykefraværsstatistikkNæring> resultat =
-        repository.hentSykefraværAlleNæringer(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3));
+        repository.hentSykefraværAlleNæringerFraOgMed(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3));
     assertThat(resultat.size()).isEqualTo(0);
     assertThat(resultat).containsExactlyInAnyOrderElementsOf(List.of());
   }

@@ -117,7 +117,7 @@ jobs:
   deployTopicsToDev:
     name: Deploy topics to dev
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/egen-topic-for-bransje'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/egen-topic-for-sektor'
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -126,7 +126,7 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
-          RESOURCE: "nais/topics/topic-arbeidsgiver-sykefravaer-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-virksomhet-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-naring-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-bransje-dev.yaml"
+          RESOURCE: "nais/topics/topic-arbeidsgiver-sykefravaer-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-virksomhet-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-naring-dev.yaml,nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-sektor-dev.yaml"
 
   deployTopicsToProd:
     name: Deploy topics to prod
