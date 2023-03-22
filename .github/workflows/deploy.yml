@@ -1,4 +1,4 @@
-name: Build & deploy
+name: Build, push & deploy
 
 on: [ push ]
 
@@ -72,20 +72,6 @@ jobs:
           VAR: version=${{ env.IMAGE }}
           RESOURCE: nais/dev.yaml
 
-  apply-alerts-to-dev:
-    name: Apply alerts to cluster (dev)
-    needs: deploy-to-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: apply to dev
-        uses: nais/deploy/actions/deploy@v1
-        env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: dev-fss
-          RESOURCE: nais/alerts-dev.yaml
-
   deploy-to-prod:
     name: Deploy to prod
     needs: build-and-push-image
@@ -99,20 +85,6 @@ jobs:
           CLUSTER: prod-fss
           VAR: version=${{ env.IMAGE }}
           RESOURCE: nais/prod.yaml
-
-  apply-alerts-to-prod:
-    name: Apply alerts to cluster (prod)
-    needs: deploy-to-prod
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: apply to dev
-        uses: nais/deploy/actions/deploy@v1
-        env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: prod-fss
-          RESOURCE: nais/alerts-prod.yaml
 
   deployTopicsToDev:
     name: Deploy topics to dev

@@ -1,0 +1,43 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: sykefravarsstatistikk-api-alert
+  namespace: arbeidsgiver
+  labels:
+    team: arbeidsgiver
+spec:
+  groups:
+    - name: sykefravarsstatistikk-api-alerts
+      rules:
+      - alert: ApplikasjonNede
+        expr: sum(up{container="sykefravarsstatistikk-api"}) == 0
+        for: 2m
+        annotations:
+          consequence: "Sykefravarsstatistikk-api er utilgjengelig"
+          action: |-
+            Sjekk helsa til applikasjonen ved å kjøre
+            `kubectl describe pod <podname> -n arbeidsgiver` og 
+            `kubectl logs <podname> -n arbeidsgiver`"
+        labels:
+          namespace: teamia
+          severity: critical
+
+      - alert: ErrorLogRegistrert
+        expr: sum(increase(logd_messages_total{log_app="sykefravarsstatistikk-api",log_level="Error"}[10m])) > 0
+        annotations:
+          description: "Sykefravarsstatistikk-api har logget en (eller flere) feil."
+          action: |-
+            Sjekk logs.adeo.no for logger, 
+            eller Grafana-dashboardet vårt: https://grafana.nais.io/dashboards/f/cvOhCMUnz/team-ia
+        labels:
+          namespace: teamia
+          severity: warning
+
+      - alert: ImportVellykket
+        expr: sum(increase(sykefravarstatistikk_vellykket_import_total{app="sykefravarsstatistikk-api"}[10m])) > 0
+        annotations:
+          description: "Import av sykefraværsstatistikk var vellykket"
+          action: "Sjekk at appene oppfører seg som de skal. Nyt deretter en kopp kaffe!"
+        labels:
+          namespace: teamia
+          severity: good
