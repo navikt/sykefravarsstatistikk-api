@@ -171,7 +171,7 @@ public class EksporteringPerStatistikkKategoriService {
                 + "Antall statistikk eksportert er: %d, "
                 + "antall ikke eksportert er: %d. "
                 + "Tid for eksportering (i millis): %d",
-            Statistikkategori.NÆRING.name(),
+            Statistikkategori.SEKTOR.name(),
             antallEksportert.get(),
             antallIkkeEksportert.get(),
             tidsbruktIMillisekund));
