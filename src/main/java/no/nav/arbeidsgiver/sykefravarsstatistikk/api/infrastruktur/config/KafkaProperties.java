@@ -93,6 +93,8 @@ public class KafkaProperties {
       return topic.get(2);
     } else if (Statistikkategori.NÆRING.name().equals(eksportNavn) && topic.size() > 3) {
       return topic.get(3);
+    } else if (Statistikkategori.SEKTOR.name().equals(eksportNavn) && topic.size() > 4) {
+      return topic.get(4);
     } else {
       return topic.get(0);
     }

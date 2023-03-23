@@ -68,6 +68,24 @@ public class SykefraværsstatistikkTilEksporteringRepository {
     }
   }
 
+  public List<SykefraværsstatistikkSektor> hentSykefraværAlleSektorerFraOgMed(
+      ÅrstallOgKvartal årstallOgKvartal) {
+    try {
+      return namedParameterJdbcTemplate.query(
+          "select sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk "
+              + "from sykefravar_statistikk_sektor "
+              + "where (arstall = :arstall and kvartal >= :kvartal) "
+              + "or (arstall > :arstall) "
+              + "order by arstall, kvartal, sektor_kode",
+          new MapSqlParameterSource()
+              .addValue("arstall", årstallOgKvartal.getÅrstall())
+              .addValue("kvartal", årstallOgKvartal.getKvartal()),
+          (rs, rowNum) -> mapTilSykefraværsstatistikkSektor(rs));
+    } catch (EmptyResultDataAccessException e) {
+      return Collections.emptyList();
+    }
+  }
+
   /* Sykefraværsprosent Næring */
 
   public List<SykefraværsstatistikkNæring> hentSykefraværprosentAlleNæringer(
@@ -147,7 +165,7 @@ public class SykefraværsstatistikkTilEksporteringRepository {
     }
   }
 
-  public List<SykefraværsstatistikkNæring> hentSykefraværAlleNæringer(
+  public List<SykefraværsstatistikkNæring> hentSykefraværAlleNæringerFraOgMed(
       ÅrstallOgKvartal fraÅrstallOgKvartal) {
     try {
       return namedParameterJdbcTemplate.query(

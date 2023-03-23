@@ -194,7 +194,7 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
 
     // #todo: tester for repository-funksjon
 
-    when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleNæringer(
+    when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleNæringerFraOgMed(
         __2019_3)).thenReturn(allData);
     when(kafkaService.sendTilStatistikkKategoriTopic(any(), any(), any(), any(), any())).thenReturn(
         true);
@@ -234,7 +234,7 @@ public class EksporteringPerStatistikkKategoriServiceMockTest {
         sykefraværsstatistikkNæring(__2019_3, "13")
     );
 
-    when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleNæringer(
+    when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleNæringerFraOgMed(
         __2019_3)).thenReturn(allData);
     when(kafkaService.sendTilStatistikkKategoriTopic(any(), any(), any(), any(), any())).thenReturn(
         true);
