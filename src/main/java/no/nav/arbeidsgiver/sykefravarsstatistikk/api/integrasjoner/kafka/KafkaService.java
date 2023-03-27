@@ -83,16 +83,21 @@ public class KafkaService {
     } catch (JsonProcessingException e) {
       kafkaUtsendingRapport.leggTilError(
           String.format(
-              "Kunne ikke parse statistikk '%s' til Json. Statistikk ikke sent",
+              "Kunne ikke parse statistikk '%s' til Json. Statistikk ikke sendt",
               statistikkategori.name()));
       return false;
     }
 
+    String topicNavn = kafkaProperties.getTopicNavn(statistikkategori.name());
+
     ListenableFuture<SendResult<String, String>> futureResult =
         kafkaTemplate.send(
-            kafkaProperties.getTopicNavn(statistikkategori.name()),
+            topicNavn,
             keyAsJsonString,
             dataAsJsonString);
+
+    log.info("Sykefraværsstatistikk med kategori '{}' blir sendt på topic '{}'.",
+        statistikkategori.name(), topicNavn);
 
     futureResult.addCallback(
         new ListenableFutureCallback<>() {
@@ -111,7 +116,7 @@ public class KafkaService {
             kafkaUtsendingRapport.leggTilUtsendingSuksess();
             log.debug(
                 "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
-                kafkaProperties.getTopicNavn(statistikkategori.name()),
+                topicNavn,
                 res.getProducerRecord().key(),
                 res.getRecordMetadata().offset());
 
