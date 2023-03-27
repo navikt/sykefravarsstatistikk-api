@@ -71,11 +71,13 @@ public class EksporteringPerStatistikkKategoriService {
       log.info("Eksportering er ikke aktivert. Avbryter.");
       return 0;
     }
+
     log.info(
-        "Starter eksportering av '{}' for årstall '{}' og kvartal '{}'.",
+        "Starter eksportering av kategori '{}' for årstall '{}' og kvartal '{}' på topic '{}'.",
         statistikkategori.name(),
         årstallOgKvartal.getÅrstall(),
-        årstallOgKvartal.getKvartal());
+        årstallOgKvartal.getKvartal(),
+        kafkaService.getTopicNavn(statistikkategori.name()));
 
     if (Statistikkategori.LAND == statistikkategori) {
       return eksporterSykefraværsstatistikkLand(årstallOgKvartal);

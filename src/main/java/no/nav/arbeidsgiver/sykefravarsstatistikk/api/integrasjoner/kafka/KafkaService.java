@@ -90,9 +90,6 @@ public class KafkaService {
 
     String topicNavn = kafkaProperties.getTopicNavn(statistikkategori.name());
 
-    log.info("Sykefraværsstatistikk med kategori '{}' blir sendt på topic '{}'.",
-        statistikkategori.name(), topicNavn);
-
     ListenableFuture<SendResult<String, String>> futureResult =
         kafkaTemplate.send(
             topicNavn,
@@ -235,5 +232,9 @@ public class KafkaService {
       long startDBOppdateringProcess, long stopDBOppdateringProcess) {
     kafkaUtsendingRapport.addDBOppdateringProcessingTime(
         startDBOppdateringProcess, stopDBOppdateringProcess);
+  }
+
+  public String getTopicNavn(String eksportNavn) {
+    return kafkaProperties.getTopicNavn(eksportNavn);
   }
 }
