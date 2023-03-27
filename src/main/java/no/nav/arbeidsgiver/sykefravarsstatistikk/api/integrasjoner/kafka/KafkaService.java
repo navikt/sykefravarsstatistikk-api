@@ -90,14 +90,14 @@ public class KafkaService {
 
     String topicNavn = kafkaProperties.getTopicNavn(statistikkategori.name());
 
+    log.info("Sykefraværsstatistikk med kategori '{}' blir sendt på topic '{}'.",
+        statistikkategori.name(), topicNavn);
+
     ListenableFuture<SendResult<String, String>> futureResult =
         kafkaTemplate.send(
             topicNavn,
             keyAsJsonString,
             dataAsJsonString);
-
-    log.info("Sykefraværsstatistikk med kategori '{}' blir sendt på topic '{}'.",
-        statistikkategori.name(), topicNavn);
 
     futureResult.addCallback(
         new ListenableFutureCallback<>() {
