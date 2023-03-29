@@ -9,7 +9,7 @@ metadata:
     team: arbeidsgiver
 spec:
   pool: nav-dev
-  config:  # optional; all fields are optional too; defaults shown
+  config: # optional; all fields are optional too; defaults shown
     cleanupPolicy: delete  # delete, compact
     minimumInSyncReplicas: 1
     partitions: 1
@@ -29,3 +29,6 @@ spec:
     - team: pia
       application: lydia-api
       access: read
+    - team: arbeidsgiver
+      application: tharald-kcat
+      access: readwrite   # read, write, readwrite
