@@ -47,6 +47,7 @@ kafka:
       - arbeidsgiver.sykefravarsstatistikk-land-v1
       - arbeidsgiver.sykefravarsstatistikk-virksomhet-v1
       - arbeidsgiver.sykefravarsstatistikk-naring-v1
+      - arbeidsgiver.sykefravarsstatistikk-sektor-v1
     bootstrapServers: localhost:9092
     securityProtocol: PLAINTEXT
 

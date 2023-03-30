@@ -83,14 +83,16 @@ public class KafkaService {
     } catch (JsonProcessingException e) {
       kafkaUtsendingRapport.leggTilError(
           String.format(
-              "Kunne ikke parse statistikk '%s' til Json. Statistikk ikke sent",
+              "Kunne ikke parse statistikk '%s' til Json. Statistikk ikke sendt",
               statistikkategori.name()));
       return false;
     }
 
+    String topicNavn = kafkaProperties.getTopicNavn(statistikkategori.name());
+
     ListenableFuture<SendResult<String, String>> futureResult =
         kafkaTemplate.send(
-            kafkaProperties.getTopicNavn(statistikkategori.name()),
+            topicNavn,
             keyAsJsonString,
             dataAsJsonString);
 
@@ -111,7 +113,7 @@ public class KafkaService {
             kafkaUtsendingRapport.leggTilUtsendingSuksess();
             log.debug(
                 "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
-                kafkaProperties.getTopicNavn(statistikkategori.name()),
+                topicNavn,
                 res.getProducerRecord().key(),
                 res.getRecordMetadata().offset());
 
@@ -230,5 +232,9 @@ public class KafkaService {
       long startDBOppdateringProcess, long stopDBOppdateringProcess) {
     kafkaUtsendingRapport.addDBOppdateringProcessingTime(
         startDBOppdateringProcess, stopDBOppdateringProcess);
+  }
+
+  public String getTopicNavn(String eksportNavn) {
+    return kafkaProperties.getTopicNavn(eksportNavn);
   }
 }
