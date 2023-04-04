@@ -27,7 +27,7 @@ spec:
           namespace: teamia
           cluster: dev-gcp
         - application: forebyggingsplan-frontend
-          namespace: pia
+          namespace: teamia
           cluster: dev-gcp
     outbound:
       rules:
