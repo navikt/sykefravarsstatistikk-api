@@ -3,16 +3,13 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 import java.util.Arrays;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Fnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.InstitusjonellSektorkode;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner.Næringsgruppering;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnOrganisasjon;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetBruker;
 
@@ -37,28 +34,8 @@ public class TestData {
     return bruker;
   }
 
-  public static Næringsgruppering enNæringsgruppering(String kode5siffer) {
-    return new Næringsgruppering(
-        kode5siffer,
-        "Test5",
-        kode5siffer.substring(0, 4),
-        "test4",
-        kode5siffer.substring(0, 3),
-        "test3",
-        kode5siffer.substring(0, 2),
-        "test2",
-        "02",
-        "test1");
-  }
-
-  public static Næringsgruppering enNæringsgruppering() {
-    return enNæringsgruppering("02123");
-  }
-
   public static AltinnOrganisasjon getOrganisasjon(String organizationNumber) {
-    AltinnOrganisasjon organisasjon = new AltinnOrganisasjon();
-    organisasjon.setOrganizationNumber(organizationNumber);
-    return organisasjon;
+    return new AltinnOrganisasjon(null, null, null, organizationNumber, null, null);
   }
 
   public static Fnr getFnr() {
@@ -71,20 +48,6 @@ public class TestData {
 
   public static InstitusjonellSektorkode enInstitusjonellSektorkode() {
     return new InstitusjonellSektorkode("1234", "sektor!");
-  }
-
-  public static OverordnetEnhet enEnhet() {
-    return OverordnetEnhet.builder()
-        .orgnr(etOrgnr())
-        .antallAnsatte(10)
-        .navn("Enhet AS")
-        .institusjonellSektorkode(enInstitusjonellSektorkode())
-        .næringskode(enNæringskode5Siffer())
-        .build();
-  }
-
-  public static Underenhet enUnderenhet() {
-    return enUnderenhetBuilder().orgnr(etOrgnr()).build();
   }
 
   public static Underenhet enUnderenhet(String orgnr) {
@@ -100,28 +63,12 @@ public class TestData {
         .antallAnsatte(40);
   }
 
-  public static Næring enNæring() {
-    return enNæring("12");
-  }
-
-  public static Næring enNæring(String kode) {
-    return new Næring(kode, "en næring");
-  }
-
   public static Næringskode5Siffer enNæringskode5Siffer() {
     return enNæringskode5Siffer("12345");
   }
 
   public static Næringskode5Siffer enNæringskode5Siffer(String kode) {
     return new Næringskode5Siffer(kode, "Spesiell næring");
-  }
-
-  public static Sektor enSektor() {
-    return new Sektor("1", "Statlig forvaltning");
-  }
-
-  public static Bransje enBransje() {
-    return new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "bransje", "12322");
   }
 
   public static ÅrstallOgKvartal etÅrstallOgKvartal() {

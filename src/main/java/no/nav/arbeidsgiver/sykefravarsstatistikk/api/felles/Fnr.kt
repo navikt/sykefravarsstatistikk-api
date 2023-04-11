@@ -1,26 +1,27 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles
 
-import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.Value;
+import com.fasterxml.jackson.annotation.JsonValue
+import lombok.Value
 
 @Value
-public class Fnr {
+class Fnr(verdi: String) {
+    val verdi: String
 
-  private final String verdi;
-
-  public Fnr(String verdi) {
-    if (!erGyldigFnr(verdi)) {
-      throw new RuntimeException("Ugyldig fødselsnummer. Må bestå av 11 tegn.");
+    init {
+        if (!erGyldigFnr(verdi)) {
+            throw RuntimeException("Ugyldig fødselsnummer. Må bestå av 11 tegn.")
+        }
+        this.verdi = verdi
     }
-    this.verdi = verdi;
-  }
 
-  public static boolean erGyldigFnr(String fnr) {
-    return fnr.matches("^[0-9]{11}$");
-  }
+    @JsonValue
+    fun asString(): String {
+        return verdi
+    }
 
-  @JsonValue
-  public String asString() {
-    return verdi;
-  }
+    companion object {
+        fun erGyldigFnr(fnr: String): Boolean {
+            return fnr.matches("^[0-9]{11}$".toRegex())
+        }
+    }
 }

@@ -1,27 +1,16 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
+import lombok.Data
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class AltinnOrganisasjon {
-  @JsonProperty("Name")
-  private String name;
-
-  @JsonProperty("Type")
-  private String type;
-
-  @JsonProperty("ParentOrganizationNumber")
-  private String parentOrganizationNumber;
-
-  @JsonProperty("OrganizationNumber")
-  private String organizationNumber;
-
-  @JsonProperty("OrganizationForm")
-  private String organizationForm;
-
-  @JsonProperty("Status")
-  private String status;
-}
+data class AltinnOrganisasjon(
+    @field:JsonProperty("Name") val name: String?,
+    @field:JsonProperty("Type") val type: String?,
+    @field:JsonProperty("ParentOrganizationNumber") val parentOrganizationNumber: String?,
+    @field:JsonProperty("OrganizationNumber") val organizationNumber: String?,
+    @field:JsonProperty("OrganizationForm") val organizationForm: String?,
+    @field:JsonProperty("Status") val status: String?,
+)
