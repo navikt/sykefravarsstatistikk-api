@@ -4,14 +4,12 @@ import com.fasterxml.jackson.annotation.JsonValue
 import lombok.Value
 
 @Value
-class Fnr(verdi: String) {
-    val verdi: String
+class Fnr(val verdi: String) {
 
     init {
-        if (!erGyldigFnr(verdi)) {
-            throw RuntimeException("Ugyldig fødselsnummer. Må bestå av 11 tegn.")
+        if (!verdi.matches("^[0-9]{11}$".toRegex())) {
+            throw UgyldigFnrException()
         }
-        this.verdi = verdi
     }
 
     @JsonValue
@@ -19,9 +17,5 @@ class Fnr(verdi: String) {
         return verdi
     }
 
-    companion object {
-        fun erGyldigFnr(fnr: String): Boolean {
-            return fnr.matches("^[0-9]{11}$".toRegex())
-        }
-    }
+    class UgyldigFnrException : RuntimeException("Ugyldig fødselsnummer. Må bestå av 11 tegn.")
 }

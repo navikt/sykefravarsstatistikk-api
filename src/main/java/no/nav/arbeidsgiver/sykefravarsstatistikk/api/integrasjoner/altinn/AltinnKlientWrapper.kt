@@ -8,7 +8,6 @@ import no.nav.security.token.support.core.jwt.JwtToken
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import java.util.stream.Collectors
 
 @Slf4j
 @Component
@@ -19,33 +18,34 @@ open class AltinnKlientWrapper(
 ) {
 
 
-    open fun hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
+    open fun hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(
         idToken: JwtToken, fnr: Fnr
     ): List<AltinnOrganisasjon> {
-        return mapTo(
-            klient.hentOrganisasjoner(
-                SelvbetjeningToken(idToken.tokenAsString),
-                Subject(fnr.verdi),
-                ServiceCode(serviceCode),
-                ServiceEdition(serviceEdition),
-                true
-            )
-        )
+        return klient.hentOrganisasjoner(
+            SelvbetjeningToken(idToken.tokenAsString),
+            Subject(fnr.verdi),
+            ServiceCode(serviceCode),
+            ServiceEdition(serviceEdition),
+            true
+        ).map(::toAltinnOrganisasjon)
     }
 
-    open fun hentOrgnumreDerBrukerHarTilgangTil(idToken: JwtToken, fnr: Fnr): List<AltinnOrganisasjon> {
-        return mapTo(
-            klient.hentOrganisasjoner(
-                SelvbetjeningToken(idToken.tokenAsString), Subject(fnr.verdi), true
-            )
-        )
+    open fun hentVirksomheterDerBrukerHarTilknytning(idToken: JwtToken, fnr: Fnr): List<AltinnOrganisasjon> {
+        return klient.hentOrganisasjoner(
+            SelvbetjeningToken(idToken.tokenAsString),
+            Subject(fnr.verdi),
+            true
+        ).map(::toAltinnOrganisasjon)
     }
 
-    private fun mapTo(altinnReportees: List<AltinnReportee>): List<AltinnOrganisasjon> {
-        return altinnReportees.stream()
-            .map { (name, type, parentOrganizationNumber, organizationNumber, organizationForm, status): AltinnReportee ->
-                AltinnOrganisasjon(name, type, parentOrganizationNumber, organizationNumber, organizationForm, status)
-            }
-            .collect(Collectors.toList())
+    private fun toAltinnOrganisasjon(altinnReportee: AltinnReportee): AltinnOrganisasjon {
+        return AltinnOrganisasjon(
+            altinnReportee.name,
+            altinnReportee.type,
+            altinnReportee.parentOrganizationNumber,
+            altinnReportee.organizationNumber,
+            altinnReportee.organizationForm,
+            altinnReportee.status
+        )
     }
 }

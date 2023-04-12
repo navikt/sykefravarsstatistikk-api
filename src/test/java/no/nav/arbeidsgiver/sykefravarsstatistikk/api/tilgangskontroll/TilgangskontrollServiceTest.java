@@ -9,7 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Fnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.CorrelationIdFilter;
@@ -61,7 +61,8 @@ public class TilgangskontrollServiceTest {
   @Test
   public void hentInnloggetBruker__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
     when(tokenUtils.hentInnloggetBruker()).thenReturn(new InnloggetBruker(fnr));
-    when(altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(any(), eq(fnr)))
+    when(altinnKlientWrapper.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(
+            any(), eq(fnr)))
         .thenThrow(new AltinnException(""));
 
     assertThrows(AltinnException.class, () -> tilgangskontroll.hentBrukerKunIaRettigheter());
@@ -71,7 +72,7 @@ public class TilgangskontrollServiceTest {
   public void
   hentInnloggetBrukerForAlleTilganger__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
     when(tokenUtils.hentInnloggetBruker()).thenReturn(new InnloggetBruker(fnr));
-    when(altinnKlientWrapper.hentOrgnumreDerBrukerHarTilgangTil(any(), eq(fnr)))
+    when(altinnKlientWrapper.hentVirksomheterDerBrukerHarTilknytning(any(), eq(fnr)))
         .thenThrow(new AltinnException(""));
 
     assertThrows(
@@ -95,7 +96,7 @@ public class TilgangskontrollServiceTest {
   @Test
   public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse__skal_gi_ok_hvis_bruker_har_tilgang() {
     InnloggetBruker bruker = getInnloggetBruker(FNR);
-    bruker.setBrukerensOrganisasjoner(Arrays.asList(getOrganisasjon("999999999")));
+    bruker.setBrukerensOrganisasjoner(List.of(getOrganisasjon("999999999")));
     værInnloggetSom(bruker);
     tilgangskontroll.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(new Orgnr("999999999"), "", "");
   }
@@ -105,7 +106,7 @@ public class TilgangskontrollServiceTest {
   sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse__skal_sende_med_riktig_parametre_til_sporbarhetsloggen() {
     InnloggetBruker bruker = getInnloggetBruker(FNR);
     Orgnr orgnr = new Orgnr("999999999");
-    bruker.setBrukerensOrganisasjoner(Arrays.asList(getOrganisasjon(orgnr.getVerdi())));
+    bruker.setBrukerensOrganisasjoner(List.of(getOrganisasjon(orgnr.getVerdi())));
     værInnloggetSom(bruker);
     String httpMetode = "GET";
     String requestUrl = "http://localhost:8080/endepunkt";
@@ -130,8 +131,8 @@ public class TilgangskontrollServiceTest {
 
   private void værInnloggetSom(InnloggetBruker bruker) {
     when(tokenUtils.hentInnloggetBruker()).thenReturn(bruker);
-    when(altinnKlientWrapper.hentOrgnumreDerBrukerHarEnkeltrettighetTilIAWeb(
-        any(), eq(bruker.getFnr())))
+    when(altinnKlientWrapper.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(
+            any(), eq(bruker.getFnr())))
         .thenReturn(bruker.getBrukerensOrganisasjoner());
   }
 }
