@@ -5,11 +5,10 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.SykefraværFlereKvartalerForEksport;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaProperties;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicName;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaStatistikkKategoriTopicValue;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaStatistikkategoriTopicKey;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaTopicKey;
@@ -17,38 +16,38 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.Kaf
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
-@Slf4j
 @Service
 public class KafkaService {
 
+  private final Logger log = LoggerFactory.getLogger(KafkaService.class);
   private static final ObjectMapper objectMapper = new ObjectMapper();
 
   private final KafkaTemplate<String, String> kafkaTemplate;
-  private final KafkaProperties kafkaProperties;
   private final KafkaUtsendingRapport kafkaUtsendingRapport;
   private final KafkaUtsendingHistorikkRepository kafkaUtsendingHistorikkRepository;
 
   KafkaService(
       KafkaTemplate<String, String> kafkaTemplate,
-      KafkaProperties kafkaProperties,
       KafkaUtsendingRapport kafkaUtsendingRapport,
       KafkaUtsendingHistorikkRepository kafkaUtsendingHistorikkRepository) {
     this.kafkaTemplate = kafkaTemplate;
-    this.kafkaProperties = kafkaProperties;
     this.kafkaUtsendingRapport = kafkaUtsendingRapport;
     this.kafkaUtsendingHistorikkRepository = kafkaUtsendingHistorikkRepository;
   }
 
-  public void nullstillUtsendingRapport(int totalMeldingerTilUtsending, String eksportNavn) {
+  public void nullstillUtsendingRapport(
+      int totalMeldingerTilUtsending, KafkaTopicName kafkaTopicName) {
     log.info(
         "Gjør utsendingrapport klar før utsending på Kafka topic '{}'. '{}' meldinger vil bli sendt.",
-        kafkaProperties.getTopicNavn(eksportNavn),
+        kafkaTopicName.getTopic(),
         totalMeldingerTilUtsending);
     kafkaUtsendingRapport.reset(totalMeldingerTilUtsending);
   }
@@ -88,13 +87,10 @@ public class KafkaService {
       return false;
     }
 
-    String topicNavn = kafkaProperties.getTopicNavn(statistikkategori.name());
+    String topicNavn = KafkaTopicName.Companion.from(statistikkategori).getTopic();
 
     ListenableFuture<SendResult<String, String>> futureResult =
-        kafkaTemplate.send(
-            topicNavn,
-            keyAsJsonString,
-            dataAsJsonString);
+        kafkaTemplate.send(topicNavn, keyAsJsonString, dataAsJsonString);
 
     futureResult.addCallback(
         new ListenableFutureCallback<>() {
@@ -180,9 +176,7 @@ public class KafkaService {
 
     ListenableFuture<SendResult<String, String>> futureResult =
         kafkaTemplate.send(
-            kafkaProperties.getTopicNavn(KafkaProperties.EKSPORT_ALLE_KATEGORIER),
-            keyAsJsonString,
-            dataAsJsonString);
+            KafkaTopicName.SYKEFRAVARSSTATISTIKK_V1.getTopic(), keyAsJsonString, dataAsJsonString);
 
     futureResult.addCallback(
         new ListenableFutureCallback<>() {
@@ -201,7 +195,7 @@ public class KafkaService {
                 new Orgnr(virksomhetSykefravær.getOrgnr()));
             log.debug(
                 "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
-                kafkaProperties.getTopicNavn(KafkaProperties.EKSPORT_ALLE_KATEGORIER),
+                KafkaTopicName.SYKEFRAVARSSTATISTIKK_V1.getTopic(),
                 res.getProducerRecord().key(),
                 res.getRecordMetadata().offset());
             kafkaUtsendingHistorikkRepository.opprettHistorikk(
@@ -232,9 +226,5 @@ public class KafkaService {
       long startDBOppdateringProcess, long stopDBOppdateringProcess) {
     kafkaUtsendingRapport.addDBOppdateringProcessingTime(
         startDBOppdateringProcess, stopDBOppdateringProcess);
-  }
-
-  public String getTopicNavn(String eksportNavn) {
-    return kafkaProperties.getTopicNavn(eksportNavn);
   }
 }

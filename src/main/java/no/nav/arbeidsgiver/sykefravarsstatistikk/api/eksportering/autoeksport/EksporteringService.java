@@ -33,7 +33,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværssta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaProperties;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicName;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUtsendingException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
@@ -114,7 +114,7 @@ public class EksporteringService {
       throws KafkaUtsendingException {
     long startEksportering = System.currentTimeMillis();
     kafkaService.nullstillUtsendingRapport(
-        virksomheterTilEksport.size(), KafkaProperties.EKSPORT_ALLE_KATEGORIER);
+        virksomheterTilEksport.size(), KafkaTopicName.SYKEFRAVARSSTATISTIKK_V1);
 
     List<VirksomhetMetadata> virksomhetMetadataListe =
         virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal);
@@ -204,43 +204,41 @@ public class EksporteringService {
     List<String> eksporterteVirksomheterListe = new ArrayList<>();
     Map<String, SykefraværsstatistikkVirksomhetUtenVarighet>
         sykefraværsstatistikkVirksomhetForEttKvartalUtenVarighetMap =
-        toMap(filterByKvartal(årstallOgKvartal, sykefraværsstatistikkVirksomhetUtenVarighet));
+            toMap(filterByKvartal(årstallOgKvartal, sykefraværsstatistikkVirksomhetUtenVarighet));
 
-    virksomheterMetadata.stream()
-        .forEach(
-            virksomhetMetadata -> {
-              long startUtsendingProcess = System.nanoTime();
+    virksomheterMetadata.forEach(
+        virksomhetMetadata -> {
+          long startUtsendingProcess = System.nanoTime();
 
-              if (virksomhetMetadata != null) {
-                kafkaService.send(
+          if (virksomhetMetadata != null) {
+            kafkaService.send(
+                årstallOgKvartal,
+                getVirksomhetSykefravær(
+                    virksomhetMetadata,
+                    sykefraværsstatistikkVirksomhetForEttKvartalUtenVarighetMap),
+                getSykefraværMedKategoriForNæring5Siffer(
+                    virksomhetMetadata, sykefraværsstatistikkNæring5Siffer),
+                getSykefraværMedKategoriNæringForVirksomhet(
+                    virksomhetMetadata, sykefraværsstatistikkNæring),
+                getSykefraværMedKategoriForSektor(virksomhetMetadata, sykefraværsstatistikkSektor),
+                landSykefravær);
+
+            long stopUtsendingProcess = System.nanoTime();
+            antallSentTilEksport.getAndIncrement();
+            kafkaService.addUtsendingTilKafkaProcessingTime(
+                startUtsendingProcess, stopUtsendingProcess);
+
+            int antallVirksomhetertLagretSomEksportert =
+                leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
+                    virksomhetMetadata.getOrgnr(),
                     årstallOgKvartal,
-                    getVirksomhetSykefravær(
-                        virksomhetMetadata,
-                        sykefraværsstatistikkVirksomhetForEttKvartalUtenVarighetMap),
-                    getSykefraværMedKategoriForNæring5Siffer(
-                        virksomhetMetadata, sykefraværsstatistikkNæring5Siffer),
-                    getSykefraværMedKategoriNæringForVirksomhet(
-                        virksomhetMetadata, sykefraværsstatistikkNæring),
-                    getSykefraværMedKategoriForSektor(
-                        virksomhetMetadata, sykefraværsstatistikkSektor),
-                    landSykefravær);
-
-                long stopUtsendingProcess = System.nanoTime();
-                antallSentTilEksport.getAndIncrement();
-                kafkaService.addUtsendingTilKafkaProcessingTime(
-                    startUtsendingProcess, stopUtsendingProcess);
-
-                int antallVirksomhetertLagretSomEksportert =
-                    leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
-                        virksomhetMetadata.getOrgnr(),
-                        årstallOgKvartal,
-                        eksporterteVirksomheterListe,
-                        eksporteringRepository,
-                        kafkaService);
-                antallVirksomheterLagretSomEksportertIDb.addAndGet(
-                    antallVirksomhetertLagretSomEksportert);
-              }
-            });
+                    eksporterteVirksomheterListe,
+                    eksporteringRepository,
+                    kafkaService);
+            antallVirksomheterLagretSomEksportertIDb.addAndGet(
+                antallVirksomhetertLagretSomEksportert);
+          }
+        });
 
     int antallRestendeOppdatert =
         lagreEksporterteVirksomheterOgNullstillLista(
