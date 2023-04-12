@@ -30,7 +30,7 @@ jobs:
   build-and-push-image:
     name: Build and push Docker image
     needs: test
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/teamia-tar-over-forebyggingsplan-fra-pia'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bump-altinnklient'
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
