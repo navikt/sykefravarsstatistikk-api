@@ -17,8 +17,8 @@ public class UmaskertSykefraværForEttKvartal
 
   protected final BigDecimal dagsverkTeller;
   protected final BigDecimal dagsverkNevner;
-  protected final int antallPersoner;
-  private final ÅrstallOgKvartal årstallOgKvartal;
+  public final int antallPersoner;
+  public final ÅrstallOgKvartal årstallOgKvartal;
 
   public UmaskertSykefraværForEttKvartal(
       ÅrstallOgKvartal årstallOgKvartal,

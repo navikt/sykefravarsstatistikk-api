@@ -12,10 +12,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.EitherUtils;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
@@ -26,9 +23,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.Aggregeringskalkulator;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.StatistikkDto;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.Sykefraværsdata;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -50,17 +44,6 @@ public class EksporteringServiceUtils {
                 sfVirksomhet.getÅrstall() == årstallOgKvartal.getÅrstall()
                     && sfVirksomhet.getKvartal() == årstallOgKvartal.getKvartal())
         .collect(Collectors.toList());
-  }
-
-  protected static SykefraværsstatistikkNæring hentSisteKvartalIBeregningenForSykefraværNæring(
-      List<SykefraværsstatistikkNæring> sykefraværNæring,
-      ÅrstallOgKvartal årstallOgKvartal) {
-    return sykefraværNæring.stream()
-        .filter(sykefraværsstatistikkNæring -> new ÅrstallOgKvartal(
-            sykefraværsstatistikkNæring.getÅrstall(),
-            sykefraværsstatistikkNæring.getKvartal()).equals(årstallOgKvartal))
-        .findFirst()
-        .orElse(null);
   }
 
   protected static UmaskertSykefraværForEttKvartal hentSisteKvartalIBeregningen(
@@ -86,10 +69,7 @@ public class EksporteringServiceUtils {
       List<SykefraværsstatistikkVirksomhetUtenVarighet>
           sykefraværsstatistikkVirksomhetUtenVarighet) {
     Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> map = new HashMap<>();
-    sykefraværsstatistikkVirksomhetUtenVarighet.forEach(
-        sf -> {
-          map.put(sf.getOrgnr(), sf);
-        });
+    sykefraværsstatistikkVirksomhetUtenVarighet.forEach(sf -> map.put(sf.getOrgnr(), sf));
 
     return map;
   }
@@ -98,7 +78,7 @@ public class EksporteringServiceUtils {
   protected static Map<String, VirksomhetMetadata> getVirksomhetMetadataHashMap(
       @NotNull List<VirksomhetMetadata> virksomhetMetadataListe) {
     HashMap<String, VirksomhetMetadata> virksomhetMetadataHashMap = new HashMap<>();
-    virksomhetMetadataListe.stream().forEach(v -> virksomhetMetadataHashMap.put(v.getOrgnr(), v));
+    virksomhetMetadataListe.forEach(v -> virksomhetMetadataHashMap.put(v.getOrgnr(), v));
 
     return virksomhetMetadataHashMap;
   }
@@ -108,13 +88,12 @@ public class EksporteringServiceUtils {
       Map<String, VirksomhetMetadata> virksomhetMetadataHashMap,
       List<VirksomhetEksportPerKvartal> subset) {
     List<VirksomhetMetadata> virksomheterMetadata = new ArrayList<>();
-    subset.stream()
-        .forEach(
-            v -> {
-              if (virksomhetMetadataHashMap.containsKey(v.getOrgnr())) {
-                virksomheterMetadata.add(virksomhetMetadataHashMap.get(v.getOrgnr()));
-              }
-            });
+    subset.forEach(
+        v -> {
+          if (virksomhetMetadataHashMap.containsKey(v.getOrgnr())) {
+            virksomheterMetadata.add(virksomhetMetadataHashMap.get(v.getOrgnr()));
+          }
+        });
 
     return virksomheterMetadata;
   }
@@ -255,49 +234,6 @@ public class EksporteringServiceUtils {
         sfNæring.getAntallPersoner());
   }
 
-  protected static List<StatistikkDto> getSykefraværMedKategoriForBransjeEllerNæringSiste4Kvartaler(
-      VirksomhetMetadata virksomhetMetadata,
-      List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring,
-      List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5Siffer,
-      ÅrstallOgKvartal fraÅrstallOgKvartal,
-      BransjeEllerNæring bransjeEllerNæring) {
-    Aggregeringskalkulator aggregeringskalkulator;
-    if (bransjeEllerNæring.isBransje()) {
-      List<UmaskertSykefraværForEttKvartal> sykefraværsstatistikkBransje =
-          sykefraværsstatistikkNæring5Siffer.stream()
-              .filter(
-                  br ->
-                      bransjeEllerNæring
-                          .getBransje()
-                          .getKoderSomSpesifisererNæringer()
-                          .contains(br.getNæringkode5siffer())
-                          && erIKvartalerIberegningen(fraÅrstallOgKvartal, br))
-              .map(EksporteringServiceUtils::mapTilUmaskertSykefraværForEttKvartal)
-              .collect(Collectors.toList());
-      aggregeringskalkulator =
-          new Aggregeringskalkulator(
-              new Sykefraværsdata(Map.of(Statistikkategori.BRANSJE, sykefraværsstatistikkBransje)),
-              fraÅrstallOgKvartal.plussKvartaler(3));
-
-    } else {
-      List<UmaskertSykefraværForEttKvartal> umaskertSykefraværForEttKvartaler =
-          sykefraværsstatistikkNæring.stream()
-              .filter(
-                  v ->
-                      v.getNæringkode().equals(virksomhetMetadata.getNæring())
-                          && erIKvartalerIberegningen(fraÅrstallOgKvartal, v))
-              .map(EksporteringServiceUtils::mapTilUmaskertSykefraværForEttKvartal)
-              .collect(Collectors.toList());
-      aggregeringskalkulator =
-          new Aggregeringskalkulator(
-              new Sykefraværsdata(
-                  Map.of(Statistikkategori.NÆRING, umaskertSykefraværForEttKvartaler)),
-              fraÅrstallOgKvartal.plussKvartaler(3));
-    }
-    return EitherUtils.filterRights(
-        aggregeringskalkulator.fraværsprosentBransjeEllerNæring(bransjeEllerNæring));
-  }
-
   protected static List<SykefraværMedKategori> getSykefraværMedKategoriForNæring5Siffer(
       VirksomhetMetadata virksomhetMetadata,
       List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5SifferList) {
@@ -306,21 +242,19 @@ public class EksporteringServiceUtils {
         getSykefraværsstatistikkNæring5Siffers(
             virksomhetMetadata, sykefraværsstatistikkNæring5SifferList);
 
-    List<SykefraværMedKategori> resultatList = new ArrayList();
+    List<SykefraværMedKategori> resultatList = new ArrayList<>();
 
-    filteredList.stream()
-        .forEach(
-            sfNæring5Siffer -> {
-              resultatList.add(
-                  new SykefraværMedKategori(
-                      Statistikkategori.NÆRING5SIFFER,
-                      sfNæring5Siffer.getNæringkode5siffer(),
-                      new ÅrstallOgKvartal(
-                          virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
-                      sfNæring5Siffer.getTapteDagsverk(),
-                      sfNæring5Siffer.getMuligeDagsverk(),
-                      sfNæring5Siffer.getAntallPersoner()));
-            });
+    filteredList.forEach(
+        sfNæring5Siffer ->
+            resultatList.add(
+                new SykefraværMedKategori(
+                    Statistikkategori.NÆRING5SIFFER,
+                    sfNæring5Siffer.getNæringkode5siffer(),
+                    new ÅrstallOgKvartal(
+                        virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
+                    sfNæring5Siffer.getTapteDagsverk(),
+                    sfNæring5Siffer.getMuligeDagsverk(),
+                    sfNæring5Siffer.getAntallPersoner())));
 
     return resultatList;
   }
@@ -329,29 +263,25 @@ public class EksporteringServiceUtils {
   protected static List<SykefraværsstatistikkNæring5Siffer> getSykefraværsstatistikkNæring5Siffers(
       VirksomhetMetadata virksomhetMetadata,
       List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5SifferList) {
-    List<SykefraværsstatistikkNæring5Siffer> filteredList =
-        sykefraværsstatistikkNæring5SifferList.stream()
-            .filter(
-                næring5Siffer ->
-                    virksomhetMetadata.getNæringOgNæringskode5siffer().stream()
+    return sykefraværsstatistikkNæring5SifferList.stream()
+        .filter(
+            næring5Siffer ->
+                virksomhetMetadata.getNæringOgNæringskode5siffer().stream()
                         .anyMatch(
                             virksomhetNæring5Siffer ->
                                 næring5Siffer
                                     .getNæringkode5siffer()
                                     .equals(virksomhetNæring5Siffer.getNæringskode5Siffer()))
-                        && næring5Siffer.getÅrstall() == virksomhetMetadata.getÅrstall()
-                        && næring5Siffer.getKvartal() == virksomhetMetadata.getKvartal())
-            .collect(Collectors.toList());
-    return filteredList;
+                    && næring5Siffer.getÅrstall() == virksomhetMetadata.getÅrstall()
+                    && næring5Siffer.getKvartal() == virksomhetMetadata.getKvartal())
+        .collect(Collectors.toList());
   }
 
-  @NotNull
   protected static void cleanUpEtterBatch(EksporteringRepository eksporteringRepository) {
     eksporteringRepository.oppdaterAlleVirksomheterIEksportTabellSomErBekrreftetEksportert();
     eksporteringRepository.slettVirksomheterBekreftetEksportert();
   }
 
-  @NotNull
   protected static int leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
       String orgnr,
       ÅrstallOgKvartal årstallOgKvartal,
@@ -372,7 +302,6 @@ public class EksporteringServiceUtils {
     }
   }
 
-  @NotNull
   protected static int lagreEksporterteVirksomheterOgNullstillLista(
       ÅrstallOgKvartal årstallOgKvartal,
       List<String> virksomheterSomSkalFlaggesSomEksportert,
@@ -403,16 +332,9 @@ public class EksporteringServiceUtils {
 
     return eksporteringBegrensning.erBegrenset()
         ? virksomhetEksportPerKvartalStream
-        .limit(eksporteringBegrensning.getAntallSomSkalEksporteres())
-        .collect(Collectors.toList())
+            .limit(eksporteringBegrensning.getAntallSomSkalEksporteres())
+            .collect(Collectors.toList())
         : virksomhetEksportPerKvartalStream.collect(Collectors.toList());
-  }
-
-  private static boolean erIKvartalerIberegningen(
-      ÅrstallOgKvartal fraÅrstallOgKvartal, Sykefraværsstatistikk v) {
-    return (v.getÅrstall() > fraÅrstallOgKvartal.getÅrstall())
-        || (v.getÅrstall() == fraÅrstallOgKvartal.getÅrstall()
-        && v.getKvartal() >= fraÅrstallOgKvartal.getKvartal());
   }
 
   private static <T> Collector<T, ?, T> toSingleton(T emptySykefraværsstatistikk) {
@@ -424,32 +346,5 @@ public class EksporteringServiceUtils {
           }
           return list.get(0);
         });
-  }
-
-  private static UmaskertSykefraværForEttKvartal mapTilUmaskertSykefraværForEttKvartal(
-      SykefraværsstatistikkNæring sfsNæring) {
-    return new UmaskertSykefraværForEttKvartal(
-        new ÅrstallOgKvartal(sfsNæring.getÅrstall(), sfsNæring.getKvartal()),
-        sfsNæring.getTapteDagsverk(),
-        sfsNæring.getMuligeDagsverk(),
-        sfsNæring.getAntallPersoner());
-  }
-
-  private static UmaskertSykefraværForEttKvartal mapTilUmaskertSykefraværForEttKvartal(
-      SykefraværsstatistikkNæring5Siffer sfsNæring) {
-    return new UmaskertSykefraværForEttKvartal(
-        new ÅrstallOgKvartal(sfsNæring.getÅrstall(), sfsNæring.getKvartal()),
-        sfsNæring.getTapteDagsverk(),
-        sfsNæring.getMuligeDagsverk(),
-        sfsNæring.getAntallPersoner());
-  }
-
-  protected static UmaskertSykefraværForEttKvartal mapTilUmaskertSykefraværForEttKvartal(
-      SykefraværsstatistikkVirksomhetUtenVarighet sfsNæring) {
-    return new UmaskertSykefraværForEttKvartal(
-        new ÅrstallOgKvartal(sfsNæring.getÅrstall(), sfsNæring.getKvartal()),
-        sfsNæring.getTapteDagsverk(),
-        sfsNæring.getMuligeDagsverk(),
-        sfsNæring.getAntallPersoner());
   }
 }

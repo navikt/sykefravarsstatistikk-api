@@ -1,13 +1,15 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
-import io.vavr.control.Either;
+import static java.math.BigDecimal.ZERO;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.StatistikkUtils.kalkulerSykefraværsprosent;
 
+import io.vavr.control.Either;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -21,11 +23,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException;
 import org.jetbrains.annotations.NotNull;
-
-import static java.math.BigDecimal.ZERO;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.CollectionUtils.concat;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.StatistikkUtils.kalkulerSykefraværsprosent;
 
 @ToString
 @EqualsAndHashCode
@@ -153,12 +150,6 @@ class SumAvSykefraværOverFlereKvartaler {
   }
 
   private StatistikkDto tilStatistikkDto(Statistikkategori type, String label, String verdi) {
-    return StatistikkDto.builder()
-        .statistikkategori(type)
-        .label(label)
-        .verdi(verdi)
-        .antallPersonerIBeregningen(høyesteAntallPersonerIEtKvartal)
-        .kvartalerIBeregningen(kvartaler)
-        .build();
+    return new StatistikkDto(type, label, verdi, høyesteAntallPersonerIEtKvartal, kvartaler);
   }
 }

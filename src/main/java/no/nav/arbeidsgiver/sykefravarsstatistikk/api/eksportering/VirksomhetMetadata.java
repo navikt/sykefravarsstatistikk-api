@@ -97,7 +97,7 @@ public class VirksomhetMetadata {
     result = 31 * result + årstallOgKvartal.hashCode();
     result =
         31 * result
-            + (næringOgNæringskode5siffer != null ? næringOgNæringskode5siffer.hashCode() : 0);
+            + næringOgNæringskode5siffer.hashCode();
     return result;
   }
 }

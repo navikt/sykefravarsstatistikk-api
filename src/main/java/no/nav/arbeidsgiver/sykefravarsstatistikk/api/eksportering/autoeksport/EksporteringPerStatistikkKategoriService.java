@@ -378,18 +378,16 @@ public class EksporteringPerStatistikkKategoriService {
           long startUtsendingProcessForSubset = System.nanoTime();
 
           virksomheter.forEach(
-              virksomhet -> {
-                sendStatistikkForVirksomhetOgOppdaterMetrikker(
-                    virksomhet,
-                    årstallOgKvartal,
-                    sykefraværMedKategoriSisteKvartalMap,
-                    sykefraværOverFlereKvartalerMap,
-                    antallEksportert,
-                    antallIkkeEksportert,
-                    antallUtenStatistikk,
-                    antallVirksomheterLagretSomEksportertIDb,
-                    eksporterteVirksomheterListe);
-              });
+              virksomhet -> sendStatistikkForVirksomhetOgOppdaterMetrikker(
+                  virksomhet,
+                  årstallOgKvartal,
+                  sykefraværMedKategoriSisteKvartalMap,
+                  sykefraværOverFlereKvartalerMap,
+                  antallEksportert,
+                  antallIkkeEksportert,
+                  antallUtenStatistikk,
+                  antallVirksomheterLagretSomEksportertIDb,
+                  eksporterteVirksomheterListe));
 
           int antallRestendeOppdatert =
               lagreEksporterteVirksomheterOgNullstillLista(
@@ -505,8 +503,7 @@ public class EksporteringPerStatistikkKategoriService {
     SykefraværFlereKvartalerForEksport sykefraværFlereKvartalerForEksport =
         sykefraværOverFlereKvartalerMap.get(identifikator);
     return Objects.requireNonNullElseGet(
-        sykefraværFlereKvartalerForEksport,
-        () -> SykefraværFlereKvartalerForEksport.utenStatistikk());
+        sykefraværFlereKvartalerForEksport, SykefraværFlereKvartalerForEksport::utenStatistikk);
   }
 
   private static SykefraværMedKategori getSykefraværMedKategori(
@@ -526,7 +523,7 @@ public class EksporteringPerStatistikkKategoriService {
   private Map<String, SykefraværMedKategori> createSykefraværMedKategoriMap(
       Map<String, List<SykefraværsstatistikkVirksomhetUtenVarighet>> sykefraværGruppertEtterOrgNr) {
     Map<String, SykefraværMedKategori> sykefraværSisteKvartalPerOrg =
-        new HashMap<String, SykefraværMedKategori>();
+        new HashMap<>();
 
     sykefraværGruppertEtterOrgNr.forEach(
         (orgnr, sykefravær) -> {
