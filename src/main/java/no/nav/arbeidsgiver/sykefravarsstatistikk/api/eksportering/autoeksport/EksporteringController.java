@@ -52,8 +52,11 @@ public class EksporteringController {
       @RequestParam int kvartal,
       @RequestParam Statistikkategori kategori,
       @RequestParam(required = false, defaultValue = "0") int begrensningTil) {
-    if (Statistikkategori.LAND != kategori && Statistikkategori.VIRKSOMHET != kategori
-        && Statistikkategori.NÆRING != kategori && Statistikkategori.SEKTOR != kategori) {
+    if (Statistikkategori.LAND != kategori
+        && Statistikkategori.VIRKSOMHET != kategori
+        && Statistikkategori.NÆRING != kategori
+        && Statistikkategori.SEKTOR != kategori
+        && Statistikkategori.BRANSJE != kategori) {
       return ResponseEntity.badRequest().build();
     }
 
@@ -70,10 +73,8 @@ public class EksporteringController {
   }
 
   private EksporteringBegrensning getBegrensning(int begrensningTil) {
-    EksporteringBegrensning eksporteringBegrensning =
-        begrensningTil == 0
-            ? EksporteringBegrensning.build().utenBegrensning()
-            : EksporteringBegrensning.build().medBegrensning(begrensningTil);
-    return eksporteringBegrensning;
+    return begrensningTil == 0
+        ? EksporteringBegrensning.build().utenBegrensning()
+        : EksporteringBegrensning.build().medBegrensning(begrensningTil);
   }
 }

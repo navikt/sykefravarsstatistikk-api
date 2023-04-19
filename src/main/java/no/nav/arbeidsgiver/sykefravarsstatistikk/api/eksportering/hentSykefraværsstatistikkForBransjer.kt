@@ -9,6 +9,7 @@ import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import java.math.BigDecimal
 import java.sql.ResultSet
 
 fun hentSykefraværsstatistikkForBransjerFraOgMed(
@@ -21,7 +22,7 @@ fun hentSykefraværsstatistikkForBransjerFraOgMed(
         val kvartalsvisSykefraværsstatistikkNæringer = getKvartalsvisSykefraværsstatistikkNæringer(
             namedParameterJdbcTemplate, kvartal, næringer, næringskoder
         )
-        summerOpp0SykefraværsstatistikkPerBransje(kvartalsvisSykefraværsstatistikkNæringer)
+        summerSykefraværsstatistikkPerBransje(kvartalsvisSykefraværsstatistikkNæringer)
     } catch (e: EmptyResultDataAccessException) {
         emptyList()
     }
@@ -104,21 +105,18 @@ private fun getKvartalsvisSykefraværsstatistikkNæringer(
     return statistikkNæringer.groupBy { ÅrstallOgKvartal(it.Årstall, it.kvartal) }
 }
 
-private fun summerOpp0SykefraværsstatistikkPerBransje(
+private fun summerSykefraværsstatistikkPerBransje(
     kvartalsvisSykefraværsstatistikkNæringer: Map<ÅrstallOgKvartal, List<SykefraværsstatistikkNæring>>
 ): List<SykefraværsstatistikkBransje> {
-    return kvartalsvisSykefraværsstatistikkNæringer.flatMap { (kvartal, sykefraværsstatistikkNæringer) ->
+    return kvartalsvisSykefraværsstatistikkNæringer.flatMap { (_, sykefraværsstatistikkNæringer) ->
         Bransjeprogram.bransjer.mapNotNull { bransje ->
-            val filtrertPåBransje = filtrerUtNæringerSomTilhørerBransje(sykefraværsstatistikkNæringer, bransje)
-            val summertPerBransje = summerSykefraværsstatistikkNæring(filtrertPåBransje)
-                ?: return@mapNotNull null
-
-            mapToSykefraværsstatistikkBransje(summertPerBransje, kvartal, bransje)
+            val filtrertPåBransje = hentStatistikkForNæringerSomTilhørerBransje(sykefraværsstatistikkNæringer, bransje)
+            summerSykefraværsstatistikkNæringForEttKvartal(filtrertPåBransje, bransje)
         }
     }
 }
 
-private fun filtrerUtNæringerSomTilhørerBransje(
+private fun hentStatistikkForNæringerSomTilhørerBransje(
     sykefraværsstatistikkNæringer: List<SykefraværsstatistikkNæring>,
     bransje: Bransje
 ): List<SykefraværsstatistikkNæring> {
@@ -128,28 +126,40 @@ private fun filtrerUtNæringerSomTilhørerBransje(
     }
 }
 
-private fun summerSykefraværsstatistikkNæring(
-    filteredNæringer: List<SykefraværsstatistikkNæring>
-): SykefraværsstatistikkNæring? {
-    return filteredNæringer.reduceOrNull { acc: SykefraværsstatistikkNæring, sykefraværsstatistikkNæring: SykefraværsstatistikkNæring ->
-        acc + sykefraværsstatistikkNæring
+private fun summerSykefraværsstatistikkNæringForEttKvartal(
+    filteredNæringer: List<SykefraværsstatistikkNæring>,
+    bransje: Bransje,
+): SykefraværsstatistikkBransje? {
+    if (filteredNæringer.isEmpty()) {
+        return null
+    }
+
+    if (!allStatistikkErFraSammeKvartal(filteredNæringer)
+    ) {
+        throw IllegalStateException("Kan ikke summere sykefraværsstatistikk for flere kvartaler")
+    }
+
+    return filteredNæringer.fold(
+        SykefraværsstatistikkBransje(
+            årstall = 0,
+            kvartal = 0,
+            bransje = bransje.type,
+            antallPersoner = 0,
+            tapteDagsverk = BigDecimal.ZERO,
+            muligeDagsverk = BigDecimal.ZERO,
+        )
+    ) { akkumulertStatistikkBransje, sykefraværsstatistikkNæring ->
+        akkumulertStatistikkBransje.copy(
+            årstall = sykefraværsstatistikkNæring.Årstall,
+            kvartal = sykefraværsstatistikkNæring.kvartal,
+            antallPersoner = akkumulertStatistikkBransje.antallPersoner + sykefraværsstatistikkNæring.antallPersoner,
+            tapteDagsverk = akkumulertStatistikkBransje.tapteDagsverk + sykefraværsstatistikkNæring.tapteDagsverk!!,
+            muligeDagsverk = akkumulertStatistikkBransje.muligeDagsverk + sykefraværsstatistikkNæring.muligeDagsverk!!,
+        )
     }
 }
 
-private fun mapToSykefraværsstatistikkBransje(
-    næringTilhørendeBransje: SykefraværsstatistikkNæring,
-    kvartal: ÅrstallOgKvartal,
-    bransje: Bransje
-): SykefraværsstatistikkBransje {
-    return SykefraværsstatistikkBransje(
-        kvartal.årstall,
-        kvartal.kvartal,
-        bransje.type,
-        næringTilhørendeBransje.antallPersoner,
-        næringTilhørendeBransje.tapteDagsverk!!,
-        næringTilhørendeBransje.muligeDagsverk!!,
-    )
-}
-
-
-
+private fun allStatistikkErFraSammeKvartal(filteredNæringer: List<SykefraværsstatistikkNæring>) =
+    filteredNæringer.all {
+        it.Årstall == filteredNæringer.first().Årstall && it.kvartal == filteredNæringer.first().kvartal
+    }

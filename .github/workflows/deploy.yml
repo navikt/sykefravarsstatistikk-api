@@ -30,7 +30,7 @@ jobs:
   build-and-push-image:
     name: Build and push Docker image
     needs: test
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bump-altinnklient'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/kafka-topic-bransje'
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -61,7 +61,7 @@ jobs:
   deploy-to-dev:
     name: Deploy to dev
     needs: build-and-push-image
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bump-altinnklient'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/kafka-topic-bransje'
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -89,7 +89,7 @@ jobs:
   deployTopicsToDev:
     name: Deploy topics to dev
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/fiks-sektor-topic'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/kafka-topic-bransje'
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
