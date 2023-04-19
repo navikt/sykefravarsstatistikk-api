@@ -9,9 +9,9 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 @Data
 public class Bransje {
 
-  private final ArbeidsmiljøportalenBransje type;
-  private final String navn;
-  private final List<String> koderSomSpesifisererNæringer;
+  public final ArbeidsmiljøportalenBransje type;
+  public final String navn;
+  public final List<String> koderSomSpesifisererNæringer;
 
   public Bransje(
       ArbeidsmiljøportalenBransje type, String navn, String... koderSomSpesifisererNæringer) {

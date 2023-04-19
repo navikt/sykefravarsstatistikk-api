@@ -46,15 +46,15 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
   private SykefraværsstatistikkTilEksporteringRepository repository;
 
-  private Næringskode5Siffer produksjonAvKlær =
+  private final Næringskode5Siffer produksjonAvKlær =
       new Næringskode5Siffer("14190", "Produksjon av klær");
-  private Næringskode5Siffer undervisning = new Næringskode5Siffer("86907", "Undervisning");
-  private Næring utdanning = new Næring("86", "Utdanning");
-  private Næring produksjon = new Næring("14", "Produksjon");
-  private Sektor kommunalForvaltning = new Sektor("1", "Kommunal forvaltning");
-  private Sektor næringsvirksomhet = new Sektor("3", "Privat og offentlig næringsvirksomhet");
-  private String VIRKSOMHET_1 = "999999999";
-  private String VIRKSOMHET_2 = "999999998";
+  private final Næringskode5Siffer undervisning = new Næringskode5Siffer("86907", "Undervisning");
+  private final Næring utdanning = new Næring("86", "Utdanning");
+  private final Næring produksjon = new Næring("14", "Produksjon");
+  private final Sektor kommunalForvaltning = new Sektor("1", "Kommunal forvaltning");
+  private final Sektor næringsvirksomhet = new Sektor("3", "Privat og offentlig næringsvirksomhet");
+  private final String VIRKSOMHET_1 = "999999999";
+  private final String VIRKSOMHET_2 = "999999998";
 
   @BeforeEach
   void setUp() {
@@ -395,19 +395,6 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
         resultat_2018_3_TIL_2019_2, 2019, 2, 4, VIRKSOMHET_2, 9, 100);
   }
 
-  // Metoder for assert/verifikasjon
-  private void assertSykefraværsstatistikkForLandIsEqual(
-      SykefraværsstatistikkLand actual,
-      int årstall,
-      int kvartal,
-      int antallPersoner,
-      Sektor sektor,
-      int tapteDagsverk,
-      int muligeDagsverk) {
-    assertSykefraværsstatistikkIsEqual(
-        actual, årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk);
-  }
-
   private void assertSykefraværsstatistikkForSektorIsEqual(
       List<SykefraværsstatistikkSektor> actual,
       int årstall,
@@ -705,4 +692,6 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
         .addValue("tapte_dagsverk", sykefraværsstatistikk.getTapteDagsverk())
         .addValue("mulige_dagsverk", sykefraværsstatistikk.getMuligeDagsverk());
   }
-}
+@Test
+void hentSykefraværAlleBransjerFraOgMed() {
+  }}

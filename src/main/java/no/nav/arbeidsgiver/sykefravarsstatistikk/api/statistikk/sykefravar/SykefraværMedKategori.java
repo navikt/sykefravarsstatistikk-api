@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -26,6 +27,18 @@ public class SykefraværMedKategori extends SykefraværForEttKvartal {
     this.kategori = statistikkategori;
     this.kode = kode;
     this.antallPersoner = antallPersoner;
+  }
+
+  public SykefraværMedKategori(
+          Statistikkategori statistikkategori, String kode, UmaskertSykefraværForEttKvartal sykefravær) {
+    super(
+            sykefravær.getÅrstallOgKvartal(),
+            sykefravær.getDagsverkTeller(),
+            sykefravær.getDagsverkNevner(),
+            sykefravær.getAntallPersoner());
+    this.kategori = statistikkategori;
+    this.kode = kode;
+    this.antallPersoner = sykefravær.getAntallPersoner();
   }
 
   // OBS: Constructor bruk i testene (objectMapper)
