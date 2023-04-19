@@ -35,7 +35,7 @@ public class UmaskertSykefraværForEttKvartal
   public UmaskertSykefraværForEttKvartal(Sykefraværsstatistikk statistikk) {
     this(
         new ÅrstallOgKvartal(statistikk.getÅrstall(), statistikk.getKvartal()),
-        statistikk.getMuligeDagsverk(),
+        statistikk.getTapteDagsverk(),
         statistikk.getMuligeDagsverk(),
         statistikk.getAntallPersoner());
   }
