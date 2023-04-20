@@ -75,7 +75,7 @@ class EksporteringService(
 
     @Throws(KafkaUtsendingException::class)
     protected fun eksporter(
-        virksomheterTilEksport: List<VirksomhetEksportPerKvartal>, årstallOgKvartal: ÅrstallOgKvartal?
+        virksomheterTilEksport: List<VirksomhetEksportPerKvartal>, årstallOgKvartal: ÅrstallOgKvartal
     ): Int {
         val startEksportering = System.currentTimeMillis()
         kafkaService.nullstillUtsendingRapport(

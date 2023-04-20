@@ -132,7 +132,7 @@ public class EksporteringServiceUtilsTest {
     VirksomhetSykefravær expectedVirksomhetSykefravær =
         new VirksomhetSykefravær(
             virksomhet1Metadata_2020_4.getOrgnr(),
-            virksomhet1Metadata_2020_4.getNavn(),
+                virksomhet1Metadata_2020_4.getNavn(),
             2020,
             4,
             null,
@@ -157,7 +157,7 @@ public class EksporteringServiceUtilsTest {
     VirksomhetSykefravær expectedVirksomhetSykefravær =
         new VirksomhetSykefravær(
             virksomhetToBeFound.getOrgnr(),
-            virksomhetToBeFound.getNavn(),
+                virksomhetToBeFound.getNavn(),
             2020,
             4,
             new BigDecimal(100),
@@ -231,7 +231,7 @@ public class EksporteringServiceUtilsTest {
         byggSykefraværStatistikkSektor(virksomhet1Metadata_2020_4, 10, 156, 22233),
         resultat,
         Statistikkategori.SEKTOR,
-        virksomhet1Metadata_2020_4.getSektor());
+            virksomhet1Metadata_2020_4.getSektor());
   }
 
   @Test
@@ -248,7 +248,7 @@ public class EksporteringServiceUtilsTest {
         byggSykefraværStatistikkNæring(virksomhet1Metadata_2020_4, 10, 156, 22233),
         resultat,
         Statistikkategori.NÆRING,
-        virksomhet1Metadata_2020_4.getNæring());
+            virksomhet1Metadata_2020_4.getNæring());
   }
 
   @Test

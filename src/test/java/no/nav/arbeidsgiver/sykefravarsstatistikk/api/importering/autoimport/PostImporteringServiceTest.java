@@ -5,6 +5,7 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKS
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.mockito.kotlin.OngoingStubbingKt.whenever;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,7 +89,7 @@ class PostImporteringServiceTest {
       List<VirksomhetMetadataNæringskode5siffer> virksomhetMetadataNæringskode5sifferListe) {
     when(graderingRepository.hentVirksomhetMetadataNæringskode5siffer(årstallOgKvartal))
         .thenReturn(virksomhetMetadataNæringskode5sifferListe);
-    when(virksomhetMetadataRepository.opprettVirksomhetMetadataNæringskode5siffer(any()))
+    whenever(virksomhetMetadataRepository.opprettVirksomhetMetadataNæringskode5siffer(any()))
         .thenReturn(virksomhetMetadataNæringskode5sifferListe.size());
   }
 

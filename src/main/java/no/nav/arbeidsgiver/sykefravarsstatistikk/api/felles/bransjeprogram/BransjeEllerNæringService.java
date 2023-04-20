@@ -54,7 +54,7 @@ public class BransjeEllerNæringService {
         new Underenhet(
             new Orgnr(virksomhetMetaData.getOrgnr()),
             new Orgnr(""),
-            virksomhetMetaData.getNavn(),
+                virksomhetMetaData.getNavn(),
             new Næringskode5Siffer(
                 virksomhetMetaData.getNæringOgNæringskode5siffer().stream().findFirst().isPresent()
                     ? virksomhetMetaData.getNæringOgNæringskode5siffer().stream()

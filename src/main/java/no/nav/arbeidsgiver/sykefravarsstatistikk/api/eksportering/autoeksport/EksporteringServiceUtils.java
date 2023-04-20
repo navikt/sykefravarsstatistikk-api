@@ -142,7 +142,7 @@ public class EksporteringServiceUtils {
 
     return new VirksomhetSykefravær(
         virksomhetMetadata.getOrgnr(),
-        virksomhetMetadata.getNavn(),
+            virksomhetMetadata.getNavn(),
         new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
         sfStatistikk.getTapteDagsverk(),
         sfStatistikk.getMuligeDagsverk(),
@@ -158,7 +158,7 @@ public class EksporteringServiceUtils {
 
     return new VirksomhetSykefravær(
         virksomhetMetadata.getOrgnr(),
-        virksomhetMetadata.getNavn(),
+            virksomhetMetadata.getNavn(),
         new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
         sfStatistikk != null ? sfStatistikk.getTapteDagsverk() : null,
         sfStatistikk != null ? sfStatistikk.getMuligeDagsverk() : null,
@@ -191,7 +191,7 @@ public class EksporteringServiceUtils {
                     new SykefraværsstatistikkSektor(
                         virksomhetMetadata.getÅrstall(),
                         virksomhetMetadata.getKvartal(),
-                        virksomhetMetadata.getSektor(),
+                            virksomhetMetadata.getSektor(),
                         0,
                         null,
                         null)));
@@ -220,7 +220,7 @@ public class EksporteringServiceUtils {
                     new SykefraværsstatistikkNæring(
                         virksomhetMetadata.getÅrstall(),
                         virksomhetMetadata.getKvartal(),
-                        virksomhetMetadata.getNæring(),
+                            virksomhetMetadata.getNæring(),
                         0,
                         null,
                         null)));

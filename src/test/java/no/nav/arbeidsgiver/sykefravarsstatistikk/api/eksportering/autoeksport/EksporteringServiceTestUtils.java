@@ -131,7 +131,7 @@ public class EksporteringServiceTestUtils {
       VirksomhetMetadata virksomhetMetadata) {
     return new VirksomhetSykefravær(
         virksomhetMetadata.getOrgnr(),
-        virksomhetMetadata.getNavn(),
+            virksomhetMetadata.getNavn(),
         new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
         null,
         null,
@@ -146,7 +146,7 @@ public class EksporteringServiceTestUtils {
     return new SykefraværsstatistikkNæring(
         virksomhetMetadata.getÅrstall(),
         virksomhetMetadata.getKvartal(),
-        virksomhetMetadata.getNæring(),
+            virksomhetMetadata.getNæring(),
         antallPersoner,
         new BigDecimal(tapteDagsverk),
         new BigDecimal(muligeDagsverk));
@@ -157,7 +157,7 @@ public class EksporteringServiceTestUtils {
     return new SykefraværsstatistikkNæring(
         virksomhetMetadata.getÅrstall(),
         virksomhetMetadata.getKvartal(),
-        virksomhetMetadata.getNæring(),
+            virksomhetMetadata.getNæring(),
         156,
         new BigDecimal(3678),
         new BigDecimal(188000));
@@ -168,7 +168,7 @@ public class EksporteringServiceTestUtils {
     return new SykefraværsstatistikkNæring(
         statistikkÅrstallOgKvartal.getÅrstall(),
         statistikkÅrstallOgKvartal.getKvartal(),
-        virksomhetMetadata.getNæring(),
+            virksomhetMetadata.getNæring(),
         156,
         new BigDecimal(3678),
         new BigDecimal(188000));
@@ -204,7 +204,7 @@ public class EksporteringServiceTestUtils {
     return new SykefraværsstatistikkSektor(
         virksomhetMetadata.getÅrstall(),
         virksomhetMetadata.getKvartal(),
-        virksomhetMetadata.getSektor(),
+            virksomhetMetadata.getSektor(),
         antallPersoner,
         new BigDecimal(tapteDagsverk),
         new BigDecimal(muligeDagsverk));
@@ -215,7 +215,7 @@ public class EksporteringServiceTestUtils {
     return new SykefraværsstatistikkSektor(
         virksomhetMetadata.getÅrstall(),
         virksomhetMetadata.getKvartal(),
-        virksomhetMetadata.getSektor(),
+            virksomhetMetadata.getSektor(),
         156,
         new BigDecimal(3678),
         new BigDecimal(188000));
@@ -228,7 +228,7 @@ public class EksporteringServiceTestUtils {
       int muligeDagsverk) {
     return new VirksomhetSykefravær(
         virksomhetMetadata.getOrgnr(),
-        virksomhetMetadata.getNavn(),
+            virksomhetMetadata.getNavn(),
         new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
         new BigDecimal(tapteDagsverk),
         new BigDecimal(muligeDagsverk),
@@ -239,7 +239,7 @@ public class EksporteringServiceTestUtils {
       VirksomhetMetadata virksomhetMetadata) {
     return new VirksomhetSykefravær(
         virksomhetMetadata.getOrgnr(),
-        virksomhetMetadata.getNavn(),
+            virksomhetMetadata.getNavn(),
         new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
         new BigDecimal(3678),
         new BigDecimal(188000),
