@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.Optional;
 import lombok.Data;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.StatistikkUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,11 +32,16 @@ public class UmaskertSykefraværForEttKvartal
     this.antallPersoner = antallPersoner;
   }
 
+  public UmaskertSykefraværForEttKvartal(Sykefraværsstatistikk statistikk) {
+    this(
+        new ÅrstallOgKvartal(statistikk.getÅrstall(), statistikk.getKvartal()),
+        statistikk.getTapteDagsverk(),
+        statistikk.getMuligeDagsverk(),
+        statistikk.getAntallPersoner());
+  }
+
   public UmaskertSykefraværForEttKvartal(
-      ÅrstallOgKvartal kvartal,
-      int dagsverkTeller,
-      int dagsverkNevner,
-      int antallPersoner) {
+      ÅrstallOgKvartal kvartal, int dagsverkTeller, int dagsverkNevner, int antallPersoner) {
     this.årstallOgKvartal = kvartal;
     this.dagsverkTeller = new BigDecimal(String.valueOf(dagsverkTeller));
     this.dagsverkNevner = new BigDecimal(String.valueOf(dagsverkNevner));
@@ -43,8 +49,7 @@ public class UmaskertSykefraværForEttKvartal
   }
 
   public static Optional<UmaskertSykefraværForEttKvartal> hentUtKvartal(
-      Collection<UmaskertSykefraværForEttKvartal> sykefravær,
-      @NotNull ÅrstallOgKvartal kvartal) {
+      Collection<UmaskertSykefraværForEttKvartal> sykefravær, @NotNull ÅrstallOgKvartal kvartal) {
     return (sykefravær == null)
         ? Optional.empty()
         : sykefravær.stream()
@@ -64,7 +69,6 @@ public class UmaskertSykefraværForEttKvartal
     return StatistikkUtils.kalkulerSykefraværsprosent(dagsverkTeller, dagsverkNevner);
   }
 
-
   public UmaskertSykefraværForEttKvartal add(UmaskertSykefraværForEttKvartal other) {
     if (!other.getÅrstallOgKvartal().equals(årstallOgKvartal)) {
       throw new IllegalArgumentException(
@@ -75,13 +79,11 @@ public class UmaskertSykefraværForEttKvartal
         dagsverkTeller.add(other.getDagsverkTeller()),
         dagsverkNevner.add(other.getDagsverkNevner()),
         antallPersoner + other.getAntallPersoner());
-
   }
 
   @Override
   public int compareTo(@NotNull UmaskertSykefraværForEttKvartal kvartalsvisSykefravær) {
-    return Comparator
-        .comparing(UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal)
+    return Comparator.comparing(UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal)
         .compare(this, kvartalsvisSykefravær);
   }
 }

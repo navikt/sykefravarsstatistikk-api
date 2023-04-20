@@ -2,13 +2,12 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
 public class EksporteringBegrensning {
 
-  private Integer antallSomSkalEksporteres;
+  private final Integer antallSomSkalEksporteres;
+  private final boolean erBegrenset;
 
   public boolean erBegrenset() {
     return erBegrenset;
   }
-
-  private boolean erBegrenset;
 
   public static EksporteringBegrensningBuilder build() {
     return new EksporteringBegrensningBuilder();

@@ -30,5 +30,5 @@ spec:
       application: lydia-api
       access: read
     - team: arbeidsgiver
-      application: tharald-kcat
+      application: teamia-kcat
       access: readwrite   # read, write, readwrite

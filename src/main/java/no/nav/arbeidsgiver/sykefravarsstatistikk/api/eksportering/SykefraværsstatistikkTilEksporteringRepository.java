@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.SykefraværsstatistikkBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
@@ -19,6 +20,8 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.HentSykefraværsstatistikkForBransjerKt.hentSykefraværsstatistikkForBransjerFraOgMed;
+
 @Component
 public class SykefraværsstatistikkTilEksporteringRepository {
 
@@ -26,7 +29,7 @@ public class SykefraværsstatistikkTilEksporteringRepository {
 
   public SykefraværsstatistikkTilEksporteringRepository(
       @Qualifier("sykefravarsstatistikkJdbcTemplate")
-      NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+          NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
     this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
   }
 
@@ -183,6 +186,11 @@ public class SykefraværsstatistikkTilEksporteringRepository {
     }
   }
 
+  public List<SykefraværsstatistikkBransje> hentSykefraværAlleBransjerFraOgMed(ÅrstallOgKvartal fraÅrstallOgKvartal) {
+    return hentSykefraværsstatistikkForBransjerFraOgMed(fraÅrstallOgKvartal, namedParameterJdbcTemplate);
+  }
+
+
   // Utilities
   @NotNull
   private static String getWhereClause(
@@ -242,7 +250,7 @@ public class SykefraværsstatistikkTilEksporteringRepository {
         rs.getBigDecimal("mulige_dagsverk"));
   }
 
-  private SykefraværsstatistikkNæring mapTilSykefraværsstatistikkNæring(ResultSet rs)
+  public static SykefraværsstatistikkNæring mapTilSykefraværsstatistikkNæring(ResultSet rs)
       throws SQLException {
     return new SykefraværsstatistikkNæring(
         rs.getInt("arstall"),

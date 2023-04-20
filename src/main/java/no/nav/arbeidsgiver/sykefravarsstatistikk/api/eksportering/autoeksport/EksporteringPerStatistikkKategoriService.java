@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
@@ -43,9 +44,8 @@ import org.springframework.stereotype.Component;
 public class EksporteringPerStatistikkKategoriService {
 
   private final EksporteringRepository eksporteringRepository;
+  private final SykefraværsstatistikkTilEksporteringRepository tilEksporteringRepository;
   private final SykefraværRepository sykefraværRepository;
-  private final SykefraværsstatistikkTilEksporteringRepository
-      sykefraværsstatistikkTilEksporteringRepository;
   private final KafkaService kafkaService;
   private final boolean erEksporteringAktivert;
 
@@ -57,8 +57,7 @@ public class EksporteringPerStatistikkKategoriService {
       @Value("${statistikk.eksportering.aktivert}") Boolean erEksporteringAktivert) {
     this.eksporteringRepository = eksporteringRepository;
     this.sykefraværRepository = sykefraværRepository;
-    this.sykefraværsstatistikkTilEksporteringRepository =
-        sykefraværsstatistikkTilEksporteringRepository;
+    this.tilEksporteringRepository = sykefraværsstatistikkTilEksporteringRepository;
     this.kafkaService = kafkaService;
     this.erEksporteringAktivert = erEksporteringAktivert;
   }
@@ -80,85 +79,81 @@ public class EksporteringPerStatistikkKategoriService {
         årstallOgKvartal.getKvartal(),
         KafkaTopicName.Companion.from(statistikkategori).getTopic());
 
-    if (Statistikkategori.LAND == statistikkategori) {
+    if (Statistikkategori.LAND.equals(statistikkategori)) {
       return eksporterSykefraværsstatistikkLand(årstallOgKvartal);
     }
 
-    if (Statistikkategori.NÆRING == statistikkategori) {
+    if (Statistikkategori.NÆRING.equals(statistikkategori)) {
       return eksporterSykefraværsstatistikkNæring(årstallOgKvartal);
     }
 
-    if (Statistikkategori.SEKTOR == statistikkategori) {
+    if (Statistikkategori.SEKTOR.equals(statistikkategori)) {
       return eksporterSykefraværsstatistikkSektor(årstallOgKvartal);
     }
 
-    int antallEksporterteVirksomheter = 0;
-
-    try {
-      antallEksporterteVirksomheter =
-          eksporterSykefraværsstatistikkVirksomhet(årstallOgKvartal, eksporteringBegrensning);
-    } catch (KafkaUtsendingException | KafkaException e) {
-      log.warn("Fikk exception fra Kafka med melding: '{}'. Avbryter prosess.", e.getMessage(), e);
+    if (Statistikkategori.BRANSJE.equals(statistikkategori)) {
+      return eksporterSykefraværsstatistikkBransje(årstallOgKvartal);
     }
 
-    return antallEksporterteVirksomheter;
+    if (Statistikkategori.VIRKSOMHET.equals(statistikkategori)) {
+      try {
+        return eksporterSykefraværsstatistikkVirksomhet(årstallOgKvartal, eksporteringBegrensning);
+      } catch (KafkaUtsendingException | KafkaException e) {
+        log.error(
+            "Fikk exception fra Kafka med melding: '{}'. Avbryter prosess.", e.getMessage(), e);
+      }
+    }
+
+    log.warn("Ikke implementert eksport for kategori '{}'", statistikkategori.name());
+    return 0;
   }
 
-  protected int eksporterSykefraværsstatistikkSektor(ÅrstallOgKvartal årstallOgKvartal) {
+  private int eksporterSykefraværsstatistikkBransje(ÅrstallOgKvartal sisteKvartal) {
     long startProcess = System.nanoTime();
-    List<SykefraværsstatistikkSektor> sykefraværsstatistikkSiste4KvartalerSektor =
-        sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleSektorerFraOgMed(
-            årstallOgKvartal.minusKvartaler(3));
+
+    List<SykefraværsstatistikkBransje> sykefraværsstatistikkSisteFireKvartalerBransje =
+        tilEksporteringRepository.hentSykefraværAlleBransjerFraOgMed(
+            sisteKvartal.minusKvartaler(3));
 
     AtomicInteger antallEksportert = new AtomicInteger();
     AtomicInteger antallIkkeEksportert = new AtomicInteger();
 
-    Map<String, List<SykefraværsstatistikkSektor>> sykefraværGruppertEtterSektor =
-        sykefraværsstatistikkSiste4KvartalerSektor.stream()
-            .collect(Collectors.groupingBy(SykefraværsstatistikkSektor::getSektorkode));
+    Map<ArbeidsmiljøportalenBransje, List<SykefraværsstatistikkBransje>>
+        sykefraværGruppertEtterBransje =
+            sykefraværsstatistikkSisteFireKvartalerBransje.stream()
+                .collect(Collectors.groupingBy(SykefraværsstatistikkBransje::getBransje));
 
-    sykefraværGruppertEtterSektor.forEach(
-        (sektor, sykefraværForEnSektor) -> {
+    sykefraværGruppertEtterBransje.forEach(
+        (bransje, sykefraværsstatistikkForEnBransje) -> {
           boolean erSendt = false;
 
-          List<UmaskertSykefraværForEttKvartal> umaskertSykefraværsstatistikkSiste4KvartalerSektor =
-              sykefraværForEnSektor.stream()
-                  .map(
-                      sykefraværForEttKvartal ->
-                          new UmaskertSykefraværForEttKvartal(
-                              new ÅrstallOgKvartal(
-                                  sykefraværForEttKvartal.getÅrstall(),
-                                  sykefraværForEttKvartal.getKvartal()),
-                              sykefraværForEttKvartal.getTapteDagsverk(),
-                              sykefraværForEttKvartal.getMuligeDagsverk(),
-                              sykefraværForEttKvartal.getAntallPersoner()))
+          List<UmaskertSykefraværForEttKvartal> sykefraværForFireKvartaler =
+              sykefraværsstatistikkForEnBransje.stream()
+                  .map(UmaskertSykefraværForEttKvartal::new)
                   .collect(Collectors.toList());
 
-          UmaskertSykefraværForEttKvartal umaskertSykefraværSisteKvartal =
-              getSykefraværSisteKvartal(umaskertSykefraværsstatistikkSiste4KvartalerSektor);
           SykefraværMedKategori sykefraværMedKategoriSisteKvartal =
               new SykefraværMedKategori(
-                  Statistikkategori.SEKTOR,
-                  sektor,
-                  umaskertSykefraværSisteKvartal.getÅrstallOgKvartal(),
-                  umaskertSykefraværSisteKvartal.getDagsverkTeller(),
-                  umaskertSykefraværSisteKvartal.getDagsverkNevner(),
-                  umaskertSykefraværSisteKvartal.getAntallPersoner());
+                  Statistikkategori.BRANSJE,
+                  bransje.name(),
+                  getSykefraværSisteKvartal(sykefraværForFireKvartaler));
+
+          assertForespurteKvartalFinnesIStatistikken(
+              sisteKvartal, sykefraværMedKategoriSisteKvartal);
+
+          SykefraværFlereKvartalerForEksport sykefraværOverFlereKvartaler =
+              new SykefraværFlereKvartalerForEksport(sykefraværForFireKvartaler);
 
           try {
-            SykefraværFlereKvartalerForEksport sykefraværOverFlereKvartaler =
-                new SykefraværFlereKvartalerForEksport(
-                    umaskertSykefraværsstatistikkSiste4KvartalerSektor);
-
             erSendt =
                 kafkaService.sendTilStatistikkKategoriTopic(
-                    årstallOgKvartal,
-                    Statistikkategori.SEKTOR,
-                    sektor,
+                    sisteKvartal,
+                    Statistikkategori.BRANSJE,
+                    bransje.name(),
                     sykefraværMedKategoriSisteKvartal,
                     sykefraværOverFlereKvartaler);
           } catch (KafkaUtsendingException | KafkaException e) {
-            log.warn(
+            log.error(
                 "Fikk exception fra Kafka med melding: '{}'. Avbryter prosess.", e.getMessage(), e);
           }
 
@@ -176,7 +171,7 @@ public class EksporteringPerStatistikkKategoriService {
                 + "Antall statistikk eksportert er: %d, "
                 + "antall ikke eksportert er: %d. "
                 + "Tid for eksportering (i millis): %d",
-            Statistikkategori.SEKTOR.name(),
+            Statistikkategori.BRANSJE.name(),
             antallEksportert.get(),
             antallIkkeEksportert.get(),
             tidsbruktIMillisekund));
@@ -184,10 +179,72 @@ public class EksporteringPerStatistikkKategoriService {
     return antallEksportert.get();
   }
 
+  protected int eksporterSykefraværsstatistikkSektor(ÅrstallOgKvartal årstallOgKvartal) {
+    long startProcess = System.nanoTime();
+    List<SykefraværsstatistikkSektor> sykefraværsstatistikkSiste4KvartalerSektor =
+        tilEksporteringRepository.hentSykefraværAlleSektorerFraOgMed(
+            årstallOgKvartal.minusKvartaler(3));
+
+    AtomicInteger antallEksportert = new AtomicInteger();
+    AtomicInteger antallIkkeEksportert = new AtomicInteger();
+
+    Map<String, List<SykefraværsstatistikkSektor>> sykefraværGruppertEtterSektor =
+        sykefraværsstatistikkSiste4KvartalerSektor.stream()
+            .collect(Collectors.groupingBy(SykefraværsstatistikkSektor::getSektorkode));
+
+    sykefraværGruppertEtterSektor.forEach(
+        (sektor, sykefraværForEnSektor) -> {
+          boolean erSendt = false;
+
+          List<UmaskertSykefraværForEttKvartal> umaskertSykefraværsstatistikkSiste4KvartalerSektor =
+              sykefraværForEnSektor.stream()
+                  .map(UmaskertSykefraværForEttKvartal::new)
+                  .collect(Collectors.toList());
+
+          UmaskertSykefraværForEttKvartal umaskertSykefraværSisteKvartal =
+              getSykefraværSisteKvartal(umaskertSykefraværsstatistikkSiste4KvartalerSektor);
+          SykefraværMedKategori sykefraværMedKategoriSisteKvartal =
+              new SykefraværMedKategori(
+                  Statistikkategori.SEKTOR, sektor, umaskertSykefraværSisteKvartal);
+
+          assertForespurteKvartalFinnesIStatistikken(
+              årstallOgKvartal, sykefraværMedKategoriSisteKvartal);
+
+          try {
+            SykefraværFlereKvartalerForEksport sykefraværOverFlereKvartaler =
+                new SykefraværFlereKvartalerForEksport(
+                    umaskertSykefraværsstatistikkSiste4KvartalerSektor);
+
+            erSendt =
+                kafkaService.sendTilStatistikkKategoriTopic(
+                    årstallOgKvartal,
+                    Statistikkategori.SEKTOR,
+                    sektor,
+                    sykefraværMedKategoriSisteKvartal,
+                    sykefraværOverFlereKvartaler);
+          } catch (KafkaUtsendingException | KafkaException e) {
+            log.error(
+                "Fikk exception fra Kafka med melding: '{}'. Avbryter prosess.", e.getMessage(), e);
+          }
+
+          if (erSendt) {
+            antallEksportert.incrementAndGet();
+          } else {
+            antallIkkeEksportert.incrementAndGet();
+          }
+        });
+
+    long tidsbruktIMillisekund = (System.nanoTime() - startProcess) / 1000000;
+    logStatusrapport(
+        Statistikkategori.SEKTOR, antallEksportert, antallIkkeEksportert, tidsbruktIMillisekund);
+
+    return antallEksportert.get();
+  }
+
   protected int eksporterSykefraværsstatistikkNæring(ÅrstallOgKvartal årstallOgKvartal) {
     long startProcess = System.nanoTime();
     List<SykefraværsstatistikkNæring> sykefraværsstatistikkSiste4KvartalerNæring =
-        sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleNæringerFraOgMed(
+        tilEksporteringRepository.hentSykefraværAlleNæringerFraOgMed(
             årstallOgKvartal.minusKvartaler(3));
 
     AtomicInteger antallEksportert = new AtomicInteger();
@@ -225,6 +282,9 @@ public class EksporteringPerStatistikkKategoriService {
                   umaskertSykefraværSisteKvartal.getDagsverkNevner(),
                   umaskertSykefraværSisteKvartal.getAntallPersoner());
 
+          assertForespurteKvartalFinnesIStatistikken(
+              årstallOgKvartal, sykefraværMedKategoriSisteKvartal);
+
           try {
             SykefraværFlereKvartalerForEksport sykefraværOverFlereKvartaler =
                 new SykefraværFlereKvartalerForEksport(
@@ -238,7 +298,7 @@ public class EksporteringPerStatistikkKategoriService {
                     sykefraværMedKategoriSisteKvartal,
                     sykefraværOverFlereKvartaler);
           } catch (KafkaUtsendingException | KafkaException e) {
-            log.warn(
+            log.error(
                 "Fikk exception fra Kafka med melding: '{}'. Avbryter prosess.", e.getMessage(), e);
           }
 
@@ -250,16 +310,8 @@ public class EksporteringPerStatistikkKategoriService {
         });
 
     long tidsbruktIMillisekund = (System.nanoTime() - startProcess) / 1000000;
-    log.info(
-        format(
-            "Eksport av statistikk for kategori %s er ferdig. "
-                + "Antall statistikk eksportert er: %d, "
-                + "antall ikke eksportert er: %d. "
-                + "Tid for eksportering (i millis): %d",
-            Statistikkategori.NÆRING.name(),
-            antallEksportert.get(),
-            antallIkkeEksportert.get(),
-            tidsbruktIMillisekund));
+    logStatusrapport(
+        Statistikkategori.NÆRING, antallEksportert, antallIkkeEksportert, tidsbruktIMillisekund);
 
     return antallEksportert.get();
   }
@@ -276,6 +328,8 @@ public class EksporteringPerStatistikkKategoriService {
                 hentSisteKvartalIBeregningen(
                     umaskertSykefraværsstatistikkSiste4KvartalerLand, årstallOgKvartal)));
 
+    assertForespurteKvartalFinnesIStatistikken(årstallOgKvartal, landSykefravær);
+
     boolean erSent = false;
     AtomicInteger antallEksportert = new AtomicInteger();
     AtomicInteger antallIkkeEksportert = new AtomicInteger();
@@ -291,7 +345,7 @@ public class EksporteringPerStatistikkKategoriService {
               landSykefravær,
               sykefraværOverFlereKvartaler);
     } catch (KafkaUtsendingException | KafkaException e) {
-      log.warn("Fikk exception fra Kafka med melding: '{}'. Avbryter prosess.", e.getMessage(), e);
+      log.error("Fikk exception fra Kafka med melding: '{}'. Avbryter prosess.", e.getMessage(), e);
     }
 
     if (erSent) {
@@ -313,6 +367,13 @@ public class EksporteringPerStatistikkKategoriService {
             tidsbruktIMillisekund));
 
     return antallEksportert.get();
+  }
+
+  private static void assertForespurteKvartalFinnesIStatistikken(
+      ÅrstallOgKvartal årstallOgKvartal, SykefraværMedKategori landSykefravær) {
+    if (!årstallOgKvartal.equals(landSykefravær.getÅrstallOgKvartal())) {
+      throw new RuntimeException("Siste kvartal i dataene er ikke lik forespurt kvartal");
+    }
   }
 
   protected int eksporterSykefraværsstatistikkVirksomhet(
@@ -342,7 +403,7 @@ public class EksporteringPerStatistikkKategoriService {
 
     log.info("Starting utregning av statistikk");
     List<SykefraværsstatistikkVirksomhetUtenVarighet> alleKvartal =
-        sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleVirksomheter(
+        tilEksporteringRepository.hentSykefraværAlleVirksomheter(
             årstallOgKvartal.minusKvartaler(3), årstallOgKvartal);
 
     Map<String, List<SykefraværsstatistikkVirksomhetUtenVarighet>> sykefraværGruppertEtterOrgNr =
@@ -378,16 +439,17 @@ public class EksporteringPerStatistikkKategoriService {
           long startUtsendingProcessForSubset = System.nanoTime();
 
           virksomheter.forEach(
-              virksomhet -> sendStatistikkForVirksomhetOgOppdaterMetrikker(
-                  virksomhet,
-                  årstallOgKvartal,
-                  sykefraværMedKategoriSisteKvartalMap,
-                  sykefraværOverFlereKvartalerMap,
-                  antallEksportert,
-                  antallIkkeEksportert,
-                  antallUtenStatistikk,
-                  antallVirksomheterLagretSomEksportertIDb,
-                  eksporterteVirksomheterListe));
+              virksomhet ->
+                  sendStatistikkForVirksomhetOgOppdaterMetrikker(
+                      virksomhet,
+                      årstallOgKvartal,
+                      sykefraværMedKategoriSisteKvartalMap,
+                      sykefraværOverFlereKvartalerMap,
+                      antallEksportert,
+                      antallIkkeEksportert,
+                      antallUtenStatistikk,
+                      antallVirksomheterLagretSomEksportertIDb,
+                      eksporterteVirksomheterListe));
 
           int antallRestendeOppdatert =
               lagreEksporterteVirksomheterOgNullstillLista(
@@ -460,6 +522,9 @@ public class EksporteringPerStatistikkKategoriService {
             Statistikkategori.VIRKSOMHET,
             virksomhet.getOrgnr(),
             virksomhet.getÅrstallOgKvartal());
+
+    assertForespurteKvartalFinnesIStatistikken(årstallOgKvartal, sykefraværMedKategori);
+
     SykefraværFlereKvartalerForEksport sykefraværOverFlereKvartaler =
         getSykefraværOverFlereKvartaler(sykefraværOverFlereKvartalerMap, virksomhet.getOrgnr());
 
@@ -522,8 +587,7 @@ public class EksporteringPerStatistikkKategoriService {
 
   private Map<String, SykefraværMedKategori> createSykefraværMedKategoriMap(
       Map<String, List<SykefraværsstatistikkVirksomhetUtenVarighet>> sykefraværGruppertEtterOrgNr) {
-    Map<String, SykefraværMedKategori> sykefraværSisteKvartalPerOrg =
-        new HashMap<>();
+    Map<String, SykefraværMedKategori> sykefraværSisteKvartalPerOrg = new HashMap<>();
 
     sykefraværGruppertEtterOrgNr.forEach(
         (orgnr, sykefravær) -> {
@@ -578,5 +642,19 @@ public class EksporteringPerStatistikkKategoriService {
         });
 
     return sykefraværOverFlereKvartalerPerOrgNr;
+  }
+
+  private static void logStatusrapport(
+      Statistikkategori kategori,
+      AtomicInteger antallEksportert,
+      AtomicInteger antallIkkeEksportert,
+      long tidsbruktIMillisekund) {
+    log.info(
+        format(
+            "Eksport av statistikk for kategori %s er ferdig. "
+                + "Antall statistikk eksportert er: %d, "
+                + "antall ikke eksportert er: %d. "
+                + "Tid for eksportering (i millis): %d",
+            kategori, antallEksportert.get(), antallIkkeEksportert.get(), tidsbruktIMillisekund));
   }
 }

@@ -3,7 +3,7 @@ kind: Topic
 metadata:
   annotations:
     kafka.nais.io/removeDataWhenResourceIsDeleted: "true"
-  name: sykefravarsstatistikk-virksomhet-v1
+  name: sykefravarsstatistikk-bransje-v1
   namespace: arbeidsgiver
   labels:
     team: arbeidsgiver

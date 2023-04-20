@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class Bransjeprogram {
 
-  private static final Bransje BARNEHAGER =
+  public static final Bransje BARNEHAGER =
       new Bransje(ArbeidsmiljøportalenBransje.BARNEHAGER, "Barnehager", "88911");
-  private static final Bransje NÆRINGSMIDDELINDUSTRI =
+  public static final Bransje NÆRINGSMIDDELINDUSTRI =
       new Bransje(
           ArbeidsmiljøportalenBransje.NÆRINGSMIDDELINDUSTRI, "Næringsmiddelsindustrien", "10");
-  private static final Bransje SYKEHUS =
+  public static final Bransje SYKEHUS =
       new Bransje(
           ArbeidsmiljøportalenBransje.SYKEHUS,
           "Sykehus",
@@ -25,9 +25,9 @@ public class Bransjeprogram {
           "86105",
           "86106",
           "86107");
-  private static final Bransje SYKEHJEM =
+  public static final Bransje SYKEHJEM =
       new Bransje(ArbeidsmiljøportalenBransje.SYKEHJEM, "Sykehjem", "87101", "87102");
-  private static final Bransje TRANSPORT =
+  public static final Bransje TRANSPORT =
       new Bransje(
           ArbeidsmiljøportalenBransje.TRANSPORT,
           "Rutebuss og persontrafikk (transport)",
@@ -35,11 +35,11 @@ public class Bransjeprogram {
           "49311",
           "49391",
           "49392");
-  private static final Bransje BYGG = new Bransje(ArbeidsmiljøportalenBransje.BYGG, "Bygg", "41");
-  private static final Bransje ANLEGG =
+  public static final Bransje BYGG = new Bransje(ArbeidsmiljøportalenBransje.BYGG, "Bygg", "41");
+  public static final Bransje ANLEGG =
       new Bransje(ArbeidsmiljøportalenBransje.ANLEGG, "Anlegg", "42");
 
-  private static final List<Bransje> bransjer =
+  public static final List<Bransje> bransjer =
       Arrays.asList(BARNEHAGER, NÆRINGSMIDDELINDUSTRI, SYKEHUS, SYKEHJEM, TRANSPORT, BYGG, ANLEGG);
 
   public Optional<Bransje> finnBransje(Underenhet underenhet) {
