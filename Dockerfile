@@ -1,4 +1,4 @@
-FROM navikt/java:11-appdynamics
+FROM navikt/java:17
 ENV APPD_ENABLED=false
 ENV APP_NAME=sykefravarsstatistikk-api
 COPY import-vault-secrets.sh /init-scripts
