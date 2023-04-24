@@ -10,10 +10,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
@@ -121,14 +118,14 @@ public class EnhetsregisteretClient {
     }
   }
 
-  public HttpStatus healthcheck() {
+  public HttpStatusCode healthcheck() {
     try {
       ResponseEntity<String> response =
           restTemplate.exchange(
               enhetsregisteretUrl, HttpMethod.GET, HttpEntity.EMPTY, String.class);
       return response.getStatusCode();
     } catch (RestClientResponseException e) {
-      return HttpStatus.valueOf(e.getRawStatusCode());
+      return HttpStatus.valueOf(e.getStatusCode().value());
     }
   }
 }

@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.healthcheck;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.security.token.support.core.api.Unprotected;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,8 +25,8 @@ public class HealthcheckController {
   }
 
   @GetMapping("/internal/healthcheck/avhengigheter")
-  public Map<String, HttpStatus> sjekkAvhengigheter() {
-    Map<String, HttpStatus> statuser = new HashMap<>();
+  public Map<String, HttpStatusCode> sjekkAvhengigheter() {
+    Map<String, HttpStatusCode> statuser = new HashMap<>();
     statuser.put("enhetsregisteret", enhetsregisteretClient.healthcheck());
     return statuser;
   }
