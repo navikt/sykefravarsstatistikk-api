@@ -33,7 +33,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
@@ -55,7 +55,7 @@ import org.springframework.web.context.WebApplicationContext;
     },
     brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
 @Disabled // TODO: spiller dårlig sammen med KafkaServiceIntegrasjonTest (pga "adress already in use
-          // når EmbeddedKafkaBroker starter")
+// når EmbeddedKafkaBroker starter")
 public class EksporteringControllerApiIntegrationTest extends SpringIntegrationTestbase {
 
   @Autowired private WebApplicationContext webApplicationContext;

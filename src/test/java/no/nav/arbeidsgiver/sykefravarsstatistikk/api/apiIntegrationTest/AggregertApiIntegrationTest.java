@@ -38,7 +38,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
@@ -47,11 +47,9 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
   private static final String ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER = "910825518";
   private static final String ORGNR_UNDERENHET_INGEN_TILGANG = "777777777";
 
-  @Autowired
-  private NamedParameterJdbcTemplate jdbcTemplate;
+  @Autowired private NamedParameterJdbcTemplate jdbcTemplate;
 
-  @Autowired
-  MockOAuth2Server mockOAuth2Server;
+  @Autowired MockOAuth2Server mockOAuth2Server;
 
   @BeforeEach
   public void setUp() {
@@ -66,8 +64,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
     slettAlleImporttidspunkt(jdbcTemplate);
   }
 
-  @LocalServerPort
-  private String port;
+  @LocalServerPort private String port;
 
   private final ObjectMapper objectMapper = new ObjectMapper();
   private final Næringskode5Siffer BARNEHAGER = new Næringskode5Siffer("88911", "Barnehager");
@@ -231,8 +228,8 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
 
   @Test
   public void
-  hentAgreggertStatistikk_returnererIkkeVirksomhetstatistikkTilBrukerSomManglerIaRettigheter()
-      throws Exception {
+      hentAgreggertStatistikk_returnererIkkeVirksomhetstatistikkTilBrukerSomManglerIaRettigheter()
+          throws Exception {
     ÅrstallOgKvartal ettÅrSiden = SISTE_PUBLISERTE_KVARTAL.minusEttÅr();
     opprettStatistikkForNæring5Siffer(
         jdbcTemplate,
@@ -250,7 +247,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
     JsonNode responseBody = objectMapper.readTree(response.body());
 
     assertThat(
-        responseBody.get("prosentSiste4KvartalerTotalt").findValuesAsText("statistikkategori"))
+            responseBody.get("prosentSiste4KvartalerTotalt").findValuesAsText("statistikkategori"))
         .containsExactlyInAnyOrderElementsOf(List.of(BRANSJE.toString(), LAND.toString()));
 
     assertThat(responseBody.get("trendTotalt").findValuesAsText("statistikkategori"))
@@ -272,7 +269,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
     JsonNode responseBody = objectMapper.readTree(response.body());
 
     assertThat(
-        responseBody.get("prosentSiste4KvartalerTotalt").findValuesAsText("statistikkategori"))
+            responseBody.get("prosentSiste4KvartalerTotalt").findValuesAsText("statistikkategori"))
         .isEmpty();
   }
 
