@@ -147,14 +147,14 @@ class EksporteringService(
         return antallEksportert.get()
     }
 
-    protected fun sendIBatch(
+    private fun sendIBatch(
         virksomheterMetadata: List<VirksomhetMetadata?>,
-        årstallOgKvartal: ÅrstallOgKvartal?,
+        årstallOgKvartal: ÅrstallOgKvartal,
         sykefraværsstatistikkSektor: List<SykefraværsstatistikkSektor?>?,
         sykefraværsstatistikkNæring: List<SykefraværsstatistikkNæring?>?,
         sykefraværsstatistikkNæring5Siffer: List<SykefraværsstatistikkNæring5Siffer?>?,
         sykefraværsstatistikkVirksomhetUtenVarighet: List<SykefraværsstatistikkVirksomhetUtenVarighet?>?,
-        landSykefravær: SykefraværMedKategori?,
+        landSykefravær: SykefraværMedKategori,
         antallEksportert: AtomicInteger,
         antallTotaltStatistikk: Int
     ) {
