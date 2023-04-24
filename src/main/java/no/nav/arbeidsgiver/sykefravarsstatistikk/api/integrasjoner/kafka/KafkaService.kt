@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -24,46 +24,44 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
 @Service
-public class KafkaService {
+open class KafkaService internal constructor(
+    private val kafkaTemplate: KafkaTemplate<String, String>,
+    private val kafkaUtsendingRapport: KafkaUtsendingRapport,
+    private val kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository
+) {
+    private val log = LoggerFactory.getLogger(KafkaService::class.java)
+    private val objectMapper = ObjectMapper()
 
-  private final Logger log = LoggerFactory.getLogger(KafkaService.class);
-  private static final ObjectMapper objectMapper = new ObjectMapper();
+    val antallMeldingerMottattForUtsending: Int
+        get() = kafkaUtsendingRapport.antallMeldingerMottattForUtsending
+    val snittTidUtsendingTilKafka: Long
+        get() = kafkaUtsendingRapport.snittTidUtsendingTilKafka
+    val snittTidOppdateringIDB: Long
+        get() = kafkaUtsendingRapport.snittTidOppdateringIDB
+    val råDataVedDetaljertMåling: String
+        get() = kafkaUtsendingRapport.råDataVedDetaljertMåling
 
-  private final KafkaTemplate<String, String> kafkaTemplate;
-  private final KafkaUtsendingRapport kafkaUtsendingRapport;
-  private final KafkaUtsendingHistorikkRepository kafkaUtsendingHistorikkRepository;
+    open fun nullstillUtsendingRapport(
+        totalMeldingerTilUtsending: Int, kafkaTopicName: KafkaTopicName
+    ) {
+        log.info(
+            "Gjør utsendingrapport klar før utsending på Kafka topic '{}'. '{}' meldinger vil bli sendt.",
+            kafkaTopicName.topic,
+            totalMeldingerTilUtsending
+        )
+        kafkaUtsendingRapport.reset(totalMeldingerTilUtsending)
+    }
 
-  KafkaService(
-      KafkaTemplate<String, String> kafkaTemplate,
-      KafkaUtsendingRapport kafkaUtsendingRapport,
-      KafkaUtsendingHistorikkRepository kafkaUtsendingHistorikkRepository) {
-    this.kafkaTemplate = kafkaTemplate;
-    this.kafkaUtsendingRapport = kafkaUtsendingRapport;
-    this.kafkaUtsendingHistorikkRepository = kafkaUtsendingHistorikkRepository;
-  }
-
-  public void nullstillUtsendingRapport(
-      int totalMeldingerTilUtsending, KafkaTopicName kafkaTopicName) {
-    log.info(
-        "Gjør utsendingrapport klar før utsending på Kafka topic '{}'. '{}' meldinger vil bli sendt.",
-        kafkaTopicName.getTopic(),
-        totalMeldingerTilUtsending);
-    kafkaUtsendingRapport.reset(totalMeldingerTilUtsending);
-  }
-
-  public int getAntallMeldingerMottattForUtsending() {
-    return kafkaUtsendingRapport.getAntallMeldingerMottattForUtsending();
-  }
-
-  public boolean sendTilStatistikkKategoriTopic(
-      ÅrstallOgKvartal årstallOgKvartal,
-      Statistikkategori statistikkategori,
-      String identifikator,
-      SykefraværMedKategori sykefraværMedKategori,
-      SykefraværFlereKvartalerForEksport sykefraværOverFlereKvartaler) {
-    kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
-    KafkaStatistikkategoriTopicKey key =
-        new KafkaStatistikkategoriTopicKey(
+    open fun sendTilStatistikkKategoriTopic(
+        årstallOgKvartal: ÅrstallOgKvartal,
+        statistikkategori: Statistikkategori,
+        identifikator: String,
+        sykefraværMedKategori: SykefraværMedKategori,
+        sykefraværOverFlereKvartaler: SykefraværFlereKvartalerForEksport?
+    ): Boolean {
+        kafkaUtsendingRapport.leggTilMeldingMottattForUtsending()
+        val topicNavn = from(statistikkategori).topic
+        val key = KafkaStatistikkategoriTopicKey(
             statistikkategori,
             identifikator,
             årstallOgKvartal.getKvartal(),
@@ -122,33 +120,33 @@ public class KafkaService {
     return true;
   }
 
-  public void send(
-      ÅrstallOgKvartal årstallOgKvartal,
-      VirksomhetSykefravær virksomhetSykefravær,
-      List<SykefraværMedKategori> næring5SifferSykefravær,
-      SykefraværMedKategori næringSykefravær,
-      SykefraværMedKategori sektorSykefravær,
-      SykefraværMedKategori landSykefravær) {
-    // TODO bytt til Prometheus
-    kafkaUtsendingRapport.leggTilMeldingMottattForUtsending();
-
-    if (kafkaUtsendingRapport.getAntallMeldingerIError() > 5) {
-      throw new KafkaUtsendingException(
-          String.format(
-              "Antall error:'%d'. Avbryter eksportering. Totalt meldinger som var klar for sending er: '%d'."
-                  + " Antall meldinger som har egentlig blitt sendt: '%d'",
-              kafkaUtsendingRapport.getAntallMeldingerIError(),
-              kafkaUtsendingRapport.getAntallMeldingerSent(),
-              kafkaUtsendingRapport.getAntallMeldingerMottattForUtsending()));
-    }
-
-    KafkaTopicKey key =
-        new KafkaTopicKey(
-            virksomhetSykefravær.getOrgnr(),
-            årstallOgKvartal.getKvartal(),
-            årstallOgKvartal.getÅrstall());
-    KafkaTopicValue value =
-        new KafkaTopicValue(
+    open fun send(
+        årstallOgKvartal: ÅrstallOgKvartal,
+        virksomhetSykefravær: VirksomhetSykefravær,
+        næring5SifferSykefravær: List<SykefraværMedKategori?>,
+        næringSykefravær: SykefraværMedKategori,
+        sektorSykefravær: SykefraværMedKategori,
+        landSykefravær: SykefraværMedKategori
+    ) {
+        // TODO bytt til Prometheus
+        kafkaUtsendingRapport.leggTilMeldingMottattForUtsending()
+        if (kafkaUtsendingRapport.antallMeldingerIError > 5) {
+            throw KafkaUtsendingException(
+                String.format(
+                    "Antall error:'%d'. Avbryter eksportering. Totalt meldinger som var klar for sending er: '%d'."
+                            + " Antall meldinger som har egentlig blitt sendt: '%d'",
+                    kafkaUtsendingRapport.antallMeldingerIError,
+                    kafkaUtsendingRapport.antallMeldingerSent,
+                    kafkaUtsendingRapport.antallMeldingerMottattForUtsending
+                )
+            )
+        }
+        val key = KafkaTopicKey(
+            virksomhetSykefravær.orgnr,
+            årstallOgKvartal.kvartal,
+            årstallOgKvartal.årstall
+        )
+        val value = KafkaTopicValue(
             virksomhetSykefravær,
             næring5SifferSykefravær,
             næringSykefravær,
@@ -207,19 +205,19 @@ public class KafkaService {
     return kafkaUtsendingRapport.getSnittTidOppdateringIDB();
   }
 
-  public String getRåDataVedDetaljertMåling() {
-    return kafkaUtsendingRapport.getRåDataVedDetaljertMåling();
-  }
+    open fun addUtsendingTilKafkaProcessingTime(
+        startUtsendingProcess: Long, stopUtsendingProcess: Long
+    ) {
+        kafkaUtsendingRapport.addUtsendingTilKafkaProcessingTime(
+            startUtsendingProcess, stopUtsendingProcess
+        )
+    }
 
-  public void addUtsendingTilKafkaProcessingTime(
-      long startUtsendingProcess, long stopUtsendingProcess) {
-    kafkaUtsendingRapport.addUtsendingTilKafkaProcessingTime(
-        startUtsendingProcess, stopUtsendingProcess);
-  }
-
-  public void addDBOppdateringProcessingTime(
-      long startDBOppdateringProcess, long stopDBOppdateringProcess) {
-    kafkaUtsendingRapport.addDBOppdateringProcessingTime(
-        startDBOppdateringProcess, stopDBOppdateringProcess);
-  }
+    open fun addDBOppdateringProcessingTime(
+        startDBOppdateringProcess: Long, stopDBOppdateringProcess: Long
+    ) {
+        kafkaUtsendingRapport.addDBOppdateringProcessingTime(
+            startDBOppdateringProcess, stopDBOppdateringProcess
+        )
+    }
 }
