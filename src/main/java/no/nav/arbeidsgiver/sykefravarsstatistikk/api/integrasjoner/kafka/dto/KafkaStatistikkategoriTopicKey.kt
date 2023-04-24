@@ -1,10 +1,14 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
 
-data class KafkaStatistikkategoriTopicKey(
-    val kategori: Statistikkategori,
-    val kode: String,
-    val kvartal: Int,
-    val årstall: Int,
-)
+@Getter
+@AllArgsConstructor
+public class KafkaStatistikkategoriTopicKey {
+  Statistikkategori kategori;
+  String kode;
+  int kvartal;
+  int årstall;
+}
