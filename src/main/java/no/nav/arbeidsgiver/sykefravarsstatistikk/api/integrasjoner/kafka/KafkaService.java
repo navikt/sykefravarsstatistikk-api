@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.SykefraværFlereKvartalerForEksport;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
@@ -21,8 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 
 @Service
 public class KafkaService {
@@ -89,38 +88,36 @@ public class KafkaService {
 
     String topicNavn = KafkaTopicName.Companion.from(statistikkategori).getTopic();
 
-    ListenableFuture<SendResult<String, String>> futureResult =
+    CompletableFuture<SendResult<String, String>> futureResult =
         kafkaTemplate.send(topicNavn, keyAsJsonString, dataAsJsonString);
 
-    futureResult.addCallback(
-        new ListenableFutureCallback<>() {
-          @Override
-          public void onFailure(Throwable throwable) {
-            kafkaUtsendingRapport.leggTilError(
-                String.format(
-                    "Utsending feilet for statistikk kategori '%s' og kode '%s',  med melding '%s'",
-                    sykefraværMedKategori.getKategori().name(),
-                    sykefraværMedKategori.getKode(),
-                    throwable.getMessage()));
-          }
+    futureResult
+        .thenAcceptAsync(
+            res -> {
+              kafkaUtsendingRapport.leggTilUtsendingSuksess();
+              log.debug(
+                  "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
+                  topicNavn,
+                  res.getProducerRecord().key(),
+                  res.getRecordMetadata().offset());
 
-          @Override
-          public void onSuccess(SendResult<String, String> res) {
-            kafkaUtsendingRapport.leggTilUtsendingSuksess();
-            log.debug(
-                "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
-                topicNavn,
-                res.getProducerRecord().key(),
-                res.getRecordMetadata().offset());
-
-            if (Statistikkategori.VIRKSOMHET == statistikkategori) {
-              kafkaUtsendingHistorikkRepository.opprettHistorikk(
-                  identifikator, // for Statistikkategori.VIRKSOMHET er identifikator et orgnr
-                  keyAsJsonString,
-                  dataAsJsonString);
-            }
-          }
-        });
+              if (Statistikkategori.VIRKSOMHET == statistikkategori) {
+                kafkaUtsendingHistorikkRepository.opprettHistorikk(
+                    identifikator, // for Statistikkategori.VIRKSOMHET er identifikator et orgnr
+                    keyAsJsonString,
+                    dataAsJsonString);
+              }
+            })
+        .exceptionally(
+            throwable -> {
+              kafkaUtsendingRapport.leggTilError(
+                  String.format(
+                      "Utsending feilet for statistikk kategori '%s' og kode '%s', med melding '%s'",
+                      sykefraværMedKategori.getKategori().name(),
+                      sykefraværMedKategori.getKode(),
+                      throwable.getMessage()));
+              return null;
+            });
 
     return true;
   }
@@ -174,34 +171,32 @@ public class KafkaService {
       return;
     }
 
-    ListenableFuture<SendResult<String, String>> futureResult =
+    CompletableFuture<SendResult<String, String>> futureResult =
         kafkaTemplate.send(
             KafkaTopicName.SYKEFRAVARSSTATISTIKK_V1.getTopic(), keyAsJsonString, dataAsJsonString);
 
-    futureResult.addCallback(
-        new ListenableFutureCallback<>() {
-          @Override
-          public void onFailure(Throwable throwable) {
-            kafkaUtsendingRapport.leggTilError(
-                String.format(
-                    "Utsending feilet for orgnr '%s' med melding '%s'",
-                    virksomhetSykefravær.getOrgnr(), throwable.getMessage()),
-                new Orgnr(virksomhetSykefravær.getOrgnr()));
-          }
-
-          @Override
-          public void onSuccess(SendResult<String, String> res) {
-            kafkaUtsendingRapport.leggTilUtsendingSuksess(
-                new Orgnr(virksomhetSykefravær.getOrgnr()));
-            log.debug(
-                "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
-                KafkaTopicName.SYKEFRAVARSSTATISTIKK_V1.getTopic(),
-                res.getProducerRecord().key(),
-                res.getRecordMetadata().offset());
-            kafkaUtsendingHistorikkRepository.opprettHistorikk(
-                virksomhetSykefravær.getOrgnr(), keyAsJsonString, dataAsJsonString);
-          }
-        });
+    futureResult
+        .thenAcceptAsync(
+            res -> {
+              kafkaUtsendingRapport.leggTilUtsendingSuksess(
+                  new Orgnr(virksomhetSykefravær.getOrgnr()));
+              log.debug(
+                  "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
+                  KafkaTopicName.SYKEFRAVARSSTATISTIKK_V1.getTopic(),
+                  res.getProducerRecord().key(),
+                  res.getRecordMetadata().offset());
+              kafkaUtsendingHistorikkRepository.opprettHistorikk(
+                  virksomhetSykefravær.getOrgnr(), keyAsJsonString, dataAsJsonString);
+            })
+        .exceptionally(
+            throwable -> {
+              kafkaUtsendingRapport.leggTilError(
+                  String.format(
+                      "Utsending feilet for orgnr '%s' med melding '%s'",
+                      virksomhetSykefravær.getOrgnr(), throwable.getMessage()),
+                  new Orgnr(virksomhetSykefravær.getOrgnr()));
+              return null;
+            });
   }
 
   public long getSnittTidUtsendingTilKafka() {

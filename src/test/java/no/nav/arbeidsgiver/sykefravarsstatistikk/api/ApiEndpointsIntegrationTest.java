@@ -33,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -42,17 +42,13 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
   private final int SISTE_ÅRSTALL = SISTE_PUBLISERTE_KVARTAL.getÅrstall();
   private final int SISTE_KVARTAL = SISTE_PUBLISERTE_KVARTAL.getKvartal();
 
-  @Autowired
-  private WebApplicationContext webApplicationContext;
+  @Autowired private WebApplicationContext webApplicationContext;
 
-  @Autowired
-  MockOAuth2Server mockOAuth2Server;
+  @Autowired MockOAuth2Server mockOAuth2Server;
 
-  @Autowired
-  private NamedParameterJdbcTemplate jdbcTemplate;
+  @Autowired private NamedParameterJdbcTemplate jdbcTemplate;
 
-  @LocalServerPort
-  private String port;
+  @LocalServerPort private String port;
 
   private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -78,8 +74,8 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
 
   @Test
   public void
-  sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_selvbetjening_token__issued_med_sub()
-      throws Exception {
+      sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_selvbetjening_token__issued_med_sub()
+          throws Exception {
     String jwtTokenIssuedByLoginservice =
         TestTokenUtil.createToken(mockOAuth2Server, "", "15008462396", SELVBETJENING_ISSUER_ID, "");
     opprettGenerellStatistikk();
@@ -88,8 +84,8 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
 
   @Test
   public void
-  sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_idporten()
-      throws Exception {
+      sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_idporten()
+          throws Exception {
     String jwtToken =
         TestTokenUtil.createToken(
             mockOAuth2Server,
@@ -102,8 +98,8 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
 
   @Test
   public void
-  sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_loginservice()
-      throws Exception {
+      sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_loginservice()
+          throws Exception {
     String jwtToken =
         TestTokenUtil.createToken(
             mockOAuth2Server,
@@ -149,9 +145,9 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
     JsonNode alleSykefraværshistorikk = objectMapper.readTree(response.body());
 
     assertThat(
-        alleSykefraværshistorikk.findValues("type").stream()
-            .map(v -> v.textValue())
-            .collect(Collectors.toList()))
+            alleSykefraværshistorikk.findValues("type").stream()
+                .map(v -> v.textValue())
+                .collect(Collectors.toList()))
         .containsExactlyInAnyOrderElementsOf(
             Arrays.asList(
                 Statistikkategori.LAND.toString(),

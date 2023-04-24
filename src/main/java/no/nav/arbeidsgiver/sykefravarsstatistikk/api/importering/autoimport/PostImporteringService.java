@@ -139,8 +139,11 @@ public class PostImporteringService {
               + "med 'eksportert=true' i tabell 'eksport_per_kvartal'. "
               + "Etter det kan du kjøre denne prosessen (forbered neste eksport) på nytt. ",
           antallIkkeEksportertSykefaværsstatistikk);
+      // Vi er ikke ferdige med forrige eksport enda 💀
       return 0;
     }
+
+    // Starter å forberede neste eksport:
     int antallSlettetEksportertPerKvartal = eksporteringRepository.slettEksportertPerKvartal();
     log.info("Slettet '{}' rader fra forrige eksportering.", antallSlettetEksportertPerKvartal);
     List<VirksomhetMetadata> virksomhetMetadata =
