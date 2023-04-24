@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api;
 
-import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.DatauthentingFeil;
 import no.nav.security.token.support.core.api.Unprotected;
@@ -19,7 +18,7 @@ public class PubliseringsdatoerController {
   }
 
   @GetMapping(value = "/publiseringsdato")
-  public Publiseringsdatoer hentPubliseringsdatoInfo(HttpServletRequest request) {
+  public Publiseringsdatoer hentPubliseringsdatoInfo() {
 
     return publiseringsdatoerService
         .hentPubliseringsdatoer()

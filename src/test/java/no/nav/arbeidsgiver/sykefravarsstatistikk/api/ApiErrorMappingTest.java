@@ -4,7 +4,7 @@ import common.SpringIntegrationTestbase;
 import no.nav.security.mock.oauth2.MockOAuth2Server;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
