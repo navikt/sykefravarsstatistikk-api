@@ -72,6 +72,22 @@ public class EksporteringController {
     }
   }
 
+  @PostMapping("/reeksport/metadata")
+  public ResponseEntity<HttpStatus> reeksportMetadata(
+      @RequestParam int årstall,
+      @RequestParam int kvartal) {
+    ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
+    int antallEksportert =
+        eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(
+            årstallOgKvartal, kategori, getBegrensning(begrensningTil));
+
+    if (antallEksportert >= 0) {
+      return ResponseEntity.ok(HttpStatus.CREATED);
+    } else {
+      return ResponseEntity.ok(HttpStatus.OK);
+    }
+  }
+
   private EksporteringBegrensning getBegrensning(int begrensningTil) {
     return begrensningTil == 0
         ? EksporteringBegrensning.build().utenBegrensning()

@@ -42,11 +42,17 @@ public class Bransjeprogram {
   public static final List<Bransje> bransjer =
       Arrays.asList(BARNEHAGER, NÆRINGSMIDDELINDUSTRI, SYKEHUS, SYKEHJEM, TRANSPORT, BYGG, ANLEGG);
 
-  public Optional<Bransje> finnBransje(Underenhet underenhet) {
+  public static Optional<Bransje> finnBransje(Underenhet underenhet) {
     return bransjer.stream().filter(bransje -> bransje.inkludererVirksomhet(underenhet)).findAny();
   }
 
-  public Optional<Bransje> finnBransje(Næringskode5Siffer næringskode5Siffer) {
+  public static Optional<Bransje> finnBransje(String næringskode5Siffer) {
+    return bransjer.stream()
+        .filter(bransje -> bransje.inkludererNæringskode(næringskode5Siffer))
+        .findAny();
+  }
+
+  public static Optional<Bransje> finnBransje(Næringskode5Siffer næringskode5Siffer) {
     return bransjer.stream()
         .filter(bransje -> bransje.inkludererNæringskode(næringskode5Siffer))
         .findAny();

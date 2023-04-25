@@ -8,7 +8,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Arbei
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicNavn
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicNavn.Companion.toStringArray
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.MetadataKafkamelding
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.MetadataVirksomhetKafkamelding
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.Sektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal
@@ -64,9 +64,12 @@ class KafkaServiceIntegrasjonTest {
     fun setUp() {
         consumerRecords = LinkedBlockingQueue()
         val containerProperties = ContainerProperties(*TOPIC_NAMES)
-        val consumerProperties = KafkaTestUtils.consumerProps("consumer", "false", embeddedKafkaBroker)
-        consumerProperties[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
-        consumerProperties[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
+        val consumerProperties =
+            KafkaTestUtils.consumerProps("consumer", "false", embeddedKafkaBroker)
+        consumerProperties[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] =
+            StringDeserializer::class.java
+        consumerProperties[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] =
+            StringDeserializer::class.java
         consumerProperties[ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG] = "60000"
         val kafkaConsumerFactory = DefaultKafkaConsumerFactory<String, String>(consumerProperties)
         container = KafkaMessageListenerContainer(kafkaConsumerFactory, containerProperties)
@@ -89,7 +92,13 @@ class KafkaServiceIntegrasjonTest {
     @Test
     fun `send kafkamelding med metadata sender på riktig topic`() {
         kafkaService.send(
-            MetadataKafkamelding("999999999", ÅrstallOgKvartal(2023, 2), "86101", ArbeidsmiljøportalenBransje.SYKEHUS, Sektor.STATLIG),
+            MetadataVirksomhetKafkamelding(
+                "999999999",
+                ÅrstallOgKvartal(2023, 2),
+                "86101",
+                ArbeidsmiljøportalenBransje.SYKEHUS,
+                Sektor.STATLIG
+            ),
             KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_METADATA_V1
         )
         val message = consumerRecords.poll(10, TimeUnit.SECONDS)
@@ -99,7 +108,13 @@ class KafkaServiceIntegrasjonTest {
     @Test
     fun `send kafkamelding med metadata sender riktig data`() {
         kafkaService.send(
-            MetadataKafkamelding("999999999", ÅrstallOgKvartal(2023, 2), "86101", ArbeidsmiljøportalenBransje.SYKEHUS, Sektor.STATLIG),
+            MetadataVirksomhetKafkamelding(
+                "999999999",
+                ÅrstallOgKvartal(2023, 2),
+                "86101",
+                ArbeidsmiljøportalenBransje.SYKEHUS,
+                Sektor.STATLIG
+            ),
             KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_METADATA_V1
         )
         val message = consumerRecords.poll(10, TimeUnit.SECONDS)
@@ -138,7 +153,10 @@ class KafkaServiceIntegrasjonTest {
             dummyData
         )
         val message = consumerRecords.poll(10, TimeUnit.SECONDS)
-        Assertions.assertEquals(KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_LAND_V1.topic, message!!.topic())
+        Assertions.assertEquals(
+            KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_LAND_V1.topic,
+            message!!.topic()
+        )
     }
 
     @Test
@@ -151,7 +169,10 @@ class KafkaServiceIntegrasjonTest {
             dummyData
         )
         val message = consumerRecords.poll(10, TimeUnit.SECONDS)
-        Assertions.assertEquals(KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_NARING_V1.topic, message!!.topic())
+        Assertions.assertEquals(
+            KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_NARING_V1.topic,
+            message!!.topic()
+        )
     }
 
     @Test
@@ -164,7 +185,10 @@ class KafkaServiceIntegrasjonTest {
             dummyData
         )
         val message = consumerRecords.poll(10, TimeUnit.SECONDS)
-        Assertions.assertEquals(KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_SEKTOR_V1.topic, message!!.topic())
+        Assertions.assertEquals(
+            KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_SEKTOR_V1.topic,
+            message!!.topic()
+        )
     }
 
     @Test
@@ -177,7 +201,10 @@ class KafkaServiceIntegrasjonTest {
             dummyData
         )
         val message = consumerRecords.poll(10, TimeUnit.SECONDS)
-        Assertions.assertEquals(KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1.topic, message!!.topic())
+        Assertions.assertEquals(
+            KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1.topic,
+            message!!.topic()
+        )
     }
 
     companion object {

@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal
 
-data class MetadataKafkamelding(
+data class MetadataVirksomhetKafkamelding(
     val orgnr: String,
     val årstallOgKvartal: ÅrstallOgKvartal,
-    val næringskode: String,
-    val bransje: ArbeidsmiljøportalenBransje,
+    val næring: String,
+    val bransje: ArbeidsmiljøportalenBransje?,
     val sektor: Sektor,
 ) : Kafkamelding {
     override val nøkkel: String
@@ -25,8 +25,8 @@ data class MetadataKafkamelding(
                 "orgnr" to orgnr,
                 "arstall" to årstallOgKvartal.årstall.toString(),
                 "kvartal" to årstallOgKvartal.kvartal.toString(),
-                "naringskode" to næringskode,
-                "bransje" to bransje.name,
+                "naring" to næring,
+                "bransje" to bransje?.name,
                 "sektor" to sektor.name
             )
         )

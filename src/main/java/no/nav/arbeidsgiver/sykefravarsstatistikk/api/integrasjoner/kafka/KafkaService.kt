@@ -42,14 +42,13 @@ class KafkaService internal constructor(
 
     fun send(kafkamelding: Kafkamelding, kafkaTopic: KafkaTopicNavn) {
         kafkaTemplate.send(kafkaTopic.topic, kafkamelding.nøkkel, kafkamelding.innhold)
-            .exceptionally {
-                kafkaUtsendingRapport.leggTilError(
-                    "Kunne ikke sende melding til Kafka topic '${kafkaTopic.topic}'. Melding med nøkkel '${kafkamelding.nøkkel}' ble ikke sendt. Feilmelding: ${it.message}"
-                )
-                null
-            }.thenAcceptAsync {
+            .thenAcceptAsync {
                 kafkaUtsendingRapport.leggTilUtsendingSuksess()
-            }
+            }.exceptionally {
+        kafkaUtsendingRapport.leggTilError(
+            "Kunne ikke sende melding til Kafka topic '${kafkaTopic.topic}'. Melding med nøkkel '${kafkamelding.nøkkel}' ble ikke sendt. Feilmelding: ${it.message}"
+        )
+        null
     }
 
     fun sendTilStatistikkKategoriTopic(
