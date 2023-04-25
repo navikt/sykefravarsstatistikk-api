@@ -7,12 +7,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.SykefraværFlereKvartalerForEksport
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicName
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicName.Companion.from
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaStatistikkKategoriTopicValue
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaStatistikkategoriTopicKey
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaTopicKey
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.KafkaTopicValue
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicNavn
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicNavn.Companion.from
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær
@@ -41,14 +38,21 @@ open class KafkaService internal constructor(
         get() = kafkaUtsendingRapport.råDataVedDetaljertMåling
 
     open fun nullstillUtsendingRapport(
-        totalMeldingerTilUtsending: Int, kafkaTopicName: KafkaTopicName
+        totalMeldingerTilUtsending: Int, kafkaTopic: KafkaTopicNavn
     ) {
         log.info(
             "Gjør utsendingrapport klar før utsending på Kafka topic '{}'. '{}' meldinger vil bli sendt.",
-            kafkaTopicName.topic,
+            kafkaTopic.topic,
             totalMeldingerTilUtsending
         )
         kafkaUtsendingRapport.reset(totalMeldingerTilUtsending)
+    }
+
+    fun send(
+        melding: Kafkamelding, kafkaTopic: KafkaTopicNavn
+    ) {
+        kafkaTemplate.send(kafkaTopic.topic, melding.nøkkel, melding.innhold)
+            .addCallback(KafkamelindSendtCallback(kafkaUtsendingRapport, kafkaTopic, melding))
     }
 
     open fun sendTilStatistikkKategoriTopic(
@@ -165,7 +169,7 @@ open class KafkaService internal constructor(
             return
         }
         val futureResult = kafkaTemplate.send(
-            KafkaTopicName.SYKEFRAVARSSTATISTIKK_V1.topic, keyAsJsonString, dataAsJsonString
+            KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_V1.topic, keyAsJsonString, dataAsJsonString
         )
         futureResult.addCallback(
             object : ListenableFutureCallback<SendResult<String?, String?>?> {
@@ -185,7 +189,7 @@ open class KafkaService internal constructor(
                     )
                     log.debug(
                         "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
-                        KafkaTopicName.SYKEFRAVARSSTATISTIKK_V1.topic,
+                        KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_V1.topic,
                         res?.producerRecord?.key(),
                         res?.recordMetadata?.offset()
                     )

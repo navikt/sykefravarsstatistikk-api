@@ -3,19 +3,15 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.SykefraværsstatistikkLocalTestApplication
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.SykefraværFlereKvartalerForEksport
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicName
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicName.Companion.toStringArray
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicNavn
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicNavn.Companion.toStringArray
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.serialization.StringDeserializer
-import org.junit.AfterClass
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
@@ -26,6 +22,7 @@ import org.springframework.kafka.listener.MessageListener
 import org.springframework.kafka.test.EmbeddedKafkaBroker
 import org.springframework.kafka.test.utils.ContainerTestUtils
 import org.springframework.kafka.test.utils.KafkaTestUtils
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import java.math.BigDecimal
 import java.util.concurrent.BlockingQueue
@@ -37,18 +34,19 @@ import java.util.concurrent.TimeUnit
     classes = [SykefraværsstatistikkLocalTestApplication::class],
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
+@DirtiesContext
 @EnableMockOAuth2Server
-@Import(
-    EmbeddedKafkaBrokerConfig::class
-)
+@Import(EmbeddedKafkaBrokerConfig::class)
 class KafkaServiceIntegrasjonTest {
     @Autowired
-    private val kafkaService: KafkaService? = null
+    private lateinit var kafkaService: KafkaService
 
     @Autowired
-    private val embeddedKafkaBroker: EmbeddedKafkaBroker? = null
-    private var container: KafkaMessageListenerContainer<String, String>? = null
-    private var consumerRecords: BlockingQueue<ConsumerRecord<String, String>>? = null
+    private lateinit var embeddedKafkaBroker: EmbeddedKafkaBroker
+
+    private lateinit var container: KafkaMessageListenerContainer<String, String>
+    private lateinit var consumerRecords: BlockingQueue<ConsumerRecord<String, String>>
+
     private val dummyData = SykefraværFlereKvartalerForEksport(
         listOf(
             UmaskertSykefraværForEttKvartal(
@@ -67,32 +65,25 @@ class KafkaServiceIntegrasjonTest {
         consumerProperties[ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG] = "60000"
         val kafkaConsumerFactory = DefaultKafkaConsumerFactory<String, String>(consumerProperties)
         container = KafkaMessageListenerContainer(kafkaConsumerFactory, containerProperties)
-        container!!.setupMessageListener(
+        container.setupMessageListener(
             MessageListener { record: ConsumerRecord<String, String> ->
                 println("Listened message=$record")
                 (consumerRecords as LinkedBlockingQueue<ConsumerRecord<String, String>>).add(record)
             } as MessageListener<String, String>)
+        container.start()
+        ContainerTestUtils.waitForAssignment(
+            container, embeddedKafkaBroker.partitionsPerTopic * TOPIC_NAMES.size
+        )
     }
 
     @AfterEach
     fun tearDown() {
-        container!!.stop()
-    }
-
-    @AfterClass
-    fun tearDownClass() {
-        container!!.destroy()
-        embeddedKafkaBroker!!.destroy()
+        container.destroy()
     }
 
     @Test
-    @Throws(Exception::class)
-    fun send__forAlleKategorier__senderTilSykefravarsstatistikkV1Topic() {
-        container!!.start()
-        ContainerTestUtils.waitForAssignment(
-            container, embeddedKafkaBroker!!.partitionsPerTopic * TOPIC_NAMES.size
-        )
-        kafkaService!!.send(
+    fun `send kafkamelding for alle kategorier sender melding til riktig topic`() {
+        kafkaService.send(
             EksporteringServiceTestUtils.__2020_2,
             EksporteringServiceTestUtils.virksomhetSykefravær,
             listOf(EksporteringServiceTestUtils.næring5SifferSykefravær),
@@ -100,80 +91,60 @@ class KafkaServiceIntegrasjonTest {
             EksporteringServiceTestUtils.sektorSykefravær,
             EksporteringServiceTestUtils.landSykefravær
         )
-        val message = consumerRecords!!.poll(10, TimeUnit.SECONDS)
-        Assertions.assertEquals(KafkaTopicName.SYKEFRAVARSSTATISTIKK_V1.topic, message!!.topic())
+        val message = consumerRecords.poll(10, TimeUnit.SECONDS)
+        Assertions.assertEquals(KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_V1.topic, message!!.topic())
     }
 
     @Test
-    @Throws(Exception::class)
-    fun send__forLandKategori__senderTilSykefravarsstatistikkLandV1Topic() {
-        container!!.start()
-        ContainerTestUtils.waitForAssignment(
-            container, embeddedKafkaBroker!!.partitionsPerTopic * TOPIC_NAMES.size
-        )
-        kafkaService!!.sendTilStatistikkKategoriTopic(
+    fun `send kafkamelding for landkategori sender melding til riktig topic`() {
+        kafkaService.sendTilStatistikkKategoriTopic(
             EksporteringServiceTestUtils.__2020_2,
             Statistikkategori.LAND,
             "NO",
             EksporteringServiceTestUtils.landSykefravær,
             dummyData
         )
-        val message = consumerRecords!!.poll(10, TimeUnit.SECONDS)
-        Assertions.assertEquals(KafkaTopicName.SYKEFRAVARSSTATISTIKK_LAND_V1.topic, message!!.topic())
+        val message = consumerRecords.poll(10, TimeUnit.SECONDS)
+        Assertions.assertEquals(KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_LAND_V1.topic, message!!.topic())
     }
 
     @Test
-    @Throws(Exception::class)
     fun send__forNæringKategori__senderTilSykefravarsstatistikkNæringV1Topic() {
-        container!!.start()
-        ContainerTestUtils.waitForAssignment(
-            container, embeddedKafkaBroker!!.partitionsPerTopic * TOPIC_NAMES.size
-        )
-        kafkaService!!.sendTilStatistikkKategoriTopic(
+        kafkaService.sendTilStatistikkKategoriTopic(
             EksporteringServiceTestUtils.__2020_2,
             Statistikkategori.NÆRING,
             "11",
             EksporteringServiceTestUtils.næringSykefravær,
             dummyData
         )
-        val message = consumerRecords!!.poll(10, TimeUnit.SECONDS)
-        Assertions.assertEquals(KafkaTopicName.SYKEFRAVARSSTATISTIKK_NARING_V1.topic, message!!.topic())
+        val message = consumerRecords.poll(10, TimeUnit.SECONDS)
+        Assertions.assertEquals(KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_NARING_V1.topic, message!!.topic())
     }
 
     @Test
-    @Throws(Exception::class)
     fun send__forSektorKategori__senderTilSykefravarsstatistikkSektorV1Topic() {
-        container!!.start()
-        ContainerTestUtils.waitForAssignment(
-            container, embeddedKafkaBroker!!.partitionsPerTopic * TOPIC_NAMES.size
-        )
-        kafkaService!!.sendTilStatistikkKategoriTopic(
+        kafkaService.sendTilStatistikkKategoriTopic(
             EksporteringServiceTestUtils.__2020_2,
             Statistikkategori.SEKTOR,
             "11",
             EksporteringServiceTestUtils.næringSykefravær,
             dummyData
         )
-        val message = consumerRecords!!.poll(10, TimeUnit.SECONDS)
-        Assertions.assertEquals(KafkaTopicName.SYKEFRAVARSSTATISTIKK_SEKTOR_V1.topic, message!!.topic())
+        val message = consumerRecords.poll(10, TimeUnit.SECONDS)
+        Assertions.assertEquals(KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_SEKTOR_V1.topic, message!!.topic())
     }
 
     @Test
-    @Throws(Exception::class)
     fun send__forVirksomhetKategori__senderTilSykefravarsstatistikkVirksomhetV1Topic() {
-        container!!.start()
-        ContainerTestUtils.waitForAssignment(
-            container, embeddedKafkaBroker!!.partitionsPerTopic * TOPIC_NAMES.size
-        )
-        kafkaService!!.sendTilStatistikkKategoriTopic(
+        kafkaService.sendTilStatistikkKategoriTopic(
             EksporteringServiceTestUtils.__2020_2,
             Statistikkategori.VIRKSOMHET,
             "11",
             EksporteringServiceTestUtils.virksomhetSykefraværMedKategori,
             dummyData
         )
-        val message = consumerRecords!!.poll(10, TimeUnit.SECONDS)
-        Assertions.assertEquals(KafkaTopicName.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1.topic, message!!.topic())
+        val message = consumerRecords.poll(10, TimeUnit.SECONDS)
+        Assertions.assertEquals(KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1.topic, message!!.topic())
     }
 
     companion object {

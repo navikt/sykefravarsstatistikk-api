@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
 
-enum class KafkaTopicName(val topic: String) {
+enum class KafkaTopicNavn(val topic: String) {
     SYKEFRAVARSSTATISTIKK_LAND_V1("arbeidsgiver.sykefravarsstatistikk-land-v1"),
     SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1("arbeidsgiver.sykefravarsstatistikk-virksomhet-v1"),
     SYKEFRAVARSSTATISTIKK_NARING_V1("arbeidsgiver.sykefravarsstatistikk-naring-v1"),
@@ -14,7 +14,7 @@ enum class KafkaTopicName(val topic: String) {
 
     companion object {
         @JvmStatic
-        fun from(statistikkategori: Statistikkategori): KafkaTopicName {
+        fun from(statistikkategori: Statistikkategori): KafkaTopicNavn {
             return when (statistikkategori) {
                 Statistikkategori.LAND -> SYKEFRAVARSSTATISTIKK_LAND_V1
                 Statistikkategori.SEKTOR -> SYKEFRAVARSSTATISTIKK_SEKTOR_V1
@@ -27,7 +27,7 @@ enum class KafkaTopicName(val topic: String) {
         }
 
         @JvmStatic
-        fun toStringArray() = KafkaTopicName.values().map { it.topic }.toTypedArray()
+        fun toStringArray() = KafkaTopicNavn.values().map { it.topic }.toTypedArray()
 
     }
 }
