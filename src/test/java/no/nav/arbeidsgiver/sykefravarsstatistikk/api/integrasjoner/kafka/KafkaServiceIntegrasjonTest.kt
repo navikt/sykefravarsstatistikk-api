@@ -1,16 +1,22 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka
 
+import net.javacrumbs.jsonunit.assertj.assertThatJson
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.SykefraværsstatistikkLocalTestApplication
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.SykefraværFlereKvartalerForEksport
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicNavn
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicNavn.Companion.toStringArray
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.MetadataKafkamelding
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.Sektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.serialization.StringDeserializer
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -46,7 +52,6 @@ class KafkaServiceIntegrasjonTest {
 
     private lateinit var container: KafkaMessageListenerContainer<String, String>
     private lateinit var consumerRecords: BlockingQueue<ConsumerRecord<String, String>>
-
     private val dummyData = SykefraværFlereKvartalerForEksport(
         listOf(
             UmaskertSykefraværForEttKvartal(
@@ -82,6 +87,34 @@ class KafkaServiceIntegrasjonTest {
     }
 
     @Test
+    fun `send kafkamelding med metadata sender på riktig topic`() {
+        kafkaService.send(
+            MetadataKafkamelding("999999999", ÅrstallOgKvartal(2023, 2), "86101", ArbeidsmiljøportalenBransje.SYKEHUS, Sektor.STATLIG),
+            KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_METADATA_V1
+        )
+        val message = consumerRecords.poll(10, TimeUnit.SECONDS)
+        assertThat(message?.topic()).isEqualTo(KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_METADATA_V1.topic)
+    }
+
+    @Test
+    fun `send kafkamelding med metadata sender riktig data`() {
+        kafkaService.send(
+            MetadataKafkamelding("999999999", ÅrstallOgKvartal(2023, 2), "86101", ArbeidsmiljøportalenBransje.SYKEHUS, Sektor.STATLIG),
+            KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_METADATA_V1
+        )
+        val message = consumerRecords.poll(10, TimeUnit.SECONDS)
+        assertThatJson(message!!.value()) {
+            isObject
+            node("orgnr").isString.isEqualTo("999999999")
+            node("arstall").isString.isEqualTo("2023")
+            node("kvartal").isString.isEqualTo("2")
+            node("bransje").isString.isEqualTo("SYKEHUS")
+            node("naringskode").isString.isEqualTo("86101")
+            node("sektor").isString.isEqualTo("STATLIG")
+        }
+    }
+
+    @Test
     fun `send kafkamelding for alle kategorier sender melding til riktig topic`() {
         kafkaService.send(
             EksporteringServiceTestUtils.__2020_2,
@@ -109,7 +142,7 @@ class KafkaServiceIntegrasjonTest {
     }
 
     @Test
-    fun send__forNæringKategori__senderTilSykefravarsstatistikkNæringV1Topic() {
+    fun `send for kategori næring sender til "sykefravarsstatistikk-næring-topic-v1"`() {
         kafkaService.sendTilStatistikkKategoriTopic(
             EksporteringServiceTestUtils.__2020_2,
             Statistikkategori.NÆRING,

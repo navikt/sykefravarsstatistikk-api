@@ -8,6 +8,7 @@ enum class KafkaTopicNavn(val topic: String) {
     SYKEFRAVARSSTATISTIKK_NARING_V1("arbeidsgiver.sykefravarsstatistikk-naring-v1"),
     SYKEFRAVARSSTATISTIKK_SEKTOR_V1("arbeidsgiver.sykefravarsstatistikk-sektor-v1"),
     SYKEFRAVARSSTATISTIKK_BRANSJE_V1("arbeidsgiver.sykefravarsstatistikk-bransje-v1"),
+    SYKEFRAVARSSTATISTIKK_METADATA_V1("arbeidsgiver.sykefravarsstatistikk-metadata-v1"),
 
     @Deprecated("Skal erstattes av topics med spesifikke kategorier", level = DeprecationLevel.WARNING)
     SYKEFRAVARSSTATISTIKK_V1("arbeidsgiver.sykefravarsstatistikk-v1");
