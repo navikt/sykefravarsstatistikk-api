@@ -21,6 +21,7 @@ public class EksporteringController {
 
   private final EksporteringService eksporteringService;
   private final EksporteringPerStatistikkKategoriService eksporteringPerStatistikkKategoriService;
+  private final EksporteringMetadataVirksomhetService eksporteringMetadataVirksomhetService;
 
   public EksporteringController(
       EksporteringService eksporteringService,
@@ -77,9 +78,8 @@ public class EksporteringController {
       @RequestParam int årstall,
       @RequestParam int kvartal) {
     ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
-    int antallEksportert =
-        eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(
-            årstallOgKvartal, kategori, getBegrensning(begrensningTil));
+    int antallEksportert = eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(
+        årstallOgKvartal);
 
     if (antallEksportert >= 0) {
       return ResponseEntity.ok(HttpStatus.CREATED);

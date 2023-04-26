@@ -23,7 +23,7 @@ class EksporteringMetadataVirksomhetService(
 ) {
     val log = LoggerFactory.getLogger(this::class.java)
 
-    fun eksporterMetadataVirksomhet(årstallOgKvartal: ÅrstallOgKvartal) {
+    fun eksporterMetadataVirksomhet(årstallOgKvartal: ÅrstallOgKvartal): Int {
         if (!erEksporteringAktivert) {
             log.info("Eksportering er ikke aktivert. Avbryter.")
         }
@@ -38,39 +38,46 @@ class EksporteringMetadataVirksomhetService(
         val antallEksportert = AtomicInteger()
         val antallIkkeEksportert = AtomicInteger()
 
-        val metadataVirksomhet =
+        val metadataVirksomheter =
             virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal)
 
 
-        metadataVirksomhet.forEach {
-            if (it.orgnr == null) {
-                log.error("Orgnummer er 'null'")
-                return@forEach
-            }
-            var erSendt = false
-            val næringskode = it.næringOgNæringskode5siffer.first {
-                Bransjeprogram.finnBransje(it.næringskode5Siffer).isPresent
-            }.næringskode5Siffer
+        metadataVirksomheter.forEach { metadataVirksomhet ->
+            try {
+                if (metadataVirksomhet.orgnr == null) {
+                    log.error("Orgnummer er 'null'")
+                    antallIkkeEksportert.incrementAndGet()
+                    return@forEach
+                }
 
-            val metadataVirksomhetKafkamelding = MetadataVirksomhetKafkamelding(
-                it.orgnr!!,
-                it.årstallOgKvartal,
-                næringskode.substring(0, 2),
-                Bransjeprogram.finnBransje(næringskode).getOrNull()?.type,
-                Sektor.valueOf(it.sektor)
-            )
+                val næringskode = metadataVirksomhet.næringOgNæringskode5siffer.first {
+                    Bransjeprogram.finnBransje(it.næringskode5Siffer).isPresent
+                }.næringskode5Siffer
 
-            kafkaService.send(
-                metadataVirksomhetKafkamelding,
-                KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_METADATA_V1
-            )
+                val metadataVirksomhetKafkamelding = MetadataVirksomhetKafkamelding(
+                    metadataVirksomhet.orgnr!!,
+                    metadataVirksomhet.årstallOgKvartal,
+                    næringskode.substring(0, 2),
+                    Bransjeprogram.finnBransje(næringskode).getOrNull()?.type,
+                    Sektor.valueOf(metadataVirksomhet.sektor)
+                )
 
-            if (erSendt) {
-                antallEksportert.incrementAndGet()
-            } else {
+                kafkaService.send(
+                    metadataVirksomhetKafkamelding,
+                    KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_METADATA_V1
+                )
+            } catch (ex: Exception) {
                 antallIkkeEksportert.incrementAndGet()
+                log.error(
+                    "Utsending av metadata for virksomhet med orgnr '{}' feilet: '{}'",
+                    metadataVirksomhet.orgnr, ex.message
+                )
+                throw ex
             }
 
+            antallEksportert.incrementAndGet()
         }
+
+        return antallEksportert.get()
     }
 }
