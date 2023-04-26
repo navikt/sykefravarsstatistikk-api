@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram.ANLEGG
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
@@ -127,7 +126,7 @@ internal class EksporteringBransjeServiceTest {
             eq(
                 SykefraværMedKategori(
                     Statistikkategori.BRANSJE,
-                    ANLEGG.type.name,
+                    ArbeidsmiljøportalenBransje.ANLEGG.name,
                     ÅrstallOgKvartal(2023, 2),
                     BigDecimal.ONE,
                     BigDecimal.ONE,

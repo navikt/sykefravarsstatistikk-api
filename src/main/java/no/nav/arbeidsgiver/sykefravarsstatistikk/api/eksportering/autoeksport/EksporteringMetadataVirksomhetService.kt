@@ -42,22 +42,21 @@ class EksporteringMetadataVirksomhetService(
             virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal)
 
 
-        metadataVirksomhet.forEach {
-            if (it.orgnr == null) {
+        metadataVirksomhet.forEach {virksomhet ->
+            if (virksomhet.orgnr == null) {
                 log.error("Orgnummer er 'null'")
                 return@forEach
             }
+
             var erSendt = false
-            val næringskode = it.næringOgNæringskode5siffer.first {
-                Bransjeprogram.finnBransje(it.næringskode5Siffer).isPresent
-            }.næringskode5Siffer
+            val næringskode = Bransjeprogram.velgPrimærnæringskode(virksomhet.næringOgNæringskode5siffer.map { it.næringskode5Siffer });
 
             val metadataVirksomhetKafkamelding = MetadataVirksomhetKafkamelding(
-                it.orgnr!!,
-                it.årstallOgKvartal,
+                virksomhet.orgnr!!,
+                virksomhet.årstallOgKvartal,
                 næringskode.substring(0, 2),
                 Bransjeprogram.finnBransje(næringskode).getOrNull()?.type,
-                Sektor.valueOf(it.sektor)
+                Sektor.valueOf(virksomhet.sektor)
             )
 
             kafkaService.send(
