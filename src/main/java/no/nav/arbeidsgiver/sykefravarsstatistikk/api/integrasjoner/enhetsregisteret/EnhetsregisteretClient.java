@@ -3,12 +3,17 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregist
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.InstitusjonellSektorkode;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -29,14 +34,6 @@ public class EnhetsregisteretClient {
       RestTemplate restTemplate, @Value("${enhetsregisteret.url}") String enhetsregisteretUrl) {
     this.restTemplate = restTemplate;
     this.enhetsregisteretUrl = enhetsregisteretUrl;
-  }
-
-  public Virksomhet hentInformasjonOmVirksomhet(Orgnr orgnrTilVirksomhet) {
-    try {
-      return hentInformasjonOmUnderenhet(orgnrTilVirksomhet);
-    } catch (RestClientException exception) {
-      return hentInformasjonOmEnhet(orgnrTilVirksomhet);
-    }
   }
 
   public OverordnetEnhet hentInformasjonOmEnhet(Orgnr orgnrTilEnhet) {
@@ -98,24 +95,28 @@ public class EnhetsregisteretClient {
   private Underenhet mapTilUnderenhet(String jsonResponseFraEnhetsregisteret) {
     try {
       JsonNode enhetJson = objectMapper.readTree(jsonResponseFraEnhetsregisteret);
-      JsonNode næringskodeJson = enhetJson.get("naeringskode1");
 
-      if (næringskodeJson == null) {
-        throw new IngenNæringException(
-            "Feil ved kall til Enhetsregisteret. Ingen næring for virksomhet.");
-      }
+      Næringskode5Siffer primærnæringskode =
+          Bransjeprogram.velgPrimærnæringskode(
+              List.of("naeringskode1", "naeringskode2", "naeringskode3").stream()
+                  .map(enhetJson::get)
+                  .filter(Objects::nonNull)
+                  .map(json -> objectMapper.convertValue(json, Næringskode5Siffer.class))
+                  .collect(Collectors.toList()));
 
       return new Underenhet(
           new Orgnr(enhetJson.get("organisasjonsnummer").textValue()),
           new Orgnr(enhetJson.get("overordnetEnhet").textValue()),
           enhetJson.get("navn").textValue(),
-          objectMapper.treeToValue(næringskodeJson, Næringskode5Siffer.class),
+          primærnæringskode,
           enhetJson.get("antallAnsatte").intValue());
 
     } catch (IOException | NullPointerException e) {
       throw new EnhetsregisteretMappingException(
           "Feil ved kall til Enhetsregisteret. Kunne ikke parse respons.", e);
     }
+  }
+
   }
 
   public HttpStatusCode healthcheck() {

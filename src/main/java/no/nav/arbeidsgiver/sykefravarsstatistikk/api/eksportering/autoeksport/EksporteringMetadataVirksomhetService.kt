@@ -38,28 +38,27 @@ class EksporteringMetadataVirksomhetService(
         val antallEksportert = AtomicInteger()
         val antallIkkeEksportert = AtomicInteger()
 
-        val metadataVirksomheter =
+        val metadataVirksomhet =
             virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal)
 
 
-        metadataVirksomheter.forEach { metadataVirksomhet ->
+        metadataVirksomhet.forEach { virksomhet ->
             try {
-                if (metadataVirksomhet.orgnr == null) {
+                if (virksomhet.orgnr == null) {
                     log.error("Orgnummer er 'null'")
-                    antallIkkeEksportert.incrementAndGet()
                     return@forEach
                 }
 
-                val næringskode = metadataVirksomhet.næringOgNæringskode5siffer.first {
-                    Bransjeprogram.finnBransje(it.næringskode5Siffer).isPresent
-                }.næringskode5Siffer
+                var erSendt = false
+                val næringskode =
+                    Bransjeprogram.velgPrimærnæringskode(virksomhet.næringOgNæringskode5siffer.map { it.næringskode5Siffer });
 
                 val metadataVirksomhetKafkamelding = MetadataVirksomhetKafkamelding(
-                    metadataVirksomhet.orgnr!!,
-                    metadataVirksomhet.årstallOgKvartal,
+                    virksomhet.orgnr!!,
+                    virksomhet.årstallOgKvartal,
                     næringskode.substring(0, 2),
                     Bransjeprogram.finnBransje(næringskode).getOrNull()?.type,
-                    Sektor.valueOf(metadataVirksomhet.sektor)
+                    Sektor.valueOf(virksomhet.sektor)
                 )
 
                 kafkaService.send(
@@ -70,7 +69,7 @@ class EksporteringMetadataVirksomhetService(
                 antallIkkeEksportert.incrementAndGet()
                 log.error(
                     "Utsending av metadata for virksomhet med orgnr '{}' feilet: '{}'",
-                    metadataVirksomhet.orgnr, ex.message
+                    virksomhet.orgnr, ex.message
                 )
                 throw ex
             }
