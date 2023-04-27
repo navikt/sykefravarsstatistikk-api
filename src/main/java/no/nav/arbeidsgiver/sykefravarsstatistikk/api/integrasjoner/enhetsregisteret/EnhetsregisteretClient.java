@@ -95,28 +95,24 @@ public class EnhetsregisteretClient {
   private Underenhet mapTilUnderenhet(String jsonResponseFraEnhetsregisteret) {
     try {
       JsonNode enhetJson = objectMapper.readTree(jsonResponseFraEnhetsregisteret);
+      JsonNode næringskodeJson = enhetJson.get("naeringskode1");
 
-      Næringskode5Siffer primærnæringskode =
-          Bransjeprogram.velgPrimærnæringskode(
-              List.of("naeringskode1", "naeringskode2", "naeringskode3").stream()
-                  .map(enhetJson::get)
-                  .filter(Objects::nonNull)
-                  .map(json -> objectMapper.convertValue(json, Næringskode5Siffer.class))
-                  .collect(Collectors.toList()));
+      if (næringskodeJson == null) {
+        throw new IngenNæringException(
+            "Feil ved kall til Enhetsregisteret. Ingen næring for virksomhet.");
+      }
 
       return new Underenhet(
           new Orgnr(enhetJson.get("organisasjonsnummer").textValue()),
           new Orgnr(enhetJson.get("overordnetEnhet").textValue()),
           enhetJson.get("navn").textValue(),
-          primærnæringskode,
+          objectMapper.treeToValue(næringskodeJson, Næringskode5Siffer.class),
           enhetJson.get("antallAnsatte").intValue());
 
     } catch (IOException | NullPointerException e) {
       throw new EnhetsregisteretMappingException(
           "Feil ved kall til Enhetsregisteret. Kunne ikke parse respons.", e);
     }
-  }
-
   }
 
   public HttpStatusCode healthcheck() {

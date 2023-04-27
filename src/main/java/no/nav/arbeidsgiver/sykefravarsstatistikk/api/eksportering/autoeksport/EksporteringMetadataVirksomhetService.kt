@@ -49,7 +49,9 @@ class EksporteringMetadataVirksomhetService(
             }
 
             var erSendt = false
-            val næringskode = Bransjeprogram.velgPrimærnæringskode(virksomhet.næringOgNæringskode5siffer.map { it.næringskode5Siffer });
+
+            // TODO: Finn primærnæringskoden, aka den som ligger først i enhetsregisteret.
+            val næringskode = velgPrimærnæringskode(virksomhet.næringOgNæringskode5siffer.map { it.næringskode5Siffer });
 
             val metadataVirksomhetKafkamelding = MetadataVirksomhetKafkamelding(
                 virksomhet.orgnr!!,
