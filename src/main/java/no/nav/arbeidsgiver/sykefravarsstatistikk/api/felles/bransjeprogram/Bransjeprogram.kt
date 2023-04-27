@@ -43,12 +43,4 @@ object Bransjeprogram {
 
     @JvmStatic
     fun finnBransje(næringskode5Siffer: Næringskode5Siffer?): Optional<Bransje> = finnBransje(næringskode5Siffer?.kode)
-
-    @JvmStatic
-    fun velgPrimærnæringskode(næringskoder: List<Næringskode5Siffer>): Næringskode5Siffer =
-        næringskoder.sortedBy { it.kode }.firstOrNull { finnBransje(it.kode).isPresent } ?: næringskoder.first()
-
-    @JvmStatic
-    fun velgPrimærnæringskode(næringskoder: List<String>): String =
-        næringskoder.sorted().firstOrNull { finnBransje(it).isPresent } ?: næringskoder.first()
 }
