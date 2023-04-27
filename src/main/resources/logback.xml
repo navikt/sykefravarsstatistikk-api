@@ -1,7 +1,14 @@
 <configuration scan="true">
-    <springProfile name="dev,prod">
+    <springProfile name="dev,prod,local">
         <appender name="consoleJsonAppender" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <jsonGeneratorDecorator class="net.logstash.logback.mask.MaskingJsonGeneratorDecorator">
+                    <valueMask>
+                        <value>(^|\W)\d{11}(?=$|\W)</value>
+                        <mask>$1***********</mask>
+                    </valueMask>
+                </jsonGeneratorDecorator>
+            </encoder>
         </appender>
 
         <appender name="sporbarhetsloggAppender" class="com.papertrailapp.logback.Syslog4jAppender">
