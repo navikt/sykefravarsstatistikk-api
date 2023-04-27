@@ -26,8 +26,7 @@ public class BransjeEllerNæringService {
   public BransjeEllerNæring bestemFraNæringskode(Næringskode5Siffer næringskode5Siffer) {
     Optional<Bransje> bransje = bransjeprogram.finnBransje(næringskode5Siffer);
 
-    boolean skalHenteDataPåNæring =
-        bransje.isEmpty() || bransje.get().erDefinertPåTosiffernivå();
+    boolean skalHenteDataPåNæring = bransje.isEmpty() || bransje.get().erDefinertPåTosiffernivå();
 
     if (skalHenteDataPåNæring) {
       return new BransjeEllerNæring(
@@ -54,19 +53,19 @@ public class BransjeEllerNæringService {
         new Underenhet(
             new Orgnr(virksomhetMetaData.getOrgnr()),
             new Orgnr(""),
-                virksomhetMetaData.getNavn(),
+            virksomhetMetaData.getNavn(),
             new Næringskode5Siffer(
                 virksomhetMetaData.getNæringOgNæringskode5siffer().stream().findFirst().isPresent()
                     ? virksomhetMetaData.getNæringOgNæringskode5siffer().stream()
-                    .findFirst()
-                    .get()
-                    .getNæringskode5Siffer()
+                        .findFirst()
+                        .get()
+                        .getNæringskode5Siffer()
                     : "00000",
                 virksomhetMetaData.getNæringOgNæringskode5siffer().stream().findFirst().isPresent()
                     ? virksomhetMetaData.getNæringOgNæringskode5siffer().stream()
-                    .findFirst()
-                    .get()
-                    .getNæring()
+                        .findFirst()
+                        .get()
+                        .getNæring()
                     : ""),
             0);
 
