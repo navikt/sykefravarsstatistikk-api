@@ -45,152 +45,157 @@ class KafkaService internal constructor(
             .thenAcceptAsync {
                 kafkaUtsendingRapport.leggTilUtsendingSuksess()
             }.exceptionally {
-        kafkaUtsendingRapport.leggTilError(
-            "Kunne ikke sende melding til Kafka topic '${kafkaTopic.topic}'. Melding med nøkkel '${kafkamelding.nøkkel}' ble ikke sendt. Feilmelding: ${it.message}"
-        )
-        null
-    }
-
-    fun sendTilStatistikkKategoriTopic(
-        årstallOgKvartal: ÅrstallOgKvartal,
-        statistikkategori: Statistikkategori,
-        identifikator: String,
-        sykefraværMedKategori: SykefraværMedKategori,
-        sykefraværOverFlereKvartaler: SykefraværFlereKvartalerForEksport?
-    ): Boolean {
-        kafkaUtsendingRapport.leggTilMeldingMottattForUtsending()
-        val key = KafkaStatistikkategoriTopicKey(
-            statistikkategori,
-            identifikator,
-            årstallOgKvartal.kvartal,
-            årstallOgKvartal.årstall
-        )
-        val value = KafkaStatistikkKategoriTopicValue(sykefraværMedKategori, sykefraværOverFlereKvartaler)
-        val keyAsJsonString: String
-        val dataAsJsonString: String
-        try {
-            keyAsJsonString = objectMapper.writeValueAsString(key)
-            dataAsJsonString = objectMapper.writeValueAsString(value)
-        } catch (e: JsonProcessingException) {
-            kafkaUtsendingRapport.leggTilError(
-                String.format(
-                    "Kunne ikke parse statistikk '%s' til Json. Statistikk ikke sendt",
-                    statistikkategori.name
-                )
-            )
-            return false
-        }
-        val topicNavn: String = KafkaTopicNavn.from(statistikkategori).topic
-        val futureResult: CompletableFuture<SendResult<String?, String?>> =
-            kafkaTemplate.send(topicNavn, keyAsJsonString, dataAsJsonString)
-        futureResult
-            .thenAcceptAsync { res: SendResult<String?, String?> ->
-                kafkaUtsendingRapport.leggTilUtsendingSuksess()
-                log.debug(
-                    "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
-                    topicNavn,
-                    res.producerRecord.key(),
-                    res.recordMetadata.offset()
-                )
-                if (Statistikkategori.VIRKSOMHET == statistikkategori) {
-                    kafkaUtsendingHistorikkRepository.opprettHistorikk(
-                        identifikator,  // for Statistikkategori.VIRKSOMHET er identifikator et orgnr
-                        keyAsJsonString,
-                        dataAsJsonString
-                    )
-                }
-            }
-            .exceptionally { throwable: Throwable ->
                 kafkaUtsendingRapport.leggTilError(
-                    String.format(
-                        "Utsending feilet for statistikkategori '%s' og kode '%s', med melding '%s'",
-                        sykefraværMedKategori.kategori.name,
-                        sykefraværMedKategori.kode,
-                        throwable.message
-                    )
+                    "Kunne ikke sende melding til Kafka topic '${kafkaTopic.topic}'. Melding med nøkkel '${kafkamelding.nøkkel}' ble ikke sendt. Feilmelding: ${it.message}"
                 )
                 null
             }
-        return true
-    }
 
-    fun send(
-        årstallOgKvartal: ÅrstallOgKvartal,
-        virksomhetSykefravær: VirksomhetSykefravær,
-        næring5SifferSykefravær: List<SykefraværMedKategori?>?,
-        næringSykefravær: SykefraværMedKategori?,
-        sektorSykefravær: SykefraværMedKategori?,
-        landSykefravær: SykefraværMedKategori?
-    ) {
-        // TODO bytt til Prometheus
-        kafkaUtsendingRapport.leggTilMeldingMottattForUtsending()
-        if (kafkaUtsendingRapport.antallMeldingerIError > 5) {
-            throw KafkaUtsendingException(
-                String.format(
-                    "Antall error:'%d'. Avbryter eksportering. Totalt meldinger som var klar for sending er: '%d'."
-                            + " Antall meldinger som har egentlig blitt sendt: '%d'",
-                    kafkaUtsendingRapport.antallMeldingerIError,
-                    kafkaUtsendingRapport.antallMeldingerSent,
-                    kafkaUtsendingRapport.antallMeldingerMottattForUtsending
-                )
+        fun sendTilStatistikkKategoriTopic(
+            årstallOgKvartal: ÅrstallOgKvartal,
+            statistikkategori: Statistikkategori,
+            identifikator: String,
+            sykefraværMedKategori: SykefraværMedKategori,
+            sykefraværOverFlereKvartaler: SykefraværFlereKvartalerForEksport?
+        ): Boolean {
+            kafkaUtsendingRapport.leggTilMeldingMottattForUtsending()
+            val key = KafkaStatistikkategoriTopicKey(
+                statistikkategori,
+                identifikator,
+                årstallOgKvartal.kvartal,
+                årstallOgKvartal.årstall
             )
-        }
-        val key = KafkaTopicKey(
-            virksomhetSykefravær.orgnr,
-            årstallOgKvartal.kvartal,
-            årstallOgKvartal.årstall
-        )
-        val value = KafkaTopicValue(
-            virksomhetSykefravær,
-            næring5SifferSykefravær,
-            næringSykefravær,
-            sektorSykefravær,
-            landSykefravær
-        )
-        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
-        val keyAsJsonString: String
-        val dataAsJsonString: String
-        try {
-            keyAsJsonString = objectMapper.writeValueAsString(key)
-            dataAsJsonString = objectMapper.writeValueAsString(value)
-        } catch (e: JsonProcessingException) {
-            kafkaUtsendingRapport.leggTilError(
-                String.format(
-                    "Kunne ikke parse orgnr '%s' til Json. Statistikk ikke sent for virksomheten.",
-                    virksomhetSykefravær.orgnr
-                ),
-                Orgnr(virksomhetSykefravær.orgnr)
+            val value = KafkaStatistikkKategoriTopicValue(
+                sykefraværMedKategori,
+                sykefraværOverFlereKvartaler
             )
-            return
-        }
-        val futureResult: CompletableFuture<SendResult<String?, String?>> = kafkaTemplate.send(
-            KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_V1.topic, keyAsJsonString, dataAsJsonString
-        )
-        futureResult
-            .thenAcceptAsync { res: SendResult<String?, String?> ->
-                kafkaUtsendingRapport.leggTilUtsendingSuksess(
-                    Orgnr(virksomhetSykefravær.orgnr)
-                )
-                log.debug(
-                    "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
-                    KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_V1.topic,
-                    res.producerRecord.key(),
-                    res.recordMetadata.offset()
-                )
-                kafkaUtsendingHistorikkRepository.opprettHistorikk(
-                    virksomhetSykefravær.orgnr, keyAsJsonString, dataAsJsonString
-                )
-            }
-            .exceptionally { throwable: Throwable ->
+            val keyAsJsonString: String
+            val dataAsJsonString: String
+            try {
+                keyAsJsonString = objectMapper.writeValueAsString(key)
+                dataAsJsonString = objectMapper.writeValueAsString(value)
+            } catch (e: JsonProcessingException) {
                 kafkaUtsendingRapport.leggTilError(
                     String.format(
-                        "Utsending feilet for orgnr '%s' med melding '%s'",
-                        virksomhetSykefravær.orgnr, throwable.message
+                        "Kunne ikke parse statistikk '%s' til Json. Statistikk ikke sendt",
+                        statistikkategori.name
+                    )
+                )
+                return false
+            }
+            val topicNavn: String = KafkaTopicNavn.from(statistikkategori).topic
+            val futureResult: CompletableFuture<SendResult<String?, String?>> =
+                kafkaTemplate.send(topicNavn, keyAsJsonString, dataAsJsonString)
+            futureResult
+                .thenAcceptAsync { res: SendResult<String?, String?> ->
+                    kafkaUtsendingRapport.leggTilUtsendingSuksess()
+                    log.debug(
+                        "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
+                        topicNavn,
+                        res.producerRecord.key(),
+                        res.recordMetadata.offset()
+                    )
+                    if (Statistikkategori.VIRKSOMHET == statistikkategori) {
+                        kafkaUtsendingHistorikkRepository.opprettHistorikk(
+                            identifikator,  // for Statistikkategori.VIRKSOMHET er identifikator et orgnr
+                            keyAsJsonString,
+                            dataAsJsonString
+                        )
+                    }
+                }
+                .exceptionally { throwable: Throwable ->
+                    kafkaUtsendingRapport.leggTilError(
+                        String.format(
+                            "Utsending feilet for statistikkategori '%s' og kode '%s', med melding '%s'",
+                            sykefraværMedKategori.kategori.name,
+                            sykefraværMedKategori.kode,
+                            throwable.message
+                        )
+                    )
+                    null
+                }
+            return true
+        }
+
+        fun send(
+            årstallOgKvartal: ÅrstallOgKvartal,
+            virksomhetSykefravær: VirksomhetSykefravær,
+            næring5SifferSykefravær: List<SykefraværMedKategori?>?,
+            næringSykefravær: SykefraværMedKategori?,
+            sektorSykefravær: SykefraværMedKategori?,
+            landSykefravær: SykefraværMedKategori?
+        ) {
+            // TODO bytt til Prometheus
+            kafkaUtsendingRapport.leggTilMeldingMottattForUtsending()
+            if (kafkaUtsendingRapport.antallMeldingerIError > 5) {
+                throw KafkaUtsendingException(
+                    String.format(
+                        "Antall error:'%d'. Avbryter eksportering. Totalt meldinger som var klar for sending er: '%d'."
+                                + " Antall meldinger som har egentlig blitt sendt: '%d'",
+                        kafkaUtsendingRapport.antallMeldingerIError,
+                        kafkaUtsendingRapport.antallMeldingerSent,
+                        kafkaUtsendingRapport.antallMeldingerMottattForUtsending
+                    )
+                )
+            }
+            val key = KafkaTopicKey(
+                virksomhetSykefravær.orgnr,
+                årstallOgKvartal.kvartal,
+                årstallOgKvartal.årstall
+            )
+            val value = KafkaTopicValue(
+                virksomhetSykefravær,
+                næring5SifferSykefravær,
+                næringSykefravær,
+                sektorSykefravær,
+                landSykefravær
+            )
+            objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
+            val keyAsJsonString: String
+            val dataAsJsonString: String
+            try {
+                keyAsJsonString = objectMapper.writeValueAsString(key)
+                dataAsJsonString = objectMapper.writeValueAsString(value)
+            } catch (e: JsonProcessingException) {
+                kafkaUtsendingRapport.leggTilError(
+                    String.format(
+                        "Kunne ikke parse orgnr '%s' til Json. Statistikk ikke sent for virksomheten.",
+                        virksomhetSykefravær.orgnr
                     ),
                     Orgnr(virksomhetSykefravær.orgnr)
                 )
-                null
+                return
             }
+            val futureResult: CompletableFuture<SendResult<String?, String?>> = kafkaTemplate.send(
+                KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_V1.topic, keyAsJsonString, dataAsJsonString
+            )
+            futureResult
+                .thenAcceptAsync { res: SendResult<String?, String?> ->
+                    kafkaUtsendingRapport.leggTilUtsendingSuksess(
+                        Orgnr(virksomhetSykefravær.orgnr)
+                    )
+                    log.debug(
+                        "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
+                        KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_V1.topic,
+                        res.producerRecord.key(),
+                        res.recordMetadata.offset()
+                    )
+                    kafkaUtsendingHistorikkRepository.opprettHistorikk(
+                        virksomhetSykefravær.orgnr, keyAsJsonString, dataAsJsonString
+                    )
+                }
+                .exceptionally { throwable: Throwable ->
+                    kafkaUtsendingRapport.leggTilError(
+                        String.format(
+                            "Utsending feilet for orgnr '%s' med melding '%s'",
+                            virksomhetSykefravær.orgnr, throwable.message
+                        ),
+                        Orgnr(virksomhetSykefravær.orgnr)
+                    )
+                    null
+                }
+        }
+
     }
 
     val snittTidUtsendingTilKafka: Long

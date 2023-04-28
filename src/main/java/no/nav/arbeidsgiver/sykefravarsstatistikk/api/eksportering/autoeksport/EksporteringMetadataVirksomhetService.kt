@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadataRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicNavn
@@ -50,9 +49,9 @@ class EksporteringMetadataVirksomhetService(
                     return@forEach
                 }
 
-            var erSendt = false
-
-            val primærnæringskode: String = TODO("Finn primærnæringskoden, aka den som ligger først i enhetsregisteret.")
+                //val primærnæringskode: String = TODO("Finn primærnæringskoden, aka den som ligger først i enhetsregisteret.")
+                val primærnæringskode: String =
+                    virksomhet.næringOgNæringskode5siffer.first().næringskode5Siffer
 
                 val metadataVirksomhetKafkamelding = MetadataVirksomhetKafkamelding(
                     virksomhet.orgnr!!,
