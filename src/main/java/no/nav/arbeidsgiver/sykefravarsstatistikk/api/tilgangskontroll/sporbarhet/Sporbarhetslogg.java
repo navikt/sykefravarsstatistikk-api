@@ -70,7 +70,7 @@ public class Sporbarhetslogg {
     extensions.add("suid=" + event.getInnloggetBruker().getFnr().getVerdi());
     extensions.add("request=" + event.getRequestUrl());
     extensions.add("requestMethod=" + event.getRequestMethod());
-    extensions.add("cs3=" + event.getOrgnr().getVerdi());
+    extensions.add("cs3=" + (event.getOrgnr() == null ? "" : event.getOrgnr().getVerdi()));
     extensions.add("cs3Label=OrgNr");
     String decision = event.isHarTilgang() ? "Permit" : "Deny";
     extensions.add("flexString1=" + decision);

@@ -102,7 +102,7 @@ class AggregertStatistikkServiceTest {
   @Test
   void hentAggregertHistorikk_kræsjerIkkeVedManglendeData() {
     when(mockTilgangskontrollService.brukerRepresentererVirksomheten(any())).thenReturn(true);
-    when(mockEnhetsregisteretClient.hentInformasjonOmUnderenhet(any())).thenReturn(enBarnehage);
+    when(mockEnhetsregisteretClient.hentUnderenhet(any())).thenReturn(enBarnehage);
     when(mockTilgangskontrollService.brukerHarIaRettigheterIVirksomheten(any())).thenReturn(true);
     when(mockBransjeEllerNæringService.finnBransje(any())).thenReturn(enBransje);
 
@@ -360,7 +360,7 @@ class AggregertStatistikkServiceTest {
 
   private void mockAvhengigheterForBarnehageMedIaRettigheter() {
     when(mockTilgangskontrollService.brukerRepresentererVirksomheten(any())).thenReturn(true);
-    when(mockEnhetsregisteretClient.hentInformasjonOmUnderenhet(any())).thenReturn(enBarnehage);
+    when(mockEnhetsregisteretClient.hentUnderenhet(any())).thenReturn(enBarnehage);
     when(mockTilgangskontrollService.brukerHarIaRettigheterIVirksomheten(any())).thenReturn(true);
     when(mockBransjeEllerNæringService.finnBransje(any())).thenReturn(enBransje);
   }

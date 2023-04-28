@@ -60,7 +60,7 @@ public class AggregertStatistikkService {
       return Either.left(
           new TilgangskontrollException("Bruker mangler tilgang til denne virksomheten"));
     }
-    Underenhet virksomhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(orgnr);
+    Underenhet virksomhet = enhetsregisteretClient.hentUnderenhet(orgnr);
     Sykefraværsdata totalSykefravær = hentTotalfraværSisteFemKvartaler(virksomhet);
     Sykefraværsdata gradertSykefravær = hentGradertSykefravær(virksomhet);
     Sykefraværsdata korttidSykefravær = hentKorttidsfravær(virksomhet);

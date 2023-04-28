@@ -48,7 +48,7 @@ public class OffentligSykefraværshistorikkController {
 
     Underenhet underenhet;
     try {
-      underenhet = enhetsregisteretClient.hentInformasjonOmUnderenhet(new Orgnr(orgnrStr));
+      underenhet = enhetsregisteretClient.hentUnderenhet(new Orgnr(orgnrStr));
     } catch (IngenNæringException e) {
       log.info("Underenhet har ingen næring. Returnerer 204 - No Content");
       return null;
