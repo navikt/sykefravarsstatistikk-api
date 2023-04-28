@@ -41,7 +41,7 @@ altinn:
   apikey: ${ALTINN_APIKEY}
   apigw.apikey: ${ALTINN_APIGW_APIKEY}
   proxy:
-    url: https://altinn-rettigheter-proxy.dev.intern.nav.no/altinn-rettigheter-proxy
+    url: https://altinn-rettigheter-proxy.intern.dev.nav.no/altinn-rettigheter-proxy
   iaweb.service:
     code: 3403
     edition: 1
