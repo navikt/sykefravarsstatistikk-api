@@ -52,8 +52,7 @@ public class KvartalsvisSykefraværshistorikkService {
   public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikk(
       Underenhet underenhet, InstitusjonellSektorkode institusjonellSektorkode) {
     Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
-    boolean skalHenteDataPåNæring =
-        bransje.isEmpty() || bransje.get().erDefinertPåTosiffernivå();
+    boolean skalHenteDataPåNæring = bransje.isEmpty() || bransje.get().erDefinertPåTosiffernivå();
 
     Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(institusjonellSektorkode);
 
@@ -90,11 +89,11 @@ public class KvartalsvisSykefraværshistorikkService {
 
     KvartalsvisSykefraværshistorikk historikkForOverordnetEnhet =
         uthentingMedFeilhåndteringOgTimeout(
-            () ->
-                hentSykefraværshistorikkVirksomhet(
-                    overordnetEnhet, Statistikkategori.OVERORDNET_ENHET),
-            Statistikkategori.OVERORDNET_ENHET,
-            underenhet.getNavn())
+                () ->
+                    hentSykefraværshistorikkVirksomhet(
+                        overordnetEnhet, Statistikkategori.OVERORDNET_ENHET),
+                Statistikkategori.OVERORDNET_ENHET,
+                underenhet.getNavn())
             .join();
 
     List<KvartalsvisSykefraværshistorikk> kvartalsvisSykefraværshistorikkListe =
@@ -142,10 +141,10 @@ public class KvartalsvisSykefraværshistorikkService {
   }
 
   protected CompletableFuture<KvartalsvisSykefraværshistorikk>
-  uthentingAvSykefraværshistorikkNæring(Underenhet underenhet) {
+      uthentingAvSykefraværshistorikkNæring(Underenhet underenhet) {
     Næringskode5Siffer næring5siffer = underenhet.getNæringskode();
     return uthentingMedTimeout(
-        () -> klassifikasjonerRepository.hentNæring(næring5siffer.hentNæringskode2Siffer()))
+            () -> klassifikasjonerRepository.hentNæring(næring5siffer.hentNæringskode2Siffer()))
         .thenCompose(
             næring ->
                 uthentingMedFeilhåndteringOgTimeout(
@@ -175,10 +174,10 @@ public class KvartalsvisSykefraværshistorikkService {
   }
 
   protected static CompletableFuture<KvartalsvisSykefraværshistorikk>
-  uthentingMedFeilhåndteringOgTimeout(
-      Supplier<KvartalsvisSykefraværshistorikk> sykefraværshistorikkSupplier,
-      Statistikkategori statistikkategori,
-      String sykefraværshistorikkLabel) {
+      uthentingMedFeilhåndteringOgTimeout(
+          Supplier<KvartalsvisSykefraværshistorikk> sykefraværshistorikkSupplier,
+          Statistikkategori statistikkategori,
+          String sykefraværshistorikkLabel) {
     return CompletableFuture.supplyAsync(sykefraværshistorikkSupplier)
         .orTimeout(TIMEOUT_UTHENTING_FRA_DB_I_SEKUNDER, TimeUnit.SECONDS)
         .exceptionally(
