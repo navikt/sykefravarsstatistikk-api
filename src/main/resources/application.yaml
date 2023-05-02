@@ -34,14 +34,14 @@ wiremock.mock:
   port: 8081
 
 enhetsregisteret:
-  url: "https://arbeidsgiver-mock-enhetsregisteret.dev.nav.no/enhetsregisteret/api"
+  url: "https://arbeidsgiver-mock-enhetsregisteret.intern.dev.nav.no/enhetsregisteret/api"
 
 altinn:
   url: "https://api-gw-q1.adeo.no/"
   apikey: ${ALTINN_APIKEY}
   apigw.apikey: ${ALTINN_APIGW_APIKEY}
   proxy:
-    url: https://altinn-rettigheter-proxy.dev.intern.nav.no/altinn-rettigheter-proxy
+    url: https://altinn-rettigheter-proxy.intern.dev.nav.no/altinn-rettigheter-proxy
   iaweb.service:
     code: 3403
     edition: 1
