@@ -25,9 +25,11 @@ public class EksporteringController {
 
   public EksporteringController(
       EksporteringService eksporteringService,
-      EksporteringPerStatistikkKategoriService eksporteringPerStatistikkKategoriService) {
+      EksporteringPerStatistikkKategoriService eksporteringPerStatistikkKategoriService,
+      EksporteringMetadataVirksomhetService eksporteringMetadataVirksomhetService) {
     this.eksporteringService = eksporteringService;
     this.eksporteringPerStatistikkKategoriService = eksporteringPerStatistikkKategoriService;
+    this.eksporteringMetadataVirksomhetService = eksporteringMetadataVirksomhetService;
   }
 
   @PostMapping("/reeksport")

@@ -41,7 +41,7 @@ public class SummertSykefraværServiceTest {
   private SummertSykefraværService summertSykefraværService;
 
   private BransjeEllerNæringService bransjeEllerNæringService =
-      new BransjeEllerNæringService(new Bransjeprogram(), klassifikasjonerRepository);
+      new BransjeEllerNæringService(klassifikasjonerRepository);
 
   private Underenhet barnehage;
   private static final ÅrstallOgKvartal _2020_3 = new ÅrstallOgKvartal(2020, 3);

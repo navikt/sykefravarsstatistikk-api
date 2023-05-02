@@ -2,10 +2,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet
-import org.springframework.stereotype.Component
 import java.util.*
 
-@Component
 object Bransjeprogram {
     private val BARNEHAGER = Bransje(ArbeidsmiljøportalenBransje.BARNEHAGER, "Barnehager", "88911")
     private val NÆRINGSMIDDELINDUSTRI = Bransje(
@@ -38,6 +36,7 @@ object Bransjeprogram {
     @JvmStatic
     fun finnBransje(underenhet: Underenhet?): Optional<Bransje> = finnBransje(underenhet?.næringskode)
 
+    @JvmStatic
     fun finnBransje(næringskode5Siffer: String?): Optional<Bransje> =
         Optional.ofNullable(alleBransjer.firstOrNull { it.inkludererNæringskode(næringskode5Siffer) })
 

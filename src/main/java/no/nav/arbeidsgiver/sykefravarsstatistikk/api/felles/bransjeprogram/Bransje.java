@@ -51,6 +51,9 @@ public class Bransje {
   }
 
   public boolean inkludererNæringskode(String næringskode5Siffer) {
+    if (næringskode5Siffer == null) {
+      return false;
+    }
     return koderSomSpesifisererNæringer.stream().anyMatch(næringskode5Siffer::startsWith);
   }
 }

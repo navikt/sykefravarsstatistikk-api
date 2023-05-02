@@ -111,7 +111,7 @@ class KafkaServiceIntegrasjonTest {
             MetadataVirksomhetKafkamelding(
                 "999999999",
                 ÅrstallOgKvartal(2023, 2),
-                "86101",
+                "86",
                 ArbeidsmiljøportalenBransje.SYKEHUS,
                 Sektor.STATLIG
             ),
@@ -124,7 +124,7 @@ class KafkaServiceIntegrasjonTest {
             node("arstall").isString.isEqualTo("2023")
             node("kvartal").isString.isEqualTo("2")
             node("bransje").isString.isEqualTo("SYKEHUS")
-            node("naringskode").isString.isEqualTo("86101")
+            node("naring").isString.isEqualTo("86")
             node("sektor").isString.isEqualTo("STATLIG")
         }
     }
@@ -160,7 +160,7 @@ class KafkaServiceIntegrasjonTest {
     }
 
     @Test
-    fun `send for kategori næring sender til "sykefravarsstatistikk-næring-topic-v1"`() {
+    fun `send for kategori næring sender til sykefravarsstatistikk-næring-topic-v1`() {
         kafkaService.sendTilStatistikkKategoriTopic(
             EksporteringServiceTestUtils.__2020_2,
             Statistikkategori.NÆRING,

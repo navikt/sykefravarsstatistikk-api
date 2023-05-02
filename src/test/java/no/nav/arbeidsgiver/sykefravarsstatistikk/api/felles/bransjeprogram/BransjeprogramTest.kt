@@ -1,34 +1,42 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram.velgPrimærnæringskode
-import org.junit.jupiter.api.Assertions.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje.BARNEHAGER
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje.NÆRINGSMIDDELINDUSTRI
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class BransjeprogramTest {
 
     @Test
-    fun `velgPrimærnæringskode velger laveste næringskode fra bransjeprogrammet`() {
-        val _11111 = Næringskode5Siffer("11111", "")
-        val _86102 = Næringskode5Siffer("86102", "")
-        val _88911 = Næringskode5Siffer("86102", "")
-        val _22222 = Næringskode5Siffer("22222", "")
+    fun `finnBransje returnerer tom Optional hvis input er null`() {
+        val næringskode: Næringskode5Siffer? = null
 
-        val næringskoder = listOf(_11111, _88911, _86102, _22222)
-
-        val primærnæringskode = velgPrimærnæringskode(næringskoder);
-        assertEquals(_86102, primærnæringskode)
+        assertThat(Bransjeprogram.finnBransje(næringskode)).isEmpty
     }
 
     @Test
-    fun `velgPrimærnæringskode velger laveste næringskode hvis ingen av dem er i bransjeprogrammet`() {
-        val _11111 = Næringskode5Siffer("11111", "")
-        val _33333 = Næringskode5Siffer("86102", "")
-        val _22222 = Næringskode5Siffer("22222", "")
+    fun `finnBransje returnerer tom Optional hvis næringskoden ikke er i bransjeprogrammet`() {
+        val næringskodeUtenforBransjeprogrammet = "11111"
 
-        val næringskoder = listOf(_11111, _33333, _22222)
+        assertThat(Bransjeprogram.finnBransje(næringskodeUtenforBransjeprogrammet)).isEmpty
+    }
 
-        val primærnæringskode = velgPrimærnæringskode(næringskoder);
-        assertEquals(_11111, primærnæringskode)
+
+    @Test
+    fun `finnBransje returnerer BARNEHAGE for næringskode 88911` () {
+        val næringskodenTilBarnehager = Næringskode5Siffer("88.911", "Barnehager")
+
+        val barnehagebransjen = Bransjeprogram.finnBransje(næringskodenTilBarnehager).get().type
+        assertEquals(BARNEHAGER, barnehagebransjen)
+    }
+
+    @Test
+    fun `finnBransje returnerer NÆRINGSMIDDELINDUSTRI for næringskode 10320`() {
+        val juicepressing = Næringskode5Siffer("10320", "Produksjon av juice av frukt og grønnsaker")
+
+        val næringsmiddelbransjen = Bransjeprogram.finnBransje(juicepressing).get().type;
+        assertEquals(NÆRINGSMIDDELINDUSTRI, næringsmiddelbransjen)
     }
 }

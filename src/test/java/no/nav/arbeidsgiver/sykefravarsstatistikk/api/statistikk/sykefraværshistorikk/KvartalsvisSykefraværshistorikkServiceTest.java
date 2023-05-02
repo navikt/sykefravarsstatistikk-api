@@ -44,8 +44,7 @@ public class KvartalsvisSykefraværshistorikkServiceTest {
         new KvartalsvisSykefraværshistorikkService(
             kvartalsvisSykefraværprosentRepository,
             sektorMappingService,
-            klassifikasjonerRepository,
-            new Bransjeprogram());
+            klassifikasjonerRepository);
 
     when(sektorMappingService.mapTilSSBSektorKode(any()))
         .thenReturn(new Sektor("1", "Statlig forvaltning"));
