@@ -292,6 +292,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
         .build()
         .send(
             HttpRequest.newBuilder()
+                .GET()
                 .uri(
                     URI.create(
                         "http://localhost:"
@@ -300,7 +301,6 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
                             + orgnr
                             + "/v1/sykefravarshistorikk/aggregert"))
                 .header(AUTHORIZATION, "Bearer " + jwtToken)
-                .GET()
                 .build(),
             ofString());
   }

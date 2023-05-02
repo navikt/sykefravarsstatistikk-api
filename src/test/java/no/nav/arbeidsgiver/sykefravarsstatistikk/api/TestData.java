@@ -5,10 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Fnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.InstitusjonellSektorkode;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnOrganisasjon;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetBruker;
@@ -51,10 +48,11 @@ public class TestData {
   }
 
   public static Underenhet enUnderenhet(String orgnr) {
-    return enUnderenhetBuilder().orgnr(new Orgnr(orgnr)).build();
+    return new Underenhet(
+        new Orgnr(orgnr), new Orgnr("053497180"), "Underenhet AS", enNæringskode5Siffer(), 40);
   }
 
-  public static Underenhet.UnderenhetBuilder enUnderenhetBuilder() {
+  public static Underenhet.Builder enUnderenhetBuilder() {
     return Underenhet.builder()
         .orgnr(etOrgnr())
         .overordnetEnhetOrgnr(new Orgnr("053497180"))

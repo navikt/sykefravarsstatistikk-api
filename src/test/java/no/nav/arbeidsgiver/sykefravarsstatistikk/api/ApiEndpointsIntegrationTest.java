@@ -372,32 +372,6 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
     assertThat(responseBody).isNotEmpty();
   }
 
-  @Test
-  public void legemeldtSykefraværsprosent__når_virksomhet_ikke_har_næring_returnerer_204()
-      throws Exception {
-    HttpResponse<String> response =
-        newBuilder()
-            .build()
-            .send(
-                HttpRequest.newBuilder()
-                    .uri(
-                        URI.create(
-                            "http://localhost:"
-                                + port
-                                + "/sykefravarsstatistikk-api/"
-                                + "555555555"
-                                + "/sykefravarshistorikk/legemeldtsykefravarsprosent"))
-                    .header(AUTHORIZATION, getBearerMedJwt())
-                    .GET()
-                    .build(),
-                ofString());
-
-    assertThat(response.statusCode()).isEqualTo(204);
-    JsonNode body = objectMapper.readTree(response.body());
-
-    assertThat(body).isNullOrEmpty();
-  }
-
   @NotNull
   private String getBearerMedJwt() {
     return "Bearer "

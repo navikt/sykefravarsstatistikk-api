@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -58,7 +59,7 @@ public class MockServer {
     }
 
     log.info("Mocker kall fra Enhetsregisteret");
-    mockKallFraEnhetsregisteret(enhetsregisteretUrl);
+    mockKallFraEnhetsregisteret(StringUtils.removeEnd(enhetsregisteretUrl, "/"));
 
     log.info("Mocker kall fra Unleash");
     mockKallFraUnleash(unleashUrl);
@@ -98,40 +99,40 @@ public class MockServer {
   private void mockKallFraEnhetsregisteret(String enhetsregisteretUrl) {
     String path = new URL(enhetsregisteretUrl).getPath();
     mockKall(
-        WireMock.urlPathMatching(path + "underenheter/[0-9]{9}"),
+        WireMock.urlPathMatching(path + "/underenheter/[0-9]{9}"),
         lesFilSomString("enhetsregisteretUnderenhet.json"));
     mockKall(
-        WireMock.urlPathMatching(path + "underenheter/444444444"),
+        WireMock.urlPathMatching(path + "/underenheter/444444444"),
         lesFilSomString("enhetsregisteretUnderenhet_444444444.json"));
     mockKall(
-        WireMock.urlPathMatching(path + "underenheter/555555555"),
+        WireMock.urlPathMatching(path + "/underenheter/555555555"),
         lesFilSomString("enhetsregisteretUnderenhet_555555555.json"));
     mockKall(
-        WireMock.urlPathMatching(path + "underenheter/910562452"),
+        WireMock.urlPathMatching(path + "/underenheter/910562452"),
         lesFilSomString("dev_enhetsregisteretUnderenhet_910562452.json"));
     mockKall(
-        WireMock.urlPathMatching(path + "underenheter/910825518"),
+        WireMock.urlPathMatching(path + "/underenheter/910825518"),
         lesFilSomString("dev_enhetsregisteretUnderenhet_910825518.json"));
     mockKall(
-        WireMock.urlPathMatching(path + "underenheter/910562436"),
+        WireMock.urlPathMatching(path + "/underenheter/910562436"),
         lesFilSomString("dev_enhetsregisteretUnderenhet_910562436.json"));
     mockKall(
-        WireMock.urlPathMatching(path + "underenheter/311874411"),
+        WireMock.urlPathMatching(path + "/underenheter/311874411"),
         lesFilSomString("dev_enhetsregisteretUnderenhet_311874411.json"));
     mockKall(
-        WireMock.urlPathMatching(path + "underenheter/315829062"),
+        WireMock.urlPathMatching(path + "/underenheter/315829062"),
         lesFilSomString("dev_enhetsregisteretUnderenhet_315829062.json"));
     mockKall(
-        WireMock.urlPathMatching(path + "enheter/[0-9]{9}"),
+        WireMock.urlPathMatching(path + "/enheter/[0-9]{9}"),
         lesFilSomString("enhetsregisteretEnhet.json"));
     mockKall(
-        WireMock.urlPathMatching(path + "enheter/910562223"),
+        WireMock.urlPathMatching(path + "/enheter/910562223"),
         lesFilSomString("dev_enhetsregisteretEnhet.json"));
     mockKall(
-        WireMock.urlPathMatching(path + "enheter/310529915"),
+        WireMock.urlPathMatching(path + "/enheter/310529915"),
         lesFilSomString("dev_enhetsregisteretEnhet_310529915.json"));
     mockKall(
-        WireMock.urlPathMatching(path + "enheter/313068420"),
+        WireMock.urlPathMatching(path + "/enheter/313068420"),
         lesFilSomString("dev_enhetsregisteretEnhet_313068420.json"));
   }
 
