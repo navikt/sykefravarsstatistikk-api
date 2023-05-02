@@ -6,7 +6,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient.HentEnhetFeil
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.IngenNæringException
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api.PubliseringsdatoerService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.AggregertStatistikkDto
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.AggregertStatistikkService
@@ -51,10 +50,23 @@ class SykefraværshistorikkController(
             orgnr, bruker, request.method, "" + request.requestURL
         )
         val underenhet = enhetsregisteretClient.hentUnderenhet(orgnr)
+            .getOrElse {
+                return when (it) {
+                    EnhetsregisteretClient.HentUnderenhetFeil.EnhetsregisteretSvarerIkke,
+                    EnhetsregisteretClient.HentUnderenhetFeil.FeilVedKallTilEnhetsregisteret,
+                    EnhetsregisteretClient.HentUnderenhetFeil.OrgnrMatcherIkke ->
+                        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
+
+                }
+            }
         val overordnetEnhet = enhetsregisteretClient
             .hentEnhet(underenhet.overordnetEnhetOrgnr!!)
-            .getOrElse { _: HentEnhetFeil ->
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
+            .getOrElse {
+                return when (it) {
+                    HentEnhetFeil.FeilVedKallTilEnhetsregisteret,
+                    HentEnhetFeil.OrgnrMatcherIkke ->
+                        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
+                }
             }
 
         val harTilgangTilOverordnetEnhet =
@@ -82,12 +94,20 @@ class SykefraværshistorikkController(
         @PathVariable("orgnr") orgnrStr: String,
         @RequestParam("antallKvartaler") antallKvartaler: Int,
         request: HttpServletRequest
-    ): List<SummertSykefraværshistorikk> {
+    ): ResponseEntity<List<SummertSykefraværshistorikk>> {
         val bruker = tilgangskontrollService.hentBrukerKunIaRettigheter()
         tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
             Orgnr(orgnrStr), bruker, request.method, "" + request.requestURL
         )
         val underenhet = enhetsregisteretClient.hentUnderenhet(Orgnr(orgnrStr))
+            .getOrElse {
+                return when (it) {
+                    EnhetsregisteretClient.HentUnderenhetFeil.EnhetsregisteretSvarerIkke,
+                    EnhetsregisteretClient.HentUnderenhetFeil.FeilVedKallTilEnhetsregisteret,
+                    EnhetsregisteretClient.HentUnderenhetFeil.OrgnrMatcherIkke ->
+                        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
+                }
+            }
         require(antallKvartaler == 4) { "For øyeblikket støtter vi kun summering av 4 kvartaler." }
         val summertSykefraværshistorikkVirksomhet = summertSykefraværService.hentSummertSykefraværshistorikk(
             underenhet, publiseringsdatoerService.hentSistePubliserteKvartal(), antallKvartaler
@@ -96,8 +116,10 @@ class SykefraværshistorikkController(
             summertSykefraværService.hentSummertSykefraværshistorikkForBransjeEllerNæring(
                 underenhet, antallKvartaler
             )
-        return listOf(
-            summertSykefraværshistorikkVirksomhet, summertSykefraværshistorikkBransjeEllerNæring
+        return ResponseEntity.ok(
+            listOf(
+                summertSykefraværshistorikkVirksomhet, summertSykefraværshistorikkBransjeEllerNæring
+            )
         )
     }
 
@@ -117,11 +139,16 @@ class SykefraværshistorikkController(
             request.method,
             "" + request.requestURL
         )
-        val underenhet: Underenhet = try {
-            enhetsregisteretClient.hentUnderenhet(orgnr)
-        } catch (e: IngenNæringException) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null)
-        }
+        val underenhet: Underenhet = enhetsregisteretClient.hentUnderenhet(orgnr)
+            .getOrElse {
+                return when (it) {
+                    EnhetsregisteretClient.HentUnderenhetFeil.EnhetsregisteretSvarerIkke,
+                    EnhetsregisteretClient.HentUnderenhetFeil.FeilVedKallTilEnhetsregisteret,
+                    EnhetsregisteretClient.HentUnderenhetFeil.OrgnrMatcherIkke ->
+                        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
+                }
+            }
+
         if (brukerHarSykefraværRettighetTilVirksomhet) {
             val legemeldtSykefraværsprosent = summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
                 underenhet, publiseringsdatoerService.hentSistePubliserteKvartal()
