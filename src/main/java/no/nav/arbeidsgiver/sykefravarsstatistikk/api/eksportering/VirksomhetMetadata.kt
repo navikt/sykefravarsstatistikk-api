@@ -11,7 +11,7 @@ data class VirksomhetMetadata(
     val næring: String,
     val årstallOgKvartal: ÅrstallOgKvartal
 ) {
-    val orgnr: String?
+    val orgnr: String
         get() = orgnrObj.verdi
 
     val næringOgNæringskode5siffer = mutableListOf<NæringOgNæringskode5siffer>()

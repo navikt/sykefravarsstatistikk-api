@@ -18,7 +18,7 @@ altinn:
     edition: 1
 
 enhetsregisteret:
-  url: "http://localhost:${wiremock.mock.port}/enhetsregisteret/"
+  url: "http://localhost:${wiremock.mock.port}/enhetsregisteret"
 
 
 statistikk.importering.aktivert: true

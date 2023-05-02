@@ -34,7 +34,7 @@ wiremock.mock:
   port: 8081
 
 enhetsregisteret:
-  url: "https://arbeidsgiver-mock-enhetsregisteret.intern.dev.nav.no/enhetsregisteret/api/"
+  url: "https://arbeidsgiver-mock-enhetsregisteret.intern.dev.nav.no/enhetsregisteret/api"
 
 altinn:
   url: "https://api-gw-q1.adeo.no/"
@@ -81,7 +81,7 @@ spring:
   config.activate.on-profile: prod
 
 enhetsregisteret:
-  url: "https://data.brreg.no/enhetsregisteret/api/"
+  url: "https://data.brreg.no/enhetsregisteret/api"
 
 altinn:
   url: "https://api-gw.adeo.no/"

@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.sporbarhet.Loggevent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.sporbarhet.Sporbarhetslogg;
 import org.junit.jupiter.api.Test;
@@ -14,9 +13,9 @@ public class SporbarhetsloggTest {
     Sporbarhetslogg sporbarhetslogg = new Sporbarhetslogg();
 
     sporbarhetslogg.loggHendelse(
-        new Loggevent(getInnloggetBruker(), new Orgnr(null), false, null, null, null, null));
+        new Loggevent(getInnloggetBruker(), null, false, null, null, null, null));
 
     sporbarhetslogg.loggHendelse(
-        new Loggevent(getInnloggetBruker(), new Orgnr(null), false, null, null, null, null), null);
+        new Loggevent(getInnloggetBruker(), null, false, null, null, null, null), null);
   }
 }
