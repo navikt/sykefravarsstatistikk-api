@@ -26,7 +26,7 @@ internal class BransjeprogramTest {
 
     @Test
     fun `finnBransje returnerer BARNEHAGE for næringskode 88911` () {
-        val næringskodenTilBarnehager = Næringskode5Siffer("88.911", "Barnehager")
+        val næringskodenTilBarnehager = Næringskode5Siffer("88911", "Barnehager")
 
         val barnehagebransjen = Bransjeprogram.finnBransje(næringskodenTilBarnehager).get().type
         assertEquals(BARNEHAGER, barnehagebransjen)

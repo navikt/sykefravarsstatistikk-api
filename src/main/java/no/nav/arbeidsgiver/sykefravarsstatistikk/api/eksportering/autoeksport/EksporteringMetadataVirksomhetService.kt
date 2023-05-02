@@ -17,8 +17,8 @@ import kotlin.jvm.optionals.getOrNull
 @Service
 class EksporteringMetadataVirksomhetService(
     val eksporteringRepository: EksporteringRepository,
-    val virksomhetMetadataRepository: VirksomhetMetadataRepository,
-    val kafkaService: KafkaService,
+    private val virksomhetMetadataRepository: VirksomhetMetadataRepository,
+    private val kafkaService: KafkaService,
     @Value("\${statistikk.eksportering.aktivert}") val erEksporteringAktivert: Boolean
 ) {
     val log = LoggerFactory.getLogger(this::class.java)

@@ -1,16 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles
 
-data class Næringskode5Siffer (
-    private val uvalidertNæringskode: String,
+data class Næringskode5Siffer(
+    val kode: String,
     val beskrivelse: String?
 ) {
-    val kode: String
-
     init {
-        val næringskodeUtenPunktum = uvalidertNæringskode.replace(".", "")
-        if (næringskodeUtenPunktum.matches("^[0-9]{5}$".toRegex())) {
-            this.kode = næringskodeUtenPunktum
-        } else {
+        if (!kode.matches("^[0-9]{5}$".toRegex())) {
             throw IllegalArgumentException("Ugyldig næringskode. Må bestå av 5 siffer.")
         }
     }
