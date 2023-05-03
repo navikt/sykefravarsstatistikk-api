@@ -4,11 +4,10 @@ import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.exporter.common.TextFormat
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient
 import no.nav.security.token.support.core.api.Unprotected
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.io.CharArrayWriter
@@ -30,12 +29,19 @@ class NaisController(private val enhetsregisteretClient: EnhetsregisteretClient)
 
     @GetMapping("/internal/metrics")
     fun metrics(
-        @PathVariable name: List<String>
+        @RequestParam(required = false) name: Set<String>?
     ): ResponseEntity<String> {
-        val formatted = CharArrayWriter(1024)
-            .also { TextFormat.write004(it, CollectorRegistry.defaultRegistry.metricFamilySamples()) }
-            .use { it.toString() }
+        val names = name ?: emptySet()
+        val metrics = CharArrayWriter(1024)
+            .also { writer ->
+                TextFormat.write004(
+                    writer,
+                    CollectorRegistry.defaultRegistry.filteredMetricFamilySamples(names)
+                )
+            }.use { it.toString() }
 
-        return ResponseEntity.ok().contentType(TextFormat.CONTENT_TYPE_004).body(formatted);
+        return ResponseEntity.ok()
+            .contentType(MediaType.valueOf(TextFormat.CONTENT_TYPE_004))
+            .body(metrics)
     }
 }

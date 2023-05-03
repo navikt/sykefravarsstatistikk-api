@@ -77,17 +77,11 @@ public class EksporteringController {
 
   @PostMapping("/reeksport/metadata")
   public ResponseEntity<HttpStatus> reeksportMetadata(
-      @RequestParam int årstall,
-      @RequestParam int kvartal) {
+      @RequestParam int årstall, @RequestParam int kvartal) {
     ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
-    int antallEksportert = eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(
-        årstallOgKvartal);
+    eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(årstallOgKvartal);
 
-    if (antallEksportert >= 0) {
-      return ResponseEntity.ok(HttpStatus.CREATED);
-    } else {
-      return ResponseEntity.ok(HttpStatus.OK);
-    }
+    return ResponseEntity.ok(HttpStatus.OK);
   }
 
   private EksporteringBegrensning getBegrensning(int begrensningTil) {

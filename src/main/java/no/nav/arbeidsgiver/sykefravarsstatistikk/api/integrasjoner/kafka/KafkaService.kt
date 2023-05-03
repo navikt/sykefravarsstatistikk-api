@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.annotation.PropertyAccessor
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.Metrics
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.SykefraværFlereKvartalerForEksport
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal
@@ -17,7 +18,6 @@ import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.support.SendResult
 import org.springframework.stereotype.Service
 import java.util.concurrent.CompletableFuture
-import io.prometheus.client.Counter;
 
 @Service
 class KafkaService internal constructor(
@@ -26,8 +26,6 @@ class KafkaService internal constructor(
     private val kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository
 ) {
     private val log = LoggerFactory.getLogger(KafkaService::class.java)
-    private val kafkaMessageCounter = Counter.build().name("sykefravarsstatistikk_kafka").help("How many hats").labelNames("hello", "hey").register();
-
 
     private val objectMapper = ObjectMapper()
 
@@ -48,16 +46,10 @@ class KafkaService internal constructor(
     fun send(kafkamelding: Kafkamelding, kafkaTopic: KafkaTopic) {
         kafkaTemplate.send(kafkaTopic.navn, kafkamelding.nøkkel, kafkamelding.innhold)
             .thenAcceptAsync {
-                kafkaUtsendingRapport.leggTilUtsendingSuksess()
-                kafkaMessageCounter.labels(kafkaTopic.navn).inc()
+                Metrics.kafkaMessageCounter.labels(kafkaTopic.navn).inc()
             }.exceptionally {
-                prometheusFeil.increment()
-                kafkaUtsendingRapport.leggTilError(
-                    """
-                    Kunne ikke sende melding til Kafka topic '${kafkaTopic.navn}'. Melding med nøkkel 
-                    '${kafkamelding.nøkkel}' ble ikke sendt. Feilmelding: ${it.message}
-                    """.trimIndent()
-                )
+                Metrics.kafkaErrorCounter.labels(kafkaTopic.navn).inc()
+                log.warn("Melding '${kafkamelding.nøkkel}' ble ikke sendt på '${kafkaTopic.navn}'", it)
                 null
             }
     }

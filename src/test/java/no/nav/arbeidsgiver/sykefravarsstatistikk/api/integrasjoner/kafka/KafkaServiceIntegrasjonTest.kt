@@ -99,7 +99,7 @@ class KafkaServiceIntegrasjonTest {
                 ArbeidsmiljøportalenBransje.SYKEHUS,
                 Sektor.STATLIG
             ),
-            KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1
+            KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1,
         )
         val message = consumerRecords.poll(10, TimeUnit.SECONDS)
         assertThat(message?.topic()).isEqualTo(KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1.navn)
@@ -115,7 +115,7 @@ class KafkaServiceIntegrasjonTest {
                 ArbeidsmiljøportalenBransje.SYKEHUS,
                 Sektor.STATLIG
             ),
-            KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1
+            KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1,
         )
         val message = consumerRecords.poll(10, TimeUnit.SECONDS)
         assertThatJson(message!!.value()) {
