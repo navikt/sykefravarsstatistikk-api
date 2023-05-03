@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.SykefraværFlereKvartalerForEksport
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicNavn
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori
@@ -17,6 +17,7 @@ import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.support.SendResult
 import org.springframework.stereotype.Service
 import java.util.concurrent.CompletableFuture
+import io.prometheus.client.Counter;
 
 @Service
 class KafkaService internal constructor(
@@ -25,15 +26,17 @@ class KafkaService internal constructor(
     private val kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository
 ) {
     private val log = LoggerFactory.getLogger(KafkaService::class.java)
+    private val counter = Counter.build().name("sykefravarsstatistikk_kafka").help("How many hats").labelNames("hello", "hey").register();
+
 
     private val objectMapper = ObjectMapper()
 
     fun nullstillUtsendingRapport(
-        totalMeldingerTilUtsending: Int, KafkaTopicNavn: KafkaTopicNavn
+        totalMeldingerTilUtsending: Int, KafkaTopicNavn: KafkaTopic
     ) {
         log.info(
             "Gjør utsendingrapport klar før utsending på Kafka topic '{}'. '{}' meldinger vil bli sendt.",
-            KafkaTopicNavn.topic,
+            KafkaTopicNavn.navn,
             totalMeldingerTilUtsending
         )
         kafkaUtsendingRapport.reset(totalMeldingerTilUtsending)
@@ -42,13 +45,18 @@ class KafkaService internal constructor(
     val antallMeldingerMottattForUtsending: Int
         get() = kafkaUtsendingRapport.antallMeldingerMottattForUtsending
 
-    fun send(kafkamelding: Kafkamelding, kafkaTopic: KafkaTopicNavn) {
-        kafkaTemplate.send(kafkaTopic.topic, kafkamelding.nøkkel, kafkamelding.innhold)
+    fun send(kafkamelding: Kafkamelding, kafkaTopic: KafkaTopic) {
+        kafkaTemplate.send(kafkaTopic.navn, kafkamelding.nøkkel, kafkamelding.innhold)
             .thenAcceptAsync {
                 kafkaUtsendingRapport.leggTilUtsendingSuksess()
+                counter.labels(kafkaTopic.navn).inc()
             }.exceptionally {
+                prometheusFeil.increment()
                 kafkaUtsendingRapport.leggTilError(
-                    "Kunne ikke sende melding til Kafka topic '${kafkaTopic.topic}'. Melding med nøkkel '${kafkamelding.nøkkel}' ble ikke sendt. Feilmelding: ${it.message}"
+                    """
+                    Kunne ikke sende melding til Kafka topic '${kafkaTopic.navn}'. Melding med nøkkel 
+                    '${kafkamelding.nøkkel}' ble ikke sendt. Feilmelding: ${it.message}
+                    """.trimIndent()
                 )
                 null
             }
@@ -86,7 +94,7 @@ class KafkaService internal constructor(
             )
             return false
         }
-        val topicNavn: String = KafkaTopicNavn.from(statistikkategori).topic
+        val topicNavn: String = KafkaTopic.from(statistikkategori).navn
         val futureResult: CompletableFuture<SendResult<String?, String?>> =
             kafkaTemplate.send(topicNavn, keyAsJsonString, dataAsJsonString)
         futureResult
@@ -170,7 +178,7 @@ class KafkaService internal constructor(
             return
         }
         val futureResult: CompletableFuture<SendResult<String?, String?>> = kafkaTemplate.send(
-            KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_V1.topic, keyAsJsonString, dataAsJsonString
+            KafkaTopic.SYKEFRAVARSSTATISTIKK_V1.navn, keyAsJsonString, dataAsJsonString
         )
         futureResult
             .thenAcceptAsync { res: SendResult<String?, String?> ->
@@ -179,7 +187,7 @@ class KafkaService internal constructor(
                 )
                 log.debug(
                     "Melding sendt fra service til topic {}. Record.key: {}. Record.offset: {}",
-                    KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_V1.topic,
+                    KafkaTopic.SYKEFRAVARSSTATISTIKK_V1.navn,
                     res.producerRecord.key(),
                     res.recordMetadata.offset()
                 )

@@ -6,8 +6,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.Ek
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.SykefraværFlereKvartalerForEksport
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicNavn
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicNavn.Companion.toStringArray
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopic
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopic.Companion.toStringArray
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.MetadataVirksomhetKafkamelding
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.Sektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
@@ -99,10 +99,10 @@ class KafkaServiceIntegrasjonTest {
                 ArbeidsmiljøportalenBransje.SYKEHUS,
                 Sektor.STATLIG
             ),
-            KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_METADATA_V1
+            KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1
         )
         val message = consumerRecords.poll(10, TimeUnit.SECONDS)
-        assertThat(message?.topic()).isEqualTo(KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_METADATA_V1.topic)
+        assertThat(message?.topic()).isEqualTo(KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1.navn)
     }
 
     @Test
@@ -115,7 +115,7 @@ class KafkaServiceIntegrasjonTest {
                 ArbeidsmiljøportalenBransje.SYKEHUS,
                 Sektor.STATLIG
             ),
-            KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_METADATA_V1
+            KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1
         )
         val message = consumerRecords.poll(10, TimeUnit.SECONDS)
         assertThatJson(message!!.value()) {
@@ -140,7 +140,7 @@ class KafkaServiceIntegrasjonTest {
             EksporteringServiceTestUtils.landSykefravær
         )
         val message = consumerRecords.poll(10, TimeUnit.SECONDS)
-        Assertions.assertEquals(KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_V1.topic, message!!.topic())
+        Assertions.assertEquals(KafkaTopic.SYKEFRAVARSSTATISTIKK_V1.navn, message!!.topic())
     }
 
     @Test
@@ -154,7 +154,7 @@ class KafkaServiceIntegrasjonTest {
         )
         val message = consumerRecords.poll(10, TimeUnit.SECONDS)
         Assertions.assertEquals(
-            KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_LAND_V1.topic,
+            KafkaTopic.SYKEFRAVARSSTATISTIKK_LAND_V1.navn,
             message!!.topic()
         )
     }
@@ -170,7 +170,7 @@ class KafkaServiceIntegrasjonTest {
         )
         val message = consumerRecords.poll(10, TimeUnit.SECONDS)
         Assertions.assertEquals(
-            KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_NARING_V1.topic,
+            KafkaTopic.SYKEFRAVARSSTATISTIKK_NARING_V1.navn,
             message!!.topic()
         )
     }
@@ -186,7 +186,7 @@ class KafkaServiceIntegrasjonTest {
         )
         val message = consumerRecords.poll(10, TimeUnit.SECONDS)
         Assertions.assertEquals(
-            KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_SEKTOR_V1.topic,
+            KafkaTopic.SYKEFRAVARSSTATISTIKK_SEKTOR_V1.navn,
             message!!.topic()
         )
     }
@@ -202,7 +202,7 @@ class KafkaServiceIntegrasjonTest {
         )
         val message = consumerRecords.poll(10, TimeUnit.SECONDS)
         Assertions.assertEquals(
-            KafkaTopicNavn.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1.topic,
+            KafkaTopic.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1.navn,
             message!!.topic()
         )
     }
