@@ -21,12 +21,15 @@ public class EksporteringController {
 
   private final EksporteringService eksporteringService;
   private final EksporteringPerStatistikkKategoriService eksporteringPerStatistikkKategoriService;
+  private final EksporteringMetadataVirksomhetService eksporteringMetadataVirksomhetService;
 
   public EksporteringController(
       EksporteringService eksporteringService,
-      EksporteringPerStatistikkKategoriService eksporteringPerStatistikkKategoriService) {
+      EksporteringPerStatistikkKategoriService eksporteringPerStatistikkKategoriService,
+      EksporteringMetadataVirksomhetService eksporteringMetadataVirksomhetService) {
     this.eksporteringService = eksporteringService;
     this.eksporteringPerStatistikkKategoriService = eksporteringPerStatistikkKategoriService;
+    this.eksporteringMetadataVirksomhetService = eksporteringMetadataVirksomhetService;
   }
 
   @PostMapping("/reeksport")
@@ -70,6 +73,15 @@ public class EksporteringController {
     } else {
       return ResponseEntity.ok(HttpStatus.OK);
     }
+  }
+
+  @PostMapping("/reeksport/metadata")
+  public ResponseEntity<HttpStatus> reeksportMetadata(
+      @RequestParam int årstall, @RequestParam int kvartal) {
+    ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
+    eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(årstallOgKvartal);
+
+    return ResponseEntity.ok(HttpStatus.OK);
   }
 
   private EksporteringBegrensning getBegrensning(int begrensningTil) {

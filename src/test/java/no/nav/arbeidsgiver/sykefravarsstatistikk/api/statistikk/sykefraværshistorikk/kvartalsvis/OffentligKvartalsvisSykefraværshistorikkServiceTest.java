@@ -42,9 +42,8 @@ class OffentligKvartalsvisSykefraværshistorikkServiceTest {
             new KvartalsvisSykefraværshistorikkService(
                 kvartalsvisSykefraværprosentRepository,
                 sektorMappingService,
-                klassifikasjonerRepository,
-                new Bransjeprogram()),
-            new Bransjeprogram());
+                klassifikasjonerRepository
+            ));
     when(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand())
         .thenReturn(Arrays.asList(sykefraværprosent("Norge")));
   }

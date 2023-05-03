@@ -150,7 +150,10 @@ public class SykefraværRepository {
   public Sykefraværsdata hentUmaskertSykefraværAlleKategorier(
       Virksomhet virksomhet, ÅrstallOgKvartal fraÅrstallOgKvartal) {
     Næring næring = new Næring(virksomhet.getNæringskode().getKode(), "");
-    Optional<Bransje> maybeBransje = new Bransjeprogram().finnBransje(virksomhet.getNæringskode());
+
+
+    // TODO: virksomhet.hentNæringskode skal returnerer i henhold til logikk
+    Optional<Bransje> maybeBransje = Bransjeprogram.finnBransje(virksomhet.getNæringskode());
 
     Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> data = new HashMap<>();
     data.put(VIRKSOMHET, hentUmaskertSykefravær(virksomhet, fraÅrstallOgKvartal));

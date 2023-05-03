@@ -13,18 +13,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class BransjeEllerNæringService {
 
-  private final Bransjeprogram bransjeprogram;
   private final KlassifikasjonerRepository klassifikasjonerRepository;
 
   public BransjeEllerNæringService(
-      Bransjeprogram bransjeprogram, KlassifikasjonerRepository klassifikasjonerRepository) {
-    this.bransjeprogram = bransjeprogram;
+      KlassifikasjonerRepository klassifikasjonerRepository) {
     this.klassifikasjonerRepository = klassifikasjonerRepository;
   }
 
   @Deprecated
   public BransjeEllerNæring bestemFraNæringskode(Næringskode5Siffer næringskode5Siffer) {
-    Optional<Bransje> bransje = bransjeprogram.finnBransje(næringskode5Siffer);
+    Optional<Bransje> bransje = Bransjeprogram.finnBransje(næringskode5Siffer);
 
     boolean skalHenteDataPåNæring = bransje.isEmpty() || bransje.get().erDefinertPåTosiffernivå();
 
@@ -37,7 +35,7 @@ public class BransjeEllerNæringService {
   }
 
   public BransjeEllerNæring finnBransje(Underenhet virksomhet) {
-    Optional<Bransje> bransje = bransjeprogram.finnBransje(virksomhet);
+    Optional<Bransje> bransje = Bransjeprogram.finnBransje(virksomhet);
 
     if (bransje.isPresent()) {
       return new BransjeEllerNæring(bransje.get());
@@ -69,7 +67,7 @@ public class BransjeEllerNæringService {
                     : ""),
             0);
 
-    Optional<Bransje> bransje = bransjeprogram.finnBransje(virksomhet);
+    Optional<Bransje> bransje = Bransjeprogram.finnBransje(virksomhet);
 
     if (bransje.isPresent()) {
       return new BransjeEllerNæring(bransje.get());
