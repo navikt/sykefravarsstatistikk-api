@@ -62,8 +62,4 @@ public class KafkaStatistikkKategoriTopicValue {
     result = 31 * result + (siste4Kvartal != null ? siste4Kvartal.hashCode() : 0);
     return result;
   }
-
-  /*
-  public SykefraværMedKategori getSisteKvartal() { return sistePubliserteKvartal; }
-  public SykefraværOverFlereKvartaler getSiste4Kvartal() { return siste4Kvartal; }*/
 }

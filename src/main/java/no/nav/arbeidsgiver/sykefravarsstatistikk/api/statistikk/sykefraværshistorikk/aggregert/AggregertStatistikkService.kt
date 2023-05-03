@@ -1,195 +1,147 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert
 
-import io.vavr.control.Either;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.EitherUtils;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api.PubliseringsdatoerService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.GraderingRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.VarighetRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
-import org.springframework.stereotype.Service;
+import io.vavr.control.Either
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.EitherUtils
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api.PubliseringsdatoerService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartalMedVarighet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.GraderingRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.VarighetRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService
+import org.springframework.stereotype.Service
 
 @Service
-public class AggregertStatistikkService {
-
-  private final SykefraværRepository sykefraværprosentRepository;
-  private final GraderingRepository graderingRepository;
-  private final VarighetRepository varighetRepository;
-  private final BransjeEllerNæringService bransjeEllerNæringService;
-  private final TilgangskontrollService tilgangskontrollService;
-  private final EnhetsregisteretClient enhetsregisteretClient;
-  private final PubliseringsdatoerService publiseringsdatoerService;
-
-  public AggregertStatistikkService(
-      SykefraværRepository sykefraværprosentRepository,
-      GraderingRepository graderingRepository,
-      VarighetRepository varighetRepository,
-      BransjeEllerNæringService bransjeEllerNæringService,
-      TilgangskontrollService tilgangskontrollService,
-      EnhetsregisteretClient enhetsregisteretClient,
-      PubliseringsdatoerService publiseringsdatoerService) {
-    this.sykefraværprosentRepository = sykefraværprosentRepository;
-    this.graderingRepository = graderingRepository;
-    this.varighetRepository = varighetRepository;
-    this.bransjeEllerNæringService = bransjeEllerNæringService;
-    this.tilgangskontrollService = tilgangskontrollService;
-    this.enhetsregisteretClient = enhetsregisteretClient;
-    this.publiseringsdatoerService = publiseringsdatoerService;
-  }
-
-  public Either<TilgangskontrollException, AggregertStatistikkDto> hentAggregertStatistikk(
-      Orgnr orgnr) {
-
-    if (!tilgangskontrollService.brukerRepresentererVirksomheten(orgnr)) {
-      return Either.left(
-          new TilgangskontrollException("Bruker mangler tilgang til denne virksomheten"));
+class AggregertStatistikkService(
+    private val sykefraværprosentRepository: SykefraværRepository,
+    private val graderingRepository: GraderingRepository,
+    private val varighetRepository: VarighetRepository,
+    private val bransjeEllerNæringService: BransjeEllerNæringService,
+    private val tilgangskontrollService: TilgangskontrollService,
+    private val enhetsregisteretClient: EnhetsregisteretClient,
+    private val publiseringsdatoerService: PubliseringsdatoerService
+) {
+    fun hentAggregertStatistikk(
+        orgnr: Orgnr
+    ): Either<TilgangskontrollException, AggregertStatistikkDto> {
+        if (!tilgangskontrollService.brukerRepresentererVirksomheten(orgnr)) {
+            return Either.left(
+                TilgangskontrollException("Bruker mangler tilgang til denne virksomheten")
+            )
+        }
+        val virksomhet =
+            enhetsregisteretClient.hentUnderenhet(orgnr).getOrNull() ?: // TODO: Legg til mer granulær feilmelding
+            return Either.left(TilgangskontrollException("Fant ikke virksomhet med orgnr $orgnr"))
+        val totalSykefravær = hentTotalfraværSisteFemKvartaler(virksomhet)
+        val gradertSykefravær = hentGradertSykefravær(virksomhet)
+        val korttidSykefravær = hentKorttidsfravær(virksomhet)
+        val langtidsfravær = hentLangtidsfravær(virksomhet)
+        if (tilgangskontrollService.brukerManglerIaRettigheterIVirksomheten(orgnr)) {
+            totalSykefravær.filtrerBortVirksomhetsdata()
+            gradertSykefravær.filtrerBortVirksomhetsdata()
+            korttidSykefravær.filtrerBortVirksomhetsdata()
+            langtidsfravær.filtrerBortVirksomhetsdata()
+        }
+        return Either.right(
+            aggregerData(
+                virksomhet, totalSykefravær, gradertSykefravær, korttidSykefravær, langtidsfravær
+            )
+        )
     }
-    Underenhet virksomhet = enhetsregisteretClient.hentUnderenhet(orgnr).getOrNull();
-    if (virksomhet == null) {
-      // TODO: Legg til mer granulær feilmelding
-      return Either.left(new TilgangskontrollException("Fant ikke virksomhet med orgnr " + orgnr));
-    }
-    Sykefraværsdata totalSykefravær = hentTotalfraværSisteFemKvartaler(virksomhet);
-    Sykefraværsdata gradertSykefravær = hentGradertSykefravær(virksomhet);
-    Sykefraværsdata korttidSykefravær = hentKorttidsfravær(virksomhet);
-    Sykefraværsdata langtidsfravær = hentLangtidsfravær(virksomhet);
 
-    if (!tilgangskontrollService.brukerHarIaRettigheterIVirksomheten(orgnr)) {
-      totalSykefravær.filtrerBortVirksomhetsdata();
-      gradertSykefravær.filtrerBortVirksomhetsdata();
-      korttidSykefravær.filtrerBortVirksomhetsdata();
-      langtidsfravær.filtrerBortVirksomhetsdata();
-    }
-    return Either.right(
-        aggregerData(
-            virksomhet, totalSykefravær, gradertSykefravær, korttidSykefravær, langtidsfravær));
-  }
-
-  private AggregertStatistikkDto aggregerData(
-      Underenhet virksomhet,
-      Sykefraværsdata totalfravær,
-      Sykefraværsdata gradertFravær,
-      Sykefraværsdata korttidsfravær,
-      Sykefraværsdata langtidsfravær) {
-    ÅrstallOgKvartal sistePubliserteKvartal =
-        publiseringsdatoerService.hentSistePubliserteKvartal();
-
-    Aggregeringskalkulator kalkulatorTotal =
-        new Aggregeringskalkulator(totalfravær, sistePubliserteKvartal);
-    Aggregeringskalkulator kalkulatorGradert =
-        new Aggregeringskalkulator(gradertFravær, sistePubliserteKvartal);
-    Aggregeringskalkulator kalkulatorKorttid =
-        new Aggregeringskalkulator(korttidsfravær, sistePubliserteKvartal);
-    Aggregeringskalkulator kalkulatorLangtid =
-        new Aggregeringskalkulator(langtidsfravær, sistePubliserteKvartal);
-
-    BransjeEllerNæring bransjeEllerNæring = bransjeEllerNæringService.finnBransje(virksomhet);
-
-    List<StatistikkDto> prosentSisteFireKvartalerTotalt =
-        EitherUtils.getRightsAndLogLefts(
-            kalkulatorTotal.fraværsprosentVirksomhet(virksomhet.getNavn()),
+    private fun aggregerData(
+        virksomhet: Underenhet,
+        totalfravær: Sykefraværsdata,
+        gradertFravær: Sykefraværsdata,
+        korttidsfravær: Sykefraværsdata,
+        langtidsfravær: Sykefraværsdata
+    ): AggregertStatistikkDto {
+        val sistePubliserteKvartal = publiseringsdatoerService.hentSistePubliserteKvartal()
+        val kalkulatorTotal = Aggregeringskalkulator(totalfravær, sistePubliserteKvartal)
+        val kalkulatorGradert = Aggregeringskalkulator(gradertFravær, sistePubliserteKvartal)
+        val kalkulatorKorttid = Aggregeringskalkulator(korttidsfravær, sistePubliserteKvartal)
+        val kalkulatorLangtid = Aggregeringskalkulator(langtidsfravær, sistePubliserteKvartal)
+        val bransjeEllerNæring = bransjeEllerNæringService.finnBransje(virksomhet)
+        val prosentSisteFireKvartalerTotalt = EitherUtils.getRightsAndLogLefts(
+            kalkulatorTotal.fraværsprosentVirksomhet(virksomhet.navn),
             kalkulatorTotal.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
-            kalkulatorTotal.fraværsprosentNorge());
-    List<StatistikkDto> prosentSisteFireKvartalerGradert =
-        EitherUtils.getRightsAndLogLefts(
-            kalkulatorGradert.fraværsprosentVirksomhet(virksomhet.getNavn()),
-            kalkulatorGradert.fraværsprosentBransjeEllerNæring(bransjeEllerNæring));
-    List<StatistikkDto> prosentSisteFireKvartalerKorttid =
-        EitherUtils.getRightsAndLogLefts(
-            kalkulatorKorttid.fraværsprosentVirksomhet(virksomhet.getNavn()),
-            kalkulatorKorttid.fraværsprosentBransjeEllerNæring(bransjeEllerNæring));
-    List<StatistikkDto> prosentSisteFireKvartalerLangtid =
-        EitherUtils.getRightsAndLogLefts(
-            kalkulatorLangtid.fraværsprosentVirksomhet(virksomhet.getNavn()),
-            kalkulatorLangtid.fraværsprosentBransjeEllerNæring(bransjeEllerNæring));
+            kalkulatorTotal.fraværsprosentNorge()
+        )
+        val prosentSisteFireKvartalerGradert = EitherUtils.getRightsAndLogLefts(
+            kalkulatorGradert.fraværsprosentVirksomhet(virksomhet.navn),
+            kalkulatorGradert.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
+        )
+        val prosentSisteFireKvartalerKorttid = EitherUtils.getRightsAndLogLefts(
+            kalkulatorKorttid.fraværsprosentVirksomhet(virksomhet.navn),
+            kalkulatorKorttid.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
+        )
+        val prosentSisteFireKvartalerLangtid = EitherUtils.getRightsAndLogLefts(
+            kalkulatorLangtid.fraværsprosentVirksomhet(virksomhet.navn),
+            kalkulatorLangtid.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
+        )
+        val trendTotalt = EitherUtils.getRightsAndLogLefts(
+            kalkulatorTotal.trendBransjeEllerNæring(bransjeEllerNæring)
+        )
+        val tapteDagsverkTotalt = EitherUtils.getRightsAndLogLefts(
+            kalkulatorTotal.tapteDagsverkVirksomhet(virksomhet.navn)
+        )
+        val muligeDagsverkTotalt = EitherUtils.getRightsAndLogLefts(
+            kalkulatorTotal.muligeDagsverkVirksomhet(virksomhet.navn)
+        )
+        return AggregertStatistikkDto(
+            prosentSisteFireKvartalerTotalt,
+            prosentSisteFireKvartalerGradert,
+            prosentSisteFireKvartalerKorttid,
+            prosentSisteFireKvartalerLangtid,
+            trendTotalt,
+            tapteDagsverkTotalt,
+            muligeDagsverkTotalt
+        )
+    }
 
-    List<StatistikkDto> trendTotalt =
-        EitherUtils.getRightsAndLogLefts(
-            kalkulatorTotal.trendBransjeEllerNæring(bransjeEllerNæring));
+    private fun hentTotalfraværSisteFemKvartaler(forBedrift: Underenhet): Sykefraværsdata {
+        return sykefraværprosentRepository.hentUmaskertSykefraværAlleKategorier(
+            forBedrift, publiseringsdatoerService.hentSistePubliserteKvartal().minusKvartaler(4)
+        )
+    }
 
-    List<StatistikkDto> tapteDagsverkTotalt =
-        EitherUtils.getRightsAndLogLefts(
-            kalkulatorTotal.tapteDagsverkVirksomhet(virksomhet.getNavn()));
+    private fun hentGradertSykefravær(virksomhet: Underenhet): Sykefraværsdata {
+        return graderingRepository.hentGradertSykefraværAlleKategorier(virksomhet)
+    }
 
-    List<StatistikkDto> muligeDagsverkTotalt =
-        EitherUtils.getRightsAndLogLefts(
-            kalkulatorTotal.muligeDagsverkVirksomhet(virksomhet.getNavn()));
+    private fun hentKorttidsfravær(virksomhet: Underenhet): Sykefraværsdata {
+        return hentLangtidsEllerKorttidsfravær(virksomhet) {
+            it.varighet.erKorttidVarighet() || it.varighet.erTotalvarighet()
+        }
+    }
 
-    return new AggregertStatistikkDto(
-        prosentSisteFireKvartalerTotalt,
-        prosentSisteFireKvartalerGradert,
-        prosentSisteFireKvartalerKorttid,
-        prosentSisteFireKvartalerLangtid,
-        trendTotalt,
-        tapteDagsverkTotalt,
-        muligeDagsverkTotalt);
-  }
+    private fun hentLangtidsfravær(virksomhet: Underenhet): Sykefraværsdata {
+        return hentLangtidsEllerKorttidsfravær(virksomhet) {
+            it.varighet.erLangtidVarighet() || it.varighet.erTotalvarighet()
+        }
+    }
 
-  private Sykefraværsdata hentTotalfraværSisteFemKvartaler(Underenhet forBedrift) {
-    return sykefraværprosentRepository.hentUmaskertSykefraværAlleKategorier(
-        forBedrift, publiseringsdatoerService.hentSistePubliserteKvartal().minusKvartaler(4));
-  }
+    private fun hentLangtidsEllerKorttidsfravær(
+        virksomhet: Underenhet, entenLangtidEllerKorttid: (UmaskertSykefraværForEttKvartalMedVarighet) -> Boolean
+    ) = Sykefraværsdata(
+        varighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(virksomhet)
+            .mapValues { (_, statistikk) ->
+                statistikk.filter(entenLangtidEllerKorttid).let(::grupperOgSummerHvertKvartal)
+            }.toMutableMap()
+    )
 
-  private Sykefraværsdata hentGradertSykefravær(Underenhet virksomhet) {
-    return graderingRepository.hentGradertSykefraværAlleKategorier(virksomhet);
-  }
 
-  private Sykefraværsdata hentKorttidsfravær(Underenhet virksomhet) {
-    return hentLangtidsEllerKorttidsfravær(
-        virksomhet,
-        datapunkt ->
-            datapunkt.getVarighet().erKorttidVarighet()
-                || datapunkt.getVarighet().erTotalvarighet());
-  }
-
-  private Sykefraværsdata hentLangtidsfravær(Underenhet virksomhet) {
-    return hentLangtidsEllerKorttidsfravær(
-        virksomhet,
-        datapunkt ->
-            datapunkt.getVarighet().erLangtidVarighet()
-                || datapunkt.getVarighet().erTotalvarighet());
-  }
-
-  private Sykefraværsdata hentLangtidsEllerKorttidsfravær(
-      Underenhet virksomhet,
-      Predicate<UmaskertSykefraværForEttKvartalMedVarighet> entenLangtidEllerKorttid) {
-
-    Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> filtrertFravær = new HashMap<>();
-
-    varighetRepository
-        .hentUmaskertSykefraværMedVarighetAlleKategorier(virksomhet)
-        .forEach(
-            (statistikkategori, fravær) ->
-                filtrertFravær.put(
-                    statistikkategori,
-                    fravær.stream()
-                        .filter(entenLangtidEllerKorttid)
-                        .collect(
-                            Collectors.groupingBy(
-                                UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal,
-                                Collectors.reducing(UmaskertSykefraværForEttKvartal::add)))
-                        .values()
-                        .stream()
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .collect(Collectors.toList())));
-
-    return new Sykefraværsdata(filtrertFravær);
-  }
+    private fun grupperOgSummerHvertKvartal(
+        fraværFlereKvartaler: List<UmaskertSykefraværForEttKvartal>
+    ): List<UmaskertSykefraværForEttKvartal> {
+        return fraværFlereKvartaler.groupBy(UmaskertSykefraværForEttKvartal::årstallOgKvartal)
+            .mapValues { (_, fraværFlereKvartaler) -> fraværFlereKvartaler.reduce(UmaskertSykefraværForEttKvartal::add) }
+            .values.toList()
+    }
 }
+

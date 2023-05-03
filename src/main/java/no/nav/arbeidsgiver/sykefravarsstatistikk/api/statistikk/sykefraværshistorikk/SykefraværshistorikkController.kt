@@ -12,8 +12,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikkService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertLegemeldtSykefraværService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertSykefraværService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertSykefraværshistorikk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService
 import no.nav.security.token.support.core.api.Protected
@@ -23,7 +21,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
@@ -33,7 +30,6 @@ class SykefraværshistorikkController(
     private val kvartalsvisSykefraværshistorikkService: KvartalsvisSykefraværshistorikkService,
     private val tilgangskontrollService: TilgangskontrollService,
     private val enhetsregisteretClient: EnhetsregisteretClient,
-    private val summertSykefraværService: SummertSykefraværService,
     private val aggregertHistorikkService: AggregertStatistikkService,
     private val publiseringsdatoerService: PubliseringsdatoerService,
     private val summertLegemeldtSykefraværService: SummertLegemeldtSykefraværService
@@ -86,41 +82,6 @@ class SykefraværshistorikkController(
                 )
             )
         }
-    }
-
-    // TODO: Fjern har vi har gått over til "aggregert"-endepunktet
-    @GetMapping(value = ["/{orgnr}/sykefravarshistorikk/summert"])
-    fun hentSummertKorttidsOgLangtidsfraværV2(
-        @PathVariable("orgnr") orgnrStr: String,
-        @RequestParam("antallKvartaler") antallKvartaler: Int,
-        request: HttpServletRequest
-    ): ResponseEntity<List<SummertSykefraværshistorikk>> {
-        val bruker = tilgangskontrollService.hentBrukerKunIaRettigheter()
-        tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
-            Orgnr(orgnrStr), bruker, request.method, "" + request.requestURL
-        )
-        val underenhet = enhetsregisteretClient.hentUnderenhet(Orgnr(orgnrStr))
-            .getOrElse {
-                return when (it) {
-                    EnhetsregisteretClient.HentUnderenhetFeil.EnhetsregisteretSvarerIkke,
-                    EnhetsregisteretClient.HentUnderenhetFeil.FeilVedKallTilEnhetsregisteret,
-                    EnhetsregisteretClient.HentUnderenhetFeil.OrgnrMatcherIkke ->
-                        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
-                }
-            }
-        require(antallKvartaler == 4) { "For øyeblikket støtter vi kun summering av 4 kvartaler." }
-        val summertSykefraværshistorikkVirksomhet = summertSykefraværService.hentSummertSykefraværshistorikk(
-            underenhet, publiseringsdatoerService.hentSistePubliserteKvartal(), antallKvartaler
-        )
-        val summertSykefraværshistorikkBransjeEllerNæring =
-            summertSykefraværService.hentSummertSykefraværshistorikkForBransjeEllerNæring(
-                underenhet, antallKvartaler
-            )
-        return ResponseEntity.ok(
-            listOf(
-                summertSykefraværshistorikkVirksomhet, summertSykefraværshistorikkBransjeEllerNæring
-            )
-        )
     }
 
     // TODO: Fjern etter at MFA har gått over til kafka

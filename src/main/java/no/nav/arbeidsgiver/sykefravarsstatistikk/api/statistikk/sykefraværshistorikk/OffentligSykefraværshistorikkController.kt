@@ -20,6 +20,7 @@ class OffentligSykefraværshistorikkController(
     private val tilgangskontrollService: TilgangskontrollService,
     private val enhetsregisteretClient: EnhetsregisteretClient
 ) {
+    // TODO: Finn ut om dette endepunktet er i bruk, og fjern det dersom ikke.
     @GetMapping(value = ["/{orgnr}/v1/offentlig/sykefravarshistorikk/kvartalsvis"])
     fun hentOffentligeSykefraværsprosenter(
         @PathVariable("orgnr") orgnrStr: String?, request: HttpServletRequest

@@ -146,7 +146,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
 
     assertThat(
             alleSykefraværshistorikk.findValues("type").stream()
-                .map(v -> v.textValue())
+                .map(JsonNode::textValue)
                 .collect(Collectors.toList()))
         .containsExactlyInAnyOrderElementsOf(
             Arrays.asList(
@@ -265,30 +265,6 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
   }
 
   @Test
-  public void summert_sykefraværshistorikk_siste_4_kvartaler__skal_utføre_tilgangskontroll()
-      throws IOException, InterruptedException {
-    HttpResponse<String> response =
-        newBuilder()
-            .build()
-            .send(
-                HttpRequest.newBuilder()
-                    .uri(
-                        URI.create(
-                            "http://localhost:"
-                                + port
-                                + "/sykefravarsstatistikk-api/"
-                                + ORGNR_UNDERENHET_INGEN_TILGANG
-                                + "/sykefravarshistorikk/summert?antallKvartaler=4"))
-                    .header(AUTHORIZATION, getBearerMedJwt())
-                    .GET()
-                    .build(),
-                ofString());
-    assertThat(response.statusCode()).isEqualTo(403);
-    assertThat(response.body())
-        .isEqualTo("{\"message\":\"You don't have access to this resource\"}");
-  }
-
-  @Test
   public void legemeldtSykefraværsprosent__skal_returnere_riktig_objekt() throws Exception {
     opprettStatistikkForVirksomhet(
         jdbcTemplate, ORGNR_UNDERENHET, SISTE_ÅRSTALL, SISTE_KVARTAL, 12, 100, 10);
@@ -345,31 +321,6 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
     assertThat(response.statusCode()).isEqualTo(403);
     assertThat(response.body())
         .isEqualTo("{\"message\":\"You don't have access to this resource\"}");
-  }
-
-  @Test
-  public void summert_sykefraværshistorikk_siste_4_kvartaler__skal_returnere_riktig_objekt()
-      throws Exception {
-    HttpResponse<String> response =
-        newBuilder()
-            .build()
-            .send(
-                HttpRequest.newBuilder()
-                    .uri(
-                        URI.create(
-                            "http://localhost:"
-                                + port
-                                + "/sykefravarsstatistikk-api/"
-                                + ORGNR_UNDERENHET
-                                + "/sykefravarshistorikk/summert?antallKvartaler=4"))
-                    .header(AUTHORIZATION, getBearerMedJwt())
-                    .GET()
-                    .build(),
-                ofString());
-
-    assertThat(response.statusCode()).isEqualTo(200);
-    JsonNode responseBody = objectMapper.readTree(response.body());
-    assertThat(responseBody).isNotEmpty();
   }
 
   @NotNull
