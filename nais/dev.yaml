@@ -47,7 +47,7 @@ spec:
     - configmap: loginservice-idporten
   prometheus:
     enabled: true
-    path: /sykefravarsstatistikk-api/internal/actuator/prometheus
+    path: /sykefravarsstatistikk-api/internal/metrics
   webproxy: true
   vault:
     enabled: true

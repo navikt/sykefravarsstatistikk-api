@@ -26,7 +26,7 @@ class KafkaService internal constructor(
     private val kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository
 ) {
     private val log = LoggerFactory.getLogger(KafkaService::class.java)
-    private val counter = Counter.build().name("sykefravarsstatistikk_kafka").help("How many hats").labelNames("hello", "hey").register();
+    private val kafkaMessageCounter = Counter.build().name("sykefravarsstatistikk_kafka").help("How many hats").labelNames("hello", "hey").register();
 
 
     private val objectMapper = ObjectMapper()
@@ -49,7 +49,7 @@ class KafkaService internal constructor(
         kafkaTemplate.send(kafkaTopic.navn, kafkamelding.nøkkel, kafkamelding.innhold)
             .thenAcceptAsync {
                 kafkaUtsendingRapport.leggTilUtsendingSuksess()
-                counter.labels(kafkaTopic.navn).inc()
+                kafkaMessageCounter.labels(kafkaTopic.navn).inc()
             }.exceptionally {
                 prometheusFeil.increment()
                 kafkaUtsendingRapport.leggTilError(
