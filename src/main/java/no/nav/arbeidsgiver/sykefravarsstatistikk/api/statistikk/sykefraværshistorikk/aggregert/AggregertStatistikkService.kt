@@ -41,7 +41,8 @@ class AggregertStatistikkService(
         val gradertSykefravær = hentGradertSykefravær(virksomhet)
         val korttidSykefravær = hentKorttidsfravær(virksomhet)
         val langtidsfravær = hentLangtidsfravær(virksomhet)
-        if (tilgangskontrollService.brukerManglerIaRettigheterIVirksomheten(orgnr)) {
+
+        if (!tilgangskontrollService.brukerHarIaRettigheterIVirksomheten(orgnr)) {
             totalSykefravær.filtrerBortVirksomhetsdata()
             gradertSykefravær.filtrerBortVirksomhetsdata()
             korttidSykefravær.filtrerBortVirksomhetsdata()

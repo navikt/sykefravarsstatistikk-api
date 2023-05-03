@@ -55,8 +55,8 @@ public class TilgangskontrollService {
     return innloggetBruker;
   }
 
-  public boolean brukerManglerIaRettigheterIVirksomheten(Orgnr tilOrgnr) {
-    return !hentBrukerKunIaRettigheter().harTilgang(tilOrgnr);
+  public boolean brukerHarIaRettigheterIVirksomheten(Orgnr tilOrgnr) {
+    return hentBrukerKunIaRettigheter().harTilgang(tilOrgnr);
   }
 
   public boolean brukerRepresentererVirksomheten(Orgnr orgnr) {

@@ -92,8 +92,8 @@ internal class AggregertStatistikkServiceTest {
         whenever(mockTilgangskontrollService.brukerRepresentererVirksomheten(any()))
             .thenReturn(true)
         whenever(mockEnhetsregisteretClient.hentUnderenhet(any())).thenReturn(enBarnehage.right())
-        whenever(mockTilgangskontrollService.brukerManglerIaRettigheterIVirksomheten(any()))
-            .thenReturn(false)
+        whenever(mockTilgangskontrollService.brukerHarIaRettigheterIVirksomheten(any()))
+            .thenReturn(true)
         whenever(mockBransjeEllerNæringService.finnBransje(any())).thenReturn(enBransje)
 
         // Helt tomt resultat skal ikke kræsje
@@ -425,8 +425,8 @@ internal class AggregertStatistikkServiceTest {
         whenever(mockTilgangskontrollService.brukerRepresentererVirksomheten(any()))
             .thenReturn(true)
         whenever(mockEnhetsregisteretClient.hentUnderenhet(any())).thenReturn(enBarnehage.right())
-        whenever(mockTilgangskontrollService.brukerManglerIaRettigheterIVirksomheten(any()))
-            .thenReturn(false)
+        whenever(mockTilgangskontrollService.brukerHarIaRettigheterIVirksomheten(any()))
+            .thenReturn(true)
         whenever(mockBransjeEllerNæringService.finnBransje(any())).thenReturn(enBransje)
     }
 
