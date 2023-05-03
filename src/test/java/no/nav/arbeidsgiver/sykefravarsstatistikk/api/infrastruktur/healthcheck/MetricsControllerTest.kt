@@ -9,20 +9,20 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 
-internal class NaisControllerTest : SpringIntegrationTestbase() {
+internal class MetricsControllerTest : SpringIntegrationTestbase() {
     @Autowired
     lateinit var mockMvc: MockMvc
 
     @Test
     fun `metrics returnerer metrics`() {
-        Metrics.kafkaMessageCounter.labels("dummy-topic").inc()
+        Metrics.kafkaMessageSentCounter.labels("dummy-topic").inc()
 
         mockMvc.get("/internal/metrics").andExpect {
             content {
                 contentType(CONTENT_TYPE_004)
                 string(
                     containsString(
-                        "sykefravarsstatistikk_kafka_message_counter_total{topic_name=\"dummy-topic\",} 1.0"
+                        "sykefravarsstatistikk_kafka_message_sent_counter_total{topic_name=\"dummy-topic\",} 1.0"
                     )
                 )
             }
