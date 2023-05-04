@@ -33,7 +33,7 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettSta
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._8_UKER_TIL_20_UKER;
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension.class)

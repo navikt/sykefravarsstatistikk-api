@@ -10,8 +10,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException
 
 class Aggregeringskalkulator(
-    var sykefraværsdata: Sykefraværsdata,
-    var sistePubliserteKvartal: ÅrstallOgKvartal? = null
+    private var sykefraværsdata: Sykefraværsdata,
+    private var sistePubliserteKvartal: ÅrstallOgKvartal? = null
 ) {
     fun fraværsprosentNorge(): Either<StatistikkException, StatistikkDto> {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(Statistikkategori.LAND))
