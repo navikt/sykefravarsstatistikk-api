@@ -91,7 +91,7 @@ public class GraderingRepository {
   public Sykefraværsdata hentGradertSykefraværAlleKategorier(@NotNull Virksomhet virksomhet) {
 
     Næring næring = new Næring(virksomhet.getNæringskode().getKode(), "");
-    Optional<Bransje> maybeBransje = new Bransjeprogram().finnBransje(virksomhet.getNæringskode());
+    Optional<Bransje> maybeBransje = Bransjeprogram.finnBransje(virksomhet.getNæringskode());
 
     Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> data = new HashMap<>();
 

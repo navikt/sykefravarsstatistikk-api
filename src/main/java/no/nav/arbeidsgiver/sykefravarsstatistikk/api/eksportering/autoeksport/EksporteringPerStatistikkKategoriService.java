@@ -28,7 +28,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicName;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopic;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUtsendingException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
@@ -77,7 +77,7 @@ public class EksporteringPerStatistikkKategoriService {
         statistikkategori.name(),
         årstallOgKvartal.getÅrstall(),
         årstallOgKvartal.getKvartal(),
-        KafkaTopicName.Companion.from(statistikkategori).getTopic());
+        KafkaTopic.Companion.from(statistikkategori).getNavn());
 
     if (Statistikkategori.LAND.equals(statistikkategori)) {
       return eksporterSykefraværsstatistikkLand(årstallOgKvartal);
@@ -399,7 +399,7 @@ public class EksporteringPerStatistikkKategoriService {
         virksomheterTilEksport.size());
     long startEksportering = System.currentTimeMillis();
     kafkaService.nullstillUtsendingRapport(
-        virksomheterTilEksport.size(), KafkaTopicName.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1);
+        virksomheterTilEksport.size(), KafkaTopic.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1);
 
     log.info("Starting utregning av statistikk");
     List<SykefraværsstatistikkVirksomhetUtenVarighet> alleKvartal =

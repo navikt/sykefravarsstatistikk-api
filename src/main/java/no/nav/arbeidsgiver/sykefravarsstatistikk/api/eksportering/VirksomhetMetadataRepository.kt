@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -15,6 +16,8 @@ import java.util.*
 open class VirksomhetMetadataRepository(
     @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate
 ) {
+    private val log = LoggerFactory.getLogger(this::class.java)
+
     open fun opprettVirksomhetMetadata(virksomhetMetadata: List<VirksomhetMetadata>): Int {
         val batch = SqlParameterSourceUtils.createBatch(*virksomhetMetadata.toTypedArray())
         val results = namedParameterJdbcTemplate.batchUpdate(
@@ -49,6 +52,7 @@ open class VirksomhetMetadataRepository(
         val paramSource = MapSqlParameterSource()
             .addValue("årstall", årstallOgKvartal.årstall)
             .addValue("kvartal", årstallOgKvartal.kvartal)
+        log.info("Henter data fra 'virksomhet_metadata' for $årstallOgKvartal ...")
         val virksomhetMetadata = namedParameterJdbcTemplate.query(
             """
                 |select orgnr, navn, rectype, sektor, naring_kode, arstall, kvartal
@@ -58,6 +62,9 @@ open class VirksomhetMetadataRepository(
             paramSource,
             virksomhetMetadataRowMapper(),
         )
+        log.info("Datauthenting fra 'virksomhet_metadata' ferdig.")
+
+        log.info("Henter data fra 'virksomhet_metadata_naring_kode_5siffer' for $årstallOgKvartal ...")
         val næringOgNæringskode5siffer = namedParameterJdbcTemplate.query(
             """
                 |select orgnr, naring_kode, naring_kode_5siffer
@@ -67,6 +74,7 @@ open class VirksomhetMetadataRepository(
             paramSource,
             næringOgNæringskode5sifferRowMapper()
         )
+        log.info("Datauthenting fra 'virksomhet_metadata_naring_kode_5siffer' ferdig.")
         return assemble(virksomhetMetadata, næringOgNæringskode5siffer)
     }
 
