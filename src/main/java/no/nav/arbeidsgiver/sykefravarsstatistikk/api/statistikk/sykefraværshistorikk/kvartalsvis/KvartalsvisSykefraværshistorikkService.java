@@ -36,22 +36,19 @@ public class KvartalsvisSykefraværshistorikkService {
   private final KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository;
   private final SektorMappingService sektorMappingService;
   private final KlassifikasjonerRepository klassifikasjonerRepository;
-  private final Bransjeprogram bransjeprogram;
 
   public KvartalsvisSykefraværshistorikkService(
       KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository,
       SektorMappingService sektorMappingService,
-      KlassifikasjonerRepository klassifikasjonerRepository,
-      Bransjeprogram bransjeprogram) {
+      KlassifikasjonerRepository klassifikasjonerRepository) {
     this.kvartalsvisSykefraværprosentRepository = kvartalsvisSykefraværprosentRepository;
     this.sektorMappingService = sektorMappingService;
     this.klassifikasjonerRepository = klassifikasjonerRepository;
-    this.bransjeprogram = bransjeprogram;
   }
 
   public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikk(
       Underenhet underenhet, InstitusjonellSektorkode institusjonellSektorkode) {
-    Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
+    Optional<Bransje> bransje = Bransjeprogram.finnBransje(underenhet);
     boolean skalHenteDataPåNæring = bransje.isEmpty() || bransje.get().erDefinertPåTosiffernivå();
 
     Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(institusjonellSektorkode);

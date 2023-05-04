@@ -14,7 +14,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
@@ -40,7 +39,7 @@ public class SummertLegemeldtSykefraværServiceTest {
     summertLegemeldtSykefraværService =
         new SummertLegemeldtSykefraværService(
             sykefraværRepository,
-            new BransjeEllerNæringService(new Bransjeprogram(), klassifikasjonerRepository));
+            new BransjeEllerNæringService(klassifikasjonerRepository));
   }
 
   @Test
@@ -61,7 +60,7 @@ public class SummertLegemeldtSykefraværServiceTest {
     assertThat(legemeldtSykefraværsprosent).isNotNull();
     assertThat(legemeldtSykefraværsprosent.getType()).isEqualTo(Statistikkategori.VIRKSOMHET);
     assertThat(legemeldtSykefraværsprosent.getLabel()).isEqualTo("Test underenhet 2");
-    assertThat(legemeldtSykefraværsprosent.getProsent()).isEqualTo(new BigDecimal(10.5));
+    assertThat(legemeldtSykefraværsprosent.getProsent()).isEqualTo(new BigDecimal("10.5"));
   }
 
   @Test
@@ -83,7 +82,7 @@ public class SummertLegemeldtSykefraværServiceTest {
     assertThat(legemeldtSykefraværsprosent).isNotNull();
     assertThat(legemeldtSykefraværsprosent.getType()).isEqualTo(Statistikkategori.BRANSJE);
     assertThat(legemeldtSykefraværsprosent.getLabel()).isEqualTo("Barnehager");
-    assertThat(legemeldtSykefraværsprosent.getProsent()).isEqualTo(new BigDecimal(10.5));
+    assertThat(legemeldtSykefraværsprosent.getProsent()).isEqualTo(new BigDecimal("10.5"));
   }
 
   @Test
@@ -103,7 +102,7 @@ public class SummertLegemeldtSykefraværServiceTest {
     assertThat(legemeldtSykefraværsprosent).isNotNull();
     assertThat(legemeldtSykefraværsprosent.getType()).isEqualTo(Statistikkategori.BRANSJE);
     assertThat(legemeldtSykefraværsprosent.getLabel()).isEqualTo("Barnehager");
-    assertThat(legemeldtSykefraværsprosent.getProsent()).isEqualTo(new BigDecimal(8.5));
+    assertThat(legemeldtSykefraværsprosent.getProsent()).isEqualTo(new BigDecimal("8.5"));
   }
 
   @Test
@@ -123,7 +122,7 @@ public class SummertLegemeldtSykefraværServiceTest {
     assertThat(legemeldtSykefraværsprosent).isNotNull();
     assertThat(legemeldtSykefraværsprosent.getType()).isEqualTo(Statistikkategori.NÆRING);
     assertThat(legemeldtSykefraværsprosent.getLabel()).isEqualTo("Skolefritidsordninger");
-    assertThat(legemeldtSykefraværsprosent.getProsent()).isEqualTo(new BigDecimal(5.5));
+    assertThat(legemeldtSykefraværsprosent.getProsent()).isEqualTo(new BigDecimal("5.5"));
   }
 
   private void lagTestDataTilRepository() {

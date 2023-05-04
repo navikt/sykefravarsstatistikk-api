@@ -8,9 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class Næringskode5SifferTest {
   @Test
-  public void næringskode__skal_fjerne_punktum() {
-    Næringskode5Siffer kode = new Næringskode5Siffer("12.345", "");
-    assertThat(kode.getKode()).isEqualTo("12345");
+  public void næringskode__skal_feile_hvis_kode_har_punktum() {
+    assertThrows(IllegalArgumentException.class, () ->  new Næringskode5Siffer("52.292", "Skipsmegling"));
   }
 
   @Test

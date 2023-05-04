@@ -1,9 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringController;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringPerStatistikkKategoriService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringScheduler;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.ImporteringController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.ImporteringScheduler;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.PostImporteringService;
@@ -58,6 +55,7 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
             TilgangskontrollService.class,
             OffentligSykefraværshistorikkController.class,
             AggregertStatistikkService.class,
+            EksporteringMetadataVirksomhetService.class
           })
     })
 public class AppConfigForJdbcTesterConfig extends JdbcRepositoryConfigExtension {}

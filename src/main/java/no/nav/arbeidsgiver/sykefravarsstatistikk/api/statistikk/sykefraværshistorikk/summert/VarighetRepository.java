@@ -93,7 +93,7 @@ public class VarighetRepository {
   public Map<Statistikkategori, List<UmaskertSykefraværForEttKvartalMedVarighet>>
   hentUmaskertSykefraværMedVarighetAlleKategorier(Virksomhet virksomhet) {
     Næring næring = new Næring(virksomhet.getNæringskode().getKode(), "");
-    Optional<Bransje> maybeBransje = new Bransjeprogram().finnBransje(virksomhet.getNæringskode());
+    Optional<Bransje> maybeBransje = Bransjeprogram.finnBransje(virksomhet.getNæringskode());
 
     Map<Statistikkategori, List<UmaskertSykefraværForEttKvartalMedVarighet>> data = new HashMap<>();
     data.put(VIRKSOMHET, hentSykefraværForEttKvartalMedVarighet(virksomhet));

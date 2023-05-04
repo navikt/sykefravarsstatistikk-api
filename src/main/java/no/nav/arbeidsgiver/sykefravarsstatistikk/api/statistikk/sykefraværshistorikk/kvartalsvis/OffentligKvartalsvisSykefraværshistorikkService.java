@@ -20,26 +20,20 @@ import org.springframework.stereotype.Component;
 public class OffentligKvartalsvisSykefraværshistorikkService {
 
   private final KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService;
-  private final Bransjeprogram bransjeprogram;
 
   public OffentligKvartalsvisSykefraværshistorikkService(
-      KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService,
-      Bransjeprogram bransjeprogram) {
+      KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService) {
     this.kvartalsvisSykefraværshistorikkService = kvartalsvisSykefraværshistorikkService;
-    this.bransjeprogram = bransjeprogram;
   }
 
   public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikkV1Offentlig(
       Underenhet underenhet) {
-    Optional<Bransje> bransje = bransjeprogram.finnBransje(underenhet);
-    boolean skalHenteDataPåNæring =
-        bransje.isEmpty() || bransje.get().erDefinertPåTosiffernivå();
+    Optional<Bransje> bransje = Bransjeprogram.finnBransje(underenhet);
+    boolean skalHenteDataPåNæring = bransje.isEmpty() || bransje.get().erDefinertPåTosiffernivå();
 
     return Stream.of(
             hentUtForNorge(),
-            skalHenteDataPåNæring
-                ? hentUtForNæring(underenhet)
-                : hentUtForBransje(bransje.get()))
+            skalHenteDataPåNæring ? hentUtForNæring(underenhet) : hentUtForBransje(bransje.get()))
         .map(CompletableFuture::join)
         .collect(Collectors.toList());
   }

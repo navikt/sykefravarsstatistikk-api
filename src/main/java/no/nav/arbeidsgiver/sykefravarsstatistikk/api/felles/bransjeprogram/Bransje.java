@@ -49,4 +49,11 @@ public class Bransje {
     String næringskode = næringskode5Siffer.getKode();
     return koderSomSpesifisererNæringer.stream().anyMatch(næringskode::startsWith);
   }
+
+  public boolean inkludererNæringskode(String næringskode5Siffer) {
+    if (næringskode5Siffer == null) {
+      return false;
+    }
+    return koderSomSpesifisererNæringer.stream().anyMatch(næringskode5Siffer::startsWith);
+  }
 }

@@ -41,7 +41,7 @@ public class BransjeEllerNæringServiceTest {
   @BeforeEach
   public void setUp() {
     bransjeEllerNæringService =
-        new BransjeEllerNæringService(new Bransjeprogram(), klassifikasjonerRepository);
+        new BransjeEllerNæringService(klassifikasjonerRepository);
   }
 
   @Test

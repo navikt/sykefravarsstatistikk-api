@@ -7,7 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværssta
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopicName
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUtsendingException
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori
@@ -79,7 +79,7 @@ class EksporteringService(
     ): Int {
         val startEksportering = System.currentTimeMillis()
         kafkaService.nullstillUtsendingRapport(
-            virksomheterTilEksport.size, KafkaTopicName.SYKEFRAVARSSTATISTIKK_V1
+            virksomheterTilEksport.size, KafkaTopic.SYKEFRAVARSSTATISTIKK_V1
         )
         val virksomhetMetadataListe = virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal)
         val umaskertSykefraværsstatistikkSistePublisertKvartalLand =
@@ -147,14 +147,14 @@ class EksporteringService(
         return antallEksportert.get()
     }
 
-    protected fun sendIBatch(
+    private fun sendIBatch(
         virksomheterMetadata: List<VirksomhetMetadata?>,
-        årstallOgKvartal: ÅrstallOgKvartal?,
+        årstallOgKvartal: ÅrstallOgKvartal,
         sykefraværsstatistikkSektor: List<SykefraværsstatistikkSektor?>?,
         sykefraværsstatistikkNæring: List<SykefraværsstatistikkNæring?>?,
         sykefraværsstatistikkNæring5Siffer: List<SykefraværsstatistikkNæring5Siffer?>?,
         sykefraværsstatistikkVirksomhetUtenVarighet: List<SykefraværsstatistikkVirksomhetUtenVarighet?>?,
-        landSykefravær: SykefraværMedKategori?,
+        landSykefravær: SykefraværMedKategori,
         antallEksportert: AtomicInteger,
         antallTotaltStatistikk: Int
     ) {
