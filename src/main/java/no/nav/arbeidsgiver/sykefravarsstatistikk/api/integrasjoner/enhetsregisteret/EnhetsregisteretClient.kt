@@ -34,7 +34,7 @@ open class EnhetsregisteretClient(
             }
             overordnetEnhet.right()
         } catch (e: RestClientException) {
-            log.error("Feil ved kall til Enhetsregisteret", e)
+            log.error("Feil ved kall til Enhetsregisteret ved henting av enhet ${orgnrTilEnhet.verdi}", e)
             HentEnhetFeil.FeilVedKallTilEnhetsregisteret.left()
         }
     }
@@ -52,7 +52,7 @@ open class EnhetsregisteretClient(
             log.error("Enhetsregisteret svarer ikke", e)
             return HentUnderenhetFeil.EnhetsregisteretSvarerIkke.left()
         } catch (e: RestClientException) {
-            log.error("Feil ved kall til Enhetsregisteret", e)
+            log.error("Feil ved kall til Enhetsregisteret ved henting av underenhet ${orgnrTilUnderenhet.verdi}", e)
             return HentUnderenhetFeil.FeilVedKallTilEnhetsregisteret.left()
         }
     }
@@ -62,11 +62,11 @@ open class EnhetsregisteretClient(
         opprinneligOrgnr: Orgnr,
         returnertOrgnr: Orgnr
     ): Boolean = if (opprinneligOrgnr != returnertOrgnr) {
-            log.error(
-                "Orgnr hentet fra Enhetsregisteret samsvarer ikke med det medsendte orgnr. Request: ${opprinneligOrgnr.verdi}, response: ${returnertOrgnr.verdi}"
-            )
-            false
-        } else true
+        log.error(
+            "Orgnr hentet fra Enhetsregisteret samsvarer ikke med det medsendte orgnr. Request: ${opprinneligOrgnr.verdi}, response: ${returnertOrgnr.verdi}"
+        )
+        false
+    } else true
 
     open fun healthcheck(): HttpStatusCode {
         return try {
