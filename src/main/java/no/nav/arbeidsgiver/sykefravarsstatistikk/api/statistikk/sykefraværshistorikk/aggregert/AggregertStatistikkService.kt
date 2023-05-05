@@ -15,7 +15,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.GraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.VarighetRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -31,21 +30,29 @@ class AggregertStatistikkService(
     private val publiseringsdatoerService: PubliseringsdatoerService
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
+
+    sealed class HentAggregertStatistikkFeil {
+        object BrukerManglerTilgang : HentAggregertStatistikkFeil()
+        object FeilVedKallTilEnhetsregisteret : HentAggregertStatistikkFeil()
+        object UnderenhetErIkkeNæringsdrivende : HentAggregertStatistikkFeil()
+    }
+
     fun hentAggregertStatistikk(
         orgnr: Orgnr
-    ): Either<TilgangskontrollException, AggregertStatistikkDto> {
+    ): Either<HentAggregertStatistikkFeil, AggregertStatistikkDto> {
         if (!tilgangskontrollService.brukerRepresentererVirksomheten(orgnr)) {
-            return TilgangskontrollException("Bruker mangler tilgang til denne virksomheten").left()
+            log.warn("Bruker mangler tilgang til denne virksomheten {}", orgnr.verdi)
+            return HentAggregertStatistikkFeil.BrukerManglerTilgang.left()
         }
         val virksomhet = enhetsregisteretClient.hentUnderenhet(orgnr).fold(
             {
-                return TilgangskontrollException("Fant ikke virksomhet med orgnr $orgnr").left()
+                return HentAggregertStatistikkFeil.FeilVedKallTilEnhetsregisteret.left()
             },
             {
                 when (it) {
                     is Underenhet.IkkeNæringsdrivende -> {
                         log.info("Underenhet {} er ikke næringsdrivende", orgnr.verdi)
-                        return TilgangskontrollException("Underenhet $orgnr er ikke næringsdrivende").left()
+                        return HentAggregertStatistikkFeil.UnderenhetErIkkeNæringsdrivende.left()
                     }
 
                     is Underenhet.Næringsdrivende -> it

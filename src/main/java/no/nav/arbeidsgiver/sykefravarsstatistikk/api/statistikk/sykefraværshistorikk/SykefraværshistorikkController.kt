@@ -148,7 +148,16 @@ class SykefraværshistorikkController(
     ): ResponseEntity<AggregertStatistikkDto> {
         val statistikk = aggregertHistorikkService.hentAggregertStatistikk(Orgnr(orgnr))
             .getOrElse {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+                return when (it) {
+                    AggregertStatistikkService.HentAggregertStatistikkFeil.BrukerManglerTilgang ->
+                        ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+
+                    AggregertStatistikkService.HentAggregertStatistikkFeil.FeilVedKallTilEnhetsregisteret ->
+                        ResponseEntity.internalServerError().build()
+
+                    AggregertStatistikkService.HentAggregertStatistikkFeil.UnderenhetErIkkeNæringsdrivende ->
+                        ResponseEntity.badRequest().build()
+                }
             }
         return ResponseEntity.status(HttpStatus.OK).body(statistikk)
     }
