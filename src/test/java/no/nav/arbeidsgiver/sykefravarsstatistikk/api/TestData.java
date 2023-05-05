@@ -52,15 +52,6 @@ public class TestData {
         new Orgnr(orgnr), new Orgnr("053497180"), "Underenhet AS", enNæringskode5Siffer(), 40);
   }
 
-  public static Underenhet.Builder enUnderenhetBuilder() {
-    return Underenhet.builder()
-        .orgnr(etOrgnr())
-        .overordnetEnhetOrgnr(new Orgnr("053497180"))
-        .navn("Underenhet AS")
-        .næringskode(enNæringskode5Siffer())
-        .antallAnsatte(40);
-  }
-
   public static Næringskode5Siffer enNæringskode5Siffer() {
     return enNæringskode5Siffer("12345");
   }

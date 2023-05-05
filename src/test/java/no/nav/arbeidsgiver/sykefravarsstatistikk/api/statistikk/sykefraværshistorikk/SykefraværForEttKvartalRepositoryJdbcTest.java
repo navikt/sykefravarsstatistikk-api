@@ -1,5 +1,15 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._8_UKER_TIL_20_UKER;
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
@@ -23,17 +33,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._8_UKER_TIL_20_UKER;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension.class)
@@ -167,13 +166,12 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
   @Test
   public void hentSykefraværprosentVirksomhet__skal_returnere_riktig_sykefravær() {
     Underenhet barnehage =
-        Underenhet.builder()
-            .orgnr(new Orgnr("999999999"))
-            .navn("test Barnehage")
-            .næringskode(new Næringskode5Siffer("88911", "Barnehage"))
-            .antallAnsatte(10)
-            .overordnetEnhetOrgnr(new Orgnr("1111111111"))
-            .build();
+        new Underenhet(
+            new Orgnr("999999999"),
+            new Orgnr("1111111111"),
+            "test Barnehage",
+            new Næringskode5Siffer("88911", "Barnehage"),
+            10);
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
             + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
@@ -200,13 +198,12 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
   @Test
   public void hentSykefraværprosentVirksomhet__skal_summere_sykefravær_på_varighet() {
     Underenhet barnehage =
-        Underenhet.builder()
-            .orgnr(new Orgnr("999999999"))
-            .navn("test Barnehage")
-            .næringskode(new Næringskode5Siffer("88911", "Barnehage"))
-            .antallAnsatte(10)
-            .overordnetEnhetOrgnr(new Orgnr("1111111111"))
-            .build();
+        new Underenhet(
+            new Orgnr("999999999"),
+            new Orgnr("1111111111"),
+            "test Barnehage",
+            new Næringskode5Siffer("88911", "Barnehage"),
+            10);
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk, varighet) "
             + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk, :varighet)",

@@ -53,13 +53,12 @@ public class VarighetRepositoryJdbcTest {
   @Test
   public void hentSykefraværForEttKvartalMedVarighet__skal_returnere_riktig_sykefravær() {
     Underenhet barnehage =
-        Underenhet.builder()
-            .orgnr(new Orgnr("999999999"))
-            .navn("test Barnehage")
-            .næringskode(new Næringskode5Siffer("88911", "Barnehage"))
-            .antallAnsatte(10)
-            .overordnetEnhetOrgnr(new Orgnr("1111111111"))
-            .build();
+        new Underenhet(
+            new Orgnr("999999999"),
+            new Orgnr("1111111111"),
+            "test Barnehage",
+            new Næringskode5Siffer("88911", "Barnehage"),
+            10);
     leggTilVirksomhetsstatistikkMedVarighet(
         jdbcTemplate,
         barnehage.getOrgnr().getVerdi(),

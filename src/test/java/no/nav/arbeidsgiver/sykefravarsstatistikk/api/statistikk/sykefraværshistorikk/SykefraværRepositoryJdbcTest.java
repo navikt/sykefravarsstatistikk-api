@@ -1,5 +1,12 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.math.BigDecimal;
+import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
@@ -19,14 +26,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
-import static org.assertj.core.api.Assertions.assertThat;
-
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {AppConfigForJdbcTesterConfig.class})
@@ -38,13 +37,12 @@ public class SykefraværRepositoryJdbcTest {
   private SykefraværRepository sykefraværRepository;
 
   public static final Underenhet BARNEHAGE =
-      Underenhet.builder()
-          .orgnr(new Orgnr("999999999"))
-          .navn("test Barnehage")
-          .næringskode(new Næringskode5Siffer("88911", "Barnehage"))
-          .antallAnsatte(10)
-          .overordnetEnhetOrgnr(new Orgnr("1111111111"))
-          .build();
+      new Underenhet(
+          new Orgnr("999999999"),
+          new Orgnr("1111111111"),
+          "test Barnehage",
+          new Næringskode5Siffer("88911", "Barnehage"),
+          10);
 
   static final Næring NÆRING = new Næring("10", "test Næring");
   static final Bransje BARNEHAGEBRANSJEN =
