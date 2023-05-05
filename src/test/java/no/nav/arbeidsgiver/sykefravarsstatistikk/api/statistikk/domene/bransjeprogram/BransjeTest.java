@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.UnderenhetLegacy;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
@@ -122,8 +122,8 @@ public class BransjeTest {
     assertThat(bransje.inkludererVirksomhet(underenhetMedNæringskode("54321"))).isFalse();
   }
 
-  private Underenhet underenhetMedNæringskode(String næringskode) {
-    return new Underenhet(
+  private UnderenhetLegacy underenhetMedNæringskode(String næringskode) {
+    return new UnderenhetLegacy(
         etOrgnr(), new Orgnr("053497180"), "Underenhet AS", enNæringskode5Siffer(næringskode), 40);
   }
 }

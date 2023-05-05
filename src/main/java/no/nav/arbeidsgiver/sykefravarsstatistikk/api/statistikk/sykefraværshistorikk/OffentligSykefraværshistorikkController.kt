@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk
 
-import arrow.core.getOrElse
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.OffentligKvartalsvisSykefraværshistorikkService
@@ -30,14 +30,21 @@ class OffentligSykefraværshistorikkController(
             Orgnr(orgnrStr!!), bruker, request.method, "" + request.requestURL
         )
         val underenhet = enhetsregisteretClient.hentUnderenhet(Orgnr(orgnrStr))
-            .getOrElse {
+            .fold({
                 return when (it) {
                     EnhetsregisteretClient.HentUnderenhetFeil.EnhetsregisteretSvarerIkke,
                     EnhetsregisteretClient.HentUnderenhetFeil.FeilVedKallTilEnhetsregisteret,
                     EnhetsregisteretClient.HentUnderenhetFeil.OrgnrMatcherIkke ->
                         ResponseEntity.internalServerError().build()
                 }
-            }
+            },
+                {
+                    when (it) {
+                        is Underenhet.IkkeNæringsdrivende -> return ResponseEntity.ok(emptyList())
+                        is Underenhet.Næringsdrivende -> it
+                    }
+                }
+            )
         return ResponseEntity.ok(
             offentligKvartalsvisSykefraværshistorikkService.hentSykefraværshistorikkV1Offentlig(
                 underenhet

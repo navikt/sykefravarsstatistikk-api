@@ -7,7 +7,7 @@ import java.text.ParseException;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnKlientWrapper;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.sporbarhet.Loggevent;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.sporbarhet.Sporbarhetslogg;
@@ -79,11 +79,11 @@ public class TilgangskontrollService {
   }
 
   public boolean hentTilgangTilOverordnetEnhetOgLoggSikkerhetshendelse(
-      InnloggetBruker bruker,
-      OverordnetEnhet overordnetEnhet,
-      Underenhet underenhet,
-      String httpMetode,
-      String requestUrl) {
+          InnloggetBruker bruker,
+          OverordnetEnhet overordnetEnhet,
+          Virksomhet underenhet,
+          String httpMetode,
+          String requestUrl) {
     boolean harTilgang = bruker.harTilgang(overordnetEnhet.getOrgnr());
     String kommentar =
         String.format(

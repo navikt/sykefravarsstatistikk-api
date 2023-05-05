@@ -2,14 +2,11 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 import arrow.core.right
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api.PubliseringsdatoerService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
@@ -20,7 +17,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.VarighetRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -106,7 +103,7 @@ internal class AggregertStatistikkServiceTest {
             .thenReturn(Sykefraværsdata(mutableMapOf()))
         whenever(mockGraderingRepository.hentGradertSykefraværAlleKategorier(any()))
             .thenReturn(Sykefraværsdata(mutableMapOf()))
-        Assertions.assertThat(serviceUnderTest.hentAggregertStatistikk(etOrgnr).get())
+        assertThat(serviceUnderTest.hentAggregertStatistikk(etOrgnr).getOrNull())
             .isEqualTo(AggregertStatistikkDto())
 
         // Resultat med statistikkategori og tomme lister skal heller ikke kræsje
@@ -136,7 +133,7 @@ internal class AggregertStatistikkServiceTest {
                     )
                 )
             )
-        Assertions.assertThat(serviceUnderTest.hentAggregertStatistikk(etOrgnr).get())
+        assertThat(serviceUnderTest.hentAggregertStatistikk(etOrgnr).getOrNull())
             .isEqualTo(AggregertStatistikkDto())
     }
 
@@ -175,22 +172,22 @@ internal class AggregertStatistikkServiceTest {
         val forventedeTrendtyper = listOf(Statistikkategori.BRANSJE)
         val prosentstatistikk = serviceUnderTest
             .hentAggregertStatistikk(etOrgnr)
-            .get()?.prosentSiste4KvartalerTotalt
+            .getOrNull()?.prosentSiste4KvartalerTotalt
             ?.stream()
             ?.map(StatistikkDto::statistikkategori)
             ?.collect(Collectors.toList())
         val gradertProsentstatistikk = serviceUnderTest
             .hentAggregertStatistikk(etOrgnr)
-            .get()?.prosentSiste4KvartalerGradert
+            .getOrNull()?.prosentSiste4KvartalerGradert
             ?.stream()
             ?.map(StatistikkDto::statistikkategori)
             ?.collect(Collectors.toList())
-        val trendstatistikk = serviceUnderTest.hentAggregertStatistikk(etOrgnr).get().trendTotalt.stream()
-            .map(StatistikkDto::statistikkategori)
-            .collect(Collectors.toList())
-        Assertions.assertThat(prosentstatistikk).isEqualTo(forventedeProsenttyper)
-        Assertions.assertThat(gradertProsentstatistikk).isEqualTo(forventedeGraderingstyper)
-        Assertions.assertThat(trendstatistikk).isEqualTo(forventedeTrendtyper)
+        val trendstatistikk = serviceUnderTest.hentAggregertStatistikk(etOrgnr).getOrNull()?.trendTotalt?.stream()
+            ?.map(StatistikkDto::statistikkategori)
+            ?.collect(Collectors.toList())
+        assertThat(prosentstatistikk).isEqualTo(forventedeProsenttyper)
+        assertThat(gradertProsentstatistikk).isEqualTo(forventedeGraderingstyper)
+        assertThat(trendstatistikk).isEqualTo(forventedeTrendtyper)
     }
 
     @Test
@@ -252,10 +249,10 @@ internal class AggregertStatistikkServiceTest {
             200,
             listOf(TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), TestUtils.SISTE_PUBLISERTE_KVARTAL)
         )
-        Assertions.assertThat(
+        assertThat(
             serviceUnderTest
                 .hentAggregertStatistikk(etOrgnr)
-                .get()?.prosentSiste4KvartalerLangtid!![0]
+                .getOrNull()?.prosentSiste4KvartalerLangtid!![0]
         )
             .isEqualTo(forventet)
     }
@@ -311,10 +308,10 @@ internal class AggregertStatistikkServiceTest {
             100,
             listOf(TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), TestUtils.SISTE_PUBLISERTE_KVARTAL)
         )
-        Assertions.assertThat(
+        assertThat(
             serviceUnderTest
                 .hentAggregertStatistikk(etOrgnr)
-                .get()?.prosentSiste4KvartalerKorttid!![0]
+                .getOrNull()?.prosentSiste4KvartalerKorttid!![0]
         )
             .isEqualTo(forventet)
     }
@@ -388,12 +385,12 @@ internal class AggregertStatistikkServiceTest {
                             )
                 )
             )
-        Assertions.assertThat(
-            serviceUnderTest.hentAggregertStatistikk(etOrgnr).get().prosentSiste4KvartalerKorttid
+        assertThat(
+            serviceUnderTest.hentAggregertStatistikk(etOrgnr).getOrNull()?.prosentSiste4KvartalerKorttid
         )
             .isEqualTo(listOf<Any>())
-        Assertions.assertThat(
-            serviceUnderTest.hentAggregertStatistikk(etOrgnr).get().prosentSiste4KvartalerLangtid
+        assertThat(
+            serviceUnderTest.hentAggregertStatistikk(etOrgnr).getOrNull()?.prosentSiste4KvartalerLangtid
         )
             .isEqualTo(listOf<Any>())
     }
@@ -414,11 +411,11 @@ internal class AggregertStatistikkServiceTest {
             mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any())
         )
             .thenReturn(mapOf())
-        val respons = serviceUnderTest.hentAggregertStatistikk(etOrgnr).get()
-        val antallMuligeDagsverk = respons.muligeDagsverkTotalt[0].verdi
-        val antallTapteDagsverk = respons.tapteDagsverkTotalt[0].verdi
-        Assertions.assertThat(antallMuligeDagsverk).isEqualTo("400.0")
-        Assertions.assertThat(antallTapteDagsverk).isEqualTo("15.0")
+        val respons = serviceUnderTest.hentAggregertStatistikk(etOrgnr).getOrNull()
+        val antallMuligeDagsverk = respons?.muligeDagsverkTotalt?.get(0)?.verdi
+        val antallTapteDagsverk = respons?.tapteDagsverkTotalt?.get(0)?.verdi
+        assertThat(antallMuligeDagsverk).isEqualTo("400.0")
+        assertThat(antallTapteDagsverk).isEqualTo("15.0")
     }
 
     private fun mockAvhengigheterForBarnehageMedIaRettigheter() {
@@ -470,7 +467,7 @@ internal class AggregertStatistikkServiceTest {
 
     private val enBransje = BransjeEllerNæring(Bransje(ArbeidsmiljøportalenBransje.BARNEHAGER, "En bransje", "88911"))
     private val etOrgnr = Orgnr("999999999")
-    private val enBarnehage = Underenhet(
+    private val enBarnehage = Underenhet.Næringsdrivende(
         orgnr = etOrgnr,
         navn = "En Barnehage",
         næringskode = Næringskode5Siffer("88911", "Barnehage"),

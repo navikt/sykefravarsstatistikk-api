@@ -36,8 +36,8 @@ public class SykefraværRepositoryJdbcTest {
 
   private SykefraværRepository sykefraværRepository;
 
-  public static final Underenhet BARNEHAGE =
-      new Underenhet(
+  public static final UnderenhetLegacy BARNEHAGE =
+      new UnderenhetLegacy(
           new Orgnr("999999999"),
           new Orgnr("1111111111"),
           "test Barnehage",
@@ -136,7 +136,7 @@ public class SykefraværRepositoryJdbcTest {
     assertThat(resultat.get(1)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2));
   }
 
-  private void persisterDatasetIDb(Underenhet barnehage) {
+  private void persisterDatasetIDb(UnderenhetLegacy barnehage) {
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, "
             + "antall_personer, tapte_dagsverk, mulige_dagsverk) "

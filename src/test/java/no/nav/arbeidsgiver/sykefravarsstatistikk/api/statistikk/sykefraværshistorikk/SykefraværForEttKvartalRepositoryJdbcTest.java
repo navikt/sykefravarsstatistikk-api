@@ -15,7 +15,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.UnderenhetLegacy;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
@@ -165,8 +165,8 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
 
   @Test
   public void hentSykefraværprosentVirksomhet__skal_returnere_riktig_sykefravær() {
-    Underenhet barnehage =
-        new Underenhet(
+    UnderenhetLegacy barnehage =
+        new UnderenhetLegacy(
             new Orgnr("999999999"),
             new Orgnr("1111111111"),
             "test Barnehage",
@@ -197,8 +197,8 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
 
   @Test
   public void hentSykefraværprosentVirksomhet__skal_summere_sykefravær_på_varighet() {
-    Underenhet barnehage =
-        new Underenhet(
+    UnderenhetLegacy barnehage =
+        new UnderenhetLegacy(
             new Orgnr("999999999"),
             new Orgnr("1111111111"),
             "test Barnehage",

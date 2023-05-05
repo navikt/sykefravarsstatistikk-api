@@ -14,7 +14,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.UnderenhetLegacy;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
@@ -54,22 +54,22 @@ public class GraderingRepositoryJdbcTest {
           .institusjonellSektorkode(new InstitusjonellSektorkode("7000", "Ideelle organisasjoner"))
           .build();
 
-  private static Underenhet UNDERENHET_1_NÆRING_14 =
-      new Underenhet(
+  private static UnderenhetLegacy UNDERENHET_1_NÆRING_14 =
+      new UnderenhetLegacy(
           new Orgnr("999999999"),
           null,
           null,
           new Næringskode5Siffer("14120", "Produksjon av arbeidstøy"),
           null);
-  private static Underenhet UNDERENHET_2_NÆRING_15 =
-      new Underenhet(
+  private static UnderenhetLegacy UNDERENHET_2_NÆRING_15 =
+      new UnderenhetLegacy(
           new Orgnr("888888888"),
           null,
           null,
           new Næringskode5Siffer("15100", "andre_næringskode"),
           null);
-  private static Underenhet UNDERENHET_3_NÆRING_14 =
-      new Underenhet(
+  private static UnderenhetLegacy UNDERENHET_3_NÆRING_14 =
+      new UnderenhetLegacy(
           new Orgnr("777777777"),
           null,
           null,

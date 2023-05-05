@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet
 import java.util.*
 
 object Bransjeprogram {
@@ -34,7 +34,7 @@ object Bransjeprogram {
     val alleBransjer: List<Bransje> = listOf(BARNEHAGER, NÆRINGSMIDDELINDUSTRI, SYKEHUS, SYKEHJEM, TRANSPORT, BYGG, ANLEGG)
 
     @JvmStatic
-    fun finnBransje(underenhet: Underenhet?): Optional<Bransje> = finnBransje(underenhet?.næringskode)
+    fun finnBransje(underenhet: Virksomhet?): Optional<Bransje> = finnBransje(underenhet?.næringskode)
 
     @JvmStatic
     fun finnBransje(næringskode5Siffer: String?): Optional<Bransje> =
