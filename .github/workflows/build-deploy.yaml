@@ -28,8 +28,9 @@ jobs:
       - name: Run tests
         run: mvn test
       # Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
-      - name: Update dependency graph
-        uses: advanced-security/maven-dependency-submission-action@d682d5d68a398c90e9b35f8c564cd8e1918d6a24 # v3.0.1
+      # TODO: Fails with "HttpError: invalid json response body at https://api.github.com/repos/navikt/sykefravarsstatistikk-api/dependency-graph/snapshots reason: Unexpected end of JSON input"
+      #- name: Update dependency graph
+      #  uses: advanced-security/maven-dependency-submission-action@d682d5d68a398c90e9b35f8c564cd8e1918d6a24 # v3.0.1
 
   build-and-push-image:
     name: Build and push Docker image
