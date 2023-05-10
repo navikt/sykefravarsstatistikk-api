@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
@@ -29,7 +29,7 @@ public class SummertLegemeldtSykefraværService {
   }
 
   public LegemeldtSykefraværsprosent hentLegemeldtSykefraværsprosent(
-      Underenhet underenhet, ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal) {
+          Virksomhet underenhet, ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal) {
     ÅrstallOgKvartal eldsteÅrstallOgKvartal = sistePubliserteÅrstallOgKvartal.minusKvartaler(3);
 
     List<UmaskertSykefraværForEttKvartal> sykefraværForEttKvartalListe =
@@ -52,7 +52,7 @@ public class SummertLegemeldtSykefraværService {
   }
 
   public LegemeldtSykefraværsprosent hentLegemeldtSykefraværsprosentUtenStatistikkForVirksomhet(
-      Underenhet underenhet, ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal) {
+          Virksomhet underenhet, ÅrstallOgKvartal sistePubliserteÅrstallOgKvartal) {
     ÅrstallOgKvartal eldsteÅrstallOgKvartal = sistePubliserteÅrstallOgKvartal.minusKvartaler(3);
 
     BransjeEllerNæring bransjeEllerNæring =

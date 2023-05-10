@@ -9,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
@@ -27,7 +27,7 @@ public class OffentligKvartalsvisSykefraværshistorikkService {
   }
 
   public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikkV1Offentlig(
-      Underenhet underenhet) {
+          Virksomhet underenhet) {
     Optional<Bransje> bransje = Bransjeprogram.finnBransje(underenhet);
     boolean skalHenteDataPåNæring = bransje.isEmpty() || bransje.get().erDefinertPåTosiffernivå();
 
@@ -39,7 +39,7 @@ public class OffentligKvartalsvisSykefraværshistorikkService {
   }
 
   private CompletableFuture<KvartalsvisSykefraværshistorikk> hentUtForNæring(
-      Underenhet underenhet) {
+      Virksomhet underenhet) {
     return kvartalsvisSykefraværshistorikkService.uthentingAvSykefraværshistorikkNæring(underenhet);
   }
 

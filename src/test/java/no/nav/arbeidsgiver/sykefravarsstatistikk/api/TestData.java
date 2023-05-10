@@ -5,7 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Fnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.InstitusjonellSektorkode;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.UnderenhetLegacy;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnOrganisasjon;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetBruker;
@@ -47,18 +47,9 @@ public class TestData {
     return new InstitusjonellSektorkode("1234", "sektor!");
   }
 
-  public static Underenhet enUnderenhet(String orgnr) {
-    return new Underenhet(
+  public static UnderenhetLegacy enUnderenhet(String orgnr) {
+    return new UnderenhetLegacy(
         new Orgnr(orgnr), new Orgnr("053497180"), "Underenhet AS", enNæringskode5Siffer(), 40);
-  }
-
-  public static Underenhet.Builder enUnderenhetBuilder() {
-    return Underenhet.builder()
-        .orgnr(etOrgnr())
-        .overordnetEnhetOrgnr(new Orgnr("053497180"))
-        .navn("Underenhet AS")
-        .næringskode(enNæringskode5Siffer())
-        .antallAnsatte(40);
   }
 
   public static Næringskode5Siffer enNæringskode5Siffer() {

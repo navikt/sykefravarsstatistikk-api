@@ -3,10 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram;
 import java.util.List;
 import java.util.Optional;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
 import org.springframework.stereotype.Component;
 
@@ -15,8 +12,7 @@ public class BransjeEllerNæringService {
 
   private final KlassifikasjonerRepository klassifikasjonerRepository;
 
-  public BransjeEllerNæringService(
-      KlassifikasjonerRepository klassifikasjonerRepository) {
+  public BransjeEllerNæringService(KlassifikasjonerRepository klassifikasjonerRepository) {
     this.klassifikasjonerRepository = klassifikasjonerRepository;
   }
 
@@ -34,21 +30,22 @@ public class BransjeEllerNæringService {
     }
   }
 
-  public BransjeEllerNæring finnBransje(Underenhet virksomhet) {
+  public BransjeEllerNæring finnBransje(Virksomhet virksomhet) {
     Optional<Bransje> bransje = Bransjeprogram.finnBransje(virksomhet);
 
-    if (bransje.isPresent()) {
-      return new BransjeEllerNæring(bransje.get());
-    }
-    return new BransjeEllerNæring(
-        klassifikasjonerRepository.hentNæring(
-            virksomhet.getNæringskode().hentNæringskode2Siffer()));
+    return bransje
+        .map(BransjeEllerNæring::new)
+        .orElseGet(
+            () ->
+                new BransjeEllerNæring(
+                    klassifikasjonerRepository.hentNæring(
+                        virksomhet.getNæringskode().hentNæringskode2Siffer())));
   }
 
   public BransjeEllerNæring finnBransjeFraMetadata(
       VirksomhetMetadata virksomhetMetaData, List<Næring> alleNæringer) {
-    Underenhet virksomhet =
-        new Underenhet(
+    UnderenhetLegacy virksomhet =
+        new UnderenhetLegacy(
             new Orgnr(virksomhetMetaData.getOrgnr()),
             new Orgnr(""),
             virksomhetMetaData.getNavn(),
@@ -69,10 +66,11 @@ public class BransjeEllerNæringService {
 
     Optional<Bransje> bransje = Bransjeprogram.finnBransje(virksomhet);
 
-    if (bransje.isPresent()) {
-      return new BransjeEllerNæring(bransje.get());
-    }
-    return new BransjeEllerNæring(hentNæringForVirksomhet(virksomhetMetaData, alleNæringer));
+    return bransje
+        .map(BransjeEllerNæring::new)
+        .orElseGet(
+            () ->
+                new BransjeEllerNæring(hentNæringForVirksomhet(virksomhetMetaData, alleNæringer)));
   }
 
   private Næring hentNæringForVirksomhet(

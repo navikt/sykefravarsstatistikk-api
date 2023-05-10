@@ -10,7 +10,7 @@ import java.util.Collections;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.UnderenhetLegacy;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService;
@@ -45,8 +45,8 @@ public class SummertLegemeldtSykefraværServiceTest {
   @Test
   public void legemeldtSykefraværsprosent_utleddes_fra_siste_4_kvartaler() {
     lagTestDataTilRepository();
-    Underenhet underenhet =
-        new Underenhet(
+    UnderenhetLegacy underenhet =
+        new UnderenhetLegacy(
             new Orgnr("987654321"),
             new Orgnr("999888777"),
             "Test underenhet 2",
@@ -67,8 +67,8 @@ public class SummertLegemeldtSykefraværServiceTest {
   public void
       legemeldtSykefraværsprosent_henter_bransje_sykefraværssprosent_dersom_prosent_er_masker_for_bedriften() {
     lagTestDataTilRepository(4);
-    Underenhet underenhet =
-        new Underenhet(
+    UnderenhetLegacy underenhet =
+        new UnderenhetLegacy(
             new Orgnr("987654321"),
             new Orgnr("999888777"),
             "Test underenhet 2",
@@ -91,7 +91,7 @@ public class SummertLegemeldtSykefraværServiceTest {
     lagTestDataTilRepositoryForBransje();
     LegemeldtSykefraværsprosent legemeldtSykefraværsprosent =
         summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
-            new Underenhet(
+            new UnderenhetLegacy(
                 new Orgnr("456456456"),
                 new Orgnr("654654654"),
                 "Underenhet uten data i DB",
@@ -111,7 +111,7 @@ public class SummertLegemeldtSykefraværServiceTest {
     lagTestDataTilRepositoryForNæring();
     LegemeldtSykefraværsprosent legemeldtSykefraværsprosent =
         summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
-            new Underenhet(
+            new UnderenhetLegacy(
                 new Orgnr("456456456"),
                 new Orgnr("654654654"),
                 "Underenhet uten data i DB",

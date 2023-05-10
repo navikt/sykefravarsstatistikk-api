@@ -1,8 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert
 
-import io.vavr.control.Either
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.BransjeEllerNæringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.utils.EitherUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient
@@ -12,8 +15,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.GraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.VarighetRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
@@ -26,17 +29,36 @@ class AggregertStatistikkService(
     private val enhetsregisteretClient: EnhetsregisteretClient,
     private val publiseringsdatoerService: PubliseringsdatoerService
 ) {
+    private val log = LoggerFactory.getLogger(this::class.java)
+
+    sealed class HentAggregertStatistikkFeil {
+        object BrukerManglerTilgang : HentAggregertStatistikkFeil()
+        object FeilVedKallTilEnhetsregisteret : HentAggregertStatistikkFeil()
+        object UnderenhetErIkkeNæringsdrivende : HentAggregertStatistikkFeil()
+    }
+
     fun hentAggregertStatistikk(
         orgnr: Orgnr
-    ): Either<TilgangskontrollException, AggregertStatistikkDto> {
+    ): Either<HentAggregertStatistikkFeil, AggregertStatistikkDto> {
         if (!tilgangskontrollService.brukerRepresentererVirksomheten(orgnr)) {
-            return Either.left(
-                TilgangskontrollException("Bruker mangler tilgang til denne virksomheten")
-            )
+            log.warn("Bruker mangler tilgang til denne virksomheten {}", orgnr.verdi)
+            return HentAggregertStatistikkFeil.BrukerManglerTilgang.left()
         }
-        val virksomhet =
-            enhetsregisteretClient.hentUnderenhet(orgnr).getOrNull() ?: // TODO: Legg til mer granulær feilmelding
-            return Either.left(TilgangskontrollException("Fant ikke virksomhet med orgnr $orgnr"))
+        val virksomhet = enhetsregisteretClient.hentUnderenhet(orgnr).fold(
+            {
+                return HentAggregertStatistikkFeil.FeilVedKallTilEnhetsregisteret.left()
+            },
+            {
+                when (it) {
+                    is Underenhet.IkkeNæringsdrivende -> {
+                        log.info("Underenhet {} er ikke næringsdrivende", orgnr.verdi)
+                        return HentAggregertStatistikkFeil.UnderenhetErIkkeNæringsdrivende.left()
+                    }
+
+                    is Underenhet.Næringsdrivende -> it
+                }
+            }
+        )
         val totalSykefravær = hentTotalfraværSisteFemKvartaler(virksomhet)
         val gradertSykefravær = hentGradertSykefravær(virksomhet)
         val korttidSykefravær = hentKorttidsfravær(virksomhet)
@@ -48,15 +70,14 @@ class AggregertStatistikkService(
             korttidSykefravær.filtrerBortVirksomhetsdata()
             langtidsfravær.filtrerBortVirksomhetsdata()
         }
-        return Either.right(
-            aggregerData(
-                virksomhet, totalSykefravær, gradertSykefravær, korttidSykefravær, langtidsfravær
-            )
-        )
+        return aggregerData(
+            virksomhet, totalSykefravær, gradertSykefravær, korttidSykefravær, langtidsfravær
+        ).right()
+
     }
 
     private fun aggregerData(
-        virksomhet: Underenhet,
+        virksomhet: Virksomhet,
         totalfravær: Sykefraværsdata,
         gradertFravær: Sykefraværsdata,
         korttidsfravær: Sykefraværsdata,
@@ -105,30 +126,30 @@ class AggregertStatistikkService(
         )
     }
 
-    private fun hentTotalfraværSisteFemKvartaler(forBedrift: Underenhet): Sykefraværsdata {
+    private fun hentTotalfraværSisteFemKvartaler(forBedrift: Virksomhet): Sykefraværsdata {
         return sykefraværprosentRepository.hentUmaskertSykefraværAlleKategorier(
             forBedrift, publiseringsdatoerService.hentSistePubliserteKvartal().minusKvartaler(4)
         )
     }
 
-    private fun hentGradertSykefravær(virksomhet: Underenhet): Sykefraværsdata {
+    private fun hentGradertSykefravær(virksomhet: Virksomhet): Sykefraværsdata {
         return graderingRepository.hentGradertSykefraværAlleKategorier(virksomhet)
     }
 
-    private fun hentKorttidsfravær(virksomhet: Underenhet): Sykefraværsdata {
+    private fun hentKorttidsfravær(virksomhet: Virksomhet): Sykefraværsdata {
         return hentLangtidsEllerKorttidsfravær(virksomhet) {
             it.varighet.erKorttidVarighet() || it.varighet.erTotalvarighet()
         }
     }
 
-    private fun hentLangtidsfravær(virksomhet: Underenhet): Sykefraværsdata {
+    private fun hentLangtidsfravær(virksomhet: Virksomhet): Sykefraværsdata {
         return hentLangtidsEllerKorttidsfravær(virksomhet) {
             it.varighet.erLangtidVarighet() || it.varighet.erTotalvarighet()
         }
     }
 
     private fun hentLangtidsEllerKorttidsfravær(
-        virksomhet: Underenhet, entenLangtidEllerKorttid: (UmaskertSykefraværForEttKvartalMedVarighet) -> Boolean
+        virksomhet: Virksomhet, entenLangtidEllerKorttid: (UmaskertSykefraværForEttKvartalMedVarighet) -> Boolean
     ) = Sykefraværsdata(
         varighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(virksomhet)
             .mapValues { (_, statistikk) ->

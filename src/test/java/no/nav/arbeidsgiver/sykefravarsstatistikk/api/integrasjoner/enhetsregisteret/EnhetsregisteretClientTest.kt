@@ -166,7 +166,7 @@ class EnhetsregisteretClientTest {
 
         val underenhet = enhetsregisteretClient.hentUnderenhet(Orgnr("971800534"))
         assertThat(underenhet.getOrNull()).isEqualTo(
-            Underenhet(
+            Underenhet.Næringsdrivende(
                 orgnr = Orgnr("971800534"),
                 navn = "NAV ARBEID OG YTELSER AVD OSLO",
                 overordnetEnhetOrgnr = Orgnr("999263550"),

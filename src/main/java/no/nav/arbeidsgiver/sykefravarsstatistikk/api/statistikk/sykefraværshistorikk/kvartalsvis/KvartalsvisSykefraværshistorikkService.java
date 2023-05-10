@@ -16,7 +16,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
@@ -47,7 +46,7 @@ public class KvartalsvisSykefraværshistorikkService {
   }
 
   public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikk(
-      Underenhet underenhet, InstitusjonellSektorkode institusjonellSektorkode) {
+          Virksomhet underenhet, InstitusjonellSektorkode institusjonellSektorkode) {
     Optional<Bransje> bransje = Bransjeprogram.finnBransje(underenhet);
     boolean skalHenteDataPåNæring = bransje.isEmpty() || bransje.get().erDefinertPåTosiffernivå();
 
@@ -82,7 +81,7 @@ public class KvartalsvisSykefraværshistorikkService {
   }
 
   public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikk(
-      Underenhet underenhet, OverordnetEnhet overordnetEnhet) {
+          Virksomhet underenhet, OverordnetEnhet overordnetEnhet) {
 
     KvartalsvisSykefraværshistorikk historikkForOverordnetEnhet =
         uthentingMedFeilhåndteringOgTimeout(
@@ -138,7 +137,7 @@ public class KvartalsvisSykefraværshistorikkService {
   }
 
   protected CompletableFuture<KvartalsvisSykefraværshistorikk>
-      uthentingAvSykefraværshistorikkNæring(Underenhet underenhet) {
+      uthentingAvSykefraværshistorikkNæring(Virksomhet underenhet) {
     Næringskode5Siffer næring5siffer = underenhet.getNæringskode();
     return uthentingMedTimeout(
             () -> klassifikasjonerRepository.hentNæring(næring5siffer.hentNæringskode2Siffer()))

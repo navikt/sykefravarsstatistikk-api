@@ -1,12 +1,20 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.GraderingTestUtils.insertDataMedGradering;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_FORETAK;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.math.BigDecimal;
+import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.InstitusjonellSektorkode;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.UnderenhetLegacy;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
@@ -23,15 +31,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.math.BigDecimal;
-import java.util.List;
-
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.GraderingTestUtils.insertDataMedGradering;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_FORETAK;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension.class)
@@ -55,21 +54,27 @@ public class GraderingRepositoryJdbcTest {
           .institusjonellSektorkode(new InstitusjonellSektorkode("7000", "Ideelle organisasjoner"))
           .build();
 
-  private static Underenhet UNDERENHET_1_NÆRING_14 =
-      Underenhet.builder()
-          .orgnr(new Orgnr("999999999"))
-          .næringskode(new Næringskode5Siffer("14120", "Produksjon av arbeidstøy"))
-          .build();
-  private static Underenhet UNDERENHET_2_NÆRING_15 =
-      Underenhet.builder()
-          .orgnr(new Orgnr("888888888"))
-          .næringskode(new Næringskode5Siffer("15100", "andre_næringskode"))
-          .build();
-  private static Underenhet UNDERENHET_3_NÆRING_14 =
-      Underenhet.builder()
-          .orgnr(new Orgnr("777777777"))
-          .næringskode(new Næringskode5Siffer("14120", "Produksjon av arbeidstøy"))
-          .build();
+  private static UnderenhetLegacy UNDERENHET_1_NÆRING_14 =
+      new UnderenhetLegacy(
+          new Orgnr("999999999"),
+          null,
+          null,
+          new Næringskode5Siffer("14120", "Produksjon av arbeidstøy"),
+          null);
+  private static UnderenhetLegacy UNDERENHET_2_NÆRING_15 =
+      new UnderenhetLegacy(
+          new Orgnr("888888888"),
+          null,
+          null,
+          new Næringskode5Siffer("15100", "andre_næringskode"),
+          null);
+  private static UnderenhetLegacy UNDERENHET_3_NÆRING_14 =
+      new UnderenhetLegacy(
+          new Orgnr("777777777"),
+          null,
+          null,
+          new Næringskode5Siffer("14120", "Produksjon av arbeidstøy"),
+          null);
   private static ÅrstallOgKvartal _2020_1 = new ÅrstallOgKvartal(2020, 1);
   private static ÅrstallOgKvartal _2019_4 = new ÅrstallOgKvartal(2019, 4);
 

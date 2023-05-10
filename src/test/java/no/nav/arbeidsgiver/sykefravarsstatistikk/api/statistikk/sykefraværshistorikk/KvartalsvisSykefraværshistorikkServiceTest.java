@@ -1,9 +1,16 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.Bransjeprogram;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.UnderenhetLegacy;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
@@ -18,15 +25,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class KvartalsvisSykefraværshistorikkServiceTest {
@@ -74,14 +72,8 @@ public class KvartalsvisSykefraværshistorikkServiceTest {
   @Test
   public void
       hentSykefraværshistorikk__skal_returnere_en_næring_dersom_virksomhet_er_i_bransjeprogram_på_2_siffer_nivå() {
-    Underenhet underenhet =
-        Underenhet.builder()
-            .orgnr(etOrgnr())
-            .overordnetEnhetOrgnr(etOrgnr())
-            .navn("Underenhet AS")
-            .næringskode(enNæringskode5Siffer("10300"))
-            .antallAnsatte(40)
-            .build();
+    UnderenhetLegacy underenhet =
+        new UnderenhetLegacy(etOrgnr(), etOrgnr(), "Underenhet AS", enNæringskode5Siffer("10300"), 40);
 
     when(klassifikasjonerRepository.hentNæring(any()))
         .thenReturn(new Næring("10", "Produksjon av nærings- og nytelsesmidler"));

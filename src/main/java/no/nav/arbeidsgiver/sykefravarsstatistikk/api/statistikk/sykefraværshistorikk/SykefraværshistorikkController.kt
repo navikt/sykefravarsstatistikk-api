@@ -12,7 +12,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikkService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SummertLegemeldtSykefraværService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollException
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService
 import no.nav.security.token.support.core.api.Protected
 import org.slf4j.Logger
@@ -45,8 +44,8 @@ class SykefraværshistorikkController(
         tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
             orgnr, bruker, request.method, "" + request.requestURL
         )
-        val underenhet = enhetsregisteretClient.hentUnderenhet(orgnr)
-            .getOrElse {
+        val underenhet: Underenhet.Næringsdrivende = enhetsregisteretClient.hentUnderenhet(orgnr)
+            .fold({
                 return when (it) {
                     EnhetsregisteretClient.HentUnderenhetFeil.EnhetsregisteretSvarerIkke,
                     EnhetsregisteretClient.HentUnderenhetFeil.FeilVedKallTilEnhetsregisteret,
@@ -54,9 +53,15 @@ class SykefraværshistorikkController(
                         ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
 
                 }
-            }
+            },
+                {
+                    when (it) {
+                        is Underenhet.IkkeNæringsdrivende -> return ResponseEntity.ok(emptyList())
+                        is Underenhet.Næringsdrivende -> it
+                    }
+                })
         val overordnetEnhet = enhetsregisteretClient
-            .hentEnhet(underenhet.overordnetEnhetOrgnr!!)
+            .hentEnhet(underenhet.overordnetEnhetOrgnr)
             .getOrElse {
                 return when (it) {
                     HentEnhetFeil.FeilVedKallTilEnhetsregisteret,
@@ -100,15 +105,21 @@ class SykefraværshistorikkController(
             request.method,
             "" + request.requestURL
         )
-        val underenhet: Underenhet = enhetsregisteretClient.hentUnderenhet(orgnr)
-            .getOrElse {
+        val underenhet: Underenhet.Næringsdrivende = enhetsregisteretClient.hentUnderenhet(orgnr)
+            .fold({
                 return when (it) {
                     EnhetsregisteretClient.HentUnderenhetFeil.EnhetsregisteretSvarerIkke,
                     EnhetsregisteretClient.HentUnderenhetFeil.FeilVedKallTilEnhetsregisteret,
                     EnhetsregisteretClient.HentUnderenhetFeil.OrgnrMatcherIkke ->
                         ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
                 }
-            }
+            },
+                {
+                    when (it) {
+                        is Underenhet.IkkeNæringsdrivende -> return ResponseEntity.noContent().build()
+                        is Underenhet.Næringsdrivende -> it
+                    }
+                })
 
         if (brukerHarSykefraværRettighetTilVirksomhet) {
             val legemeldtSykefraværsprosent = summertLegemeldtSykefraværService.hentLegemeldtSykefraværsprosent(
@@ -136,7 +147,18 @@ class SykefraværshistorikkController(
         @PathVariable("orgnr") orgnr: String
     ): ResponseEntity<AggregertStatistikkDto> {
         val statistikk = aggregertHistorikkService.hentAggregertStatistikk(Orgnr(orgnr))
-            .getOrElseThrow { e: TilgangskontrollException? -> e }
+            .getOrElse {
+                return when (it) {
+                    AggregertStatistikkService.HentAggregertStatistikkFeil.BrukerManglerTilgang ->
+                        ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+
+                    AggregertStatistikkService.HentAggregertStatistikkFeil.FeilVedKallTilEnhetsregisteret ->
+                        ResponseEntity.internalServerError().build()
+
+                    AggregertStatistikkService.HentAggregertStatistikkFeil.UnderenhetErIkkeNæringsdrivende ->
+                        ResponseEntity.badRequest().build()
+                }
+            }
         return ResponseEntity.status(HttpStatus.OK).body(statistikk)
     }
 }

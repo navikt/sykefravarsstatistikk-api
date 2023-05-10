@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.Data;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næringskode5Siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.UnderenhetLegacy;
 
 @Data
 public class Bransje {
@@ -41,7 +41,7 @@ public class Bransje {
     return inneholderKunKoderMedGittAntallSifre(5);
   }
 
-  public boolean inkludererVirksomhet(Underenhet underenhet) {
+  public boolean inkludererVirksomhet(UnderenhetLegacy underenhet) {
     return inkludererNæringskode(underenhet.getNæringskode());
   }
 
