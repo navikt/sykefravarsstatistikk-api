@@ -22,7 +22,7 @@ open class EnhetsregisteretClient(
     @param:Value("\${enhetsregisteret.url}") private val enhetsregisteretUrl: String
 ) {
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
-    private val retrySpec = Retry.max(3).filter {
+    private val retrySpec = Retry.max(2).filter {
         it !is DecodingException
     }.onRetryExhaustedThrow { _, signal -> signal.failure() }
 

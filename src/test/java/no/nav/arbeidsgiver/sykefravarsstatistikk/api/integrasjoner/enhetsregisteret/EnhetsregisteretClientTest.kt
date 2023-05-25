@@ -4,6 +4,7 @@ import arrow.core.left
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
+import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
 import common.StaticAppenderExtension
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*
 import org.assertj.core.api.Assertions.assertThat
@@ -203,7 +204,7 @@ class EnhetsregisteretClientTest {
     }
 
     @Test
-    fun informasjonOmUnderenhet__skal_feile_hvis_returnert_orgnr_ikke_matcher_med_medsendt_orgnr() {
+    fun `hent underenhet skal feile hvis returnert orgnr ikke matcher med medsendt orgnr`() {
         stubFor(
             get("/enhetsregisteret/underenheter/777777777").willReturn(
                 okJson(
@@ -230,6 +231,63 @@ class EnhetsregisteretClientTest {
                 fail("Skulle feilet")
             }
         )
+    }
+
+    @Test
+    fun `hent underenhet skal returnere en underenhet på tredje forsøk`() {
+        val (scenarioName, scenarioState) = failTwiceScenario()
+        stubFor(
+            get("/enhetsregisteret/underenheter/971800534")
+                .inScenario(scenarioName)
+                .whenScenarioStateIs(scenarioState)
+                .willReturn(
+                    okJson(
+                        """
+                    {
+                      "organisasjonsnummer": "971800534",
+                      "navn": "NAV ARBEID OG YTELSER AVD OSLO",
+                      "overordnetEnhet": "999263550",
+                      "naeringskode1": {
+                        "kode": "84300",
+                        "beskrivelse": "Trygdeordninger underlagt offentlig forvaltning"
+                      },
+                      "antallAnsatte": 40
+                    }
+                    """.trimIndent()
+                    )
+                )
+        )
+        val underenhet = enhetsregisteretClient.hentUnderenhet(Orgnr("971800534"))
+        assertThat(underenhet.isRight()).isTrue
+    }
+
+    /**
+     * A stubbing that will fail twice for any url
+     *
+     * @return A pair of strings where the first string is the scenario name and the second string is the following scenario state
+     */
+    private fun failTwiceScenario(): Pair<String, String> {
+        stubFor(
+            any(anyUrl())
+                .inScenario("Retry")
+                .whenScenarioStateIs(STARTED)
+                .willReturn(
+                    aResponse().withStatus(500)
+                )
+                .willSetStateTo("Second retry")
+        )
+
+        stubFor(
+            any(anyUrl())
+                .inScenario("Retry")
+                .whenScenarioStateIs("Second retry")
+                .willReturn(
+                    aResponse().withStatus(500)
+                )
+                .willSetStateTo("Third retry")
+        )
+
+        return "Retry" to "Third retry"
     }
 
     companion object {
