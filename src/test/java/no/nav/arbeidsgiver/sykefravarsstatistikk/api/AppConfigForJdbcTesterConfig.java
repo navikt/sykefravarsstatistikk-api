@@ -7,7 +7,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.Post
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.SykefraværsstatistikkImporteringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.klassifikasjoner.KlassifikasjonsimporteringController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.MockServer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.WebClientConfiguration;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.healthcheck.HealthcheckController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnClient;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.UnleashFeatureToggleConfig;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.UnleashService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.organisasjoner.OrganisasjonerController;
@@ -55,7 +58,10 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
             TilgangskontrollService.class,
             OffentligSykefraværshistorikkController.class,
             AggregertStatistikkService.class,
-            EksporteringMetadataVirksomhetService.class
+            EksporteringMetadataVirksomhetService.class,
+            HealthcheckController.class,
+            EnhetsregisteretClient.class,
+            WebClientConfiguration.class,
           })
     })
 public class AppConfigForJdbcTesterConfig extends JdbcRepositoryConfigExtension {}

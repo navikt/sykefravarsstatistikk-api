@@ -1,9 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret
 
+import arrow.core.left
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
-import common.StaticAppender
 import common.StaticAppenderExtension
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*
 import org.assertj.core.api.Assertions.assertThat
@@ -11,16 +11,16 @@ import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.web.client.RestTemplate
+import org.springframework.web.reactive.function.client.WebClient
 
 @WireMockTest
 @ExtendWith(StaticAppenderExtension::class)
 class EnhetsregisteretClientTest {
     private val url get() = "http://localhost:${port}/enhetsregisteret"
-    private val restTemplate: RestTemplate = RestTemplate()
+    private val webClient = WebClient.create()
     private val enhetsregisteretClient: EnhetsregisteretClient by lazy {
         EnhetsregisteretClient(
-            restTemplate, url
+            webClient, url
         )
     }
 
@@ -97,17 +97,8 @@ class EnhetsregisteretClientTest {
             )
         )
 
-        enhetsregisteretClient.hentEnhet(Orgnr("999263550")).fold(
-            {
-                assertThat(it).isEqualTo(EnhetsregisteretClient.HentEnhetFeil.FeilVedKallTilEnhetsregisteret)
-                val loggetFeil = StaticAppender.getLastLoggedEvent()
-                assertThat(loggetFeil.throwableProxy.cause.message)
-                    .startsWith("JSON parse error")
-            },
-            {
-                fail("Skulle feilet")
-            }
-        )
+        val result = enhetsregisteretClient.hentEnhet(Orgnr("999263550"))
+        assertThat(result).isEqualTo(EnhetsregisteretClient.HentEnhetFeil.FeilVedDekodingAvJson.left())
     }
 
     @Test
@@ -184,14 +175,8 @@ class EnhetsregisteretClientTest {
             )
         )
 
-        enhetsregisteretClient.hentUnderenhet(Orgnr("971800534")).fold(
-            {
-                assertThat(it).isEqualTo(EnhetsregisteretClient.HentUnderenhetFeil.EnhetsregisteretSvarerIkke)
-            },
-            {
-                fail("Skulle returnert left")
-            }
-        )
+        val result = enhetsregisteretClient.hentUnderenhet(Orgnr("971800534"))
+        assertThat(result).isEqualTo(EnhetsregisteretClient.HentUnderenhetFeil.EnhetsregisteretSvarerIkke.left())
     }
 
     @Test
@@ -213,17 +198,8 @@ class EnhetsregisteretClientTest {
             )
         )
 
-        enhetsregisteretClient.hentUnderenhet(Orgnr("971800534")).fold(
-            {
-                assertThat(it).isEqualTo(EnhetsregisteretClient.HentUnderenhetFeil.FeilVedKallTilEnhetsregisteret)
-                val loggetFeil = StaticAppender.getLastLoggedEvent()
-                assertThat(loggetFeil.throwableProxy.cause.message)
-                    .startsWith("JSON parse error")
-            },
-            {
-                fail("Skulle returnert left")
-            }
-        )
+        val result = enhetsregisteretClient.hentUnderenhet(Orgnr("971800534"))
+        assertThat(result).isEqualTo(EnhetsregisteretClient.HentUnderenhetFeil.FeilVedDekodingAvJson.left())
     }
 
     @Test
