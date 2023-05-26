@@ -9,73 +9,51 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregiste
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.codec.DecodingException
 import org.springframework.http.*
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.WebClientResponseException
-import reactor.util.retry.Retry
+import org.springframework.web.client.HttpServerErrorException
+import org.springframework.web.client.RestClientException
+import org.springframework.web.client.RestClientResponseException
+import org.springframework.web.client.RestTemplate
 
 @Component
 open class EnhetsregisteretClient(
-    private val webClient: WebClient,
+    private val restTemplate: RestTemplate,
     @param:Value("\${enhetsregisteret.url}") private val enhetsregisteretUrl: String
 ) {
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
-    private val retrySpec = Retry.max(2).filter {
-        it !is DecodingException
-    }.onRetryExhaustedThrow { _, signal -> signal.failure() }
 
     open fun hentEnhet(orgnrTilEnhet: Orgnr): Either<HentEnhetFeil, OverordnetEnhet> {
         val url = "${enhetsregisteretUrl}/enheter/{orgnr}"
         return try {
-
-            val overordnetEnhet = webClient.get()
-                .uri(url, orgnrTilEnhet.verdi)
-                .retrieve()
-                .bodyToMono(OverordnetEnhetResponseJson::class.java)
-                .retryWhen(retrySpec)
-                .block()!!
+            val overordnetEnhet = restTemplate
+                .getForObject(url, OverordnetEnhetResponseJson::class.java, orgnrTilEnhet.verdi)!!
                 .toDomain()
             if (!validerReturnertOrgnr(orgnrTilEnhet, overordnetEnhet.orgnr)) {
                 return HentEnhetFeil.OrgnrMatcherIkke.left()
             }
             overordnetEnhet.right()
-        } catch (e: WebClientResponseException) {
+        } catch (e: RestClientException) {
             log.error("Feil ved kall til Enhetsregisteret ved henting av enhet ${orgnrTilEnhet.verdi}", e)
             HentEnhetFeil.FeilVedKallTilEnhetsregisteret.left()
-        } catch (e: DecodingException) {
-            log.error("Feil ved dekoding av JSON ved henting av enhet ${orgnrTilEnhet.verdi}", e)
-            HentEnhetFeil.FeilVedDekodingAvJson.left()
         }
     }
-
 
     open fun hentUnderenhet(orgnrTilUnderenhet: Orgnr): Either<HentUnderenhetFeil, Underenhet> {
         return try {
             val url = "${enhetsregisteretUrl}/underenheter/${orgnrTilUnderenhet.verdi}"
-            val underenhet = webClient.get()
-                .uri(url)
-                .retrieve()
-                .bodyToMono(UnderenhetResponseJson::class.java)
-                .retryWhen(retrySpec)
-                .block()!!
+            val underenhet = restTemplate.getForObject(url, UnderenhetResponseJson::class.java)!!
                 .toDomain()
             if (!validerReturnertOrgnr(orgnrTilUnderenhet, underenhet.orgnr)) {
                 return HentUnderenhetFeil.OrgnrMatcherIkke.left()
             }
             underenhet.right()
-        } catch (e: WebClientResponseException) {
-            if (e.statusCode.is5xxServerError) {
-                log.error("Enhetsregisteret svarer ikke", e)
-                return HentUnderenhetFeil.EnhetsregisteretSvarerIkke.left()
-            } else {
-                log.error("Feil ved kall til Enhetsregisteret ved henting av underenhet ${orgnrTilUnderenhet.verdi}", e)
-                return HentUnderenhetFeil.FeilVedKallTilEnhetsregisteret.left()
-            }
-        } catch (e: DecodingException) {
-            log.error("Feil ved dekoding av JSON ved henting av underenhet ${orgnrTilUnderenhet.verdi}", e)
-            return HentUnderenhetFeil.FeilVedDekodingAvJson.left()
+        } catch (e: HttpServerErrorException) {
+            log.error("Enhetsregisteret svarer ikke", e)
+            return HentUnderenhetFeil.EnhetsregisteretSvarerIkke.left()
+        } catch (e: RestClientException) {
+            log.error("Feil ved kall til Enhetsregisteret ved henting av underenhet ${orgnrTilUnderenhet.verdi}", e)
+            return HentUnderenhetFeil.FeilVedKallTilEnhetsregisteret.left()
         }
     }
 
@@ -92,26 +70,22 @@ open class EnhetsregisteretClient(
 
     open fun healthcheck(): HttpStatusCode {
         return try {
-            webClient.get()
-                .uri(enhetsregisteretUrl)
-                .retrieve()
-                .toBodilessEntity()
-                .block()!!
-                .statusCode
-        } catch (e: WebClientResponseException) {
-            e.statusCode
+            val response = restTemplate.exchange(
+                enhetsregisteretUrl, HttpMethod.GET, HttpEntity.EMPTY, String::class.java
+            )
+            response.statusCode
+        } catch (e: RestClientResponseException) {
+            HttpStatus.valueOf(e.statusCode.value())
         }
     }
 
     sealed class HentEnhetFeil {
         object FeilVedKallTilEnhetsregisteret : HentEnhetFeil()
-        object FeilVedDekodingAvJson : HentEnhetFeil()
         object OrgnrMatcherIkke : HentEnhetFeil()
     }
 
     sealed class HentUnderenhetFeil {
         object EnhetsregisteretSvarerIkke : HentUnderenhetFeil()
-        object FeilVedDekodingAvJson : HentUnderenhetFeil()
         object FeilVedKallTilEnhetsregisteret : HentUnderenhetFeil()
         object OrgnrMatcherIkke : HentUnderenhetFeil()
     }

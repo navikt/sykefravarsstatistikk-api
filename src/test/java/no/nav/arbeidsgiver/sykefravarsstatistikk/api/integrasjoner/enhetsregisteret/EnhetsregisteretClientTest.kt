@@ -1,10 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret
 
-import arrow.core.left
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
-import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
+import common.StaticAppender
 import common.StaticAppenderExtension
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*
 import org.assertj.core.api.Assertions.assertThat
@@ -12,16 +11,16 @@ import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.client.RestTemplate
 
 @WireMockTest
 @ExtendWith(StaticAppenderExtension::class)
 class EnhetsregisteretClientTest {
     private val url get() = "http://localhost:${port}/enhetsregisteret"
-    private val webClient = WebClient.create()
+    private val restTemplate: RestTemplate = RestTemplate()
     private val enhetsregisteretClient: EnhetsregisteretClient by lazy {
         EnhetsregisteretClient(
-            webClient, url
+            restTemplate, url
         )
     }
 
@@ -98,8 +97,17 @@ class EnhetsregisteretClientTest {
             )
         )
 
-        val result = enhetsregisteretClient.hentEnhet(Orgnr("999263550"))
-        assertThat(result).isEqualTo(EnhetsregisteretClient.HentEnhetFeil.FeilVedDekodingAvJson.left())
+        enhetsregisteretClient.hentEnhet(Orgnr("999263550")).fold(
+            {
+                assertThat(it).isEqualTo(EnhetsregisteretClient.HentEnhetFeil.FeilVedKallTilEnhetsregisteret)
+                val loggetFeil = StaticAppender.getLastLoggedEvent()
+                assertThat(loggetFeil.throwableProxy.cause.message)
+                    .startsWith("JSON parse error")
+            },
+            {
+                fail("Skulle feilet")
+            }
+        )
     }
 
     @Test
@@ -176,8 +184,14 @@ class EnhetsregisteretClientTest {
             )
         )
 
-        val result = enhetsregisteretClient.hentUnderenhet(Orgnr("971800534"))
-        assertThat(result).isEqualTo(EnhetsregisteretClient.HentUnderenhetFeil.EnhetsregisteretSvarerIkke.left())
+        enhetsregisteretClient.hentUnderenhet(Orgnr("971800534")).fold(
+            {
+                assertThat(it).isEqualTo(EnhetsregisteretClient.HentUnderenhetFeil.EnhetsregisteretSvarerIkke)
+            },
+            {
+                fail("Skulle returnert left")
+            }
+        )
     }
 
     @Test
@@ -199,12 +213,21 @@ class EnhetsregisteretClientTest {
             )
         )
 
-        val result = enhetsregisteretClient.hentUnderenhet(Orgnr("971800534"))
-        assertThat(result).isEqualTo(EnhetsregisteretClient.HentUnderenhetFeil.FeilVedDekodingAvJson.left())
+        enhetsregisteretClient.hentUnderenhet(Orgnr("971800534")).fold(
+            {
+                assertThat(it).isEqualTo(EnhetsregisteretClient.HentUnderenhetFeil.FeilVedKallTilEnhetsregisteret)
+                val loggetFeil = StaticAppender.getLastLoggedEvent()
+                assertThat(loggetFeil.throwableProxy.cause.message)
+                    .startsWith("JSON parse error")
+            },
+            {
+                fail("Skulle returnert left")
+            }
+        )
     }
 
     @Test
-    fun `hent underenhet skal feile hvis returnert orgnr ikke matcher med medsendt orgnr`() {
+    fun informasjonOmUnderenhet__skal_feile_hvis_returnert_orgnr_ikke_matcher_med_medsendt_orgnr() {
         stubFor(
             get("/enhetsregisteret/underenheter/777777777").willReturn(
                 okJson(
@@ -231,63 +254,6 @@ class EnhetsregisteretClientTest {
                 fail("Skulle feilet")
             }
         )
-    }
-
-    @Test
-    fun `hent underenhet skal returnere en underenhet på tredje forsøk`() {
-        val (scenarioName, scenarioState) = failTwiceScenario()
-        stubFor(
-            get("/enhetsregisteret/underenheter/971800534")
-                .inScenario(scenarioName)
-                .whenScenarioStateIs(scenarioState)
-                .willReturn(
-                    okJson(
-                        """
-                    {
-                      "organisasjonsnummer": "971800534",
-                      "navn": "NAV ARBEID OG YTELSER AVD OSLO",
-                      "overordnetEnhet": "999263550",
-                      "naeringskode1": {
-                        "kode": "84300",
-                        "beskrivelse": "Trygdeordninger underlagt offentlig forvaltning"
-                      },
-                      "antallAnsatte": 40
-                    }
-                    """.trimIndent()
-                    )
-                )
-        )
-        val underenhet = enhetsregisteretClient.hentUnderenhet(Orgnr("971800534"))
-        assertThat(underenhet.isRight()).isTrue
-    }
-
-    /**
-     * A stubbing that will fail twice for any url
-     *
-     * @return A pair of strings where the first string is the scenario name and the second string is the following scenario state
-     */
-    private fun failTwiceScenario(): Pair<String, String> {
-        stubFor(
-            any(anyUrl())
-                .inScenario("Retry")
-                .whenScenarioStateIs(STARTED)
-                .willReturn(
-                    aResponse().withStatus(500)
-                )
-                .willSetStateTo("Second retry")
-        )
-
-        stubFor(
-            any(anyUrl())
-                .inScenario("Retry")
-                .whenScenarioStateIs("Second retry")
-                .willReturn(
-                    aResponse().withStatus(500)
-                )
-                .willSetStateTo("Third retry")
-        )
-
-        return "Retry" to "Third retry"
     }
 
     companion object {
