@@ -45,7 +45,7 @@ open class EnhetsregisteretClient(
             log.error("Feil ved kall til Enhetsregisteret ved henting av enhet ${orgnrTilEnhet.verdi}", e)
             HentEnhetFeil.FeilVedKallTilEnhetsregisteret.left()
         } catch (e: DecodingException) {
-            log.error("Feild ved dekoding av JSON ved henting av enhet ${orgnrTilEnhet.verdi}", e)
+            log.error("Feil ved dekoding av JSON ved henting av enhet ${orgnrTilEnhet.verdi}", e)
             HentEnhetFeil.FeilVedDekodingAvJson.left()
         }
     }
@@ -74,7 +74,7 @@ open class EnhetsregisteretClient(
                 return HentUnderenhetFeil.FeilVedKallTilEnhetsregisteret.left()
             }
         } catch (e: DecodingException) {
-            log.error("Feild ved dekoding av JSON ved henting av underenhet ${orgnrTilUnderenhet.verdi}", e)
+            log.error("Feil ved dekoding av JSON ved henting av underenhet ${orgnrTilUnderenhet.verdi}", e)
             return HentUnderenhetFeil.FeilVedDekodingAvJson.left()
         }
     }
