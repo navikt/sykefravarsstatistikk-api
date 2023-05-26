@@ -34,6 +34,8 @@ spec:
         - application: altinn-rettigheter-proxy
           namespace: arbeidsgiver
           cluster: dev-gcp
+      external:
+        - host: data.brreg.no
   liveness:
     path: /sykefravarsstatistikk-api/internal/healthcheck
     initialDelay: 30
