@@ -49,7 +49,6 @@ class SykefraværshistorikkController(
                 return when (it) {
                     EnhetsregisteretClient.HentUnderenhetFeil.EnhetsregisteretSvarerIkke,
                     EnhetsregisteretClient.HentUnderenhetFeil.FeilVedKallTilEnhetsregisteret,
-                    EnhetsregisteretClient.HentUnderenhetFeil.FeilVedDekodingAvJson,
                     EnhetsregisteretClient.HentUnderenhetFeil.OrgnrMatcherIkke ->
                         ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
 
@@ -66,7 +65,6 @@ class SykefraværshistorikkController(
             .getOrElse {
                 return when (it) {
                     HentEnhetFeil.FeilVedKallTilEnhetsregisteret,
-                    HentEnhetFeil.FeilVedDekodingAvJson,
                     HentEnhetFeil.OrgnrMatcherIkke ->
                         ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
                 }
@@ -112,7 +110,6 @@ class SykefraværshistorikkController(
                 return when (it) {
                     EnhetsregisteretClient.HentUnderenhetFeil.EnhetsregisteretSvarerIkke,
                     EnhetsregisteretClient.HentUnderenhetFeil.FeilVedKallTilEnhetsregisteret,
-                    EnhetsregisteretClient.HentUnderenhetFeil.FeilVedDekodingAvJson,
                     EnhetsregisteretClient.HentUnderenhetFeil.OrgnrMatcherIkke ->
                         ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
                 }
