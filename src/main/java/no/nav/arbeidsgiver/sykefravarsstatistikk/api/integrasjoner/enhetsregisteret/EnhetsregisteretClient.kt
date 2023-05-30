@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.ProxyWebClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.json.OverordnetEnhetResponseJson
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.json.UnderenhetResponseJson
 import org.slf4j.Logger
@@ -12,13 +13,12 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.codec.DecodingException
 import org.springframework.http.*
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.util.retry.Retry
 
 @Component
 open class EnhetsregisteretClient(
-    private val webClient: WebClient,
+    private val webClient: ProxyWebClient,
     @param:Value("\${enhetsregisteret.url}") private val enhetsregisteretUrl: String
 ) {
     private val log: Logger = LoggerFactory.getLogger(this::class.java)

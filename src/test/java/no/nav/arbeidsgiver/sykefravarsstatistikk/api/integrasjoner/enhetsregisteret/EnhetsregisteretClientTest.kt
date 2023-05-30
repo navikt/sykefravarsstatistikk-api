@@ -7,6 +7,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
 import common.StaticAppenderExtension
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.ProxyWebClient
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.BeforeAll
@@ -18,7 +19,7 @@ import org.springframework.web.reactive.function.client.WebClient
 @ExtendWith(StaticAppenderExtension::class)
 class EnhetsregisteretClientTest {
     private val url get() = "http://localhost:${port}/enhetsregisteret"
-    private val webClient = WebClient.create()
+    private val webClient = ProxyWebClient(WebClient.builder())
     private val enhetsregisteretClient: EnhetsregisteretClient by lazy {
         EnhetsregisteretClient(
             webClient, url
