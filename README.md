@@ -43,9 +43,8 @@ API-et kan sees og testes på:
 
 * Lokalt: `http://localhost:8080/sykefravarsstatistikk-api/swagger-ui/index.html`
 * På server:
-    - `{host}/sykefravarsstatistikk-api/swagger-ui/index.html?configUrl=/sykefravarsstatistikk-api/v3/api-docs/swagger-config#/`
-    - `{host}/sykefravarsstatistikk-api/swagger-ui/index.html` og lim
-      inn `/sykefravarsstatistikk-api/v3/api-docs` i __Explore__ søkefelt
+    - Dev: `https://arbeidsgiver.nais.preprod.local/sykefravarsstatistikk-api/swagger-ui/index.html`
+    - Prod: `https://arbeidsgiver.nais.adeo.no/sykefravarsstatistikk-api/swagger-ui.html`
 
 ## Local Auth
 
