@@ -89,23 +89,24 @@ create table dt_p.agg_ia_sykefravar_naring_kode
 
 create table dt_p.agg_ia_sykefravar_v_2
 (
-    arstall      char(4),
-    kvartal      char(1),
-    orgnr        char(9) not null,
-    sektor       char(1),
-    naring       char(2),
-    naering_kode char(5),
-    alder        char(1),
-    kjonn        char(1),
-    fylkbo       varchar(2),
-    kommnr       char(4),
-    rectype      char(1),
-    antall_gs    decimal(7, 0),
-    taptedv_gs   decimal(14, 6),
-    antall       decimal(7, 0),
-    taptedv      decimal(14, 6),
-    mulige_dv    decimal(15, 6),
-    antpers      decimal(7, 0)
+    arstall           char(4),
+    kvartal           char(1),
+    orgnr             char(9) not null,
+    sektor            char(1),
+    naring            char(2),
+    naering_kode      char(5),
+    primærnæringskode char(6),
+    alder             char(1),
+    kjonn             char(1),
+    fylkbo            varchar(2),
+    kommnr            char(4),
+    rectype           char(1),
+    antall_gs         decimal(7, 0),
+    taptedv_gs        decimal(14, 6),
+    antall            decimal(7, 0),
+    taptedv           decimal(14, 6),
+    mulige_dv         decimal(15, 6),
+    antpers           decimal(7, 0)
 );
 
 

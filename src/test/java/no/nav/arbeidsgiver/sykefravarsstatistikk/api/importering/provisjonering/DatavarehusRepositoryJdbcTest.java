@@ -492,6 +492,7 @@ public class DatavarehusRepositoryJdbcTest {
         ORGNR_VIRKSOMHET_1,
         SEKTOR,
         NÆRINGSKODE_2SIFFER,
+        "10.111",
         2020,
         3);
 
@@ -505,6 +506,7 @@ public class DatavarehusRepositoryJdbcTest {
                 RECTYPE_FOR_VIRKSOMHET,
                 SEKTOR,
                 NÆRINGSKODE_2SIFFER,
+
                 new ÅrstallOgKvartal(2020, 3))));
   }
 }

@@ -55,6 +55,7 @@ public class DatavarehusRepositoryJdbcTestUtils {
       String orgnr,
       String sektor,
       String næring,
+      String primærnæringskode,
       int årstall,
       int kvartal) {
     MapSqlParameterSource naringParams =
@@ -62,12 +63,13 @@ public class DatavarehusRepositoryJdbcTestUtils {
             .addValue("orgnr", orgnr)
             .addValue("sektor", sektor)
             .addValue("naring", næring)
+            .addValue("primærnæringskode", primærnæringskode)
             .addValue("årstall", årstall)
             .addValue("kvartal", kvartal);
 
     jdbcTemplate.update(
-        "insert into dt_p.agg_ia_sykefravar_v_2 (orgnr, rectype, sektor, naring, arstall, kvartal) "
-            + "values (:orgnr, '2', :sektor, :naring, :årstall, :kvartal)",
+        "insert into dt_p.agg_ia_sykefravar_v_2 (orgnr, rectype, sektor, naring, primærnæringskode, arstall, kvartal) "
+            + "values (:orgnr, '2', :sektor, :naring, :primærnæringskode, :årstall, :kvartal)",
         naringParams);
   }
 

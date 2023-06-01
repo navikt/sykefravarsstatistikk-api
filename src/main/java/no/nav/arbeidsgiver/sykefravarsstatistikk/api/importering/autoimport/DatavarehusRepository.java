@@ -310,7 +310,7 @@ public class DatavarehusRepository {
         .addValue(KVARTAL, årstallOgKvartal.getKvartal());
 
     return namedParameterJdbcTemplate.query(
-        "select distinct orgnr, rectype, sektor, naring, arstall, kvartal "
+        "select distinct orgnr, rectype, sektor, substr(primærnæringskode, 1,2) as naring, arstall, kvartal "
             + "from dt_p.agg_ia_sykefravar_v_2 "
             + "where arstall = :arstall and kvartal = :kvartal "
             + "and length(trim(orgnr)) = 9",
