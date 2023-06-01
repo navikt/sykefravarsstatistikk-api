@@ -78,7 +78,7 @@ class PostImporteringServiceTest {
 
   private void mockImportVirksomhetMetadata(
       ÅrstallOgKvartal årstallOgKvartal, List<Orgenhet> orgenhetSomSkalTilVirksomhetMetadata) {
-    when(datavarehusRepository.hentOrgenhet(årstallOgKvartal))
+    when(datavarehusRepository.hentOrgenheter(årstallOgKvartal))
         .thenReturn(orgenhetSomSkalTilVirksomhetMetadata);
     when(virksomhetMetadataRepository.opprettVirksomhetMetadata(any()))
         .thenReturn(orgenhetSomSkalTilVirksomhetMetadata.size());

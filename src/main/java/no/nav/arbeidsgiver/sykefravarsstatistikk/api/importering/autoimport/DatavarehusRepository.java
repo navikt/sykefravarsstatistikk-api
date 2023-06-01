@@ -302,7 +302,7 @@ public class DatavarehusRepository {
             new Næring(resultSet.getString(NARINGKODE), resultSet.getString(NARINGNAVN)));
   }
 
-  public List<Orgenhet> hentOrgenhet(
+  public List<Orgenhet> hentOrgenheter(
       ÅrstallOgKvartal årstallOgKvartal) {
 
     MapSqlParameterSource namedParameters = new MapSqlParameterSource()
@@ -310,7 +310,7 @@ public class DatavarehusRepository {
         .addValue(KVARTAL, årstallOgKvartal.getKvartal());
 
     return namedParameterJdbcTemplate.query(
-        "select orgnr, rectype, sektor, naring, arstall, kvartal "
+        "select distinct orgnr, rectype, sektor, naring, arstall, kvartal "
             + "from dt_p.agg_ia_sykefravar_v_2 "
             + "where arstall = :arstall and kvartal = :kvartal "
             + "and length(trim(orgnr)) = 9",

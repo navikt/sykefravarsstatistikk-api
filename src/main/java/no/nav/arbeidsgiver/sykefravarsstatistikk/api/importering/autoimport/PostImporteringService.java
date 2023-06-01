@@ -186,7 +186,7 @@ public class PostImporteringService {
 
   @Nullable
   private List<Orgenhet> hentOrgenhetListeFraDvh(ÅrstallOgKvartal årstallOgKvartal) {
-    List<Orgenhet> orgenhetList = datavarehusRepository.hentOrgenhet(årstallOgKvartal);
+    List<Orgenhet> orgenhetList = datavarehusRepository.hentOrgenheter(årstallOgKvartal);
 
     if (orgenhetList.isEmpty()) {
       log.warn("Har ikke funnet Orgenhet for årstall '{}' og kvartal '{}'. ",

@@ -495,7 +495,7 @@ public class DatavarehusRepositoryJdbcTest {
         2020,
         3);
 
-    List<Orgenhet> orgenhetList = repository.hentOrgenhet(new ÅrstallOgKvartal(2020, 3));
+    List<Orgenhet> orgenhetList = repository.hentOrgenheter(new ÅrstallOgKvartal(2020, 3));
 
     assertTrue(
         orgenhetList.contains(
