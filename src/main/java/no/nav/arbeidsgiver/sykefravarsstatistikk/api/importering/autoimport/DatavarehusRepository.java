@@ -313,8 +313,8 @@ public class DatavarehusRepository {
         "select distinct orgnr, rectype, sektor, substr(primærnæringskode, 1,2) as naring, arstall, kvartal "
             + "from dt_p.agg_ia_sykefravar_v_2 "
             + "where arstall = :arstall and kvartal = :kvartal "
-            + "and length(trim(orgnr)) = 9"
-            + "and rectype=2"
+            + "and length(trim(orgnr)) = 9 "
+            + "and rectype=2 "
             + "and primærnæringskode is not null",
         namedParameters,
         ((resultSet, i) ->
