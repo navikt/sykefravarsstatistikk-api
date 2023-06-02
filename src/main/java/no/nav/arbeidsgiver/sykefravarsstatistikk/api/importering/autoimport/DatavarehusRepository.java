@@ -315,7 +315,8 @@ public class DatavarehusRepository {
             + "where arstall = :arstall and kvartal = :kvartal "
             + "and length(trim(orgnr)) = 9 "
             + "and rectype=2 "
-            + "and primærnæringskode is not null",
+            + "and primærnæringskode is not null "
+            + "and primærnæringskode != '00.000'",
         namedParameters,
         ((resultSet, i) ->
             new Orgenhet(

@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.OrgenhetFilterKt.fjernDupliserteOrgnr;
+
 @Slf4j
 @Component
 public class PostImporteringService {
@@ -186,16 +188,16 @@ public class PostImporteringService {
 
   @Nullable
   private List<Orgenhet> hentOrgenhetListeFraDvh(ÅrstallOgKvartal årstallOgKvartal) {
-    List<Orgenhet> orgenhetList = datavarehusRepository.hentOrgenheter(årstallOgKvartal);
+    List<Orgenhet> orgenheter = datavarehusRepository.hentOrgenheter(årstallOgKvartal);
 
-    if (orgenhetList.isEmpty()) {
+    if (orgenheter.isEmpty()) {
       log.warn("Har ikke funnet Orgenhet for årstall '{}' og kvartal '{}'. ",
           årstallOgKvartal.getÅrstall(),
           årstallOgKvartal.getKvartal()
       );
       return Collections.emptyList();
     }
-    return orgenhetList;
+    return fjernDupliserteOrgnr(orgenheter);
   }
 
   private int importVirksomhetNæringskode5sifferMapping(ÅrstallOgKvartal årstallOgKvartal) {
@@ -231,7 +233,7 @@ public class PostImporteringService {
                     orgenhet.getRectype(),
                     orgenhet.getSektor(),
                     orgenhet.getNæring(),
-                    orgenhet.getÅrstallOgKvartal()))
+                    orgenhet.getårstallOgKvartal()))
         .collect(Collectors.toList());
   }
 
