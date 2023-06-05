@@ -9,12 +9,13 @@ import org.junit.jupiter.api.Test
 
 internal class OrgenhetFilterKtTest {
 
-    val dummyvirksomhet = Orgenhet(
+    private val dummyvirksomhet = Orgenhet(
         orgnr = Orgnr("111111111"),
         navn = "navn",
         rectype = "2",
         sektor = "1",
         næring = "10",
+        næringskode = "10123",
         årstallOgKvartal = ÅrstallOgKvartal(
             årstall = 2023, kvartal = 1
         )

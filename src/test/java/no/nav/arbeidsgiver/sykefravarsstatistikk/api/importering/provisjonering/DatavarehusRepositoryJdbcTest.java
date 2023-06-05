@@ -20,6 +20,7 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjo
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._1_DAG_TIL_7_DAGER;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Varighetskategori._8_DAGER_TIL_16_DAGER;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
@@ -468,7 +469,7 @@ public class DatavarehusRepositoryJdbcTest {
 
     List<Sektor> sektorer = repository.hentAlleSektorer();
 
-    assertTrue(sektorer.size() == 2);
+    assertEquals(2, sektorer.size());
     assertTrue(sektorer.contains(new Sektor("0", "Ukjent")));
     assertTrue(sektorer.contains(new Sektor("9", "Fylkeskommunal forvaltning")));
   }
@@ -506,7 +507,7 @@ public class DatavarehusRepositoryJdbcTest {
                 RECTYPE_FOR_VIRKSOMHET,
                 SEKTOR,
                 NÆRINGSKODE_2SIFFER,
-
+                "10111",
                 new ÅrstallOgKvartal(2020, 3))));
   }
 }

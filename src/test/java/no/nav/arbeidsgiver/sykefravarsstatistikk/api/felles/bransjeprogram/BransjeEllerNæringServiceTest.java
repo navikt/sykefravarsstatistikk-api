@@ -28,7 +28,7 @@ public class BransjeEllerNæringServiceTest {
 
   @Mock private KlassifikasjonerRepository klassifikasjonerRepository;
 
-  private Næringskode5Siffer barnehage = new Næringskode5Siffer("88911", "Barnehager");
+  private final Næringskode5Siffer barnehage = new Næringskode5Siffer("88911", "Barnehager");
   private VirksomhetMetadata virksomhetMetadata =
       new VirksomhetMetadata(
           ORGNR_VIRKSOMHET_1,
@@ -36,6 +36,7 @@ public class BransjeEllerNæringServiceTest {
           RECTYPE_FOR_VIRKSOMHET,
           "1",
           "88",
+          "88000",
           SISTE_PUBLISERTE_KVARTAL);
 
   @BeforeEach
@@ -95,6 +96,7 @@ public class BransjeEllerNæringServiceTest {
             RECTYPE_FOR_VIRKSOMHET,
             "1",
             "11",
+            "11000",
             SISTE_PUBLISERTE_KVARTAL);
     BransjeEllerNæring resultat =
         bransjeEllerNæringService.finnBransjeFraMetadata(

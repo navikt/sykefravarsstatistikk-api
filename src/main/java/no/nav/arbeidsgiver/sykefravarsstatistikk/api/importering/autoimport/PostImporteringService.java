@@ -149,7 +149,7 @@ public class PostImporteringService {
     int antallSlettetEksportertPerKvartal = eksporteringRepository.slettEksportertPerKvartal();
     log.info("Slettet '{}' rader fra forrige eksportering.", antallSlettetEksportertPerKvartal);
     List<VirksomhetMetadata> virksomhetMetadata =
-        virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal);
+        virksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(årstallOgKvartal);
 
     List<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartalListe =
         mapToVirksomhetEksportPerKvartal(virksomhetMetadata);
@@ -164,14 +164,14 @@ public class PostImporteringService {
   }
 
   private int importVirksomhetMetadata(ÅrstallOgKvartal årstallOgKvartal) {
-    List<Orgenhet> orgenhetList = hentOrgenhetListeFraDvh(årstallOgKvartal);
+    List<Orgenhet> virksomheter = hentOrgenhetListeFraDvh(årstallOgKvartal);
 
-    if (orgenhetList.isEmpty()) {
-      log.warn("Stopper import av metadata.");
+    if (virksomheter.isEmpty()) {
+      log.warn("Stopper import av metadata. Fant ingen virksomheter for {}", årstallOgKvartal);
       return 0;
     }
 
-    log.info("Antall orgenhet fra DVH: {}", orgenhetList.size());
+    log.info("Antall orgenhet fra DVH: {}", virksomheter.size());
     int antallSlettet = virksomhetMetadataRepository.slettVirksomhetMetadata();
     log.info(
         "Slettet '{}' VirksomhetMetadata for årstall '{}' og kvartal '{}'",
@@ -180,7 +180,7 @@ public class PostImporteringService {
         årstallOgKvartal.getKvartal());
     int antallOpprettet =
         virksomhetMetadataRepository.opprettVirksomhetMetadata(
-            mapToVirksomhetMetadata(orgenhetList));
+            mapToVirksomhetMetadata(virksomheter));
     log.info("Antall rader VirksomhetMetadata opprettet: {}", antallOpprettet);
 
     return antallOpprettet;
@@ -233,6 +233,7 @@ public class PostImporteringService {
                     orgenhet.getRectype(),
                     orgenhet.getSektor(),
                     orgenhet.getNæring(),
+                    orgenhet.getNæringskode(),
                     orgenhet.getårstallOgKvartal()))
         .collect(Collectors.toList());
   }

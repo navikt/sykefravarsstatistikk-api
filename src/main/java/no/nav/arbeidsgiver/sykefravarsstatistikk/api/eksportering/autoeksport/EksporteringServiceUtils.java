@@ -212,7 +212,7 @@ public class EksporteringServiceUtils {
         sykefraværsstatistikkNæring.stream()
             .filter(
                 v ->
-                    v.getNæringkode().equals(virksomhetMetadata.getNæring())
+                    v.getNæringkode().equals(virksomhetMetadata.getPrimærnæring())
                         && v.getÅrstall() == virksomhetMetadata.getÅrstall()
                         && v.getKvartal() == virksomhetMetadata.getKvartal())
             .collect(
@@ -220,7 +220,7 @@ public class EksporteringServiceUtils {
                     new SykefraværsstatistikkNæring(
                         virksomhetMetadata.getÅrstall(),
                         virksomhetMetadata.getKvartal(),
-                            virksomhetMetadata.getNæring(),
+                            virksomhetMetadata.getPrimærnæring(),
                         0,
                         null,
                         null)));

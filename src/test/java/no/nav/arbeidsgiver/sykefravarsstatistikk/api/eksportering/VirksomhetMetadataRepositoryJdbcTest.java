@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.NÆRINGSKODE_2SIFFER;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.NÆRINGSKODE_5SIFFER;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_1;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_2;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_3;
@@ -99,6 +100,7 @@ class VirksomhetMetadataRepositoryJdbcTest {
             RECTYPE_FOR_VIRKSOMHET,
             SEKTOR,
             NÆRINGSKODE_2SIFFER,
+            NÆRINGSKODE_5SIFFER,
             new ÅrstallOgKvartal(2020, 3));
     VirksomhetMetadata virksomhetMetadataVirksomhet2 =
         new VirksomhetMetadata(
@@ -107,6 +109,7 @@ class VirksomhetMetadataRepositoryJdbcTest {
             RECTYPE_FOR_VIRKSOMHET,
             SEKTOR,
             NÆRINGSKODE_2SIFFER,
+            NÆRINGSKODE_5SIFFER,
             new ÅrstallOgKvartal(2020, 3));
 
     repository.opprettVirksomhetMetadata(
@@ -122,7 +125,7 @@ class VirksomhetMetadataRepositoryJdbcTest {
     opprettTestVirksomhetMetaData(2020, 2);
 
     List<VirksomhetMetadata> results =
-        repository.hentVirksomhetMetadata(new ÅrstallOgKvartal(2019, 2));
+        repository.hentVirksomhetMetadataMedNæringskoder(new ÅrstallOgKvartal(2019, 2));
 
     assertThat(results.size()).isEqualTo(0);
   }
@@ -132,7 +135,7 @@ class VirksomhetMetadataRepositoryJdbcTest {
     opprettTestVirksomhetMetaData(2020, 3);
 
     List<VirksomhetMetadata> results =
-        repository.hentVirksomhetMetadata(new ÅrstallOgKvartal(2020, 3));
+        repository.hentVirksomhetMetadataMedNæringskoder(new ÅrstallOgKvartal(2020, 3));
 
     assertThat(results.size()).isEqualTo(3);
     VirksomhetMetadata virksomhetMetadataVirksomhet1 =
@@ -156,7 +159,8 @@ class VirksomhetMetadataRepositoryJdbcTest {
                 rs.getString("navn"),
                 rs.getString("rectype"),
                 rs.getString("sektor"),
-                rs.getString("naring_kode"),
+                rs.getString("primarnaring"),
+                rs.getString("primarnaringskode"),
                 new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal"))));
   }
 
@@ -175,10 +179,10 @@ class VirksomhetMetadataRepositoryJdbcTest {
 
   private int opprettTestVirksomhetMetaData(int årstall, int kvartal) {
     namedParameterJdbcTemplate.update(
-        "insert into virksomhet_metadata (orgnr, navn, rectype, sektor, naring_kode, arstall, kvartal) "
-            + "VALUES (:orgnr, :navn, :rectype, :sektor, :naring_kode, :årstall, :kvartal)",
+        "insert into virksomhet_metadata (orgnr, navn, rectype, sektor, primarnaring, primarnaringskode, arstall, kvartal) "
+            + "VALUES (:orgnr, :navn, :rectype, :sektor, :primarnaring, :primarnaringskode, :årstall, :kvartal)",
         parametreViksomhetMetadata(
-            ORGNR_VIRKSOMHET_1, "Virksomhet 1", "2", "3", "71", årstall, kvartal));
+            ORGNR_VIRKSOMHET_1, "Virksomhet 1", "2", "3", "71", "71000", årstall, kvartal));
 
     namedParameterJdbcTemplate.update(
         "insert into virksomhet_metadata_naring_kode_5siffer (orgnr, naring_kode, naring_kode_5siffer, arstall, kvartal) "
@@ -193,15 +197,15 @@ class VirksomhetMetadataRepositoryJdbcTest {
             ORGNR_VIRKSOMHET_1, "71", "71002", årstall, kvartal));
 
     namedParameterJdbcTemplate.update(
-        "insert into virksomhet_metadata (orgnr, navn, rectype, sektor, naring_kode, arstall, kvartal) "
-            + "VALUES (:orgnr, :navn, :rectype, :sektor, :naring_kode, :årstall, :kvartal)",
+        "insert into virksomhet_metadata (orgnr, navn, rectype, sektor, primarnaring, primarnaringskode, arstall, kvartal) "
+            + "VALUES (:orgnr, :navn, :rectype, :sektor, :primarnaring, :primarnaringskode, :årstall, :kvartal)",
         parametreViksomhetMetadata(
-            ORGNR_VIRKSOMHET_2, "Virksomhet 2", "2", "3", "10", årstall, kvartal));
+            ORGNR_VIRKSOMHET_2, "Virksomhet 2", "2", "3", "10", "10000", årstall, kvartal));
     namedParameterJdbcTemplate.update(
-        "insert into virksomhet_metadata (orgnr, navn, rectype, sektor, naring_kode, arstall, kvartal) "
-            + "VALUES (:orgnr, :navn, :rectype, :sektor, :naring_kode, :årstall, :kvartal)",
+        "insert into virksomhet_metadata (orgnr, navn, rectype, sektor, primarnaring, primarnaringskode, arstall, kvartal) "
+            + "VALUES (:orgnr, :navn, :rectype, :sektor, :primarnaring, :primarnaringskode, :årstall, :kvartal)",
         parametreViksomhetMetadata(
-            ORGNR_VIRKSOMHET_3, "Virksomhet 3", "2", "3", "10", årstall, kvartal));
+            ORGNR_VIRKSOMHET_3, "Virksomhet 3", "2", "3", "10", "10000", årstall, kvartal));
     return 0;
   }
 
@@ -214,7 +218,8 @@ class VirksomhetMetadataRepositoryJdbcTest {
       String navn,
       String rectype,
       String sektor,
-      String næringskode2Siffer,
+      String primarnaring,
+      String primarnaringskode,
       int årstall,
       int kvartal) {
     return new MapSqlParameterSource()
@@ -222,7 +227,8 @@ class VirksomhetMetadataRepositoryJdbcTest {
         .addValue("navn", navn)
         .addValue("rectype", rectype)
         .addValue("sektor", sektor)
-        .addValue("naring_kode", næringskode2Siffer)
+        .addValue("primarnaring", primarnaring)
+        .addValue("primarnaringskode", primarnaringskode)
         .addValue("årstall", årstall)
         .addValue("kvartal", kvartal);
   }

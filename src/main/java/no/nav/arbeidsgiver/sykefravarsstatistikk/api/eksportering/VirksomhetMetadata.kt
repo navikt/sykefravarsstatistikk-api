@@ -8,7 +8,8 @@ data class VirksomhetMetadata(
     val navn: String,
     val rectype: String,
     val sektor: String,
-    val næring: String,
+    val primærnæring: String,
+    val primærnæringskode: String,
     val årstallOgKvartal: ÅrstallOgKvartal
 ) {
     val orgnr: String

@@ -23,9 +23,9 @@ open class VirksomhetMetadataRepository(
         val results = namedParameterJdbcTemplate.batchUpdate(
             """
                 |insert into virksomhet_metadata
-                |    (orgnr, navn, rectype, sektor, naring_kode, arstall, kvartal)
+                |    (orgnr, navn, rectype, sektor, primarnaring, primarnaringskode, arstall, kvartal)
                 |values
-                |    (:orgnr, :navn, :rectype, :sektor, :næring, :årstall, :kvartal)
+                |    (:orgnr, :navn, :rectype, :sektor, :primærnæring, :primærnæringskode, :årstall, :kvartal)
             """.trimMargin(),
             batch,
         )
@@ -48,23 +48,13 @@ open class VirksomhetMetadataRepository(
         return results.sum()
     }
 
-    open fun hentVirksomhetMetadata(årstallOgKvartal: ÅrstallOgKvartal): List<VirksomhetMetadata> {
+    open fun hentVirksomhetMetadataMedNæringskoder(årstallOgKvartal: ÅrstallOgKvartal): List<VirksomhetMetadata> {
+        val virksomhetMetadata = hentVirksomhetMetadata(årstallOgKvartal)
+
+        log.info("Henter data fra 'virksomhet_metadata_naring_kode_5siffer' for $årstallOgKvartal ...")
         val paramSource = MapSqlParameterSource()
             .addValue("årstall", årstallOgKvartal.årstall)
             .addValue("kvartal", årstallOgKvartal.kvartal)
-        log.info("Henter data fra 'virksomhet_metadata' for $årstallOgKvartal ...")
-        val virksomhetMetadata = namedParameterJdbcTemplate.query(
-            """
-                |select orgnr, navn, rectype, sektor, naring_kode, arstall, kvartal
-                |from virksomhet_metadata
-                |where arstall = :årstall and kvartal = :kvartal
-            """.trimMargin(),
-            paramSource,
-            virksomhetMetadataRowMapper(),
-        )
-        log.info("Datauthenting fra 'virksomhet_metadata' ferdig.")
-
-        log.info("Henter data fra 'virksomhet_metadata_naring_kode_5siffer' for $årstallOgKvartal ...")
         val næringOgNæringskode5siffer = namedParameterJdbcTemplate.query(
             """
                 |select orgnr, naring_kode, naring_kode_5siffer
@@ -76,6 +66,24 @@ open class VirksomhetMetadataRepository(
         )
         log.info("Datauthenting fra 'virksomhet_metadata_naring_kode_5siffer' ferdig.")
         return assemble(virksomhetMetadata, næringOgNæringskode5siffer)
+    }
+
+     open fun hentVirksomhetMetadata(årstallOgKvartal: ÅrstallOgKvartal): MutableList<VirksomhetMetadata> {
+        val paramSource = MapSqlParameterSource()
+            .addValue("årstall", årstallOgKvartal.årstall)
+            .addValue("kvartal", årstallOgKvartal.kvartal)
+        log.info("Henter data fra 'virksomhet_metadata' for $årstallOgKvartal ...")
+        val virksomhetMetadata = namedParameterJdbcTemplate.query(
+            """
+                |select orgnr, navn, rectype, sektor, primarnaring, primarnaringskode, arstall, kvartal
+                |from virksomhet_metadata
+                |where arstall = :årstall and kvartal = :kvartal
+                """.trimMargin(),
+            paramSource,
+            virksomhetMetadataRowMapper(),
+        )
+        log.info("Datauthenting fra 'virksomhet_metadata' ferdig.")
+        return virksomhetMetadata
     }
 
     open fun slettVirksomhetMetadata(): Int =
@@ -117,7 +125,8 @@ open class VirksomhetMetadataRepository(
             resultSet.getString("navn"),
             resultSet.getString("rectype"),
             resultSet.getString("sektor"),
-            resultSet.getString("naring_kode"),
+            resultSet.getString("primarnaring"),
+            resultSet.getString("primarnaringskode"),
             ÅrstallOgKvartal(
                 resultSet.getInt("arstall"), resultSet.getInt("kvartal")
             )

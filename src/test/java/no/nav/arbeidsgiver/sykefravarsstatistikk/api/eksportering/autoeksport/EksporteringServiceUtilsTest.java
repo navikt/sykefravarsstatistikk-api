@@ -145,7 +145,7 @@ public class EksporteringServiceUtilsTest {
   public void getVirksomhetSykefravær__returnerer_VirksomhetSykefravær_som_matcher_Virksomhet() {
     VirksomhetMetadata virksomhetToBeFound =
         new VirksomhetMetadata(
-            new Orgnr("399000"), "Virksomhet 1", RECTYPE_FOR_VIRKSOMHET, "1", "11", __2020_4);
+            new Orgnr("399000"), "Virksomhet 1", RECTYPE_FOR_VIRKSOMHET, "1", "11", "11111", __2020_4);
     Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> bigMap =
         buildMapAvSykefraværsstatistikkPerVirksomhet(500000);
 
@@ -248,7 +248,7 @@ public class EksporteringServiceUtilsTest {
         byggSykefraværStatistikkNæring(virksomhet1Metadata_2020_4, 10, 156, 22233),
         resultat,
         Statistikkategori.NÆRING,
-            virksomhet1Metadata_2020_4.getNæring());
+            virksomhet1Metadata_2020_4.getPrimærnæring());
   }
 
   @Test

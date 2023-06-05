@@ -9,5 +9,6 @@ data class Orgenhet(
     val rectype: String?,
     val sektor: String?,
     val næring: String?,
+    val næringskode: String?,
     val årstallOgKvartal: ÅrstallOgKvartal
 )

@@ -81,7 +81,7 @@ class EksporteringService(
         kafkaService.nullstillUtsendingRapport(
             virksomheterTilEksport.size, KafkaTopic.SYKEFRAVARSSTATISTIKK_V1
         )
-        val virksomhetMetadataListe = virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal)
+        val virksomhetMetadataListe = virksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(årstallOgKvartal)
         val umaskertSykefraværsstatistikkSistePublisertKvartalLand =
             sykefraværRepository.hentUmaskertSykefraværForNorge(årstallOgKvartal)
         val sykefraværsstatistikkSektor =
