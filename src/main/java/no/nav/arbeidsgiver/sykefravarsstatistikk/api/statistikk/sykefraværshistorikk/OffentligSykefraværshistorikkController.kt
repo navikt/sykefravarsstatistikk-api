@@ -34,8 +34,10 @@ class OffentligSykefraværshistorikkController(
                 return when (it) {
                     EnhetsregisteretClient.HentUnderenhetFeil.EnhetsregisteretSvarerIkke,
                     EnhetsregisteretClient.HentUnderenhetFeil.FeilVedKallTilEnhetsregisteret,
+                    EnhetsregisteretClient.HentUnderenhetFeil.FeilVedDekodingAvJson,
                     EnhetsregisteretClient.HentUnderenhetFeil.OrgnrMatcherIkke ->
                         ResponseEntity.internalServerError().build()
+
                 }
             },
                 {
