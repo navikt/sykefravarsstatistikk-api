@@ -45,7 +45,7 @@ class EksporteringMetadataVirksomhetService(
                     virksomhet.årstallOgKvartal,
                     virksomhet.primærnæring,
                     Bransjeprogram.finnBransje(virksomhet.primærnæringskode).getOrNull()?.type,
-                    Sektor.valueOf(virksomhet.sektor)
+                    Sektor.fraSsbSektorkode(virksomhet.sektor.toInt())
                 )
 
                 kafkaService.send(
