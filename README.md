@@ -6,6 +6,8 @@ Arbeidsgivere skal kunne se sitt eget sykefravær sammenlignet med sykefraværet
 sektor og i hele landet.
 Hensikten er å gjøre arbeidsgivere mer engasjert i eget sykefravær.
 
+[![Build, push & deploy](https://github.com/navikt/sykefravarsstatistikk-api/actions/workflows/build-deploy.yaml/badge.svg?branch=master)](https://github.com/navikt/sykefravarsstatistikk-api/actions/workflows/build-deploy.yaml)
+
 # Komme i gang
 
 Koden kan kjøres som en vanlig Spring Boot-applikasjon fra SykefraværsstatistikkApplication. Du må
