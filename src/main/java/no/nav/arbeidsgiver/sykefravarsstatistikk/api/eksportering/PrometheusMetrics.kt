@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering
 
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopic
 import org.springframework.stereotype.Component
 
 @Component
@@ -25,11 +26,11 @@ class PrometheusMetrics(
             .register(meterRegistry)
     }
 
-    fun incrementKafkaMessageSentCounter(vararg labels: String) {
-        kafkaMessageSentCounter.labels(*labels).inc()
+    fun incrementKafkaMessageSentCounter(kafkaTopic: KafkaTopic) {
+        kafkaMessageSentCounter.labels(kafkaTopic.name).inc()
     }
 
-    fun incrementKafkaMessageErrorCounter(vararg labels: String) {
-        kafkaMessageErrorCounter.labels(*labels).inc()
+    fun incrementKafkaMessageErrorCounter(kafkaTopic: KafkaTopic) {
+        kafkaMessageErrorCounter.labels(kafkaTopic.navn).inc()
     }
 }

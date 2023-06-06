@@ -47,9 +47,9 @@ class KafkaService internal constructor(
     fun send(kafkamelding: Kafkamelding, kafkaTopic: KafkaTopic) {
         kafkaTemplate.send(kafkaTopic.navn, kafkamelding.nøkkel, kafkamelding.innhold)
             .thenAcceptAsync {
-                prometheusMetrics.incrementKafkaMessageSentCounter(kafkaTopic.navn)
+                prometheusMetrics.incrementKafkaMessageSentCounter(kafkaTopic)
             }.exceptionally {
-                prometheusMetrics.incrementKafkaMessageErrorCounter(kafkaTopic.navn)
+                prometheusMetrics.incrementKafkaMessageErrorCounter(kafkaTopic)
                 log.warn("Melding '${kafkamelding.nøkkel}' ble ikke sendt på '${kafkaTopic.navn}'", it)
                 null
             }
