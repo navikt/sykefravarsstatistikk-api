@@ -19,6 +19,7 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
@@ -43,6 +44,7 @@ import java.util.concurrent.TimeUnit
 @DirtiesContext
 @EnableMockOAuth2Server
 @Import(EmbeddedKafkaBrokerConfig::class)
+@AutoConfigureObservability
 class KafkaServiceIntegrasjonTest {
     @Autowired
     private lateinit var kafkaService: KafkaService
