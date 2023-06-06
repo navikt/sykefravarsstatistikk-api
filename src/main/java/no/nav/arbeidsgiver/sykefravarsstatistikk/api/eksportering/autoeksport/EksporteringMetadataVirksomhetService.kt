@@ -40,16 +40,12 @@ class EksporteringMetadataVirksomhetService(
 
         metadataVirksomhet.forEach { virksomhet ->
             try {
-                // TODO("Finn primærnæringskoden, aka den som ligger først i enhetsregisteret.")
-                val primærnæringskode: String =
-                    virksomhet.næringOgNæringskode5siffer.first().næringskode5Siffer
-
                 val metadataVirksomhetKafkamelding = MetadataVirksomhetKafkamelding(
                     virksomhet.orgnr,
                     virksomhet.årstallOgKvartal,
-                    primærnæringskode.substring(0, 2),
-                    Bransjeprogram.finnBransje(primærnæringskode).getOrNull()?.type,
-                    Sektor.valueOf(virksomhet.sektor)
+                    virksomhet.primærnæring,
+                    Bransjeprogram.finnBransje(virksomhet.primærnæringskode).getOrNull()?.type,
+                    Sektor.fraSsbSektorkode(virksomhet.sektor.toInt())
                 )
 
                 kafkaService.send(

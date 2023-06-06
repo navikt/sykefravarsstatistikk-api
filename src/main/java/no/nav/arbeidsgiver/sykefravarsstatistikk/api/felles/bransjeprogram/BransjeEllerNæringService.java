@@ -76,8 +76,8 @@ public class BransjeEllerNæringService {
   private Næring hentNæringForVirksomhet(
       VirksomhetMetadata virksomhetMetadata, List<Næring> næringer) {
     return næringer.stream()
-        .filter(næring -> næring.getKode().equals(virksomhetMetadata.getNæring()))
+        .filter(næring -> næring.getKode().equals(virksomhetMetadata.getPrimærnæring()))
         .findFirst()
-        .orElse(new Næring(virksomhetMetadata.getNæring(), "Ukjent næring"));
+        .orElse(new Næring(virksomhetMetadata.getPrimærnæring(), "Ukjent næring"));
   }
 }

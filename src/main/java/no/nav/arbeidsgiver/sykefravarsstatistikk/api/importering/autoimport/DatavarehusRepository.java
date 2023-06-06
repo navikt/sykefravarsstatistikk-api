@@ -243,7 +243,7 @@ public class DatavarehusRepository {
   }
 
   public List<SykefraværsstatistikkVirksomhetMedGradering>
-  hentSykefraværsstatistikkVirksomhetMedGradering(ÅrstallOgKvartal årstallOgKvartal) {
+      hentSykefraværsstatistikkVirksomhetMedGradering(ÅrstallOgKvartal årstallOgKvartal) {
     SqlParameterSource namedParameters =
         new MapSqlParameterSource()
             .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
@@ -302,15 +302,15 @@ public class DatavarehusRepository {
             new Næring(resultSet.getString(NARINGKODE), resultSet.getString(NARINGNAVN)));
   }
 
-  public List<Orgenhet> hentOrgenheter(
-      ÅrstallOgKvartal årstallOgKvartal) {
+  public List<Orgenhet> hentOrgenheter(ÅrstallOgKvartal årstallOgKvartal) {
 
-    MapSqlParameterSource namedParameters = new MapSqlParameterSource()
-        .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
-        .addValue(KVARTAL, årstallOgKvartal.getKvartal());
+    MapSqlParameterSource namedParameters =
+        new MapSqlParameterSource()
+            .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
+            .addValue(KVARTAL, årstallOgKvartal.getKvartal());
 
     return namedParameterJdbcTemplate.query(
-        "select distinct orgnr, rectype, sektor, substr(primærnæringskode, 1,2) as naring, arstall, kvartal "
+        "select distinct orgnr, rectype, sektor, substr(primærnæringskode, 1,2) as naring, primærnæringskode as naringskode, arstall, kvartal "
             + "from dt_p.agg_ia_sykefravar_v_2 "
             + "where arstall = :arstall and kvartal = :kvartal "
             + "and length(trim(orgnr)) = 9 "
@@ -325,8 +325,8 @@ public class DatavarehusRepository {
                 resultSet.getString(RECTYPE),
                 resultSet.getString(SEKTOR),
                 resultSet.getString(NARING),
-                new ÅrstallOgKvartal(resultSet.getInt(ARSTALL), resultSet.getInt(KVARTAL))
-            )));
+                resultSet.getString("naringskode").replace(".", ""),
+                new ÅrstallOgKvartal(resultSet.getInt(ARSTALL), resultSet.getInt(KVARTAL)))));
   }
 
   public List<PubliseringsdatoDbDto> hentPubliseringsdatoerFraDvh() {

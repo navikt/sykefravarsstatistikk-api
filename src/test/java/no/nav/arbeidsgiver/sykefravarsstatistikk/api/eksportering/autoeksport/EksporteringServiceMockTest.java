@@ -42,7 +42,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaSe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.KlassifikasjonerRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.StatistikkDto;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -110,7 +109,7 @@ public class EksporteringServiceMockTest {
             new NæringOgNæringskode5siffer("85", "85000")));
     ÅrstallOgKvartal fraÅrstallOgKvartal = __2020_2.minusKvartaler(3);
 
-    when(virksomhetMetadataRepository.hentVirksomhetMetadata(__2020_2))
+    when(virksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(__2020_2))
         .thenReturn(Arrays.asList(virksomhetMetadata));
     when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(__2020_2))
         .thenReturn(Arrays.asList(sykefraværsstatistikkSektor));
@@ -174,7 +173,7 @@ public class EksporteringServiceMockTest {
     when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2))
         .thenReturn(Arrays.asList(virksomhetEksportPerKvartal));
 
-    when(virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal))
+    when(virksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(årstallOgKvartal))
         .thenReturn(Arrays.asList(virksomhet1_TilHørerBransjeMetadata));
     when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(
             årstallOgKvartal))
