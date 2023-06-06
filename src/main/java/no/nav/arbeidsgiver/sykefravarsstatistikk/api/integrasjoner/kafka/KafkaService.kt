@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.annotation.PropertyAccessor
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.Metrics
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.PrometheusMetrics
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.SykefraværFlereKvartalerForEksport
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal
@@ -23,7 +23,8 @@ import java.util.concurrent.CompletableFuture
 class KafkaService internal constructor(
     private val kafkaTemplate: KafkaTemplate<String?, String?>,
     private val kafkaUtsendingRapport: KafkaUtsendingRapport,
-    private val kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository
+    private val kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository,
+    private val prometheusMetrics: PrometheusMetrics,
 ) {
     private val log = LoggerFactory.getLogger(KafkaService::class.java)
 
@@ -46,9 +47,9 @@ class KafkaService internal constructor(
     fun send(kafkamelding: Kafkamelding, kafkaTopic: KafkaTopic) {
         kafkaTemplate.send(kafkaTopic.navn, kafkamelding.nøkkel, kafkamelding.innhold)
             .thenAcceptAsync {
-                Metrics.kafkaMessageSentCounter.labels(kafkaTopic.navn).inc()
+                prometheusMetrics.incrementKafkaMessageSentCounter(kafkaTopic.navn)
             }.exceptionally {
-                Metrics.kafkaMessageErrorCounter.labels(kafkaTopic.navn).inc()
+                prometheusMetrics.incrementKafkaMessageErrorCounter(kafkaTopic.navn)
                 log.warn("Melding '${kafkamelding.nøkkel}' ble ikke sendt på '${kafkaTopic.navn}'", it)
                 null
             }

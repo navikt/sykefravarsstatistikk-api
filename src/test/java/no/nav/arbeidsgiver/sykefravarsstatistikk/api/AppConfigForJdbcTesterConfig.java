@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.PrometheusMetrics;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.ImporteringController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.ImporteringScheduler;
@@ -11,6 +12,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.WebCli
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.healthcheck.HealthcheckController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.UnleashFeatureToggleConfig;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.UnleashService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.organisasjoner.OrganisasjonerController;
@@ -62,6 +64,8 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
             HealthcheckController.class,
             EnhetsregisteretClient.class,
             WebClientConfiguration.class,
+            PrometheusMetrics.class,
+            KafkaService.class,
           })
     })
 public class AppConfigForJdbcTesterConfig extends JdbcRepositoryConfigExtension {}
