@@ -48,7 +48,7 @@ class EksporteringMetadataVirksomhetService(
                     Sektor.fraSsbSektorkode(virksomhet.sektor.toInt())
                 )
 
-                kafkaService.send(
+                kafkaService.sendMessage(
                     metadataVirksomhetKafkamelding,
                     KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1,
                 )

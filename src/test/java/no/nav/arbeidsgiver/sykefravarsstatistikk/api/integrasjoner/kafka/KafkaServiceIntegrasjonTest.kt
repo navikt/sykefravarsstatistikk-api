@@ -93,7 +93,7 @@ class KafkaServiceIntegrasjonTest {
 
     @Test
     fun `send kafkamelding med metadata sender på riktig topic`() {
-        kafkaService.send(
+        kafkaService.sendMessage(
             MetadataVirksomhetKafkamelding(
                 "999999999",
                 ÅrstallOgKvartal(2023, 2),
@@ -109,7 +109,7 @@ class KafkaServiceIntegrasjonTest {
 
     @Test
     fun `send kafkamelding med metadata sender riktig data`() {
-        kafkaService.send(
+        kafkaService.sendMessage(
             MetadataVirksomhetKafkamelding(
                 "999999999",
                 ÅrstallOgKvartal(2023, 2),
