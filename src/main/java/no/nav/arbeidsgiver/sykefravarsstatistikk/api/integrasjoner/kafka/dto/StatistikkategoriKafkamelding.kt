@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.SykefraværFlereKvartalerForEksport
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori
 
-class StatistikkategoriKafkamelding(
+data class StatistikkategoriKafkamelding(
     private val sisteKvartal: SykefraværMedKategori,
     private val siste4Kvartal: SykefraværFlereKvartalerForEksport,
 ) : Kafkamelding {

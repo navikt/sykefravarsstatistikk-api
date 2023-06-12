@@ -10,8 +10,9 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
+import java.math.BigDecimal
 
-class EksporteringPerStatistikkKategoriServiceMockTest {
+class EksporteringPerStatistikkKategoriServiceTest {
     private val sykefraværRepository = mock<SykefraværRepository>()
     private val sykefraværsstatistikkTilEksporteringRepository = mock<SykefraværsstatistikkTilEksporteringRepository>()
     private val kafkaService = mock<KafkaService>()
@@ -53,7 +54,7 @@ class EksporteringPerStatistikkKategoriServiceMockTest {
             isObject
             node("kategori").isString.isEqualTo(Statistikkategori.LAND.name)
             node("kode").isString.isEqualTo("NO")
-            node("sistePubliserteKvartal").isObject.node("årstall").isString.isEqualTo("2020")
+            node("sistePubliserteKvartal").isObject.node("årstall").isNumber.isEqualTo(BigDecimal("2020"))
         }
     }
 
@@ -101,10 +102,9 @@ class EksporteringPerStatistikkKategoriServiceMockTest {
             isObject
             node("kategori").isString.isEqualTo(Statistikkategori.VIRKSOMHET.name)
             node("kode").isString.isEqualTo("987654321")
-            node("sistePubliserteKvartal").isObject.node("årstall").isString.isEqualTo("2020")
-            node("siste4Kvartal").isObject.node("prosent").isString.isEqualTo("10000000000")
+            node("sistePubliserteKvartal").isObject.node("årstall").isNumber.isEqualTo(BigDecimal("2020"))
+            node("siste4Kvartal").isObject.node("prosent").isNumber.isEqualTo(BigDecimal("2.0"))
         }
-
     }
 
 
@@ -135,14 +135,15 @@ class EksporteringPerStatistikkKategoriServiceMockTest {
 
         assertThatJson(statistikkategoriKafkameldingCaptor.firstValue.innhold) {
             isObject
-            node("kategori").isString.isEqualTo(Statistikkategori.NÆRING)
+            node("kategori").isString.isEqualTo(Statistikkategori.NÆRING.name)
             node("kode").isString.isEqualTo("11")
-            node("sistePubliserteKvartal").isObject.node("årstall").isEqualTo("2020").node("kvartal").isString.isEqualTo("2")
+            node("sistePubliserteKvartal").isObject.node("årstall").isNumber.isEqualTo(BigDecimal("2020"))
+            node("sistePubliserteKvartal").isObject.node("kvartal").isNumber.isEqualTo(BigDecimal("2"))
         }
 
         assertThatJson(statistikkategoriKafkameldingCaptor.firstValue.nøkkel) {
             isObject
-            node("kategori").isString.isEqualTo(Statistikkategori.NÆRING)
+            node("kategori").isString.isEqualTo(Statistikkategori.NÆRING.name)
             node("kode").isString.isEqualTo("11")
             node("kvartal").isString.isEqualTo("2")
             node("årstall").isString.isEqualTo("2020")
