@@ -42,13 +42,13 @@ class KafkaService internal constructor(
     val antallMeldingerMottattForUtsending: Int
         get() = kafkaUtsendingRapport.antallMeldingerMottattForUtsending
 
-    fun sendMessage(kafkamelding: Kafkamelding, kafkaTopic: KafkaTopic) {
-        kafkaTemplate.send(kafkaTopic.navn, kafkamelding.nøkkel, kafkamelding.innhold)
+    fun sendMelding(melding: Kafkamelding, topic: KafkaTopic) {
+        kafkaTemplate.send(topic.navn, melding.nøkkel, melding.innhold)
             .thenAcceptAsync {
-                prometheusMetrics.incrementKafkaMessageSentCounter(kafkaTopic)
+                prometheusMetrics.incrementKafkaMessageSentCounter(topic)
             }.exceptionally {
-                prometheusMetrics.incrementKafkaMessageErrorCounter(kafkaTopic)
-                log.warn("Melding '${kafkamelding.nøkkel}' ble ikke sendt på '${kafkaTopic.navn}'", it)
+                prometheusMetrics.incrementKafkaMessageErrorCounter(topic)
+                log.warn("Melding '${melding.nøkkel}' ble ikke sendt på '${topic.navn}'", it)
                 null
             }
     }

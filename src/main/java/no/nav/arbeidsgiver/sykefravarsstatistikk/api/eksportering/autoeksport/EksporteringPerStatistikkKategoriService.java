@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.EksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
@@ -105,7 +104,7 @@ public class EksporteringPerStatistikkKategoriService {
           StatistikkategoriKafkamelding melding =
               new StatistikkategoriKafkamelding(
                   sykefraværMedKategoriSisteKvartal, sykefraværOverFlereKvartaler);
-          kafkaService.sendMessage(melding, KafkaTopic.SYKEFRAVARSSTATISTIKK_BRANSJE_V1);
+          kafkaService.sendMelding(melding, KafkaTopic.SYKEFRAVARSSTATISTIKK_BRANSJE_V1);
         });
   }
 
@@ -141,7 +140,7 @@ public class EksporteringPerStatistikkKategoriService {
           StatistikkategoriKafkamelding melding =
               new StatistikkategoriKafkamelding(
                   sykefraværMedKategoriSisteKvartal, sykefraværOverFlereKvartaler);
-          kafkaService.sendMessage(melding, KafkaTopic.SYKEFRAVARSSTATISTIKK_SEKTOR_V1);
+          kafkaService.sendMelding(melding, KafkaTopic.SYKEFRAVARSSTATISTIKK_SEKTOR_V1);
         });
   }
 
@@ -190,7 +189,7 @@ public class EksporteringPerStatistikkKategoriService {
           StatistikkategoriKafkamelding melding =
               new StatistikkategoriKafkamelding(
                   sykefraværMedKategoriSisteKvartal, sykefraværOverFlereKvartaler);
-          kafkaService.sendMessage(melding, KafkaTopic.SYKEFRAVARSSTATISTIKK_BRANSJE_V1);
+          kafkaService.sendMelding(melding, KafkaTopic.SYKEFRAVARSSTATISTIKK_NARING_V1);
         });
   }
 
@@ -212,7 +211,7 @@ public class EksporteringPerStatistikkKategoriService {
 
     StatistikkategoriKafkamelding melding =
         new StatistikkategoriKafkamelding(landSykefravær, sykefraværOverFlereKvartaler);
-    kafkaService.sendMessage(melding, KafkaTopic.SYKEFRAVARSSTATISTIKK_BRANSJE_V1);
+    kafkaService.sendMelding(melding, KafkaTopic.SYKEFRAVARSSTATISTIKK_LAND_V1);
   }
 
   private static void assertForespurteKvartalFinnesIStatistikken(
@@ -252,7 +251,7 @@ public class EksporteringPerStatistikkKategoriService {
       StatistikkategoriKafkamelding melding =
           new StatistikkategoriKafkamelding(sykefraværEttKvartal, sykefraværOverFlereKvartaler);
 
-      kafkaService.sendMessage(melding, KafkaTopic.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1);
+      kafkaService.sendMelding(melding, KafkaTopic.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1);
     }
 
     log.info("Ferdig med utsending av alle meldinger til Kafka for statistikkategori VIRKSOMHET.");

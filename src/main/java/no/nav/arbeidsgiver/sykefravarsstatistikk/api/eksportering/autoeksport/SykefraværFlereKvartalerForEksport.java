@@ -16,12 +16,12 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 @Data
 public class SykefraværFlereKvartalerForEksport {
 
-  private BigDecimal tapteDagsverk;
-  private BigDecimal muligeDagsverk;
-  private BigDecimal prosent;
-  private int antallPersoner;
-  private List<ÅrstallOgKvartal> kvartaler;
-  private final boolean erMaskert;
+  public BigDecimal tapteDagsverk;
+  public BigDecimal muligeDagsverk;
+  public BigDecimal prosent;
+  public int antallPersoner;
+  public List<ÅrstallOgKvartal> kvartaler;
+  public final boolean erMaskert;
 
   public SykefraværFlereKvartalerForEksport(
       List<UmaskertSykefraværForEttKvartal> umaskertSykefravær) {

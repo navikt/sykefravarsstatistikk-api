@@ -10,7 +10,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaT
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopic.Companion.toStringArray
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.MetadataVirksomhetKafkamelding
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.Sektor
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.apache.kafka.clients.consumer.ConsumerConfig
@@ -54,13 +53,6 @@ class KafkaServiceIntegrasjonTest {
 
     private lateinit var container: KafkaMessageListenerContainer<String, String>
     private lateinit var consumerRecords: BlockingQueue<ConsumerRecord<String, String>>
-    private val dummyData = SykefraværFlereKvartalerForEksport(
-        listOf(
-            UmaskertSykefraværForEttKvartal(
-                EksporteringServiceTestUtils.__2020_2, BigDecimal(1100), BigDecimal(11000), 5
-            )
-        )
-    )
 
     @BeforeEach
     fun setUp() {
@@ -93,7 +85,7 @@ class KafkaServiceIntegrasjonTest {
 
     @Test
     fun `send kafkamelding med metadata sender på riktig topic`() {
-        kafkaService.sendMessage(
+        kafkaService.sendMelding(
             MetadataVirksomhetKafkamelding(
                 "999999999",
                 ÅrstallOgKvartal(2023, 2),
@@ -109,7 +101,7 @@ class KafkaServiceIntegrasjonTest {
 
     @Test
     fun `send kafkamelding med metadata sender riktig data`() {
-        kafkaService.sendMessage(
+        kafkaService.sendMelding(
             MetadataVirksomhetKafkamelding(
                 "999999999",
                 ÅrstallOgKvartal(2023, 2),
@@ -143,70 +135,6 @@ class KafkaServiceIntegrasjonTest {
         )
         val message = consumerRecords.poll(10, TimeUnit.SECONDS)
         Assertions.assertEquals(KafkaTopic.SYKEFRAVARSSTATISTIKK_V1.navn, message!!.topic())
-    }
-
-    @Test
-    fun `send kafkamelding for landkategori sender melding til riktig topic`() {
-        kafkaService.sendTilStatistikkKategoriTopic(
-            EksporteringServiceTestUtils.__2020_2,
-            Statistikkategori.LAND,
-            "NO",
-            EksporteringServiceTestUtils.landSykefravær,
-            dummyData
-        )
-        val message = consumerRecords.poll(10, TimeUnit.SECONDS)
-        Assertions.assertEquals(
-            KafkaTopic.SYKEFRAVARSSTATISTIKK_LAND_V1.navn,
-            message!!.topic()
-        )
-    }
-
-    @Test
-    fun `send for kategori næring sender til sykefravarsstatistikk-næring-topic-v1`() {
-        kafkaService.sendTilStatistikkKategoriTopic(
-            EksporteringServiceTestUtils.__2020_2,
-            Statistikkategori.NÆRING,
-            "11",
-            EksporteringServiceTestUtils.næringSykefravær,
-            dummyData
-        )
-        val message = consumerRecords.poll(10, TimeUnit.SECONDS)
-        Assertions.assertEquals(
-            KafkaTopic.SYKEFRAVARSSTATISTIKK_NARING_V1.navn,
-            message!!.topic()
-        )
-    }
-
-    @Test
-    fun send__forSektorKategori__senderTilSykefravarsstatistikkSektorV1Topic() {
-        kafkaService.sendTilStatistikkKategoriTopic(
-            EksporteringServiceTestUtils.__2020_2,
-            Statistikkategori.SEKTOR,
-            "11",
-            EksporteringServiceTestUtils.næringSykefravær,
-            dummyData
-        )
-        val message = consumerRecords.poll(10, TimeUnit.SECONDS)
-        Assertions.assertEquals(
-            KafkaTopic.SYKEFRAVARSSTATISTIKK_SEKTOR_V1.navn,
-            message!!.topic()
-        )
-    }
-
-    @Test
-    fun send__forVirksomhetKategori__senderTilSykefravarsstatistikkVirksomhetV1Topic() {
-        kafkaService.sendTilStatistikkKategoriTopic(
-            EksporteringServiceTestUtils.__2020_2,
-            Statistikkategori.VIRKSOMHET,
-            "11",
-            EksporteringServiceTestUtils.virksomhetSykefraværMedKategori,
-            dummyData
-        )
-        val message = consumerRecords.poll(10, TimeUnit.SECONDS)
-        Assertions.assertEquals(
-            KafkaTopic.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1.navn,
-            message!!.topic()
-        )
     }
 
     companion object {

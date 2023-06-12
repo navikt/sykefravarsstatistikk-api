@@ -12,10 +12,10 @@ import java.math.RoundingMode;
 @EqualsAndHashCode
 public abstract class MaskerbartSykefravær {
 
-  private final BigDecimal prosent;
-  private final BigDecimal tapteDagsverk;
-  private final BigDecimal muligeDagsverk;
-  private final boolean erMaskert;
+  public final BigDecimal prosent;
+  public final BigDecimal tapteDagsverk;
+  public final BigDecimal muligeDagsverk;
+  public final boolean erMaskert;
 
   public MaskerbartSykefravær(
       BigDecimal tapteDagsverk,
