@@ -3,7 +3,9 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram.ArbeidsmiljøportalenBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.StatistikkategoriKafkamelding
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal
@@ -19,18 +21,16 @@ internal class EksporteringBransjeServiceTest {
     private val kafkaServiceMock = mock<KafkaService>()
 
     private val service =
-        EksporteringPerStatistikkKategoriService(mock(), repositoryMock, mock(), kafkaServiceMock, true)
+        EksporteringPerStatistikkKategoriService(mock(), repositoryMock, kafkaServiceMock, true)
 
     @Test
     fun `eksporterPerStatistikkKategori skal ikke putte noe på kafkastrømmen dersom datagrunnalget er tomt`() {
-        val antallEksportert = service.eksporterPerStatistikkKategori(
+        service.eksporterPerStatistikkKategori(
             ÅrstallOgKvartal(2023, 1),
             Statistikkategori.BRANSJE,
-            EksporteringBegrensning.build().utenBegrensning()
         )
 
-        assertThat(antallEksportert).isEqualTo(0)
-        verify(kafkaServiceMock, never()).sendTilStatistikkKategoriTopic(any(), any(), any(), any(), any())
+        verify(kafkaServiceMock, never()).sendMelding(any(), any())
     }
 
     @Test
@@ -56,16 +56,12 @@ internal class EksporteringBransjeServiceTest {
                 )
             )
 
-        whenever(kafkaServiceMock.sendTilStatistikkKategoriTopic(any(), any(), any(), any(), any()))
-            .thenReturn(true)
-
-        val result = service.eksporterPerStatistikkKategori(
+        service.eksporterPerStatistikkKategori(
             ÅrstallOgKvartal(2023, 1),
             Statistikkategori.BRANSJE,
-            EksporteringBegrensning.build().utenBegrensning()
         )
 
-        assertThat(result).isEqualTo(1)
+        verify(kafkaServiceMock, times(1)).sendMelding(any(), any())
     }
 
     @Test
@@ -87,7 +83,6 @@ internal class EksporteringBransjeServiceTest {
             service.eksporterPerStatistikkKategori(
                 ÅrstallOgKvartal(2023, 2),
                 Statistikkategori.BRANSJE,
-                EksporteringBegrensning.build().utenBegrensning()
             )
         }
         assertThat(exception.message).isEqualTo("Siste kvartal i dataene er ikke lik forespurt kvartal")
@@ -109,31 +104,32 @@ internal class EksporteringBransjeServiceTest {
         whenever(repositoryMock.hentSykefraværAlleBransjerFraOgMed(any()))
             .thenReturn(sykefraværsstatistikk)
 
-        whenever(
-            kafkaServiceMock.sendTilStatistikkKategoriTopic(any(), any(), any(), any(), any())
-        ).thenReturn(true)
-
         service.eksporterPerStatistikkKategori(
             ÅrstallOgKvartal(2023, 2),
             Statistikkategori.BRANSJE,
-            EksporteringBegrensning.build().utenBegrensning()
         )
 
-        verify(kafkaServiceMock).sendTilStatistikkKategoriTopic(
-            any(),
-            any(),
-            any(),
-            eq(
-                SykefraværMedKategori(
-                    Statistikkategori.BRANSJE,
-                    ArbeidsmiljøportalenBransje.ANLEGG.name,
-                    ÅrstallOgKvartal(2023, 2),
-                    BigDecimal.ONE,
-                    BigDecimal.ONE,
-                    5,
-                )
+        val melding = StatistikkategoriKafkamelding(
+            SykefraværMedKategori(
+                Statistikkategori.BRANSJE,
+                ArbeidsmiljøportalenBransje.ANLEGG.name,
+                2023,
+                2,
+                BigDecimal.ONE,
+                BigDecimal.ONE,
+                5
             ),
-            eq(SykefraværFlereKvartalerForEksport(listOf(UmaskertSykefraværForEttKvartal(bransjestatistikk))))
+            SykefraværFlereKvartalerForEksport(
+                listOf(
+                    UmaskertSykefraværForEttKvartal(bransjestatistikk)
+                )
+            )
+        )
+
+
+        verify(kafkaServiceMock).sendMelding(
+            eq(melding),
+            eq(KafkaTopic.SYKEFRAVARSSTATISTIKK_BRANSJE_V1),
         )
     }
 }
