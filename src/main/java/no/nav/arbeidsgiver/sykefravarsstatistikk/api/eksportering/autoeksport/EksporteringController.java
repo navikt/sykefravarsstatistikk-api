@@ -53,8 +53,8 @@ public class EksporteringController {
   public ResponseEntity<HttpStatus> reeksportMedKafka(
       @RequestParam int årstall,
       @RequestParam int kvartal,
-      @RequestParam Statistikkategori kategori,
-      @RequestParam(required = false, defaultValue = "0") int begrensningTil) {
+      @RequestParam Statistikkategori kategori
+  ) {
     if (Statistikkategori.LAND != kategori
         && Statistikkategori.VIRKSOMHET != kategori
         && Statistikkategori.NÆRING != kategori
@@ -63,16 +63,10 @@ public class EksporteringController {
       return ResponseEntity.badRequest().build();
     }
 
-    ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
-    int antallEksportert =
-        eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(
-            årstallOgKvartal, kategori, getBegrensning(begrensningTil));
+    eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(
+        new ÅrstallOgKvartal(årstall, kvartal), kategori);
 
-    if (antallEksportert >= 0) {
-      return ResponseEntity.ok(HttpStatus.CREATED);
-    } else {
-      return ResponseEntity.ok(HttpStatus.OK);
-    }
+    return ResponseEntity.ok(HttpStatus.OK);
   }
 
   @PostMapping("/reeksport/metadata")

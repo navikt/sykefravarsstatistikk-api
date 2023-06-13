@@ -19,14 +19,15 @@ internal class PrometheusMetricsControllerTest : SpringIntegrationTestbase() {
 
     @Test
     fun `metrics returnerer metrics`() {
-        prometheusMetrics.incrementKafkaMessageSentCounter(KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1)
+        val dummyTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1
+        prometheusMetrics.incrementKafkaMessageSentCounter(dummyTopic)
 
         mockMvc.get("/internal/actuator/prometheus").andExpect {
             content {
                 contentType(CONTENT_TYPE_004)
                 string(
                     containsString(
-                        "sykefravarsstatistikk_kafka_message_sent_counter_total{topic_name=\"${KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1.name}\",} 1.0"
+                        "sykefravarsstatistikk_kafka_message_sent_counter_total{topic_name=\"${dummyTopic.name}\",} 1.0"
                     )
                 )
             }
