@@ -127,7 +127,7 @@ class AggregertStatistikkService(
     }
 
     private fun hentTotalfraværSisteFemKvartaler(forBedrift: Virksomhet): Sykefraværsdata {
-        return sykefraværprosentRepository.hentUmaskertSykefraværAlleKategorier(
+        return sykefraværprosentRepository.hentTotaltSykefraværAlleKategorier(
             forBedrift, publiseringsdatoerService.hentSistePubliserteKvartal().minusKvartaler(4)
         )
     }

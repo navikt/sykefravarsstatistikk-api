@@ -6,11 +6,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshist
 class Sykefraværsdata(
     val sykefravær: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> = mutableMapOf()
 ) {
-    fun filtrerPåKategori(kategori: Statistikkategori): List<UmaskertSykefraværForEttKvartal> {
-        return if (sykefravær.containsKey(kategori)) {
-            sykefravær[kategori]!!
-        } else listOf()
-    }
+    fun filtrerPåKategori(kategori: Statistikkategori): List<UmaskertSykefraværForEttKvartal> =
+        sykefravær[kategori] ?: listOf()
 
     fun filtrerBortVirksomhetsdata() {
         sykefravær.remove(Statistikkategori.VIRKSOMHET)

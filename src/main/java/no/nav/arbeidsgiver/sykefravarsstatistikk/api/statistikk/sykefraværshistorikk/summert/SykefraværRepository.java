@@ -147,7 +147,7 @@ public class SykefraværRepository {
     }
   }
 
-  public Sykefraværsdata hentUmaskertSykefraværAlleKategorier(
+  public Sykefraværsdata hentTotaltSykefraværAlleKategorier(
       Virksomhet virksomhet, ÅrstallOgKvartal fraÅrstallOgKvartal) {
     Næring næring = new Næring(virksomhet.getNæringskode().getKode(), "");
 

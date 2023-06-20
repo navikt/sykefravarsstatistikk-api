@@ -33,10 +33,24 @@ internal class BransjeprogramTest {
     }
 
     @Test
+    fun `finnBransje returnerer empty for næringskode 84300` () {
+        val næringskode = Næringskode5Siffer("84300", "")
+
+        val bransje = Bransjeprogram.finnBransje(næringskode)
+        assertThat(bransje).isEmpty
+    }
+
+    @Test
+    fun `finnBransje returnerer empty for en tom string` () {
+        val bransje = Bransjeprogram.finnBransje("")
+        assertThat(bransje).isEmpty
+    }
+
+    @Test
     fun `finnBransje returnerer NÆRINGSMIDDELINDUSTRI for næringskode 10320`() {
         val juicepressing = Næringskode5Siffer("10320", "Produksjon av juice av frukt og grønnsaker")
 
-        val næringsmiddelbransjen = Bransjeprogram.finnBransje(juicepressing).get().type;
+        val næringsmiddelbransjen = Bransjeprogram.finnBransje(juicepressing).get().type
         assertEquals(NÆRINGSMIDDELINDUSTRI, næringsmiddelbransjen)
     }
 }
