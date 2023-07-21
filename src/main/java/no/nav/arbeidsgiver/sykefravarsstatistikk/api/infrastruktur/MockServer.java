@@ -39,7 +39,6 @@ public class MockServer {
       @Value("${altinn.url}") String altinnUrl,
       @Value("${altinn.proxy.url}") String altinnProxyUrl,
       @Value("${enhetsregisteret.url}") String enhetsregisteretUrl,
-      @Value("${unleash.url}") String unleashUrl,
       Environment environment) {
     log.info("Starter mock-server på port " + port);
 
@@ -61,38 +60,7 @@ public class MockServer {
     log.info("Mocker kall fra Enhetsregisteret");
     mockKallFraEnhetsregisteret(StringUtils.removeEnd(enhetsregisteretUrl, "/"));
 
-    log.info("Mocker kall fra Unleash");
-    mockKallFraUnleash(unleashUrl);
-
     server.start();
-  }
-
-  @SneakyThrows
-  private void mockKallFraUnleash(String unleashUrl) {
-    String path = new URL(unleashUrl).getPath();
-    server.stubFor(
-        WireMock.post(path + "client/register")
-            .willReturn(
-                WireMock.aResponse()
-                    .withHeader("Content-Type", "application/json")
-                    .withStatus(HttpStatus.OK.value())
-                    .withBody("[]")));
-    server.stubFor(
-        WireMock.get(path + "client/features")
-            .willReturn(
-                WireMock.aResponse()
-                    .withHeader("Content-Type", "application/json")
-                    .withStatus(HttpStatus.OK.value())
-                    .withBody("[]")));
-    server.stubFor(
-        WireMock.post(path + "client/metrics")
-            .willReturn(
-                WireMock.aResponse()
-                    .withHeader("Content-Type", "application/json")
-                    .withStatus(HttpStatus.OK.value())
-                    .withBody("[]")));
-
-    mockKall(WireMock.urlPathMatching(path + "/unleash/client/features"), "[]");
   }
 
   @SneakyThrows

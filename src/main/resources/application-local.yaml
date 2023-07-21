@@ -36,8 +36,6 @@ datavarehus.datasource:
   password:
   driver-class-name: org.h2.Driver
 
-unleash.url: http://localhost:${wiremock.mock.port}/unleash/
-
 nais.cluster.name: local
 
 kafka:
