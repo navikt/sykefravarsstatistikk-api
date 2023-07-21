@@ -22,7 +22,7 @@ jobs:
         run: mvn test
       - name: Build jar with Maven
         run: mvn package -DskipTests
-        uses: nais/docker-build-push@v0
+      - uses: nais/docker-build-push@v0
         id: docker-push
         with:
           team: teamia
