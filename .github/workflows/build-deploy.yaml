@@ -81,7 +81,7 @@ jobs:
             nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-dev.yaml,\
             nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-virksomhet-dev.yaml,\
             nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-naring-dev.yaml,\
-            nais0/topics/topic-arbeidsgiver-sykefravarsstatistikk-sektor-dev.yaml,\
+            nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-sektor-dev.yaml,\
             nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-bransje-dev.yaml,\
             nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-metadata-virksomhet-dev.yaml"
 
