@@ -4,6 +4,7 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.*;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.StatistikkUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -25,12 +26,9 @@ public abstract class MaskerbartSykefravær {
     erMaskert =
         harSykefraværData
             && antallPersoner < MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER;
-
     if (!erMaskert && harSykefraværData) {
       prosent =
-          tapteDagsverk
-              .multiply(new BigDecimal(100))
-              .divide(muligeDagsverk, 1, RoundingMode.HALF_UP);
+          StatistikkUtils.kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk).getOrNull();
       this.tapteDagsverk = tapteDagsverk.setScale(1, RoundingMode.HALF_UP);
       this.muligeDagsverk = muligeDagsverk.setScale(1, RoundingMode.HALF_UP);
     } else {
