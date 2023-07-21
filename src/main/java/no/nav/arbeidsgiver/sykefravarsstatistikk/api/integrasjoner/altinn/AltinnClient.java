@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Fnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.UnleashService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -35,7 +34,6 @@ public class AltinnClient {
   private final String iawebServiceEdition;
 
   private final TilgangskontrollUtils tilgangskontrollUtils;
-  private final UnleashService featureToggles;
 
   public AltinnClient(
       RestTemplate restTemplate,
@@ -45,8 +43,7 @@ public class AltinnClient {
       @Value("${altinn.apikey}") String altinnApikey,
       @Value("${altinn.iaweb.service.code}") String iawebServiceCode,
       @Value("${altinn.iaweb.service.edition}") String iawebServiceEdition,
-      TilgangskontrollUtils tilgangskontrollUtils,
-      UnleashService featureToggles) {
+      TilgangskontrollUtils tilgangskontrollUtils) {
     this.restTemplate = restTemplate;
     this.altinnUrl = altinnUrl;
     this.altinnProxyUrl = altinnProxyUrl;
@@ -55,7 +52,6 @@ public class AltinnClient {
     this.iawebServiceCode = iawebServiceCode;
     this.iawebServiceEdition = iawebServiceEdition;
     this.tilgangskontrollUtils = tilgangskontrollUtils;
-    this.featureToggles = featureToggles;
   }
 
   public List<AltinnRolle> hentRoller(Fnr fnr, Orgnr orgnr) {

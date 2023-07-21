@@ -13,8 +13,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.healthcheck.H
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.UnleashFeatureToggleConfig;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.unleash.UnleashService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.organisasjoner.OrganisasjonerController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.OffentligSykefraværshistorikkController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværshistorikkController;
@@ -42,8 +40,6 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
           value = {
             MockServer.class,
             AltinnClient.class,
-            UnleashFeatureToggleConfig.class,
-            UnleashService.class,
             TilgangskontrollUtils.class,
             EksporteringService.class,
             EksporteringPerStatistikkKategoriService.class,

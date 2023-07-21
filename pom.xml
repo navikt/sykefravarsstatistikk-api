@@ -33,7 +33,6 @@
         <shedlock.version>5.2.0</shedlock.version>
         <shedlock.shedlock-provider-jdbc-template.version>4.33.0
         </shedlock.shedlock-provider-jdbc-template.version>
-        <unleash.version>4.4.1</unleash.version>
         <no.nav.common-log.version>2.2023.01.10_13.49-81ddc732df3a</no.nav.common-log.version>
         <net.minidev.json-smart.version>2.4.10</net.minidev.json-smart.version>
         <com.nimbusds.nimbus-jose-jwt.version>9.31</com.nimbusds.nimbus-jose-jwt.version>
@@ -204,12 +203,6 @@
             <groupId>no.nav.arbeidsgiver</groupId>
             <artifactId>altinn-rettigheter-proxy-klient</artifactId>
             <version>${altinn-rettigheter-proxy-klient.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>no.finn.unleash</groupId>
-            <artifactId>unleash-client-java</artifactId>
-            <version>${unleash.version}</version>
         </dependency>
 
         <dependency>
