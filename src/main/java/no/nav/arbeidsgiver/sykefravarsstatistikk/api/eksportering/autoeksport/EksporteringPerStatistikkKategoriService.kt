@@ -140,6 +140,7 @@ class EksporteringPerStatistikkKategoriService(
             kafkaTopic: KafkaTopic
     ) {
 
+        var antallStatistikkEksportert = 0
         sykefraværGruppertEtterKode.forEach { (kode: String, statistikk: List<Sykefraværsstatistikk>) ->
             val umaskertSykefraværsstatistikkSiste4Kvartaler: List<UmaskertSykefraværForEttKvartal> =
                     statistikk.tilUmaskertSykefraværForEttKvartal()
@@ -160,9 +161,11 @@ class EksporteringPerStatistikkKategoriService(
                         SykefraværFlereKvartalerForEksport(umaskertSykefraværsstatistikkSiste4Kvartaler)
                 )
                 kafkaService.sendMelding(melding, kafkaTopic)
+                antallStatistikkEksportert++
             }
         }
-        log.info("Ferdig med utsending av alle meldinger til Kafka for statistikkategori ${statistikkategori.name}.")
+        log.info("Ferdig med utsending av alle meldinger til Kafka for statistikkategori ${statistikkategori.name}. " +
+                "Antall statistikk eksportert: $antallStatistikkEksportert")
     }
 
 
