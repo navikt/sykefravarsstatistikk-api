@@ -15,4 +15,9 @@ public class SykefraværsstatistikkSektor implements Sykefraværsstatistikk {
 
   private BigDecimal tapteDagsverk;
   private BigDecimal muligeDagsverk;
+
+  // Kotlin kjenner ikke til @Data annotation (Lombok)
+  public String getSektorkode() {
+    return sektorkode;
+  }
 }
