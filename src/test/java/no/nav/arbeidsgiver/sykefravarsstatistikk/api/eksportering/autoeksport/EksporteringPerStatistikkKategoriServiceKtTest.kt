@@ -1,6 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -60,4 +62,28 @@ class EksporteringPerStatistikkKategoriServiceKtTest {
                 ))
     }
 
+    @Test
+    fun `vi beregner siste kvartal`() {
+
+        val dataset: List<SykefraværsstatistikkNæring5Siffer> = listOf(
+                SykefraværsstatistikkNæring5Siffer(
+                        2023, 1, "12345", 5, BigDecimal(15.5), BigDecimal(15.5)
+                ),
+                SykefraværsstatistikkNæring5Siffer(
+                        2022, 4, "12345", 5, BigDecimal(15.5), BigDecimal(15.5)
+                ),
+                SykefraværsstatistikkNæring5Siffer(
+                        2022, 3, "12345", 5, BigDecimal(15.5), BigDecimal(15.5)
+                ),
+                SykefraværsstatistikkNæring5Siffer(
+                        2022, 2, "12345", 5, BigDecimal(15.5), BigDecimal(15.5)
+                )).shuffled()
+
+
+        val result = dataset
+                .tilUmaskertSykefraværForEttKvartal()
+                .tilSykefraværMedKategoriSisteKvartal(Statistikkategori.NÆRINGSKODE, "12345")
+
+        assertThat(result.ÅrstallOgKvartal).isEqualTo(ÅrstallOgKvartal(2023, 1))
+    }
 }

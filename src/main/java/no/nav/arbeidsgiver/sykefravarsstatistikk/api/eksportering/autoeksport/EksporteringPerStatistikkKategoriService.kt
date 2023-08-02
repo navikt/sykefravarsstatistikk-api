@@ -144,20 +144,20 @@ class EksporteringPerStatistikkKategoriService(
         sykefraværGruppertEtterKode.forEach { (kode: String, statistikk: List<Sykefraværsstatistikk>) ->
             val umaskertSykefraværsstatistikkSiste4Kvartaler: List<UmaskertSykefraværForEttKvartal> =
                     statistikk.tilUmaskertSykefraværForEttKvartal()
-
             val sykefraværMedKategoriSisteKvartal =
                     umaskertSykefraværsstatistikkSiste4Kvartaler
-                            .maxWith(compareBy({ it.Årstall }, { it.kvartal }))
-                            .tilSykefraværMedKategori(statistikkategori, kode)
+                            .tilSykefraværMedKategoriSisteKvartal(statistikkategori, kode)
+
             assertForespurteKvartalFinnesIStatistikken(
-                    årstallOgKvartal, sykefraværMedKategoriSisteKvartal
+                    årstallOgKvartal,
+                    sykefraværMedKategoriSisteKvartal,
+                    statistikkategori,
+                    kode
             )
 
             val melding = StatistikkategoriKafkamelding(
                     sykefraværMedKategoriSisteKvartal,
-                    SykefraværFlereKvartalerForEksport(
-                            umaskertSykefraværsstatistikkSiste4Kvartaler
-                    )
+                    SykefraværFlereKvartalerForEksport(umaskertSykefraværsstatistikkSiste4Kvartaler)
             )
             kafkaService.sendMelding(melding, kafkaTopic)
         }
@@ -167,13 +167,16 @@ class EksporteringPerStatistikkKategoriService(
 
     private fun assertForespurteKvartalFinnesIStatistikken(
             årstallOgKvartal: ÅrstallOgKvartal,
-            sykefravær: SykefraværMedKategori
+            sykefravær: SykefraværMedKategori,
+            statistikkategori: Statistikkategori,
+            kode: String
     ) {
         if (årstallOgKvartal != sykefravær.ÅrstallOgKvartal) {
-            throw RuntimeException("Siste kvartal i dataene er ikke lik forespurt kvartal")
+            throw RuntimeException("Siste kvartal i dataene '${sykefravær.ÅrstallOgKvartal?.årstall}-${sykefravær.ÅrstallOgKvartal?.kvartal}' " +
+                    "er ikke lik forespurt kvartal '${årstallOgKvartal.årstall}-${årstallOgKvartal.kvartal}'. " +
+                    "Kategori er '${statistikkategori.name}' og kode er '$kode'.")
         }
     }
-
 }
 
 fun List<Sykefraværsstatistikk>.tilUmaskertSykefraværForEttKvartal() =
@@ -212,3 +215,11 @@ fun List<SykefraværsstatistikkBransje>.groupByBransje():
 fun List<SykefraværsstatistikkVirksomhetUtenVarighet>.groupByVirksomhet():
         Map<String, List<Sykefraværsstatistikk>> =
         this.groupByTo(HashMap(), { it.orgnr }, { it })
+
+fun List<UmaskertSykefraværForEttKvartal>.tilSykefraværMedKategoriSisteKvartal(
+        statistikkategori: Statistikkategori,
+        kode: String
+): SykefraværMedKategori =
+        this.maxWith(compareBy({ it.Årstall }, { it.kvartal }))
+                .tilSykefraværMedKategori(statistikkategori, kode)
+
