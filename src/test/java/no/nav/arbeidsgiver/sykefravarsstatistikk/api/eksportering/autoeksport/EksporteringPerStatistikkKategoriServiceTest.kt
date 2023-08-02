@@ -232,4 +232,53 @@ class EksporteringPerStatistikkKategoriServiceTest {
             node("årstall").isString.isEqualTo("2020")
         }
     }
+
+    @Test
+    fun `eksport sykefraværsstatistikk NÆRINGSKODE hopper over næringskoder som ikke har statistikk for forespurt kvartal`() {
+        val allData = listOf(
+                EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(årstallOgKvartal = __2020_2, næringskode = "11001"),
+                EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(årstallOgKvartal = __2020_1, næringskode = "11001"),
+                EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(årstallOgKvartal = __2019_4, næringskode = "11001"),
+                EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(årstallOgKvartal = __2020_2, næringskode = "22002"),
+                EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(årstallOgKvartal = __2020_1, næringskode = "22002"),
+                EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(årstallOgKvartal = __2020_1, næringskode = "33003"),
+                EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(årstallOgKvartal = __2019_4, næringskode = "33003"),
+                )
+
+        whenever(
+                sykefraværsstatistikkTilEksporteringRepository
+                        .hentSykefraværprosentAlleNæringer5Siffer(__2019_3, __2020_2)
+        ).thenReturn(allData)
+
+        service.eksporterPerStatistikkKategori(__2020_2, Statistikkategori.NÆRINGSKODE)
+
+        verify(kafkaService, times(2))
+                .sendMelding(
+                        statistikkategoriKafkameldingCaptor.capture(),
+                        eq(KafkaTopic.SYKEFRAVARSSTATISTIKK_NARINGSKODE_V1)
+                )
+
+        assertThatJson(statistikkategoriKafkameldingCaptor.firstValue.innhold) {
+            isObject
+            node("kode").isString.isEqualTo("11001")
+            node("sistePubliserteKvartal").isObject.node("årstall").isNumber.isEqualTo(BigDecimal("2020"))
+            node("sistePubliserteKvartal").isObject.node("kvartal").isNumber.isEqualTo(BigDecimal("2"))
+        }
+
+        assertThatJson(statistikkategoriKafkameldingCaptor.secondValue.innhold) {
+            isObject
+            node("kategori").isString.isEqualTo(Statistikkategori.NÆRINGSKODE.name)
+            node("kode").isString.isEqualTo("22002")
+            node("sistePubliserteKvartal").isObject.node("årstall").isNumber.isEqualTo(BigDecimal("2020"))
+            node("sistePubliserteKvartal").isObject.node("kvartal").isNumber.isEqualTo(BigDecimal("2"))
+        }
+
+        assertThatJson(statistikkategoriKafkameldingCaptor.firstValue.nøkkel) {
+            isObject
+            node("kategori").isString.isEqualTo(Statistikkategori.NÆRINGSKODE.name)
+            node("kode").isString.isEqualTo("11001")
+            node("kvartal").isString.isEqualTo("2")
+            node("årstall").isString.isEqualTo("2020")
+        }
+    }
 }

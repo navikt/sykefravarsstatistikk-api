@@ -24,7 +24,6 @@ class EksporteringPerStatistikkKategoriService(
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-
     fun eksporterPerStatistikkKategori(
             årstallOgKvartal: ÅrstallOgKvartal,
             statistikkategori: Statistikkategori
@@ -42,8 +41,8 @@ class EksporteringPerStatistikkKategoriService(
 
         when (statistikkategori) {
             Statistikkategori.LAND -> eksporterSykefraværsstatistikkLand(årstallOgKvartal)
-            Statistikkategori.NÆRING -> eksporterSykefraværsstatistikkNæring(årstallOgKvartal)
             Statistikkategori.SEKTOR -> eksporterSykefraværsstatistikkSektor(årstallOgKvartal)
+            Statistikkategori.NÆRING -> eksporterSykefraværsstatistikkNæring(årstallOgKvartal)
             Statistikkategori.NÆRINGSKODE -> eksporterSykefraværsstatistikkNæringskode(årstallOgKvartal)
             Statistikkategori.BRANSJE -> eksporterSykefraværsstatistikkBransje(årstallOgKvartal)
             Statistikkategori.VIRKSOMHET -> eksporterSykefraværsstatistikkVirksomhet(årstallOgKvartal)
@@ -148,18 +147,20 @@ class EksporteringPerStatistikkKategoriService(
                     umaskertSykefraværsstatistikkSiste4Kvartaler
                             .tilSykefraværMedKategoriSisteKvartal(statistikkategori, kode)
 
-            assertForespurteKvartalFinnesIStatistikken(
+            val erValidertStatistikk = assertForespurteKvartalFinnesIStatistikken(
                     årstallOgKvartal,
                     sykefraværMedKategoriSisteKvartal,
                     statistikkategori,
                     kode
             )
 
-            val melding = StatistikkategoriKafkamelding(
-                    sykefraværMedKategoriSisteKvartal,
-                    SykefraværFlereKvartalerForEksport(umaskertSykefraværsstatistikkSiste4Kvartaler)
-            )
-            kafkaService.sendMelding(melding, kafkaTopic)
+            if (erValidertStatistikk) {
+                val melding = StatistikkategoriKafkamelding(
+                        sykefraværMedKategoriSisteKvartal,
+                        SykefraværFlereKvartalerForEksport(umaskertSykefraværsstatistikkSiste4Kvartaler)
+                )
+                kafkaService.sendMelding(melding, kafkaTopic)
+            }
         }
         log.info("Ferdig med utsending av alle meldinger til Kafka for statistikkategori ${statistikkategori.name}.")
     }
@@ -170,12 +171,22 @@ class EksporteringPerStatistikkKategoriService(
             sykefravær: SykefraværMedKategori,
             statistikkategori: Statistikkategori,
             kode: String
-    ) {
+    ): Boolean {
         if (årstallOgKvartal != sykefravær.ÅrstallOgKvartal) {
-            throw RuntimeException("Siste kvartal i dataene '${sykefravær.ÅrstallOgKvartal?.årstall}-${sykefravær.ÅrstallOgKvartal?.kvartal}' " +
+            val message = "Siste kvartal i dataene '${sykefravær.ÅrstallOgKvartal?.årstall}-${sykefravær.ÅrstallOgKvartal?.kvartal}' " +
                     "er ikke lik forespurt kvartal '${årstallOgKvartal.årstall}-${årstallOgKvartal.kvartal}'. " +
-                    "Kategori er '${statistikkategori.name}' og kode er '$kode'.")
+                    "Kategori er '${statistikkategori.name}' og kode er '$kode'"
+
+            when (statistikkategori) {
+                Statistikkategori.NÆRINGSKODE,
+                Statistikkategori.VIRKSOMHET -> {
+                    log.info("$message. Ingen kafka melding blir sendt. Fortsetter eksport. ")
+                }
+                else -> throw RuntimeException("Stopper eksport av kategori ${statistikkategori.name} pga: '$message'")
+            }
+            return false
         }
+        return true
     }
 }
 
