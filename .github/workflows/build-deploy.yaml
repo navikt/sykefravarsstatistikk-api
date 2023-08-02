@@ -35,7 +35,7 @@ jobs:
   build-and-push-image:
     name: Build and push Docker image
     needs: test
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bruk-2siffer-for-varighetsstatistikk'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/eksport-sykefraværsstatistikk-næringskode'
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -67,7 +67,7 @@ jobs:
   deploy-to-dev:
     name: Deploy to dev
     needs: build-and-push-image
-    if: github.ref == 'refs/heads/remove_unleash'
+    if: github.ref == 'refs/heads/eksport-sykefraværsstatistikk-næringskode'
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -95,7 +95,7 @@ jobs:
   deployTopicsToDev:
     name: Deploy topics to dev
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/fiks-prometheus-metrikker'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/eksport-sykefraværsstatistikk-næringskode'
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
