@@ -24,11 +24,11 @@ enum class KafkaTopic(val navn: String) {
                 Statistikkategori.LAND -> SYKEFRAVARSSTATISTIKK_LAND_V1
                 Statistikkategori.SEKTOR -> SYKEFRAVARSSTATISTIKK_SEKTOR_V1
                 Statistikkategori.NÆRING -> SYKEFRAVARSSTATISTIKK_NARING_V1
-                Statistikkategori.VIRKSOMHET -> SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1
                 Statistikkategori.BRANSJE -> SYKEFRAVARSSTATISTIKK_BRANSJE_V1
+                Statistikkategori.NÆRINGSKODE -> SYKEFRAVARSSTATISTIKK_NARINGSKODE_V1
+                Statistikkategori.VIRKSOMHET -> SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1
                 Statistikkategori.OVERORDNET_ENHET,
                 Statistikkategori.NÆRING5SIFFER -> throw NotImplementedError()
-                Statistikkategori.NÆRINGSKODE -> throw NotImplementedError()
             }
         }
 

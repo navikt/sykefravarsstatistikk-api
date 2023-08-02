@@ -87,6 +87,7 @@ object EksporteringServiceTestUtils {
         BigDecimal(500000000),
         2500000
     )
+
     var virksomhetSykefraværMedKategori = SykefraværMedKategori(
         Statistikkategori.VIRKSOMHET,
         "987654321",
@@ -95,7 +96,6 @@ object EksporteringServiceTestUtils {
         BigDecimal(500),
         2500000
     )
-
 
     @JvmField
     var virksomhet1Metadata_2020_4 = VirksomhetMetadata(
@@ -385,6 +385,26 @@ object EksporteringServiceTestUtils {
             150,
             BigDecimal(100),
             BigDecimal(5000)
+        )
+    }
+
+    @JvmStatic
+    @JvmOverloads
+    fun sykefraværsstatistikkNæringskode(
+            årstallOgKvartal: ÅrstallOgKvartal,
+            næringskode: String = "11001",
+            antallPersoner: Int = 150,
+            tapteDagsverk: BigDecimal = BigDecimal(100),
+            muligeDagsverk: BigDecimal = BigDecimal(5000)
+
+    ): SykefraværsstatistikkNæring5Siffer {
+        return SykefraværsstatistikkNæring5Siffer(
+                årstallOgKvartal.årstall,
+                årstallOgKvartal.kvartal,
+                næringskode,
+                antallPersoner,
+                tapteDagsverk,
+                muligeDagsverk
         )
     }
 

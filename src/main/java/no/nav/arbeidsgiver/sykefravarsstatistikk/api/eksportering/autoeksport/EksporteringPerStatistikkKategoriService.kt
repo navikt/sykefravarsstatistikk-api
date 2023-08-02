@@ -53,7 +53,7 @@ class EksporteringPerStatistikkKategoriService(
         log.info("Eksportering av kategori '{}' er ferdig.", statistikkategori.name)
     }
 
-    fun eksporterSykefraværsstatistikkLand(årstallOgKvartal: ÅrstallOgKvartal) {
+    protected fun eksporterSykefraværsstatistikkLand(årstallOgKvartal: ÅrstallOgKvartal) {
         sykefraværRepository.hentUmaskertSykefraværForNorge(
                 årstallOgKvartal.minusKvartaler(3)
         ).tilSykefraværsstatistikkLand()
@@ -80,7 +80,7 @@ class EksporteringPerStatistikkKategoriService(
         }
     }
 
-    fun eksporterSykefraværsstatistikkNæring(årstallOgKvartal: ÅrstallOgKvartal) {
+    protected fun eksporterSykefraværsstatistikkNæring(årstallOgKvartal: ÅrstallOgKvartal) {
         tilEksporteringRepository.hentSykefraværAlleNæringerFraOgMed(
                 årstallOgKvartal.minusKvartaler(3)
         ).groupByNæring().let {
@@ -120,7 +120,7 @@ class EksporteringPerStatistikkKategoriService(
         }
     }
 
-    fun eksporterSykefraværsstatistikkVirksomhet(årstallOgKvartal: ÅrstallOgKvartal) {
+    protected fun eksporterSykefraværsstatistikkVirksomhet(årstallOgKvartal: ÅrstallOgKvartal) {
         tilEksporteringRepository.hentSykefraværAlleVirksomheter(
                 årstallOgKvartal.minusKvartaler(3), årstallOgKvartal)
                 .groupByVirksomhet().let {
