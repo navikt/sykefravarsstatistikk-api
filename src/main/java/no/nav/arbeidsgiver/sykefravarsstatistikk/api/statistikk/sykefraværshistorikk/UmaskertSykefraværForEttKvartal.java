@@ -9,7 +9,10 @@ import java.util.Optional;
 import lombok.Data;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.Sykefraværsstatistikk;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.StatistikkUtils;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
 import org.jetbrains.annotations.NotNull;
 
 @Data
@@ -46,6 +49,27 @@ public class UmaskertSykefraværForEttKvartal
     this.dagsverkTeller = new BigDecimal(String.valueOf(dagsverkTeller));
     this.dagsverkNevner = new BigDecimal(String.valueOf(dagsverkNevner));
     this.antallPersoner = antallPersoner;
+  }
+
+  public SykefraværMedKategori tilSykefraværMedKategori(Statistikkategori kategori, String kode) {
+    return new SykefraværMedKategori(
+        kategori,
+        kode,
+        årstallOgKvartal,
+        dagsverkTeller,
+        dagsverkNevner,
+        antallPersoner
+    );
+  }
+
+  public SykefraværsstatistikkLand tilSykefraværsstatistikkLand() {
+    return new SykefraværsstatistikkLand(
+        årstallOgKvartal.getÅrstall(),
+        årstallOgKvartal.getKvartal(),
+        antallPersoner,
+        dagsverkTeller,
+        dagsverkNevner
+    );
   }
 
   public static Optional<UmaskertSykefraværForEttKvartal> hentUtKvartal(

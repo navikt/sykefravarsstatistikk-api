@@ -85,7 +85,7 @@ internal class EksporteringBransjeServiceTest {
                 Statistikkategori.BRANSJE,
             )
         }
-        assertThat(exception.message).isEqualTo("Siste kvartal i dataene er ikke lik forespurt kvartal")
+        assertThat(exception.message).isEqualTo("Stopper eksport av kategori BRANSJE pga: 'Siste kvartal i dataene '1990-1' er ikke lik forespurt kvartal '2023-2'. Kategori er 'BRANSJE' og kode er 'ANLEGG''")
     }
 
 

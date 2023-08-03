@@ -7,5 +7,6 @@ public enum Statistikkategori {
   BRANSJE,
   VIRKSOMHET,
   OVERORDNET_ENHET,
-  NÆRING5SIFFER,
+  NÆRING5SIFFER, // deprecated -- bruk NÆRINGSKODE i stedet
+  NÆRINGSKODE
 }

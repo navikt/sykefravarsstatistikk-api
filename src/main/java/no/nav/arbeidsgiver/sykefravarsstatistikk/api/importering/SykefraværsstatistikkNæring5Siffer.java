@@ -15,4 +15,9 @@ public class SykefraværsstatistikkNæring5Siffer implements Sykefraværsstatist
 
   private BigDecimal tapteDagsverk;
   private BigDecimal muligeDagsverk;
+
+  // Kotlin kjenner ikke til @Data annotation (Lombok)
+  public String getNæringkode5siffer() {
+    return næringkode5siffer;
+  }
 }

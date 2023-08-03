@@ -16,4 +16,9 @@ public class SykefraværsstatistikkVirksomhetUtenVarighet implements Sykefravær
   private int antallPersoner;
   private BigDecimal tapteDagsverk;
   private BigDecimal muligeDagsverk;
+
+  // Kotlin kjenner ikke til @Data annotation (Lombok)
+  public String getOrgnr() {
+    return orgnr;
+  }
 }
