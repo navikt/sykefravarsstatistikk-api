@@ -208,27 +208,27 @@ fun List<UmaskertSykefraværForEttKvartal>.tilSykefraværsstatistikkLand() =
 
 fun List<SykefraværsstatistikkLand>.groupByLand():
         Map<String, List<Sykefraværsstatistikk>> =
-        this.groupByTo(HashMap(), { "NO" }, { it })
+        this.groupBy({ "NO" }, { it })
 
 fun List<SykefraværsstatistikkSektor>.groupBySektor():
         Map<String, List<Sykefraværsstatistikk>> =
-        this.groupByTo(HashMap(), { it.sektorkode }, { it })
+        this.groupBy({ it.sektorkode }, { it })
 
 fun List<SykefraværsstatistikkNæring>.groupByNæring():
         Map<String, List<Sykefraværsstatistikk>> =
-        this.groupByTo(HashMap(), { it.næringkode }, { it })
+        this.groupBy({ it.næringkode }, { it })
 
 fun List<SykefraværsstatistikkNæring5Siffer>.groupByNæringskode():
         Map<String, List<Sykefraværsstatistikk>> =
-        this.groupByTo(HashMap(), { it.næringkode5siffer }, { it })
+        this.groupBy({ it.næringkode5siffer }, { it })
 
 fun List<SykefraværsstatistikkBransje>.groupByBransje():
         Map<String, List<Sykefraværsstatistikk>> =
-        this.groupByTo(HashMap(), { it.bransje.name }, { it })
+        this.groupBy({ it.bransje.name }, { it })
 
 fun List<SykefraværsstatistikkVirksomhetUtenVarighet>.groupByVirksomhet():
         Map<String, List<Sykefraværsstatistikk>> =
-        this.groupByTo(HashMap(), { it.orgnr }, { it })
+        this.groupBy({ it.orgnr }, { it })
 
 fun List<UmaskertSykefraværForEttKvartal>.tilSykefraværMedKategoriSisteKvartal(
         statistikkategori: Statistikkategori,
