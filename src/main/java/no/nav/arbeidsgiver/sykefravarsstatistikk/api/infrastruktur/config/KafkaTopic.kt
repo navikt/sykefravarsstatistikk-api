@@ -8,6 +8,7 @@ enum class KafkaTopic(val navn: String) {
     SYKEFRAVARSSTATISTIKK_NARING_V1("arbeidsgiver.sykefravarsstatistikk-naring-v1"),
     SYKEFRAVARSSTATISTIKK_SEKTOR_V1("arbeidsgiver.sykefravarsstatistikk-sektor-v1"),
     SYKEFRAVARSSTATISTIKK_BRANSJE_V1("arbeidsgiver.sykefravarsstatistikk-bransje-v1"),
+    SYKEFRAVARSSTATISTIKK_NARINGSKODE_V1("arbeidsgiver.sykefravarsstatistikk-naringskode-v1"),
     SYKEFRAVARSSTATISTIKK_METADATA_V1("arbeidsgiver.sykefravarsstatistikk-metadata-virksomhet-v1"),
 
     @Deprecated(
@@ -23,8 +24,9 @@ enum class KafkaTopic(val navn: String) {
                 Statistikkategori.LAND -> SYKEFRAVARSSTATISTIKK_LAND_V1
                 Statistikkategori.SEKTOR -> SYKEFRAVARSSTATISTIKK_SEKTOR_V1
                 Statistikkategori.NÆRING -> SYKEFRAVARSSTATISTIKK_NARING_V1
-                Statistikkategori.VIRKSOMHET -> SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1
                 Statistikkategori.BRANSJE -> SYKEFRAVARSSTATISTIKK_BRANSJE_V1
+                Statistikkategori.NÆRINGSKODE -> SYKEFRAVARSSTATISTIKK_NARINGSKODE_V1
+                Statistikkategori.VIRKSOMHET -> SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1
                 Statistikkategori.OVERORDNET_ENHET,
                 Statistikkategori.NÆRING5SIFFER -> throw NotImplementedError()
             }

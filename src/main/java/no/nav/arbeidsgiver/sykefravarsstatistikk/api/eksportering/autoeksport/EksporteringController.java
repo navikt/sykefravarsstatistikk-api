@@ -59,7 +59,8 @@ public class EksporteringController {
         && Statistikkategori.VIRKSOMHET != kategori
         && Statistikkategori.NÆRING != kategori
         && Statistikkategori.SEKTOR != kategori
-        && Statistikkategori.BRANSJE != kategori) {
+        && Statistikkategori.BRANSJE != kategori
+        && Statistikkategori.NÆRINGSKODE != kategori) {
       return ResponseEntity.badRequest().build();
     }
 
