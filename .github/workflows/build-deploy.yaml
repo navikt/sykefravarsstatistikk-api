@@ -45,7 +45,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: nais/deploy/actions/deploy@v1
         env:
-          CLUSTER: dev-gcp
+          CLUSTER: dev-fss
           IMAGE: ${{ needs.docker-build-push.outputs.image }}
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           RESOURCE: nais/dev.yaml
@@ -60,7 +60,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: nais/deploy/actions/deploy@v1
         env:
-          CLUSTER: prod-gcp
+          CLUSTER: prod-fss
           IMAGE: ${{ needs.docker-build-push.outputs.image }}
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           RESOURCE: nais/prod.yaml
@@ -83,7 +83,7 @@ jobs:
             nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-naring-dev.yaml,\
             nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-sektor-dev.yaml,\
             nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-bransje-dev.yaml,\
-            nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-metadata-virksomhet-dev.yaml,
+            nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-metadata-virksomhet-dev.yaml,\
             nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-naringskode-dev.yaml"
 
   deployTopicsToProd:
@@ -104,5 +104,5 @@ jobs:
             nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-naring-prod.yaml,\
             nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-sektor-prod.yaml,\
             nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-bransje-prod.yaml,\
-            nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-metadata-virksomhet-prod.yaml,
+            nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-metadata-virksomhet-prod.yaml,\
             nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-naringskode-prod.yaml"
