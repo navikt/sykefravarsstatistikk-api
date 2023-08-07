@@ -22,7 +22,7 @@ open class AltinnKlientWrapper(
         idToken: JwtToken, fnr: Fnr
     ): List<AltinnOrganisasjon> {
         return klient.hentOrganisasjoner(
-            SelvbetjeningToken(idToken.tokenAsString),
+            TokenXToken(idToken.tokenAsString),
             Subject(fnr.verdi),
             ServiceCode(serviceCode),
             ServiceEdition(serviceEdition),
@@ -32,7 +32,7 @@ open class AltinnKlientWrapper(
 
     open fun hentVirksomheterDerBrukerHarTilknytning(idToken: JwtToken, fnr: Fnr): List<AltinnOrganisasjon> {
         return klient.hentOrganisasjoner(
-            SelvbetjeningToken(idToken.tokenAsString),
+            TokenXToken(idToken.tokenAsString),
             Subject(fnr.verdi),
             true
         ).map(::toAltinnOrganisasjon)

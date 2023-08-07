@@ -21,11 +21,10 @@ import static java.lang.String.format;
 @Component
 public class TilgangskontrollUtils {
 
-  static final String ISSUER_SELVBETJENING = "selvbetjening";
   static final String ISSUER_TOKENX = "tokenx";
 
   private static final Set<String> VALID_ISSUERS =
-      ImmutableSet.of(ISSUER_TOKENX, ISSUER_SELVBETJENING);
+      ImmutableSet.of(ISSUER_TOKENX);
   private final TokenValidationContextHolder contextHolder;
   private final Environment environment;
 
@@ -41,22 +40,22 @@ public class TilgangskontrollUtils {
         .map(issuer -> getJwtTokenFor(contextHolder.getTokenValidationContext(), issuer))
         .flatMap(Optional::stream)
         .findFirst()
-        .orElseThrow(() -> new TilgangskontrollException(format("Finner ikke gyldig jwt token")));
+        .orElseThrow(() -> new TilgangskontrollException("Finner ikke gyldig jwt token"));
   }
 
   public InnloggetBruker hentInnloggetBruker() {
     TokenValidationContext context = contextHolder.getTokenValidationContext();
 
-    Optional<JwtTokenClaims> claimsForIssuerSelvbetjening =
-        getClaimsFor(context, ISSUER_SELVBETJENING);
+    Optional<JwtTokenClaims> claims =
+        getClaimsFor(context);
 
-    if (claimsForIssuerSelvbetjening.isPresent()) {
-      log.debug("Claims kommer fra issuer Selvbetjening (loginservice)");
+    if (claims.isPresent()) {
+      log.debug("Claims kommer fra issuer Selvbetjening (loginservice - deprecated!)");
 
-      return new InnloggetBruker(new Fnr(getFnrFraClaims(claimsForIssuerSelvbetjening.get())));
+      return new InnloggetBruker(new Fnr(getFnrFraClaims(claims.get())));
     }
 
-    Optional<JwtTokenClaims> claimsForIssuerTokenX = getClaimsFor(context, ISSUER_TOKENX);
+    Optional<JwtTokenClaims> claimsForIssuerTokenX = getClaimsFor(context);
     if (claimsForIssuerTokenX.isPresent()) {
       log.debug("Claims kommer fra issuer TokenX");
       String fnrString = getTokenXFnr(claimsForIssuerTokenX.get());
@@ -65,25 +64,24 @@ public class TilgangskontrollUtils {
 
     throw new TilgangskontrollException(
         format(
-            "Kan ikke hente innlogget bruker. Finner ikke claims for issuer '%s' eller '%s'",
-            ISSUER_SELVBETJENING, ISSUER_TOKENX));
+            "Kan ikke hente innlogget bruker. Finner ikke claims for issuer '%s'", ISSUER_TOKENX));
   }
 
-  private String getFnrFraClaims(JwtTokenClaims claimsForIssuerSelvbetjening) {
+  private String getFnrFraClaims(JwtTokenClaims claimsForIssuer) {
     String fnrFromClaim = "";
-    if (claimsForIssuerSelvbetjening.getStringClaim("pid") != null) {
+    if (claimsForIssuer.getStringClaim("pid") != null) {
       log.debug("Fnr hentet fra claims 'pid'");
-      fnrFromClaim = claimsForIssuerSelvbetjening.getStringClaim("pid");
-    } else if (claimsForIssuerSelvbetjening.getStringClaim("sub") != null) {
+      fnrFromClaim = claimsForIssuer.getStringClaim("pid");
+    } else if (claimsForIssuer.getStringClaim("sub") != null) {
       log.debug("Fnr hentet fra claims 'sub' skal snart fases ut");
-      fnrFromClaim = claimsForIssuerSelvbetjening.getStringClaim("sub");
+      fnrFromClaim = claimsForIssuer.getStringClaim("sub");
     }
     return fnrFromClaim;
   }
 
-  private Optional<JwtTokenClaims> getClaimsFor(TokenValidationContext context, String issuer) {
-    if (context.hasTokenFor(issuer)) {
-      return Optional.of(context.getClaims(issuer));
+  private Optional<JwtTokenClaims> getClaimsFor(TokenValidationContext context) {
+    if (context.hasTokenFor(TilgangskontrollUtils.ISSUER_TOKENX)) {
+      return Optional.of(context.getClaims(TilgangskontrollUtils.ISSUER_TOKENX));
     } else {
       return Optional.empty();
     }

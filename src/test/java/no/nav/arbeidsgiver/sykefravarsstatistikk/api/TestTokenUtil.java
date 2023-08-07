@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 
 public class TestTokenUtil {
 
-  public static String SELVBETJENING_ISSUER_ID = "selvbetjening";
   public static String TOKENX_ISSUER_ID = "tokenx";
 
   public static String createMockIdportenTokenXToken(MockOAuth2Server mockOAuth2Server) {

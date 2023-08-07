@@ -55,10 +55,6 @@ no.nav.security.jwt:
       discoveryurl: http://localhost:${mock-oauth2-server.port}/tokenx/.well-known/openid-configuration
       accepted_audience: someaudience
       cookie_name: tokenx-token
-    selvbetjening:
-      discoveryurl: http://localhost:${mock-oauth2-server.port}/selvbetjening/.well-known/openid-configuration
-      accepted_audience: someaudience
-      cookie_name: selvbetjening-idtoken
 
 ## jwk generert med https://connect2id.com/products/nimbus-jose-jwt/generator
 tokenxclient:

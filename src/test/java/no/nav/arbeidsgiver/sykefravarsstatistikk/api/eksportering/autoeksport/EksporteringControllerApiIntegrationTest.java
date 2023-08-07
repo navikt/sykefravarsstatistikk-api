@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static java.net.http.HttpClient.newBuilder;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.SELVBETJENING_ISSUER_ID;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForVirksomhet;
@@ -73,6 +72,8 @@ public class EksporteringControllerApiIntegrationTest extends SpringIntegrationT
   };
   private KafkaMessageListenerContainer<String, String> container;
   private BlockingQueue<ConsumerRecord<String, String>> consumerRecords;
+
+  static final String ISSUER_TOKENX = "tokenx";
 
   @LocalServerPort private String port;
 
@@ -249,6 +250,6 @@ public class EksporteringControllerApiIntegrationTest extends SpringIntegrationT
   @NotNull
   private String getBearerMedJwt() {
     return "Bearer "
-        + TestTokenUtil.createToken(mockOAuth2Server, "15008462396", SELVBETJENING_ISSUER_ID, "");
+        + TestTokenUtil.createToken(mockOAuth2Server, "15008462396", ISSUER_TOKENX, "");
   }
 }

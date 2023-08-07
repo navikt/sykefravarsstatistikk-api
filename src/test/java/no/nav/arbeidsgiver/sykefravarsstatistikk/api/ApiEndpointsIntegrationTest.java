@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static java.net.http.HttpClient.newBuilder;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.SELVBETJENING_ISSUER_ID;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.TOKENX_ISSUER_ID;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.PRODUKSJON_NYTELSESMIDLER;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
@@ -64,25 +63,6 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
   }
 
   @Test
-  public void sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_selvbetjening_token()
-      throws Exception {
-    String jwtTokenIssuedByLoginservice =
-        TestTokenUtil.createToken(mockOAuth2Server, "15008462396", SELVBETJENING_ISSUER_ID, "");
-    opprettGenerellStatistikk();
-    sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtTokenIssuedByLoginservice);
-  }
-
-  @Test
-  public void
-      sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_selvbetjening_token__issued_med_sub()
-          throws Exception {
-    String jwtTokenIssuedByLoginservice =
-        TestTokenUtil.createToken(mockOAuth2Server, "", "15008462396", SELVBETJENING_ISSUER_ID, "");
-    opprettGenerellStatistikk();
-    sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtTokenIssuedByLoginservice);
-  }
-
-  @Test
   public void
       sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_idporten()
           throws Exception {
@@ -93,22 +73,6 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
             TOKENX_ISSUER_ID,
             "https://oidc.difi.no/idporten-oidc-provider/");
     opprettGenerellStatistikk();
-    sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtToken);
-  }
-
-  @Test
-  public void
-      sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_loginservice()
-          throws Exception {
-    String jwtToken =
-        TestTokenUtil.createToken(
-            mockOAuth2Server,
-            "15008462396",
-            TOKENX_ISSUER_ID,
-            "https://navnob2c.b2clogin.com/something-unique-and-long/v2.0/");
-
-    opprettGenerellStatistikk();
-
     sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtToken);
   }
 
@@ -216,8 +180,8 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
   @Test
   public void sykefraværshistorikk__skal_IKKE_godkjenne_en_token_uten_sub_eller_pid()
       throws Exception {
-    String jwtTokenIssuedByLoginservice =
-        TestTokenUtil.createToken(mockOAuth2Server, "", "", SELVBETJENING_ISSUER_ID, "");
+    String jwtToken =
+        TestTokenUtil.createToken(mockOAuth2Server, "", "", TOKENX_ISSUER_ID, "");
 
     HttpResponse<String> response =
         newBuilder()
@@ -231,7 +195,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
                                 + "/sykefravarsstatistikk-api/"
                                 + ORGNR_UNDERENHET_INGEN_TILGANG
                                 + "/sykefravarshistorikk/kvartalsvis"))
-                    .header(AUTHORIZATION, jwtTokenIssuedByLoginservice)
+                    .header(AUTHORIZATION, jwtToken)
                     .GET()
                     .build(),
                 ofString());
@@ -326,6 +290,6 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
   @NotNull
   private String getBearerMedJwt() {
     return "Bearer "
-        + TestTokenUtil.createToken(mockOAuth2Server, "15008462396", SELVBETJENING_ISSUER_ID, "");
+        + TestTokenUtil.createToken(mockOAuth2Server, "15008462396", TOKENX_ISSUER_ID, "");
   }
 }

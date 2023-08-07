@@ -48,10 +48,6 @@ no.nav.security.jwt:
     tokenx:
       discoveryurl: https://fakedings.dev-gcp.nais.io/fake/.well-known/oauth-authorization-server
       accepted_audience: dev-fss:arbeidsgiver:sykefravarsstatistikk-api
-    selvbetjening:
-      discoveryurl: http://localhost:${mock-oauth2-server.port}/selvbetjening/.well-known/openid-configuration
-      accepted_audience: someaudience
-      cookie_name: selvbetjening-idtoken
 
 tokenxclient:
   jwk: '
