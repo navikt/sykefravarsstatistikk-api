@@ -42,7 +42,6 @@
         <com.oracle.ojdbc.ojdbc10version>19.19.0.0</com.oracle.ojdbc.ojdbc10version>
         <com.h2database.h2.version>2.1.214</com.h2database.h2.version>
         <org.apache.logging.log4j.version>2.20.0</org.apache.logging.log4j.version>
-        <org.flywaydb.version>9.21.1</org.flywaydb.version>
     </properties>
     <dependencies>
         <dependency>
@@ -109,7 +108,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>${org.flywaydb.version}</version>
+            <version>8.5.13</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
