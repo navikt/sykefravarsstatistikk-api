@@ -2,8 +2,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 import arrow.core.getOrElse
 import jakarta.servlet.http.HttpServletRequest
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Underenhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.Orgnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.Underenhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient.HentEnhetFeil
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api.PubliseringsdatoerService
@@ -21,7 +21,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
-import java.util.*
 
 @Protected
 @RestController

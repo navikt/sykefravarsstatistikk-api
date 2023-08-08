@@ -1,9 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.klassifikasjoner;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Virksomhetsklassifikasjon;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.Klassifikasjonskilde;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.Næring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.Sektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.Virksomhetsklassifikasjon;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KlassifikasjonsimporteringRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

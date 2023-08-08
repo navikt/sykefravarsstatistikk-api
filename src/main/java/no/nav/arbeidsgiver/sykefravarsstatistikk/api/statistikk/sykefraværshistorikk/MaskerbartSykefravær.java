@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Konstanter.*;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.Konstanter.*;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

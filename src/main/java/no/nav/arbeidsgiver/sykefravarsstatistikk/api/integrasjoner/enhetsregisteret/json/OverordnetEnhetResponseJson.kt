@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.json
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.OverordnetEnhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.Orgnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.OverordnetEnhet
 
 data class OverordnetEnhetResponseJson(
     @JsonProperty("organisasjonsnummer")

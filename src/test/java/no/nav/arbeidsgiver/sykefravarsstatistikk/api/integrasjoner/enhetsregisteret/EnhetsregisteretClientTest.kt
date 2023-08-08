@@ -6,7 +6,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
 import common.StaticAppenderExtension
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.ProxyWebClient
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail

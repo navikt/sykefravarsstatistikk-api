@@ -1,13 +1,13 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksport.SykefraværFlereKvartalerForEksport
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.SykefraværFlereKvartalerForEksport
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.VirksomhetEksportPerKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.VirksomhetMetadata
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.Orgnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.DatavarehusRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær
@@ -397,11 +397,11 @@ object EksporteringServiceTestUtils {
     @JvmStatic
     @JvmOverloads
     fun sykefraværsstatistikkNæringskode(
-            årstallOgKvartal: ÅrstallOgKvartal,
-            næringskode: String = "11001",
-            antallPersoner: Int = 150,
-            tapteDagsverk: BigDecimal = BigDecimal(100),
-            muligeDagsverk: BigDecimal = BigDecimal(5000)
+        årstallOgKvartal: ÅrstallOgKvartal,
+        næringskode: String = "11001",
+        antallPersoner: Int = 150,
+        tapteDagsverk: BigDecimal = BigDecimal(100),
+        muligeDagsverk: BigDecimal = BigDecimal(5000)
 
     ): SykefraværsstatistikkNæring5Siffer {
         return SykefraværsstatistikkNæring5Siffer(
