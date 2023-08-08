@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværMedKategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.VirksomhetSykefravær;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværMedKategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetSykefravær;
 
 import java.util.List;
 

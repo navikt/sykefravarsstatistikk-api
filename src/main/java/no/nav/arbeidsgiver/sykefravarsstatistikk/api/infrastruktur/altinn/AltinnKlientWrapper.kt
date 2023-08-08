@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn
 import lombok.extern.slf4j.Slf4j
 import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.AltinnrettigheterProxyKlient
 import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.model.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.Fnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Fnr
 import no.nav.security.token.support.core.jwt.JwtToken
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value

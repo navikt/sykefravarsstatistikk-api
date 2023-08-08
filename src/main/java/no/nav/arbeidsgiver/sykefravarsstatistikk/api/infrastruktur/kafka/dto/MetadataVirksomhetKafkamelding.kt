@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.bransjeprogram.ArbeidsmiljøportalenBransje
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 
 data class MetadataVirksomhetKafkamelding(
     val orgnr: String,

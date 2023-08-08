@@ -1,10 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.dataTilFrontends
 
 import io.vavr.control.Either
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.Trend
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UtilstrekkeligDataException
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Trend
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.UtilstrekkeligDataException
 
 data class Trendkalkulator(
     var datagrunnlag: List<UmaskertSykefraværForEttKvartal>? = null,

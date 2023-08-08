@@ -6,7 +6,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
 import common.StaticAppenderExtension
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.ProxyWebClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
 import org.assertj.core.api.Assertions.assertThat

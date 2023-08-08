@@ -1,9 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.Næringskode5Siffer
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.bransjeprogram.ArbeidsmiljøportalenBransje.BARNEHAGER
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.bransjeprogram.ArbeidsmiljøportalenBransje.NÆRINGSMIDDELINDUSTRI
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.bransjeprogram.Bransjeprogram
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode5Siffer
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje.BARNEHAGER
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje.NÆRINGSMIDDELINDUSTRI
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransjeprogram
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

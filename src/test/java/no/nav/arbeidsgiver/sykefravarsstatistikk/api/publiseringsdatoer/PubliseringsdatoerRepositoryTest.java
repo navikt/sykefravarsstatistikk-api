@@ -13,7 +13,7 @@ import common.StaticAppender;
 import io.vavr.control.Option;
 import java.util.List;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.ImporttidspunktDto;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImporttidspunktDto;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.PubliseringsdatoerRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

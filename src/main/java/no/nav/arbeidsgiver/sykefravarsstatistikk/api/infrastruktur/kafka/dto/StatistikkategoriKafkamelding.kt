@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.SykefraværFlereKvartalerForEksport
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværMedKategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværMedKategori
 
 data class StatistikkategoriKafkamelding(
     private val sisteKvartal: SykefraværMedKategori,

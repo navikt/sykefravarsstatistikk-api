@@ -43,12 +43,12 @@ import java.util.Map;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.NæringOgNæringskode5siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.VirksomhetEksportPerKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.VirksomhetMetadata;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværsstatistikkNæring5Siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværsstatistikkVirksomhetUtenVarighet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværMedKategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.VirksomhetSykefravær;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkNæring5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkVirksomhetUtenVarighet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværMedKategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetSykefravær;
 import org.junit.jupiter.api.Test;
 
 public class EksporteringServiceUtilsTest {

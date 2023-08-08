@@ -3,9 +3,9 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværsstatistikkVirksomhet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværsstatistikkVirksomhetMedGradering;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkVirksomhet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkVirksomhetMedGradering;
 
 public class SykefraværsstatistikkImporteringUtils {
 

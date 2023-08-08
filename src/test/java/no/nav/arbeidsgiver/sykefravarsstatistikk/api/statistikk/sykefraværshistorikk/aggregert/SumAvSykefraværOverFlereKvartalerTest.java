@@ -1,19 +1,18 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori.VIRKSOMHET;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori.VIRKSOMHET;
 
 import io.vavr.control.Either;
 import java.math.BigDecimal;
 import java.util.List;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.StatistikkDto;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SumAvSykefraværOverFlereKvartaler;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.MaskerteDataException;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.StatistikkException;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværOverFlereKvartaler;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.StatistikkDto;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SumAvSykefraværOverFlereKvartaler;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.StatistikkException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværForEttKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværOverFlereKvartaler;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -74,7 +73,7 @@ class SumAvSykefraværOverFlereKvartalerTest {
             .regnUtProsentOgMapTilDto(VIRKSOMHET, "");
 
     Assertions.assertThat(maskertSykefravær.getLeft())
-        .isExactlyInstanceOf(MaskerteDataException.class);
+        .isExactlyInstanceOf(SumAvSykefraværOverFlereKvartaler.MaskerteDataException.class);
   }
 
   @Test

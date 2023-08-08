@@ -1,14 +1,14 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic.Companion.from
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.StatistikkategoriKafkamelding
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværMedKategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværMedKategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -195,10 +195,10 @@ class EksporteringPerStatistikkKategoriService(
 fun List<Sykefraværsstatistikk>.tilUmaskertSykefraværForEttKvartal() =
         this.map {
             UmaskertSykefraværForEttKvartal(
-                    ÅrstallOgKvartal(it.Årstall, it.kvartal),
-                    it.tapteDagsverk,
-                    it.muligeDagsverk,
-                    it.antallPersoner
+                ÅrstallOgKvartal(it.Årstall, it.kvartal),
+                it.tapteDagsverk,
+                it.muligeDagsverk,
+                it.antallPersoner
             )
         }
 
@@ -230,8 +230,8 @@ fun List<SykefraværsstatistikkVirksomhetUtenVarighet>.groupByVirksomhet():
         this.groupBy({ it.orgnr }, { it })
 
 fun List<UmaskertSykefraværForEttKvartal>.tilSykefraværMedKategoriSisteKvartal(
-        statistikkategori: Statistikkategori,
-        kode: String
+    statistikkategori: Statistikkategori,
+    kode: String
 ): SykefraværMedKategori =
         this.maxWith(compareBy({ it.Årstall }, { it.kvartal }))
                 .tilSykefraværMedKategori(statistikkategori, kode)

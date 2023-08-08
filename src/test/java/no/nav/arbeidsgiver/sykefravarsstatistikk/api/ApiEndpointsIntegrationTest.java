@@ -27,7 +27,7 @@ import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori;
 import no.nav.security.mock.oauth2.MockOAuth2Server;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;

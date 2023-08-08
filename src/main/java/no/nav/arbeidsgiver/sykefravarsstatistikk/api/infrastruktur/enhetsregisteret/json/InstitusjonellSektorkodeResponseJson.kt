@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.json
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.InstitusjonellSektorkode
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.InstitusjonellSektorkode
 
 data class InstitusjonellSektorkodeResponseJson(
     val kode: String,

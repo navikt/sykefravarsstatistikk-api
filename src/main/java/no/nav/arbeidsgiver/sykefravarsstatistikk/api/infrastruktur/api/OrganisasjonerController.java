@@ -2,8 +2,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api;
 
 import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnOrganisasjon;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.InnloggetBruker;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.InnloggetBruker;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService;
 import no.nav.security.token.support.core.api.Protected;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

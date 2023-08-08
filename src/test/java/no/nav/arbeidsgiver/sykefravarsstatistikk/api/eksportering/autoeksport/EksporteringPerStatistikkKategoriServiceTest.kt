@@ -10,7 +10,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.Ek
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.StatistikkategoriKafkamelding
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
