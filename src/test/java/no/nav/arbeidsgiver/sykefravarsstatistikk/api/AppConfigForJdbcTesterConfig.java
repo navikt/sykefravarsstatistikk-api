@@ -1,24 +1,27 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.PrometheusMetrics;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.*;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.ImporteringController;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.ImporteringScheduler;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.PostImporteringService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.SykefraværsstatistikkImporteringService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.klassifikasjoner.KlassifikasjonsimporteringController;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringMetadataVirksomhetService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringPerStatistikkKategoriService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.PrometheusMetrics;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.ImporteringController;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImporteringScheduler;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PostImporteringService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.SykefraværsstatistikkImporteringService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.KlassifikasjonsimporteringController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.MockServer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.WebClientConfiguration;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.healthcheck.HealthcheckController;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnClient;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.metrikker.organisasjoner.OrganisasjonerController;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.OffentligSykefraværshistorikkController;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværshistorikkController;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert.AggregertStatistikkService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollUtils;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.WebClientConfiguration;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.EksporteringController;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.healthcheck.HealthcheckController;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnClient;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.OrganisasjonerController;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.OffentligSykefraværshistorikkController;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.SykefraværshistorikkController;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.AggregertStatistikkService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.TilgangskontrollUtils;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
@@ -43,7 +46,6 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
             TilgangskontrollUtils.class,
             EksporteringService.class,
             EksporteringPerStatistikkKategoriService.class,
-            EksporteringScheduler.class,
             ImporteringScheduler.class,
             SykefraværsstatistikkImporteringService.class,
             PostImporteringService.class,
@@ -61,7 +63,7 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
             EnhetsregisteretClient.class,
             WebClientConfiguration.class,
             PrometheusMetrics.class,
-            KafkaService.class,
+            KafkaClient.class,
           })
     })
 public class AppConfigForJdbcTesterConfig extends JdbcRepositoryConfigExtension {}

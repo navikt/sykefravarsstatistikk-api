@@ -1,10 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.StatistikkUtils.kalkulerSykefraværsprosent;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.StatistikkUtils.kalkulerSykefraværsprosent;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.StatistikkException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.StatistikkException;
 import org.junit.jupiter.api.Test;
 
 class StatistikkUtilsTest {

@@ -2,8 +2,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.healthcheck
 
 import common.SpringIntegrationTestbase
 import io.prometheus.client.exporter.common.TextFormat.CONTENT_TYPE_004
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.PrometheusMetrics
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopic
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.PrometheusMetrics
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

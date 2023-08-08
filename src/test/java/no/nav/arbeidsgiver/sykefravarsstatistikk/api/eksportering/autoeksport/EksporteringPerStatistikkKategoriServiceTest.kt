@@ -1,16 +1,17 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport
 
 import net.javacrumbs.jsonunit.assertj.assertThatJson
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.SykefraværsstatistikkTilEksporteringRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringPerStatistikkKategoriService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2019_3
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2019_4
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2020_1
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2020_2
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.KafkaTopic
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.StatistikkategoriKafkamelding
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.StatistikkategoriKafkamelding
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
@@ -19,11 +20,11 @@ import java.math.BigDecimal
 class EksporteringPerStatistikkKategoriServiceTest {
     private val sykefraværRepository = mock<SykefraværRepository>()
     private val sykefraværsstatistikkTilEksporteringRepository = mock<SykefraværsstatistikkTilEksporteringRepository>()
-    private val kafkaService = mock<KafkaService>()
+    private val kafkaClient = mock<KafkaClient>()
     private var service: EksporteringPerStatistikkKategoriService = EksporteringPerStatistikkKategoriService(
         sykefraværRepository,
         sykefraværsstatistikkTilEksporteringRepository,
-        kafkaService,
+        kafkaClient,
         true,
     )
 
@@ -34,7 +35,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
         service = EksporteringPerStatistikkKategoriService(
             sykefraværRepository,
             sykefraværsstatistikkTilEksporteringRepository,
-            kafkaService,
+            kafkaClient,
             true
         )
     }
@@ -48,7 +49,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
 
         service.eksporterPerStatistikkKategori(__2020_2, Statistikkategori.LAND)
 
-        verify(kafkaService)
+        verify(kafkaClient)
             .sendMelding(
                 statistikkategoriKafkameldingCaptor.capture(),
                 eq(KafkaTopic.SYKEFRAVARSSTATISTIKK_LAND_V1)
@@ -98,7 +99,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
 
 
         // 3- Sjekk hva Kafka har fått
-        verify(kafkaService)
+        verify(kafkaClient)
             .sendMelding(
                 statistikkategoriKafkameldingCaptor.capture(),
                 eq(KafkaTopic.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1)
@@ -135,7 +136,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
                 Statistikkategori.NÆRING)
 
         // 3- Sjekk hva Kafka har fått
-        verify(kafkaService)
+        verify(kafkaClient)
             .sendMelding(
                 statistikkategoriKafkameldingCaptor.capture(),
                 eq(KafkaTopic.SYKEFRAVARSSTATISTIKK_NARING_V1)
@@ -189,7 +190,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
         service.eksporterPerStatistikkKategori(__2020_2, Statistikkategori.NÆRINGSKODE)
 
         // 3- Sjekk hva Kafka har fått
-        verify(kafkaService, times(2))
+        verify(kafkaClient, times(2))
                 .sendMelding(
                         statistikkategoriKafkameldingCaptor.capture(),
                         eq(KafkaTopic.SYKEFRAVARSSTATISTIKK_NARINGSKODE_V1)
@@ -252,7 +253,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
 
         service.eksporterPerStatistikkKategori(__2020_2, Statistikkategori.NÆRINGSKODE)
 
-        verify(kafkaService, times(2))
+        verify(kafkaClient, times(2))
                 .sendMelding(
                         statistikkategoriKafkameldingCaptor.capture(),
                         eq(KafkaTopic.SYKEFRAVARSSTATISTIKK_NARINGSKODE_V1)
