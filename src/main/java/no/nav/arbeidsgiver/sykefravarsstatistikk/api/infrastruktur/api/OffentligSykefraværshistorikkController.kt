@@ -5,7 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Underenhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.KvartalsvisSykefraværshistorikk
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.dataTilFrontends.OffentligKvartalsvisSykefraværshistorikkService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.OffentligKvartalsvisSykefraværshistorikkService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.ResponseEntity

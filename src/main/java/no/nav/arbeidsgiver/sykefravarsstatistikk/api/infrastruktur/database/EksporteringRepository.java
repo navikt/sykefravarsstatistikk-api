@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.VirksomhetEksportPerKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetEksportPerKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
 import org.springframework.beans.factory.annotation.Qualifier;

@@ -15,7 +15,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.Klas
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.SektorMappingService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KvartalsvisSykefraværRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.dataTilFrontends.KvartalsvisSykefraværshistorikkService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.KvartalsvisSykefraværshistorikkService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

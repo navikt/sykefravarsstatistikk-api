@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.dataTilFrontends
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering
 
 import io.vavr.control.Either
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*

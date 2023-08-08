@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering
 
 import com.google.common.collect.Lists
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.VirksomhetEksportPerKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.VirksomhetMetadata
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetEksportPerKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetMetadata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkNæring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkNæring5Siffer

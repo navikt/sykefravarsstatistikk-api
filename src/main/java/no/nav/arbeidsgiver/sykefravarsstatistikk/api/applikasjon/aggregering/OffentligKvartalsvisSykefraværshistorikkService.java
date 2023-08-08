@@ -1,7 +1,7 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.dataTilFrontends;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.dataTilFrontends.KvartalsvisSykefraværshistorikkService.SYKEFRAVÆRPROSENT_LAND_LABEL;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.dataTilFrontends.KvartalsvisSykefraværshistorikkService.uthentingMedFeilhåndteringOgTimeout;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.KvartalsvisSykefraværshistorikkService.SYKEFRAVÆRPROSENT_LAND_LABEL;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.KvartalsvisSykefraværshistorikkService.uthentingMedFeilhåndteringOgTimeout;
 
 import java.util.List;
 import java.util.Optional;

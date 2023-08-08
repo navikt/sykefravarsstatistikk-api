@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.dataTilFrontends
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering
 
 import arrow.core.Either
 import arrow.core.left

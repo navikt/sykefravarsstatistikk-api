@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.dataTilFrontends;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;

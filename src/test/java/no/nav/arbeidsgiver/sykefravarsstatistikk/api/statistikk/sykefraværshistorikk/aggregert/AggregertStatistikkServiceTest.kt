@@ -9,7 +9,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.BransjeEllerNæ
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PubliseringsdatoerService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.dataTilFrontends.AggregertStatistikkService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.AggregertStatistikkService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal

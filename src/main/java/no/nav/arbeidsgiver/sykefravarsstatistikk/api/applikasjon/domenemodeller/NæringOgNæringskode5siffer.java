@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller;
 
 public class NæringOgNæringskode5siffer {
   String næring;

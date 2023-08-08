@@ -1,7 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon
-
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
 data class VirksomhetMetadata(
     private val orgnrObj: Orgnr,

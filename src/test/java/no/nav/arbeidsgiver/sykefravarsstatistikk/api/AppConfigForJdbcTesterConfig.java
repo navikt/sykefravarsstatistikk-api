@@ -19,7 +19,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaCl
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.OrganisasjonerController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.OffentligSykefraværshistorikkController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.SykefraværshistorikkController;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.dataTilFrontends.AggregertStatistikkService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.AggregertStatistikkService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.TilgangskontrollUtils;
 import org.springframework.boot.SpringBootConfiguration;

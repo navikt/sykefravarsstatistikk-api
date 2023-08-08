@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.dataTilFrontends.SummertLegemeldtSykefraværService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.SummertLegemeldtSykefraværService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode5Siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr;

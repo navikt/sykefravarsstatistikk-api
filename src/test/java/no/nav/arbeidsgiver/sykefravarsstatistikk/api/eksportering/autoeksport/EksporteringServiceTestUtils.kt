@@ -2,8 +2,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.SykefraværFlereKvartalerForEksport
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.VirksomhetEksportPerKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.VirksomhetMetadata
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetEksportPerKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetMetadata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori

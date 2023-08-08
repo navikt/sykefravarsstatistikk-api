@@ -8,7 +8,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.util.List;
 import java.util.Map;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.dataTilFrontends.Aggregeringskalkulator;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.Aggregeringskalkulator;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sykefraværsdata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje;

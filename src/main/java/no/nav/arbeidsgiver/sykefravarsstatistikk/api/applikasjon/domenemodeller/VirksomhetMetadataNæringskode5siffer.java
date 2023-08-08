@@ -1,7 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon;
-
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller;
 
 public class VirksomhetMetadataNæringskode5siffer {
   public VirksomhetMetadataNæringskode5siffer(
