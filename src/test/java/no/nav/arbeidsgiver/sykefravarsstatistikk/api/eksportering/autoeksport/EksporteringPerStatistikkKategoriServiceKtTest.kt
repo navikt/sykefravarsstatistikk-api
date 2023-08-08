@@ -1,5 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksport.groupByNæringskode
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksport.tilSykefraværMedKategoriSisteKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksport.tilUmaskertSykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori

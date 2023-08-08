@@ -134,8 +134,7 @@ public class EksporteringControllerApiIntegrationTest extends SpringIntegrationT
                                 + SISTE_PUBLISERTE_KVARTAL.getÅrstall()
                                 + "&kvartal="
                                 + SISTE_PUBLISERTE_KVARTAL.getKvartal()
-                                + "&kategori=LAND"
-                                + "&begrensningTil=10"))
+                                + "&kategori=LAND"))
                     .header(AUTHORIZATION, getBearerMedJwt())
                     .POST(HttpRequest.BodyPublishers.noBody())
                     .build(),
@@ -188,8 +187,7 @@ public class EksporteringControllerApiIntegrationTest extends SpringIntegrationT
                                 + SISTE_PUBLISERTE_KVARTAL.getÅrstall()
                                 + "&kvartal="
                                 + SISTE_PUBLISERTE_KVARTAL.getKvartal()
-                                + "&kategori=VIRKSOMHET"
-                                + "&begrensningTil=10"))
+                                + "&kategori=VIRKSOMHET"))
                     .header(AUTHORIZATION, getBearerMedJwt())
                     .POST(HttpRequest.BodyPublishers.noBody())
                     .build(),
@@ -236,8 +234,7 @@ public class EksporteringControllerApiIntegrationTest extends SpringIntegrationT
                                 + SISTE_PUBLISERTE_KVARTAL.getÅrstall()
                                 + "&kvartal="
                                 + SISTE_PUBLISERTE_KVARTAL.getKvartal()
-                                + "&kategori=VIRKSOMHET"
-                                + "&begrensningTil=10"))
+                                + "&kategori=VIRKSOMHET"))
                     .header(AUTHORIZATION, getBearerMedJwt())
                     .POST(HttpRequest.BodyPublishers.noBody())
                     .build(),

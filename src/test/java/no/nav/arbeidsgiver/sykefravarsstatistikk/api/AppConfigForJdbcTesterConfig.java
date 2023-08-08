@@ -1,15 +1,18 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.PrometheusMetrics;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.*;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksport.EksporteringMetadataVirksomhetService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksport.EksporteringPerStatistikkKategoriService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksport.EksporteringService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.PrometheusMetrics;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.ImporteringController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.ImporteringScheduler;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.PostImporteringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.SykefraværsstatistikkImporteringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.klassifikasjoner.KlassifikasjonsimporteringController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.MockServer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.WebClientConfiguration;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.healthcheck.HealthcheckController;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.WebClientConfiguration;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.EksporteringController;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.healthcheck.HealthcheckController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.altinn.AltinnClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
@@ -43,7 +46,6 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
             TilgangskontrollUtils.class,
             EksporteringService.class,
             EksporteringPerStatistikkKategoriService.class,
-            EksporteringScheduler.class,
             ImporteringScheduler.class,
             SykefraværsstatistikkImporteringService.class,
             PostImporteringService.class,

@@ -1,8 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetEksportPerKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.VirksomhetMetadata
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksport.SykefraværFlereKvartalerForEksport
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.VirksomhetEksportPerKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.VirksomhetMetadata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*
@@ -319,7 +320,12 @@ object EksporteringServiceTestUtils {
     }
 
     @JvmField
-    val virksomhetEksportPerKvartal = VirksomhetEksportPerKvartal(Orgnr("987654321"), __2020_2, false)
+    val virksomhetEksportPerKvartal =
+        VirksomhetEksportPerKvartal(
+            Orgnr("987654321"),
+            __2020_2,
+            false
+        )
 
     @JvmField
     val virksomhetMetadata = VirksomhetMetadata(Orgnr("987654321"), "Virksomhet 1", "2", "1", "11", "11111", __2020_2)

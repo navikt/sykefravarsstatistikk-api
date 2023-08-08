@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.config.ProxyWebClient
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.ProxyWebClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.json.OverordnetEnhetResponseJson
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.json.UnderenhetResponseJson
 import org.slf4j.Logger

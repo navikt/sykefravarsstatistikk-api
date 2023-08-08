@@ -6,6 +6,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.math.BigDecimal;
 import java.util.List;
+
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksport.SykefraværFlereKvartalerForEksport;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import org.junit.jupiter.api.Test;
 
