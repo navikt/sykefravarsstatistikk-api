@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.Sektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.Næring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.Sektor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;

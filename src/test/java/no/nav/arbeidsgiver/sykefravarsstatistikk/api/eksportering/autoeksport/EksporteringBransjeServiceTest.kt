@@ -4,13 +4,13 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.Ek
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.SykefraværFlereKvartalerForEksport
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.SykefraværsstatistikkBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.bransjeprogram.ArbeidsmiljøportalenBransje
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.bransjeprogram.ArbeidsmiljøportalenBransje
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.StatistikkategoriKafkamelding
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.StatistikkategoriKafkamelding
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværMedKategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -21,10 +21,10 @@ import java.math.BigDecimal
 internal class EksporteringBransjeServiceTest {
 
     private val repositoryMock = mock<SykefraværsstatistikkTilEksporteringRepository>()
-    private val kafkaServiceMock = mock<KafkaService>()
+    private val kafkaClientMock = mock<KafkaClient>()
 
     private val service =
-        EksporteringPerStatistikkKategoriService(mock(), repositoryMock, kafkaServiceMock, true)
+        EksporteringPerStatistikkKategoriService(mock(), repositoryMock, kafkaClientMock, true)
 
     @Test
     fun `eksporterPerStatistikkKategori skal ikke putte noe på kafkastrømmen dersom datagrunnalget er tomt`() {
@@ -33,7 +33,7 @@ internal class EksporteringBransjeServiceTest {
             Statistikkategori.BRANSJE,
         )
 
-        verify(kafkaServiceMock, never()).sendMelding(any(), any())
+        verify(kafkaClientMock, never()).sendMelding(any(), any())
     }
 
     @Test
@@ -64,7 +64,7 @@ internal class EksporteringBransjeServiceTest {
             Statistikkategori.BRANSJE,
         )
 
-        verify(kafkaServiceMock, times(1)).sendMelding(any(), any())
+        verify(kafkaClientMock, times(1)).sendMelding(any(), any())
     }
 
     @Test
@@ -130,7 +130,7 @@ internal class EksporteringBransjeServiceTest {
         )
 
 
-        verify(kafkaServiceMock).sendMelding(
+        verify(kafkaClientMock).sendMelding(
             eq(melding),
             eq(KafkaTopic.SYKEFRAVARSSTATISTIKK_BRANSJE_V1),
         )

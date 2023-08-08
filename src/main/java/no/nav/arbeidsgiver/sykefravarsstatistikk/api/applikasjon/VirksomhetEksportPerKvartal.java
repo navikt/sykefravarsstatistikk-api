@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.ÅrstallOgKvartal;
 
 public class VirksomhetEksportPerKvartal {
   private final Orgnr orgnr;

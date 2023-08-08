@@ -1,16 +1,15 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic.Companion.from
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.StatistikkategoriKafkamelding
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.StatistikkategoriKafkamelding
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværMedKategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -19,7 +18,7 @@ import org.springframework.stereotype.Component
 class EksporteringPerStatistikkKategoriService(
     private val sykefraværRepository: SykefraværRepository,
     private val tilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository,
-    private val kafkaService: KafkaService,
+    private val kafkaClient: KafkaClient,
     @param:Value("\${statistikk.eksportering.aktivert}") private val erEksporteringAktivert: Boolean
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -160,7 +159,7 @@ class EksporteringPerStatistikkKategoriService(
                         sykefraværMedKategoriSisteKvartal,
                         SykefraværFlereKvartalerForEksport(umaskertSykefraværsstatistikkSiste4Kvartaler)
                 )
-                kafkaService.sendMelding(melding, kafkaTopic)
+                kafkaClient.sendMelding(melding, kafkaTopic)
                 antallStatistikkEksportert++
             }
         }

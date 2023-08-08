@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.SykefraværsstatistikkImporteringService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.ÅrstallOgKvartal;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.env.Environment;
 

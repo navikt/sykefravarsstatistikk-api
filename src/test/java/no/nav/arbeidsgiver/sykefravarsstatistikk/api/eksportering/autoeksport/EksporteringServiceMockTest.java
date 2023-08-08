@@ -3,14 +3,14 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.NæringOgNæringskode5siffer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.VirksomhetMetadata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværMedKategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.VirksomhetSykefravær;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +44,7 @@ public class EksporteringServiceMockTest {
     @Mock
     private SykefraværRepository sykefraværsRepository;
     @Mock
-    private KafkaService kafkaService;
+    private KafkaClient kafkaClient;
 
     private EksporteringService service;
 
@@ -69,7 +69,7 @@ public class EksporteringServiceMockTest {
                         virksomhetMetadataRepository,
                         sykefraværsstatistikkTilEksporteringRepository,
                         sykefraværsRepository,
-                        kafkaService,
+                        kafkaClient,
                         true);
     }
 
@@ -122,7 +122,7 @@ public class EksporteringServiceMockTest {
         int antallEksporterte =
                 service.eksporter(__2020_2);
 
-        verify(kafkaService)
+        verify(kafkaClient)
                 .send(
                         årstallOgKvartalArgumentCaptor.capture(),
                         virksomhetSykefraværArgumentCaptor.capture(),
@@ -201,7 +201,7 @@ public class EksporteringServiceMockTest {
         int antallEksporterte =
                 service.eksporter(årstallOgKvartal);
 
-        verify(kafkaService)
+        verify(kafkaClient)
                 .send(
                         årstallOgKvartalArgumentCaptor.capture(),
                         virksomhetSykefraværArgumentCaptor.capture(),

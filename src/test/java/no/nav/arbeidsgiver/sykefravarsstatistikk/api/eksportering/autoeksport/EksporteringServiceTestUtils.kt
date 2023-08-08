@@ -4,13 +4,11 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.SykefraværFlereKvartalerForEksport
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.VirksomhetEksportPerKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.VirksomhetMetadata
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.Orgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværMedKategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.VirksomhetSykefravær
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal
 import org.assertj.core.api.Assertions
 import java.math.BigDecimal
@@ -40,63 +38,70 @@ object EksporteringServiceTestUtils {
     var ORGNR_VIRKSOMHET_3 = Orgnr("999966633")
 
     @JvmField
-    var virksomhetSykefravær = VirksomhetSykefravær(
-        "987654321", "Virksomhet 1", __2020_2, BigDecimal(10), BigDecimal(500), 6
-    )
+    var virksomhetSykefravær =
+        VirksomhetSykefravær(
+            "987654321", "Virksomhet 1", __2020_2, BigDecimal(10), BigDecimal(500), 6
+        )
 
     @JvmField
-    var næringSykefravær = SykefraværMedKategori(
-        Statistikkategori.NÆRING, "11", __2020_2, BigDecimal(100), BigDecimal(5000), 150
-    )
+    var næringSykefravær =
+        SykefraværMedKategori(
+            Statistikkategori.NÆRING, "11", __2020_2, BigDecimal(100), BigDecimal(5000), 150
+        )
 
     @JvmField
-    var næring5SifferSykefravær = SykefraværMedKategori(
-        Statistikkategori.NÆRING5SIFFER,
-        "11000",
-        __2020_2,
-        BigDecimal(40),
-        BigDecimal(4000),
-        1250
-    )
+    var næring5SifferSykefravær =
+        SykefraværMedKategori(
+            Statistikkategori.NÆRING5SIFFER,
+            "11000",
+            __2020_2,
+            BigDecimal(40),
+            BigDecimal(4000),
+            1250
+        )
 
     @JvmField
-    var næring5SifferSykefraværTilhørerBransje = SykefraværMedKategori(
-        Statistikkategori.NÆRING5SIFFER,
-        "86101",
-        __2020_2,
-        BigDecimal(80),
-        BigDecimal(6000),
-        1000
-    )
+    var næring5SifferSykefraværTilhørerBransje =
+        SykefraværMedKategori(
+            Statistikkategori.NÆRING5SIFFER,
+            "86101",
+            __2020_2,
+            BigDecimal(80),
+            BigDecimal(6000),
+            1000
+        )
 
     @JvmField
-    var sektorSykefravær = SykefraværMedKategori(
-        Statistikkategori.SEKTOR,
-        "1",
-        __2020_2,
-        BigDecimal(1340),
-        BigDecimal(88000),
-        33000
-    )
+    var sektorSykefravær =
+        SykefraværMedKategori(
+            Statistikkategori.SEKTOR,
+            "1",
+            __2020_2,
+            BigDecimal(1340),
+            BigDecimal(88000),
+            33000
+        )
 
     @JvmField
-    var landSykefravær = SykefraværMedKategori(
-        Statistikkategori.LAND,
-        "NO",
-        __2020_2,
-        BigDecimal(10000000),
-        BigDecimal(500000000),
-        2500000
-    )
+    var landSykefravær =
+        SykefraværMedKategori(
+            Statistikkategori.LAND,
+            "NO",
+            __2020_2,
+            BigDecimal(10000000),
+            BigDecimal(500000000),
+            2500000
+        )
 
-    var virksomhetSykefraværMedKategori = SykefraværMedKategori(
-        Statistikkategori.VIRKSOMHET,
-        "987654321",
-        __2020_2,
-        BigDecimal(10),
-        BigDecimal(500),
-        2500000
-    )
+    var virksomhetSykefraværMedKategori =
+        SykefraværMedKategori(
+            Statistikkategori.VIRKSOMHET,
+            "987654321",
+            __2020_2,
+            BigDecimal(10),
+            BigDecimal(500),
+            2500000
+        )
 
     @JvmField
     var virksomhet1Metadata_2020_4 = VirksomhetMetadata(

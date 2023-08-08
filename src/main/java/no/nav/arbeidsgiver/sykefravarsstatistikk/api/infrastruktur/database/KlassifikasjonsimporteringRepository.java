@@ -1,9 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.Virksomhetsklassifikasjon;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.Klassifikasjonskilde;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.Næring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.Sektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.Virksomhetsklassifikasjon;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.Klassifikasjonskilde;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;

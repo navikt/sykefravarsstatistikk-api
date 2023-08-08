@@ -3,19 +3,19 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering
 import com.google.common.collect.Lists
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.VirksomhetEksportPerKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.VirksomhetMetadata
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværsstatistikkNæring
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværsstatistikkNæring5Siffer
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværsstatistikkSektor
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværsstatistikkVirksomhetUtenVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaUtsendingException
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert.SykefraværRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingException
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværMedKategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.KafkaException
@@ -29,7 +29,7 @@ class EksporteringService(
     private val virksomhetMetadataRepository: VirksomhetMetadataRepository,
     private val sykefraværsstatistikkTilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository,
     private val sykefraværRepository: SykefraværRepository,
-    private val kafkaService: KafkaService,
+    private val kafkaClient: KafkaClient,
     @param:Value("\${statistikk.eksportering.aktivert}") private val erEksporteringAktivert: Boolean
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -81,7 +81,7 @@ class EksporteringService(
         virksomheterTilEksport: List<VirksomhetEksportPerKvartal>, årstallOgKvartal: ÅrstallOgKvartal
     ): Int {
         val startEksportering = System.currentTimeMillis()
-        kafkaService.nullstillUtsendingRapport(
+        kafkaClient.nullstillUtsendingRapport(
             virksomheterTilEksport.size, KafkaTopic.SYKEFRAVARSSTATISTIKK_V1
         )
         val virksomhetMetadataListe = virksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(årstallOgKvartal)
@@ -141,12 +141,12 @@ class EksporteringService(
                     + "Eksportering tok '{}' sekunder totalt. "
                     + "Snitt prossesseringstid ved utsending til Kafka er: '{}'. "
                     + "Snitt prossesseringstid for å oppdatere DB er: '{}'.",
-            kafkaService.antallMeldingerMottattForUtsending,
+            kafkaClient.antallMeldingerMottattForUtsending,
             totalProsesseringTidISekunder,
-            kafkaService.snittTidUtsendingTilKafka,
-            kafkaService.snittTidOppdateringIDB
+            kafkaClient.snittTidUtsendingTilKafka,
+            kafkaClient.snittTidOppdateringIDB
         )
-        log.info("[Måling] Rå data ved måling: {}", kafkaService.råDataVedDetaljertMåling)
+        log.info("[Måling] Rå data ved måling: {}", kafkaClient.råDataVedDetaljertMåling)
         return antallEksportert.get()
     }
 
@@ -174,7 +174,7 @@ class EksporteringService(
             Consumer<VirksomhetMetadata?> { virksomhetMetadata: VirksomhetMetadata? ->
                 val startUtsendingProcess = System.nanoTime()
                 if (virksomhetMetadata != null) {
-                    kafkaService.send(
+                    kafkaClient.send(
                         årstallOgKvartal,
                         EksporteringServiceUtils.getVirksomhetSykefravær(
                             virksomhetMetadata,
@@ -194,7 +194,7 @@ class EksporteringService(
                     )
                     val stopUtsendingProcess = System.nanoTime()
                     antallSentTilEksport.getAndIncrement()
-                    kafkaService.addUtsendingTilKafkaProcessingTime(
+                    kafkaClient.addUtsendingTilKafkaProcessingTime(
                         startUtsendingProcess, stopUtsendingProcess
                     )
                     val antallVirksomhetertLagretSomEksportert =
@@ -203,7 +203,7 @@ class EksporteringService(
                             årstallOgKvartal,
                             eksporterteVirksomheterListe,
                             eksporteringRepository,
-                            kafkaService
+                            kafkaClient
                         )
                     antallVirksomheterLagretSomEksportertIDb.addAndGet(
                         antallVirksomhetertLagretSomEksportert
@@ -211,7 +211,7 @@ class EksporteringService(
                 }
             })
         val antallRestendeOppdatert = EksporteringServiceUtils.lagreEksporterteVirksomheterOgNullstillLista(
-            årstallOgKvartal, eksporterteVirksomheterListe, eksporteringRepository, kafkaService
+            årstallOgKvartal, eksporterteVirksomheterListe, eksporteringRepository, kafkaClient
         )
         antallVirksomheterLagretSomEksportertIDb.addAndGet(antallRestendeOppdatert)
         val eksportertHittilNå = antallEksportert.addAndGet(antallSentTilEksport.get())

@@ -1,12 +1,12 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.bransjeprogram.Bransjeprogram
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.bransjeprogram.Bransjeprogram
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.MetadataVirksomhetKafkamelding
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.dto.Sektor
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.MetadataVirksomhetKafkamelding
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.Sektor
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -16,7 +16,7 @@ import kotlin.jvm.optionals.getOrNull
 @Service
 class EksporteringMetadataVirksomhetService(
     private val virksomhetMetadataRepository: VirksomhetMetadataRepository,
-    private val kafkaService: KafkaService,
+    private val kafkaClient: KafkaClient,
     @Value("\${statistikk.eksportering.aktivert}") val erEksporteringAktivert: Boolean
 ) {
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -48,7 +48,7 @@ class EksporteringMetadataVirksomhetService(
                     Sektor.fraSsbSektorkode(virksomhet.sektor.toInt())
                 )
 
-                kafkaService.sendMelding(
+                kafkaClient.sendMelding(
                     metadataVirksomhetKafkamelding,
                     KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1,
                 )

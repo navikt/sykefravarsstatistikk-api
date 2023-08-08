@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner.Orgenhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.Orgenhet
 
 fun fjernDupliserteOrgnr(orgenheter: List<Orgenhet>): List<Orgenhet> {
     // Noen bedrifter er registrert som flere sektorer, typisk dersom de har endret sektor underveis i et kvartal.

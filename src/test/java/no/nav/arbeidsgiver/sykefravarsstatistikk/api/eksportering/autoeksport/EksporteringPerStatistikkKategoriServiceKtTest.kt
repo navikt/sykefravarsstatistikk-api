@@ -3,8 +3,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.groupByNæringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.tilSykefraværMedKategoriSisteKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.tilUmaskertSykefraværForEttKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværsstatistikkNæring5Siffer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -80,7 +80,8 @@ class EksporteringPerStatistikkKategoriServiceKtTest {
                 ),
                 SykefraværsstatistikkNæring5Siffer(
                         2022, 2, "12345", 5, BigDecimal(15.5), BigDecimal(15.5)
-                )).shuffled()
+                )
+        ).shuffled()
 
 
         val result = dataset

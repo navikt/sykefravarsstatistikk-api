@@ -1,11 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk
 
 import jakarta.servlet.http.HttpServletRequest
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.Orgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.Underenhet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.enhetsregisteret.EnhetsregisteretClient
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.KvartalsvisSykefraværshistorikk
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis.OffentligKvartalsvisSykefraværshistorikkService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.Orgnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.Underenhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.KvartalsvisSykefraværshistorikk
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.dataTilFrontends.OffentligKvartalsvisSykefraværshistorikkService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll.TilgangskontrollService
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.ResponseEntity

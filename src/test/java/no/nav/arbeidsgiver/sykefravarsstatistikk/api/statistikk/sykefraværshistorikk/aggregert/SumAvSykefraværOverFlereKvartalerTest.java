@@ -6,7 +6,9 @@ import io.vavr.control.Either;
 import java.math.BigDecimal;
 import java.util.List;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.StatistikkDto;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SumAvSykefraværOverFlereKvartaler;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.MaskerteDataException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.StatistikkException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.SykefraværForEttKvartal;
@@ -55,8 +57,8 @@ class SumAvSykefraværOverFlereKvartalerTest {
     SykefraværOverFlereKvartaler resultSykefraværOverFlereKvartaler =
         result.regnUtProsentOgMapTilSykefraværForFlereKvartaler().get();
 
-    Assertions.assertThat(result.muligeDagsverk).isEqualByComparingTo(new BigDecimal(430));
-    Assertions.assertThat(result.tapteDagsverk).isEqualByComparingTo(new BigDecimal(110));
+    Assertions.assertThat(result.getMuligeDagsverk()).isEqualByComparingTo(new BigDecimal(430));
+    Assertions.assertThat(result.getTapteDagsverk()).isEqualByComparingTo(new BigDecimal(110));
     Assertions.assertThat(resultSykefraværOverFlereKvartaler.getProsent())
         .isEqualByComparingTo(expected.getProsent());
     Assertions.assertThat(resultSykefraværOverFlereKvartaler.getKvartaler())

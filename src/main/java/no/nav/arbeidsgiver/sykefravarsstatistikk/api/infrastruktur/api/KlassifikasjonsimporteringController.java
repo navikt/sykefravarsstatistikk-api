@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.OpprettEllerOppdaterResultat;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.OpprettEllerOppdaterResultat;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.KlassifikasjonsimporteringService;
 import no.nav.security.token.support.core.api.Protected;
 import org.springframework.beans.factory.annotation.Autowired;

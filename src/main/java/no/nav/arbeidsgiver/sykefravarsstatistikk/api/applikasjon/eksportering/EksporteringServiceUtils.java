@@ -11,17 +11,17 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.VirksomhetEksportPerKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.VirksomhetMetadata;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.modell.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkLand;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkNæring5Siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkSektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.SykefraværsstatistikkVirksomhetUtenVarighet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka.KafkaService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværsstatistikkLand;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværsstatistikkNæring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværsstatistikkNæring5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværsstatistikkSektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværsstatistikkVirksomhetUtenVarighet;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.Statistikkategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.SykefraværMedKategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefravar.VirksomhetSykefravær;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.SykefraværMedKategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domene.VirksomhetSykefravær;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.UmaskertSykefraværForEttKvartal;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
@@ -283,11 +283,11 @@ public class EksporteringServiceUtils {
   }
 
   public static int leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
-      String orgnr,
-      ÅrstallOgKvartal årstallOgKvartal,
-      @NotNull List<String> virksomheterSomSkalFlaggesSomEksportert,
-      EksporteringRepository eksporteringRepository,
-      KafkaService kafkaService) {
+          String orgnr,
+          ÅrstallOgKvartal årstallOgKvartal,
+          @NotNull List<String> virksomheterSomSkalFlaggesSomEksportert,
+          EksporteringRepository eksporteringRepository,
+          KafkaClient kafkaClient) {
     virksomheterSomSkalFlaggesSomEksportert.add(orgnr);
 
     if (virksomheterSomSkalFlaggesSomEksportert.size()
@@ -296,17 +296,17 @@ public class EksporteringServiceUtils {
           årstallOgKvartal,
           virksomheterSomSkalFlaggesSomEksportert,
           eksporteringRepository,
-          kafkaService);
+              kafkaClient);
     } else {
       return 0;
     }
   }
 
   public static int lagreEksporterteVirksomheterOgNullstillLista(
-      ÅrstallOgKvartal årstallOgKvartal,
-      List<String> virksomheterSomSkalFlaggesSomEksportert,
-      EksporteringRepository eksporteringRepository,
-      KafkaService kafkaService) {
+          ÅrstallOgKvartal årstallOgKvartal,
+          List<String> virksomheterSomSkalFlaggesSomEksportert,
+          EksporteringRepository eksporteringRepository,
+          KafkaClient kafkaClient) {
     int antallSomSkalOppdateres = virksomheterSomSkalFlaggesSomEksportert.size();
     long startWriteToDB = System.nanoTime();
     eksporteringRepository.batchOpprettVirksomheterBekreftetEksportert(
@@ -314,7 +314,7 @@ public class EksporteringServiceUtils {
     virksomheterSomSkalFlaggesSomEksportert.clear();
     long stopWriteToDB = System.nanoTime();
 
-    kafkaService.addDBOppdateringProcessingTime(startWriteToDB, stopWriteToDB);
+    kafkaClient.addDBOppdateringProcessingTime(startWriteToDB, stopWriteToDB);
 
     return antallSomSkalOppdateres;
   }
