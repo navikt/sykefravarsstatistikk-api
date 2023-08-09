@@ -196,7 +196,6 @@
             <version>${net.minidev.json-smart.version}</version>
         </dependency>
 
-
         <dependency>
             <groupId>no.nav.arbeidsgiver</groupId>
             <artifactId>altinn-rettigheter-proxy-klient</artifactId>
