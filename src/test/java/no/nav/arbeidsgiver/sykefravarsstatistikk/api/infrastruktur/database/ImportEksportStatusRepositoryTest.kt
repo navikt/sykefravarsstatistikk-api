@@ -3,9 +3,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 import io.kotest.core.extensions.Extension
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.spring.SpringExtension
-import io.kotest.matchers.collections.shouldContain
-import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
+import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.collections.shouldHaveSize
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
@@ -17,14 +16,31 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
 @ActiveProfiles("db-test")
 open class ImportEksportStatusRepositoryTest(repo: ImportEksportStatusRepository) : FunSpec({
-    test("init burde inite") {
-        val årstallOgKvartal = ÅrstallOgKvartal(2023, 3)
-        repo.initStatus(årstallOgKvartal)
+    val årstallOgKvartal = ÅrstallOgKvartal(2023, 3)
+    val importEksportStatus = ImportEksportStatusDao(
+        årstall = årstallOgKvartal.årstall.toString(),
+        kvartal = årstallOgKvartal.kvartal.toString(),
+        importertStatistikk = true,
+        importertVirksomhetsdata = false,
+        eksportertPåKafka = false,
+        forberedtNesteEksport = false,
+    )
 
-        val resultat = repo.hentImportEksportStatus(årstallOgKvartal)
+    test("sett import eksport status burde sette ny status") {
+        repo.hentImportEksportStatus(årstallOgKvartal) shouldHaveSize 0
 
-        resultat shouldNotBe null
-        resultat shouldContain årstallOgKvartal.årstall.toString()
+        repo.settImportEksportStatus(importEksportStatus)
+
+        repo.hentImportEksportStatus(årstallOgKvartal) shouldContainExactly listOf(importEksportStatus)
+    }
+
+    test("sett import eksport status burde oppdatere eksisterende status") {
+        val oppdatertImportEksportStatus = importEksportStatus.copy(importertVirksomhetsdata = true)
+
+        repo.settImportEksportStatus(importEksportStatus)
+        repo.settImportEksportStatus(oppdatertImportEksportStatus)
+
+        repo.hentImportEksportStatus(årstallOgKvartal) shouldContainExactly listOf(oppdatertImportEksportStatus)
     }
 }) {
     override fun extensions(): List<Extension> = listOf(SpringExtension)
