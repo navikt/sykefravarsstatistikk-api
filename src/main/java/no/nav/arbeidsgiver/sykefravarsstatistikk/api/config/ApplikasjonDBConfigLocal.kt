@@ -1,84 +1,79 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.config;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.config
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import org.flywaydb.core.Flyway;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
-import org.springframework.core.env.Environment;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
+import org.flywaydb.core.Flyway
+import org.jetbrains.exposed.sql.Database
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
+import org.springframework.context.annotation.Profile
+import org.springframework.core.env.Environment
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import javax.sql.DataSource
 
 @Configuration
-@Profile({"local", "mvc-test", "db-test"})
-public class ApplikasjonDBConfigLocal {
+@Profile("local", "mvc-test", "db-test")
+open class ApplikasjonDBConfigLocal(private val environment: Environment) {
+    @Value("\${applikasjon.datasource.url}")
+    private val databaseUrl: String? = null
 
-  @Value("${applikasjon.datasource.url}")
-  private String databaseUrl;
+    @Value("\${applikasjon.datasource.username}")
+    private val username: String? = null
 
-  @Value("${applikasjon.datasource.username}")
-  private String username;
+    @Value("\${applikasjon.datasource.password}")
+    private val password: String? = null
 
-  @Value("${applikasjon.datasource.password}")
-  private String password;
-
-  @Value("${applikasjon.datasource.driver-class-name}")
-  private String driverClassName;
-
-  private final Environment environment;
-
-  public ApplikasjonDBConfigLocal(Environment environment) {
-    this.environment = environment;
-  }
-
-  @Primary
-  @Bean(name = "sykefravarsstatistikkDataSource")
-  public DataSource sykefravarsstatistikkDataSource() {
-    HikariConfig config = new HikariConfig();
-    config.setPoolName("Sykefraværsstatistikk-connection-pool-local");
-    config.setJdbcUrl(databaseUrl);
-    config.setUsername(username);
-    config.setPassword(password);
-    config.setMaximumPoolSize(2);
-    config.setDriverClassName(driverClassName);
-
-    return new HikariDataSource(config);
-  }
-
-  @Primary
-  @Bean(name = "sykefravarsstatistikkJdbcTemplate")
-  public NamedParameterJdbcTemplate sykefravarsstatistikkJdbcTemplate(
-      @Qualifier("sykefravarsstatistikkDataSource") DataSource dataSource) {
-    return new NamedParameterJdbcTemplate(dataSource);
-  }
-
-  @Bean
-  public FlywayMigrationStrategy flywayMigrationStrategy() {
-    List<String> locations = new ArrayList<>();
-    locations.add("/db/migration");
-    locations.add("/db/test-datavarehus");
-
-    String[] profiles = environment.getActiveProfiles();
-    if (Arrays.asList(profiles).contains("mvc-test") || Arrays.asList(profiles).contains("local")) {
-      locations.add("/db/test-lokaldb-data");
+    @Value("\${applikasjon.datasource.driver-class-name}")
+    private val driverClassName: String? = null
+    @Primary
+    @Bean(name = ["sykefravarsstatistikkDataSource"])
+    open fun sykefravarsstatistikkDataSource(): DataSource {
+        val config = HikariConfig()
+        config.poolName = "Sykefraværsstatistikk-connection-pool-local"
+        config.jdbcUrl = databaseUrl
+        config.username = username
+        config.password = password
+        config.maximumPoolSize = 2
+        config.driverClassName = driverClassName
+        return HikariDataSource(config)
     }
 
-    return flyway -> {
-      Flyway.configure()
-          .dataSource(sykefravarsstatistikkDataSource())
-          .locations(locations.toArray(new String[0]))
-          .load()
-          .migrate();
-    };
-  }
+    @Primary
+    @Bean(name = ["sykefravarsstatistikkJdbcTemplate"])
+    open fun sykefravarsstatistikkJdbcTemplate(
+        @Qualifier("sykefravarsstatistikkDataSource") dataSource: DataSource
+    ): NamedParameterJdbcTemplate {
+        return NamedParameterJdbcTemplate(dataSource)
+    }
+
+    @Bean
+    open fun database(
+        @Qualifier("sykefravarsstatistikkDataSource") dataSource: DataSource,
+    ): Database {
+        return Database.connect(dataSource)
+    }
+
+    @Bean
+    open fun flywayMigrationStrategy(): FlywayMigrationStrategy {
+        val locations: MutableList<String> = ArrayList()
+        locations.add("/db/migration")
+        locations.add("/db/test-datavarehus")
+        val profiles = environment.activeProfiles
+        if (listOf<String>(*profiles).contains("mvc-test") || listOf<String>(*profiles)
+                .contains("local")
+        ) {
+            locations.add("/db/test-lokaldb-data")
+        }
+        return FlywayMigrationStrategy {
+            Flyway.configure()
+                .dataSource(sykefravarsstatistikkDataSource())
+                .locations(*locations.toTypedArray<String>())
+                .load()
+                .migrate()
+        }
+    }
 }
