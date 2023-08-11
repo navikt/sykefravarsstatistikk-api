@@ -6,9 +6,9 @@ import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.upsert
-import org.springframework.stereotype.Repository
+import org.springframework.stereotype.Component
 
-@Repository
+@Component
 open class ImportEksportStatusRepository : Table("import_eksport_status") {
     val årstall = varchar("aarstall", 4)
     val kvartal = varchar("kvartal", 1)
