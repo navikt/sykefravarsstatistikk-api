@@ -9,7 +9,7 @@ import org.jetbrains.exposed.sql.upsert
 import org.springframework.stereotype.Repository
 
 @Repository
-object ImportEksportStatusRepository : Table("import_eksport_status") {
+open class ImportEksportStatusRepository : Table("import_eksport_status") {
     val årstall = varchar("aarstall", 4)
     val kvartal = varchar("kvartal", 1)
     val importertStatistikk = bool("importert_statistikk").default(false)
