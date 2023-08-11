@@ -40,6 +40,7 @@ open class ApplikasjonDBConfigLocal(private val environment: Environment) {
         config.password = password
         config.maximumPoolSize = 2
         config.driverClassName = driverClassName
+        config.connectionTestQuery = "SELECT 1"
         return HikariDataSource(config)
     }
 
