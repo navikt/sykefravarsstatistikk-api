@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy
@@ -54,7 +55,9 @@ open class ApplikasjonDBConfigLocal(private val environment: Environment) {
     open fun database(
         @Qualifier("sykefravarsstatistikkDataSource") dataSource: DataSource,
     ): Database {
-        return Database.connect(dataSource)
+        val db = Database.connect(dataSource)
+        TransactionManager.defaultDatabase = db
+        return db
     }
 
     @Bean
