@@ -5,17 +5,13 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.upsert
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 
 @Component
 open class ImportEksportStatusRepository(
-    @Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
-    val database: Database,
-) : Table("import_eksport_status") {
+    override val database: Database,
+) : Table("import_eksport_status"), UsingExposed {
     val årstall = varchar("aarstall", 4)
     val kvartal = varchar("kvartal", 1)
     val importertStatistikk = bool("importert_statistikk").default(false)
@@ -25,7 +21,7 @@ open class ImportEksportStatusRepository(
     override val primaryKey: PrimaryKey = PrimaryKey(årstall, kvartal)
 
     fun settImportEksportStatus(importEksportStatus: ImportEksportStatus) {
-        transaction(database) {
+        transaction {
             upsert {
                 it[årstall] = importEksportStatus.årstallOgKvartal.årstall.toString()
                 it[kvartal] = importEksportStatus.årstallOgKvartal.kvartal.toString()
@@ -40,7 +36,7 @@ open class ImportEksportStatusRepository(
     fun hentImportEksportStatus(
         årstallOgKvartal: ÅrstallOgKvartal
     ): List<ImportEksportStatus> {
-        return transaction(database) {
+        return transaction {
             select {
                 årstall eq årstallOgKvartal.årstall.toString()
                 kvartal eq årstallOgKvartal.kvartal.toString()
