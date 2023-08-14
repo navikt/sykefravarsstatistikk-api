@@ -36,9 +36,9 @@ jobs:
       image: ${{ steps.docker-push.outputs.image }}
 
   deploy-to-dev:
-    name: Deploy to dev-gcp
+    name: Deploy to dev-fss
     needs: docker-build-push
-    if: github.ref == 'refs/heads/arkitektur'
+    if: github.ref == 'refs/heads/tabell'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -51,7 +51,7 @@ jobs:
           RESOURCE: nais/dev.yaml
 
   deploy-to-prod:
-    name: Deploy to dev-gcp
+    name: Deploy to prod-fss
     needs: docker-build-push
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
@@ -71,7 +71,7 @@ jobs:
     if: github.ref == 'refs/heads/use_gar_distroless'
     steps:
       - uses: actions/checkout@v3
-      - name: Deploy topics to dev-gcp
+      - name: Deploy topics to dev-fss
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
@@ -92,7 +92,7 @@ jobs:
     if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v3
-      - name: Deploy topics to prod-gcp
+      - name: Deploy topics to prod-fss
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
