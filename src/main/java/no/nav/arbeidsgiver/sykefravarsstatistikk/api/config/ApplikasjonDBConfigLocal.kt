@@ -34,7 +34,7 @@ open class ApplikasjonDBConfigLocal(private val environment: Environment) {
     @Bean(name = ["sykefravarsstatistikkDataSource"])
     open fun sykefravarsstatistikkDataSource(): DataSource {
         val config = HikariConfig()
-        config.poolName = "Sykefraværsstatistikk-connection-pool-local"
+        config.poolName = "sykefraværsstatistikk-connection-pool-local"
         config.jdbcUrl = databaseUrl
         config.username = username
         config.password = password

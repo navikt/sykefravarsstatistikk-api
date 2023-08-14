@@ -25,7 +25,7 @@ statistikk.importering.aktivert: true
 statistikk.eksportering.aktivert: true
 
 applikasjon.datasource:
-  url: jdbc:h2:mem:db-local;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+  url: jdbc:h2:mem:db-local;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;TRACE_LEVEL_SYSTEM_OUT=3
   username: SA
   password:
   driver-class-name: org.h2.Driver
