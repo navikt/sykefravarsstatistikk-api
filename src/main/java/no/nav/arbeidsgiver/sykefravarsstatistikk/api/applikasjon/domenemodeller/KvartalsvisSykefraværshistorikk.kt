@@ -1,15 +1,13 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty
+import lombok.Data
 
 @Data
-public class KvartalsvisSykefraværshistorikk {
-  private Statistikkategori type;
-  private String label;
+class KvartalsvisSykefraværshistorikk {
+    private val type: Statistikkategori? = null
+    private val label: String? = null
 
-  @JsonProperty("kvartalsvisSykefraværsprosent")
-  private List<SykefraværForEttKvartal> sykefraværForEttKvartal;
+    @JsonProperty("kvartalsvisSykefraværsprosent")
+    private val sykefraværForEttKvartal: List<SykefraværForEttKvartal>? = null
 }

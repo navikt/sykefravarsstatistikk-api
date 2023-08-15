@@ -1,109 +1,105 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-import io.vavr.control.Either;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Optional;
-import lombok.Data;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.StatistikkUtils;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.StatistikkException;
-import org.jetbrains.annotations.NotNull;
+import io.vavr.control.Either
+import lombok.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.StatistikkException
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.StatistikkUtils
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.util.*
 
 @Data
-public class UmaskertSykefraværForEttKvartal
-    implements Comparable<UmaskertSykefraværForEttKvartal> {
+open class UmaskertSykefraværForEttKvartal : Comparable<UmaskertSykefraværForEttKvartal> {
+    val dagsverkTeller: BigDecimal
+    val dagsverkNevner: BigDecimal
+    val antallPersoner: Int
+    val årstallOgKvartal: ÅrstallOgKvartal?
 
-  protected final BigDecimal dagsverkTeller;
-  protected final BigDecimal dagsverkNevner;
-  public final int antallPersoner;
-  public final ÅrstallOgKvartal årstallOgKvartal;
+    constructor(
+        årstallOgKvartal: ÅrstallOgKvartal?,
+        dagsverkTeller: BigDecimal?,
+        dagsverkNevner: BigDecimal?,
+        antallPersoner: Int
+    ) {
+        this.årstallOgKvartal = årstallOgKvartal
+        this.dagsverkTeller = dagsverkTeller!!.setScale(1, RoundingMode.HALF_UP)
+        this.dagsverkNevner = dagsverkNevner!!.setScale(1, RoundingMode.HALF_UP)
+        this.antallPersoner = antallPersoner
+    }
 
-  public UmaskertSykefraværForEttKvartal(
-      ÅrstallOgKvartal årstallOgKvartal,
-      BigDecimal dagsverkTeller,
-      BigDecimal dagsverkNevner,
-      int antallPersoner) {
-    this.årstallOgKvartal = årstallOgKvartal;
-    this.dagsverkTeller = dagsverkTeller.setScale(1, RoundingMode.HALF_UP);
-    this.dagsverkNevner = dagsverkNevner.setScale(1, RoundingMode.HALF_UP);
-    this.antallPersoner = antallPersoner;
-  }
-
-  public UmaskertSykefraværForEttKvartal(Sykefraværsstatistikk statistikk) {
-    this(
-        new ÅrstallOgKvartal(statistikk.getÅrstall(), statistikk.getKvartal()),
+    constructor(statistikk: Sykefraværsstatistikk) : this(
+        ÅrstallOgKvartal(statistikk.getÅrstall(), statistikk.getKvartal()),
         statistikk.getTapteDagsverk(),
         statistikk.getMuligeDagsverk(),
-        statistikk.getAntallPersoner());
-  }
+        statistikk.getAntallPersoner()
+    )
 
-  public UmaskertSykefraværForEttKvartal(
-      ÅrstallOgKvartal kvartal, int dagsverkTeller, int dagsverkNevner, int antallPersoner) {
-    this.årstallOgKvartal = kvartal;
-    this.dagsverkTeller = new BigDecimal(String.valueOf(dagsverkTeller));
-    this.dagsverkNevner = new BigDecimal(String.valueOf(dagsverkNevner));
-    this.antallPersoner = antallPersoner;
-  }
-
-  public SykefraværMedKategori tilSykefraværMedKategori(Statistikkategori kategori, String kode) {
-    return new SykefraværMedKategori(
-        kategori,
-        kode,
-        årstallOgKvartal,
-        dagsverkTeller,
-        dagsverkNevner,
-        antallPersoner
-    );
-  }
-
-  public SykefraværsstatistikkLand tilSykefraværsstatistikkLand() {
-    return new SykefraværsstatistikkLand(
-        årstallOgKvartal.getÅrstall(),
-        årstallOgKvartal.getKvartal(),
-        antallPersoner,
-        dagsverkTeller,
-        dagsverkNevner
-    );
-  }
-
-  public static Optional<UmaskertSykefraværForEttKvartal> hentUtKvartal(
-      Collection<UmaskertSykefraværForEttKvartal> sykefravær, @NotNull ÅrstallOgKvartal kvartal) {
-    return (sykefravær == null)
-        ? Optional.empty()
-        : sykefravær.stream()
-            .filter(datapunkt -> datapunkt.getÅrstallOgKvartal().equals(kvartal))
-            .findAny();
-  }
-
-  public int getKvartal() {
-    return årstallOgKvartal != null ? årstallOgKvartal.getKvartal() : 0;
-  }
-
-  public int getÅrstall() {
-    return årstallOgKvartal != null ? årstallOgKvartal.getÅrstall() : 0;
-  }
-
-  public Either<StatistikkException, BigDecimal> kalkulerSykefraværsprosent() {
-    return StatistikkUtils.kalkulerSykefraværsprosent(dagsverkTeller, dagsverkNevner);
-  }
-
-  public UmaskertSykefraværForEttKvartal add(UmaskertSykefraværForEttKvartal other) {
-    if (!other.getÅrstallOgKvartal().equals(årstallOgKvartal)) {
-      throw new IllegalArgumentException(
-          "Kan ikke summere kvartalsvis sykefravær med forskjellige kvartaler");
+    constructor(
+        kvartal: ÅrstallOgKvartal?, dagsverkTeller: Int, dagsverkNevner: Int, antallPersoner: Int
+    ) {
+        årstallOgKvartal = kvartal
+        this.dagsverkTeller = BigDecimal(dagsverkTeller.toString())
+        this.dagsverkNevner = BigDecimal(dagsverkNevner.toString())
+        this.antallPersoner = antallPersoner
     }
-    return new UmaskertSykefraværForEttKvartal(
-        årstallOgKvartal,
-        dagsverkTeller.add(other.getDagsverkTeller()),
-        dagsverkNevner.add(other.getDagsverkNevner()),
-        antallPersoner + other.getAntallPersoner());
-  }
 
-  @Override
-  public int compareTo(@NotNull UmaskertSykefraværForEttKvartal kvartalsvisSykefravær) {
-    return Comparator.comparing(UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal)
-        .compare(this, kvartalsvisSykefravær);
-  }
+    fun tilSykefraværMedKategori(kategori: Statistikkategori, kode: String): SykefraværMedKategori {
+        return SykefraværMedKategori(
+            kategori,
+            kode,
+            årstallOgKvartal,
+            dagsverkTeller,
+            dagsverkNevner,
+            antallPersoner
+        )
+    }
+
+    fun tilSykefraværsstatistikkLand(): SykefraværsstatistikkLand {
+        return SykefraværsstatistikkLand(
+            årstallOgKvartal!!.årstall,
+            årstallOgKvartal.kvartal,
+            antallPersoner,
+            dagsverkTeller,
+            dagsverkNevner
+        )
+    }
+
+    val kvartal: Int
+        get() = årstallOgKvartal?.kvartal ?: 0
+    val Årstall: Int
+        get() = årstallOgKvartal?.årstall ?: 0
+
+    fun kalkulerSykefraværsprosent(): Either<StatistikkException, BigDecimal> {
+        return StatistikkUtils.kalkulerSykefraværsprosent(dagsverkTeller, dagsverkNevner)
+    }
+
+    fun add(other: UmaskertSykefraværForEttKvartal): UmaskertSykefraværForEttKvartal {
+        require(
+            other.getÅrstallOgKvartal().equals(årstallOgKvartal)
+        ) { "Kan ikke summere kvartalsvis sykefravær med forskjellige kvartaler" }
+        return UmaskertSykefraværForEttKvartal(
+            årstallOgKvartal,
+            dagsverkTeller.add(other.getDagsverkTeller()),
+            dagsverkNevner.add(other.getDagsverkNevner()),
+            antallPersoner + other.getAntallPersoner()
+        )
+    }
+
+    override fun compareTo(kvartalsvisSykefravær: UmaskertSykefraværForEttKvartal): Int {
+        return Comparator.comparing<Any, Any>(UmaskertSykefraværForEttKvartal::getÅrstallOgKvartal)
+            .compare(this, kvartalsvisSykefravær)
+    }
+
+    companion object {
+        fun hentUtKvartal(
+            sykefravær: Collection<UmaskertSykefraværForEttKvartal>?, kvartal: ÅrstallOgKvartal
+        ): Optional<UmaskertSykefraværForEttKvartal> {
+            return if (sykefravær == null) Optional.empty<UmaskertSykefraværForEttKvartal>() else sykefravær.stream()
+                .filter { datapunkt: UmaskertSykefraværForEttKvartal ->
+                    datapunkt.getÅrstallOgKvartal().equals(kvartal)
+                }
+                .findAny()
+        }
+    }
 }

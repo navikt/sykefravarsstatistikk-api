@@ -60,8 +60,8 @@ class SumAvSykefraværOverFlereKvartalerTest {
     Assertions.assertThat(result.getTapteDagsverk()).isEqualByComparingTo(new BigDecimal(110));
     Assertions.assertThat(resultSykefraværOverFlereKvartaler.getProsent())
         .isEqualByComparingTo(expected.getProsent());
-    Assertions.assertThat(resultSykefraværOverFlereKvartaler.getKvartaler())
-        .isEqualTo(expected.getKvartaler());
+    Assertions.assertThat(resultSykefraværOverFlereKvartaler.kvartaler)
+        .isEqualTo(expected.kvartaler);
   }
 
   @Test

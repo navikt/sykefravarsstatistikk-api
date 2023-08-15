@@ -1,40 +1,26 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Objects;
+import java.math.BigDecimal
+import java.util.*
 
-public class SykefraværOverFlereKvartaler extends MaskerbartSykefraværOverFlereKvartaler {
+class SykefraværOverFlereKvartaler(
+    @JvmField val kvartaler: List<ÅrstallOgKvartal?>,
+    tapteDagsverk: BigDecimal,
+    muligeDagsverk: BigDecimal,
+    sykefraværList: List<SykefraværForEttKvartal?>
+) : MaskerbartSykefraværOverFlereKvartaler(tapteDagsverk, muligeDagsverk, sykefraværList, kvartaler.size != 0) {
 
-  private List<ÅrstallOgKvartal> kvartaler;
+    override fun equals(o: Any?): Boolean {
+        if (this === o) return true
+        if (o !is SykefraværOverFlereKvartaler) return false
+        if (!super.equals(o)) return false
+        val that = o
+        return (kvartaler == that.kvartaler && getProsent().equals(that.getProsent())
+                && getTapteDagsverk().equals(that.getTapteDagsverk())
+                && getMuligeDagsverk().equals(that.getMuligeDagsverk()))
+    }
 
-  public SykefraværOverFlereKvartaler(
-      List<ÅrstallOgKvartal> kvartaler,
-      BigDecimal tapteDagsverk,
-      BigDecimal muligeDagsverk,
-      List<SykefraværForEttKvartal> sykefraværList) {
-    super(tapteDagsverk, muligeDagsverk, sykefraværList, kvartaler.size() != 0);
-    this.kvartaler = kvartaler;
-  }
-
-  public List<ÅrstallOgKvartal> getKvartaler() {
-    return kvartaler;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof SykefraværOverFlereKvartaler)) return false;
-    if (!super.equals(o)) return false;
-    SykefraværOverFlereKvartaler that = (SykefraværOverFlereKvartaler) o;
-    return (kvartaler.equals(that.kvartaler)
-        && getProsent().equals(that.getProsent())
-        && getTapteDagsverk().equals(that.getTapteDagsverk())
-        && getMuligeDagsverk().equals(that.getMuligeDagsverk()));
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(super.hashCode(), kvartaler);
-  }
+    override fun hashCode(): Int {
+        return Objects.hash(super.hashCode(), kvartaler)
+    }
 }

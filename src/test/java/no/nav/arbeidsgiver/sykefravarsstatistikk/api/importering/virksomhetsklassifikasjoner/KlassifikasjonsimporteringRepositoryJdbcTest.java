@@ -45,8 +45,8 @@ public class KlassifikasjonsimporteringRepositoryJdbcTest {
 
     Sektor sektor = repository.hentSektor("9");
 
-    assertThat(sektor.getKode()).isEqualTo("9");
-    assertThat(sektor.getNavn()).isEqualTo("Fylkeskommunal forvaltning");
+    assertThat(sektor.kode).isEqualTo("9");
+    assertThat(sektor.navn).isEqualTo("Fylkeskommunal forvaltning");
   }
 
   private static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {

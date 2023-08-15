@@ -1,41 +1,38 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram
 
-import io.vavr.control.Either;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori;
+import io.vavr.control.Either
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring.getNavn
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
 
-public class BransjeEllerNæring {
-  public final Either<Bransje, Næring> verdi;
+class BransjeEllerNæring {
+    val verdi: Either<Bransje, Næring>
 
-  public BransjeEllerNæring(Bransje bransje) {
-    this.verdi = Either.left(bransje);
-  }
-
-  public BransjeEllerNæring(Næring næring) {
-    this.verdi = Either.right(næring);
-  }
-
-  public Statistikkategori getStatistikkategori() {
-    if (verdi.isLeft()) {
-      return Statistikkategori.BRANSJE;
-    } else {
-      return Statistikkategori.NÆRING;
+    constructor(bransje: Bransje) {
+        verdi = Either.left(bransje)
     }
-  }
 
-  public boolean isBransje() {
-    return verdi.isLeft();
-  }
+    constructor(næring: Næring) {
+        verdi = Either.right(næring)
+    }
 
-  public Bransje getBransje() {
-    return verdi.getLeft();
-  }
+    val statistikkategori: Statistikkategori
+        get() = if (verdi.isLeft) {
+            Statistikkategori.BRANSJE
+        } else {
+            Statistikkategori.NÆRING
+        }
+    val isBransje: Boolean
+        get() = verdi.isLeft
 
-  public String navn() {
-    return this.isBransje() ? verdi.getLeft().getNavn() : verdi.get().getNavn();
-  }
+    fun getBransje(): Bransje {
+        return verdi.left
+    }
 
-  public Næring getNæring() {
-    return verdi.get();
-  }
+    fun navn(): String {
+        return if (isBransje) verdi.left.getNavn() else verdi.get().navn
+    }
+
+    val næring: Næring
+        get() = verdi.get()
 }

@@ -57,7 +57,7 @@ public class KvartalsvisSykefraværshistorikkService {
                 uthentingMedFeilhåndteringOgTimeout(
                     () -> hentSykefraværshistorikkSektor(ssbSektor),
                     Statistikkategori.SEKTOR,
-                    ssbSektor.getNavn()),
+                        ssbSektor.navn),
                 skalHenteDataPåNæring
                     ? uthentingAvSykefraværshistorikkNæring(underenhet)
                     : uthentingMedFeilhåndteringOgTimeout(
@@ -105,7 +105,7 @@ public class KvartalsvisSykefraværshistorikkService {
   private KvartalsvisSykefraværshistorikk hentSykefraværshistorikkSektor(Sektor ssbSektor) {
     return byggSykefraværshistorikk(
         Statistikkategori.SEKTOR,
-        ssbSektor.getNavn(),
+            ssbSektor.navn,
         kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(ssbSektor));
   }
 

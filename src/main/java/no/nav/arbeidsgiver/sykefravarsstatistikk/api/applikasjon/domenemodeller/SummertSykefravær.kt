@@ -1,52 +1,39 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-import lombok.Getter;
-import lombok.Setter;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal
+import java.math.BigDecimal
+import java.util.stream.Collectors
 
 @Setter
 @Getter
-public class SummertSykefravær extends MaskerbartSykefravær {
-
-  private final List<ÅrstallOgKvartal> kvartaler;
-
-  public SummertSykefravær(
-      BigDecimal tapteDagsverk,
-      BigDecimal muligeDagsverk,
-      int maksAntallPersonerOverPerioden,
-      List<ÅrstallOgKvartal> kvartaler) {
-    super(tapteDagsverk, muligeDagsverk, maksAntallPersonerOverPerioden, !kvartaler.isEmpty());
-    this.kvartaler = kvartaler;
-  }
-
-  public static SummertSykefravær getSummertSykefravær(
-      List<UmaskertSykefraværForEttKvartal> kvartalsvisSykefravær) {
-
-    BigDecimal totalTaptedagsverk =
-        kvartalsvisSykefravær.stream()
-            .map(UmaskertSykefraværForEttKvartal::getDagsverkTeller)
-            .reduce(new BigDecimal(0), BigDecimal::add);
-
-    BigDecimal totalMuligedagsverk =
-        kvartalsvisSykefravær.stream()
-            .map(UmaskertSykefraværForEttKvartal::getDagsverkNevner)
-            .reduce(new BigDecimal(0), BigDecimal::add);
-
-    int maksAntallPersoner =
-        kvartalsvisSykefravær.stream()
-            .map(e -> e.getAntallPersoner())
-            .max(Integer::compare)
-            .orElse(0);
-
-    return new SummertSykefravær(
-        totalTaptedagsverk,
-        totalMuligedagsverk,
-        maksAntallPersoner,
-        kvartalsvisSykefravær.stream()
-            .map(k -> k.getÅrstallOgKvartal())
-            .collect(Collectors.toList()));
-  }
+class SummertSykefravær(
+    tapteDagsverk: BigDecimal?,
+    muligeDagsverk: BigDecimal?,
+    maksAntallPersonerOverPerioden: Int,
+    private val kvartaler: List<ÅrstallOgKvartal?>
+) : MaskerbartSykefravær(tapteDagsverk, muligeDagsverk, maksAntallPersonerOverPerioden, !kvartaler.isEmpty()) {
+    companion object {
+        fun getSummertSykefravær(
+            kvartalsvisSykefravær: List<UmaskertSykefraværForEttKvartal>
+        ): SummertSykefravær {
+            val totalTaptedagsverk: BigDecimal = kvartalsvisSykefravær.stream()
+                .map<Any>(UmaskertSykefraværForEttKvartal::getDagsverkTeller)
+                .reduce(BigDecimal(0), BigDecimal::add)
+            val totalMuligedagsverk: BigDecimal = kvartalsvisSykefravær.stream()
+                .map<Any>(UmaskertSykefraværForEttKvartal::getDagsverkNevner)
+                .reduce(BigDecimal(0), BigDecimal::add)
+            val maksAntallPersoner: Int = kvartalsvisSykefravær.stream()
+                .map<Any> { e: UmaskertSykefraværForEttKvartal -> e.getAntallPersoner() }
+                .max { x: Any?, y: Any? -> Integer.compare(x, y) }
+                .orElse(0)
+            return SummertSykefravær(
+                totalTaptedagsverk,
+                totalMuligedagsverk,
+                maksAntallPersoner,
+                kvartalsvisSykefravær.stream()
+                    .map<Any?> { k: UmaskertSykefraværForEttKvartal -> k.getÅrstallOgKvartal() }
+                    .collect(Collectors.toList<Any?>()))
+        }
+    }
 }

@@ -1,8 +1,8 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-public interface Virksomhetsklassifikasjon {
-
-  String getNavn();
-
-  String getKode();
+interface Virksomhetsklassifikasjon {
+    @JvmField
+    val navn: String?
+    @JvmField
+    val kode: String?
 }

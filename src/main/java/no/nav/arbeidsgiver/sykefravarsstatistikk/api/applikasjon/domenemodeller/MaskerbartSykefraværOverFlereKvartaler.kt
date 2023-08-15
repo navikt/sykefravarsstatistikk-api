@@ -1,40 +1,34 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.List;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.StatistikkUtils;
+import lombok.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.StatistikkUtils
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 @Getter
 @EqualsAndHashCode
-public abstract class MaskerbartSykefraværOverFlereKvartaler {
+abstract class MaskerbartSykefraværOverFlereKvartaler(
+    tapteDagsverk: BigDecimal,
+    muligeDagsverk: BigDecimal,
+    sykefraværForEttKvartalList: List<SykefraværForEttKvartal?>,
+    harSykefraværData: Boolean
+) {
+    private var prosent: BigDecimal? = null
+    private val tapteDagsverk: BigDecimal? = null
+    private val muligeDagsverk: BigDecimal? = null
+    private val erMaskert: Boolean
 
-  private final BigDecimal prosent;
-  private final BigDecimal tapteDagsverk;
-  private final BigDecimal muligeDagsverk;
-  private final boolean erMaskert;
-
-  public MaskerbartSykefraværOverFlereKvartaler(
-      BigDecimal tapteDagsverk,
-      BigDecimal muligeDagsverk,
-      List<SykefraværForEttKvartal> sykefraværForEttKvartalList,
-      boolean harSykefraværData) {
-    erMaskert =
-        harSykefraværData
-            && sykefraværForEttKvartalList.stream().allMatch(MaskerbartSykefravær::isErMaskert);
-
-    if (!erMaskert && harSykefraværData) {
-      prosent =
-          StatistikkUtils.kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk).getOrNull();
-
-      this.tapteDagsverk = tapteDagsverk.setScale(1, RoundingMode.HALF_UP);
-      this.muligeDagsverk = muligeDagsverk.setScale(1, RoundingMode.HALF_UP);
-    } else {
-      prosent = null;
-      this.tapteDagsverk = null;
-      this.muligeDagsverk = null;
+    init {
+        erMaskert = (harSykefraværData
+                && sykefraværForEttKvartalList.stream().allMatch(MaskerbartSykefravær::isErMaskert))
+        if (!erMaskert && harSykefraværData) {
+            prosent = StatistikkUtils.kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk).getOrNull()
+            this.tapteDagsverk = tapteDagsverk.setScale(1, RoundingMode.HALF_UP)
+            this.muligeDagsverk = muligeDagsverk.setScale(1, RoundingMode.HALF_UP)
+        } else {
+            prosent = null
+            this.tapteDagsverk = null
+            this.muligeDagsverk = null
+        }
     }
-  }
 }

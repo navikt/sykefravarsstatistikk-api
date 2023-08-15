@@ -1,37 +1,17 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-public class NæringOgNæringskode5siffer {
-  String næring;
-  String næringskode5Siffer;
+class NæringOgNæringskode5siffer(@JvmField var næring: String, @JvmField var næringskode5Siffer: String) {
 
-  public NæringOgNæringskode5siffer(String næring, String næringskode5Siffer) {
-    this.næring = næring;
-    this.næringskode5Siffer = næringskode5Siffer;
-  }
+    override fun equals(o: Any?): Boolean {
+        if (this === o) return true
+        if (o == null || javaClass != o.javaClass) return false
+        val that = o as NæringOgNæringskode5siffer
+        return if (næring != that.næring) false else næringskode5Siffer == that.næringskode5Siffer
+    }
 
-  public String getNæring() {
-    return næring;
-  }
-
-  public String getNæringskode5Siffer() {
-    return næringskode5Siffer;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    NæringOgNæringskode5siffer that = (NæringOgNæringskode5siffer) o;
-
-    if (!næring.equals(that.næring)) return false;
-    return næringskode5Siffer.equals(that.næringskode5Siffer);
-  }
-
-  @Override
-  public int hashCode() {
-    int result = næring.hashCode();
-    result = 31 * result + næringskode5Siffer.hashCode();
-    return result;
-  }
+    override fun hashCode(): Int {
+        var result = næring.hashCode()
+        result = 31 * result + næringskode5Siffer.hashCode()
+        return result
+    }
 }

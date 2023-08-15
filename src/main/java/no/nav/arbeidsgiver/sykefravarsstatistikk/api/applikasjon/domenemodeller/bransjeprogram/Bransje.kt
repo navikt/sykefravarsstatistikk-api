@@ -1,59 +1,62 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram
 
-import java.util.Arrays;
-import java.util.List;
-import lombok.Data;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode5Siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UnderenhetLegacy;
+import lombok.Data
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode5Siffer
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UnderenhetLegacy
+import java.util.*
 
 @Data
-public class Bransje {
+class Bransje(
+    val type: ArbeidsmiljøportalenBransje, val navn: String, vararg koderSomSpesifisererNæringer: String?
+) {
+    val koderSomSpesifisererNæringer: List<String>
 
-  public final ArbeidsmiljøportalenBransje type;
-  public final String navn;
-  public final List<String> koderSomSpesifisererNæringer;
-
-  public Bransje(
-      ArbeidsmiljøportalenBransje type, String navn, String... koderSomSpesifisererNæringer) {
-    this.type = type;
-    this.navn = navn;
-    this.koderSomSpesifisererNæringer = Arrays.asList(koderSomSpesifisererNæringer);
-    validerKoder();
-  }
-
-  private void validerKoder() {
-    if (inneholderKunKoderMedGittAntallSifre(2) || inneholderKunKoderMedGittAntallSifre(5)) {
-      return;
+    init {
+        this.koderSomSpesifisererNæringer = Arrays.asList(*koderSomSpesifisererNæringer)
+        validerKoder()
     }
-    throw new IllegalArgumentException(
-        "Støtter kun bransjer som er spesifisert av enten 2 eller 5 sifre");
-  }
 
-  private boolean inneholderKunKoderMedGittAntallSifre(int antallSifre) {
-    return koderSomSpesifisererNæringer.stream().allMatch(kode -> kode.length() == antallSifre);
-  }
-
-  public boolean erDefinertPåTosiffernivå() {
-    return inneholderKunKoderMedGittAntallSifre(2);
-  }
-
-  public boolean erDefinertPåFemsiffernivå() {
-    return inneholderKunKoderMedGittAntallSifre(5);
-  }
-
-  public boolean inkludererVirksomhet(UnderenhetLegacy underenhet) {
-    return inkludererNæringskode(underenhet.getNæringskode());
-  }
-
-  public boolean inkludererNæringskode(Næringskode5Siffer næringskode5Siffer) {
-    String næringskode = næringskode5Siffer.getKode();
-    return koderSomSpesifisererNæringer.stream().anyMatch(næringskode::startsWith);
-  }
-
-  public boolean inkludererNæringskode(String næringskode5Siffer) {
-    if (næringskode5Siffer == null) {
-      return false;
+    private fun validerKoder() {
+        if (inneholderKunKoderMedGittAntallSifre(2) || inneholderKunKoderMedGittAntallSifre(5)) {
+            return
+        }
+        throw IllegalArgumentException(
+            "Støtter kun bransjer som er spesifisert av enten 2 eller 5 sifre"
+        )
     }
-    return koderSomSpesifisererNæringer.stream().anyMatch(næringskode5Siffer::startsWith);
-  }
+
+    private fun inneholderKunKoderMedGittAntallSifre(antallSifre: Int): Boolean {
+        return koderSomSpesifisererNæringer.stream().allMatch { kode: String -> kode.length == antallSifre }
+    }
+
+    fun erDefinertPåTosiffernivå(): Boolean {
+        return inneholderKunKoderMedGittAntallSifre(2)
+    }
+
+    fun erDefinertPåFemsiffernivå(): Boolean {
+        return inneholderKunKoderMedGittAntallSifre(5)
+    }
+
+    fun inkludererVirksomhet(underenhet: UnderenhetLegacy): Boolean {
+        return inkludererNæringskode(underenhet.næringskode)
+    }
+
+    fun inkludererNæringskode(næringskode5Siffer: Næringskode5Siffer?): Boolean {
+        val næringskode = næringskode5Siffer!!.kode
+        return koderSomSpesifisererNæringer.stream().anyMatch { prefix: String? ->
+            næringskode.startsWith(
+                prefix!!
+            )
+        }
+    }
+
+    fun inkludererNæringskode(næringskode5Siffer: String?): Boolean {
+        return if (næringskode5Siffer == null) {
+            false
+        } else koderSomSpesifisererNæringer.stream().anyMatch { prefix: String? ->
+            næringskode5Siffer.startsWith(
+                prefix!!
+            )
+        }
+    }
 }

@@ -1,11 +1,11 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram
 
-public enum ArbeidsmiljøportalenBransje {
-  BARNEHAGER,
-  NÆRINGSMIDDELINDUSTRI,
-  SYKEHUS,
-  SYKEHJEM,
-  TRANSPORT,
-  BYGG,
-  ANLEGG,
+enum class ArbeidsmiljøportalenBransje {
+    BARNEHAGER,
+    NÆRINGSMIDDELINDUSTRI,
+    SYKEHUS,
+    SYKEHJEM,
+    TRANSPORT,
+    BYGG,
+    ANLEGG
 }

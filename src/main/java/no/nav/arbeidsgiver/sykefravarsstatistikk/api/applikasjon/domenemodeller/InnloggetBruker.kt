@@ -1,37 +1,30 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import lombok.Data;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnOrganisasjon;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.TilgangskontrollException;
+import lombok.Data
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.TilgangskontrollException
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnOrganisasjon
+import java.util.*
+import java.util.stream.Collectors
 
 @Data
-public class InnloggetBruker {
+class InnloggetBruker(private val fnr: Fnr) {
+    private val brukerensOrganisasjoner: List<AltinnOrganisasjon>
 
-  private List<AltinnOrganisasjon> brukerensOrganisasjoner;
-  private Fnr fnr;
-
-  public InnloggetBruker(Fnr fnr) {
-    this.fnr = fnr;
-    brukerensOrganisasjoner = new ArrayList<>();
-  }
-
-  public void sjekkTilgang(Orgnr orgnr) {
-    if (!harTilgang(orgnr)) {
-      throw new TilgangskontrollException("Har ikke tilgang til statistikk for denne bedriften.");
+    init {
+        brukerensOrganisasjoner = ArrayList()
     }
-  }
 
-  public boolean harTilgang(Orgnr orgnr) {
-    List<String> orgnumreBrukerHarTilgangTil =
-        brukerensOrganisasjoner.stream()
-            .filter(Objects::nonNull)
-            .map(AltinnOrganisasjon::getOrganizationNumber)
-            .collect(Collectors.toList());
+    fun sjekkTilgang(orgnr: Orgnr) {
+        if (!harTilgang(orgnr)) {
+            throw TilgangskontrollException("Har ikke tilgang til statistikk for denne bedriften.")
+        }
+    }
 
-    return orgnumreBrukerHarTilgangTil.contains(orgnr.getVerdi());
-  }
+    fun harTilgang(orgnr: Orgnr): Boolean {
+        val orgnumreBrukerHarTilgangTil = brukerensOrganisasjoner.stream()
+            .filter { obj: AltinnOrganisasjon? -> Objects.nonNull(obj) }
+            .map(AltinnOrganisasjon::organizationNumber)
+            .collect(Collectors.toList())
+        return orgnumreBrukerHarTilgangTil.contains(orgnr.verdi)
+    }
 }

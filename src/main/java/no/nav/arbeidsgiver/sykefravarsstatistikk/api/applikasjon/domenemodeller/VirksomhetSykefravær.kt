@@ -1,77 +1,56 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonProperty
+import java.math.BigDecimal
+import java.util.*
 
-import java.math.BigDecimal;
-import java.util.Objects;
+class VirksomhetSykefravær : SykefraværForEttKvartal {
+    @JsonProperty("kategori")
+    private val kategori: Statistikkategori
+    val orgnr: String
+    val navn: String
+    override val antallPersoner: Int
 
-public class VirksomhetSykefravær extends SykefraværForEttKvartal {
+    constructor(
+        orgnr: String,
+        navn: String,
+        årstallOgKvartal: ÅrstallOgKvartal?,
+        tapteDagsverk: BigDecimal?,
+        mulige_dagsverk: BigDecimal?,
+        antallPersoner: Int
+    ) : super(årstallOgKvartal, tapteDagsverk, mulige_dagsverk, antallPersoner) {
+        kategori = Statistikkategori.VIRKSOMHET
+        this.orgnr = orgnr
+        this.navn = navn
+        this.antallPersoner = antallPersoner
+    }
 
-  @JsonProperty("kategori")
-  private final Statistikkategori kategori;
+    @JsonCreator
+    constructor(
+        @JsonProperty("orgnr") orgnr: String,
+        @JsonProperty("navn") navn: String,
+        @JsonProperty("årstall") årstall: Int,
+        @JsonProperty("kvartal") kvartal: Int,
+        @JsonProperty("tapteDagsverk") tapteDagsverk: BigDecimal?,
+        @JsonProperty("muligeDagsverk") muligeDagsverk: BigDecimal?,
+        @JsonProperty("antallPersoner") antallPersoner: Int
+    ) : super(ÅrstallOgKvartal(årstall, kvartal), tapteDagsverk, muligeDagsverk, antallPersoner) {
+        kategori = Statistikkategori.VIRKSOMHET
+        this.orgnr = orgnr
+        this.navn = navn
+        this.antallPersoner = antallPersoner
+    }
 
-  private final String orgnr;
-  private final String navn;
-  private final int antallPersoner;
+    override fun equals(o: Any?): Boolean {
+        if (this === o) return true
+        if (o !is VirksomhetSykefravær) return false
+        if (!super.equals(o)) return false
+        val that = o
+        return super.equals(that) && antallPersoner == that.antallPersoner && kategori == that.kategori && orgnr == that.orgnr && navn == that.navn
+    }
 
-  public VirksomhetSykefravær(
-      String orgnr,
-      String navn,
-      ÅrstallOgKvartal årstallOgKvartal,
-      BigDecimal tapteDagsverk,
-      BigDecimal mulige_dagsverk,
-      int antallPersoner) {
-    super(årstallOgKvartal, tapteDagsverk, mulige_dagsverk, antallPersoner);
-    this.kategori = Statistikkategori.VIRKSOMHET;
-    this.orgnr = orgnr;
-    this.navn = navn;
-    this.antallPersoner = antallPersoner;
-  }
-
-  @JsonCreator
-  public VirksomhetSykefravær(
-      @JsonProperty("orgnr") String orgnr,
-      @JsonProperty("navn") String navn,
-      @JsonProperty("årstall") int årstall,
-      @JsonProperty("kvartal") int kvartal,
-      @JsonProperty("tapteDagsverk") BigDecimal tapteDagsverk,
-      @JsonProperty("muligeDagsverk") BigDecimal muligeDagsverk,
-      @JsonProperty("antallPersoner") int antallPersoner) {
-    super(new ÅrstallOgKvartal(årstall, kvartal), tapteDagsverk, muligeDagsverk, antallPersoner);
-    this.kategori = Statistikkategori.VIRKSOMHET;
-    this.orgnr = orgnr;
-    this.navn = navn;
-    this.antallPersoner = antallPersoner;
-  }
-
-  public String getOrgnr() {
-    return orgnr;
-  }
-
-  public String getNavn() {
-    return navn;
-  }
-
-  public int getAntallPersoner() {
-    return antallPersoner;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof VirksomhetSykefravær)) return false;
-    if (!super.equals(o)) return false;
-    VirksomhetSykefravær that = (VirksomhetSykefravær) o;
-    return super.equals(that)
-        && antallPersoner == that.antallPersoner
-        && kategori == that.kategori
-        && orgnr.equals(that.orgnr)
-        && navn.equals(that.navn);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(super.hashCode(), kategori, orgnr, navn, antallPersoner);
-  }
+    override fun hashCode(): Int {
+        return Objects.hash(super.hashCode(), kategori, orgnr, navn, antallPersoner)
+    }
 }

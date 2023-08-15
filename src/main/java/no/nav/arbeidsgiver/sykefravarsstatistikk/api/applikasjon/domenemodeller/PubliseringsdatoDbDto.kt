@@ -1,32 +1,18 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-import java.sql.Date;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
+import lombok.*
+import java.sql.Date
 
 @Getter
 @EqualsAndHashCode
-public class PubliseringsdatoDbDto {
-
-  private final Integer rapportPeriode; // (sic)
-  private final Date offentligDato;
-  private final Date oppdatertDato;
-  private final String aktivitet;
-
-  public PubliseringsdatoDbDto(
-      Integer rapportPeriode,
-      Date offentligDato, // dato for offentliggjøring
-      Date oppdatertDato,
-      String aktivitet // beskrivelse, typ "Sykefravær pr 3. kvartal 2022"
-      ) {
-    this.rapportPeriode = rapportPeriode;
-    this.offentligDato = offentligDato;
-    this.oppdatertDato = oppdatertDato;
-    this.aktivitet = aktivitet;
-  }
-
-  public int sammenlignPubliseringsdatoer(@NotNull PubliseringsdatoDbDto annen) {
-    return this.getOffentligDato().toLocalDate().compareTo(annen.getOffentligDato().toLocalDate());
-  }
+class PubliseringsdatoDbDto(
+    // (sic)
+    private val rapportPeriode: Int,
+    private val offentligDato: Date,  // dato for offentliggjøring
+    private val oppdatertDato: Date,
+    private val aktivitet: String // beskrivelse, typ "Sykefravær pr 3. kvartal 2022"
+) {
+    fun sammenlignPubliseringsdatoer(annen: PubliseringsdatoDbDto): Int {
+        return this.getOffentligDato().toLocalDate().compareTo(annen.getOffentligDato().toLocalDate())
+    }
 }

@@ -1,23 +1,19 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
-import java.math.BigDecimal;
+import lombok.AllArgsConstructor
+import lombok.Data
+import java.math.BigDecimal
 
 @Data
 @AllArgsConstructor
-public class SykefraværsstatistikkSektor implements Sykefraværsstatistikk {
-  private int årstall;
-  private int kvartal;
-  private String sektorkode;
-  private int antallPersoner;
+class SykefraværsstatistikkSektor : Sykefraværsstatistikk {
+    private val årstall = 0
+    private override val kvartal = 0
 
-  private BigDecimal tapteDagsverk;
-  private BigDecimal muligeDagsverk;
-
-  // Kotlin kjenner ikke til @Data annotation (Lombok)
-  public String getSektorkode() {
-    return sektorkode;
-  }
+    // Kotlin kjenner ikke til @Data annotation (Lombok)
+    @JvmField
+    val sektorkode: String? = null
+    private override val antallPersoner = 0
+    private override val tapteDagsverk: BigDecimal? = null
+    private override val muligeDagsverk: BigDecimal? = null
 }

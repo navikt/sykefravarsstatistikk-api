@@ -1,68 +1,53 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-import java.util.HashMap;
-import java.util.Map;
+enum class Varighetskategori(@JvmField val kode: String) {
+    _1_DAG_TIL_7_DAGER("A"),
+    _8_DAGER_TIL_16_DAGER("B"),
+    _17_DAGER_TIL_8_UKER("C"),
+    _8_UKER_TIL_20_UKER("D"),
+    _20_UKER_TIL_39_UKER("E"),
+    MER_ENN_39_UKER("F"),
+    TOTAL("X"),
+    UKJENT(null);
 
-public enum Varighetskategori {
-  _1_DAG_TIL_7_DAGER("A"),
-  _8_DAGER_TIL_16_DAGER("B"),
-  _17_DAGER_TIL_8_UKER("C"),
-  _8_UKER_TIL_20_UKER("D"),
-  _20_UKER_TIL_39_UKER("E"),
-  MER_ENN_39_UKER("F"),
-  TOTAL("X"),
-  UKJENT(null);
-
-  public final String kode;
-
-  private static final Map<String, Varighetskategori> FRA_KODE = new HashMap<>();
-
-  static {
-    for (Varighetskategori varighet : values()) {
-      FRA_KODE.put(varighet.kode, varighet);
+    fun erTotalvarighet(): Boolean {
+        return kode == "X"
     }
-  }
 
-  Varighetskategori(String kode) {
-    this.kode = kode;
-  }
-
-  public static Varighetskategori fraKode(String kode) {
-    if (FRA_KODE.containsKey(kode)) {
-      return FRA_KODE.get(kode);
-    } else {
-      throw new IllegalArgumentException("Det finnes ingen sykefraværsvarighet med kode " + kode);
+    fun erKorttidVarighet(): Boolean {
+        return when (kode) {
+            "A", "B" -> true
+            else -> false
+        }
     }
-  }
 
-  public boolean erTotalvarighet() {
-    return this.kode.equals("X");
-  }
-
-  public boolean erKorttidVarighet() {
-    switch (this.kode) {
-      case "A":
-      case "B":
-        return true;
-      default:
-        return false;
+    fun erLangtidVarighet(): Boolean {
+        return when (kode) {
+            "C", "D", "E", "F" -> true
+            else -> false
+        }
     }
-  }
 
-  public boolean erLangtidVarighet() {
-    switch (this.kode) {
-      case "C":
-      case "D":
-      case "E":
-      case "F":
-        return true;
-      default:
-        return false;
+    override fun toString(): String {
+        return kode
     }
-  }
 
-  @Override
-  public String toString() {
-    return kode;
-  }
+    companion object {
+        private val FRA_KODE: MutableMap<String, Varighetskategori> = HashMap()
+
+        init {
+            for (varighet in entries) {
+                FRA_KODE[varighet.kode] = varighet
+            }
+        }
+
+        @JvmStatic
+        fun fraKode(kode: String): Varighetskategori? {
+            return if (FRA_KODE.containsKey(kode)) {
+                FRA_KODE[kode]
+            } else {
+                throw IllegalArgumentException("Det finnes ingen sykefraværsvarighet med kode $kode")
+            }
+        }
+    }
 }

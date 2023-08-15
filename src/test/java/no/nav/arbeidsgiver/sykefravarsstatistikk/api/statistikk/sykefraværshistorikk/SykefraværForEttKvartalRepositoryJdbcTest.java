@@ -261,7 +261,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
       int tapteDagsverk,
       int muligeDagsverk) {
     return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
-        .addValue("sektor_kode", sektor.getKode());
+        .addValue("sektor_kode", sektor.kode);
   }
 
   private MapSqlParameterSource parametre(

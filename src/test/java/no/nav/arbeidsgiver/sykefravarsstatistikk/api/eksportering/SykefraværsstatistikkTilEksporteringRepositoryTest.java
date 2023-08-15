@@ -406,7 +406,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
       int muligeDagsverk) {
     List<SykefraværsstatistikkSektor> statistikkForSektor =
         actual.stream()
-            .filter(sfSektor -> sfSektor.getSektorkode().equals(sektor.getKode()))
+            .filter(sfSektor -> sfSektor.sektorkode.equals(sektor.kode))
             .collect(Collectors.toList());
     assertThat(statistikkForSektor.size()).isEqualTo(1);
     assertSykefraværsstatistikkIsEqual(
@@ -430,9 +430,9 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
         actual.stream()
             .filter(
                 sfVirksomhet ->
-                    sfVirksomhet.getOrgnr().equals(orgnr)
-                        && sfVirksomhet.getÅrstall() == årstall
-                        && sfVirksomhet.getKvartal() == kvartal)
+                    sfVirksomhet.orgnr.equals(orgnr)
+                        && sfVirksomhet.Årstall == årstall
+                        && sfVirksomhet.kvartal == kvartal)
             .collect(Collectors.toList());
     assertThat(statistikkForVirksomhet.size()).isEqualTo(1);
     assertSykefraværsstatistikkIsEqual(
@@ -478,9 +478,9 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
         actual.stream()
             .filter(
                 sfNæring ->
-                    sfNæring.getNæringkode5siffer().equals(næringskode5Siffer.getKode())
-                        && sfNæring.getÅrstall() == årstall
-                        && sfNæring.getKvartal() == kvartal)
+                    sfNæring.næringkode5siffer.equals(næringskode5Siffer.getKode())
+                        && sfNæring.Årstall == årstall
+                        && sfNæring.kvartal == kvartal)
             .collect(Collectors.toList());
     assertThat(statistikkForNæring5Siffer.size()).isEqualTo(1);
     assertSykefraværsstatistikkIsEqual(
@@ -499,11 +499,11 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
       int antallPersoner,
       int tapteDagsverk,
       int muligeDagsverk) {
-    assertThat(actual.getÅrstall()).isEqualTo(årstall);
-    assertThat(actual.getKvartal()).isEqualTo(kvartal);
-    assertThat(actual.getAntallPersoner()).isEqualTo(antallPersoner);
-    assertBigDecimalIsEqual(actual.getTapteDagsverk(), new BigDecimal(tapteDagsverk));
-    assertBigDecimalIsEqual(actual.getMuligeDagsverk(), new BigDecimal(muligeDagsverk));
+    assertThat(actual.Årstall).isEqualTo(årstall);
+    assertThat(actual.kvartal).isEqualTo(kvartal);
+    assertThat(actual.antallPersoner).isEqualTo(antallPersoner);
+    assertBigDecimalIsEqual(actual.tapteDagsverk, new BigDecimal(tapteDagsverk));
+    assertBigDecimalIsEqual(actual.muligeDagsverk, new BigDecimal(muligeDagsverk));
   }
 
   // Metoder for å opprette testdata
@@ -583,7 +583,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
             new SykefraværsstatistikkSektor(
                 årstall,
                 kvartal,
-                sektor.getKode(),
+                    sektor.kode,
                 antallPersoner,
                 new BigDecimal(tapteDagsverk),
                 new BigDecimal(muligeDagsverk))));
@@ -654,7 +654,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
   private MapSqlParameterSource parametre(SykefraværsstatistikkSektor sykefraværsstatistikkSektor) {
     MapSqlParameterSource parametre =
         new MapSqlParameterSource()
-            .addValue("sektor_kode", sykefraværsstatistikkSektor.getSektorkode());
+            .addValue("sektor_kode", sykefraværsstatistikkSektor.sektorkode);
 
     return leggTilParametreForSykefraværsstatistikk(parametre, sykefraværsstatistikkSektor);
   }
@@ -671,7 +671,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
       SykefraværsstatistikkNæring5Siffer sykefraværsstatistikkNæring5Siffer) {
     MapSqlParameterSource parametre =
         new MapSqlParameterSource()
-            .addValue("naring_kode", sykefraværsstatistikkNæring5Siffer.getNæringkode5siffer());
+            .addValue("naring_kode", sykefraværsstatistikkNæring5Siffer.næringkode5siffer);
 
     return leggTilParametreForSykefraværsstatistikk(parametre, sykefraværsstatistikkNæring5Siffer);
   }
@@ -679,7 +679,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
   private MapSqlParameterSource parametre(
       SykefraværsstatistikkVirksomhetUtenVarighet sykefraværsstatistikkVirksomhet) {
     MapSqlParameterSource parametre =
-        new MapSqlParameterSource().addValue("orgnr", sykefraværsstatistikkVirksomhet.getOrgnr());
+        new MapSqlParameterSource().addValue("orgnr", sykefraværsstatistikkVirksomhet.orgnr);
 
     return leggTilParametreForSykefraværsstatistikk(parametre, sykefraværsstatistikkVirksomhet);
   }
@@ -687,11 +687,11 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
   private MapSqlParameterSource leggTilParametreForSykefraværsstatistikk(
       MapSqlParameterSource parametre, Sykefraværsstatistikk sykefraværsstatistikk) {
     return parametre
-        .addValue("arstall", sykefraværsstatistikk.getÅrstall())
-        .addValue("kvartal", sykefraværsstatistikk.getKvartal())
-        .addValue("antall_personer", sykefraværsstatistikk.getAntallPersoner())
-        .addValue("tapte_dagsverk", sykefraværsstatistikk.getTapteDagsverk())
-        .addValue("mulige_dagsverk", sykefraværsstatistikk.getMuligeDagsverk());
+        .addValue("arstall", sykefraværsstatistikk.Årstall)
+        .addValue("kvartal", sykefraværsstatistikk.kvartal)
+        .addValue("antall_personer", sykefraværsstatistikk.antallPersoner)
+        .addValue("tapte_dagsverk", sykefraværsstatistikk.tapteDagsverk)
+        .addValue("mulige_dagsverk", sykefraværsstatistikk.muligeDagsverk);
   }
 @Test
 void hentSykefraværAlleBransjerFraOgMed() {

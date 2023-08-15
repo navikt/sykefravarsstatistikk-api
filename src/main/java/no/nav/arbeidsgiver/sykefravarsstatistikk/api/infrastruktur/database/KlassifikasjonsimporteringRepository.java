@@ -33,7 +33,7 @@ public class KlassifikasjonsimporteringRepository {
       Virksomhetsklassifikasjon virksomhetsklassifikasjon,
       Klassifikasjonskilde klassifikasjonskilde) {
     SqlParameterSource namedParameters =
-        new MapSqlParameterSource().addValue(KODE, virksomhetsklassifikasjon.getKode());
+        new MapSqlParameterSource().addValue(KODE, virksomhetsklassifikasjon.kode);
 
     try {
       Virksomhetsklassifikasjon hentetVirksomhetsklassifikasjon =
@@ -53,8 +53,8 @@ public class KlassifikasjonsimporteringRepository {
       Klassifikasjonskilde klassifikasjonskilde) {
     SqlParameterSource namedParameters =
         new MapSqlParameterSource()
-            .addValue(KODE, virksomhetsklassifikasjon.getKode())
-            .addValue(NAVN, virksomhetsklassifikasjon.getNavn());
+            .addValue(KODE, virksomhetsklassifikasjon.kode)
+            .addValue(NAVN, virksomhetsklassifikasjon.navn);
 
     return namedParameterJdbcTemplate.update(
         "insert into " + klassifikasjonskilde.tabell + " (kode, navn)  values (:kode, :navn)",
@@ -66,8 +66,8 @@ public class KlassifikasjonsimporteringRepository {
       Klassifikasjonskilde klassifikasjonskilde) {
     SqlParameterSource namedParameters =
         new MapSqlParameterSource()
-            .addValue(KODE, virksomhetsklassifikasjon.getKode())
-            .addValue(NAVN, virksomhetsklassifikasjon.getNavn());
+            .addValue(KODE, virksomhetsklassifikasjon.kode)
+            .addValue(NAVN, virksomhetsklassifikasjon.navn);
 
     return namedParameterJdbcTemplate.update(
         "update " + klassifikasjonskilde.tabell + " set navn = :navn where kode = :kode",

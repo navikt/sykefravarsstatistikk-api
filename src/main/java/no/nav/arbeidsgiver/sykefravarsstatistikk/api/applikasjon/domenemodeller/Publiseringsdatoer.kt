@@ -1,14 +1,14 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.AllArgsConstructor
+import lombok.Builder
+import lombok.Data
 
 @Data
 @AllArgsConstructor
 @Builder
-public class Publiseringsdatoer {
-  private String sistePubliseringsdato;
-  private String nestePubliseringsdato;
-  private ÅrstallOgKvartal gjeldendePeriode;
+class Publiseringsdatoer {
+    private val sistePubliseringsdato: String? = null
+    private val nestePubliseringsdato: String? = null
+    private val gjeldendePeriode: ÅrstallOgKvartal? = null
 }

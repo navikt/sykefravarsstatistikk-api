@@ -1,18 +1,11 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Value;
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonProperty
+import lombok.Value
 
 @Value
-public class InstitusjonellSektorkode {
-  private final String kode;
-  private final String beskrivelse;
-
-  @JsonCreator
-  public InstitusjonellSektorkode(
-      @JsonProperty("kode") String kode, @JsonProperty("beskrivelse") String beskrivelse) {
-    this.kode = kode;
-    this.beskrivelse = beskrivelse;
-  }
-}
+class InstitusjonellSektorkode @JsonCreator constructor(
+    @param:JsonProperty("kode") private val kode: String,
+    @param:JsonProperty("beskrivelse") private val beskrivelse: String
+)

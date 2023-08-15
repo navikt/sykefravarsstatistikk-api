@@ -1,86 +1,57 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore
+import java.math.BigDecimal
+import java.util.*
+import java.util.function.Function
 
-import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.Objects;
+open class SykefraværForEttKvartal(
+    @field:JsonIgnore val ÅrstallOgKvartal: ÅrstallOgKvartal?,
+    tapteDagsverk: BigDecimal?,
+    muligeDagsverk: BigDecimal?,
+    // TODO: trenger vi det?
+    @field:JsonIgnore val antallPersoner: Int
+) : MaskerbartSykefravær(
+    tapteDagsverk,
+    muligeDagsverk,
+    antallPersoner,
+    ÅrstallOgKvartal != null && tapteDagsverk != null && muligeDagsverk != null
+), Comparable<SykefraværForEttKvartal> {
 
-public class SykefraværForEttKvartal extends MaskerbartSykefravær
-    implements Comparable<SykefraværForEttKvartal> {
+    val kvartal: Int
+        get() = ÅrstallOgKvartal?.kvartal ?: 0
+    val Årstall: Int
+        get() = ÅrstallOgKvartal?.årstall ?: 0
 
-  @JsonIgnore private final ÅrstallOgKvartal årstallOgKvartal;
-
-  @JsonIgnore private final int antallPersoner; // TODO: trenger vi det?
-
-  public SykefraværForEttKvartal(
-      ÅrstallOgKvartal årstallOgKvartal,
-      BigDecimal tapteDagsverk,
-      BigDecimal muligeDagsverk,
-      int antallPersoner) {
-    super(
-        tapteDagsverk,
-        muligeDagsverk,
-        antallPersoner,
-        årstallOgKvartal != null && tapteDagsverk != null && muligeDagsverk != null);
-    this.årstallOgKvartal = årstallOgKvartal;
-    this.antallPersoner = antallPersoner;
-  }
-
-  public int getKvartal() {
-    return årstallOgKvartal != null ? årstallOgKvartal.getKvartal() : 0;
-  }
-
-  public int getÅrstall() {
-    return årstallOgKvartal != null ? årstallOgKvartal.getÅrstall() : 0;
-  }
-
-  public int getAntallPersoner() {
-    return antallPersoner;
-  }
-
-  @Override
-  public int compareTo(SykefraværForEttKvartal sykefraværForEttKvartal) {
-    return Comparator.comparing(SykefraværForEttKvartal::getÅrstallOgKvartal)
-        .compare(this, sykefraværForEttKvartal);
-  }
-
-  public ÅrstallOgKvartal getÅrstallOgKvartal() {
-    return årstallOgKvartal;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
+    override fun compareTo(other: SykefraværForEttKvartal): Int {
+        return Comparator.comparing(Function { obj: SykefraværForEttKvartal -> obj.ÅrstallOgKvartal })
+            .compare(this, other)
     }
-    if (!(o instanceof SykefraværForEttKvartal)) {
-      return false;
+
+    override fun equals(o: Any?): Boolean {
+        if (this === o) {
+            return true
+        }
+        if (o !is SykefraværForEttKvartal) {
+            return false
+        }
+        if (!super.equals(o)) {
+            return false
+        }
+        val that = o
+        val erÅrstallOgKvartalLike = ÅrstallOgKvartal == that.ÅrstallOgKvartal
+        val erProsentLike =
+            if (this.getProsent() == null) that.getProsent() == null else this.getProsent().equals(that.getProsent())
+        val erTapteDagsverkLike =
+            if (this.getTapteDagsverk() == null) that.getTapteDagsverk() == null else this.getTapteDagsverk()
+                .equals(that.getTapteDagsverk())
+        val erMuligeDagsverkLike =
+            if (this.getMuligeDagsverk() == null) that.getMuligeDagsverk() == null else this.getMuligeDagsverk()
+                .equals(that.getMuligeDagsverk())
+        return erÅrstallOgKvartalLike && erProsentLike && erTapteDagsverkLike && erMuligeDagsverkLike
     }
-    if (!super.equals(o)) {
-      return false;
+
+    override fun hashCode(): Int {
+        return Objects.hash(super.hashCode(), ÅrstallOgKvartal)
     }
-    SykefraværForEttKvartal that = (SykefraværForEttKvartal) o;
-
-    boolean erÅrstallOgKvartalLike = this.årstallOgKvartal.equals(that.årstallOgKvartal);
-    boolean erProsentLike =
-        this.getProsent() == null
-            ? that.getProsent() == null
-            : this.getProsent().equals(that.getProsent());
-    boolean erTapteDagsverkLike =
-        this.getTapteDagsverk() == null
-            ? that.getTapteDagsverk() == null
-            : this.getTapteDagsverk().equals(that.getTapteDagsverk());
-    boolean erMuligeDagsverkLike =
-        this.getMuligeDagsverk() == null
-            ? that.getMuligeDagsverk() == null
-            : this.getMuligeDagsverk().equals(that.getMuligeDagsverk());
-
-    return (erÅrstallOgKvartalLike && erProsentLike && erTapteDagsverkLike && erMuligeDagsverkLike);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(super.hashCode(), årstallOgKvartal);
-  }
 }
