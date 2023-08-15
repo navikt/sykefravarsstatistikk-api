@@ -1,26 +1,24 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.StatistikkUtils
 import java.math.BigDecimal
-import java.util.*
+import java.math.RoundingMode
 
-class SykefraværOverFlereKvartaler(
-    @JvmField val kvartaler: List<ÅrstallOgKvartal?>,
-    tapteDagsverk: BigDecimal,
-    muligeDagsverk: BigDecimal,
-    sykefraværList: List<SykefraværForEttKvartal?>
-) : MaskerbartSykefraværOverFlereKvartaler(tapteDagsverk, muligeDagsverk, sykefraværList, kvartaler.size != 0) {
+data class SykefraværOverFlereKvartaler(
+    val kvartaler: List<ÅrstallOgKvartal>,
+    var tapteDagsverk: BigDecimal? = null,
+    var muligeDagsverk: BigDecimal? = null,
+    val sykefraværList: List<SykefraværForEttKvartal>
+) {
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o !is SykefraværOverFlereKvartaler) return false
-        if (!super.equals(o)) return false
-        val that = o
-        return (kvartaler == that.kvartaler && getProsent().equals(that.getProsent())
-                && getTapteDagsverk().equals(that.getTapteDagsverk())
-                && getMuligeDagsverk().equals(that.getMuligeDagsverk()))
-    }
+    var prosent: BigDecimal? = null
 
-    override fun hashCode(): Int {
-        return Objects.hash(super.hashCode(), kvartaler)
+    init {
+        val erMaskert = sykefraværList.isNotEmpty() && sykefraværList.all { it.erMaskert }
+        if (!erMaskert) {
+            tapteDagsverk = tapteDagsverk?.setScale(1, RoundingMode.HALF_UP)
+            muligeDagsverk = muligeDagsverk?.setScale(1, RoundingMode.HALF_UP)
+            prosent = StatistikkUtils.kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk).getOrNull()
+        }
     }
 }

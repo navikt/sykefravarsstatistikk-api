@@ -12,26 +12,23 @@ import java.util.stream.Collectors
 import java.util.stream.Stream
 import kotlin.math.max
 
-@ToString
-@EqualsAndHashCode
-@AllArgsConstructor
-class SumAvSykefraværOverFlereKvartaler(umaskertSykefravær: UmaskertSykefraværForEttKvartal) {
-    @Getter
-    var muligeDagsverk: BigDecimal
 
-    @Getter
-    var tapteDagsverk: BigDecimal
-    private val høyesteAntallPersonerIEtKvartal: Int
-    private val kvartaler: List<ÅrstallOgKvartal?>
+data class SumAvSykefraværOverFlereKvartaler(
+    var muligeDagsverk: BigDecimal,
+    var tapteDagsverk: BigDecimal,
+    private val høyesteAntallPersonerIEtKvartal: Int,
+    private val kvartaler: List<ÅrstallOgKvartal>,
     private val umaskertSykefraværList: List<UmaskertSykefraværForEttKvartal>
+) {
 
-    init {
-        muligeDagsverk = umaskertSykefravær.dagsverkNevner
-        tapteDagsverk = umaskertSykefravær.dagsverkTeller
-        høyesteAntallPersonerIEtKvartal = umaskertSykefravær.antallPersoner
-        kvartaler = listOf(umaskertSykefravær.årstallOgKvartal)
+    constructor(umaskertSykefravær: UmaskertSykefraværForEttKvartal) : this(
+        muligeDagsverk = umaskertSykefravær.dagsverkNevner,
+        tapteDagsverk = umaskertSykefravær.dagsverkTeller,
+        høyesteAntallPersonerIEtKvartal = umaskertSykefravær.antallPersoner,
+        kvartaler = listOf(umaskertSykefravær.årstallOgKvartal),
         umaskertSykefraværList = listOf(umaskertSykefravær)
-    }
+    )
+
 
     fun regnUtProsentOgMapTilDto(
         type: Statistikkategori, label: String
@@ -59,10 +56,10 @@ class SumAvSykefraværOverFlereKvartaler(umaskertSykefravær: UmaskertSykefravæ
             umaskertSykefraværList.stream()
                 .map<SykefraværForEttKvartal?> { sf: UmaskertSykefraværForEttKvartal ->
                     SykefraværForEttKvartal(
-                        sf.getÅrstallOgKvartal(),
-                        sf.getDagsverkTeller(),
-                        sf.getDagsverkNevner(),
-                        sf.getAntallPersoner()
+                        sf.årstallOgKvartal,
+                        sf.dagsverkTeller,
+                        sf.dagsverkNevner,
+                        sf.antallPersoner
                     )
                 }
                 .collect(Collectors.toList<SykefraværForEttKvartal?>()))
@@ -101,13 +98,9 @@ class SumAvSykefraværOverFlereKvartaler(umaskertSykefravær: UmaskertSykefravæ
         return SumAvSykefraværOverFlereKvartaler(
             muligeDagsverk.add(other.muligeDagsverk),
             tapteDagsverk.add(other.tapteDagsverk),
-            max(høyesteAntallPersonerIEtKvartal.toDouble(), other.høyesteAntallPersonerIEtKvartal.toDouble()),
-            Stream.concat(kvartaler.stream(), other.kvartaler.stream())
-                .distinct()
-                .collect(Collectors.toList<Any?>()),
-            Stream.concat(umaskertSykefraværList.stream(), other.umaskertSykefraværList.stream())
-                .distinct()
-                .collect(Collectors.toList<Any>())
+            max(høyesteAntallPersonerIEtKvartal, other.høyesteAntallPersonerIEtKvartal),
+            (kvartaler + other.kvartaler).distinct(),
+            (umaskertSykefraværList + other.umaskertSykefraværList).distinct()
         )
     }
 
@@ -140,8 +133,9 @@ class SumAvSykefraværOverFlereKvartaler(umaskertSykefravær: UmaskertSykefravæ
     }
 
     class MaskerteDataException : StatistikkException("Ikke nok personer i datagrunnlaget - data maskeres.")
+
     companion object {
         var NULLPUNKT =
-            SumAvSykefraværOverFlereKvartaler(BigDecimal.ZERO, BigDecimal.ZERO, 0, listOf<Any>(), listOf<Any>())
+            SumAvSykefraværOverFlereKvartaler(BigDecimal.ZERO, BigDecimal.ZERO, 0, emptyList(), emptyList())
     }
 }

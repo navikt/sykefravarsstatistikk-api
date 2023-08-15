@@ -1,26 +1,27 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.etÅrstallOgKvartal;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværForEttKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværMedKategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.SykefraværFlereKvartalerForEksport;
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
-import lombok.SneakyThrows;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværForEttKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.SykefraværFlereKvartalerForEksport;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværMedKategori;
-import org.junit.jupiter.api.Test;
+
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.etÅrstallOgKvartal;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class SykefraværForEttKvartalTest {
 
   @Test
   public void sykefraværprosent__uten_data_er_ikke_maskert() {
-    assertThat(new SykefraværForEttKvartal(etÅrstallOgKvartal(), null, null, 0).isErMaskert())
+    assertThat(new SykefraværForEttKvartal(etÅrstallOgKvartal(), null, null, 0).getErMaskert())
         .isFalse();
   }
 
@@ -29,7 +30,6 @@ public class SykefraværForEttKvartalTest {
     SykefraværForEttKvartal sykefravær =
         new SykefraværForEttKvartal(
             etÅrstallOgKvartal(), new BigDecimal(5), new BigDecimal(10), 20);
-    assertThat(sykefravær.equals(null)).isEqualTo(false);
     assertThat(
             sykefravær.equals(
                 new SykefraværForEttKvartal(
@@ -59,7 +59,6 @@ public class SykefraværForEttKvartalTest {
                             6))),
                 SykefraværFlereKvartalerForEksport.utenStatistikk()))
         .isFalse();
-    assertThat(new BigDecimal(1).equals(null)).isFalse();
   }
 
   @Test
@@ -119,7 +118,7 @@ public class SykefraværForEttKvartalTest {
   public void sykefraværprosent__skal_være_maskert_hvis_antallPersoner_er_4_eller_under() {
     SykefraværForEttKvartal sykefravær =
         new SykefraværForEttKvartal(etÅrstallOgKvartal(), new BigDecimal(1), new BigDecimal(10), 4);
-    assertThat(sykefravær.isErMaskert()).isTrue();
+    assertThat(sykefravær.getErMaskert()).isTrue();
     assertThat(sykefravær.getProsent()).isNull();
     assertThat(sykefravær.getTapteDagsverk()).isNull();
     assertThat(sykefravær.getMuligeDagsverk()).isNull();
@@ -129,7 +128,7 @@ public class SykefraværForEttKvartalTest {
   public void sykefraværprosent__skal_være_maskert_hvis_antallPersoner_over_4() {
     SykefraværForEttKvartal sykefravær =
         new SykefraværForEttKvartal(etÅrstallOgKvartal(), new BigDecimal(1), new BigDecimal(10), 5);
-    assertThat(sykefravær.isErMaskert()).isFalse();
+    assertThat(sykefravær.getErMaskert()).isFalse();
     assertThat(sykefravær.getProsent()).isNotNull();
     assertThat(sykefravær.getTapteDagsverk()).isNotNull();
     assertThat(sykefravær.getMuligeDagsverk()).isNotNull();

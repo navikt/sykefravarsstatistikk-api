@@ -3,55 +3,46 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.math.BigDecimal
 import java.util.*
-import java.util.function.Function
 
 open class SykefraværForEttKvartal(
-    @field:JsonIgnore val ÅrstallOgKvartal: ÅrstallOgKvartal?,
+    @field:JsonIgnore val årstallOgKvartal: ÅrstallOgKvartal?,
     tapteDagsverk: BigDecimal?,
     muligeDagsverk: BigDecimal?,
     // TODO: trenger vi det?
-    @field:JsonIgnore val antallPersoner: Int
+    @field:JsonIgnore open val antallPersoner: Int
 ) : MaskerbartSykefravær(
     tapteDagsverk,
     muligeDagsverk,
     antallPersoner,
-    ÅrstallOgKvartal != null && tapteDagsverk != null && muligeDagsverk != null
+    årstallOgKvartal != null && tapteDagsverk != null && muligeDagsverk != null
 ), Comparable<SykefraværForEttKvartal> {
 
     val kvartal: Int
-        get() = ÅrstallOgKvartal?.kvartal ?: 0
+        get() = årstallOgKvartal?.kvartal ?: 0
     val Årstall: Int
-        get() = ÅrstallOgKvartal?.årstall ?: 0
+        get() = årstallOgKvartal?.årstall ?: 0
 
-    override fun compareTo(other: SykefraværForEttKvartal): Int {
-        return Comparator.comparing(Function { obj: SykefraværForEttKvartal -> obj.ÅrstallOgKvartal })
-            .compare(this, other)
-    }
+    override fun compareTo(other: SykefraværForEttKvartal) = compareValuesBy(this, other) { it.årstallOgKvartal }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) {
             return true
         }
-        if (o !is SykefraværForEttKvartal) {
+        if (other !is SykefraværForEttKvartal) {
             return false
         }
-        if (!super.equals(o)) {
+        if (!super.equals(other)) {
             return false
         }
-        val that = o
-        val erÅrstallOgKvartalLike = ÅrstallOgKvartal == that.ÅrstallOgKvartal
-        val erProsentLike =
-            if (this.getProsent() == null) that.getProsent() == null else this.getProsent().equals(that.getProsent())
-        val erTapteDagsverkLike =
-            if (this.getTapteDagsverk() == null) that.getTapteDagsverk() == null else this.getTapteDagsverk()
-                .equals(that.getTapteDagsverk())
-        val erMuligeDagsverkLike =
-            if (this.getMuligeDagsverk() == null) that.getMuligeDagsverk() == null else this.getMuligeDagsverk()
-                .equals(that.getMuligeDagsverk())
+        val erÅrstallOgKvartalLike = årstallOgKvartal == other.årstallOgKvartal
+        val erProsentLike = prosent == other.prosent
+        val erTapteDagsverkLike = tapteDagsverk == other.tapteDagsverk
+        val erMuligeDagsverkLike = muligeDagsverk == other.muligeDagsverk
+
         return erÅrstallOgKvartalLike && erProsentLike && erTapteDagsverkLike && erMuligeDagsverkLike
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(super.hashCode(), ÅrstallOgKvartal)
+        return Objects.hash(super.hashCode(), årstallOgKvartal)
     }
 }

@@ -28,14 +28,14 @@ class SykefraværMedKategori : SykefraværForEttKvartal {
     constructor(
         statistikkategori: Statistikkategori, kode: String, sykefravær: UmaskertSykefraværForEttKvartal
     ) : super(
-        sykefravær.getÅrstallOgKvartal(),
-        sykefravær.getDagsverkTeller(),
-        sykefravær.getDagsverkNevner(),
-        sykefravær.getAntallPersoner()
+        sykefravær.årstallOgKvartal,
+        sykefravær.dagsverkTeller,
+        sykefravær.dagsverkNevner,
+        sykefravær.antallPersoner
     ) {
         kategori = statistikkategori
         this.kode = kode
-        this.antallPersoner = sykefravær.getAntallPersoner()
+        this.antallPersoner = sykefravær.antallPersoner
     }
 
     // OBS: Constructor bruk i testene (objectMapper)
@@ -54,12 +54,11 @@ class SykefraværMedKategori : SykefraværForEttKvartal {
         this.antallPersoner = antallPersoner
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o !is SykefraværMedKategori) return false
-        if (!super.equals(o)) return false
-        val that = o
-        return super.equals(that) && antallPersoner == that.antallPersoner && kategori == that.kategori && kode == that.kode
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SykefraværMedKategori) return false
+        if (!super.equals(other)) return false
+        return (antallPersoner == other.antallPersoner) && (kategori == other.kategori) && (kode == other.kode)
     }
 
     override fun hashCode(): Int {

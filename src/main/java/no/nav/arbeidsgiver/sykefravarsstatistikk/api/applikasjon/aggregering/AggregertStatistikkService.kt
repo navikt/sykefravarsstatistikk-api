@@ -4,16 +4,15 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.BransjeEllerNæringService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.EitherUtils
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PubliseringsdatoerService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartalMedVarighet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.EitherUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.GraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VarighetRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -87,6 +86,7 @@ class AggregertStatistikkService(
         val kalkulatorKorttid = Aggregeringskalkulator(korttidsfravær, sistePubliserteKvartal)
         val kalkulatorLangtid = Aggregeringskalkulator(langtidsfravær, sistePubliserteKvartal)
         val bransjeEllerNæring = bransjeEllerNæringService.finnBransje(virksomhet)
+
         val prosentSisteFireKvartalerTotalt = EitherUtils.getRightsAndLogLefts(
             kalkulatorTotal.fraværsprosentVirksomhet(virksomhet.navn),
             kalkulatorTotal.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),

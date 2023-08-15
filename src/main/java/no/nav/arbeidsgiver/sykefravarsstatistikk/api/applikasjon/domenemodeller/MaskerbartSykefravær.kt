@@ -1,23 +1,19 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-import lombok.EqualsAndHashCode
-import lombok.Getter
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.StatistikkUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.Konstanter
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-@Getter
-@EqualsAndHashCode
-abstract class MaskerbartSykefravær(
+open class MaskerbartSykefravær(
     tapteDagsverk: BigDecimal?,
     muligeDagsverk: BigDecimal?,
     antallPersoner: Int,
     harSykefraværData: Boolean
 ) {
     var prosent: BigDecimal? = null
-    val tapteDagsverk: BigDecimal? = null
-    val muligeDagsverk: BigDecimal? = null
+    var tapteDagsverk: BigDecimal? = null
+    var muligeDagsverk: BigDecimal? = null
     val erMaskert: Boolean
 
     init {
@@ -27,10 +23,26 @@ abstract class MaskerbartSykefravær(
             prosent = StatistikkUtils.kalkulerSykefraværsprosent(tapteDagsverk!!, muligeDagsverk!!).getOrNull()
             this.tapteDagsverk = tapteDagsverk.setScale(1, RoundingMode.HALF_UP)
             this.muligeDagsverk = muligeDagsverk.setScale(1, RoundingMode.HALF_UP)
-        } else {
-            prosent = null
-            this.tapteDagsverk = null
-            this.muligeDagsverk = null
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as MaskerbartSykefravær
+
+        if (prosent != other.prosent) return false
+        if (tapteDagsverk != other.tapteDagsverk) return false
+        if (muligeDagsverk != other.muligeDagsverk) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = prosent?.hashCode() ?: 0
+        result = 31 * result + (tapteDagsverk?.hashCode() ?: 0)
+        result = 31 * result + (muligeDagsverk?.hashCode() ?: 0)
+        return result
     }
 }

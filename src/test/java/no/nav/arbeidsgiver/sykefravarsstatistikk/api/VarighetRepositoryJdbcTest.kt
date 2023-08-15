@@ -3,8 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartalMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VarighetRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -159,12 +157,14 @@ open class VarighetRepositoryJdbcTest {
             Bransje(
                 ArbeidsmiljøportalenBransje.SYKEHUS,
                 "Sykehus",
-                "86101",
-                "86102",
-                "86104",
-                "86105",
-                "86106",
-                "86107"
+                listOf(
+                    "86101",
+                    "86102",
+                    "86104",
+                    "86105",
+                    "86106",
+                    "86107"
+                )
             )
         )
         assertThat(resultat.size).isEqualTo(2)

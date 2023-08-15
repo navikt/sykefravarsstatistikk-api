@@ -1,12 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.math.BigDecimal;
-import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje;
@@ -25,6 +18,13 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
+
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension.class)
@@ -46,7 +46,7 @@ public class SykefraværRepositoryJdbcTest {
 
   static final Næring NÆRING = new Næring("10", "test Næring");
   static final Bransje BARNEHAGEBRANSJEN =
-      new Bransje(ArbeidsmiljøportalenBransje.BARNEHAGER, "Barnehage", "88911");
+      new Bransje(ArbeidsmiljøportalenBransje.BARNEHAGER, "Barnehage", Collections.singletonList("88911"));
 
   @BeforeEach
   public void setUp() {

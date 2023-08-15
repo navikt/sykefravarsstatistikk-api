@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-enum class Varighetskategori(@JvmField val kode: String) {
+enum class Varighetskategori(@JvmField val kode: String?) {
     _1_DAG_TIL_7_DAGER("A"),
     _8_DAGER_TIL_16_DAGER("B"),
     _17_DAGER_TIL_8_UKER("C"),
@@ -29,25 +29,13 @@ enum class Varighetskategori(@JvmField val kode: String) {
     }
 
     override fun toString(): String {
-        return kode
+        return kode ?: "UKJENT"
     }
 
     companion object {
-        private val FRA_KODE: MutableMap<String, Varighetskategori> = HashMap()
-
-        init {
-            for (varighet in entries) {
-                FRA_KODE[varighet.kode] = varighet
-            }
-        }
-
-        @JvmStatic
-        fun fraKode(kode: String): Varighetskategori? {
-            return if (FRA_KODE.containsKey(kode)) {
-                FRA_KODE[kode]
-            } else {
-                throw IllegalArgumentException("Det finnes ingen sykefraværsvarighet med kode $kode")
-            }
-        }
+        fun fraKode(kode: String?): Varighetskategori =
+            Varighetskategori.entries.find { it.kode == kode }
+                ?: throw IllegalArgumentException("Det finnes ingen sykefraværsvarighet med kode $kode")
     }
 }
+

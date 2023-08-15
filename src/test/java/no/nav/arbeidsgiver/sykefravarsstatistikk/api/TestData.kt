@@ -1,66 +1,60 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api
 
-import java.util.Arrays;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Fnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.InstitusjonellSektorkode;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode5Siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UnderenhetLegacy;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnOrganisasjon;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.InnloggetBruker;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnOrganisasjon
+import java.util.*
 
-public class TestData {
+object TestData {
+    const val ORGNR_VIRKSOMHET_1 = "987654321"
+    const val ORGNR_VIRKSOMHET_2 = "999999999"
+    const val ORGNR_VIRKSOMHET_3 = "999999777"
+    const val NÆRINGSKODE_5SIFFER = "10062"
+    const val NÆRINGSKODE_2SIFFER = "10"
+    const val SEKTOR = "3"
+    @JvmStatic
+    val innloggetBruker: InnloggetBruker
+        get() = getInnloggetBruker(fnr.verdi)
 
-  public static final String ORGNR_VIRKSOMHET_1 = "987654321";
-  public static final String ORGNR_VIRKSOMHET_2 = "999999999";
-  public static final String ORGNR_VIRKSOMHET_3 = "999999777";
+    @JvmStatic
+    fun getInnloggetBruker(fnr: String?): InnloggetBruker {
+        val bruker = InnloggetBruker(Fnr(fnr!!))
+        bruker.brukerensOrganisasjoner = Arrays.asList(getOrganisasjon("999999999"), getOrganisasjon("111111111"))
+        return bruker
+    }
 
-  public static final String NÆRINGSKODE_5SIFFER = "10062";
-  public static final String NÆRINGSKODE_2SIFFER = "10";
-  public static final String SEKTOR = "3";
+    @JvmStatic
+    fun getOrganisasjon(organizationNumber: String?): AltinnOrganisasjon {
+        return AltinnOrganisasjon(null, null, null, organizationNumber, null, null)
+    }
 
-  public static InnloggetBruker getInnloggetBruker() {
-    return getInnloggetBruker(getFnr().getVerdi());
-  }
+    val fnr: Fnr
+        get() = Fnr("26070248114")
 
-  public static InnloggetBruker getInnloggetBruker(String fnr) {
-    InnloggetBruker bruker = new InnloggetBruker(new Fnr(fnr));
-    bruker.setBrukerensOrganisasjoner(
-        Arrays.asList(getOrganisasjon("999999999"), getOrganisasjon("111111111")));
-    return bruker;
-  }
+    @JvmStatic
+    fun etOrgnr(): Orgnr {
+        return Orgnr("971800534")
+    }
 
-  public static AltinnOrganisasjon getOrganisasjon(String organizationNumber) {
-    return new AltinnOrganisasjon(null, null, null, organizationNumber, null, null);
-  }
+    @JvmStatic
+    fun enInstitusjonellSektorkode(): InstitusjonellSektorkode {
+        return InstitusjonellSektorkode("1234", "sektor!")
+    }
 
-  public static Fnr getFnr() {
-    return new Fnr("26070248114");
-  }
+    @JvmStatic
+    fun enUnderenhet(orgnr: String?): UnderenhetLegacy {
+        return UnderenhetLegacy(
+            Orgnr(orgnr!!), Orgnr("053497180"), "Underenhet AS", enNæringskode5Siffer(), 40
+        )
+    }
 
-  public static Orgnr etOrgnr() {
-    return new Orgnr("971800534");
-  }
+    @JvmStatic
+    @JvmOverloads
+    fun enNæringskode5Siffer(kode: String? = "12345"): Næringskode5Siffer {
+        return Næringskode5Siffer(kode!!, "Spesiell næring")
+    }
 
-  public static InstitusjonellSektorkode enInstitusjonellSektorkode() {
-    return new InstitusjonellSektorkode("1234", "sektor!");
-  }
-
-  public static UnderenhetLegacy enUnderenhet(String orgnr) {
-    return new UnderenhetLegacy(
-        new Orgnr(orgnr), new Orgnr("053497180"), "Underenhet AS", enNæringskode5Siffer(), 40);
-  }
-
-  public static Næringskode5Siffer enNæringskode5Siffer() {
-    return enNæringskode5Siffer("12345");
-  }
-
-  public static Næringskode5Siffer enNæringskode5Siffer(String kode) {
-    return new Næringskode5Siffer(kode, "Spesiell næring");
-  }
-
-  public static ÅrstallOgKvartal etÅrstallOgKvartal() {
-    return new ÅrstallOgKvartal(2019, 4);
-  }
+    @JvmStatic
+    fun etÅrstallOgKvartal(): ÅrstallOgKvartal {
+        return ÅrstallOgKvartal(2019, 4)
+    }
 }

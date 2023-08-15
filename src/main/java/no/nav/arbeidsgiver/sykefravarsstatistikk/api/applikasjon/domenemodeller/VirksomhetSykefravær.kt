@@ -42,11 +42,11 @@ class VirksomhetSykefravær : SykefraværForEttKvartal {
         this.antallPersoner = antallPersoner
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o !is VirksomhetSykefravær) return false
-        if (!super.equals(o)) return false
-        val that = o
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is VirksomhetSykefravær) return false
+        if (!super.equals(other)) return false
+        val that = other
         return super.equals(that) && antallPersoner == that.antallPersoner && kategori == that.kategori && orgnr == that.orgnr && navn == that.navn
     }
 

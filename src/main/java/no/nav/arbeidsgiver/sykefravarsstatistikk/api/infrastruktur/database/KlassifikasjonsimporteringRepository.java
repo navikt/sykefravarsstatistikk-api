@@ -1,9 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Klassifikasjonskilde;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Virksomhetsklassifikasjon;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Klassifikasjonskilde;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -33,7 +33,7 @@ public class KlassifikasjonsimporteringRepository {
       Virksomhetsklassifikasjon virksomhetsklassifikasjon,
       Klassifikasjonskilde klassifikasjonskilde) {
     SqlParameterSource namedParameters =
-        new MapSqlParameterSource().addValue(KODE, virksomhetsklassifikasjon.kode);
+        new MapSqlParameterSource().addValue(KODE, virksomhetsklassifikasjon.getKode());
 
     try {
       Virksomhetsklassifikasjon hentetVirksomhetsklassifikasjon =
@@ -53,8 +53,8 @@ public class KlassifikasjonsimporteringRepository {
       Klassifikasjonskilde klassifikasjonskilde) {
     SqlParameterSource namedParameters =
         new MapSqlParameterSource()
-            .addValue(KODE, virksomhetsklassifikasjon.kode)
-            .addValue(NAVN, virksomhetsklassifikasjon.navn);
+            .addValue(KODE, virksomhetsklassifikasjon.getKode())
+            .addValue(NAVN, virksomhetsklassifikasjon.getNavn());
 
     return namedParameterJdbcTemplate.update(
         "insert into " + klassifikasjonskilde.tabell + " (kode, navn)  values (:kode, :navn)",
@@ -66,8 +66,8 @@ public class KlassifikasjonsimporteringRepository {
       Klassifikasjonskilde klassifikasjonskilde) {
     SqlParameterSource namedParameters =
         new MapSqlParameterSource()
-            .addValue(KODE, virksomhetsklassifikasjon.kode)
-            .addValue(NAVN, virksomhetsklassifikasjon.navn);
+            .addValue(KODE, virksomhetsklassifikasjon.getKode())
+            .addValue(NAVN, virksomhetsklassifikasjon.getNavn());
 
     return namedParameterJdbcTemplate.update(
         "update " + klassifikasjonskilde.tabell + " set navn = :navn where kode = :kode",

@@ -5,15 +5,16 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.UtilstrekkeligDataException
+import java.util.*
 
 data class Trendkalkulator(
-    var datagrunnlag: List<UmaskertSykefraværForEttKvartal>? = null,
-    var sistePubliserteKvartal: ÅrstallOgKvartal? = null
+    var datagrunnlag: List<UmaskertSykefraværForEttKvartal>,
+    var sistePubliserteKvartal: ÅrstallOgKvartal
 ) {
     fun kalkulerTrend(): Either<UtilstrekkeligDataException, Trend> {
-        val ettÅrSiden = sistePubliserteKvartal!!.minusEttÅr()
-        val nyesteSykefravær = UmaskertSykefraværForEttKvartal.hentUtKvartal(datagrunnlag, sistePubliserteKvartal!!)
-        val sykefraværetEttÅrSiden = UmaskertSykefraværForEttKvartal.hentUtKvartal(datagrunnlag, ettÅrSiden)
+        val ettÅrSiden = sistePubliserteKvartal.minusEttÅr()
+        val nyesteSykefravær = hentUtKvartal(datagrunnlag, sistePubliserteKvartal)
+        val sykefraværetEttÅrSiden = hentUtKvartal(datagrunnlag, ettÅrSiden)
         if (nyesteSykefravær.isEmpty || sykefraværetEttÅrSiden.isEmpty) {
             return Either.left(
                 UtilstrekkeligDataException(
@@ -37,4 +38,10 @@ data class Trendkalkulator(
             Trend(trendverdi, antallTilfeller, java.util.List.of(sistePubliserteKvartal, ettÅrSiden))
         )
     }
+}
+
+fun hentUtKvartal(
+    sykefravær: Collection<UmaskertSykefraværForEttKvartal>, kvartal: ÅrstallOgKvartal
+): Optional<UmaskertSykefraværForEttKvartal> {
+    return Optional.ofNullable(sykefravær.find { it.årstallOgKvartal == kvartal })
 }

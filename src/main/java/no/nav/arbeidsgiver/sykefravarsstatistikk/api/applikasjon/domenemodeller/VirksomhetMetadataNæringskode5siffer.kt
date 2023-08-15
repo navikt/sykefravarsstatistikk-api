@@ -14,9 +14,9 @@ class VirksomhetMetadataNæringskode5siffer(
     val kvartal: Int
         get() = årstallOgKvartal.kvartal
     val næring: String?
-        get() = næringOgNæringskode5siffer.getNæring()
+        get() = næringOgNæringskode5siffer.næring
     val næringskode5siffer: String?
-        get() = næringOgNæringskode5siffer.getNæringskode5Siffer()
+        get() = næringOgNæringskode5siffer.næringskode5Siffer
 
     override fun equals(o: Any?): Boolean {
         if (this === o) return true

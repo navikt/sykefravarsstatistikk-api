@@ -1,20 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori._1_DAG_TIL_7_DAGER;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori._8_UKER_TIL_20_UKER;
-import static org.assertj.core.api.Java6Assertions.assertThat;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KvartalsvisSykefraværRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +17,15 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.*;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori._1_DAG_TIL_7_DAGER;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori._8_UKER_TIL_20_UKER;
+import static org.assertj.core.api.Java6Assertions.assertThat;
 
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension.class)
@@ -148,7 +146,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
         parametre(new Næring("87301", "Aldershjem"), 2018, 4, 10, 6, 100));
 
     Bransje sykehjem =
-        new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "Sykehjem", "87101", "87102");
+        new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "Sykehjem", List.of("87101", "87102"));
     List<SykefraværForEttKvartal> resultat =
         kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentBransje(sykehjem);
     assertThat(resultat.size()).isEqualTo(2);
@@ -234,12 +232,12 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
     assertThat(resultat.size()).isEqualTo(2);
 
     SykefraværForEttKvartal ikkeMaskertSykefraværForEttKvartal = resultat.get(0);
-    assertThat(ikkeMaskertSykefraværForEttKvartal.isErMaskert()).isFalse();
+    assertThat(ikkeMaskertSykefraværForEttKvartal.getErMaskert()).isFalse();
     assertThat(ikkeMaskertSykefraværForEttKvartal.getProsent().setScale(2))
         .isEqualTo(new BigDecimal(5).setScale(2));
 
     SykefraværForEttKvartal maskertSykefraværForEttKvartal = resultat.get(1);
-    assertThat(maskertSykefraværForEttKvartal.isErMaskert()).isTrue();
+    assertThat(maskertSykefraværForEttKvartal.getErMaskert()).isTrue();
     assertThat(maskertSykefraværForEttKvartal.getProsent()).isNull();
   }
 
@@ -261,7 +259,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
       int tapteDagsverk,
       int muligeDagsverk) {
     return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
-        .addValue("sektor_kode", sektor.kode);
+        .addValue("sektor_kode", sektor.getKode());
   }
 
   private MapSqlParameterSource parametre(

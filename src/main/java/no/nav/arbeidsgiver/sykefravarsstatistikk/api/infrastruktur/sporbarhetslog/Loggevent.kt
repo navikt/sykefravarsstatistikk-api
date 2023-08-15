@@ -1,18 +1,14 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetslog;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetslog
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.InnloggetBruker;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.InnloggetBruker
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr
 
-@AllArgsConstructor
-@Data
-public class Loggevent {
-  private InnloggetBruker innloggetBruker;
-  private Orgnr orgnr;
-  private boolean harTilgang;
-  private String requestMethod;
-  private String requestUrl;
-  private String altinnServiceCode;
-  private String altinnServiceEdition;
-}
+data class Loggevent(
+    val innloggetBruker: InnloggetBruker? = null,
+    val orgnr: Orgnr? = null,
+    val harTilgang: Boolean = false,
+    val requestMethod: String? = null,
+    val requestUrl: String? = null,
+    val altinnServiceCode: String? = null,
+    val altinnServiceEdition: String? = null,
+)

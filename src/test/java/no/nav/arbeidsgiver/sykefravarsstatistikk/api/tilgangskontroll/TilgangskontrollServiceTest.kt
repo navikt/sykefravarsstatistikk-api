@@ -1,144 +1,137 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getInnloggetBruker;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getOrganisasjon;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getInnloggetBruker
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getOrganisasjon
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Fnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.InnloggetBruker
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.TilgangskontrollException
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.TilgangskontrollUtils
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.CorrelationIdFilter
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnException
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnKlientWrapper
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetslog.Loggevent
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetslog.Sporbarhetslogg
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.tokenx.TokenXClient
+import no.nav.security.token.support.core.jwt.JwtToken
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Test
+import org.mockito.ArgumentMatchers
+import org.mockito.Mockito
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.whenever
+import org.slf4j.MDC
 
-import java.util.ArrayList;
-import java.util.List;
+class TilgangskontrollServiceTest {
+    private val altinnKlientWrapper: AltinnKlientWrapper = mock()
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Fnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.InnloggetBruker;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.TilgangskontrollException;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.TilgangskontrollUtils;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.CorrelationIdFilter;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.tokenx.TokenXClient;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnException;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnKlientWrapper;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetslog.Loggevent;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetslog.Sporbarhetslogg;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.MDC;
+    private val tokenUtils: TilgangskontrollUtils = mock()
 
-@ExtendWith(MockitoExtension.class)
-public class TilgangskontrollServiceTest {
+    private val sporbarhetslogg: Sporbarhetslogg = mock()
 
-  private static final String FNR = "01082248486";
-  private static final String IAWEB_SERVICE_CODE = "7834";
-  private static final String IAWEB_SERVICE_EDITION = "3";
+    private val tokenXClient: TokenXClient = mock()
 
-  @Mock
-  private AltinnKlientWrapper altinnKlientWrapper;
-  @Mock
-  private TilgangskontrollService tilgangskontroll;
-  @Mock
-  private TilgangskontrollUtils tokenUtils;
-  @Mock
-  private Sporbarhetslogg sporbarhetslogg;
+    private val fnr: Fnr = Fnr(FNR)
 
-  @Mock
-  private TokenXClient tokenXClient;
+    private val tilgangskontroll: TilgangskontrollService = TilgangskontrollService(
+        altinnKlientWrapper,
+        tokenUtils,
+        sporbarhetslogg,
+        IAWEB_SERVICE_CODE,
+        IAWEB_SERVICE_EDITION,
+        tokenXClient
+    )
 
-  private Fnr fnr;
+    @Test
+    fun hentInnloggetBruker__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
+        Mockito.`when`(tokenUtils.hentInnloggetBruker()).thenReturn(InnloggetBruker(fnr))
+        Mockito.`when`(
+            altinnKlientWrapper.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(
+                ArgumentMatchers.any(), ArgumentMatchers.eq(fnr)
+            )
+        )
+            .thenThrow(AltinnException(""))
+        assertThrows(
+            AltinnException::class.java
+        ) { tilgangskontroll.hentBrukerKunIaRettigheter() }
+    }
 
-  @BeforeEach
-  public void setUp() {
-    tilgangskontroll =
-        new TilgangskontrollService(
-            altinnKlientWrapper,
-            tokenUtils,
-            sporbarhetslogg,
-            IAWEB_SERVICE_CODE,
-            IAWEB_SERVICE_EDITION,
-            tokenXClient);
-    fnr = new Fnr(FNR);
-  }
+    @Test
+    fun hentInnloggetBrukerForAlleTilganger__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
+        whenever(tokenUtils.hentInnloggetBruker()).thenReturn(InnloggetBruker(fnr))
+        whenever(
+            altinnKlientWrapper.hentVirksomheterDerBrukerHarTilknytning(
+                Mockito.any(JwtToken::class.java),
+                Mockito.any(Fnr::class.java)
+            )
+        ).thenThrow(AltinnException(""))
+        assertThrows(
+            AltinnException::class.java
+        ) { tilgangskontroll.hentInnloggetBrukerForAlleRettigheter() }
+    }
 
-  @Test
-  public void hentInnloggetBruker__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
-    when(tokenUtils.hentInnloggetBruker()).thenReturn(new InnloggetBruker(fnr));
-    when(altinnKlientWrapper.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(
-            any(), eq(fnr)))
-        .thenThrow(new AltinnException(""));
-
-    assertThrows(AltinnException.class, () -> tilgangskontroll.hentBrukerKunIaRettigheter());
-  }
-
-  @Test
-  public void
-  hentInnloggetBrukerForAlleTilganger__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
-    when(tokenUtils.hentInnloggetBruker()).thenReturn(new InnloggetBruker(fnr));
-    when(altinnKlientWrapper.hentVirksomheterDerBrukerHarTilknytning(any(), eq(fnr)))
-        .thenThrow(new AltinnException(""));
-
-    assertThrows(
-        AltinnException.class, () -> tilgangskontroll.hentInnloggetBrukerForAlleRettigheter());
-  }
-
-  @Test
-  public void
-  sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse__skal_feile_hvis_bruker_ikke_har_tilgang() {
-    InnloggetBruker bruker = getInnloggetBruker(FNR);
-    bruker.setBrukerensOrganisasjoner(new ArrayList<>());
-    værInnloggetSom(bruker);
-
-    assertThrows(
-        TilgangskontrollException.class,
-        () ->
+    @Test
+    fun sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse__skal_feile_hvis_bruker_ikke_har_tilgang() {
+        val bruker = getInnloggetBruker(FNR)
+        bruker.brukerensOrganisasjoner = ArrayList()
+        værInnloggetSom(bruker)
+        assertThrows(
+            TilgangskontrollException::class.java
+        ) {
             tilgangskontroll.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
-                new Orgnr("111111111"), "", ""));
-  }
+                Orgnr("111111111"), "", ""
+            )
+        }
+    }
 
-  @Test
-  public void sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse__skal_gi_ok_hvis_bruker_har_tilgang() {
-    InnloggetBruker bruker = getInnloggetBruker(FNR);
-    bruker.setBrukerensOrganisasjoner(List.of(getOrganisasjon("999999999")));
-    værInnloggetSom(bruker);
-    tilgangskontroll.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(new Orgnr("999999999"), "", "");
-  }
+    @Test
+    fun sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse__skal_gi_ok_hvis_bruker_har_tilgang() {
+        val bruker = getInnloggetBruker(FNR)
+        bruker.brukerensOrganisasjoner = listOf(getOrganisasjon("999999999"))
+        værInnloggetSom(bruker)
+        tilgangskontroll.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(Orgnr("999999999"), "", "")
+    }
 
-  @Test
-  public void
-  sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse__skal_sende_med_riktig_parametre_til_sporbarhetsloggen() {
-    InnloggetBruker bruker = getInnloggetBruker(FNR);
-    Orgnr orgnr = new Orgnr("999999999");
-    bruker.setBrukerensOrganisasjoner(List.of(getOrganisasjon(orgnr.getVerdi())));
-    værInnloggetSom(bruker);
-    String httpMetode = "GET";
-    String requestUrl = "http://localhost:8080/endepunkt";
-    String correlationId = "flfkjdhzdnjb";
-    MDC.put(CorrelationIdFilter.CORRELATION_ID_MDC_NAME, correlationId);
+    @Test
+    fun sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse__skal_sende_med_riktig_parametre_til_sporbarhetsloggen() {
+        val bruker = getInnloggetBruker(FNR)
+        val orgnr = Orgnr("999999999")
+        bruker.brukerensOrganisasjoner = listOf(getOrganisasjon(orgnr.verdi))
+        værInnloggetSom(bruker)
+        val httpMetode = "GET"
+        val requestUrl = "http://localhost:8080/endepunkt"
+        val correlationId = "flfkjdhzdnjb"
+        MDC.put(CorrelationIdFilter.CORRELATION_ID_MDC_NAME, correlationId)
+        tilgangskontroll.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(orgnr, httpMetode, requestUrl)
+        Mockito.verify(sporbarhetslogg)
+            ?.loggHendelse(
+                Loggevent(
+                    bruker,
+                    orgnr,
+                    true,
+                    httpMetode,
+                    requestUrl,
+                    IAWEB_SERVICE_CODE,
+                    IAWEB_SERVICE_EDITION
+                )
+            )
+        MDC.remove(CorrelationIdFilter.CORRELATION_ID_MDC_NAME)
+    }
 
-    tilgangskontroll.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(orgnr, httpMetode, requestUrl);
+    private fun værInnloggetSom(bruker: InnloggetBruker) {
+        Mockito.`when`(tokenUtils.hentInnloggetBruker()).thenReturn(bruker)
+        Mockito.`when`(
+            altinnKlientWrapper.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(
+                ArgumentMatchers.any(), ArgumentMatchers.eq(bruker.fnr)
+            )
+        )
+            .thenReturn(bruker.brukerensOrganisasjoner)
+    }
 
-    verify(sporbarhetslogg)
-        .loggHendelse(
-            new Loggevent(
-                bruker,
-                orgnr,
-                true,
-                httpMetode,
-                requestUrl,
-                IAWEB_SERVICE_CODE,
-                IAWEB_SERVICE_EDITION));
-
-    MDC.remove(CorrelationIdFilter.CORRELATION_ID_MDC_NAME);
-  }
-
-  private void værInnloggetSom(InnloggetBruker bruker) {
-    when(tokenUtils.hentInnloggetBruker()).thenReturn(bruker);
-    when(altinnKlientWrapper.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(
-            any(), eq(bruker.getFnr())))
-        .thenReturn(bruker.getBrukerensOrganisasjoner());
-  }
+    companion object {
+        private const val FNR = "01082248486"
+        private const val IAWEB_SERVICE_CODE = "7834"
+        private const val IAWEB_SERVICE_EDITION = "3"
+    }
 }

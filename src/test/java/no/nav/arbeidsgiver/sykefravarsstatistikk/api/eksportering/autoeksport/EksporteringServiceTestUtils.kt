@@ -1,15 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.SykefraværFlereKvartalerForEksport
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetEksportPerKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetMetadata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværMedKategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetSykefravær
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal
 import org.assertj.core.api.Assertions
 import java.math.BigDecimal
 
@@ -90,16 +83,6 @@ object EksporteringServiceTestUtils {
             __2020_2,
             BigDecimal(10000000),
             BigDecimal(500000000),
-            2500000
-        )
-
-    var virksomhetSykefraværMedKategori =
-        SykefraværMedKategori(
-            Statistikkategori.VIRKSOMHET,
-            "987654321",
-            __2020_2,
-            BigDecimal(10),
-            BigDecimal(500),
             2500000
         )
 
@@ -222,7 +205,7 @@ object EksporteringServiceTestUtils {
 
     @JvmStatic
     fun byggSykefraværStatistikkNæring5Siffer(
-        virksomhetMetadata: VirksomhetMetadata, næringskode5Siffer: String?
+        virksomhetMetadata: VirksomhetMetadata, næringskode5Siffer: String
     ): SykefraværsstatistikkNæring5Siffer {
         return SykefraværsstatistikkNæring5Siffer(
             virksomhetMetadata.årstall,
@@ -236,7 +219,7 @@ object EksporteringServiceTestUtils {
 
     @JvmStatic
     fun byggSykefraværStatistikkNæring5Siffer(
-        statistikkÅrstallOgKvartal: ÅrstallOgKvartal, næringskode5Siffer: String?
+        statistikkÅrstallOgKvartal: ÅrstallOgKvartal, næringskode5Siffer: String
     ): SykefraværsstatistikkNæring5Siffer {
         return SykefraværsstatistikkNæring5Siffer(
             statistikkÅrstallOgKvartal.årstall,
@@ -312,7 +295,7 @@ object EksporteringServiceTestUtils {
 
     @JvmStatic
     fun sykefraværsstatistikkVirksomhet(
-        årstallOgKvartal: ÅrstallOgKvartal, orgnr: String?
+        årstallOgKvartal: ÅrstallOgKvartal, orgnr: String
     ): SykefraværsstatistikkVirksomhetUtenVarighet {
         return SykefraværsstatistikkVirksomhetUtenVarighet(
             årstallOgKvartal.årstall,
@@ -374,16 +357,6 @@ object EksporteringServiceTestUtils {
         BigDecimal(88000)
     )
 
-    @JvmField
-    val sykefraværsstatistikkNæring = SykefraværsstatistikkNæring(
-        __2020_2.årstall,
-        __2020_2.kvartal,
-        "11",
-        150,
-        BigDecimal(100),
-        BigDecimal(5000)
-    )
-
     @JvmStatic
     @JvmOverloads
     fun sykefraværsstatistikkNæring(
@@ -431,7 +404,7 @@ object EksporteringServiceTestUtils {
 
     @JvmStatic
     fun sykefraværsstatistikkNæring5SifferBransjeprogram(
-        næringskode5Siffer: String?, årstallOgKvartal: ÅrstallOgKvartal
+        næringskode5Siffer: String, årstallOgKvartal: ÅrstallOgKvartal
     ): SykefraværsstatistikkNæring5Siffer {
         return SykefraværsstatistikkNæring5Siffer(
             årstallOgKvartal.årstall,
@@ -441,17 +414,6 @@ object EksporteringServiceTestUtils {
             BigDecimal(80),
             BigDecimal(6000)
         )
-    }
-
-    fun assertEqualsSykefraværFlereKvartalerForEksport(
-        expected: SykefraværFlereKvartalerForEksport, actual: SykefraværFlereKvartalerForEksport
-    ) {
-        Assertions.assertThat(actual.prosent).`as`("Sjekk prosent").isEqualByComparingTo(expected.prosent)
-        Assertions.assertThat(actual.kvartaler)
-            .`as`("Sjekk listen av kvartaler")
-            .isEqualTo(expected.kvartaler)
-        AssertUtils.assertBigDecimalIsEqual(actual.muligeDagsverk, expected.muligeDagsverk)
-        AssertUtils.assertBigDecimalIsEqual(actual.tapteDagsverk, expected.tapteDagsverk)
     }
 
     @JvmStatic
@@ -474,7 +436,7 @@ object EksporteringServiceTestUtils {
     ) {
         Assertions.assertThat(actual.kategori).`as`("Sjekk Statistikkategori").isEqualTo(expectedKategori)
         Assertions.assertThat(actual.kode).`as`("Sjekk kode").isEqualTo(expectedKode)
-        Assertions.assertThat(actual.Årstall).`as`("Sjekk årstall").isEqualTo(expected.Årstall)
+        Assertions.assertThat(actual.Årstall).`as`("Sjekk årstall").isEqualTo(expected.årstall)
         Assertions.assertThat(actual.kvartal).`as`("Sjekk kvartal").isEqualTo(expected.kvartal)
         AssertUtils.assertBigDecimalIsEqual(actual.muligeDagsverk, expected.muligeDagsverk)
         AssertUtils.assertBigDecimalIsEqual(actual.tapteDagsverk, expected.tapteDagsverk)

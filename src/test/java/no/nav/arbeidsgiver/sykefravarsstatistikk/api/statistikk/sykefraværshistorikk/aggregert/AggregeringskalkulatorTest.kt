@@ -1,88 +1,101 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.sisteKvartalMinus;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje.BARNEHAGER;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.Aggregeringskalkulator
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sykefraværsdata
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.BransjeEllerNæring
+import org.assertj.core.api.AssertionsForClassTypes
+import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 
-import java.util.List;
-import java.util.Map;
+internal class AggregeringskalkulatorTest {
+    @Test
+    fun fraværsprosentLand_regnerUtRiktigFraværsprosent() {
+        val kalkulator = Aggregeringskalkulator(
+            Sykefraværsdata(mutableMapOf(Statistikkategori.VIRKSOMHET to   synkendeSykefravær)),
+            TestUtils.SISTE_PUBLISERTE_KVARTAL
+        )
+        AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentVirksomhet("dummynavn").get().verdi)
+            .isEqualTo("5.0")
+    }
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.Aggregeringskalkulator;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sykefraværsdata;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.BransjeEllerNæring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal;
-import org.junit.jupiter.api.Test;
+    @Test
+    fun fraværsprosentBransjeEllerNæring_regnerUtRiktigFraværsprosentForBransje() {
+        val kalkulator = Aggregeringskalkulator(
+            Sykefraværsdata(mutableMapOf(Statistikkategori.BRANSJE to   synkendeSykefravær)),
+            TestUtils.SISTE_PUBLISERTE_KVARTAL
+        )
+        val bransje = BransjeEllerNæring(Bransje(ArbeidsmiljøportalenBransje.BARNEHAGER, "Barnehager", listOf("88911")))
+        AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentBransjeEllerNæring(bransje).get().verdi)
+            .isEqualTo("5.0")
+    }
 
-class AggregeringskalkulatorTest {
+    @Test
+    fun fraværsprosentBransjeEllerNæring_regnerUtRiktigFraværsprosentForNæring() {
+        val kalkulator = Aggregeringskalkulator(
+            Sykefraværsdata(mutableMapOf(Statistikkategori.NÆRING to synkendeSykefravær)),
+            TestUtils.SISTE_PUBLISERTE_KVARTAL
+        )
+        val dummynæring = BransjeEllerNæring(Næring("00000", "Dummynæring"))
+        AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentBransjeEllerNæring(dummynæring).get().verdi)
+            .isEqualTo("5.0")
+    }
 
-  @Test
-  void fraværsprosentLand_regnerUtRiktigFraværsprosent() {
-    Aggregeringskalkulator kalkulator =
-        new Aggregeringskalkulator(
-            new Sykefraværsdata(Map.of(Statistikkategori.VIRKSOMHET, synkendeSykefravær)),
-            SISTE_PUBLISERTE_KVARTAL);
+    @Test
+    fun fraværsprosentNorge_regnerUtRiktigFraværsprosent() {
+        val kalkulator = Aggregeringskalkulator(
+            Sykefraværsdata(mutableMapOf(Statistikkategori.LAND to synkendeSykefravær)),
+            TestUtils.SISTE_PUBLISERTE_KVARTAL
+        )
+        AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentNorge().get().verdi).isEqualTo("5.0")
+    }
 
-    assertThat(kalkulator.fraværsprosentVirksomhet("dummynavn").get().getVerdi()).isEqualTo("5.0");
-  }
+    @Test
+    fun trendBransjeEllerNæring_regnerUtRiktigTrendForNæring() {
+        val kalkulator = Aggregeringskalkulator(
+            Sykefraværsdata(mutableMapOf(Statistikkategori.NÆRING to synkendeSykefravær)),
+            TestUtils.SISTE_PUBLISERTE_KVARTAL
+        )
+        val dummynæring = BransjeEllerNæring(Næring("00000", "Dummynæring"))
+        AssertionsForClassTypes.assertThat(kalkulator.trendBransjeEllerNæring(dummynæring).get().verdi)
+            .isEqualTo("-8.0")
+    }
 
-  @Test
-  void fraværsprosentBransjeEllerNæring_regnerUtRiktigFraværsprosentForBransje() {
-    Aggregeringskalkulator kalkulator =
-        new Aggregeringskalkulator(
-            new Sykefraværsdata(Map.of(Statistikkategori.BRANSJE, synkendeSykefravær)),
-            SISTE_PUBLISERTE_KVARTAL);
-
-    BransjeEllerNæring bransje =
-        new BransjeEllerNæring(new Bransje(BARNEHAGER, "Barnehager", "88911"));
-
-    assertThat(kalkulator.fraværsprosentBransjeEllerNæring(bransje).get().getVerdi())
-        .isEqualTo("5.0");
-  }
-
-  @Test
-  void fraværsprosentBransjeEllerNæring_regnerUtRiktigFraværsprosentForNæring() {
-    Aggregeringskalkulator kalkulator =
-        new Aggregeringskalkulator(
-            new Sykefraværsdata(Map.of(Statistikkategori.NÆRING, synkendeSykefravær)),
-            SISTE_PUBLISERTE_KVARTAL);
-
-    BransjeEllerNæring dummynæring = new BransjeEllerNæring(new Næring("00000", "Dummynæring"));
-
-    assertThat(kalkulator.fraværsprosentBransjeEllerNæring(dummynæring).get().getVerdi())
-        .isEqualTo("5.0");
-  }
-
-  @Test
-  void fraværsprosentNorge_regnerUtRiktigFraværsprosent() {
-    Aggregeringskalkulator kalkulator =
-        new Aggregeringskalkulator(
-            new Sykefraværsdata(Map.of(Statistikkategori.LAND, synkendeSykefravær)),
-            SISTE_PUBLISERTE_KVARTAL);
-
-    assertThat(kalkulator.fraværsprosentNorge().get().getVerdi()).isEqualTo("5.0");
-  }
-
-  @Test
-  void trendBransjeEllerNæring_regnerUtRiktigTrendForNæring() {
-    Aggregeringskalkulator kalkulator =
-        new Aggregeringskalkulator(
-            new Sykefraværsdata(Map.of(Statistikkategori.NÆRING, synkendeSykefravær)),
-            SISTE_PUBLISERTE_KVARTAL);
-
-    BransjeEllerNæring dummynæring = new BransjeEllerNæring(new Næring("00000", "Dummynæring"));
-
-    assertThat(kalkulator.trendBransjeEllerNæring(dummynæring).get().getVerdi()).isEqualTo("-8.0");
-  }
-
-  private final List<UmaskertSykefraværForEttKvartal> synkendeSykefravær =
-      List.of(
-          new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(0), 2, 100, 10),
-          new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(1), 4, 100, 10),
-          new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(2), 6, 100, 10),
-          new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(3), 8, 100, 10),
-          new UmaskertSykefraværForEttKvartal(sisteKvartalMinus(4), 10, 100, 10));
+    private val synkendeSykefravær = listOf(
+        UmaskertSykefraværForEttKvartal(
+            TestUtils.sisteKvartalMinus(0),
+            BigDecimal.valueOf(2),
+            BigDecimal.valueOf(100),
+            10
+        ),
+        UmaskertSykefraværForEttKvartal(
+            TestUtils.sisteKvartalMinus(1),
+            BigDecimal.valueOf(4),
+            BigDecimal.valueOf(100),
+            10
+        ),
+        UmaskertSykefraværForEttKvartal(
+            TestUtils.sisteKvartalMinus(2),
+            BigDecimal.valueOf(6),
+            BigDecimal.valueOf(100),
+            10
+        ),
+        UmaskertSykefraværForEttKvartal(
+            TestUtils.sisteKvartalMinus(3),
+            BigDecimal.valueOf(8),
+            BigDecimal.valueOf(100),
+            10
+        ),
+        UmaskertSykefraværForEttKvartal(
+            TestUtils.sisteKvartalMinus(4),
+            BigDecimal.valueOf(10),
+            BigDecimal.valueOf(100),
+            10
+        )
+    )
 }

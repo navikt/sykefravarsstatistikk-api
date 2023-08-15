@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
 import io.vavr.control.Either
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring.getNavn
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
 
 class BransjeEllerNæring {
@@ -30,7 +29,7 @@ class BransjeEllerNæring {
     }
 
     fun navn(): String {
-        return if (isBransje) verdi.left.getNavn() else verdi.get().navn
+        return if (isBransje) verdi.left.navn else verdi.get().navn
     }
 
     val næring: Næring

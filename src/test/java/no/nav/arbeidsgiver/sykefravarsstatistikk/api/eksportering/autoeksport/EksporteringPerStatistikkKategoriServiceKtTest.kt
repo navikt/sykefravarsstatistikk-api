@@ -1,11 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkNæring5Siffer
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.groupByNæringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.tilSykefraværMedKategoriSisteKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.tilUmaskertSykefraværForEttKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkNæring5Siffer
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -88,6 +88,6 @@ class EksporteringPerStatistikkKategoriServiceKtTest {
                 .tilUmaskertSykefraværForEttKvartal()
                 .tilSykefraværMedKategoriSisteKvartal(Statistikkategori.NÆRINGSKODE, "12345")
 
-        assertThat(result.ÅrstallOgKvartal).isEqualTo(ÅrstallOgKvartal(2023, 1))
+        assertThat(result.årstallOgKvartal).isEqualTo(ÅrstallOgKvartal(2023, 1))
     }
 }

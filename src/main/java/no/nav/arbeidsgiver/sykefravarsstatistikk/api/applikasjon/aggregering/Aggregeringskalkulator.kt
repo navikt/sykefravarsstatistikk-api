@@ -4,14 +4,12 @@ import io.vavr.control.Either
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.BransjeEllerNæring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal.Companion.sisteFireKvartaler
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.StatistikkException
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.UtilstrekkeligDataException
 
 class Aggregeringskalkulator(
     private var sykefraværsdata: Sykefraværsdata,
-    private var sistePubliserteKvartal: ÅrstallOgKvartal? = null
+    private var sistePubliserteKvartal: ÅrstallOgKvartal
 ) {
     fun fraværsprosentNorge(): Either<StatistikkException, StatistikkDto> {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(Statistikkategori.LAND))
@@ -29,18 +27,18 @@ class Aggregeringskalkulator(
             )
     }
 
-    fun tapteDagsverkVirksomhet(bedriftsnavn: String?): Either<StatistikkException, StatistikkDto> {
+    fun tapteDagsverkVirksomhet(bedriftsnavn: String): Either<StatistikkException, StatistikkDto> {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(Statistikkategori.VIRKSOMHET))
             .getTapteDagsverkOgMapTilDto(Statistikkategori.VIRKSOMHET, bedriftsnavn)
     }
 
-    fun muligeDagsverkVirksomhet(bedriftsnavn: String?): Either<StatistikkException, StatistikkDto> {
+    fun muligeDagsverkVirksomhet(bedriftsnavn: String): Either<StatistikkException, StatistikkDto> {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(Statistikkategori.VIRKSOMHET))
             .getMuligeDagsverkOgMapTilDto(Statistikkategori.VIRKSOMHET, bedriftsnavn)
     }
 
     fun fraværsprosentVirksomhet(
-        virksomhetsnavn: String?
+        virksomhetsnavn: String
     ): Either<StatistikkException, StatistikkDto> {
         return summerOppSisteFireKvartaler(sykefraværsdata.filtrerPåKategori(Statistikkategori.VIRKSOMHET))
             .regnUtProsentOgMapTilDto(Statistikkategori.VIRKSOMHET, virksomhetsnavn)
@@ -78,16 +76,11 @@ class Aggregeringskalkulator(
     }
 
     private fun ekstraherSisteFireKvartaler(
-        statistikk: List<UmaskertSykefraværForEttKvartal>?
+        statistikk: List<UmaskertSykefraværForEttKvartal>
     ): List<UmaskertSykefraværForEttKvartal> {
-        return if (statistikk == null) {
-            listOf()
-        } else statistikk
-            .filter { datapunkt: UmaskertSykefraværForEttKvartal ->
-                sisteFireKvartaler(
-                    sistePubliserteKvartal!!
-                )
-                    .contains(datapunkt.årstallOgKvartal)
+        return statistikk
+            .filter {
+                sisteFireKvartaler(sistePubliserteKvartal).contains(it.årstallOgKvartal)
             }.sorted()
     }
 }
