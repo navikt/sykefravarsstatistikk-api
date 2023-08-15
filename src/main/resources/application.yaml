@@ -62,7 +62,6 @@ tokenxclient:
   altinn_rettigheter_proxy_audience: dev-gcp:arbeidsgiver:altinn-rettigheter-proxy
 
 
-statistikk.importering.aktivert: true
 statistikk.eksportering.aktivert: true
 
 database.navn: sykefravarsstatistikk
@@ -106,7 +105,6 @@ tokenxclient:
   clientId: ${TOKEN_X_CLIENT_ID}
   altinn_rettigheter_proxy_audience: prod-gcp:arbeidsgiver:altinn-rettigheter-proxy
 
-statistikk.importering.aktivert: true
 statistikk.eksportering.aktivert: true
 
 database.navn: sykefravarsstatistikk

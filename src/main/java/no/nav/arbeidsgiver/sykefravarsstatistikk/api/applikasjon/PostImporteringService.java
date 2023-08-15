@@ -26,7 +26,6 @@ public class PostImporteringService {
   private final GraderingRepository graderingRepository;
   private final EksporteringRepository eksporteringRepository;
   private final KafkaUtsendingHistorikkRepository kafkaUtsendingHistorikkRepository;
-  private final boolean erImporteringAktivert;
   private final boolean erEksporteringAktivert;
 
   public PostImporteringService(
@@ -35,13 +34,11 @@ public class PostImporteringService {
       GraderingRepository graderingRepository,
       EksporteringRepository eksporteringRepository,
       KafkaUtsendingHistorikkRepository kafkaUtsendingHistorikkRepository,
-      @Value("${statistikk.importering.aktivert}") Boolean erImporteringAktivert,
       @Value("${statistikk.eksportering.aktivert}") Boolean erEksporteringAktivert) {
     this.datavarehusRepository = datavarehusRepository;
     this.virksomhetMetadataRepository = virksomhetMetadataRepository;
     this.graderingRepository = graderingRepository;
     this.eksporteringRepository = eksporteringRepository;
-    this.erImporteringAktivert = erImporteringAktivert;
     this.erEksporteringAktivert = erEksporteringAktivert;
     this.kafkaUtsendingHistorikkRepository = kafkaUtsendingHistorikkRepository;
   }
@@ -81,12 +78,6 @@ public class PostImporteringService {
   // Kall fra Controller / backdoor
   public Pair<Integer, Integer> importVirksomhetMetadataOgVirksomhetNæringskode5sifferMapping(
       ÅrstallOgKvartal årstallOgKvartal) {
-    if (!erImporteringAktivert) {
-      log.info(
-          "Importering er ikke aktivert. Skal ikke importere VirksomhetMetadata "
-              + "og VirksomhetNæringskode5sifferMapping");
-      return Pair.of(0, 0);
-    }
 
     int antallVirksomhetMetadataOpprettet = importVirksomhetMetadata(årstallOgKvartal);
     int antallVirksomhetMetadataNæringskode5siffer =

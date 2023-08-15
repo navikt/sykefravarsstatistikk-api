@@ -55,7 +55,6 @@ class PostImporteringServiceTest {
             graderingRepository,
             eksporteringRepository,
             kafkaUtsendingHistorikkRepository,
-            true,
             true);
   }
 

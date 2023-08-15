@@ -21,7 +21,6 @@ enhetsregisteret:
   url: "http://localhost:${wiremock.mock.port}/enhetsregisteret"
 
 
-statistikk.importering.aktivert: true
 statistikk.eksportering.aktivert: true
 
 applikasjon.datasource:
