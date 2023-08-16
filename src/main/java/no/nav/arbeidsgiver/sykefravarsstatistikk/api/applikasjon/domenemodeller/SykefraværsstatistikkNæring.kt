@@ -7,6 +7,6 @@ data class SykefraværsstatistikkNæring(
     override val kvartal: Int,
     val næringkode: String,
     override val antallPersoner: Int,
-    override val tapteDagsverk: BigDecimal,
-    override val muligeDagsverk: BigDecimal
+    override val tapteDagsverk: BigDecimal?, // Må være nullable fordi klassen brukes som en kafkamelding ...
+    override val muligeDagsverk: BigDecimal?, // Må være nullable fordi klassen brukes som en kafkamelding ...
 ) : Sykefraværsstatistikk

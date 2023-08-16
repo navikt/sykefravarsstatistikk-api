@@ -9,7 +9,7 @@ import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import java.math.BigDecimal
+import java.math.BigDecimal.ZERO
 import java.sql.ResultSet
 
 fun hentSykefraværsstatistikkForBransjerFraOgMed(
@@ -34,8 +34,8 @@ operator fun SykefraværsstatistikkNæring.plus(other: SykefraværsstatistikkNæ
         this.kvartal,
         this.næringkode,
         this.antallPersoner + other.antallPersoner,
-        this.tapteDagsverk + other.tapteDagsverk,
-        this.muligeDagsverk + other.muligeDagsverk,
+        (this.tapteDagsverk ?: ZERO) + (other.tapteDagsverk ?: ZERO),
+        (this.muligeDagsverk ?: ZERO) + (other.muligeDagsverk ?: ZERO),
     )
 }
 
@@ -145,16 +145,18 @@ private fun summerSykefraværsstatistikkNæringForEttKvartal(
             kvartal = 0,
             bransje = bransje.type,
             antallPersoner = 0,
-            tapteDagsverk = BigDecimal.ZERO,
-            muligeDagsverk = BigDecimal.ZERO,
+            tapteDagsverk = ZERO,
+            muligeDagsverk = ZERO,
         )
     ) { akkumulertStatistikkBransje, sykefraværsstatistikkNæring ->
         akkumulertStatistikkBransje.copy(
             årstall = sykefraværsstatistikkNæring.årstall,
             kvartal = sykefraværsstatistikkNæring.kvartal,
             antallPersoner = akkumulertStatistikkBransje.antallPersoner + sykefraværsstatistikkNæring.antallPersoner,
-            tapteDagsverk = akkumulertStatistikkBransje.tapteDagsverk + sykefraværsstatistikkNæring.tapteDagsverk,
-            muligeDagsverk = akkumulertStatistikkBransje.muligeDagsverk + sykefraværsstatistikkNæring.muligeDagsverk,
+            tapteDagsverk = akkumulertStatistikkBransje.tapteDagsverk + (sykefraværsstatistikkNæring.tapteDagsverk
+                ?: ZERO),
+            muligeDagsverk = akkumulertStatistikkBransje.muligeDagsverk + (sykefraværsstatistikkNæring.muligeDagsverk
+                ?: ZERO),
         )
     }
 }

@@ -19,7 +19,7 @@ object StatistikkUtils {
         val ANTALL_SIFRE_I_UTREGNING = 3
         val ANTALL_SIFRE_I_RESULTAT = 1
 
-        if (dagsverkTeller == null || dagsverkNevner == null || dagsverkNevner == BigDecimal.ZERO) {
+        if (dagsverkTeller == null || dagsverkNevner == null || dagsverkNevner.compareTo(BigDecimal.ZERO) == 0) {
             return Either.left(
                 StatistikkException(
                     "Kan ikke regne ut prosent når antall dagsverk i nevner er lik $dagsverkNevner"
