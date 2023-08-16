@@ -1,10 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
 import com.fasterxml.jackson.annotation.JsonValue
-import lombok.Value
 
-@Value
-class Fnr(val verdi: String) {
+data class Fnr(val verdi: String) {
 
     init {
         if (!verdi.matches("^[0-9]{11}$".toRegex())) {

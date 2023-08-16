@@ -1,6 +1,5 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sykefraværsstatistikk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje
 import java.math.BigDecimal
 

@@ -1,15 +1,15 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2021_1;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2021_2;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværFlereKvartalerForEksport;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.SykefraværFlereKvartalerForEksport;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal;
-import org.junit.jupiter.api.Test;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2021_1;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2021_2;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class SykefraværFlereKvartalerForEksportTest {
 
@@ -76,6 +76,6 @@ class SykefraværFlereKvartalerForEksportTest {
     assertThat(sykefraværFlereKvartalerForEksport.getTapteDagsverk()).isNull();
     assertThat(sykefraværFlereKvartalerForEksport.getMuligeDagsverk()).isNull();
     assertThat(sykefraværFlereKvartalerForEksport.getProsent()).isNull();
-    assertThat(sykefraværFlereKvartalerForEksport.isErMaskert()).isFalse();
+    assertThat(sykefraværFlereKvartalerForEksport.getErMaskert()).isFalse();
   }
 }
