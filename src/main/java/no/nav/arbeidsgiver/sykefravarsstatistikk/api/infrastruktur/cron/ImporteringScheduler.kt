@@ -1,11 +1,13 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron
 
+import arrow.core.getOrElse
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import net.javacrumbs.shedlock.core.LockConfiguration
 import net.javacrumbs.shedlock.core.LockingTaskExecutor
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.Importeringstatus
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.SykefraværsstatistikkImporteringService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImportEksportStatusRepository
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -17,7 +19,8 @@ import java.time.temporal.ChronoUnit
 class ImporteringScheduler(
     private val taskExecutor: LockingTaskExecutor,
     private val importeringService: SykefraværsstatistikkImporteringService,
-    registry: MeterRegistry
+    registry: MeterRegistry,
+    private val importEksportStatusRepository: ImportEksportStatusRepository,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -39,11 +42,12 @@ class ImporteringScheduler(
 
     private fun importering() {
         log.info("Jobb for å importere sykefraværsstatistikk er startet.")
-        val importeringstatus = importeringService.importerHvisDetFinnesNyStatistikk()
-        if (importeringstatus == Importeringstatus.IMPORTERT) {
-            log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_import'")
-            counter.increment()
-            log.info("Counter er nå: {}", counter.count())
-        }
+        val gjeldendeKvartal = importeringService.importerHvisDetFinnesNyStatistikk()
+            .getOrElse { return }
+
+        importEksportStatusRepository.markerJobbSomKjørt(gjeldendeKvartal, ImportEksportJobb.IMPORTERT_STATISTIKK)
+        log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_import'")
+        counter.increment()
+        log.info("Counter er nå: {}", counter.count())
     }
 }

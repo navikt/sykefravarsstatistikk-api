@@ -2,7 +2,9 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.equals.shouldBeEqual
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -56,6 +58,39 @@ open class ImportEksportStatusRepositoryTest {
         repo.settImportEksportStatus(oppdatertImportEksportStatus)
 
         repo.hentImportEksportStatus(årstallOgKvartal) shouldContainExactly listOf(oppdatertImportEksportStatus)
+    }
+
+    @Test
+    fun `marker jobb som kjørt burde markere en jobb hvis raden ikke finnes`() {
+        repo.markerJobbSomKjørt(årstallOgKvartal, ImportEksportJobb.IMPORTERT_STATISTIKK)
+
+        val resultat = repo.hentImportEksportStatus(årstallOgKvartal).first()
+
+        resultat shouldBeEqual ImportEksportStatusDao(
+            årstall = årstallOgKvartal.årstall.toString(),
+            kvartal = årstallOgKvartal.kvartal.toString(),
+            importertStatistikk = true,
+            importertVirksomhetsdata = false,
+            forberedtNesteEksport = false,
+            eksportertPåKafka = false,
+        )
+    }
+
+    @Test
+    fun `marker jobb som kjørt burde markere en jobb hvis raden finnes`() {
+        repo.markerJobbSomKjørt(årstallOgKvartal, ImportEksportJobb.IMPORTERT_STATISTIKK)
+        repo.markerJobbSomKjørt(årstallOgKvartal, ImportEksportJobb.IMPORTERT_VIRKSOMHETDATA)
+
+        val resultat = repo.hentImportEksportStatus(årstallOgKvartal).first()
+
+        resultat shouldBeEqual ImportEksportStatusDao(
+            årstall = årstallOgKvartal.årstall.toString(),
+            kvartal = årstallOgKvartal.kvartal.toString(),
+            importertStatistikk = true,
+            importertVirksomhetsdata = true,
+            forberedtNesteEksport = false,
+            eksportertPåKafka = false,
+        )
     }
 
     private fun ImportEksportStatusRepository.slettAlt() {
