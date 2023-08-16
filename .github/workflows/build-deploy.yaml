@@ -38,7 +38,7 @@ jobs:
   deploy-to-dev:
     name: Deploy to dev-fss
     needs: docker-build-push
-    if: github.ref == 'refs/heads/tabell'
+    if: github.ref == 'refs/heads/domain_to_kotlin'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -68,7 +68,7 @@ jobs:
   deployTopicsToDev:
     name: Deploy topics to dev
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/domain_to_kotlin'
+    if: github.ref == 'refs/heads/branch'
     steps:
       - uses: actions/checkout@v3
       - name: Deploy topics to dev-fss
