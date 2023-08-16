@@ -38,6 +38,11 @@ class TilgangskontrollServiceTest {
         tokenXClient
     )
 
+    @BeforeEach
+    fun beforeEach() {
+        værInnloggetSom(InnloggetBruker(Fnr(FNR)))
+    }
+
     @Test
     fun hentInnloggetBruker__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
         every {
