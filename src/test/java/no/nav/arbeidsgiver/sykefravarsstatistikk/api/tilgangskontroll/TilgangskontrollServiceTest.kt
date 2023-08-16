@@ -1,5 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll
 
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getInnloggetBruker
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getOrganisasjon
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService
@@ -14,29 +18,20 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.Altinn
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetslog.Loggevent
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetslog.Sporbarhetslogg
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.tokenx.TokenXClient
-import no.nav.security.token.support.core.jwt.JwtToken
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito
-import org.mockito.Mockito.mock
-import org.mockito.kotlin.whenever
 import org.slf4j.MDC
 
 class TilgangskontrollServiceTest {
-    private val altinnKlientWrapper: AltinnKlientWrapper = mock()
-
-    private val tokenUtils: TilgangskontrollUtils = mock()
-
-    private val sporbarhetslogg: Sporbarhetslogg = mock()
-
-    private val tokenXClient: TokenXClient = mock()
-
-    private val fnr: Fnr = Fnr(FNR)
+    private val altinnKlientWrapper: AltinnKlientWrapper = mockk()
+    private val tilgangskontrollUtils: TilgangskontrollUtils = mockk(relaxed = true)
+    private val tokenXClient: TokenXClient = mockk(relaxed = true)
+    private val sporbarhetslogg: Sporbarhetslogg = spyk()
 
     private val tilgangskontroll: TilgangskontrollService = TilgangskontrollService(
         altinnKlientWrapper,
-        tokenUtils,
+        tilgangskontrollUtils,
         sporbarhetslogg,
         IAWEB_SERVICE_CODE,
         IAWEB_SERVICE_EDITION,
@@ -45,13 +40,9 @@ class TilgangskontrollServiceTest {
 
     @Test
     fun hentInnloggetBruker__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
-        Mockito.`when`(tokenUtils.hentInnloggetBruker()).thenReturn(InnloggetBruker(fnr))
-        Mockito.`when`(
-            altinnKlientWrapper.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(
-                ArgumentMatchers.any(), ArgumentMatchers.eq(fnr)
-            )
-        )
-            .thenThrow(AltinnException(""))
+        every {
+            altinnKlientWrapper.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(any(), any())
+        } throws AltinnException("")
         assertThrows(
             AltinnException::class.java
         ) { tilgangskontroll.hentBrukerKunIaRettigheter() }
@@ -59,13 +50,8 @@ class TilgangskontrollServiceTest {
 
     @Test
     fun hentInnloggetBrukerForAlleTilganger__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
-        whenever(tokenUtils.hentInnloggetBruker()).thenReturn(InnloggetBruker(fnr))
-        whenever(
-            altinnKlientWrapper.hentVirksomheterDerBrukerHarTilknytning(
-                Mockito.any(JwtToken::class.java),
-                Mockito.any(Fnr::class.java)
-            )
-        ).thenThrow(AltinnException(""))
+        every { altinnKlientWrapper.hentVirksomheterDerBrukerHarTilknytning(any(), any()) } throws AltinnException("")
+
         assertThrows(
             AltinnException::class.java
         ) { tilgangskontroll.hentInnloggetBrukerForAlleRettigheter() }
@@ -73,9 +59,6 @@ class TilgangskontrollServiceTest {
 
     @Test
     fun sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse__skal_feile_hvis_bruker_ikke_har_tilgang() {
-        val bruker = getInnloggetBruker(FNR)
-        bruker.brukerensOrganisasjoner = ArrayList()
-        værInnloggetSom(bruker)
         assertThrows(
             TilgangskontrollException::class.java
         ) {
@@ -104,29 +87,37 @@ class TilgangskontrollServiceTest {
         val correlationId = "flfkjdhzdnjb"
         MDC.put(CorrelationIdFilter.CORRELATION_ID_MDC_NAME, correlationId)
         tilgangskontroll.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(orgnr, httpMetode, requestUrl)
-        Mockito.verify(sporbarhetslogg)
-            ?.loggHendelse(
-                Loggevent(
-                    bruker,
-                    orgnr,
-                    true,
-                    httpMetode,
-                    requestUrl,
-                    IAWEB_SERVICE_CODE,
-                    IAWEB_SERVICE_EDITION
+        verify {
+            sporbarhetslogg
+                .loggHendelse(
+                    Loggevent(
+                        bruker,
+                        orgnr,
+                        true,
+                        httpMetode,
+                        requestUrl,
+                        IAWEB_SERVICE_CODE,
+                        IAWEB_SERVICE_EDITION
+                    )
                 )
-            )
+        }
         MDC.remove(CorrelationIdFilter.CORRELATION_ID_MDC_NAME)
     }
 
     private fun værInnloggetSom(bruker: InnloggetBruker) {
-        Mockito.`when`(tokenUtils.hentInnloggetBruker()).thenReturn(bruker)
-        Mockito.`when`(
+        every { tilgangskontrollUtils.hentInnloggetBruker() } returns bruker
+
+        every {
             altinnKlientWrapper.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(
-                ArgumentMatchers.any(), ArgumentMatchers.eq(bruker.fnr)
+                any(), any()
             )
-        )
-            .thenReturn(bruker.brukerensOrganisasjoner)
+        } returns bruker.brukerensOrganisasjoner
+
+        every {
+            altinnKlientWrapper.hentVirksomheterDerBrukerHarTilknytning(
+                any(), any()
+            )
+        } returns bruker.brukerensOrganisasjoner
     }
 
     companion object {

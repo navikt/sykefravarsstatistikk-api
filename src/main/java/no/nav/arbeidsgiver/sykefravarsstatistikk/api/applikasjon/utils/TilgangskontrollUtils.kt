@@ -17,7 +17,7 @@ import java.util.*
 
 @Slf4j
 @Component
-class TilgangskontrollUtils @Autowired constructor(
+open class TilgangskontrollUtils @Autowired constructor(
     private val contextHolder: TokenValidationContextHolder, private val environment: Environment
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
