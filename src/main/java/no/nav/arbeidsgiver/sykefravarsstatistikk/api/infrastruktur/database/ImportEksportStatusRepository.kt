@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportStatus
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import org.jetbrains.exposed.sql.Database
@@ -14,10 +15,10 @@ open class ImportEksportStatusRepository(
 ) : Table("import_eksport_status"), UsingExposed {
     val årstall = varchar("aarstall", 4)
     val kvartal = varchar("kvartal", 1)
-    val importertStatistikk = bool("importert_statistikk").default(false)
-    val importertVirksomhetsdata = bool("importert_virksomhetsdata").default(false)
-    val forberedtNesteEksport = bool("forberedt_neste_eksport").default(false)
-    val eksportertPåKafka = bool("eksportert_paa_kafka").default(false)
+    val importertStatistikk = bool("importert_statistikk")
+    val importertVirksomhetsdata = bool("importert_virksomhetsdata")
+    val forberedtNesteEksport = bool("forberedt_neste_eksport")
+    val eksportertPåKafka = bool("eksportert_paa_kafka")
     override val primaryKey: PrimaryKey = PrimaryKey(årstall, kvartal)
 
     fun settImportEksportStatus(importEksportStatus: ImportEksportStatus) {
@@ -29,6 +30,24 @@ open class ImportEksportStatusRepository(
                 it[importertVirksomhetsdata] = importEksportStatus.importertVirksomhetsdata
                 it[forberedtNesteEksport] = importEksportStatus.forberedtNesteEksport
                 it[eksportertPåKafka] = importEksportStatus.eksportertPåKafka
+            }
+        }
+    }
+
+    fun markerJobbSomKjørt(
+        årstallOgKvartal: ÅrstallOgKvartal,
+        importEksportJobb: ImportEksportJobb
+    ) {
+        transaction {
+            upsert {
+                it[årstall] = årstallOgKvartal.årstall.toString()
+                it[kvartal] = årstallOgKvartal.kvartal.toString()
+                when (importEksportJobb) {
+                    ImportEksportJobb.IMPORTERT_STATISTIKK -> it[importertStatistikk] = true
+                    ImportEksportJobb.IMPORTERT_VIRKSOMHETDATA -> it[importertVirksomhetsdata] = true
+                    ImportEksportJobb.FORBEREDT_NESTE_EKSPORT -> it[forberedtNesteEksport] = true
+                    ImportEksportJobb.EKSPORTERT_PÅ_KAFKA -> it[eksportertPåKafka] = true
+                }
             }
         }
     }
