@@ -1,20 +1,15 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori.VIRKSOMHET;
-
 import io.vavr.control.Either;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.StatistikkException;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.util.List;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.StatistikkDto;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SumAvSykefraværOverFlereKvartaler;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.StatistikkException;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværForEttKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværOverFlereKvartaler;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori.VIRKSOMHET;
 
 class SumAvSykefraværOverFlereKvartalerTest {
 
@@ -31,18 +26,18 @@ class SumAvSykefraværOverFlereKvartalerTest {
     SykefraværOverFlereKvartaler expected =
         new SykefraværOverFlereKvartaler(
             List.of(
-                umaskertSykefravær_Q1.getÅrstallOgKvartal(),
-                umaskertSykefravær_Q2.getÅrstallOgKvartal()),
+                umaskertSykefravær_Q1.getårstallOgKvartal(),
+                umaskertSykefravær_Q2.getårstallOgKvartal()),
             new BigDecimal(110),
             new BigDecimal(430),
             List.of(
                 new SykefraværForEttKvartal(
-                    umaskertSykefravær_Q1.getÅrstallOgKvartal(),
+                    umaskertSykefravær_Q1.getårstallOgKvartal(),
                     umaskertSykefravær_Q1.getDagsverkTeller(),
                     umaskertSykefravær_Q1.getDagsverkNevner(),
                     umaskertSykefravær_Q1.getAntallPersoner()),
                 new SykefraværForEttKvartal(
-                    umaskertSykefravær_Q2.getÅrstallOgKvartal(),
+                    umaskertSykefravær_Q2.getårstallOgKvartal(),
                     umaskertSykefravær_Q2.getDagsverkTeller(),
                     umaskertSykefravær_Q2.getDagsverkNevner(),
                     umaskertSykefravær_Q2.getAntallPersoner())));

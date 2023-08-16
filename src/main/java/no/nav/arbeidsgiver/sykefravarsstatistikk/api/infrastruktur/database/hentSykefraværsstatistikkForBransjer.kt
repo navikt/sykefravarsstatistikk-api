@@ -1,15 +1,15 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.SykefraværsstatistikkBransje
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkBransje
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkNæring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransjeprogram
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkNæring
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import java.math.BigDecimal
+import java.math.BigDecimal.ZERO
 import java.sql.ResultSet
 
 fun hentSykefraværsstatistikkForBransjerFraOgMed(
@@ -30,12 +30,12 @@ fun hentSykefraværsstatistikkForBransjerFraOgMed(
 
 operator fun SykefraværsstatistikkNæring.plus(other: SykefraværsstatistikkNæring): SykefraværsstatistikkNæring {
     return SykefraværsstatistikkNæring(
-        this.Årstall,
+        this.årstall,
         this.kvartal,
         this.næringkode,
         this.antallPersoner + other.antallPersoner,
-        this.tapteDagsverk!! + other.tapteDagsverk!!,
-        this.muligeDagsverk!! + other.muligeDagsverk!!,
+        (this.tapteDagsverk ?: ZERO) + (other.tapteDagsverk ?: ZERO),
+        (this.muligeDagsverk ?: ZERO) + (other.muligeDagsverk ?: ZERO),
     )
 }
 
@@ -102,7 +102,7 @@ private fun getKvartalsvisSykefraværsstatistikkNæringer(
         namedParameterJdbcTemplate, kvartal, næringskoder
     )
 
-    return statistikkNæringer.groupBy { ÅrstallOgKvartal(it.Årstall, it.kvartal) }
+    return statistikkNæringer.groupBy { ÅrstallOgKvartal(it.årstall, it.kvartal) }
 }
 
 private fun summerSykefraværsstatistikkPerBransje(
@@ -145,21 +145,23 @@ private fun summerSykefraværsstatistikkNæringForEttKvartal(
             kvartal = 0,
             bransje = bransje.type,
             antallPersoner = 0,
-            tapteDagsverk = BigDecimal.ZERO,
-            muligeDagsverk = BigDecimal.ZERO,
+            tapteDagsverk = ZERO,
+            muligeDagsverk = ZERO,
         )
     ) { akkumulertStatistikkBransje, sykefraværsstatistikkNæring ->
         akkumulertStatistikkBransje.copy(
-            årstall = sykefraværsstatistikkNæring.Årstall,
+            årstall = sykefraværsstatistikkNæring.årstall,
             kvartal = sykefraværsstatistikkNæring.kvartal,
             antallPersoner = akkumulertStatistikkBransje.antallPersoner + sykefraværsstatistikkNæring.antallPersoner,
-            tapteDagsverk = akkumulertStatistikkBransje.tapteDagsverk + sykefraværsstatistikkNæring.tapteDagsverk!!,
-            muligeDagsverk = akkumulertStatistikkBransje.muligeDagsverk + sykefraværsstatistikkNæring.muligeDagsverk!!,
+            tapteDagsverk = akkumulertStatistikkBransje.tapteDagsverk + (sykefraværsstatistikkNæring.tapteDagsverk
+                ?: ZERO),
+            muligeDagsverk = akkumulertStatistikkBransje.muligeDagsverk + (sykefraværsstatistikkNæring.muligeDagsverk
+                ?: ZERO),
         )
     }
 }
 
 private fun allStatistikkErFraSammeKvartal(filteredNæringer: List<SykefraværsstatistikkNæring>) =
     filteredNæringer.all {
-        it.Årstall == filteredNæringer.first().Årstall && it.kvartal == filteredNæringer.first().kvartal
+        it.årstall == filteredNæringer.first().årstall && it.kvartal == filteredNæringer.first().kvartal
     }

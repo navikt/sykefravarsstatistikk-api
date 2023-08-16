@@ -21,9 +21,9 @@ public class Sporbarhetslogg {
     extensions.add("cs5=" + kommentar);
     extensions.add("cs5Label=Kommentar");
 
-    String loggmelding = lagLoggmelding(extensions, event.isHarTilgang());
+    String loggmelding = lagLoggmelding(extensions, event.getHarTilgang());
 
-    if (event.isHarTilgang()) {
+    if (event.getHarTilgang()) {
       SPORBARHETSLOGGER.info(loggmelding);
     } else {
       SPORBARHETSLOGGER.warn(loggmelding);
@@ -31,9 +31,9 @@ public class Sporbarhetslogg {
   }
 
   public void loggHendelse(Loggevent event) {
-    String loggmelding = lagLoggmelding(getExtensions(event), event.isHarTilgang());
+    String loggmelding = lagLoggmelding(getExtensions(event), event.getHarTilgang());
 
-    if (event.isHarTilgang()) {
+    if (event.getHarTilgang()) {
       SPORBARHETSLOGGER.info(loggmelding);
     } else {
       SPORBARHETSLOGGER.warn(loggmelding);
@@ -72,11 +72,11 @@ public class Sporbarhetslogg {
     extensions.add("requestMethod=" + event.getRequestMethod());
     extensions.add("cs3=" + (event.getOrgnr() == null ? "" : event.getOrgnr().getVerdi()));
     extensions.add("cs3Label=OrgNr");
-    String decision = event.isHarTilgang() ? "Permit" : "Deny";
+    String decision = event.getHarTilgang() ? "Permit" : "Deny";
     extensions.add("flexString1=" + decision);
     extensions.add("flexString1Label=Decision");
 
-    if (!event.isHarTilgang()) {
+    if (!event.getHarTilgang()) {
       extensions.add("flexString2=Bruker har ikke rettighet i Altinn");
       extensions.add("flexString2Label=Begrunnelse");
       extensions.add("cn1=" + event.getAltinnServiceCode());

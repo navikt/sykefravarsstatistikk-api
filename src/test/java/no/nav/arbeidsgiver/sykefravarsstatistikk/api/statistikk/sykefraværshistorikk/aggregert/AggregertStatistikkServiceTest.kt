@@ -2,23 +2,19 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 import arrow.core.right
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.BransjeEllerNæringService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PubliseringsdatoerService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.AggregertStatistikkService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.BransjeEllerNæring
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.BransjeEllerNæringService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PubliseringsdatoerService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.AggregertStatistikkService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartalMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.GraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VarighetRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService
-import org.assertj.core.api.Assertions.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -363,27 +359,27 @@ internal class AggregertStatistikkServiceTest {
         whenever(mockEnhetsregisteretClient.hentUnderenhet(any())).thenReturn(virksomhetUtenforBransjeprogrammet.right())
         whenever(mockGraderingRepository.hentGradertSykefraværAlleKategorier(any())).thenReturn(
             Sykefraværsdata(
-            mutableMapOf()
-        )
+                mutableMapOf()
+            )
         )
         whenever(mockBransjeEllerNæringService.finnBransje(any()))
             .thenReturn(BransjeEllerNæring(Næring("84", "Et langt navn")))
 
         val årstallOgKvartal = ÅrstallOgKvartal(2022, 1)
         whenever(mockSykefraværRepository.hentTotaltSykefraværAlleKategorier(any(), any())).thenReturn(
-                Sykefraværsdata(
-                    mutableMapOf(
-                        Statistikkategori.NÆRING to listOf(
-                            UmaskertSykefraværForEttKvartal(
-                                årstallOgKvartal,
-                                BigDecimal(68),
-                                BigDecimal(1000),
-                                20,
-                            )
+            Sykefraværsdata(
+                mutableMapOf(
+                    Statistikkategori.NÆRING to listOf(
+                        UmaskertSykefraværForEttKvartal(
+                            årstallOgKvartal,
+                            BigDecimal(68),
+                            BigDecimal(1000),
+                            20,
                         )
                     )
                 )
             )
+        )
 
         whenever(mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any()))
             // Korttidsfravær 0.7%
@@ -521,7 +517,12 @@ internal class AggregertStatistikkServiceTest {
         }
     }
 
-    private val barnehager = BransjeEllerNæring(Bransje(ArbeidsmiljøportalenBransje.BARNEHAGER, "En bransje", "88911"))
+    private val barnehager = BransjeEllerNæring(
+        Bransje(
+            ArbeidsmiljøportalenBransje.BARNEHAGER, "En bransje",
+            listOf("88911")
+        )
+    )
     private val etOrgnr = Orgnr("999999999")
     private val etAnnetOrgnr = Orgnr("1111111111")
 

@@ -1,5 +1,13 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering;
 
+import lombok.extern.slf4j.Slf4j;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,24 +15,6 @@ import java.util.Map;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetEksportPerKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetMetadata;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkLand;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkNæring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkNæring5Siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkSektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkVirksomhetUtenVarighet;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværMedKategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetSykefravær;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
@@ -41,7 +31,7 @@ public class EksporteringServiceUtils {
     return sykefraværsstatistikkVirksomhetUtenVarighet.stream()
         .filter(
             sfVirksomhet ->
-                sfVirksomhet.getÅrstall() == årstallOgKvartal.getÅrstall()
+                sfVirksomhet.getårstall() == årstallOgKvartal.getÅrstall()
                     && sfVirksomhet.getKvartal() == årstallOgKvartal.getKvartal())
         .collect(Collectors.toList());
   }
@@ -50,7 +40,7 @@ public class EksporteringServiceUtils {
       List<UmaskertSykefraværForEttKvartal> umaskertSykefraværsstatistikkSiste4Kvartaler,
       ÅrstallOgKvartal årstallOgKvartal) {
     return umaskertSykefraværsstatistikkSiste4Kvartaler.stream()
-        .filter(u -> u.getÅrstallOgKvartal().equals(årstallOgKvartal))
+        .filter(u -> u.getårstallOgKvartal().equals(årstallOgKvartal))
         .findFirst()
         .orElse(null);
   }
@@ -109,7 +99,7 @@ public class EksporteringServiceUtils {
     List<VirksomhetMetadata> virksomhetMetadataFunnet =
         virksomhetMetadataSet.stream()
             .filter(v -> v.getOrgnr().equals(orgnr.getVerdi()))
-            .collect(Collectors.toList());
+            .toList();
 
     if (virksomhetMetadataFunnet.size() != 1) {
       return null;
@@ -128,7 +118,7 @@ public class EksporteringServiceUtils {
             .filter(
                 v ->
                     v.getOrgnr().equals(virksomhetMetadata.getOrgnr())
-                        && v.getÅrstall() == virksomhetMetadata.getÅrstall()
+                        && v.getårstall() == virksomhetMetadata.getÅrstall()
                         && v.getKvartal() == virksomhetMetadata.getKvartal())
             .collect(
                 toSingleton(
@@ -137,16 +127,16 @@ public class EksporteringServiceUtils {
                         virksomhetMetadata.getKvartal(),
                         virksomhetMetadata.getOrgnr(),
                         0,
-                        null,
-                        null)));
+                        BigDecimal.ZERO,
+                        BigDecimal.ZERO)));
 
     return new VirksomhetSykefravær(
         virksomhetMetadata.getOrgnr(),
             virksomhetMetadata.getNavn(),
         new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
-        sfStatistikk.getTapteDagsverk(),
-        sfStatistikk.getMuligeDagsverk(),
-        sfStatistikk.getAntallPersoner());
+            sfStatistikk.getTapteDagsverk(),
+            sfStatistikk.getMuligeDagsverk(),
+            sfStatistikk.getAntallPersoner());
   }
 
   public static VirksomhetSykefravær getVirksomhetSykefravær(
@@ -171,9 +161,9 @@ public class EksporteringServiceUtils {
         Statistikkategori.LAND,
         "NO",
         årstallOgKvartal,
-        sykefraværsstatistikkLand.getTapteDagsverk(),
-        sykefraværsstatistikkLand.getMuligeDagsverk(),
-        sykefraværsstatistikkLand.getAntallPersoner());
+            sykefraværsstatistikkLand.getTapteDagsverk(),
+            sykefraværsstatistikkLand.getMuligeDagsverk(),
+            sykefraværsstatistikkLand.getAntallPersoner());
   }
 
   public static SykefraværMedKategori getSykefraværMedKategoriForSektor(
@@ -184,7 +174,7 @@ public class EksporteringServiceUtils {
             .filter(
                 v ->
                     v.getSektorkode().equals(virksomhetMetadata.getSektor())
-                        && v.getÅrstall() == virksomhetMetadata.getÅrstall()
+                        && v.getårstall() == virksomhetMetadata.getÅrstall()
                         && v.getKvartal() == virksomhetMetadata.getKvartal())
             .collect(
                 toSingleton(
@@ -198,11 +188,11 @@ public class EksporteringServiceUtils {
 
     return new SykefraværMedKategori(
         Statistikkategori.SEKTOR,
-        sfSektor.getSektorkode(),
+            sfSektor.getSektorkode(),
         new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
-        sfSektor.getTapteDagsverk(),
-        sfSektor.getMuligeDagsverk(),
-        sfSektor.getAntallPersoner());
+            sfSektor.getTapteDagsverk(),
+            sfSektor.getMuligeDagsverk(),
+            sfSektor.getAntallPersoner());
   }
 
   public static SykefraværMedKategori getSykefraværMedKategoriNæringForVirksomhet(
@@ -213,7 +203,7 @@ public class EksporteringServiceUtils {
             .filter(
                 v ->
                     v.getNæringkode().equals(virksomhetMetadata.getPrimærnæring())
-                        && v.getÅrstall() == virksomhetMetadata.getÅrstall()
+                        && v.getårstall() == virksomhetMetadata.getÅrstall()
                         && v.getKvartal() == virksomhetMetadata.getKvartal())
             .collect(
                 toSingleton(
@@ -249,12 +239,12 @@ public class EksporteringServiceUtils {
             resultatList.add(
                 new SykefraværMedKategori(
                     Statistikkategori.NÆRING5SIFFER,
-                    sfNæring5Siffer.getNæringkode5siffer(),
+                        sfNæring5Siffer.getNæringkode5siffer(),
                     new ÅrstallOgKvartal(
                         virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
-                    sfNæring5Siffer.getTapteDagsverk(),
-                    sfNæring5Siffer.getMuligeDagsverk(),
-                    sfNæring5Siffer.getAntallPersoner())));
+                        sfNæring5Siffer.getTapteDagsverk(),
+                        sfNæring5Siffer.getMuligeDagsverk(),
+                        sfNæring5Siffer.getAntallPersoner())));
 
     return resultatList;
   }
@@ -269,10 +259,9 @@ public class EksporteringServiceUtils {
                 virksomhetMetadata.getNæringOgNæringskode5siffer().stream()
                         .anyMatch(
                             virksomhetNæring5Siffer ->
-                                næring5Siffer
-                                    .getNæringkode5siffer()
-                                    .equals(virksomhetNæring5Siffer.getNæringskode5Siffer()))
-                    && næring5Siffer.getÅrstall() == virksomhetMetadata.getÅrstall()
+                                næring5Siffer.getNæringkode5siffer()
+                                    .equals(virksomhetNæring5Siffer.næringskode5Siffer))
+                    && næring5Siffer.getårstall() == virksomhetMetadata.getÅrstall()
                     && næring5Siffer.getKvartal() == virksomhetMetadata.getKvartal())
         .collect(Collectors.toList());
   }

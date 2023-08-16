@@ -72,7 +72,7 @@ open class ApplikasjonDBConfig {
 
     @Bean
     open fun flywayMigrationStrategy(): FlywayMigrationStrategy {
-        return FlywayMigrationStrategy { flyway: Flyway? ->
+        return FlywayMigrationStrategy {
             Flyway.configure()
                 .dataSource(dataSource("admin"))
                 .initSql(String.format("SET ROLE \"%s\"", dbRole("admin")))

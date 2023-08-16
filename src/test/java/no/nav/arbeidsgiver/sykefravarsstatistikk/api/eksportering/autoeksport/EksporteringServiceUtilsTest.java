@@ -267,21 +267,21 @@ public class EksporteringServiceUtilsTest {
 
     assertThat(resultat.size()).isEqualTo(2);
     SykefraværMedKategori sykefraværMedKategori85000 =
-        resultat.stream().filter(r -> "85000".equals(r.getKode())).findFirst().get();
+        resultat.stream().filter(r -> "85000".equals(r.kode)).findFirst().get();
 
     EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(
         byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "85000"),
         sykefraværMedKategori85000,
         Statistikkategori.NÆRING5SIFFER,
-        virksomhet1Metadata_2020_4.getNæringOgNæringskode5siffer().get(0).getNæringskode5Siffer());
+            virksomhet1Metadata_2020_4.getNæringOgNæringskode5siffer().get(0).næringskode5Siffer);
     SykefraværMedKategori sykefraværMedKategori11000 =
-        resultat.stream().filter(r -> "11000".equals(r.getKode())).findFirst().get();
+        resultat.stream().filter(r -> "11000".equals(r.kode)).findFirst().get();
 
     EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(
         byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "11000"),
         sykefraværMedKategori11000,
         Statistikkategori.NÆRING5SIFFER,
-        virksomhet1Metadata_2020_4.getNæringOgNæringskode5siffer().get(1).getNæringskode5Siffer());
+            virksomhet1Metadata_2020_4.getNæringOgNæringskode5siffer().get(1).næringskode5Siffer);
   }
 
   @Test

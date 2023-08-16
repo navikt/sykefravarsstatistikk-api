@@ -1,8 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository.sorterKronologisk;
@@ -11,18 +13,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class SykefraværRepositoryTest {
 
   static UmaskertSykefraværForEttKvartal SF_Q2_2021 =
-      new UmaskertSykefraværForEttKvartal(new ÅrstallOgKvartal(2021, 2), 15, 100, 10);
+      new UmaskertSykefraværForEttKvartal(new ÅrstallOgKvartal(2021, 2), BigDecimal.valueOf(15), BigDecimal.valueOf(100), 10);
 
   static UmaskertSykefraværForEttKvartal SF_Q4_2021 =
-      new UmaskertSykefraværForEttKvartal(new ÅrstallOgKvartal(2021, 4), 15, 100, 10);
+      new UmaskertSykefraværForEttKvartal(new ÅrstallOgKvartal(2021, 4), BigDecimal.valueOf(15), BigDecimal.valueOf(100), 10);
 
   static UmaskertSykefraværForEttKvartal SF_Q1_2022 =
-      new UmaskertSykefraværForEttKvartal(new ÅrstallOgKvartal(2022, 1), 15, 100, 10);
+      new UmaskertSykefraværForEttKvartal(new ÅrstallOgKvartal(2022, 1), BigDecimal.valueOf(15), BigDecimal.valueOf(100), 10);
 
   static UmaskertSykefraværForEttKvartal SF_Q2_2022 =
-      new UmaskertSykefraværForEttKvartal(new ÅrstallOgKvartal(2022, 2), 15, 100, 10);
+      new UmaskertSykefraværForEttKvartal(new ÅrstallOgKvartal(2022, 2), BigDecimal.valueOf(15), BigDecimal.valueOf(100), 10);
   static UmaskertSykefraværForEttKvartal SF_Q3_2022 =
-      new UmaskertSykefraværForEttKvartal(new ÅrstallOgKvartal(2022, 3), 15, 100, 10);
+      new UmaskertSykefraværForEttKvartal(new ÅrstallOgKvartal(2022, 3), BigDecimal.valueOf(15), BigDecimal.valueOf(100), 10);
 
   static List<UmaskertSykefraværForEttKvartal> FRA_Q4_2021_TIL_Q3_2022 =
       List.of(SF_Q4_2021, SF_Q1_2022, SF_Q2_2022, SF_Q3_2022);

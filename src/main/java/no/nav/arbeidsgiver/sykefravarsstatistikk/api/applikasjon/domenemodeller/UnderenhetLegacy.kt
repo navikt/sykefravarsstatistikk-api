@@ -4,8 +4,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 data class UnderenhetLegacy(
     override var orgnr: Orgnr,
     var overordnetEnhetOrgnr: Orgnr? = null,
-    override var navn: String? = null,
-    override var næringskode: Næringskode5Siffer? = null,
+    override var navn: String,
+    override var næringskode: Næringskode5Siffer,
     var antallAnsatte: Int? = null,
 ) : Virksomhet
 

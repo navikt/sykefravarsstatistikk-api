@@ -222,7 +222,7 @@ class StatistikkRepository(
         return Arrays.stream(results).sum()
     }
 
-    fun opprettSykefraværsstatistikkVirksomhetMedGradering(
+    private fun opprettSykefraværsstatistikkVirksomhetMedGradering(
         sykefraværsstatistikk: List<Sykefraværsstatistikk?>
     ): Int {
         val batch = SqlParameterSourceUtils.createBatch(*sykefraværsstatistikk.toTypedArray())
