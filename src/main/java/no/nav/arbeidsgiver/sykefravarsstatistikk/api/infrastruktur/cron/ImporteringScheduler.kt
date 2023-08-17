@@ -49,12 +49,15 @@ class ImporteringScheduler(
         )
     }
 
-    private fun importering() {
+    fun importering() {
         log.info("Jobb for å importere sykefraværsstatistikk er startet.")
         val gjeldendeKvartal = importeringService.importerHvisDetFinnesNyStatistikk()
             .getOrElse { return }
 
+        importEksportStatusRepository.markerJobbSomKjørt(gjeldendeKvartal, ImportEksportJobb.IMPORTERT_STATISTIKK)
+
         postImporteringService.overskrivMetadataForVirksomheter(gjeldendeKvartal)
+            .getOrElse { return }
 
         postImporteringService.overskrivNæringskoderForVirksomheter(gjeldendeKvartal)
 
@@ -68,7 +71,6 @@ class ImporteringScheduler(
             eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(gjeldendeKvartal, it)
         }
 
-        importEksportStatusRepository.markerJobbSomKjørt(gjeldendeKvartal, ImportEksportJobb.IMPORTERT_STATISTIKK)
         log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_import'")
         counter.increment()
         log.info("Counter er nå: {}", counter.count())
