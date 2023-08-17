@@ -42,7 +42,7 @@ public class EksporteringController {
 
     ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
     int antallEksportert =
-        eksporteringService.eksporter(årstallOgKvartal);
+        eksporteringService.legacyEksporter(årstallOgKvartal);
 
     if (antallEksportert >= 0) {
       return ResponseEntity.ok(HttpStatus.CREATED);

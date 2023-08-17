@@ -25,7 +25,8 @@ class EksporteringService(
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    fun eksporter(
+    @Deprecated("Bruk eksport per kategori")
+    fun legacyEksporter(
         årstallOgKvartal: ÅrstallOgKvartal,
     ): Int {
         val virksomheterTilEksport = EksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal(
@@ -49,7 +50,7 @@ class EksporteringService(
             antallStatistikkSomSkalEksporteres
         )
         val antallEksporterteVirksomheter = runCatching {
-            eksporter(virksomheterTilEksport, årstallOgKvartal)
+            legacyEksporter(virksomheterTilEksport, årstallOgKvartal)
         }.getOrElse {
             when (it) {
                 is KafkaUtsendingException, is KafkaException -> {
@@ -64,7 +65,7 @@ class EksporteringService(
     }
 
     @Throws(KafkaUtsendingException::class)
-    protected fun eksporter(
+    protected fun legacyEksporter(
         virksomheterTilEksport: List<VirksomhetEksportPerKvartal>, årstallOgKvartal: ÅrstallOgKvartal
     ): Int {
         val startEksportering = System.currentTimeMillis()

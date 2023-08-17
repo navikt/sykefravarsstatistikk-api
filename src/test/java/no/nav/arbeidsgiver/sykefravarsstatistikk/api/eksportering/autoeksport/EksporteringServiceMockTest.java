@@ -74,7 +74,7 @@ public class EksporteringServiceMockTest {
                 .thenReturn(Collections.emptyList());
 
         int antallEksporterte =
-                service.eksporter(__2020_2);
+                service.legacyEksporter(__2020_2);
 
         assertThat(antallEksporterte).isEqualTo(0);
     }
@@ -115,7 +115,7 @@ public class EksporteringServiceMockTest {
                 .thenReturn(sykefraværsstatistikkLandSiste4Kvartaler(__2020_2));
 
         int antallEksporterte =
-                service.eksporter(__2020_2);
+                service.legacyEksporter(__2020_2);
 
         verify(kafkaClient)
                 .send(
@@ -194,7 +194,7 @@ public class EksporteringServiceMockTest {
                 .thenReturn(sykefraværsstatistikkLandSiste4Kvartaler(årstallOgKvartal));
 
         int antallEksporterte =
-                service.eksporter(årstallOgKvartal);
+                service.legacyEksporter(årstallOgKvartal);
 
         verify(kafkaClient)
                 .send(

@@ -7,6 +7,10 @@ import net.javacrumbs.shedlock.core.LockConfiguration
 import net.javacrumbs.shedlock.core.LockingTaskExecutor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PostImporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringMetadataVirksomhetService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringPerStatistikkKategoriService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.SykefraværsstatistikkImporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImportEksportStatusRepository
 import org.slf4j.LoggerFactory
@@ -23,6 +27,9 @@ class ImporteringScheduler(
     registry: MeterRegistry,
     private val importEksportStatusRepository: ImportEksportStatusRepository,
     private val postImporteringService: PostImporteringService,
+    private val eksporteringsService: EksporteringService,
+    private val eksporteringPerStatistikkKategoriService: EksporteringPerStatistikkKategoriService,
+    private val eksporteringMetadataVirksomhetService: EksporteringMetadataVirksomhetService,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -53,9 +60,13 @@ class ImporteringScheduler(
 
         postImporteringService.forberedNesteEksport(gjeldendeKvartal, true)
 
+        eksporteringsService.legacyEksporter(gjeldendeKvartal)
 
-        // eksporterPåKafka(gjeldendeKvartal)
+        eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(gjeldendeKvartal)
 
+        Statistikkategori.entries.forEach {
+            eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(gjeldendeKvartal, it)
+        }
 
         importEksportStatusRepository.markerJobbSomKjørt(gjeldendeKvartal, ImportEksportJobb.IMPORTERT_STATISTIKK)
         log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_import'")
