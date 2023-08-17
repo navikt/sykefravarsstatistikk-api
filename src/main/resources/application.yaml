@@ -62,8 +62,6 @@ tokenxclient:
   altinn_rettigheter_proxy_audience: dev-gcp:arbeidsgiver:altinn-rettigheter-proxy
 
 
-statistikk.eksportering.aktivert: true
-
 database.navn: sykefravarsstatistikk
 vault.mount-path: postgresql/preprod-fss
 
@@ -104,8 +102,6 @@ tokenxclient:
   jwk: ${TOKEN_X_PRIVATE_JWK}
   clientId: ${TOKEN_X_CLIENT_ID}
   altinn_rettigheter_proxy_audience: prod-gcp:arbeidsgiver:altinn-rettigheter-proxy
-
-statistikk.eksportering.aktivert: true
 
 database.navn: sykefravarsstatistikk
 vault.mount-path: postgresql/prod-fss

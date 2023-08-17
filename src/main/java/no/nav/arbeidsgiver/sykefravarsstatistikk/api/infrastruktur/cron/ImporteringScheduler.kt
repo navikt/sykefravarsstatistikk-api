@@ -47,11 +47,14 @@ class ImporteringScheduler(
         val gjeldendeKvartal = importeringService.importerHvisDetFinnesNyStatistikk()
             .getOrElse { return }
 
-        // postImporteringService.importMetadataForVirksomheter(gjeldendeKvartal);
+        postImporteringService.overskrivMetadataForVirksomheter(gjeldendeKvartal)
 
-        //metadataImporteringService.importerMetadata(gjeldendeKvartal)
-        //forberedNesteEksport(gjeldendeKvartal)
-        //eksporterPåKafka(gjeldendeKvartal)
+        postImporteringService.overskrivNæringskoderForVirksomheter(gjeldendeKvartal)
+
+        postImporteringService.forberedNesteEksport(gjeldendeKvartal, true)
+
+
+        // eksporterPåKafka(gjeldendeKvartal)
 
 
         importEksportStatusRepository.markerJobbSomKjørt(gjeldendeKvartal, ImportEksportJobb.IMPORTERT_STATISTIKK)

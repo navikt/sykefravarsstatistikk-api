@@ -15,8 +15,10 @@ open class ImportEksportStatusRepository(
 ) : Table("import_eksport_status"), UsingExposed {
     val årstall = varchar("aarstall", 4)
     val kvartal = varchar("kvartal", 1)
+
     val importertStatistikk = bool("importert_statistikk")
     val importertVirksomhetsdata = bool("importert_virksomhetsdata")
+    val importertNæringskodemapping = bool("importert_naringskodemapping")
     val forberedtNesteEksport = bool("forberedt_neste_eksport")
     val eksportertPåKafka = bool("eksportert_paa_kafka")
     override val primaryKey: PrimaryKey = PrimaryKey(årstall, kvartal)
@@ -28,6 +30,7 @@ open class ImportEksportStatusRepository(
                 it[kvartal] = importEksportStatus.årstallOgKvartal.kvartal.toString()
                 it[importertStatistikk] = importEksportStatus.importertStatistikk
                 it[importertVirksomhetsdata] = importEksportStatus.importertVirksomhetsdata
+                it[importertNæringskodemapping] = importEksportStatus.importertNæringskodemapping
                 it[forberedtNesteEksport] = importEksportStatus.forberedtNesteEksport
                 it[eksportertPåKafka] = importEksportStatus.eksportertPåKafka
             }
@@ -45,6 +48,7 @@ open class ImportEksportStatusRepository(
                 when (importEksportJobb) {
                     ImportEksportJobb.IMPORTERT_STATISTIKK -> it[importertStatistikk] = true
                     ImportEksportJobb.IMPORTERT_VIRKSOMHETDATA -> it[importertVirksomhetsdata] = true
+                    ImportEksportJobb.IMPORTERT_NÆRINGSKODEMAPPING -> it[importertNæringskodemapping] = true
                     ImportEksportJobb.FORBEREDT_NESTE_EKSPORT -> it[forberedtNesteEksport] = true
                     ImportEksportJobb.EKSPORTERT_PÅ_KAFKA -> it[eksportertPåKafka] = true
                 }
@@ -65,6 +69,7 @@ open class ImportEksportStatusRepository(
                     kvartal = it[kvartal],
                     importertStatistikk = it[importertStatistikk],
                     importertVirksomhetsdata = it[importertVirksomhetsdata],
+                    importertNæringskodemapping = it[importertNæringskodemapping],
                     forberedtNesteEksport = it[forberedtNesteEksport],
                     eksportertPåKafka = it[eksportertPåKafka],
                 )
@@ -78,6 +83,7 @@ data class ImportEksportStatusDao(
     val kvartal: String,
     override val importertStatistikk: Boolean,
     override val importertVirksomhetsdata: Boolean,
+    override val importertNæringskodemapping: Boolean,
     override val forberedtNesteEksport: Boolean,
     override val eksportertPåKafka: Boolean,
 ) : ImportEksportStatus {

@@ -8,7 +8,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.Syke
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.StatistikkategoriKafkamelding
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
@@ -16,7 +15,6 @@ class EksporteringPerStatistikkKategoriService(
     private val sykefraværRepository: SykefraværRepository,
     private val tilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository,
     private val kafkaClient: KafkaClient,
-    @param:Value("\${statistikk.eksportering.aktivert}") private val erEksporteringAktivert: Boolean
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -24,10 +22,6 @@ class EksporteringPerStatistikkKategoriService(
         årstallOgKvartal: ÅrstallOgKvartal,
         statistikkategori: Statistikkategori
     ) {
-        if (!erEksporteringAktivert) {
-            log.info("Eksportering er ikke aktivert. Avbryter.")
-            return
-        }
         log.info(
             "Starter eksportering av kategori '{}' for årstall '{}' og kvartal '{}' på topic '{}'.",
             statistikkategori.name,

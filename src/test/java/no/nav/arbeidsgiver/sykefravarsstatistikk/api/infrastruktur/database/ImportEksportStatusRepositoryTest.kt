@@ -32,6 +32,7 @@ open class ImportEksportStatusRepositoryTest {
         kvartal = årstallOgKvartal.kvartal.toString(),
         importertStatistikk = true,
         importertVirksomhetsdata = false,
+        importertNæringskodemapping = false,
         eksportertPåKafka = false,
         forberedtNesteEksport = false,
     )
@@ -71,6 +72,7 @@ open class ImportEksportStatusRepositoryTest {
             kvartal = årstallOgKvartal.kvartal.toString(),
             importertStatistikk = true,
             importertVirksomhetsdata = false,
+            importertNæringskodemapping = false,
             forberedtNesteEksport = false,
             eksportertPåKafka = false,
         )
@@ -88,6 +90,7 @@ open class ImportEksportStatusRepositoryTest {
             kvartal = årstallOgKvartal.kvartal.toString(),
             importertStatistikk = true,
             importertVirksomhetsdata = true,
+            importertNæringskodemapping = false,
             forberedtNesteEksport = false,
             eksportertPåKafka = false,
         )

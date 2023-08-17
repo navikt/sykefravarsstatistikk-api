@@ -8,6 +8,7 @@ interface ImportEksportStatus {
     val årstallOgKvartal: ÅrstallOgKvartal
     val importertStatistikk: Boolean
     val importertVirksomhetsdata: Boolean
+    val importertNæringskodemapping: Boolean
     val forberedtNesteEksport: Boolean
     val eksportertPåKafka: Boolean
 }
