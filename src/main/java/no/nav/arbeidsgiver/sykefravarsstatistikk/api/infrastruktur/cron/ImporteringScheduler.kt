@@ -5,6 +5,7 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import net.javacrumbs.shedlock.core.LockConfiguration
 import net.javacrumbs.shedlock.core.LockingTaskExecutor
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PostImporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.SykefraværsstatistikkImporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImportEksportStatusRepository
@@ -21,6 +22,7 @@ class ImporteringScheduler(
     private val importeringService: SykefraværsstatistikkImporteringService,
     registry: MeterRegistry,
     private val importEksportStatusRepository: ImportEksportStatusRepository,
+    private val postImporteringService: PostImporteringService,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -44,6 +46,13 @@ class ImporteringScheduler(
         log.info("Jobb for å importere sykefraværsstatistikk er startet.")
         val gjeldendeKvartal = importeringService.importerHvisDetFinnesNyStatistikk()
             .getOrElse { return }
+
+        // postImporteringService.importMetadataForVirksomheter(gjeldendeKvartal);
+
+        //metadataImporteringService.importerMetadata(gjeldendeKvartal)
+        //forberedNesteEksport(gjeldendeKvartal)
+        //eksporterPåKafka(gjeldendeKvartal)
+
 
         importEksportStatusRepository.markerJobbSomKjørt(gjeldendeKvartal, ImportEksportJobb.IMPORTERT_STATISTIKK)
         log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_import'")

@@ -4,7 +4,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.
 
 fun fjernDupliserteOrgnr(orgenheter: List<Orgenhet>): List<Orgenhet> {
     // Noen bedrifter er registrert som flere sektorer, typisk dersom de har endret sektor underveis i et kvartal.
-    // I de tilfellene har vi bestemt oss for å velge ut i henhold til prioriteringen 1=statlig, 2=kommunal, 3=privat, 0=ukjent
+    // I de tilfellene har vi bestemt oss for å velge ut i henhold til prioriteringen 1(statlig), 2(kommunal), 3(priva), 0(ukjent)
     val sektorprioritering = listOf("1", "2", "3", "0")
 
     return orgenheter.sortedBy { sektorprioritering.indexOf(it.sektor) }.distinctBy {it.orgnr}

@@ -1,9 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PostImporteringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.ImporteringKvalitetssjekkService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PostImporteringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.SykefraværsstatistikkImporteringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.statistikk.Importeringsobjekt;
 import no.nav.security.token.support.core.api.Protected;
@@ -60,7 +60,7 @@ public class ImporteringController {
       @RequestParam int årstall, @RequestParam int kvartal) {
     ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
     Pair<Integer, Integer> antallImportert =
-        postImporteringService.importVirksomhetMetadataOgVirksomhetNæringskode5sifferMapping(
+        postImporteringService.importMetadataForVirksomheter(
             årstallOgKvartal);
 
     if (antallImportert.getFirst() >= 0) {
