@@ -1,8 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import io.kotest.matchers.collections.shouldContainExactly
-import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.equals.shouldBeEqual
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb.IMPORTERT_STATISTIKK
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb.IMPORTERT_VIRKSOMHETDATA
@@ -26,13 +24,7 @@ open class ImportEksportStatusRepositoryTest {
     @Autowired
     private lateinit var repo: ImportEksportStatusRepository
 
-
     private val årstallOgKvartal = ÅrstallOgKvartal(2023, 3)
-    private val nyImportEksportStatusDao = ImportEksportStatusDao(
-        årstall = årstallOgKvartal.årstall.toString(),
-        kvartal = årstallOgKvartal.kvartal.toString(),
-        ""
-    )
 
     @AfterEach
     fun afterEach() {
@@ -40,40 +32,12 @@ open class ImportEksportStatusRepositoryTest {
     }
 
     @Test
-    fun `sett import eksport status burde sette ny status`() {
-        repo.hentFullførteJobber(årstallOgKvartal) shouldHaveSize 0
-
-        repo.leggTilFullførtJobb(IMPORTERT_STATISTIKK, årstallOgKvartal)
-
-        repo.hentFullførteJobber(årstallOgKvartal) shouldContainExactly listOf(
-            nyImportEksportStatusDao.copy(
-                fullførteJobberKommaseparert = "IMPORTERT_STATISTIKK"
-            )
-        )
-    }
-
-    @Test
-    fun `lagre import eksport status burde oppdatere eksisterende status`() {
-        val oppdatertImportEksportStatus =
-            nyImportEksportStatusDao.copy(fullførteJobberKommaseparert = "IMPORTERT_STATISTIKK,IMPORTERT_VIRKSOMHETDATA")
-
-        repo.lagreImportEksportStatus(oppdatertImportEksportStatus)
-        repo.lagreImportEksportStatus(oppdatertImportEksportStatus)
-
-        repo.hentFullførteJobber(årstallOgKvartal) shouldContainExactly listOf(oppdatertImportEksportStatus)
-    }
-
-    @Test
     fun `marker jobb som kjørt burde markere en jobb hvis raden ikke finnes`() {
         repo.leggTilFullførtJobb(IMPORTERT_STATISTIKK, årstallOgKvartal)
 
-        val resultat = repo.hentFullførteJobber(årstallOgKvartal).first()
+        val resultat = repo.hentFullførteJobber(årstallOgKvartal)
 
-        resultat shouldBeEqual ImportEksportStatusDao(
-            årstall = årstallOgKvartal.årstall.toString(),
-            kvartal = årstallOgKvartal.kvartal.toString(),
-            fullførteJobberKommaseparert = "IMPORTERT_STATISTIKK",
-        )
+        resultat shouldContainExactly listOf(IMPORTERT_STATISTIKK)
     }
 
     @Test
@@ -81,13 +45,9 @@ open class ImportEksportStatusRepositoryTest {
         repo.leggTilFullførtJobb(IMPORTERT_STATISTIKK, årstallOgKvartal)
         repo.leggTilFullførtJobb(IMPORTERT_VIRKSOMHETDATA, årstallOgKvartal)
 
-        val resultat = repo.hentFullførteJobber(årstallOgKvartal).first()
+        val resultat = repo.hentFullførteJobber(årstallOgKvartal)
 
-        resultat shouldBeEqual ImportEksportStatusDao(
-            årstall = årstallOgKvartal.årstall.toString(),
-            kvartal = årstallOgKvartal.kvartal.toString(),
-            fullførteJobberKommaseparert = "IMPORTERT_STATISTIKK,IMPORTERT_VIRKSOMHETDATA",
-        )
+        resultat shouldContainExactly listOf(IMPORTERT_STATISTIKK, IMPORTERT_VIRKSOMHETDATA)
     }
 
     private fun ImportEksportStatusRepository.slettAlt() {

@@ -58,7 +58,7 @@ open class ImportEksportStatusRepository(
     }
 }
 
-private open class ImportEksportStatus(
+private data class ImportEksportStatus(
     val årstallOgKvartal: ÅrstallOgKvartal,
     val fullførteJobber: List<FullførteJobber>
 )
