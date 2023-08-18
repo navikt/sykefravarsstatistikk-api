@@ -65,8 +65,8 @@ class ImporteringSchedulerTest {
 
         importeringScheduler.importering()
 
-        verify(exactly = 1) { importEksportStatusRepository.markerJobbSomKjørt(any(), any()) }
-        verify(exactly = 1) { importEksportStatusRepository.markerJobbSomKjørt(any(), IMPORTERT_STATISTIKK) }
+        verify(exactly = 1) { importEksportStatusRepository.leggTilFullførtJobb(any(), any()) }
+        verify(exactly = 1) { importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_STATISTIKK, any()) }
     }
 
      @Test
@@ -74,7 +74,7 @@ class ImporteringSchedulerTest {
          importeringScheduler.importering()
 
          verify(exactly = 6 + Statistikkategori.entries.size) {
-             importEksportStatusRepository.markerJobbSomKjørt(any(), any())
+             importEksportStatusRepository.leggTilFullførtJobb(any(), any())
          }
      }
 }

@@ -1,2 +1,6 @@
 ALTER TABLE import_eksport_status
-ADD COLUMN importert_naringskodemapping bool default false;
+DROP COLUMN importert_statistikk
+DROP COLUMN importert_virksomhetsdata
+DROP COLUMN forberedt_neste_eksport
+DROP COLUMN eksportert_paa_kafka
+ADD COLUMN fullforte_jobber text not null;

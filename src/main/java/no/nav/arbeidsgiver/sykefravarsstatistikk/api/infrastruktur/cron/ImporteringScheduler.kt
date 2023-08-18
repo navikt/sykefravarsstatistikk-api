@@ -6,7 +6,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import net.javacrumbs.shedlock.core.LockConfiguration
 import net.javacrumbs.shedlock.core.LockingTaskExecutor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PostImporteringService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb.IMPORTERT_STATISTIKK
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringMetadataVirksomhetService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringPerStatistikkKategoriService
@@ -54,7 +54,7 @@ class ImporteringScheduler(
         val gjeldendeKvartal = importeringService.importerHvisDetFinnesNyStatistikk()
             .getOrElse { return }
 
-        importEksportStatusRepository.markerJobbSomKjørt(gjeldendeKvartal, ImportEksportJobb.IMPORTERT_STATISTIKK)
+        importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_STATISTIKK, gjeldendeKvartal)
 
         postImporteringService.overskrivMetadataForVirksomheter(gjeldendeKvartal)
             .getOrElse { return }
