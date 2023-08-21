@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron
 
 import arrow.core.left
 import arrow.core.right
-import io.mockk.Called
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -15,7 +14,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.Ek
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringPerStatistikkKategoriService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.SykefraværsstatistikkImporteringService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.SykefraværsstatistikkImporteringService.KunneIkkeImportere
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImportEksportStatusRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -41,7 +39,7 @@ class ImporteringSchedulerTest {
 
     @BeforeEach
     fun beforeEach() {
-        every { importeringService.importerHvisDetFinnesNyStatistikk() } returns årstallOgKvartal.right()
+        every { importeringService.importerHvisDetFinnesNyStatistikk() } returns årstallOgKvartal
         every { postImporteringService.overskrivMetadataForVirksomheter(any()) } returns 1.right()
         every { postImporteringService.overskrivNæringskoderForVirksomheter(any()) } returns 1.right()
         every { postImporteringService.forberedNesteEksport(any(), any()) } returns 1.right()
@@ -51,12 +49,14 @@ class ImporteringSchedulerTest {
     }
 
     @Test
-    fun `importering burde ikke markere jobb som kjørt når det ikke finnes ny statistikk`() {
-        every { importeringService.importerHvisDetFinnesNyStatistikk() } returns KunneIkkeImportere.left()
+    fun `burde ikke legge til jobb i lista over fullførte jobber når jobben ikke fullfører`() {
+        every { importeringService.importerHvisDetFinnesNyStatistikk() } returns årstallOgKvartal
+        every { importEksportStatusRepository.hentFullførteJobber(any()) } returns listOf(IMPORTERT_STATISTIKK)
+        every { postImporteringService.overskrivMetadataForVirksomheter(any()) } returns IngenRaderImportert.left()
 
         importeringScheduler.importOgEksport()
 
-        verify { importEksportStatusRepository wasNot Called }
+        verify(exactly = 0) { importEksportStatusRepository.leggTilFullførtJobb(any(), any()) }
     }
 
     @Test
@@ -69,12 +69,12 @@ class ImporteringSchedulerTest {
         verify(exactly = 1) { importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_STATISTIKK, any()) }
     }
 
-     @Test
-     fun `importering burde markere alle jobber som kjørt når det finnes ny statistikk og ingenting feiler`() {
-         importeringScheduler.importOgEksport()
+    @Test
+    fun `importering burde markere alle jobber som kjørt når det finnes ny statistikk og ingenting feiler`() {
+        importeringScheduler.importOgEksport()
 
-         verify(exactly = ImportEksportJobb.entries.size) {
-             importEksportStatusRepository.leggTilFullførtJobb(any(), any())
-         }
-     }
+        verify(exactly = ImportEksportJobb.entries.size) {
+            importEksportStatusRepository.leggTilFullførtJobb(any(), any())
+        }
+    }
 }

@@ -52,33 +52,48 @@ class ImporteringScheduler(
     fun importOgEksport() {
         log.info("Jobb for å importere sykefraværsstatistikk er startet.")
         val gjeldendeKvartal = importeringService.importerHvisDetFinnesNyStatistikk()
-            .getOrElse { return }
 
-        importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_STATISTIKK, gjeldendeKvartal)
+        val fullførteJobber = importEksportStatusRepository.hentFullførteJobber(gjeldendeKvartal)
 
-        postImporteringService.overskrivMetadataForVirksomheter(gjeldendeKvartal)
-            .getOrElse { return }
-        importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_VIRKSOMHETDATA, gjeldendeKvartal)
-
-        postImporteringService.overskrivNæringskoderForVirksomheter(gjeldendeKvartal)
-            .getOrElse { return }
-        importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_NÆRINGSKODEMAPPING, gjeldendeKvartal)
-
-        postImporteringService.forberedNesteEksport(gjeldendeKvartal, true)
-            .getOrElse { return }
-        importEksportStatusRepository.leggTilFullførtJobb(FORBEREDT_NESTE_EKSPORT_LEGACY, gjeldendeKvartal)
-
-        eksporteringsService.legacyEksporter(gjeldendeKvartal)
-            .getOrElse { return }
-        importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_LEGACY, gjeldendeKvartal)
-
-        eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(gjeldendeKvartal)
-        importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_METADATA_VIRKSOMHET, gjeldendeKvartal)
-
-        Statistikkategori.entries.forEach {
-            eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(gjeldendeKvartal, it)
+        if (fullførteJobber.none { it == IMPORTERT_STATISTIKK }) {
+            importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_STATISTIKK, gjeldendeKvartal)
         }
-        importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_PER_STATISTIKKATEGORI, gjeldendeKvartal)
+
+        if (fullførteJobber.none { it == IMPORTERT_VIRKSOMHETDATA }) {
+            postImporteringService.overskrivMetadataForVirksomheter(gjeldendeKvartal)
+                .getOrElse { return }
+            importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_VIRKSOMHETDATA, gjeldendeKvartal)
+        }
+
+        if (fullførteJobber.none { it == IMPORTERT_NÆRINGSKODEMAPPING }) {
+            postImporteringService.overskrivNæringskoderForVirksomheter(gjeldendeKvartal)
+                .getOrElse { return }
+            importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_NÆRINGSKODEMAPPING, gjeldendeKvartal)
+        }
+
+        if (fullførteJobber.none { it == FORBEREDT_NESTE_EKSPORT_LEGACY }) {
+            postImporteringService.forberedNesteEksport(gjeldendeKvartal, true)
+                .getOrElse { return }
+            importEksportStatusRepository.leggTilFullførtJobb(FORBEREDT_NESTE_EKSPORT_LEGACY, gjeldendeKvartal)
+        }
+
+        if (fullførteJobber.none { it == EKSPORTERT_LEGACY }) {
+            eksporteringsService.legacyEksporter(gjeldendeKvartal)
+                .getOrElse { return }
+            importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_LEGACY, gjeldendeKvartal)
+        }
+
+        if (fullførteJobber.none { it == EKSPORTERT_METADATA_VIRKSOMHET }) {
+            eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(gjeldendeKvartal)
+            importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_METADATA_VIRKSOMHET, gjeldendeKvartal)
+        }
+
+        if (fullførteJobber.none { it == EKSPORTERT_PER_STATISTIKKATEGORI }) {
+            Statistikkategori.entries.forEach {
+                eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(gjeldendeKvartal, it)
+            }
+            importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_PER_STATISTIKKATEGORI, gjeldendeKvartal)
+        }
 
         log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_import'")
         counter.increment()
