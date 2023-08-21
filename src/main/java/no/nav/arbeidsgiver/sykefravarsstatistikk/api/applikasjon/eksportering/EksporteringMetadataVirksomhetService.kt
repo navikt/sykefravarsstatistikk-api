@@ -1,5 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering
 
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransjeprogram
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
@@ -19,7 +22,7 @@ class EksporteringMetadataVirksomhetService(
 ) {
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-    fun eksporterMetadataVirksomhet(årstallOgKvartal: ÅrstallOgKvartal) {
+    fun eksporterMetadataVirksomhet(årstallOgKvartal: ÅrstallOgKvartal): Either<FantIkkeData, Unit> {
 
         log.info(
             "Starter eksportering av metadata (virksomhet) for årstall '{}' og kvartal '{}' på topic '{}'.",
@@ -30,6 +33,10 @@ class EksporteringMetadataVirksomhetService(
 
         val metadataVirksomhet =
             virksomhetMetadataRepository.hentVirksomhetMetadata(årstallOgKvartal)
+
+        if (metadataVirksomhet.isEmpty()) {
+            return FantIkkeData.left()
+        }
 
 
         metadataVirksomhet.forEach { virksomhet ->
@@ -62,5 +69,8 @@ class EksporteringMetadataVirksomhetService(
             årstallOgKvartal.kvartal,
             KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1.navn
         )
+        return Unit.right()
     }
+
+    object FantIkkeData
 }

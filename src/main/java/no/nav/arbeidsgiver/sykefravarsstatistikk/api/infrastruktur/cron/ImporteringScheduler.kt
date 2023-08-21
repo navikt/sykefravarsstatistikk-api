@@ -85,6 +85,7 @@ class ImporteringScheduler(
 
         if (fullførteJobber.none { it == EKSPORTERT_METADATA_VIRKSOMHET }) {
             eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(gjeldendeKvartal)
+                .getOrElse { return }
             importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_METADATA_VIRKSOMHET, gjeldendeKvartal)
         }
 

@@ -76,8 +76,9 @@ public class EksporteringController {
   public ResponseEntity<HttpStatus> reeksportMetadata(
       @RequestParam int årstall, @RequestParam int kvartal) {
     ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
-    eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(årstallOgKvartal);
-
-    return ResponseEntity.ok(HttpStatus.OK);
+    return eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(årstallOgKvartal).fold(
+        left -> ResponseEntity.internalServerError().build(),
+        right -> ResponseEntity.ok(HttpStatus.OK)
+    );
   }
 }

@@ -9,6 +9,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PostImportering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PostImporteringService.IngenRaderImportert
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb.IMPORTERT_STATISTIKK
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb.IMPORTERT_VIRKSOMHETDATA
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringMetadataVirksomhetService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringPerStatistikkKategoriService
@@ -39,17 +40,18 @@ class ImporteringSchedulerTest {
 
     @BeforeEach
     fun beforeEach() {
+        // Defaults to happy case, can be overritten in tests
         every { importeringService.importerHvisDetFinnesNyStatistikk() } returns årstallOgKvartal
         every { postImporteringService.overskrivMetadataForVirksomheter(any()) } returns 1.right()
         every { postImporteringService.overskrivNæringskoderForVirksomheter(any()) } returns 1.right()
         every { postImporteringService.forberedNesteEksport(any(), any()) } returns 1.right()
         every { eksporteringsService.legacyEksporter(any()) } returns 1.right()
-        every { eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(any()) } returns Unit
+        every { eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(any()) } returns Unit.right()
         every { eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(any(), any()) } returns Unit
     }
 
     @Test
-    fun `burde ikke legge til jobb i lista over fullførte jobber når jobben ikke fullfører`() {
+    fun `importEksport burde ikke legge til jobb i lista over fullførte jobber når jobben ikke fullfører`() {
         every { importeringService.importerHvisDetFinnesNyStatistikk() } returns årstallOgKvartal
         every { importEksportStatusRepository.hentFullførteJobber(any()) } returns listOf(IMPORTERT_STATISTIKK)
         every { postImporteringService.overskrivMetadataForVirksomheter(any()) } returns IngenRaderImportert.left()
@@ -60,7 +62,7 @@ class ImporteringSchedulerTest {
     }
 
     @Test
-    fun `importering burde markere importert statistikk jobb som kjørt når det finnes ny statistikk men resten feiler`() {
+    fun `importEksport burde markere IMPORTERT_STATUISTIKK-jobb som kjørt når det finnes ny statistikk men resten feiler`() {
         every { postImporteringService.overskrivMetadataForVirksomheter(any()) } returns IngenRaderImportert.left()
 
         importeringScheduler.importOgEksport()
@@ -70,11 +72,20 @@ class ImporteringSchedulerTest {
     }
 
     @Test
-    fun `importering burde markere alle jobber som kjørt når det finnes ny statistikk og ingenting feiler`() {
+    fun `importEksport burde markere alle jobber som kjørt når det finnes ny statistikk og ingenting feiler`() {
         importeringScheduler.importOgEksport()
 
         verify(exactly = ImportEksportJobb.entries.size) {
             importEksportStatusRepository.leggTilFullførtJobb(any(), any())
         }
+    }
+
+    @Test
+    fun `importEksport bør fortsette der den slapp`() {
+        every { importEksportStatusRepository.hentFullførteJobber(any()) } returns listOf(IMPORTERT_STATISTIKK, IMPORTERT_VIRKSOMHETDATA)
+        importeringScheduler.importOgEksport()
+
+        verify(exactly = 0) { postImporteringService.overskrivMetadataForVirksomheter(any()) }
+        verify(exactly = 1) { postImporteringService.overskrivNæringskoderForVirksomheter(any())}
     }
 }
