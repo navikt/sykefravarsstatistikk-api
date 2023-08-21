@@ -1,5 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering
 
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import com.google.common.collect.Lists
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
@@ -28,7 +31,7 @@ class EksporteringService(
     @Deprecated("Bruk eksport per kategori")
     fun legacyEksporter(
         årstallOgKvartal: ÅrstallOgKvartal,
-    ): Int {
+    ): Either<LegacyEksportFeil, Int> {
         val virksomheterTilEksport = EksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal(
             årstallOgKvartal, eksporteringRepository
         )
@@ -41,7 +44,7 @@ class EksporteringService(
                 årstallOgKvartal.årstall,
                 årstallOgKvartal.kvartal
             )
-            return 0
+            return LegacyEksportFeil.IngenNyStatistikk.left()
         }
         log.info(
             "Starting eksportering for årstall '{}' og kvartal '{}'. Skal eksportere '{}' rader med statistikk.",
@@ -55,13 +58,18 @@ class EksporteringService(
             when (it) {
                 is KafkaUtsendingException, is KafkaException -> {
                     log.warn("Fikk exception fra Kafka med melding: '{}'. Avbryter prosess.", it.message, it)
-                    return 0
+                    return LegacyEksportFeil.EksportFeilet.left()
                 }
 
                 else -> throw it
             }
         }
-        return antallEksporterteVirksomheter
+        return antallEksporterteVirksomheter.right()
+    }
+
+    sealed class LegacyEksportFeil {
+        object EksportFeilet : LegacyEksportFeil()
+        object IngenNyStatistikk : LegacyEksportFeil()
     }
 
     @Throws(KafkaUtsendingException::class)

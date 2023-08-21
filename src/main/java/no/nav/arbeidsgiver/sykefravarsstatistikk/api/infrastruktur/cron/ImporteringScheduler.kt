@@ -18,7 +18,7 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.time.Duration
 import java.time.Instant
-import java.time.temporal.ChronoUnit
+import java.time.temporal.ChronoUnit.MINUTES
 
 @Component
 class ImporteringScheduler(
@@ -41,8 +41,8 @@ class ImporteringScheduler(
 
     @Scheduled(cron = "0 5 8 * * ?")
     fun scheduledImportering() {
-        val lockAtMostFor = Duration.of(10, ChronoUnit.MINUTES)
-        val lockAtLeastFor = Duration.of(1, ChronoUnit.MINUTES)
+        val lockAtMostFor = Duration.of(10, MINUTES)
+        val lockAtLeastFor = Duration.of(1, MINUTES)
         taskExecutor.executeWithLock(
             Runnable { importOgEksport() },
             LockConfiguration(Instant.now(), "importering", lockAtMostFor, lockAtLeastFor)
@@ -60,7 +60,6 @@ class ImporteringScheduler(
             .getOrElse { return }
         importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_VIRKSOMHETDATA, gjeldendeKvartal)
 
-
         postImporteringService.overskrivNæringskoderForVirksomheter(gjeldendeKvartal)
             .getOrElse { return }
         importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_NÆRINGSKODEMAPPING, gjeldendeKvartal)
@@ -70,6 +69,7 @@ class ImporteringScheduler(
         importEksportStatusRepository.leggTilFullførtJobb(FORBEREDT_NESTE_EKSPORT_LEGACY, gjeldendeKvartal)
 
         eksporteringsService.legacyEksporter(gjeldendeKvartal)
+            .getOrElse { return }
         importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_LEGACY, gjeldendeKvartal)
 
         eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(gjeldendeKvartal)

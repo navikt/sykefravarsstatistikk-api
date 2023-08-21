@@ -69,14 +69,14 @@ public class EksporteringServiceMockTest {
     }
 
     @Test
-    public void eksporter_returnerer_antall_rader_eksportert() {
+    public void eksporter_returnerer_feil_når_det_ikke_finnes_statistikk() {
         when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2))
                 .thenReturn(Collections.emptyList());
 
-        int antallEksporterte =
-                service.legacyEksporter(__2020_2);
+        EksporteringService.LegacyEksportFeil antallEksporterte =
+                service.legacyEksporter(__2020_2).swap().getOrNull();
 
-        assertThat(antallEksporterte).isEqualTo(0);
+        assertThat(antallEksporterte).isEqualTo(EksporteringService.LegacyEksportFeil.IngenNyStatistikk.INSTANCE);
     }
 
     @Test
@@ -115,7 +115,7 @@ public class EksporteringServiceMockTest {
                 .thenReturn(sykefraværsstatistikkLandSiste4Kvartaler(__2020_2));
 
         int antallEksporterte =
-                service.legacyEksporter(__2020_2);
+                service.legacyEksporter(__2020_2).getOrNull();
 
         verify(kafkaClient)
                 .send(
@@ -193,8 +193,8 @@ public class EksporteringServiceMockTest {
         when(sykefraværsRepository.hentUmaskertSykefraværForNorge(any()))
                 .thenReturn(sykefraværsstatistikkLandSiste4Kvartaler(årstallOgKvartal));
 
-        int antallEksporterte =
-                service.legacyEksporter(årstallOgKvartal);
+        Integer antallEksporterte =
+                service.legacyEksporter(årstallOgKvartal).getOrNull();
 
         verify(kafkaClient)
                 .send(

@@ -44,8 +44,8 @@ class ImporteringSchedulerTest {
         every { importeringService.importerHvisDetFinnesNyStatistikk() } returns årstallOgKvartal.right()
         every { postImporteringService.overskrivMetadataForVirksomheter(any()) } returns 1.right()
         every { postImporteringService.overskrivNæringskoderForVirksomheter(any()) } returns 1.right()
-        every { postImporteringService.forberedNesteEksport(any(), any()) } returns 1 // TODO: Legg til feilhåndtering
-        every { eksporteringsService.legacyEksporter(any()) } returns 1 // TODO: Legg til feilhåndtering?
+        every { postImporteringService.forberedNesteEksport(any(), any()) } returns 1.right()
+        every { eksporteringsService.legacyEksporter(any()) } returns 1.right()
         every { eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(any()) } returns Unit // TODO: Legg til feilhåndtering
         every { eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(any(), any()) } returns Unit // TODO: Legg til feilhåndtering
     }

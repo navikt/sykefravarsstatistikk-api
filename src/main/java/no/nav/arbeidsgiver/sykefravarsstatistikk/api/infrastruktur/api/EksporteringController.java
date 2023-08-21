@@ -41,10 +41,10 @@ public class EksporteringController {
       @RequestParam int kvartal) {
 
     ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
-    int antallEksportert =
-        eksporteringService.legacyEksporter(årstallOgKvartal);
+    Integer antallEksportert =
+        eksporteringService.legacyEksporter(årstallOgKvartal).getOrNull();
 
-    if (antallEksportert >= 0) {
+    if (antallEksportert != null) {
       return ResponseEntity.ok(HttpStatus.CREATED);
     } else {
       return ResponseEntity.ok(HttpStatus.OK);

@@ -54,7 +54,8 @@ class PostImporteringService(
     }
 
     object ForrigeEksportIkkeFerdig
-    
+
+    @Deprecated("Brukes bare av legacy Kafka-strøm, som skal fases ut.")
     fun forberedNesteEksport(årstallOgKvartal: ÅrstallOgKvartal, slettHistorikk: Boolean): Either<ForrigeEksportIkkeFerdig, Int> {
         log.info("Forberede neste eksport: prosessen starter.")
         if (slettHistorikk) {
