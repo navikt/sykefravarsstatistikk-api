@@ -51,6 +51,8 @@ class EksporteringMetadataVirksomhetService(
                     "Utsending av metadata for virksomhet med orgnr '{}' feilet: '{}'",
                     virksomhet.orgnr, ex.message
                 )
+
+                throw ex
             }
         }
 

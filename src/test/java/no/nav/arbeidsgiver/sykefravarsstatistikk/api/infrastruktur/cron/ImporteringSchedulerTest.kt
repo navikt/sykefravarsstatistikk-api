@@ -46,8 +46,8 @@ class ImporteringSchedulerTest {
         every { postImporteringService.overskrivNæringskoderForVirksomheter(any()) } returns 1.right()
         every { postImporteringService.forberedNesteEksport(any(), any()) } returns 1.right()
         every { eksporteringsService.legacyEksporter(any()) } returns 1.right()
-        every { eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(any()) } returns Unit // TODO: Legg til feilhåndtering
-        every { eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(any(), any()) } returns Unit // TODO: Legg til feilhåndtering
+        every { eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(any()) } returns Unit
+        every { eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(any(), any()) } returns Unit
     }
 
     @Test
