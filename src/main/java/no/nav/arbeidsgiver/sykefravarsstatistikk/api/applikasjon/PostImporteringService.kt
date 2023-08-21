@@ -53,7 +53,9 @@ class PostImporteringService(
         }
     }
 
-    fun forberedNesteEksport(årstallOgKvartal: ÅrstallOgKvartal, slettHistorikk: Boolean): Int {
+    object ForrigeEksportIkkeFerdig
+    
+    fun forberedNesteEksport(årstallOgKvartal: ÅrstallOgKvartal, slettHistorikk: Boolean): Either<ForrigeEksportIkkeFerdig, Int> {
         log.info("Forberede neste eksport: prosessen starter.")
         if (slettHistorikk) {
             val slettUtsendingHistorikkStart = System.currentTimeMillis()
@@ -79,7 +81,7 @@ class PostImporteringService(
                 antallIkkeEksportertSykefaværsstatistikk
             )
             // Vi er ikke ferdige med forrige eksport enda 💀
-            return 0
+            return ForrigeEksportIkkeFerdig.left()
         }
 
         // Starter å forberede neste eksport:

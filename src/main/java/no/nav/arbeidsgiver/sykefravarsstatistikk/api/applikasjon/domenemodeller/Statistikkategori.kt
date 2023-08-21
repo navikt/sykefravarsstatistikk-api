@@ -5,9 +5,9 @@ enum class Statistikkategori {
     SEKTOR,
     NÆRING,
     BRANSJE,
-    VIRKSOMHET,
-    OVERORDNET_ENHET,
     NÆRING5SIFFER,
+    OVERORDNET_ENHET,
+    VIRKSOMHET,
 
     // deprecated -- bruk NÆRINGSKODE i stedet
     NÆRINGSKODE

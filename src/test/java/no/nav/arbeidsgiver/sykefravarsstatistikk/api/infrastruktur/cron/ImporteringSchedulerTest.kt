@@ -8,8 +8,8 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PostImporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PostImporteringService.IngenRaderImportert
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb.IMPORTERT_STATISTIKK
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringMetadataVirksomhetService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringPerStatistikkKategoriService
@@ -54,7 +54,7 @@ class ImporteringSchedulerTest {
     fun `importering burde ikke markere jobb som kjørt når det ikke finnes ny statistikk`() {
         every { importeringService.importerHvisDetFinnesNyStatistikk() } returns KunneIkkeImportere.left()
 
-        importeringScheduler.importering()
+        importeringScheduler.importOgEksport()
 
         verify { importEksportStatusRepository wasNot Called }
     }
@@ -63,7 +63,7 @@ class ImporteringSchedulerTest {
     fun `importering burde markere importert statistikk jobb som kjørt når det finnes ny statistikk men resten feiler`() {
         every { postImporteringService.overskrivMetadataForVirksomheter(any()) } returns IngenRaderImportert.left()
 
-        importeringScheduler.importering()
+        importeringScheduler.importOgEksport()
 
         verify(exactly = 1) { importEksportStatusRepository.leggTilFullførtJobb(any(), any()) }
         verify(exactly = 1) { importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_STATISTIKK, any()) }
@@ -71,7 +71,7 @@ class ImporteringSchedulerTest {
 
      @Test
      fun `importering burde markere alle jobber som kjørt når det finnes ny statistikk og ingenting feiler`() {
-         importeringScheduler.importering()
+         importeringScheduler.importOgEksport()
 
          verify(exactly = 6 + Statistikkategori.entries.size) {
              importEksportStatusRepository.leggTilFullførtJobb(any(), any())

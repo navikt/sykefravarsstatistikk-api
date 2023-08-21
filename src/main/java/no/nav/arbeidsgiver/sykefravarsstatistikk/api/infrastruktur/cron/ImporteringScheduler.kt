@@ -6,7 +6,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import net.javacrumbs.shedlock.core.LockConfiguration
 import net.javacrumbs.shedlock.core.LockingTaskExecutor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PostImporteringService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb.IMPORTERT_STATISTIKK
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringMetadataVirksomhetService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringPerStatistikkKategoriService
@@ -44,12 +44,12 @@ class ImporteringScheduler(
         val lockAtMostFor = Duration.of(10, ChronoUnit.MINUTES)
         val lockAtLeastFor = Duration.of(1, ChronoUnit.MINUTES)
         taskExecutor.executeWithLock(
-            Runnable { importering() },
+            Runnable { importOgEksport() },
             LockConfiguration(Instant.now(), "importering", lockAtMostFor, lockAtLeastFor)
         )
     }
 
-    fun importering() {
+    fun importOgEksport() {
         log.info("Jobb for å importere sykefraværsstatistikk er startet.")
         val gjeldendeKvartal = importeringService.importerHvisDetFinnesNyStatistikk()
             .getOrElse { return }
@@ -58,18 +58,24 @@ class ImporteringScheduler(
 
         postImporteringService.overskrivMetadataForVirksomheter(gjeldendeKvartal)
             .getOrElse { return }
+        importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_VIRKSOMHETDATA, gjeldendeKvartal)
+
 
         postImporteringService.overskrivNæringskoderForVirksomheter(gjeldendeKvartal)
+            .getOrElse { return }
+        importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_NÆRINGSKODEMAPPING, gjeldendeKvartal)
 
         postImporteringService.forberedNesteEksport(gjeldendeKvartal, true)
 
         eksporteringsService.legacyEksporter(gjeldendeKvartal)
+        importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_LEGACY, gjeldendeKvartal)
 
         eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(gjeldendeKvartal)
 
         Statistikkategori.entries.forEach {
             eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(gjeldendeKvartal, it)
         }
+        importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_PER_STATISTIKKATEGORI, gjeldendeKvartal)
 
         log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_import'")
         counter.increment()

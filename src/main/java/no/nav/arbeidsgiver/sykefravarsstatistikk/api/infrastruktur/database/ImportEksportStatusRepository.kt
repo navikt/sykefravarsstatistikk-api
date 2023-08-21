@@ -41,7 +41,7 @@ open class ImportEksportStatusRepository(
             }.map {
                 ImportEksportStatus(
                     årstallOgKvartal = ÅrstallOgKvartal(it[årstall].toInt(), it[kvartal].toInt()),
-                    fullførteJobber = it[fullførteJobber].splittTilFullførteJobber()
+                    fullførteJobber = it[fullførteJobber].splittTilListe()
                 )
             }
         }
@@ -63,19 +63,25 @@ private data class ImportEksportStatus(
     val fullførteJobber: List<FullførteJobber>
 )
 
+// Formålet til denne enumen er å adskille domene og database. Dermed kan ImportEksportJobb endres fritt, uten at det
+// fører til kluss i databasen.
 private enum class FullførteJobber {
     IMPORTERT_STATISTIKK,
     IMPORTERT_VIRKSOMHETDATA,
     IMPORTERT_NÆRINGSKODEMAPPING,
-    FORBEREDT_NESTE_EKSPORT,
-    EKSPORTERT_PÅ_KAFKA;
+    FORBEREDT_NESTE_EKSPORT_LEGACY,
+    EKSPORTERT_LEGACY,
+    EKSPORTERT_METADATA_VIRKSOMHET,
+    EKSPORTERT_PER_STATISTIKKATEGORI;
 
     fun tilDomene(): ImportEksportJobb = when (this) {
         IMPORTERT_STATISTIKK -> ImportEksportJobb.IMPORTERT_STATISTIKK
         IMPORTERT_VIRKSOMHETDATA -> ImportEksportJobb.IMPORTERT_VIRKSOMHETDATA
         IMPORTERT_NÆRINGSKODEMAPPING -> ImportEksportJobb.IMPORTERT_NÆRINGSKODEMAPPING
-        FORBEREDT_NESTE_EKSPORT -> ImportEksportJobb.FORBEREDT_NESTE_EKSPORT
-        EKSPORTERT_PÅ_KAFKA -> ImportEksportJobb.EKSPORTERT_PÅ_KAFKA
+        FORBEREDT_NESTE_EKSPORT_LEGACY -> ImportEksportJobb.FORBEREDT_NESTE_EKSPORT_LEGACY
+        EKSPORTERT_LEGACY -> ImportEksportJobb.EKSPORTERT_LEGACY
+        EKSPORTERT_METADATA_VIRKSOMHET -> ImportEksportJobb.EKSPORTERT_METADATA_VIRKSOMHET
+        EKSPORTERT_PER_STATISTIKKATEGORI -> ImportEksportJobb.EKSPORTERT_PER_STATISTIKKATEGORI
     }
 
     companion object {
@@ -83,14 +89,16 @@ private enum class FullførteJobber {
             ImportEksportJobb.IMPORTERT_STATISTIKK -> IMPORTERT_STATISTIKK
             ImportEksportJobb.IMPORTERT_VIRKSOMHETDATA -> IMPORTERT_VIRKSOMHETDATA
             ImportEksportJobb.IMPORTERT_NÆRINGSKODEMAPPING -> IMPORTERT_NÆRINGSKODEMAPPING
-            ImportEksportJobb.FORBEREDT_NESTE_EKSPORT -> FORBEREDT_NESTE_EKSPORT
-            ImportEksportJobb.EKSPORTERT_PÅ_KAFKA -> EKSPORTERT_PÅ_KAFKA
+            ImportEksportJobb.FORBEREDT_NESTE_EKSPORT_LEGACY -> FORBEREDT_NESTE_EKSPORT_LEGACY
+            ImportEksportJobb.EKSPORTERT_LEGACY -> EKSPORTERT_LEGACY
+            ImportEksportJobb.EKSPORTERT_METADATA_VIRKSOMHET -> EKSPORTERT_METADATA_VIRKSOMHET
+            ImportEksportJobb.EKSPORTERT_PER_STATISTIKKATEGORI -> EKSPORTERT_PER_STATISTIKKATEGORI
         }
     }
 }
 
 
-private fun String.splittTilFullførteJobber(): List<FullførteJobber> {
+private fun String.splittTilListe(): List<FullførteJobber> {
     return split(",")
         .mapNotNull { it.ifEmpty { null } }
         .map { FullførteJobber.valueOf(it) }
