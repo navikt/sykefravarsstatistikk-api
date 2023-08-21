@@ -66,11 +66,14 @@ class ImporteringScheduler(
         importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_NÆRINGSKODEMAPPING, gjeldendeKvartal)
 
         postImporteringService.forberedNesteEksport(gjeldendeKvartal, true)
+            .getOrElse { return }
+        importEksportStatusRepository.leggTilFullførtJobb(FORBEREDT_NESTE_EKSPORT_LEGACY, gjeldendeKvartal)
 
         eksporteringsService.legacyEksporter(gjeldendeKvartal)
         importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_LEGACY, gjeldendeKvartal)
 
         eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(gjeldendeKvartal)
+        importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_METADATA_VIRKSOMHET, gjeldendeKvartal)
 
         Statistikkategori.entries.forEach {
             eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(gjeldendeKvartal, it)

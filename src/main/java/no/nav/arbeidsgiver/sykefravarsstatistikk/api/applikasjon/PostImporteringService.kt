@@ -98,7 +98,7 @@ class PostImporteringService(
         )
         val antallOpprettet = eksporteringRepository.opprettEksport(virksomhetEksportPerKvartalListe)
         log.info("Antall rader opprettet til neste eksportering: {}", antallOpprettet)
-        return antallOpprettet
+        return antallOpprettet.right()
     }
 
     private fun overskrivVirksomhetMetadata(årstallOgKvartal: ÅrstallOgKvartal): Int {

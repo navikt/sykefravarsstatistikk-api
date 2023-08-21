@@ -21,12 +21,12 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class ImporteringSchedulerTest {
-    val importeringService = mockk<SykefraværsstatistikkImporteringService>()
-    val importEksportStatusRepository = mockk<ImportEksportStatusRepository>(relaxed = true)
-    val postImporteringService = mockk<PostImporteringService>()
-    val eksporteringsService = mockk<EksporteringService>()
-    val eksporteringPerStatistikkKategoriService = mockk<EksporteringPerStatistikkKategoriService>()
-    val eksporteringMetadataVirksomhetService = mockk<EksporteringMetadataVirksomhetService>()
+    private val importeringService = mockk<SykefraværsstatistikkImporteringService>()
+    private val importEksportStatusRepository = mockk<ImportEksportStatusRepository>(relaxed = true)
+    private val postImporteringService = mockk<PostImporteringService>()
+    private val eksporteringsService = mockk<EksporteringService>()
+    private val eksporteringPerStatistikkKategoriService = mockk<EksporteringPerStatistikkKategoriService>()
+    private val eksporteringMetadataVirksomhetService = mockk<EksporteringMetadataVirksomhetService>()
     private val importeringScheduler = ImporteringScheduler(
         taskExecutor = mockk(),
         importeringService = importeringService,
@@ -47,7 +47,7 @@ class ImporteringSchedulerTest {
         every { postImporteringService.forberedNesteEksport(any(), any()) } returns 1 // TODO: Legg til feilhåndtering
         every { eksporteringsService.legacyEksporter(any()) } returns 1 // TODO: Legg til feilhåndtering?
         every { eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(any()) } returns Unit // TODO: Legg til feilhåndtering
-        every { eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(any(), any()) } // TODO: Legg til feilhåndtering
+        every { eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(any(), any()) } returns Unit // TODO: Legg til feilhåndtering
     }
 
     @Test
@@ -73,7 +73,7 @@ class ImporteringSchedulerTest {
      fun `importering burde markere alle jobber som kjørt når det finnes ny statistikk og ingenting feiler`() {
          importeringScheduler.importOgEksport()
 
-         verify(exactly = 6 + Statistikkategori.entries.size) {
+         verify(exactly = ImportEksportJobb.entries.size) {
              importEksportStatusRepository.leggTilFullførtJobb(any(), any())
          }
      }

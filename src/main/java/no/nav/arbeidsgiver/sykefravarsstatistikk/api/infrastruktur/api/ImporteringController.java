@@ -71,10 +71,11 @@ public class ImporteringController {
             @RequestParam int kvartal,
             @RequestParam(required = false) boolean slettHistorikk) {
         ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
-        int antallOpprettet =
-                postImporteringService.forberedNesteEksport(årstallOgKvartal, slettHistorikk);
+        Integer antallOpprettet =
+                postImporteringService.forberedNesteEksport(årstallOgKvartal, slettHistorikk)
+                        .getOrNull();
 
-        if (antallOpprettet >= 0) {
+        if (antallOpprettet != null) {
             return ResponseEntity.ok(HttpStatus.CREATED);
         } else {
             return ResponseEntity.ok(HttpStatus.OK);
