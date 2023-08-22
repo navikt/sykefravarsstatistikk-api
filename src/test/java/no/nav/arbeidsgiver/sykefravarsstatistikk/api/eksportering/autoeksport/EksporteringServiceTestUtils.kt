@@ -45,7 +45,7 @@ object EksporteringServiceTestUtils {
     @JvmField
     var næring5SifferSykefravær =
         SykefraværMedKategori(
-            Statistikkategori.NÆRING5SIFFER,
+            Statistikkategori.NÆRINGSKODE,
             "11000",
             __2020_2,
             BigDecimal(40),
@@ -56,7 +56,7 @@ object EksporteringServiceTestUtils {
     @JvmField
     var næring5SifferSykefraværTilhørerBransje =
         SykefraværMedKategori(
-            Statistikkategori.NÆRING5SIFFER,
+            Statistikkategori.NÆRINGSKODE,
             "86101",
             __2020_2,
             BigDecimal(80),

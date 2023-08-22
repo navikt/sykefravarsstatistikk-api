@@ -238,7 +238,7 @@ public class EksporteringServiceUtils {
         sfNæring5Siffer ->
             resultatList.add(
                 new SykefraværMedKategori(
-                    Statistikkategori.NÆRING5SIFFER,
+                    Statistikkategori.NÆRINGSKODE,
                         sfNæring5Siffer.getNæringkode5siffer(),
                     new ÅrstallOgKvartal(
                         virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),

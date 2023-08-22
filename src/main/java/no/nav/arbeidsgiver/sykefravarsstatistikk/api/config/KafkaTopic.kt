@@ -19,7 +19,7 @@ enum class KafkaTopic(val navn: String) {
 
     companion object {
         @JvmStatic
-        fun from(statistikkategori: Statistikkategori): KafkaTopic {
+        fun from(statistikkategori: Statistikkategori): KafkaTopic? {
             return when (statistikkategori) {
                 Statistikkategori.LAND -> SYKEFRAVARSSTATISTIKK_LAND_V1
                 Statistikkategori.SEKTOR -> SYKEFRAVARSSTATISTIKK_SEKTOR_V1
@@ -27,13 +27,12 @@ enum class KafkaTopic(val navn: String) {
                 Statistikkategori.BRANSJE -> SYKEFRAVARSSTATISTIKK_BRANSJE_V1
                 Statistikkategori.NÆRINGSKODE -> SYKEFRAVARSSTATISTIKK_NARINGSKODE_V1
                 Statistikkategori.VIRKSOMHET -> SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1
-                Statistikkategori.OVERORDNET_ENHET,
-                Statistikkategori.NÆRING5SIFFER -> throw NotImplementedError()
+                Statistikkategori.OVERORDNET_ENHET -> null
             }
         }
 
         @JvmStatic
-        fun toStringArray() = KafkaTopic.values().map { it.navn }.toTypedArray()
+        fun toStringArray() = entries.map { it.navn }.toTypedArray()
 
     }
 }
