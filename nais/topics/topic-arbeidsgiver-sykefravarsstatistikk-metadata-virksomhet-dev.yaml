@@ -26,3 +26,6 @@ spec:
     - team: arbeidsgiver
       application: teamia-kcat
       access: readwrite   # read, write, readwrite
+    - team: fager
+      application: min-side-arbeidsgiver-api
+      access: read

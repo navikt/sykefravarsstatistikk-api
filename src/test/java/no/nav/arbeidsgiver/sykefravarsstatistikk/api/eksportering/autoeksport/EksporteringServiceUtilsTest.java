@@ -117,7 +117,7 @@ public class EksporteringServiceUtilsTest {
   @Test
   public void getVirksomhetMetada__returnerer_NULL__dersom_ingen_entry_matcher_Virksomhet() {
     VirksomhetMetadata result =
-        getVirksomhetMetada(ORGNR_VIRKSOMHET_2, Arrays.asList(virksomhet1Metadata_2020_4));
+        getVirksomhetMetada(ORGNR_VIRKSOMHET_2, List.of(virksomhet1Metadata_2020_4));
 
     assertNull(result);
   }
@@ -272,7 +272,7 @@ public class EksporteringServiceUtilsTest {
     EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(
         byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "85000"),
         sykefraværMedKategori85000,
-        Statistikkategori.NÆRING5SIFFER,
+        Statistikkategori.NÆRINGSKODE,
             virksomhet1Metadata_2020_4.getNæringOgNæringskode5siffer().get(0).næringskode5Siffer);
     SykefraværMedKategori sykefraværMedKategori11000 =
         resultat.stream().filter(r -> "11000".equals(r.kode)).findFirst().get();
@@ -280,7 +280,7 @@ public class EksporteringServiceUtilsTest {
     EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(
         byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "11000"),
         sykefraværMedKategori11000,
-        Statistikkategori.NÆRING5SIFFER,
+        Statistikkategori.NÆRINGSKODE,
             virksomhet1Metadata_2020_4.getNæringOgNæringskode5siffer().get(1).næringskode5Siffer);
   }
 

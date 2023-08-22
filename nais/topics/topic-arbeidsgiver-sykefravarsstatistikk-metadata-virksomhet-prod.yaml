@@ -23,3 +23,6 @@ spec:
     - team: pia
       application: lydia-api
       access: read
+    - team: fager
+      application: min-side-arbeidsgiver-api
+      access: read

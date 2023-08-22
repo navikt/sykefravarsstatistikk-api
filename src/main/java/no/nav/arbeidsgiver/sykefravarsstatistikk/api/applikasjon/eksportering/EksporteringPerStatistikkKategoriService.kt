@@ -27,7 +27,7 @@ class EksporteringPerStatistikkKategoriService(
             statistikkategori.name,
             årstallOgKvartal.årstall,
             årstallOgKvartal.kvartal,
-            from(statistikkategori).navn
+            from(statistikkategori)?.navn
         )
 
         when (statistikkategori) {
