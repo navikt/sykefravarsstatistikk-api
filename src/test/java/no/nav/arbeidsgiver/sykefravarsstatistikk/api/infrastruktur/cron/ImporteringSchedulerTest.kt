@@ -40,7 +40,7 @@ class ImporteringSchedulerTest {
 
     @BeforeEach
     fun beforeEach() {
-        // Defaults to happy case, can be overritten in tests
+        // Defaults to happy case
         every { importeringService.importerHvisDetFinnesNyStatistikk() } returns årstallOgKvartal
         every { postImporteringService.overskrivMetadataForVirksomheter(any()) } returns 1.right()
         every { postImporteringService.overskrivNæringskoderForVirksomheter(any()) } returns 1.right()
@@ -56,7 +56,7 @@ class ImporteringSchedulerTest {
         every { importEksportStatusRepository.hentFullførteJobber(any()) } returns listOf(IMPORTERT_STATISTIKK)
         every { postImporteringService.overskrivMetadataForVirksomheter(any()) } returns IngenRaderImportert.left()
 
-        importeringScheduler.importOgEksport()
+        importeringScheduler.gjennomførImportOgEksport()
 
         verify(exactly = 0) { importEksportStatusRepository.leggTilFullførtJobb(any(), any()) }
     }
@@ -65,7 +65,7 @@ class ImporteringSchedulerTest {
     fun `importEksport burde markere IMPORTERT_STATUISTIKK-jobb som kjørt når det finnes ny statistikk men resten feiler`() {
         every { postImporteringService.overskrivMetadataForVirksomheter(any()) } returns IngenRaderImportert.left()
 
-        importeringScheduler.importOgEksport()
+        importeringScheduler.gjennomførImportOgEksport()
 
         verify(exactly = 1) { importEksportStatusRepository.leggTilFullførtJobb(any(), any()) }
         verify(exactly = 1) { importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_STATISTIKK, any()) }
@@ -73,7 +73,7 @@ class ImporteringSchedulerTest {
 
     @Test
     fun `importEksport burde markere alle jobber som kjørt når det finnes ny statistikk og ingenting feiler`() {
-        importeringScheduler.importOgEksport()
+        importeringScheduler.gjennomførImportOgEksport()
 
         verify(exactly = ImportEksportJobb.entries.size) {
             importEksportStatusRepository.leggTilFullførtJobb(any(), any())
@@ -83,7 +83,7 @@ class ImporteringSchedulerTest {
     @Test
     fun `importEksport bør fortsette der den slapp`() {
         every { importEksportStatusRepository.hentFullførteJobber(any()) } returns listOf(IMPORTERT_STATISTIKK, IMPORTERT_VIRKSOMHETDATA)
-        importeringScheduler.importOgEksport()
+        importeringScheduler.gjennomførImportOgEksport()
 
         verify(exactly = 0) { postImporteringService.overskrivMetadataForVirksomheter(any()) }
         verify(exactly = 1) { postImporteringService.overskrivNæringskoderForVirksomheter(any())}

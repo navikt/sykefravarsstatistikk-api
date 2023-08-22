@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import net.javacrumbs.shedlock.core.LockConfiguration
 import net.javacrumbs.shedlock.core.LockingTaskExecutor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PostImporteringService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringMetadataVirksomhetService
@@ -22,9 +23,9 @@ import java.time.temporal.ChronoUnit.MINUTES
 
 @Component
 class ImporteringScheduler(
+    registry: MeterRegistry,
     private val taskExecutor: LockingTaskExecutor,
     private val importeringService: SykefraværsstatistikkImporteringService,
-    registry: MeterRegistry,
     private val importEksportStatusRepository: ImportEksportStatusRepository,
     private val postImporteringService: PostImporteringService,
     private val eksporteringsService: EksporteringService,
@@ -32,73 +33,80 @@ class ImporteringScheduler(
     private val eksporteringMetadataVirksomhetService: EksporteringMetadataVirksomhetService,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
-
-    private val counter: Counter
+    private val vellykketImportCounter: Counter
+    private val vellykketEksportCounter: Counter
 
     init {
-        counter = registry.counter("sykefravarstatistikk_vellykket_import")
+        vellykketImportCounter = registry.counter("sykefravarstatistikk_vellykket_import")
+        vellykketEksportCounter = registry.counter("sykefravarstatistikk_vellykket_eksport")
     }
 
-    //@Scheduled(cron = "0 5 8 * * ?")
-    @Scheduled(fixedDelay = Long.MAX_VALUE)
-    fun scheduledImportering() {
-        val lockAtMostFor = Duration.of(10, MINUTES)
+    @Scheduled(cron = "0 5 8 * * ?")
+    fun scheduledImporteringOgEksportering() {
+        val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
         taskExecutor.executeWithLock(
-            Runnable { importOgEksport() },
+            Runnable { gjennomførImportOgEksport() },
             LockConfiguration(Instant.now(), "importering", lockAtMostFor, lockAtLeastFor)
         )
     }
 
-    fun importOgEksport() {
+    fun gjennomførImportOgEksport() {
         log.info("Jobb for å importere sykefraværsstatistikk er startet.")
         val gjeldendeKvartal = importeringService.importerHvisDetFinnesNyStatistikk()
 
         val fullførteJobber = importEksportStatusRepository.hentFullførteJobber(gjeldendeKvartal)
+        log.info("Listen over fullførte jobber dette kvartalet: ${fullførteJobber.joinToString()}")
 
-        if (fullførteJobber.none { it == IMPORTERT_STATISTIKK }) {
+        if (fullførteJobber.manglerJobben(IMPORTERT_STATISTIKK)) {
             importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_STATISTIKK, gjeldendeKvartal)
         }
 
-        if (fullførteJobber.none { it == IMPORTERT_VIRKSOMHETDATA }) {
+        if (fullførteJobber.manglerJobben(IMPORTERT_VIRKSOMHETDATA)) {
             postImporteringService.overskrivMetadataForVirksomheter(gjeldendeKvartal)
                 .getOrElse { return }
             importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_VIRKSOMHETDATA, gjeldendeKvartal)
         }
 
-        if (fullførteJobber.none { it == IMPORTERT_NÆRINGSKODEMAPPING }) {
+        if (fullførteJobber.manglerJobben(IMPORTERT_NÆRINGSKODEMAPPING)) {
             postImporteringService.overskrivNæringskoderForVirksomheter(gjeldendeKvartal)
                 .getOrElse { return }
             importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_NÆRINGSKODEMAPPING, gjeldendeKvartal)
         }
 
-        if (fullførteJobber.none { it == FORBEREDT_NESTE_EKSPORT_LEGACY }) {
+        log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_import'")
+        vellykketImportCounter.increment()
+
+        if (fullførteJobber.manglerJobben(FORBEREDT_NESTE_EKSPORT_LEGACY)) {
             postImporteringService.forberedNesteEksport(gjeldendeKvartal, true)
                 .getOrElse { return }
             importEksportStatusRepository.leggTilFullførtJobb(FORBEREDT_NESTE_EKSPORT_LEGACY, gjeldendeKvartal)
         }
 
-        if (fullførteJobber.none { it == EKSPORTERT_LEGACY }) {
+        if (fullførteJobber.manglerJobben(EKSPORTERT_LEGACY)) {
             eksporteringsService.legacyEksporter(gjeldendeKvartal)
                 .getOrElse { return }
             importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_LEGACY, gjeldendeKvartal)
         }
 
-        if (fullførteJobber.none { it == EKSPORTERT_METADATA_VIRKSOMHET }) {
+        if (fullførteJobber.manglerJobben(EKSPORTERT_METADATA_VIRKSOMHET)) {
             eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(gjeldendeKvartal)
                 .getOrElse { return }
             importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_METADATA_VIRKSOMHET, gjeldendeKvartal)
         }
 
-        if (fullførteJobber.none { it == EKSPORTERT_PER_STATISTIKKATEGORI }) {
+        if (fullførteJobber.manglerJobben(EKSPORTERT_PER_STATISTIKKATEGORI)) {
             Statistikkategori.entries.forEach {
                 eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(gjeldendeKvartal, it)
             }
             importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_PER_STATISTIKKATEGORI, gjeldendeKvartal)
         }
 
-        log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_import'")
-        counter.increment()
-        log.info("Counter er nå: {}", counter.count())
+        log.info("Listen over fullførte jobber dette kvartalet: $fullførteJobber")
+
+        log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_eksport'")
+        vellykketEksportCounter.increment()
     }
 }
+
+fun List<ImportEksportJobb>.manglerJobben(jobb: ImportEksportJobb) = this.none { it == jobb }
