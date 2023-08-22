@@ -124,11 +124,11 @@ class ImporteringScheduler(
                     noeFeilet.increment()
                     return
                 }
-                importEksportStatusRepository.leggTilFullførtJobb(
-                    EKSPORTERT_PER_STATISTIKKATEGORI,
-                    gjeldendeKvartal
-                )
             }
+            importEksportStatusRepository.leggTilFullførtJobb(
+                EKSPORTERT_PER_STATISTIKKATEGORI,
+                gjeldendeKvartal
+            )
 
             log.info("Listen over fullførte jobber dette kvartalet: $fullførteJobber")
 
