@@ -30,7 +30,6 @@ class PostImporteringService(
 
     fun overskrivMetadataForVirksomheter(årstallOgKvartal: ÅrstallOgKvartal): Either<IngenRaderImportert, Int> {
         val antallRaderOpprettet = overskrivVirksomhetMetadata(årstallOgKvartal)
-        //  val antallVirksomhetMetadataNæringskodeOpprettet = importVirksomhetNæringskode(årstallOgKvartal)
         log.info(
             "Importering av $antallRaderOpprettet rader VirksomhetMetadata ferdig."
         )
