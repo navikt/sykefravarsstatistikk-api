@@ -41,3 +41,12 @@ spec:
         labels:
           namespace: teamia
           severity: good
+
+      - alert: EksportVellykket
+        expr: sum(increase(sykefravarstatistikk_vellykket_eksport_total{app="sykefravarsstatistikk-api"}[10m])) > 0
+        annotations:
+          action: "Sjekk at appene oppfører seg som de skal. Nyt deretter en kopp kaffe!"
+          description: "Eksport av sykefraværsstatistikk var vellykket"
+        labels:
+          namespace: teamia
+          severity: good
