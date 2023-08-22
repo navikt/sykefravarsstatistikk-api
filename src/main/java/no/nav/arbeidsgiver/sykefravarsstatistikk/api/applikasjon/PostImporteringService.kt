@@ -1,5 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon
 
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import lombok.extern.slf4j.Slf4j
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.fjernDupliserteOrgnr
@@ -9,8 +12,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.Virk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkRepository
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.util.Pair
 import org.springframework.stereotype.Component
 import java.util.stream.Collectors
 
@@ -22,64 +23,39 @@ class PostImporteringService(
     private val graderingRepository: GraderingRepository,
     private val eksporteringRepository: EksporteringRepository,
     private val kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository,
-    @param:Value("\${statistikk.eksportering.aktivert}") private val erEksporteringAktivert: Boolean
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    // Kall fra Scheduler / Importering
-    // TODO: ikke tatt i bruk enda
-    fun fullførPostImporteringOgForberedNesteEksport(årstallOgKvartal: ÅrstallOgKvartal): Int {
-        val antallVirksomheterImportert = importMetadataForVirksomheter(årstallOgKvartal)
-        val harNoeÅForbereddeTilNesteEksport = antallVirksomheterImportert.first > 0
-        if (!harNoeÅForbereddeTilNesteEksport) {
-            log.info("Post-importering er ferdig. Ingenting å forberedde til neste eksport")
-            return 0
+    object IngenRaderImportert
+
+    fun overskrivMetadataForVirksomheter(årstallOgKvartal: ÅrstallOgKvartal): Either<IngenRaderImportert, Int> {
+        val antallRaderOpprettet = overskrivVirksomhetMetadata(årstallOgKvartal)
+        log.info(
+            "Importering av $antallRaderOpprettet rader VirksomhetMetadata ferdig."
+        )
+        return if (antallRaderOpprettet > 0) {
+            antallRaderOpprettet.right()
         } else {
-            log.info(
-                "Post-importering for årstall '{}' og kvartal '{}' er ferdig med "
-                        + "'{}' VirksomhetMetadata opprettet og "
-                        + "'{}' VirksomhetMetadataNæringskode5siffer opprettet",
-                årstallOgKvartal.årstall,
-                årstallOgKvartal.kvartal,
-                antallVirksomheterImportert.first,
-                antallVirksomheterImportert.second
-            )
+            IngenRaderImportert.left()
         }
-        val antallRaderTilNesteEksportering = forberedNesteEksport(årstallOgKvartal, true)
-        log.info(
-            "Forberedelse til neste eksport er ferdig, med '{}' rader klare til neste eksportering "
-                    + "(årstall '{}', kvartal '{}')",
-            antallRaderTilNesteEksportering,
-            årstallOgKvartal.årstall,
-            årstallOgKvartal.kvartal
-        )
-        return antallRaderTilNesteEksportering
     }
 
-    // Kall fra Controller / backdoor
-    fun importMetadataForVirksomheter(årstallOgKvartal: ÅrstallOgKvartal): Pair<Int, Int> {
-        val antallVirksomhetMetadataOpprettet = importVirksomhetMetadata(årstallOgKvartal)
-        val antallVirksomhetMetadataNæringskodeOpprettet = importVirksomhetNæringskode(årstallOgKvartal)
+    fun overskrivNæringskoderForVirksomheter(årstallOgKvartal: ÅrstallOgKvartal): Either<IngenRaderImportert, Int> {
+        val antallRaderOpprettet = importVirksomhetNæringskode(årstallOgKvartal)
         log.info(
-            "Importering av VirksomhetMetadata og VirksomhetNæringskode5sifferMapping er ferdig. "
-                    + "'{}' VirksomhetMetadata og '{}' VirksomhetNæringskode5sifferMapping har blitt importert. ",
-            antallVirksomhetMetadataOpprettet,
-            antallVirksomhetMetadataNæringskodeOpprettet
+            "Importering av $antallRaderOpprettet rader med næringskodemappinger ferdig."
         )
-        return Pair.of(antallVirksomhetMetadataOpprettet, antallVirksomhetMetadataNæringskodeOpprettet)
+        return if (antallRaderOpprettet > 0) {
+            antallRaderOpprettet.right()
+        } else {
+            IngenRaderImportert.left()
+        }
     }
 
-    // Kall fra Controller / backdoor
-    fun forberedNesteEksport(årstallOgKvartal: ÅrstallOgKvartal, slettHistorikk: Boolean): Int {
-        if (!erEksporteringAktivert) {
-            log.info(
-                "Eksportering er ikke aktivert. "
-                        + "Skal ikke forberedde til neste eksportering for årstall '{}' og kvartal '{}'. ",
-                årstallOgKvartal.årstall,
-                årstallOgKvartal.kvartal
-            )
-            return 0
-        }
+    object ForrigeEksportIkkeFerdig
+
+    @Deprecated("Brukes bare av legacy Kafka-strøm, som skal fases ut.")
+    fun forberedNesteEksport(årstallOgKvartal: ÅrstallOgKvartal, slettHistorikk: Boolean): Either<ForrigeEksportIkkeFerdig, Int> {
         log.info("Forberede neste eksport: prosessen starter.")
         if (slettHistorikk) {
             val slettUtsendingHistorikkStart = System.currentTimeMillis()
@@ -105,7 +81,7 @@ class PostImporteringService(
                 antallIkkeEksportertSykefaværsstatistikk
             )
             // Vi er ikke ferdige med forrige eksport enda 💀
-            return 0
+            return ForrigeEksportIkkeFerdig.left()
         }
 
         // Starter å forberede neste eksport:
@@ -122,12 +98,12 @@ class PostImporteringService(
         )
         val antallOpprettet = eksporteringRepository.opprettEksport(virksomhetEksportPerKvartalListe)
         log.info("Antall rader opprettet til neste eksportering: {}", antallOpprettet)
-        return antallOpprettet
+        return antallOpprettet.right()
     }
 
-    private fun importVirksomhetMetadata(årstallOgKvartal: ÅrstallOgKvartal): Int {
+    private fun overskrivVirksomhetMetadata(årstallOgKvartal: ÅrstallOgKvartal): Int {
         val virksomheter = hentVirksomheterFraDvh(årstallOgKvartal)
-        if (virksomheter!!.isEmpty()) {
+        if (virksomheter.isEmpty()) {
             log.warn(
                 "Stopper import av metadata. Fant ingen virksomheter for {}",
                 årstallOgKvartal
@@ -153,7 +129,7 @@ class PostImporteringService(
         val virksomheter = datavarehusRepository.hentVirksomheter(årstallOgKvartal)
         if (virksomheter.isEmpty()) {
             log.warn(
-                "Har ikke funnet noen virksmoheter for årstall '{}' og kvartal '{}'. ",
+                "Har ikke funnet noen virksomheter for årstall '{}' og kvartal '{}'. ",
                 årstallOgKvartal.årstall,
                 årstallOgKvartal.kvartal
             )

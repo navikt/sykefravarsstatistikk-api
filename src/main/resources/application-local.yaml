@@ -21,8 +21,6 @@ enhetsregisteret:
   url: "http://localhost:${wiremock.mock.port}/enhetsregisteret"
 
 
-statistikk.eksportering.aktivert: true
-
 applikasjon.datasource:
   url: jdbc:h2:mem:db-local;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
   username: SA

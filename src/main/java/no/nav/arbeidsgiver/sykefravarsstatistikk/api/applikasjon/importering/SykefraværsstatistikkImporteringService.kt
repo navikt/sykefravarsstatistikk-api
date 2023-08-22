@@ -1,8 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal.Companion.range
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.PubliseringsdatoerRepository
@@ -22,7 +19,7 @@ class SykefraværsstatistikkImporteringService(
     private val environment: Environment
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
-    fun importerHvisDetFinnesNyStatistikk(): Either<KunneIkkeImportere, ÅrstallOgKvartal> {
+    fun importerHvisDetFinnesNyStatistikk(): ÅrstallOgKvartal {
         log.info("Gjeldende miljø: " + environment.activeProfiles.contentToString())
         val årstallOgKvartalForSykefraværsstatistikk = listOf(
             statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
@@ -55,15 +52,15 @@ class SykefraværsstatistikkImporteringService(
                 StatistikkildeDvh.VIRKSOMHET
             )
         )
+        val gjeldendeÅrstallOgKvartal = årstallOgKvartalForDvh[0]
         return if (kanImportStartes(årstallOgKvartalForSykefraværsstatistikk, årstallOgKvartalForDvh)) {
-            val gjeldendeÅrstallOgKvartal = årstallOgKvartalForDvh[0]
             log.info("Importerer ny statistikk")
             importerNyStatistikk(gjeldendeÅrstallOgKvartal)
             oppdaterPubliseringsstatus(gjeldendeÅrstallOgKvartal)
-            gjeldendeÅrstallOgKvartal.right()
+            gjeldendeÅrstallOgKvartal
         } else {
             log.info("Importerer ikke statistikk")
-            KunneIkkeImportere.left()
+            gjeldendeÅrstallOgKvartal
         }
     }
 

@@ -1,16 +1,12 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.NæringOgNæringskode5siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetMetadata;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværMedKategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetSykefravær;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,19 +65,18 @@ public class EksporteringServiceMockTest {
                         virksomhetMetadataRepository,
                         sykefraværsstatistikkTilEksporteringRepository,
                         sykefraværsRepository,
-                        kafkaClient,
-                        true);
+                        kafkaClient);
     }
 
     @Test
-    public void eksporter_returnerer_antall_rader_eksportert() {
+    public void eksporter_returnerer_feil_når_det_ikke_finnes_statistikk() {
         when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2))
                 .thenReturn(Collections.emptyList());
 
-        int antallEksporterte =
-                service.eksporter(__2020_2);
+        EksporteringService.LegacyEksportFeil antallEksporterte =
+                service.legacyEksporter(__2020_2).swap().getOrNull();
 
-        assertThat(antallEksporterte).isEqualTo(0);
+        assertThat(antallEksporterte).isEqualTo(EksporteringService.LegacyEksportFeil.IngenNyStatistikk.INSTANCE);
     }
 
     @Test
@@ -120,7 +115,7 @@ public class EksporteringServiceMockTest {
                 .thenReturn(sykefraværsstatistikkLandSiste4Kvartaler(__2020_2));
 
         int antallEksporterte =
-                service.eksporter(__2020_2);
+                service.legacyEksporter(__2020_2).getOrNull();
 
         verify(kafkaClient)
                 .send(
@@ -198,8 +193,8 @@ public class EksporteringServiceMockTest {
         when(sykefraværsRepository.hentUmaskertSykefraværForNorge(any()))
                 .thenReturn(sykefraværsstatistikkLandSiste4Kvartaler(årstallOgKvartal));
 
-        int antallEksporterte =
-                service.eksporter(årstallOgKvartal);
+        Integer antallEksporterte =
+                service.legacyEksporter(årstallOgKvartal).getOrNull();
 
         verify(kafkaClient)
                 .send(

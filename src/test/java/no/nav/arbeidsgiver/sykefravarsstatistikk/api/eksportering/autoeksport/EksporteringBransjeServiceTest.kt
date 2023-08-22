@@ -19,7 +19,7 @@ internal class EksporteringBransjeServiceTest {
     private val kafkaClientMock = mock<KafkaClient>()
 
     private val service =
-        EksporteringPerStatistikkKategoriService(mock(), repositoryMock, kafkaClientMock, true)
+        EksporteringPerStatistikkKategoriService(mock(), repositoryMock, kafkaClientMock)
 
     @Test
     fun `eksporterPerStatistikkKategori skal ikke putte noe på kafkastrømmen dersom datagrunnalget er tomt`() {

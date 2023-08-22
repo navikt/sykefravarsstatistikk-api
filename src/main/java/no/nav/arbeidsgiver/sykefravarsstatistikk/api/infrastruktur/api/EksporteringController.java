@@ -1,11 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringMetadataVirksomhetService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringPerStatistikkKategoriService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori;
 import no.nav.security.token.support.core.api.Protected;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -41,10 +41,10 @@ public class EksporteringController {
       @RequestParam int kvartal) {
 
     ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
-    int antallEksportert =
-        eksporteringService.eksporter(årstallOgKvartal);
+    Integer antallEksportert =
+        eksporteringService.legacyEksporter(årstallOgKvartal).getOrNull();
 
-    if (antallEksportert >= 0) {
+    if (antallEksportert != null) {
       return ResponseEntity.ok(HttpStatus.CREATED);
     } else {
       return ResponseEntity.ok(HttpStatus.OK);
@@ -76,9 +76,9 @@ public class EksporteringController {
   public ResponseEntity<HttpStatus> reeksportMetadata(
       @RequestParam int årstall, @RequestParam int kvartal) {
     ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
-    eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(årstallOgKvartal);
-
-    return ResponseEntity.ok(HttpStatus.OK);
+    return eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(årstallOgKvartal).fold(
+        left -> ResponseEntity.internalServerError().build(),
+        right -> ResponseEntity.ok(HttpStatus.OK)
+    );
   }
-
 }

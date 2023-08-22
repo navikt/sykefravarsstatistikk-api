@@ -1,23 +1,18 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering
 
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import com.google.common.collect.Lists
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetEksportPerKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetMetadata
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkNæring
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkNæring5Siffer
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkSektor
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkVirksomhetUtenVarighet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingException
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværMedKategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.KafkaException
 import org.springframework.stereotype.Component
 import java.util.concurrent.atomic.AtomicInteger
@@ -30,17 +25,13 @@ class EksporteringService(
     private val sykefraværsstatistikkTilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository,
     private val sykefraværRepository: SykefraværRepository,
     private val kafkaClient: KafkaClient,
-    @param:Value("\${statistikk.eksportering.aktivert}") private val erEksporteringAktivert: Boolean
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    fun eksporter(
+    @Deprecated("Bruk eksport per kategori")
+    fun legacyEksporter(
         årstallOgKvartal: ÅrstallOgKvartal,
-    ): Int {
-        if (!erEksporteringAktivert) {
-            log.info("Eksportering er ikke aktivert. Avbryter.")
-            return 0
-        }
+    ): Either<LegacyEksportFeil, Int> {
         val virksomheterTilEksport = EksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal(
             årstallOgKvartal, eksporteringRepository
         )
@@ -53,7 +44,7 @@ class EksporteringService(
                 årstallOgKvartal.årstall,
                 årstallOgKvartal.kvartal
             )
-            return 0
+            return LegacyEksportFeil.IngenNyStatistikk.left()
         }
         log.info(
             "Starting eksportering for årstall '{}' og kvartal '{}'. Skal eksportere '{}' rader med statistikk.",
@@ -62,22 +53,27 @@ class EksporteringService(
             antallStatistikkSomSkalEksporteres
         )
         val antallEksporterteVirksomheter = runCatching {
-            eksporter(virksomheterTilEksport, årstallOgKvartal)
+            legacyEksporter(virksomheterTilEksport, årstallOgKvartal)
         }.getOrElse {
             when (it) {
                 is KafkaUtsendingException, is KafkaException -> {
                     log.warn("Fikk exception fra Kafka med melding: '{}'. Avbryter prosess.", it.message, it)
-                    return 0
+                    return LegacyEksportFeil.EksportFeilet.left()
                 }
 
                 else -> throw it
             }
         }
-        return antallEksporterteVirksomheter
+        return antallEksporterteVirksomheter.right()
+    }
+
+    sealed class LegacyEksportFeil {
+        object EksportFeilet : LegacyEksportFeil()
+        object IngenNyStatistikk : LegacyEksportFeil()
     }
 
     @Throws(KafkaUtsendingException::class)
-    protected fun eksporter(
+    protected fun legacyEksporter(
         virksomheterTilEksport: List<VirksomhetEksportPerKvartal>, årstallOgKvartal: ÅrstallOgKvartal
     ): Int {
         val startEksportering = System.currentTimeMillis()

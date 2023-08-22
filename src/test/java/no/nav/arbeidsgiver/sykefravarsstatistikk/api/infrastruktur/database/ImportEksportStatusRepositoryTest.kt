@@ -1,10 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import io.kotest.matchers.collections.shouldContainExactly
-import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.equals.shouldBeEqual
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb.IMPORTERT_STATISTIKK
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb.IMPORTERT_VIRKSOMHETDATA
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -25,16 +24,7 @@ open class ImportEksportStatusRepositoryTest {
     @Autowired
     private lateinit var repo: ImportEksportStatusRepository
 
-
     private val årstallOgKvartal = ÅrstallOgKvartal(2023, 3)
-    private val importEksportStatus = ImportEksportStatusDao(
-        årstall = årstallOgKvartal.årstall.toString(),
-        kvartal = årstallOgKvartal.kvartal.toString(),
-        importertStatistikk = true,
-        importertVirksomhetsdata = false,
-        eksportertPåKafka = false,
-        forberedtNesteEksport = false,
-    )
 
     @AfterEach
     fun afterEach() {
@@ -42,55 +32,22 @@ open class ImportEksportStatusRepositoryTest {
     }
 
     @Test
-    fun `sett import eksport status burde sette ny status`() {
-        repo.hentImportEksportStatus(årstallOgKvartal) shouldHaveSize 0
-
-        repo.settImportEksportStatus(importEksportStatus)
-
-        repo.hentImportEksportStatus(årstallOgKvartal) shouldContainExactly listOf(importEksportStatus)
-    }
-
-    @Test
-    fun `sett import eksport status burde oppdatere eksisterende status`() {
-        val oppdatertImportEksportStatus = importEksportStatus.copy(importertVirksomhetsdata = true)
-
-        repo.settImportEksportStatus(importEksportStatus)
-        repo.settImportEksportStatus(oppdatertImportEksportStatus)
-
-        repo.hentImportEksportStatus(årstallOgKvartal) shouldContainExactly listOf(oppdatertImportEksportStatus)
-    }
-
-    @Test
     fun `marker jobb som kjørt burde markere en jobb hvis raden ikke finnes`() {
-        repo.markerJobbSomKjørt(årstallOgKvartal, ImportEksportJobb.IMPORTERT_STATISTIKK)
+        repo.leggTilFullførtJobb(IMPORTERT_STATISTIKK, årstallOgKvartal)
 
-        val resultat = repo.hentImportEksportStatus(årstallOgKvartal).first()
+        val resultat = repo.hentFullførteJobber(årstallOgKvartal)
 
-        resultat shouldBeEqual ImportEksportStatusDao(
-            årstall = årstallOgKvartal.årstall.toString(),
-            kvartal = årstallOgKvartal.kvartal.toString(),
-            importertStatistikk = true,
-            importertVirksomhetsdata = false,
-            forberedtNesteEksport = false,
-            eksportertPåKafka = false,
-        )
+        resultat shouldContainExactly listOf(IMPORTERT_STATISTIKK)
     }
 
     @Test
     fun `marker jobb som kjørt burde markere en jobb hvis raden finnes`() {
-        repo.markerJobbSomKjørt(årstallOgKvartal, ImportEksportJobb.IMPORTERT_STATISTIKK)
-        repo.markerJobbSomKjørt(årstallOgKvartal, ImportEksportJobb.IMPORTERT_VIRKSOMHETDATA)
+        repo.leggTilFullførtJobb(IMPORTERT_STATISTIKK, årstallOgKvartal)
+        repo.leggTilFullførtJobb(IMPORTERT_VIRKSOMHETDATA, årstallOgKvartal)
 
-        val resultat = repo.hentImportEksportStatus(årstallOgKvartal).first()
+        val resultat = repo.hentFullførteJobber(årstallOgKvartal)
 
-        resultat shouldBeEqual ImportEksportStatusDao(
-            årstall = årstallOgKvartal.årstall.toString(),
-            kvartal = årstallOgKvartal.kvartal.toString(),
-            importertStatistikk = true,
-            importertVirksomhetsdata = true,
-            forberedtNesteEksport = false,
-            eksportertPåKafka = false,
-        )
+        resultat shouldContainExactly listOf(IMPORTERT_STATISTIKK, IMPORTERT_VIRKSOMHETDATA)
     }
 
     private fun ImportEksportStatusRepository.slettAlt() {
