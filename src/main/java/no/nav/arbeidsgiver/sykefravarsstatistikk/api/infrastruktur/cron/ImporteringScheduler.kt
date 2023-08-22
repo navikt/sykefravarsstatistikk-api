@@ -35,10 +35,12 @@ class ImporteringScheduler(
     private val log = LoggerFactory.getLogger(this::class.java)
     private val vellykketImportCounter: Counter
     private val vellykketEksportCounter: Counter
+    private val noeFeilet: Counter
 
     init {
         vellykketImportCounter = registry.counter("sykefravarstatistikk_vellykket_import")
         vellykketEksportCounter = registry.counter("sykefravarstatistikk_vellykket_eksport")
+        noeFeilet = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
     }
 
     @Scheduled(cron = "0 5 8 * * ?")
@@ -64,13 +66,19 @@ class ImporteringScheduler(
 
         if (fullførteJobber.manglerJobben(IMPORTERT_VIRKSOMHETDATA)) {
             postImporteringService.overskrivMetadataForVirksomheter(gjeldendeKvartal)
-                .getOrElse { return }
+                .getOrElse {
+                    noeFeilet.increment()
+                    return
+                }
             importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_VIRKSOMHETDATA, gjeldendeKvartal)
         }
 
         if (fullførteJobber.manglerJobben(IMPORTERT_NÆRINGSKODEMAPPING)) {
             postImporteringService.overskrivNæringskoderForVirksomheter(gjeldendeKvartal)
-                .getOrElse { return }
+                .getOrElse {
+                    noeFeilet.increment()
+                    return
+                }
             importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_NÆRINGSKODEMAPPING, gjeldendeKvartal)
         }
 
@@ -79,33 +87,54 @@ class ImporteringScheduler(
 
         if (fullførteJobber.manglerJobben(FORBEREDT_NESTE_EKSPORT_LEGACY)) {
             postImporteringService.forberedNesteEksport(gjeldendeKvartal, true)
-                .getOrElse { return }
+                .getOrElse {
+                    noeFeilet.increment()
+                    return
+                }
             importEksportStatusRepository.leggTilFullførtJobb(FORBEREDT_NESTE_EKSPORT_LEGACY, gjeldendeKvartal)
         }
 
         if (fullførteJobber.manglerJobben(EKSPORTERT_LEGACY)) {
             eksporteringsService.legacyEksporter(gjeldendeKvartal)
-                .getOrElse { return }
+                .getOrElse {
+                    noeFeilet.increment()
+                    return
+                }
             importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_LEGACY, gjeldendeKvartal)
         }
 
         if (fullførteJobber.manglerJobben(EKSPORTERT_METADATA_VIRKSOMHET)) {
             eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(gjeldendeKvartal)
-                .getOrElse { return }
+                .getOrElse {
+                    noeFeilet.increment()
+                    return
+                }
             importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_METADATA_VIRKSOMHET, gjeldendeKvartal)
         }
 
         if (fullførteJobber.manglerJobben(EKSPORTERT_PER_STATISTIKKATEGORI)) {
-            Statistikkategori.entries.forEach {
-                eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(gjeldendeKvartal, it)
+            Statistikkategori.entries.forEach { kategori ->
+                runCatching {
+                    eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(
+                        gjeldendeKvartal,
+                        kategori
+                    )
+                }.getOrElse {
+                    log.error("Eksport av kategori $kategori feilet", it)
+                    noeFeilet.increment()
+                    return
+                }
+                importEksportStatusRepository.leggTilFullførtJobb(
+                    EKSPORTERT_PER_STATISTIKKATEGORI,
+                    gjeldendeKvartal
+                )
             }
-            importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_PER_STATISTIKKATEGORI, gjeldendeKvartal)
+
+            log.info("Listen over fullførte jobber dette kvartalet: $fullførteJobber")
+
+            log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_eksport'")
+            vellykketEksportCounter.increment()
         }
-
-        log.info("Listen over fullførte jobber dette kvartalet: $fullførteJobber")
-
-        log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_eksport'")
-        vellykketEksportCounter.increment()
     }
 }
 
