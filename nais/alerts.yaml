@@ -51,13 +51,13 @@ spec:
           namespace: teamia
           severity: good
 
-    - alert: FeilUnderImportEllerEksport
-      expr: sum(increase(sykefravarstatistikk_import_eller_eksport_feilet{app="sykefravarsstatistikk-api"}[10m])) > 0
-      annotations:
-        action: |-
-          Sjekk logs.adeo.no for logger, 
-          eller Grafana-dashboardet vårt: https://grafana.nais.io/dashboards/f/cvOhCMUnz/team-ia
-        description: "Det har skjedd en feil under import eller eksport av sykefraværsstatistikk."
-      labels:
-        namespace: teamia
-        severity: critical
+      - alert: FeilUnderImportEllerEksport
+        expr: sum(increase(sykefravarstatistikk_import_eller_eksport_feilet{app="sykefravarsstatistikk-api"}[10m])) > 0
+        annotations:
+          action: |-
+            Sjekk logs.adeo.no for logger,
+            eller Grafana-dashboardet vårt: https://grafana.nais.io/dashboards/f/cvOhCMUnz/team-ia
+          description: "Det har skjedd en feil under import eller eksport av sykefraværsstatistikk."
+        labels:
+          namespace: teamia
+          severity: critical
