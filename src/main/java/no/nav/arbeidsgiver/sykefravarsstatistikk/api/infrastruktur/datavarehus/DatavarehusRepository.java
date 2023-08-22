@@ -1,6 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus;
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.KildeTilVirksomhetsdata;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -13,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Component
-public class DatavarehusRepository {
+public class DatavarehusRepository implements KildeTilVirksomhetsdata {
 
   public static final String NARINGKODE = "naringkode";
   public static final String NARINGNAVN = "naringnavn";
@@ -26,7 +28,6 @@ public class DatavarehusRepository {
   public static final String NARING = "naring";
   public static final String NARING_5SIFFER = "naering_kode";
   public static final String ORGNR = "orgnr";
-  public static final String OFFNAVN = "offnavn";
   public static final String VARIGHET = "varighet";
   public static final String SUM_TAPTE_DAGSVERK_GS = "sum_tapte_dagsverk_gs";
   public static final String SUM_ANTALL_PERSONER = "sum_antall_personer";
@@ -39,7 +40,7 @@ public class DatavarehusRepository {
 
   public static final String RECTYPE_FOR_FORETAK = "1";
   public static final String RECTYPE_FOR_VIRKSOMHET = "2";
-  public static final String RECTYPE_FOR_ORGANISASJONSLEDD = "3";
+  //public static final String RECTYPE_FOR_ORGANISASJONSLEDD = "3";
 
   private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
@@ -291,6 +292,8 @@ public class DatavarehusRepository {
             new Næring(resultSet.getString(NARINGKODE), resultSet.getString(NARINGNAVN)));
   }
 
+  @NotNull
+  @Override
   public List<Orgenhet> hentVirksomheter(ÅrstallOgKvartal årstallOgKvartal) {
 
     MapSqlParameterSource namedParameters =
