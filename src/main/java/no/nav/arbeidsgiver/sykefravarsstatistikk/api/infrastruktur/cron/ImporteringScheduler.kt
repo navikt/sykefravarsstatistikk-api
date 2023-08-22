@@ -39,7 +39,8 @@ class ImporteringScheduler(
         counter = registry.counter("sykefravarstatistikk_vellykket_import")
     }
 
-    @Scheduled(cron = "0 5 8 * * ?")
+    //@Scheduled(cron = "0 5 8 * * ?")
+    @Scheduled(fixedDelay = Long.MAX_VALUE)
     fun scheduledImportering() {
         val lockAtMostFor = Duration.of(10, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
