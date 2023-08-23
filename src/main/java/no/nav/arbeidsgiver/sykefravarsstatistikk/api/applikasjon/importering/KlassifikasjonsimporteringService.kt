@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Klassifikasjonskilde
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.OpprettEllerOppdaterResultat
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Virksomhetsklassifikasjon
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KlassifikasjonsimporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.slf4j.LoggerFactory
@@ -18,7 +18,7 @@ class KlassifikasjonsimporteringService(
 
     fun populerSektorer(): OpprettEllerOppdaterResultat {
         val sektorer = datavarehusRepository.hentAlleSektorer()
-        val resultat = opprettEllerOppdaterVirksomhetsklassifikasjoner(sektorer, Klassifikasjonskilde.SEKTOR)
+        val resultat = opprettEllerOppdaterSektor(sektorer)
         log.info(
             String.format(
                 "Import av sektorer er ferdig. Antall opprettet: %d, antall oppdatert: %d",
@@ -30,7 +30,7 @@ class KlassifikasjonsimporteringService(
 
     fun populerNæringskoder(): OpprettEllerOppdaterResultat {
         val næringer = datavarehusRepository.hentAlleNæringer()
-        val resultat = opprettEllerOppdaterVirksomhetsklassifikasjoner(næringer, Klassifikasjonskilde.NÆRING)
+        val resultat = opprettEllerOppdaterNæring(næringer)
         log.info(
             String.format(
                 "Import av næringer (med næringskode på 2 siffer) er ferdig. Antall opprettet: %d, antall oppdatert: %d",
@@ -40,15 +40,13 @@ class KlassifikasjonsimporteringService(
         return resultat
     }
 
-    fun opprettEllerOppdaterVirksomhetsklassifikasjoner(
-        virksomhetsklassifikasjonerIDatavarehus: List<Virksomhetsklassifikasjon>,
-        klassifikasjonskilde: Klassifikasjonskilde
+    fun opprettEllerOppdaterNæring(
+        næringer: List<Næring>
     ): OpprettEllerOppdaterResultat {
-        return virksomhetsklassifikasjonerIDatavarehus.stream()
-            .map { klassifikasjon: Virksomhetsklassifikasjon ->
-                opprettEllerOppdater(
-                    klassifikasjon,
-                    klassifikasjonskilde
+        return næringer.stream()
+            .map { klassifikasjon: Næring ->
+                opprettEllerOppdaterNæring(
+                    klassifikasjon
                 )
             }
             .reduce(OpprettEllerOppdaterResultat()) { obj: OpprettEllerOppdaterResultat, other: OpprettEllerOppdaterResultat ->
@@ -58,25 +56,64 @@ class KlassifikasjonsimporteringService(
             }
     }
 
-    private fun opprettEllerOppdater(
-        virksomhetsklassifikasjon: Virksomhetsklassifikasjon,
-        klassifikasjonskilde: Klassifikasjonskilde
+    fun opprettEllerOppdaterSektor(
+        sektorer: List<Sektor>
+    ): OpprettEllerOppdaterResultat {
+        return sektorer.stream()
+            .map { klassifikasjon: Sektor ->
+                opprettEllerOppdaterSektor(
+                    klassifikasjon
+                )
+            }
+            .reduce(OpprettEllerOppdaterResultat()) { obj: OpprettEllerOppdaterResultat, other: OpprettEllerOppdaterResultat ->
+                obj.add(
+                    other
+                )
+            }
+    }
+
+    private fun opprettEllerOppdaterNæring(
+        næring: Næring
     ): OpprettEllerOppdaterResultat {
         var resultat = OpprettEllerOppdaterResultat()
         klassifikasjonsimporteringRepository
-            .hent(virksomhetsklassifikasjon, klassifikasjonskilde)
+            .hentNæring(næring)
             .ifPresentOrElse(
-                { eksisterendeKlassifikasjon: Virksomhetsklassifikasjon ->
-                    if (eksisterendeKlassifikasjon != virksomhetsklassifikasjon) {
-                        klassifikasjonsimporteringRepository.oppdater(
-                            virksomhetsklassifikasjon, klassifikasjonskilde
+                { eksisterendeKlassifikasjon: Næring ->
+                    if (eksisterendeKlassifikasjon != næring) {
+                        klassifikasjonsimporteringRepository.oppdaterNæring(
+                            næring
                         )
                         resultat = OpprettEllerOppdaterResultat(0, 1)
                     }
                 }
             ) {
-                klassifikasjonsimporteringRepository.opprett(
-                    virksomhetsklassifikasjon, klassifikasjonskilde
+                klassifikasjonsimporteringRepository.opprettNæring(
+                    næring
+                )
+                resultat = OpprettEllerOppdaterResultat(1, 0)
+            }
+        return resultat
+    }
+
+    private fun opprettEllerOppdaterSektor(
+        sektor: Sektor
+    ): OpprettEllerOppdaterResultat {
+        var resultat = OpprettEllerOppdaterResultat()
+        klassifikasjonsimporteringRepository
+            .hentSektor(sektor)
+            .ifPresentOrElse(
+                { eksisterendeKlassifikasjon: Sektor ->
+                    if (eksisterendeKlassifikasjon != sektor) {
+                        klassifikasjonsimporteringRepository.oppdaterSektor(
+                            sektor
+                        )
+                        resultat = OpprettEllerOppdaterResultat(0, 1)
+                    }
+                }
+            ) {
+                klassifikasjonsimporteringRepository.opprettSektor(
+                    sektor
                 )
                 resultat = OpprettEllerOppdaterResultat(1, 0)
             }

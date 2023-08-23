@@ -1,10 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.autoimport.klassifikasjoner;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Klassifikasjonskilde;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Virksomhetsklassifikasjon;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KlassifikasjonsimporteringRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +44,7 @@ public class KlassifikasjonsimporteringRepositoryTest {
 
   @Test
   public void opprett__skal_lagre_næring_i_næringstabellen() {
-    repository.opprett(new Næring("01", "Jordbruk"), Klassifikasjonskilde.NÆRING);
+    repository.opprettNæring(new Næring("01", "Jordbruk"));
 
     List<Næring> næringList = hentNæring(namedParameterJdbcTemplate);
     assertThat(næringList.size()).isEqualTo(1);
@@ -57,8 +55,8 @@ public class KlassifikasjonsimporteringRepositoryTest {
   public void hent__skal_hente_næring_fra_næringstabellen() {
     opprettNæring(namedParameterJdbcTemplate, "01", "Jordbruk");
 
-    Optional<Virksomhetsklassifikasjon> næring =
-        repository.hent(new Næring("01", "Jordbruk"), Klassifikasjonskilde.NÆRING);
+    Optional<Næring> næring =
+        repository.hentNæring(new Næring("01", "Jordbruk"));
 
     assertThat(næring.isPresent()).isTrue();
     assertThat(næring.get()).isEqualTo((new Næring("01", "Jordbruk")));
@@ -69,8 +67,8 @@ public class KlassifikasjonsimporteringRepositoryTest {
     opprettNæring(namedParameterJdbcTemplate, "01", "Jordbruk");
 
     int antallOppdatert =
-        repository.oppdater(
-            new Næring("01", "Jordbruk og andre ting"), Klassifikasjonskilde.NÆRING);
+        repository.oppdaterNæring(
+            new Næring("01", "Jordbruk og andre ting"));
 
     Næring oppdatertNæring = hentNæring(namedParameterJdbcTemplate).get(0);
     assertThat(antallOppdatert).isEqualTo(1);
@@ -79,7 +77,7 @@ public class KlassifikasjonsimporteringRepositoryTest {
 
   @Test
   public void opprett__skal_lagre_sektor_i_sektortabellen() {
-    repository.opprett(new Sektor("1111", "offentlig"), Klassifikasjonskilde.SEKTOR);
+    repository.opprettSektor(new Sektor("1111", "offentlig"));
 
     List<Sektor> sektorList = hentSektor(namedParameterJdbcTemplate);
     assertThat(sektorList.size()).isEqualTo(1);
@@ -90,8 +88,8 @@ public class KlassifikasjonsimporteringRepositoryTest {
   public void hent__skal_hente_sektor_fra_sektorstabellen() {
     opprettSektor(namedParameterJdbcTemplate, "2222", "privat");
 
-    Optional<Virksomhetsklassifikasjon> sektor =
-        repository.hent(new Næring("2222", "privat"), Klassifikasjonskilde.SEKTOR);
+    Optional<Sektor> sektor =
+        repository.hentSektor(new Sektor("2222", "privat"));
 
     assertThat(sektor.isPresent()).isTrue();
     assertThat(sektor.get()).isEqualTo((new Sektor("2222", "privat")));
@@ -102,7 +100,7 @@ public class KlassifikasjonsimporteringRepositoryTest {
     opprettSektor(namedParameterJdbcTemplate, "3333", "privat");
 
     int antallOppdatert =
-        repository.oppdater(new Sektor("3333", "offentlig"), Klassifikasjonskilde.SEKTOR);
+        repository.oppdaterSektor(new Sektor("3333", "offentlig"));
 
     Sektor oppdatertSektor = hentSektor(namedParameterJdbcTemplate).get(0);
     assertThat(antallOppdatert).isEqualTo(1);
