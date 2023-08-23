@@ -129,7 +129,7 @@ class ImporteringScheduler(
                 gjeldendeKvartal
             )
 
-            log.info("Listen over fullførte jobber dette kvartalet: $fullførteJobber")
+            log.info("Listen over fullførte jobber dette kvartalet: ${importEksportStatusRepository.hentFullførteJobber(gjeldendeKvartal)}")
 
             log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_eksport'")
             vellykketEksportCounter.increment()

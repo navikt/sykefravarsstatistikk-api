@@ -9,7 +9,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.fje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.GraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -18,7 +17,7 @@ import java.util.stream.Collectors
 @Slf4j
 @Component
 class PostImporteringService(
-    private val datavarehusRepository: DatavarehusRepository,
+    private val datavarehusRepository: KildeTilVirksomhetsdata,
     private val virksomhetMetadataRepository: VirksomhetMetadataRepository,
     private val graderingRepository: GraderingRepository,
     private val eksporteringRepository: EksporteringRepository,

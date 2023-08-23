@@ -64,8 +64,6 @@ class SykefraværsstatistikkImporteringService(
         }
     }
 
-    object KunneIkkeImportere
-
     private fun oppdaterPubliseringsstatus(gjeldendeÅrstallOgKvartal: ÅrstallOgKvartal) {
         publiseringsdatoerRepository.oppdaterSisteImporttidspunkt(gjeldendeÅrstallOgKvartal)
     }
@@ -283,6 +281,6 @@ class SykefraværsstatistikkImporteringService(
     }
 
     private fun currentEnvironmentIsProd(): Boolean {
-        return listOf(*environment.activeProfiles).contains("prod")
+        return environment.activeProfiles.contains("prod")
     }
 }
