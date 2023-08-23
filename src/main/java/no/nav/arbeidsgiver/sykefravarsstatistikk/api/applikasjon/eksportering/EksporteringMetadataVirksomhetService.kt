@@ -3,13 +3,14 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransjeprogram
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.MetadataVirksomhetKafkamelding
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.Sektor
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.SektorKafkaDto
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -46,7 +47,7 @@ class EksporteringMetadataVirksomhetService(
                     virksomhet.årstallOgKvartal,
                     virksomhet.primærnæring,
                     Bransjeprogram.finnBransje(virksomhet.primærnæringskode).getOrNull()?.type,
-                    Sektor.fraSsbSektorkode(virksomhet.sektor.toInt())
+                    SektorKafkaDto.fraDomene(Sektor(virksomhet.sektor))
                 )
 
                 kafkaClient.sendMelding(

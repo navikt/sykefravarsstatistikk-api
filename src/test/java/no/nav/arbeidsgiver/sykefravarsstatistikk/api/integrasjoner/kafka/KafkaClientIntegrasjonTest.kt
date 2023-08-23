@@ -2,20 +2,23 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka
 
 import net.javacrumbs.jsonunit.assertj.assertThatJson
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.SykefraværsstatistikkLocalTestApplication
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic.Companion.toStringArray
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.MetadataVirksomhetKafkamelding
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.Sektor
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.SektorKafkaDto
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.context.SpringBootTest
@@ -89,7 +92,7 @@ class KafkaClientIntegrasjonTest {
                 ÅrstallOgKvartal(2023, 2),
                 "86101",
                 ArbeidsmiljøportalenBransje.SYKEHUS,
-                Sektor.STATLIG
+                SektorKafkaDto.STATLIG
             ),
             KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1,
         )
@@ -105,7 +108,7 @@ class KafkaClientIntegrasjonTest {
                 ÅrstallOgKvartal(2023, 2),
                 "86",
                 ArbeidsmiljøportalenBransje.SYKEHUS,
-                Sektor.STATLIG
+                SektorKafkaDto.STATLIG
             ),
             KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1,
         )

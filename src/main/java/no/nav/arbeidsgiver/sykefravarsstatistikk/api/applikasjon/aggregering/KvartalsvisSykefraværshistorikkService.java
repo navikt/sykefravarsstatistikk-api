@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.SektorMappingService;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.EnhetsregisteretSektorMapping;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransjeprogram;
@@ -27,12 +27,11 @@ public class KvartalsvisSykefraværshistorikkService {
   public static final String SYKEFRAVÆRPROSENT_LAND_LABEL = "Norge";
 
   private final KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository;
-  private final SektorMappingService sektorMappingService;
+  private final EnhetsregisteretSektorMapping sektorMappingService;
   private final KlassifikasjonerRepository klassifikasjonerRepository;
 
   public KvartalsvisSykefraværshistorikkService(
       KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository,
-      SektorMappingService sektorMappingService,
       KlassifikasjonerRepository klassifikasjonerRepository) {
     this.kvartalsvisSykefraværprosentRepository = kvartalsvisSykefraværprosentRepository;
     this.sektorMappingService = sektorMappingService;
