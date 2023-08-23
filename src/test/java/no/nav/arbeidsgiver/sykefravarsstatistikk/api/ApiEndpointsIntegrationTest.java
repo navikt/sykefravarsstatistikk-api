@@ -1,41 +1,31 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
-import static com.google.common.net.HttpHeaders.AUTHORIZATION;
-import static java.net.http.HttpClient.newBuilder;
-import static java.net.http.HttpResponse.BodyHandlers.ofString;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.SELVBETJENING_ISSUER_ID;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.TOKENX_ISSUER_ID;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.PRODUKSJON_NYTELSESMIDLER;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForSektor;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForVirksomhet;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.skrivSisteImporttidspunktTilDb;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAlleImporttidspunkt;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import common.SpringIntegrationTestbase;
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Arrays;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori;
 import no.nav.security.mock.oauth2.MockOAuth2Server;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+import static com.google.common.net.HttpHeaders.AUTHORIZATION;
+import static java.net.http.HttpClient.newBuilder;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.SELVBETJENING_ISSUER_ID;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.TOKENX_ISSUER_ID;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
 
@@ -264,66 +254,6 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         .isEqualTo("{\"message\":\"You don't have access to this resource\"}");
   }
 
-  @Test
-  public void legemeldtSykefraværsprosent__skal_returnere_riktig_objekt() throws Exception {
-    opprettStatistikkForVirksomhet(
-        jdbcTemplate, ORGNR_UNDERENHET, SISTE_ÅRSTALL, SISTE_KVARTAL, 12, 100, 10);
-
-    HttpResponse<String> response =
-        newBuilder()
-            .build()
-            .send(
-                HttpRequest.newBuilder()
-                    .uri(
-                        URI.create(
-                            "http://localhost:"
-                                + port
-                                + "/sykefravarsstatistikk-api/"
-                                + ORGNR_UNDERENHET
-                                + "/sykefravarshistorikk/legemeldtsykefravarsprosent"))
-                    .header(AUTHORIZATION, getBearerMedJwt())
-                    .GET()
-                    .build(),
-                ofString());
-
-    assertThat(response.statusCode()).isEqualTo(200);
-    JsonNode alleSykefraværshistorikk = objectMapper.readTree(response.body());
-
-    assertTrue(
-        Stream.of(
-                Statistikkategori.VIRKSOMHET.toString(),
-                Statistikkategori.BRANSJE.toString(),
-                Statistikkategori.NÆRING.toString())
-            .anyMatch(alleSykefraværshistorikk.findValue("type").asText()::contains));
-    assertTrue(alleSykefraværshistorikk.findValue("label").isTextual());
-    assertTrue(alleSykefraværshistorikk.findValue("prosent").isNumber());
-  }
-
-  @Test
-  public void legemeldt_sykefraværsprosent_siste_4_kvartaler__skal_utføre_tilgangskontroll()
-      throws IOException, InterruptedException {
-    HttpResponse<String> response =
-        newBuilder()
-            .build()
-            .send(
-                HttpRequest.newBuilder()
-                    .uri(
-                        URI.create(
-                            "http://localhost:"
-                                + port
-                                + "/sykefravarsstatistikk-api/"
-                                + ORGNR_UNDERENHET_INGEN_TILGANG
-                                + "/sykefravarshistorikk/legemeldtsykefravarsprosent"))
-                    .header(AUTHORIZATION, getBearerMedJwt())
-                    .GET()
-                    .build(),
-                ofString());
-    assertThat(response.statusCode()).isEqualTo(403);
-    assertThat(response.body())
-        .isEqualTo("{\"message\":\"You don't have access to this resource\"}");
-  }
-
-  @NotNull
   private String getBearerMedJwt() {
     return "Bearer "
         + TestTokenUtil.createToken(mockOAuth2Server, "15008462396", SELVBETJENING_ISSUER_ID, "");
