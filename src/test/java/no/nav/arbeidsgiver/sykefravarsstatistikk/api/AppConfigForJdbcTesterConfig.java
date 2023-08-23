@@ -8,7 +8,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.Importeri
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImporteringScheduler;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PostImporteringService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.SykefraværsstatistikkImporteringService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.KlassifikasjonsimporteringController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.MockServer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.WebClientConfiguration;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.EksporteringController;
@@ -52,7 +51,6 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
             OrganisasjonerController.class,
             ImporteringController.class,
             EksporteringController.class,
-            KlassifikasjonsimporteringController.class,
             SykefraværshistorikkController.class,
             OrganisasjonerController.class,
             TilgangskontrollService.class,
