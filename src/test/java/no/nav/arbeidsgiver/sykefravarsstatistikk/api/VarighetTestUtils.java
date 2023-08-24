@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.BedreNæringskode;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -32,14 +32,14 @@ public class VarighetTestUtils {
   }
 
   public static void leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
-      NamedParameterJdbcTemplate jdbcTemplate,
-      Næringskode5Siffer næringskode5Siffer,
-      ÅrstallOgKvartal årstallOgKvartal,
-      int antallPersoner,
-      int muligeDagsverk) {
+          NamedParameterJdbcTemplate jdbcTemplate,
+          BedreNæringskode næringskode,
+          ÅrstallOgKvartal årstallOgKvartal,
+          int antallPersoner,
+          int muligeDagsverk) {
     leggTilStatisitkkNæringMedVarighet(
         jdbcTemplate,
-        næringskode5Siffer,
+        næringskode,
         årstallOgKvartal.getÅrstall(),
         årstallOgKvartal.getKvartal(),
         Varighetskategori.TOTAL.kode,
@@ -49,14 +49,14 @@ public class VarighetTestUtils {
   }
 
   public static void leggTilStatisitkkNæringMedVarighet(
-      NamedParameterJdbcTemplate jdbcTemplate,
-      Næringskode5Siffer næringskode5Siffer,
-      ÅrstallOgKvartal årstallOgKvartal,
-      Varighetskategori varighetskategori,
-      int tapteDagsverk) {
+          NamedParameterJdbcTemplate jdbcTemplate,
+          BedreNæringskode næringskode,
+          ÅrstallOgKvartal årstallOgKvartal,
+          Varighetskategori varighetskategori,
+          int tapteDagsverk) {
     leggTilStatisitkkNæringMedVarighet(
         jdbcTemplate,
-        næringskode5Siffer,
+        næringskode,
         årstallOgKvartal.getÅrstall(),
         årstallOgKvartal.getKvartal(),
         varighetskategori.kode,
@@ -66,14 +66,14 @@ public class VarighetTestUtils {
   }
 
   public static void leggTilStatisitkkNæringMedVarighet(
-      NamedParameterJdbcTemplate jdbcTemplate,
-      Næringskode5Siffer næringskode5Siffer,
-      int årstall,
-      int kvartal,
-      String varighet,
-      int antallPersoner,
-      int tapteDagsverk,
-      int muligeDagsverk) {
+          NamedParameterJdbcTemplate jdbcTemplate,
+          BedreNæringskode næringskode,
+          int årstall,
+          int kvartal,
+          String varighet,
+          int antallPersoner,
+          int tapteDagsverk,
+          int muligeDagsverk) {
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_naring_med_varighet "
             + "(arstall, kvartal, naring_kode, varighet, antall_personer, tapte_dagsverk, "
@@ -89,7 +89,7 @@ public class VarighetTestUtils {
         new MapSqlParameterSource()
             .addValue("arstall", årstall)
             .addValue("kvartal", kvartal)
-            .addValue("naring_kode", næringskode5Siffer.getKode())
+            .addValue("naring_kode", næringskode.getFemsifferIdentifikator())
             .addValue("varighet", varighet)
             .addValue("antall_personer", antallPersoner)
             .addValue("tapte_dagsverk", tapteDagsverk)

@@ -30,7 +30,7 @@ import java.net.http.HttpResponse;
 import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.VarighetTestUtils;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode5Siffer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.BedreNæringskode;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori;
 import no.nav.security.mock.oauth2.MockOAuth2Server;
@@ -67,7 +67,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
   @LocalServerPort private String port;
 
   private final ObjectMapper objectMapper = new ObjectMapper();
-  private final Næringskode5Siffer BARNEHAGER = new Næringskode5Siffer("88911", "Barnehager");
+  private final BedreNæringskode BARNEHAGER = new BedreNæringskode("88911");
 
   @Test
   public void hentAgreggertStatistikk_skalReturnere403NaarBrukerIkkeRepresentererBedriften()
@@ -206,10 +206,10 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
         0,
         100);
     VarighetTestUtils.leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
-        jdbcTemplate, new Næringskode5Siffer("10300", ""), new ÅrstallOgKvartal(2022, 1), 10, 100);
+        jdbcTemplate, new BedreNæringskode("10300"), new ÅrstallOgKvartal(2022, 1), 10, 100);
     VarighetTestUtils.leggTilStatisitkkNæringMedVarighet(
         jdbcTemplate,
-        new Næringskode5Siffer("10300", ""),
+        new BedreNæringskode("10300"),
         new ÅrstallOgKvartal(2022, 1),
         Varighetskategori._1_DAG_TIL_7_DAGER,
         10);

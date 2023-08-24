@@ -92,7 +92,7 @@ open class VarighetRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværForEttKvartalMedVarighet_for_næring__skal_returnere_riktig_sykefravær() {
-        val barnehager = Næringskode5Siffer("88911", "Barnehage")
+        val barnehager = BedreNæringskode("88911")
         VarighetTestUtils.leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
             jdbcTemplate, barnehager, ÅrstallOgKvartal(2019, 2), 1, 10
         )
@@ -104,7 +104,7 @@ open class VarighetRepositoryJdbcTest {
             4
         )
         val resultat = varighetRepository.hentSykefraværMedVarighet(
-            Næring(barnehager.kode, "")
+            Næring(barnehager.næring.tosifferIdentifikator, "")
         )
         assertThat(resultat.size).isEqualTo(2)
         assertThat(resultat[0])
@@ -131,8 +131,8 @@ open class VarighetRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværForEttKvartalMedVarighet_for_bransje__skal_returnere_riktig_sykefravær() {
-        val sykehus = Næringskode5Siffer("86101", "Barnehage")
-        val legetjeneste = Næringskode5Siffer("86211", "Barnehage")
+        val sykehus = BedreNæringskode("86101")
+        val legetjeneste = BedreNæringskode("86211")
         VarighetTestUtils.leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
             jdbcTemplate, sykehus, ÅrstallOgKvartal(2019, 2), 1, 10
         )
@@ -192,9 +192,9 @@ open class VarighetRepositoryJdbcTest {
 
     @Test
     fun `hent sykefravær med varighet for næring burde returnere sykefraværsstatistikk for alle inkluderte næringskoder`() {
-        val næringskode1 = Næringskode5Siffer("84300", "Næring")
-        val næringskode2 = Næringskode5Siffer("84999", "Næring")
-        val næring1 = Næring(næringskode1.kode, "Næring 1")
+        val næringskode1 = BedreNæringskode("84300")
+        val næringskode2 = BedreNæringskode("84999")
+        val næring1 = Næring(næringskode1.næring.tosifferIdentifikator, "Næring 1")
 
         // Populer databasen med statistikk for to næringskoder, som har felles næring
         VarighetTestUtils.leggTilStatisitkkNæringMedVarighet(jdbcTemplate, næringskode1, 2023, 1, "E", 20, 100, 1000)
