@@ -69,12 +69,14 @@ class VirksomhetMetadataRepositoryJdbcTest {
         new VirksomhetMetadataNæringskode5siffer(
             new Orgnr(ORGNR_VIRKSOMHET_1),
             new ÅrstallOgKvartal(2020, 3),
-            new NæringOgNæringskode5siffer(NÆRINGSKODE_2SIFFER, "10001"));
+            new BedreNæringskode("10001")
+        );
     VirksomhetMetadataNæringskode5siffer virksomhetMetadataNæringskode5siffer2 =
         new VirksomhetMetadataNæringskode5siffer(
             new Orgnr(ORGNR_VIRKSOMHET_1),
             new ÅrstallOgKvartal(2020, 3),
-            new NæringOgNæringskode5siffer(NÆRINGSKODE_2SIFFER, "10002"));
+            new BedreNæringskode("10002")
+        );
 
     repository.opprettVirksomhetMetadataNæringskode5siffer(
         Arrays.asList(
@@ -168,8 +170,8 @@ class VirksomhetMetadataRepositoryJdbcTest {
             new VirksomhetMetadataNæringskode5siffer(
                 new Orgnr(rs.getString("orgnr")),
                 new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
-                new NæringOgNæringskode5siffer(
-                    rs.getString("naring_kode"), rs.getString("naring_kode_5siffer"))));
+                new BedreNæringskode(rs.getString("naring_kode_5siffer"))
+            ));
   }
 
   private int opprettTestVirksomhetMetaData(int årstall, int kvartal) {

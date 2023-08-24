@@ -11,17 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.NæringOgNæringskode5siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetMetadataNæringskode5siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Virksomhet;
+
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransjeprogram;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sykefraværsdata;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -58,8 +51,8 @@ public class GraderingRepository {
               new VirksomhetMetadataNæringskode5siffer(
                   new Orgnr(rs.getString("orgnr")),
                   new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
-                  new NæringOgNæringskode5siffer(
-                      rs.getString("naring"), rs.getString("naring_kode"))));
+                  new BedreNæringskode(rs.getString("naring_kode"))
+              ));
     } catch (EmptyResultDataAccessException e) {
       return Collections.emptyList();
     }

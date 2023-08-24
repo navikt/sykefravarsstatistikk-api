@@ -100,17 +100,20 @@ class PostImporteringServiceTest {
                 new VirksomhetMetadataNæringskode5siffer(
                         new Orgnr(ORGNR_VIRKSOMHET_1),
                         årstallOgKvartal,
-                        new NæringOgNæringskode5siffer("10", "10101")));
+                        new BedreNæringskode("10101")
+                ));
         virksomhetMetadataNæringskode5siffer.add(
                 new VirksomhetMetadataNæringskode5siffer(
                         new Orgnr(ORGNR_VIRKSOMHET_1),
                         årstallOgKvartal,
-                        new NæringOgNæringskode5siffer("10", "10102")));
+                        new BedreNæringskode("10102")
+                ));
         virksomhetMetadataNæringskode5siffer.add(
                 new VirksomhetMetadataNæringskode5siffer(
                         new Orgnr(ORGNR_VIRKSOMHET_1),
                         årstallOgKvartal,
-                        new NæringOgNæringskode5siffer("20", "20101")));
+                        new BedreNæringskode("20101")
+                ));
 
         return virksomhetMetadataNæringskode5siffer;
     }

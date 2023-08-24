@@ -2,16 +2,12 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
 
 class BedreNæring(
-    tosifferIdentifikator: String,
+    val tosifferIdentifikator: String
 ) {
-    val identifikator = Nærigsidentifikator(tosifferIdentifikator)
-    val navn = næringer[identifikator.identifikator]
-}
-
-data class Nærigsidentifikator(val identifikator: String) {
     init {
-        require(næringer.containsKey(identifikator)) { "Identifikatoren til næringen '$identifikator' finnes ikke." }
+        require(næringer.containsKey(tosifferIdentifikator)) { "Identifikatoren til næringen '$tosifferIdentifikator' finnes ikke." }
     }
+    val navn = næringer[tosifferIdentifikator]
 }
 
 private val næringer = mapOf(

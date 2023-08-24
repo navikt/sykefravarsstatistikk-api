@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
 data class BedreNæringskode(
-    val identifikator: String
+    val femsifferIdentifikator: String
 ) {
-    val næring = BedreNæring(identifikator.take(2))
+    val næring = BedreNæring(femsifferIdentifikator.take(2))
 }
