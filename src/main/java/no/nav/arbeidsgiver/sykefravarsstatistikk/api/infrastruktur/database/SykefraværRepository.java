@@ -137,7 +137,7 @@ public class SykefraværRepository {
 
   public Sykefraværsdata hentTotaltSykefraværAlleKategorier(
       Virksomhet virksomhet, ÅrstallOgKvartal fraÅrstallOgKvartal) {
-    Næring næring = new Næring(virksomhet.getNæringskode().getKode(), "");
+    Næring næring = new Næring(virksomhet.getNæringskode().getFemsifferIdentifikator(), "");
 
 
     // TODO: virksomhet.hentNæringskode skal returnerer i henhold til logikk

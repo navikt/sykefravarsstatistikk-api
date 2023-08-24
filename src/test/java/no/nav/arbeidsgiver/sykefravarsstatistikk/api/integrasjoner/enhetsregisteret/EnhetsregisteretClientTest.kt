@@ -56,7 +56,7 @@ class EnhetsregisteretClientTest {
             OverordnetEnhet(
                 orgnr = Orgnr("999263550"),
                 navn = "NAV ARBEID OG YTELSER",
-                næringskode = Næringskode5Siffer("84300", "Trygdeordninger underlagt offentlig forvaltning"),
+                næringskode = BedreNæringskode("84300"),
                 sektor = Sektor.STATLIG,
                 antallAnsatte = 40
             )
@@ -164,7 +164,7 @@ class EnhetsregisteretClientTest {
                 orgnr = Orgnr("971800534"),
                 navn = "NAV ARBEID OG YTELSER AVD OSLO",
                 overordnetEnhetOrgnr = Orgnr("999263550"),
-                næringskode = Næringskode5Siffer("84300", "Trygdeordninger underlagt offentlig forvaltning"),
+                næringskode = BedreNæringskode("84300"),
                 antallAnsatte = 40
             )
         )

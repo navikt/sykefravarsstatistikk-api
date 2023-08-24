@@ -124,9 +124,9 @@ public class KvartalsvisSykefraværshistorikkService {
 
   protected CompletableFuture<KvartalsvisSykefraværshistorikk>
       uthentingAvSykefraværshistorikkNæring(Virksomhet underenhet) {
-    Næringskode5Siffer næring5siffer = underenhet.getNæringskode();
+    BedreNæringskode næring5siffer = underenhet.getNæringskode();
     return uthentingMedTimeout(
-            () -> klassifikasjonerRepository.hentNæring(næring5siffer.hentNæringskode2Siffer()))
+            () -> klassifikasjonerRepository.hentNæring(næring5siffer.getNæring().getTosifferIdentifikator()))
         .thenCompose(
             næring ->
                 uthentingMedFeilhåndteringOgTimeout(
@@ -141,7 +141,7 @@ public class KvartalsvisSykefraværshistorikkService {
                 log.warn(
                     format(
                         "Fikk '%s' ved uthenting av næring '%s'. " + "Returnerer en tom liste",
-                        throwable.getMessage(), næring5siffer.hentNæringskode2Siffer()),
+                        throwable.getMessage(), næring5siffer.getNæring().getTosifferIdentifikator()),
                     throwable);
                 return new KvartalsvisSykefraværshistorikk(
                     Statistikkategori.NÆRING, null, List.of());

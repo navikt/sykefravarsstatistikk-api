@@ -45,7 +45,7 @@ open class VarighetRepositoryJdbcTest {
             Orgnr("999999999"),
             Orgnr("1111111111"),
             "test Barnehage",
-            Næringskode5Siffer("88911", "Barnehage"),
+            BedreNæringskode("88911"),
             10
         )
         VarighetTestUtils.leggTilVirksomhetsstatistikkMedVarighet(

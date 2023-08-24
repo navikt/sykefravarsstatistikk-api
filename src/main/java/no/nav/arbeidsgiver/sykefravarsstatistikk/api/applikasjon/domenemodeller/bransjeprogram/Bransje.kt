@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode5Siffer
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.BedreNæringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UnderenhetLegacy
 
 data class Bransje(
@@ -19,12 +19,9 @@ data class Bransje(
         return inkludererNæringskode(underenhet.næringskode)
     }
 
-    private fun inkludererNæringskode(næringskode5Siffer: Næringskode5Siffer?): Boolean {
-        val næringskode = næringskode5Siffer!!.kode
+    private fun inkludererNæringskode(næringskode: BedreNæringskode): Boolean {
         return koderSomSpesifisererNæringer.stream().anyMatch { prefix: String? ->
-            næringskode.startsWith(
-                prefix!!
-            )
+            næringskode.femsifferIdentifikator.startsWith(prefix!!)
         }
     }
 

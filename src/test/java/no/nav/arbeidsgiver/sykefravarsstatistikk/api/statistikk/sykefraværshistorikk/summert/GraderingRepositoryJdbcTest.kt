@@ -103,7 +103,7 @@ open class GraderingRepositoryJdbcTest {
             jdbcTemplate,
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
             PRODUKSJON_AV_KLÆR.kode,
-            UNDERENHET_1_NÆRING_14.næringskode.kode,
+            UNDERENHET_1_NÆRING_14.næringskode.femsifferIdentifikator,
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
             _2019_4,
             7,
@@ -157,7 +157,7 @@ open class GraderingRepositoryJdbcTest {
             jdbcTemplate,
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
             PRODUKSJON_AV_KLÆR.kode,
-            UNDERENHET_1_NÆRING_14.næringskode.kode,
+            UNDERENHET_1_NÆRING_14.næringskode.femsifferIdentifikator,
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
             _2019_4,
             7,
@@ -207,9 +207,9 @@ open class GraderingRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværForEttKvartalMedGradering__skal_returnere_riktig_sykefravær_for_bransje() {
-        val (kode) = Næringskode5Siffer("86101", "Alminnelige somatiske sykehus")
-        val (kode1) = Næringskode5Siffer("86211", "Allmenn legetjeneste")
-        val (kode2) = Næringskode5Siffer("86902", "Fysioterapitjeneste")
+        val (kode) = BedreNæringskode("86101")
+        val (kode1) = BedreNæringskode("86211")
+        val (kode2) = BedreNæringskode("86902")
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
@@ -278,7 +278,7 @@ open class GraderingRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværForEttKvartalMedGradering__henterIkkeUtGradertSykefraværForOverordnetEnhet() {
-        val (kode) = Næringskode5Siffer("86101", "Alminnelige somatiske sykehus")
+        val (kode) = BedreNæringskode("86101")
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
             OVERORDNETENHET_1_NÆRING_86.orgnr.verdi,
@@ -323,7 +323,7 @@ open class GraderingRepositoryJdbcTest {
         private val OVERORDNETENHET_1_NÆRING_86 = OverordnetEnhet(
             orgnr = Orgnr("999999777"),
             navn = "Hospital",
-            næringskode = Næringskode5Siffer("86101", "Alminnelige somatiske sykehus"),
+            næringskode = BedreNæringskode("86101"),
             sektor = Sektor.PRIVAT,
         )
 
@@ -331,21 +331,21 @@ open class GraderingRepositoryJdbcTest {
             Orgnr("999999999"),
             null,
             null.toString(),
-            Næringskode5Siffer("14120", "Produksjon av arbeidstøy"),
+            BedreNæringskode("14120"),
             null
         )
         private val UNDERENHET_2_NÆRING_15 = UnderenhetLegacy(
             Orgnr("888888888"),
             null,
             null.toString(),
-            Næringskode5Siffer("15100", "andre_næringskode"),
+            BedreNæringskode("15100"),
             null
         )
         private val UNDERENHET_3_NÆRING_14 = UnderenhetLegacy(
             Orgnr("777777777"),
             null,
             null.toString(),
-            Næringskode5Siffer("14120", "Produksjon av arbeidstøy"),
+            BedreNæringskode("14120"),
             null
         )
         private val _2020_1 = ÅrstallOgKvartal(2020, 1)
