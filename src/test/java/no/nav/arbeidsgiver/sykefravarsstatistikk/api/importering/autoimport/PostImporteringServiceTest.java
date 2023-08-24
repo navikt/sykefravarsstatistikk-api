@@ -9,6 +9,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.D
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkRepository;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,6 +19,7 @@ import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_1;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_2;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.kotlin.OngoingStubbingKt.whenever;
@@ -50,6 +52,21 @@ class PostImporteringServiceTest {
                         kafkaUtsendingHistorikkRepository
                 );
     }
+
+    @Test
+    public void
+    fullførPostImporteringOgForberedNesteEksport__returnerer_antall_virksomheter_som_skal_til_neste_eksport() {
+        mockImportVirksomhetMetadata(__2020_4, getOrgenhetListe(__2020_4));
+        mockImportVirksomhetNæringskode5sifferMapping(
+                __2020_4, getVirksomhetMetadataNæringskode5sifferListe(__2020_4));
+        mockForberedNesteEksport(__2020_4, getVirksomhetMetadataListe(__2020_4));
+
+        service.overskrivMetadataForVirksomheter(__2020_4);
+        service.overskrivNæringskoderForVirksomheter(__2020_4);
+        Integer antall = service.forberedNesteEksport(__2020_4, true).getOrNull();
+        assertEquals(2, antall);
+    }
+
 
     private void mockForberedNesteEksport(
             ÅrstallOgKvartal årstallOgKvartal, List<VirksomhetMetadata> virksomhetMetadataListe) {

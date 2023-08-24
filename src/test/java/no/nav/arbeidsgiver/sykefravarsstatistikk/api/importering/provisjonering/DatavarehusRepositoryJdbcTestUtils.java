@@ -22,17 +22,6 @@ public class DatavarehusRepositoryJdbcTestUtils {
         String.format("delete from %s", tabell), new MapSqlParameterSource());
   }
 
-  public static void insertSektorInDvhTabell(
-      NamedParameterJdbcTemplate jdbcTemplate, String kode, String navn) {
-    MapSqlParameterSource params =
-        new MapSqlParameterSource().addValue("sektorkode", kode).addValue("sektornavn", navn);
-
-    jdbcTemplate.update(
-        "insert into dt_p.v_dim_ia_sektor (sektorkode, sektornavn) "
-            + "values (:sektorkode, :sektornavn)",
-        params);
-  }
-
   public static void insertNæringInDvhTabell(
       NamedParameterJdbcTemplate jdbcTemplate,
       String næringkode,

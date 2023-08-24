@@ -27,6 +27,7 @@ class PostImporteringService(
 
     object IngenRaderImportert
 
+
     fun overskrivMetadataForVirksomheter(årstallOgKvartal: ÅrstallOgKvartal): Either<IngenRaderImportert, Int> {
         val antallRaderOpprettet = overskrivVirksomhetMetadata(årstallOgKvartal)
         log.info(
