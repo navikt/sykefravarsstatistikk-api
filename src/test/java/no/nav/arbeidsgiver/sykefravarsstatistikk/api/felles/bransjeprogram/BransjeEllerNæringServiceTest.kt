@@ -2,10 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.BransjeEllerNæringService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.NæringOgNæringskode5siffer
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode5Siffer
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetMetadata
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.ORGNR_VIRKSOMHET_1
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.ORGNR_VIRKSOMHET_2
@@ -20,7 +17,6 @@ import org.mockito.Mockito.mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
-import java.util.List
 
 @ExtendWith(MockitoExtension::class)
 class BransjeEllerNæringServiceTest {
@@ -33,7 +29,7 @@ class BransjeEllerNæringServiceTest {
         ORGNR_VIRKSOMHET_1,
         "Virksomhet 1",
         DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
-        "1",
+        Sektor.STATLIG,
         "88",
         "88000",
         TestUtils.SISTE_PUBLISERTE_KVARTAL
@@ -65,7 +61,7 @@ class BransjeEllerNæringServiceTest {
     @Test
     fun finnBransejFraMetadata__skalFinneRiktigBransjeFraMetadata() {
         virksomhetMetadata.leggTilNæringOgNæringskode5siffer(
-            List.of(
+            listOf(
                 NæringOgNæringskode5siffer(barnehage.hentNæringskode2Siffer(), barnehage.kode),
                 NæringOgNæringskode5siffer("00", "00000")
             )
@@ -91,14 +87,14 @@ class BransjeEllerNæringServiceTest {
             ORGNR_VIRKSOMHET_2,
             "Virksomhet 2",
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
-            "1",
+            Sektor.STATLIG,
             "11",
             "11000",
             TestUtils.SISTE_PUBLISERTE_KVARTAL
         )
         val resultat = bransjeEllerNæringService!!.finnBransjeFraMetadata(
             virksomhetMetadata2,
-            List.of(
+            listOf(
                 Næring("02", "Skogbruk og tjenester tilknyttet skogbruk"),
                 Næring("11", "Produksjon av drikkevarer")
             )

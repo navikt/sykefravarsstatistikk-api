@@ -10,8 +10,14 @@ enum class SektorKafkaDto(val ssbSektorkode: String) {
     UKJENT("0");
 
     companion object {
-        fun fraDomene(sektor: Sektor): SektorKafkaDto =
-            entries.find { it.ssbSektorkode == sektor.sektorkode.kode } ?: UKJENT
+        fun fraDomene(domeneSektor: Sektor): SektorKafkaDto =
+            when (domeneSektor) {
+                Sektor.STATLIG -> STATLIG
+                Sektor.KOMMUNAL -> KOMMUNAL
+                Sektor.PRIVAT -> PRIVAT
+                Sektor.FYLKESKOMMUNAL -> FYLKESKOMMUNAL_FORVALTNING
+                Sektor.UKJENT -> UKJENT
+            }
     }
 
 }

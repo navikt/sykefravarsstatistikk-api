@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sektor
 
@@ -31,4 +31,5 @@ private val enhetsregisterSektorkoder = mapOf(
     "9000" to "3"
 )
 
-fun fraEnhetsregisteretSektor(fireSifferKode: String) = enhetsregisterSektorkoder[fireSifferKode]?.let { Sektor(it) }
+fun fraEnhetsregisteretSektor(fireSifferKode: String) =
+    enhetsregisterSektorkoder[fireSifferKode]?.let { Sektor.fraSektorkode(it) }

@@ -103,10 +103,10 @@ class PostImporteringServiceTest {
         List<Orgenhet> orgenhetSomSkalTilVirksomhetMetadata = new ArrayList<>();
         orgenhetSomSkalTilVirksomhetMetadata.add(
                 new Orgenhet(
-                        new Orgnr(ORGNR_VIRKSOMHET_1), "Virksomhet 1", "2", "3", "10", "10000", årstallOgKvartal));
+                        new Orgnr(ORGNR_VIRKSOMHET_1), "Virksomhet 1", "2", Sektor.PRIVAT, "10", "10000", årstallOgKvartal));
         orgenhetSomSkalTilVirksomhetMetadata.add(
                 new Orgenhet(
-                        new Orgnr(ORGNR_VIRKSOMHET_2), "Virksomhet 2", "2", "3", "20", "20000", årstallOgKvartal));
+                        new Orgnr(ORGNR_VIRKSOMHET_2), "Virksomhet 2", "2", Sektor.PRIVAT, "20", "20000", årstallOgKvartal));
 
         return orgenhetSomSkalTilVirksomhetMetadata;
     }
@@ -115,10 +115,10 @@ class PostImporteringServiceTest {
         List<VirksomhetMetadata> virksomhetMetadataListe = new ArrayList<>();
         virksomhetMetadataListe.add(
                 new VirksomhetMetadata(
-                        new Orgnr(ORGNR_VIRKSOMHET_1), "Virksomhet 1", "2", "3", "10", "10000", årstallOgKvartal));
+                        new Orgnr(ORGNR_VIRKSOMHET_1), "Virksomhet 1", "2", Sektor.PRIVAT, "10", "10000", årstallOgKvartal));
         virksomhetMetadataListe.add(
                 new VirksomhetMetadata(
-                        new Orgnr(ORGNR_VIRKSOMHET_2), "Virksomhet 2", "2", "3", "20", "20000", årstallOgKvartal));
+                        new Orgnr(ORGNR_VIRKSOMHET_2), "Virksomhet 2", "2", Sektor.PRIVAT, "20", "20000", årstallOgKvartal));
 
         return virksomhetMetadataListe;
     }

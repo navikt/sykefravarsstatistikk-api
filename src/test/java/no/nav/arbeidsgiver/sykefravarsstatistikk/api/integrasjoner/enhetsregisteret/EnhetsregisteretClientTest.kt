@@ -57,7 +57,7 @@ class EnhetsregisteretClientTest {
                 orgnr = Orgnr("999263550"),
                 navn = "NAV ARBEID OG YTELSER",
                 næringskode = Næringskode5Siffer("84300", "Trygdeordninger underlagt offentlig forvaltning"),
-                institusjonellSektorkode = InstitusjonellSektorkode("6100", "Statsforvaltningen"),
+                sektor = Sektor.STATLIG,
                 antallAnsatte = 40
             )
         )

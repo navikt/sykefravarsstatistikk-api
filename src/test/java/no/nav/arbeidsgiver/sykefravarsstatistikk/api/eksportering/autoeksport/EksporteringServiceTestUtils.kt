@@ -68,7 +68,7 @@ object EksporteringServiceTestUtils {
     var sektorSykefravær =
         SykefraværMedKategori(
             Statistikkategori.SEKTOR,
-            "1",
+            Sektor.STATLIG.sektorkode,
             __2020_2,
             BigDecimal(1340),
             BigDecimal(88000),
@@ -88,27 +88,27 @@ object EksporteringServiceTestUtils {
 
     @JvmField
     var virksomhet1Metadata_2020_4 = VirksomhetMetadata(
-        ORGNR_VIRKSOMHET_1, "Virksomhet 1", DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET, "1", "11", "11111", __2020_4
+        ORGNR_VIRKSOMHET_1, "Virksomhet 1", DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET, Sektor.STATLIG, "11", "11111", __2020_4
     )
 
     @JvmField
     val virksomhet2Metadata_2020_4 = VirksomhetMetadata(
-        ORGNR_VIRKSOMHET_2, "Virksomhet 2", DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET, "2", "22", "22222", __2020_4
+        ORGNR_VIRKSOMHET_2, "Virksomhet 2", DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET, Sektor.KOMMUNAL, "22", "22222", __2020_4
     )
 
     @JvmField
     val virksomhet3Metadata_2020_4 = VirksomhetMetadata(
-        ORGNR_VIRKSOMHET_3, "Virksomhet 3", DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET, "3", "33", "33333", __2020_4
+        ORGNR_VIRKSOMHET_3, "Virksomhet 3", DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET, Sektor.PRIVAT, "33", "33333", __2020_4
     )
 
     @JvmField
     val virksomhet1Metadata_2021_1 = VirksomhetMetadata(
-        ORGNR_VIRKSOMHET_1, "Virksomhet 1", DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET, "1", "11", "11111", __2021_1
+        ORGNR_VIRKSOMHET_1, "Virksomhet 1", DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET, Sektor.STATLIG, "11", "11111", __2021_1
     )
 
     @JvmField
     val virksomhet1Metadata_2021_2 = VirksomhetMetadata(
-        ORGNR_VIRKSOMHET_1, "Virksomhet 1", DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET, "1", "11", "11111", __2021_2
+        ORGNR_VIRKSOMHET_1, "Virksomhet 1", DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET, Sektor.STATLIG, "11", "11111", __2021_2
     )
 
     @JvmStatic
@@ -119,7 +119,7 @@ object EksporteringServiceTestUtils {
             ORGNR_VIRKSOMHET_1,
             "Virksomhet 1",
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
-            "1",
+            Sektor.STATLIG,
             "86",
             "86000",
             årstallOgKvartal!!
@@ -241,7 +241,7 @@ object EksporteringServiceTestUtils {
         return SykefraværsstatistikkSektor(
             virksomhetMetadata.årstall,
             virksomhetMetadata.kvartal,
-            virksomhetMetadata.sektor,
+            virksomhetMetadata.sektor.sektorkode,
             antallPersoner,
             BigDecimal(tapteDagsverk),
             BigDecimal(muligeDagsverk)
@@ -255,7 +255,7 @@ object EksporteringServiceTestUtils {
         return SykefraværsstatistikkSektor(
             virksomhetMetadata.årstall,
             virksomhetMetadata.kvartal,
-            virksomhetMetadata.sektor,
+            virksomhetMetadata.sektor.sektorkode,
             156,
             BigDecimal(3678),
             BigDecimal(188000)
@@ -316,13 +316,13 @@ object EksporteringServiceTestUtils {
         )
 
     @JvmField
-    val virksomhetMetadata = VirksomhetMetadata(Orgnr("987654321"), "Virksomhet 1", "2", "1", "11", "11111", __2020_2)
+    val virksomhetMetadata = VirksomhetMetadata(Orgnr("987654321"), "Virksomhet 1", "2", Sektor.STATLIG, "11", "11111", __2020_2)
 
     @JvmStatic
     fun sykefraværsstatistikkLandSiste4Kvartaler(
         årstallOgKvartal: ÅrstallOgKvartal
     ): List<UmaskertSykefraværForEttKvartal> {
-        return java.util.List.of(
+        return listOf(
             UmaskertSykefraværForEttKvartal(
                 årstallOgKvartal, BigDecimal(10000000), BigDecimal(500000000), 2500000
             ),
@@ -351,7 +351,7 @@ object EksporteringServiceTestUtils {
     val sykefraværsstatistikkSektor = SykefraværsstatistikkSektor(
         __2020_2.årstall,
         __2020_2.kvartal,
-        "1",
+        Sektor.STATLIG.sektorkode,
         33000,
         BigDecimal(1340),
         BigDecimal(88000)

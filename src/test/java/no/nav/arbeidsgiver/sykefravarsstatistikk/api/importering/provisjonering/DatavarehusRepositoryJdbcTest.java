@@ -26,7 +26,6 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjo
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository.RECTYPE_FOR_FORETAK;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ActiveProfiles("db-test")
@@ -441,18 +440,6 @@ public class DatavarehusRepositoryJdbcTest {
   }
 
   @Test
-  public void hentAlleSektorer__returnerer_eksisterende_Sektor() {
-    insertSektorInDvhTabell(namedParameterJdbcTemplate, "9", "Fylkeskommunal forvaltning");
-    insertSektorInDvhTabell(namedParameterJdbcTemplate, "0", "Ukjent");
-
-    List<Sektor> sektorer = repository.hentAlleSektorer();
-
-    assertEquals(2, sektorer.size());
-    assertTrue(sektorer.contains(new Sektor("0", "Ukjent")));
-    assertTrue(sektorer.contains(new Sektor("9", "Fylkeskommunal forvaltning")));
-  }
-
-  @Test
   public void hentAlleNæringer__returnerer_eksisterende_Næring() {
     insertNæringInDvhTabell(
         namedParameterJdbcTemplate, "02", "01", "Skogbruk og tjenester tilknyttet skogbruk");
@@ -469,7 +456,7 @@ public class DatavarehusRepositoryJdbcTest {
     insertOrgenhetInDvhTabell(
         namedParameterJdbcTemplate,
         ORGNR_VIRKSOMHET_1,
-        SEKTOR,
+        Sektor.PRIVAT.getSektorkode(),
         NÆRINGSKODE_2SIFFER,
         "10.111",
         2020,
@@ -483,7 +470,7 @@ public class DatavarehusRepositoryJdbcTest {
                 new Orgnr(ORGNR_VIRKSOMHET_1),
                 "",
                 RECTYPE_FOR_VIRKSOMHET,
-                SEKTOR,
+                Sektor.PRIVAT,
                 NÆRINGSKODE_2SIFFER,
                 "10111",
                 new ÅrstallOgKvartal(2020, 3))));

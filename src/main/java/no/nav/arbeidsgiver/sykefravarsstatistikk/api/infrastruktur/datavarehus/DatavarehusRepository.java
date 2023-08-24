@@ -19,9 +19,6 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
 
   public static final String NARINGKODE = "naringkode";
   public static final String NARINGNAVN = "naringnavn";
-  public static final String SEKTORKODE = "sektorkode";
-  public static final String SEKTORNAVN = "sektornavn";
-
   public static final String ARSTALL = "arstall";
   public static final String KVARTAL = "kvartal";
   public static final String SEKTOR = "sektor";
@@ -266,20 +263,6 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
                 resultSet.getInt(SUM_ANTALL_PERSONER),
                 resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
-  }
-
-  /*
-   Klassifikasjoner
-  */
-
-  public List<Sektor> hentAlleSektorer() {
-    SqlParameterSource namedParameters = new MapSqlParameterSource();
-
-    return namedParameterJdbcTemplate.query(
-        "select sektorkode, sektornavn from dt_p.v_dim_ia_sektor",
-        namedParameters,
-        (resultSet, rowNum) ->
-            new Sektor(resultSet.getString(SEKTORKODE), resultSet.getString(SEKTORNAVN)));
   }
 
   public List<Næring> hentAlleNæringer() {

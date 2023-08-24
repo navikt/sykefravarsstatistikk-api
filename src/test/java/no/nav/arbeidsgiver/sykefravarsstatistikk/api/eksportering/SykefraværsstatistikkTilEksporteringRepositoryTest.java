@@ -42,8 +42,6 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     private final Næringskode5Siffer undervisning = new Næringskode5Siffer("86907", "Undervisning");
     private final Næring utdanning = new Næring("86", "Utdanning");
     private final Næring produksjon = new Næring("14", "Produksjon");
-    private final Sektor kommunalForvaltning = new Sektor("1", "Kommunal forvaltning");
-    private final Sektor næringsvirksomhet = new Sektor("3", "Privat og offentlig næringsvirksomhet");
     private final String VIRKSOMHET_1 = "999999999";
     private final String VIRKSOMHET_2 = "999999998";
 
@@ -86,17 +84,17 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 repository.hentSykefraværprosentAlleSektorer(new ÅrstallOgKvartal(2019, 2));
 
         assertThat(resultat.size()).isEqualTo(2);
-        assertSykefraværsstatistikkForSektorIsEqual(resultat, 2019, 2, 3, kommunalForvaltning, 1, 60);
-        assertSykefraværsstatistikkForSektorIsEqual(resultat, 2019, 2, 4, næringsvirksomhet, 9, 100);
+        assertSykefraværsstatistikkForSektorIsEqual(resultat, 2019, 2, 3, Sektor.KOMMUNAL, 1, 60);
+        assertSykefraværsstatistikkForSektorIsEqual(resultat, 2019, 2, 4, Sektor.PRIVAT, 9, 100);
 
         List<SykefraværsstatistikkSektor> resultat_2019_1 =
                 repository.hentSykefraværprosentAlleSektorer(new ÅrstallOgKvartal(2019, 1));
 
         assertThat(resultat_2019_1.size()).isEqualTo(2);
         assertSykefraværsstatistikkForSektorIsEqual(
-                resultat_2019_1, 2019, 1, 40, kommunalForvaltning, 20, 115);
+                resultat_2019_1, 2019, 1, 40, Sektor.KOMMUNAL, 20, 115);
         assertSykefraværsstatistikkForSektorIsEqual(
-                resultat_2019_1, 2019, 1, 7, næringsvirksomhet, 12, 100);
+                resultat_2019_1, 2019, 1, 7, Sektor.PRIVAT, 12, 100);
     }
 
     @Test
@@ -396,8 +394,8 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
             int muligeDagsverk) {
         List<SykefraværsstatistikkSektor> statistikkForSektor =
                 actual.stream()
-                        .filter(sfSektor -> sfSektor.getSektorkode().equals(sektor.getKode()))
-                        .collect(Collectors.toList());
+                        .filter(sfSektor -> sfSektor.getSektorkode().equals(sektor.getSektorkode()))
+                        .toList();
         assertThat(statistikkForSektor.size()).isEqualTo(1);
         assertSykefraværsstatistikkIsEqual(
                 statistikkForSektor.get(0),
@@ -423,7 +421,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                                         sfVirksomhet.getOrgnr().equals(orgnr)
                                                 && sfVirksomhet.getårstall() == årstall
                                                 && sfVirksomhet.getKvartal() == kvartal)
-                        .collect(Collectors.toList());
+                        .toList();
         assertThat(statistikkForVirksomhet.size()).isEqualTo(1);
         assertSykefraværsstatistikkIsEqual(
                 statistikkForVirksomhet.get(0),
@@ -445,7 +443,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
         List<SykefraværsstatistikkNæring> statistikkForNæring =
                 actual.stream()
                         .filter(sfNæring -> sfNæring.getNæringkode().equals(næring.getKode()))
-                        .collect(Collectors.toList());
+                        .toList();
         assertThat(statistikkForNæring.size()).isEqualTo(1);
         assertSykefraværsstatistikkIsEqual(
                 statistikkForNæring.get(0),
@@ -503,10 +501,10 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     }
 
     private void opprettStatistikkSektorTestData() {
-        createStatistikkSektor(kommunalForvaltning, 2019, 2, 3, 1, 60);
-        createStatistikkSektor(kommunalForvaltning, 2019, 1, 40, 20, 115);
-        createStatistikkSektor(næringsvirksomhet, 2019, 2, 4, 9, 100);
-        createStatistikkSektor(næringsvirksomhet, 2019, 1, 7, 12, 100);
+        createStatistikkSektor(Sektor.KOMMUNAL, 2019, 2, 3, 1, 60);
+        createStatistikkSektor(Sektor.KOMMUNAL, 2019, 1, 40, 20, 115);
+        createStatistikkSektor(Sektor.PRIVAT, 2019, 2, 4, 9, 100);
+        createStatistikkSektor(Sektor.PRIVAT, 2019, 1, 7, 12, 100);
     }
 
     private void opprettStatistikkVirksomhetTestData() {
@@ -573,7 +571,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                         new SykefraværsstatistikkSektor(
                                 årstall,
                                 kvartal,
-                                sektor.getKode(),
+                                sektor.getSektorkode(),
                                 antallPersoner,
                                 new BigDecimal(tapteDagsverk),
                                 new BigDecimal(muligeDagsverk))));

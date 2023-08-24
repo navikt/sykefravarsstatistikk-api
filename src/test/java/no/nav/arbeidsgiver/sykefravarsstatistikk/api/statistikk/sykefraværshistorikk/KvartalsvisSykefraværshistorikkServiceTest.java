@@ -1,11 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.EnhetsregisteretSektorMappingKt;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.KvartalsvisSykefraværshistorikkService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KlassifikasjonerRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KvartalsvisSykefraværRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
@@ -26,7 +23,6 @@ import static org.mockito.Mockito.*;
 public class KvartalsvisSykefraværshistorikkServiceTest {
 
   @Mock private KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository;
-  @Mock private EnhetsregisteretClient enhetsregisteretClient;
   @Mock private KlassifikasjonerRepository klassifikasjonerRepository;
 
   KvartalsvisSykefraværshistorikkService kvartalsvisSykefraværshistorikkService;
@@ -41,11 +37,11 @@ public class KvartalsvisSykefraværshistorikkServiceTest {
     when(EnhetsregisteretSektorMappingKt.fraEnhetsregisteretSektor(any()))
         .thenReturn(new Sektor("1"));
     when(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand())
-        .thenReturn(Arrays.asList(sykefraværprosent("Norge")));
+        .thenReturn(List.of(sykefraværprosent()));
     when(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(any()))
-        .thenReturn(Arrays.asList(sykefraværprosent("Statlig forvlatning")));
+        .thenReturn(List.of(sykefraværprosent()));
     when(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(any()))
-        .thenReturn(Arrays.asList(sykefraværprosent("Test Virksomhet")));
+        .thenReturn(List.of(sykefraværprosent()));
   }
 
   @Test
@@ -74,7 +70,7 @@ public class KvartalsvisSykefraværshistorikkServiceTest {
 
     List<KvartalsvisSykefraværshistorikk> kvartalsvisSykefraværshistorikk =
         kvartalsvisSykefraværshistorikkService.hentSykefraværshistorikk(
-            underenhet, enInstitusjonellSektorkode());
+            underenhet, Sektor.PRIVAT);
 
     assertThatHistorikkHarKategori(kvartalsvisSykefraværshistorikk, Statistikkategori.NÆRING, true);
     assertThatHistorikkHarKategori(kvartalsvisSykefraværshistorikk, Statistikkategori.LAND, true);
@@ -95,7 +91,7 @@ public class KvartalsvisSykefraværshistorikkServiceTest {
         .isEqualTo(expected);
   }
 
-  private static SykefraværForEttKvartal sykefraværprosent(String label) {
+  private static SykefraværForEttKvartal sykefraværprosent() {
     return new SykefraværForEttKvartal(
         new ÅrstallOgKvartal(2019, 1), new BigDecimal(50), new BigDecimal(100), 10);
   }

@@ -1,11 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.SEKTOR;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
-
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 
 public class DatavarehusRepositoryJdbcTestUtils {
 
@@ -151,7 +151,7 @@ public class DatavarehusRepositoryJdbcTestUtils {
             .addValue("orgnr", orgnr)
             .addValue("varighet", varighet.kode)
             .addValue("naering_kode", næringskode5siffer)
-            .addValue("sektor", SEKTOR)
+            .addValue("sektor", Sektor.PRIVAT.getSektorkode())
             .addValue("kjonn", kjonn)
             .addValue("taptedv", taptedagsverk)
             .addValue("muligedv", muligedagsverk)

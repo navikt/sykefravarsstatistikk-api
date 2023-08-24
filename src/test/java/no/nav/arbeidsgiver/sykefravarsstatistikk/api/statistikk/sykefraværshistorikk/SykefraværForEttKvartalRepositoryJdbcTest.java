@@ -19,13 +19,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.*;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori._1_DAG_TIL_7_DAGER;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori._8_UKER_TIL_20_UKER;
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension.class)
@@ -64,19 +63,18 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
 
   @Test
   public void hentSykefraværprosentSektor__skal_returnere_riktig_sykefravær() {
-    Sektor statligForvaltning = new Sektor("1", "Statlig forvaltning");
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
             + "VALUES (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-        parametre(statligForvaltning, 2019, 2, 10, 2, 100));
+        parametre(Sektor.STATLIG, 2019, 2, 10, 2, 100));
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
             + "VALUES (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-        parametre(statligForvaltning, 2019, 1, 10, 3, 100));
+        parametre(Sektor.STATLIG, 2019, 1, 10, 3, 100));
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
             + "VALUES (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-        parametre(statligForvaltning, 2018, 4, 10, 4, 100));
+        parametre(Sektor.STATLIG, 2018, 4, 10, 4, 100));
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
             + "VALUES (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
@@ -84,7 +82,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
 
     List<SykefraværForEttKvartal> resultat =
         kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(
-            statligForvaltning);
+                Sektor.STATLIG);
     assertThat(resultat.size()).isEqualTo(3);
     assertThat(resultat.get(0))
         .isEqualTo(
@@ -210,9 +208,9 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
             barnehage);
     assertThat(resultat)
         .isEqualTo(
-            Arrays.asList(
-                new SykefraværForEttKvartal(
-                    new ÅrstallOgKvartal(2019, 2), new BigDecimal(7), new BigDecimal(200), 20)));
+                List.of(
+                        new SykefraværForEttKvartal(
+                                new ÅrstallOgKvartal(2019, 2), new BigDecimal(7), new BigDecimal(200), 20)));
   }
 
   @Test
@@ -252,12 +250,12 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
   }
 
   private MapSqlParameterSource parametre(
-      Sektor sektor,
-      int årstall,
-      int kvartal,
-      int antallPersoner,
-      int tapteDagsverk,
-      int muligeDagsverk) {
+          Sektor sektor,
+          int årstall,
+          int kvartal,
+          int antallPersoner,
+          int tapteDagsverk,
+          int muligeDagsverk) {
     return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
         .addValue("sektor_kode", sektor.getKode());
   }

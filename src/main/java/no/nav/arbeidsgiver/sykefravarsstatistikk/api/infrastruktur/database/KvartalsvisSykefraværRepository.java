@@ -45,7 +45,7 @@ public class KvartalsvisSykefraværRepository {
               + "FROM sykefravar_statistikk_sektor "
               + "where sektor_kode = :sektorKode "
               + "ORDER BY arstall, kvartal ",
-          new MapSqlParameterSource().addValue("sektorKode", sektor.getKode()),
+          new MapSqlParameterSource().addValue("sektorKode", sektor.getSektorkode()),
           (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs));
     } catch (EmptyResultDataAccessException e) {
       return Collections.emptyList();

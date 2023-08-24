@@ -77,7 +77,7 @@ class SykefraværshistorikkController(
         } else {
             ResponseEntity.ok(
                 kvartalsvisSykefraværshistorikkService.hentSykefraværshistorikk(
-                    underenhet, overordnetEnhet.institusjonellSektorkode
+                    underenhet, overordnetEnhet.sektor
                 )
             )
         }

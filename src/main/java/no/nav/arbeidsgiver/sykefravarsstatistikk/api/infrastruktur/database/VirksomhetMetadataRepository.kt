@@ -1,10 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.NæringOgNæringskode5siffer
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetMetadata
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetMetadataNæringskode5siffer
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.jdbc.core.RowMapper
@@ -126,7 +122,7 @@ open class VirksomhetMetadataRepository(
             Orgnr(resultSet.getString("orgnr")),
             resultSet.getString("navn"),
             resultSet.getString("rectype"),
-            resultSet.getString("sektor"),
+            Sektor.fraSektorkode(resultSet.getString("sektor"))!!,
             resultSet.getString("primarnaring"),
             resultSet.getString("primarnaringskode"),
             ÅrstallOgKvartal(

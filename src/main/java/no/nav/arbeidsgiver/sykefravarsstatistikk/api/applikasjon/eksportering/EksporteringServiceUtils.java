@@ -181,7 +181,7 @@ public class EksporteringServiceUtils {
                     new SykefraværsstatistikkSektor(
                         virksomhetMetadata.getÅrstall(),
                         virksomhetMetadata.getKvartal(),
-                            virksomhetMetadata.getSektor(),
+                            virksomhetMetadata.getSektor().getSektorkode(),
                         0,
                         null,
                         null)));
