@@ -56,12 +56,12 @@ public class BransjeEllerNæringService {
                 virksomhetMetaData.getNæringOgNæringskode5siffer().stream().findFirst().isPresent()
                     ? virksomhetMetaData.getNæringOgNæringskode5siffer().stream()
                         .findFirst()
-                        .get().næringskode5Siffer
+                        .get().getFemsifferIdentifikator()
                     : "00000",
                 virksomhetMetaData.getNæringOgNæringskode5siffer().stream().findFirst().isPresent()
                     ? virksomhetMetaData.getNæringOgNæringskode5siffer().stream()
                         .findFirst()
-                        .get().næring
+                        .get().getNæring().getTosifferIdentifikator()
                     : ""),
             0);
 

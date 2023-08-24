@@ -137,11 +137,11 @@ class VirksomhetMetadataRepositoryJdbcTest {
     assertThat(results.size()).isEqualTo(3);
     VirksomhetMetadata virksomhetMetadataVirksomhet1 =
         results.stream().filter(r -> ORGNR_VIRKSOMHET_1.equals(r.getOrgnr())).findFirst().get();
-    List<NæringOgNæringskode5siffer> næringOgNæringskode5siffer =
+    List<BedreNæringskode> næringskoder =
         virksomhetMetadataVirksomhet1.getNæringOgNæringskode5siffer();
-    assertThat(næringOgNæringskode5siffer.contains(new NæringOgNæringskode5siffer("71", "71001")))
+    assertThat(næringskoder.contains(new BedreNæringskode( "71001")))
         .isTrue();
-    assertThat(næringOgNæringskode5siffer.contains(new NæringOgNæringskode5siffer("71", "71002")))
+    assertThat(næringskoder.contains(new BedreNæringskode( "71002")))
         .isTrue();
   }
 

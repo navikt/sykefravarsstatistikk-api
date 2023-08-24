@@ -258,9 +258,9 @@ public class EksporteringServiceUtils {
             næring5Siffer ->
                 virksomhetMetadata.getNæringOgNæringskode5siffer().stream()
                         .anyMatch(
-                            virksomhetNæring5Siffer ->
+                            næringskode ->
                                 næring5Siffer.getNæringkode5siffer()
-                                    .equals(virksomhetNæring5Siffer.næringskode5Siffer))
+                                    .equals(næringskode.getFemsifferIdentifikator()))
                     && næring5Siffer.getårstall() == virksomhetMetadata.getÅrstall()
                     && næring5Siffer.getKvartal() == virksomhetMetadata.getKvartal())
         .collect(Collectors.toList());

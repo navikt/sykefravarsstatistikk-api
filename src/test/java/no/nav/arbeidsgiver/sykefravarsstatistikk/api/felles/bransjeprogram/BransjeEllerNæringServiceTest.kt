@@ -62,8 +62,8 @@ class BransjeEllerNæringServiceTest {
     fun finnBransejFraMetadata__skalFinneRiktigBransjeFraMetadata() {
         virksomhetMetadata.leggTilNæringOgNæringskode5siffer(
             listOf(
-                NæringOgNæringskode5siffer(barnehage.hentNæringskode2Siffer(), barnehage.kode),
-                NæringOgNæringskode5siffer("00", "00000")
+                BedreNæringskode(barnehage.kode),
+                BedreNæringskode("00000"),
             )
         )
         val resultat = bransjeEllerNæringService!!.finnBransjeFraMetadata(virksomhetMetadata, listOf())

@@ -106,7 +106,7 @@ open class VirksomhetMetadataRepository(
 
     private fun assemble(
         virksomhetMetadata: List<VirksomhetMetadata>,
-        næringOgNæringskode5siffer: List<Pair<Orgnr, NæringOgNæringskode5siffer>>
+        næringOgNæringskode5siffer: List<Pair<Orgnr, BedreNæringskode>>
     ): List<VirksomhetMetadata> {
 
         val map = næringOgNæringskode5siffer
@@ -122,10 +122,7 @@ open class VirksomhetMetadataRepository(
     private fun næringOgNæringskode5sifferRowMapper() = RowMapper { resultSet: ResultSet, _: Int ->
         Pair(
             Orgnr(resultSet.getString("orgnr")),
-            NæringOgNæringskode5siffer(
-                resultSet.getString("naring_kode"),
-                resultSet.getString("naring_kode_5siffer")
-            )
+            BedreNæringskode(resultSet.getString("naring_kode_5siffer"))
         )
     }
 
