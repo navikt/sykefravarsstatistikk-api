@@ -47,7 +47,7 @@ public class KvartalsvisSykefraværshistorikkService {
                     Statistikkategori.LAND,
                     SYKEFRAVÆRPROSENT_LAND_LABEL),
                 uthentingMedFeilhåndteringOgTimeout(
-                    () -> hentSykefraværshistorikkSektor(ssbSektor),
+                    () -> hentSykefraværshistorikkSektor(sektor),
                     Statistikkategori.SEKTOR,
                         sektor.getDisplaystring()),
                 skalHenteDataPåNæring

@@ -78,7 +78,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
             + "VALUES (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-        parametre(new Sektor("2", "Kommunal forvaltning"), 2018, 4, 10, 5, 100));
+        parametre(Sektor.KOMMUNAL, 2018, 4, 10, 5, 100));
 
     List<SykefraværForEttKvartal> resultat =
         kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(
@@ -118,7 +118,6 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
 
   @Test
   public void hentSykefraværprosentBransje__skal_returnere_riktig_sykefravær() {
-    Næring produksjonAvKlær = new Næring("14", "Produksjon av klær");
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_naring5siffer "
             + "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
@@ -257,7 +256,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
           int tapteDagsverk,
           int muligeDagsverk) {
     return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
-        .addValue("sektor_kode", sektor.getKode());
+        .addValue("sektor_kode", sektor.getSektorkode());
   }
 
   private MapSqlParameterSource parametre(

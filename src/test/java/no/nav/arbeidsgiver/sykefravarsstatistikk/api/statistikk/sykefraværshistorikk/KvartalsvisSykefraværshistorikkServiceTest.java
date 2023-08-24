@@ -34,8 +34,6 @@ public class KvartalsvisSykefraværshistorikkServiceTest {
             kvartalsvisSykefraværprosentRepository,
             klassifikasjonerRepository);
 
-    when(EnhetsregisteretSektorMappingKt.fraEnhetsregisteretSektor(any()))
-        .thenReturn(new Sektor("1"));
     when(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand())
         .thenReturn(List.of(sykefraværprosent()));
     when(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(any()))
@@ -51,7 +49,7 @@ public class KvartalsvisSykefraværshistorikkServiceTest {
 
     List<KvartalsvisSykefraværshistorikk> kvartalsvisSykefraværshistorikk =
         kvartalsvisSykefraværshistorikkService.hentSykefraværshistorikk(
-            enUnderenhet("999999998"), enInstitusjonellSektorkode());
+            enUnderenhet("999999998"), Sektor.STATLIG);
 
     verify(kvartalsvisSykefraværprosentRepository, times(0))
         .hentKvartalsvisSykefraværprosentNæring(any());

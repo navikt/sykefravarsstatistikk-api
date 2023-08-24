@@ -298,7 +298,7 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
                 new Orgnr(resultSet.getString(ORGNR)),
                 "", // henter ikke lenger navn for virksomheter, da dette ikke er i bruk
                 resultSet.getString(RECTYPE),
-                resultSet.getString(SEKTOR),
+                Sektor.Companion.fraSektorkode(resultSet.getString(SEKTOR)),
                 resultSet.getString(NARING),
                 resultSet.getString("naringskode").replace(".", ""),
                 new ÅrstallOgKvartal(resultSet.getInt(ARSTALL), resultSet.getInt(KVARTAL)))));

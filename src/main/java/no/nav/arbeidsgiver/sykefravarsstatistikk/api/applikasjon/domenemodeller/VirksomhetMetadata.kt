@@ -4,7 +4,7 @@ data class VirksomhetMetadata(
     private val orgnrObj: Orgnr,
     val navn: String,
     val rectype: String,
-    val sektor: String,
+    val sektor: Sektor,
     val primærnæring: String,
     val primærnæringskode: String,
     val årstallOgKvartal: ÅrstallOgKvartal

@@ -173,7 +173,7 @@ public class EksporteringServiceUtils {
         sykefraværsstatistikkSektor.stream()
             .filter(
                 v ->
-                    v.getSektorkode().equals(virksomhetMetadata.getSektor())
+                    v.getSektorkode().equals(virksomhetMetadata.getSektor().getSektorkode())
                         && v.getårstall() == virksomhetMetadata.getÅrstall()
                         && v.getKvartal() == virksomhetMetadata.getKvartal())
             .collect(

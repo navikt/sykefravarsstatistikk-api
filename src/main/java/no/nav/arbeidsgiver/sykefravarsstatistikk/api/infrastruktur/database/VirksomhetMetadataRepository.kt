@@ -17,7 +17,19 @@ open class VirksomhetMetadataRepository(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     open fun opprettVirksomhetMetadata(virksomhetMetadata: List<VirksomhetMetadata>): Int {
-        val batch = SqlParameterSourceUtils.createBatch(*virksomhetMetadata.toTypedArray())
+        val m = virksomhetMetadata.map {
+            mapOf(
+                "orgnr" to it.orgnr,
+                "navn" to it.navn,
+                "rectype" to it.rectype,
+                "sektor" to it.sektor.sektorkode,
+                "primærnæring" to it.primærnæring,
+                "primærnæringskode" to it.primærnæringskode,
+                "årstall" to it.årstall,
+                "kvartal" to it.kvartal,
+            )
+        }
+        val batch = SqlParameterSourceUtils.createBatch(m)
         val results = namedParameterJdbcTemplate.batchUpdate(
             """
                 |insert into virksomhet_metadata
