@@ -1,10 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.NæringOgNæringskode5siffer
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetMetadata
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetMetadataNæringskode5siffer
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.jdbc.core.RowMapper
@@ -21,7 +17,19 @@ open class VirksomhetMetadataRepository(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     open fun opprettVirksomhetMetadata(virksomhetMetadata: List<VirksomhetMetadata>): Int {
-        val batch = SqlParameterSourceUtils.createBatch(*virksomhetMetadata.toTypedArray())
+        val m = virksomhetMetadata.map {
+            mapOf(
+                "orgnr" to it.orgnr,
+                "navn" to it.navn,
+                "rectype" to it.rectype,
+                "sektor" to it.sektor.sektorkode,
+                "primærnæring" to it.primærnæring,
+                "primærnæringskode" to it.primærnæringskode,
+                "årstall" to it.årstall,
+                "kvartal" to it.kvartal,
+            )
+        }
+        val batch = SqlParameterSourceUtils.createBatch(m)
         val results = namedParameterJdbcTemplate.batchUpdate(
             """
                 |insert into virksomhet_metadata
@@ -126,7 +134,7 @@ open class VirksomhetMetadataRepository(
             Orgnr(resultSet.getString("orgnr")),
             resultSet.getString("navn"),
             resultSet.getString("rectype"),
-            resultSet.getString("sektor"),
+            Sektor.fraSektorkode(resultSet.getString("sektor"))!!,
             resultSet.getString("primarnaring"),
             resultSet.getString("primarnaringskode"),
             ÅrstallOgKvartal(

@@ -10,7 +10,6 @@ object TestData {
     const val ORGNR_VIRKSOMHET_3 = "999999777"
     const val NÆRINGSKODE_5SIFFER = "10062"
     const val NÆRINGSKODE_2SIFFER = "10"
-    const val SEKTOR = "3"
     @JvmStatic
     val innloggetBruker: InnloggetBruker
         get() = getInnloggetBruker(fnr.verdi)
@@ -33,11 +32,6 @@ object TestData {
     @JvmStatic
     fun etOrgnr(): Orgnr {
         return Orgnr("971800534")
-    }
-
-    @JvmStatic
-    fun enInstitusjonellSektorkode(): InstitusjonellSektorkode {
-        return InstitusjonellSektorkode("1234", "sektor!")
     }
 
     @JvmStatic

@@ -1,11 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.SEKTOR;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
-
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sektor;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 
 public class DatavarehusRepositoryJdbcTestUtils {
 
@@ -20,17 +20,6 @@ public class DatavarehusRepositoryJdbcTestUtils {
   public static int delete(NamedParameterJdbcTemplate jdbcTemplate, String tabell) {
     return jdbcTemplate.update(
         String.format("delete from %s", tabell), new MapSqlParameterSource());
-  }
-
-  public static void insertSektorInDvhTabell(
-      NamedParameterJdbcTemplate jdbcTemplate, String kode, String navn) {
-    MapSqlParameterSource params =
-        new MapSqlParameterSource().addValue("sektorkode", kode).addValue("sektornavn", navn);
-
-    jdbcTemplate.update(
-        "insert into dt_p.v_dim_ia_sektor (sektorkode, sektornavn) "
-            + "values (:sektorkode, :sektornavn)",
-        params);
   }
 
   public static void insertNæringInDvhTabell(
@@ -151,7 +140,7 @@ public class DatavarehusRepositoryJdbcTestUtils {
             .addValue("orgnr", orgnr)
             .addValue("varighet", varighet.kode)
             .addValue("naering_kode", næringskode5siffer)
-            .addValue("sektor", SEKTOR)
+            .addValue("sektor", Sektor.PRIVAT.getSektorkode())
             .addValue("kjonn", kjonn)
             .addValue("taptedv", taptedagsverk)
             .addValue("muligedv", muligedagsverk)

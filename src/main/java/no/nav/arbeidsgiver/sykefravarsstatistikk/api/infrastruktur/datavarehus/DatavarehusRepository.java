@@ -19,9 +19,6 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
 
   public static final String NARINGKODE = "naringkode";
   public static final String NARINGNAVN = "naringnavn";
-  public static final String SEKTORKODE = "sektorkode";
-  public static final String SEKTORNAVN = "sektornavn";
-
   public static final String ARSTALL = "arstall";
   public static final String KVARTAL = "kvartal";
   public static final String SEKTOR = "sektor";
@@ -268,20 +265,6 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
   }
 
-  /*
-   Klassifikasjoner
-  */
-
-  public List<Sektor> hentAlleSektorer() {
-    SqlParameterSource namedParameters = new MapSqlParameterSource();
-
-    return namedParameterJdbcTemplate.query(
-        "select sektorkode, sektornavn from dt_p.v_dim_ia_sektor",
-        namedParameters,
-        (resultSet, rowNum) ->
-            new Sektor(resultSet.getString(SEKTORKODE), resultSet.getString(SEKTORNAVN)));
-  }
-
   public List<Næring> hentAlleNæringer() {
     SqlParameterSource namedParameters = new MapSqlParameterSource();
 
@@ -315,7 +298,7 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
                 new Orgnr(resultSet.getString(ORGNR)),
                 "", // henter ikke lenger navn for virksomheter, da dette ikke er i bruk
                 resultSet.getString(RECTYPE),
-                resultSet.getString(SEKTOR),
+                Sektor.Companion.fraSektorkode(resultSet.getString(SEKTOR)),
                 resultSet.getString(NARING),
                 resultSet.getString("naringskode").replace(".", ""),
                 new ÅrstallOgKvartal(resultSet.getInt(ARSTALL), resultSet.getInt(KVARTAL)))));

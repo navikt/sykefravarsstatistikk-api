@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.SektorMappingService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransjeprogram;
@@ -27,24 +26,19 @@ public class KvartalsvisSykefraværshistorikkService {
   public static final String SYKEFRAVÆRPROSENT_LAND_LABEL = "Norge";
 
   private final KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository;
-  private final SektorMappingService sektorMappingService;
   private final KlassifikasjonerRepository klassifikasjonerRepository;
 
   public KvartalsvisSykefraværshistorikkService(
       KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository,
-      SektorMappingService sektorMappingService,
       KlassifikasjonerRepository klassifikasjonerRepository) {
     this.kvartalsvisSykefraværprosentRepository = kvartalsvisSykefraværprosentRepository;
-    this.sektorMappingService = sektorMappingService;
     this.klassifikasjonerRepository = klassifikasjonerRepository;
   }
 
   public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikk(
-          Virksomhet underenhet, InstitusjonellSektorkode institusjonellSektorkode) {
+          Virksomhet underenhet, Sektor sektor) {
     Optional<Bransje> bransje = Bransjeprogram.finnBransje(underenhet);
     boolean skalHenteDataPåNæring = bransje.isEmpty() || bransje.get().erDefinertPåTosiffernivå();
-
-    Sektor ssbSektor = sektorMappingService.mapTilSSBSektorKode(institusjonellSektorkode);
 
     return
         Stream.of(
@@ -53,9 +47,9 @@ public class KvartalsvisSykefraværshistorikkService {
                     Statistikkategori.LAND,
                     SYKEFRAVÆRPROSENT_LAND_LABEL),
                 uthentingMedFeilhåndteringOgTimeout(
-                    () -> hentSykefraværshistorikkSektor(ssbSektor),
+                    () -> hentSykefraværshistorikkSektor(sektor),
                     Statistikkategori.SEKTOR,
-                        ssbSektor.getNavn()),
+                        sektor.getDisplaystring()),
                 skalHenteDataPåNæring
                     ? uthentingAvSykefraværshistorikkNæring(underenhet)
                     : uthentingMedFeilhåndteringOgTimeout(
@@ -85,7 +79,7 @@ public class KvartalsvisSykefraværshistorikkService {
             .join();
 
     List<KvartalsvisSykefraværshistorikk> kvartalsvisSykefraværshistorikkListe =
-        hentSykefraværshistorikk(underenhet, overordnetEnhet.getInstitusjonellSektorkode());
+        hentSykefraværshistorikk(underenhet, overordnetEnhet.getSektor());
     kvartalsvisSykefraværshistorikkListe.add(historikkForOverordnetEnhet);
 
     return kvartalsvisSykefraværshistorikkListe;
@@ -101,7 +95,7 @@ public class KvartalsvisSykefraværshistorikkService {
   private KvartalsvisSykefraværshistorikk hentSykefraværshistorikkSektor(Sektor ssbSektor) {
     return new KvartalsvisSykefraværshistorikk(
         Statistikkategori.SEKTOR,
-            ssbSektor.getNavn(),
+            ssbSektor.getDisplaystring(),
         kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(ssbSektor));
   }
 

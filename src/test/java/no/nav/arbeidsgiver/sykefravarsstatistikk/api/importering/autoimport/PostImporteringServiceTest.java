@@ -9,6 +9,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.D
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkRepository;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,6 +19,7 @@ import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_1;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_2;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.kotlin.OngoingStubbingKt.whenever;
@@ -50,6 +52,21 @@ class PostImporteringServiceTest {
                         kafkaUtsendingHistorikkRepository
                 );
     }
+
+    @Test
+    public void
+    fullførPostImporteringOgForberedNesteEksport__returnerer_antall_virksomheter_som_skal_til_neste_eksport() {
+        mockImportVirksomhetMetadata(__2020_4, getOrgenhetListe(__2020_4));
+        mockImportVirksomhetNæringskode5sifferMapping(
+                __2020_4, getVirksomhetMetadataNæringskode5sifferListe(__2020_4));
+        mockForberedNesteEksport(__2020_4, getVirksomhetMetadataListe(__2020_4));
+
+        service.overskrivMetadataForVirksomheter(__2020_4);
+        service.overskrivNæringskoderForVirksomheter(__2020_4);
+        Integer antall = service.forberedNesteEksport(__2020_4, true).getOrNull();
+        assertEquals(2, antall);
+    }
+
 
     private void mockForberedNesteEksport(
             ÅrstallOgKvartal årstallOgKvartal, List<VirksomhetMetadata> virksomhetMetadataListe) {
@@ -103,10 +120,10 @@ class PostImporteringServiceTest {
         List<Orgenhet> orgenhetSomSkalTilVirksomhetMetadata = new ArrayList<>();
         orgenhetSomSkalTilVirksomhetMetadata.add(
                 new Orgenhet(
-                        new Orgnr(ORGNR_VIRKSOMHET_1), "Virksomhet 1", "2", "3", "10", "10000", årstallOgKvartal));
+                        new Orgnr(ORGNR_VIRKSOMHET_1), "Virksomhet 1", "2", Sektor.PRIVAT, "10", "10000", årstallOgKvartal));
         orgenhetSomSkalTilVirksomhetMetadata.add(
                 new Orgenhet(
-                        new Orgnr(ORGNR_VIRKSOMHET_2), "Virksomhet 2", "2", "3", "20", "20000", årstallOgKvartal));
+                        new Orgnr(ORGNR_VIRKSOMHET_2), "Virksomhet 2", "2", Sektor.PRIVAT, "20", "20000", årstallOgKvartal));
 
         return orgenhetSomSkalTilVirksomhetMetadata;
     }
@@ -115,10 +132,10 @@ class PostImporteringServiceTest {
         List<VirksomhetMetadata> virksomhetMetadataListe = new ArrayList<>();
         virksomhetMetadataListe.add(
                 new VirksomhetMetadata(
-                        new Orgnr(ORGNR_VIRKSOMHET_1), "Virksomhet 1", "2", "3", "10", "10000", årstallOgKvartal));
+                        new Orgnr(ORGNR_VIRKSOMHET_1), "Virksomhet 1", "2", Sektor.PRIVAT, "10", "10000", årstallOgKvartal));
         virksomhetMetadataListe.add(
                 new VirksomhetMetadata(
-                        new Orgnr(ORGNR_VIRKSOMHET_2), "Virksomhet 2", "2", "3", "20", "20000", årstallOgKvartal));
+                        new Orgnr(ORGNR_VIRKSOMHET_2), "Virksomhet 2", "2", Sektor.PRIVAT, "20", "20000", årstallOgKvartal));
 
         return virksomhetMetadataListe;
     }

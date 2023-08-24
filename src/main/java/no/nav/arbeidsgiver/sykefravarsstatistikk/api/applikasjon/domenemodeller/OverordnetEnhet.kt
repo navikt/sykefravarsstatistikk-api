@@ -4,6 +4,6 @@ data class OverordnetEnhet(
     override val orgnr: Orgnr,
     override val navn: String,
     override val næringskode: Næringskode5Siffer,
-    val institusjonellSektorkode: InstitusjonellSektorkode? = null,
+    val sektor: Sektor?,
     val antallAnsatte: Int? = 0
 ) : Virksomhet

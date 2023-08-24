@@ -1,11 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.NæringOgNæringskode5siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetMetadata;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetMetadataNæringskode5siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,12 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.Arrays;
 import java.util.List;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.NÆRINGSKODE_2SIFFER;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.NÆRINGSKODE_5SIFFER;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_1;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_2;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_3;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.SEKTOR;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -102,7 +93,7 @@ class VirksomhetMetadataRepositoryJdbcTest {
             new Orgnr(ORGNR_VIRKSOMHET_1),
             "Virksomhet 1",
             RECTYPE_FOR_VIRKSOMHET,
-            SEKTOR,
+                Sektor.PRIVAT,
             NÆRINGSKODE_2SIFFER,
             NÆRINGSKODE_5SIFFER,
             new ÅrstallOgKvartal(2020, 3));
@@ -111,7 +102,7 @@ class VirksomhetMetadataRepositoryJdbcTest {
             new Orgnr(ORGNR_VIRKSOMHET_2),
             "Virksomhet 2",
             RECTYPE_FOR_VIRKSOMHET,
-            SEKTOR,
+            Sektor.PRIVAT,
             NÆRINGSKODE_2SIFFER,
             NÆRINGSKODE_5SIFFER,
             new ÅrstallOgKvartal(2020, 3));
@@ -162,7 +153,7 @@ class VirksomhetMetadataRepositoryJdbcTest {
                 new Orgnr(rs.getString("orgnr")),
                 rs.getString("navn"),
                 rs.getString("rectype"),
-                rs.getString("sektor"),
+                Sektor.Companion.fraSektorkode(rs.getString("sektor")),
                 rs.getString("primarnaring"),
                 rs.getString("primarnaringskode"),
                 new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal"))));

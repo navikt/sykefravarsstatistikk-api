@@ -1,9 +1,9 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.virksomhetsklassifikasjoner
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.fjernDupliserteOrgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgenhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sektor
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -14,7 +14,7 @@ internal class OrgenhetFilterKtTest {
         orgnr = Orgnr("111111111"),
         navn = "navn",
         rectype = "2",
-        sektor = "1",
+        sektor = Sektor.STATLIG,
         næring = "10",
         næringskode = "10123",
         årstallOgKvartal = ÅrstallOgKvartal(
@@ -23,23 +23,23 @@ internal class OrgenhetFilterKtTest {
     )
 
     @Test
-    fun `fjernDupliserteOrgnr skal fjerne elementet med høyeste sektor dersom en virksomhet har to sektorer`() {
+    fun `fjernDupliserteOrgnr skal fjerne elementet med høyest prioriterte sektor dersom en virksomhet har to sektorer`() {
         val orgenheter = listOf(
             dummyvirksomhet.copy(
-                sektor = "3"
+                sektor = Sektor.PRIVAT
             ),
             dummyvirksomhet.copy(
-                sektor = "1"
+                sektor = Sektor.STATLIG
             ),
             dummyvirksomhet.copy(
-                sektor = "2"
+                sektor = Sektor.KOMMUNAL
             ),
         )
 
         assertEquals(
             listOf(
                 dummyvirksomhet.copy(
-                    sektor = "1"
+                    sektor = Sektor.STATLIG
                 )
             ), fjernDupliserteOrgnr(orgenheter)
         )
@@ -50,15 +50,15 @@ internal class OrgenhetFilterKtTest {
         val orgenheter = listOf(
             dummyvirksomhet.copy(
                 orgnr = Orgnr("111111111"),
-                sektor = "1"
+                sektor = Sektor.STATLIG
             ),
             dummyvirksomhet.copy(
                 orgnr = Orgnr("222222222"),
-                sektor = "3"
+                sektor = Sektor.PRIVAT
             ),
             dummyvirksomhet.copy(
                 orgnr = Orgnr("333333333"),
-                sektor = "2"
+                sektor = Sektor.KOMMUNAL
             ),
         )
         assertThat(fjernDupliserteOrgnr(orgenheter)).containsExactlyInAnyOrderElementsOf(orgenheter)
@@ -68,24 +68,24 @@ internal class OrgenhetFilterKtTest {
     fun `fjernDupliserteOrgnr skal fjerne dupliserte virksomheter, og beholde alle de reserende`() {
         val orgenheter = listOf(
             dummyvirksomhet.copy(
-                sektor = "3"
+                sektor = Sektor.PRIVAT
             ),
             dummyvirksomhet.copy(
                 orgnr = Orgnr("222222222"),
-                sektor = "3"
+                sektor = Sektor.PRIVAT
             ),
             dummyvirksomhet.copy(
-                sektor = "1"
+                sektor = Sektor.STATLIG
             ),
         )
 
         assertThat(fjernDupliserteOrgnr(orgenheter)).containsExactlyInAnyOrder(
             dummyvirksomhet.copy(
                 orgnr = Orgnr("222222222"),
-                sektor = "3"
+                sektor = Sektor.PRIVAT
             ),
             dummyvirksomhet.copy(
-                sektor = "1"
+                sektor = Sektor.STATLIG
             ),
         )
     }
@@ -94,16 +94,16 @@ internal class OrgenhetFilterKtTest {
     fun `hvis en bedrift har ukjent sektor, så skal denne ikke bli prioritert i tilfelle duolikater`() {
         val orgenheter = listOf(
             dummyvirksomhet.copy(
-                sektor = "0"
+                sektor = Sektor.UKJENT
             ),
             dummyvirksomhet.copy(
-                sektor = "3"
+                sektor = Sektor.PRIVAT
             ),
         )
         assertEquals(
             listOf(
                 dummyvirksomhet.copy(
-                    sektor = "3"
+                    sektor = Sektor.PRIVAT
                 )
             ), fjernDupliserteOrgnr(orgenheter)
         )

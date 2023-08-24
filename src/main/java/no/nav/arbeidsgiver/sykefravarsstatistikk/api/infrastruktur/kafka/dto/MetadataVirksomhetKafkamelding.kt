@@ -9,7 +9,7 @@ data class MetadataVirksomhetKafkamelding(
     val årstallOgKvartal: ÅrstallOgKvartal,
     val næring: String,
     val bransje: ArbeidsmiljøportalenBransje?,
-    val sektor: Sektor,
+    val sektor: SektorKafkaDto,
 ) : Kafkamelding {
     override val nøkkel: String
         get() = ObjectMapper().writeValueAsString(

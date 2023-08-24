@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.KildeTilVirksomhetsdata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgenhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
@@ -18,7 +19,7 @@ class HardkodetKildeTilVirksomhetsdata : KildeTilVirksomhetsdata {
                 orgnr = Orgnr(verdi = it.orgnr!!),
                 navn = "Bedrift ${it.orgnr}",
                 rectype = it.rectype,
-                sektor = "3",
+                sektor = Sektor.PRIVAT,
                 næring = it.næring,
                 næringskode = it.næringkode,
                 årstallOgKvartal = årstallOgKvartal

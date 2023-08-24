@@ -1,26 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.kvartalsvis;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.KvartalsvisSykefraværshistorikkService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.OffentligKvartalsvisSykefraværshistorikkService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.KvartalsvisSykefraværshistorikk;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UnderenhetLegacy;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KvartalsvisSykefraværRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KlassifikasjonerRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.SektorMappingService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværForEttKvartal;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KvartalsvisSykefraværRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,11 +13,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 @ExtendWith(MockitoExtension.class)
 class OffentligKvartalsvisSykefraværshistorikkServiceTest {
   @Mock private KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository;
-  @Mock private EnhetsregisteretClient enhetsregisteretClient;
-  @Mock private SektorMappingService sektorMappingService;
   @Mock private KlassifikasjonerRepository klassifikasjonerRepository;
 
   OffentligKvartalsvisSykefraværshistorikkService offentligKvartalsvisSykefraværshistorikkService;
@@ -44,10 +34,10 @@ class OffentligKvartalsvisSykefraværshistorikkServiceTest {
         new OffentligKvartalsvisSykefraværshistorikkService(
             new KvartalsvisSykefraværshistorikkService(
                 kvartalsvisSykefraværprosentRepository,
-                sektorMappingService,
                 klassifikasjonerRepository));
     when(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand())
-        .thenReturn(Arrays.asList(sykefraværprosent("Norge")));
+        .thenReturn(List.of(new SykefraværForEttKvartal(
+                new ÅrstallOgKvartal(2019, 1), new BigDecimal(50), new BigDecimal(100), 10)));
   }
 
   @AfterEach
@@ -115,8 +105,4 @@ class OffentligKvartalsvisSykefraværshistorikkServiceTest {
         .isEqualTo(expected);
   }
 
-  private static SykefraværForEttKvartal sykefraværprosent(String label) {
-    return new SykefraværForEttKvartal(
-        new ÅrstallOgKvartal(2019, 1), new BigDecimal(50), new BigDecimal(100), 10);
-  }
 }

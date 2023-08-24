@@ -18,7 +18,7 @@ data class OverordnetEnhetResponseJson(
         orgnr = Orgnr(orgnr),
         navn = navn,
         næringskode = næringskode.toDomain(),
-        institusjonellSektorkode = institusjonellSektorkode.toDomain(),
+        sektor = institusjonellSektorkode.toDomain(), // DETTE FEILER
         antallAnsatte = antallAnsatte,
     )
 }

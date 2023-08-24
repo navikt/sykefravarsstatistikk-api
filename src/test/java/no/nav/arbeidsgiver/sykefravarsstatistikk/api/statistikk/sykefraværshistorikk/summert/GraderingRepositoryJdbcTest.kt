@@ -103,7 +103,7 @@ open class GraderingRepositoryJdbcTest {
             jdbcTemplate,
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
             PRODUKSJON_AV_KLÆR.kode,
-            UNDERENHET_1_NÆRING_14.næringskode!!.kode,
+            UNDERENHET_1_NÆRING_14.næringskode.kode,
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
             _2019_4,
             7,
@@ -157,7 +157,7 @@ open class GraderingRepositoryJdbcTest {
             jdbcTemplate,
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
             PRODUKSJON_AV_KLÆR.kode,
-            UNDERENHET_1_NÆRING_14.næringskode!!.kode,
+            UNDERENHET_1_NÆRING_14.næringskode.kode,
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
             _2019_4,
             7,
@@ -324,7 +324,7 @@ open class GraderingRepositoryJdbcTest {
             orgnr = Orgnr("999999777"),
             navn = "Hospital",
             næringskode = Næringskode5Siffer("86101", "Alminnelige somatiske sykehus"),
-            institusjonellSektorkode = InstitusjonellSektorkode("7000", "Ideelle organisasjoner")
+            sektor = Sektor.PRIVAT,
         )
 
         private val UNDERENHET_1_NÆRING_14 = UnderenhetLegacy(
