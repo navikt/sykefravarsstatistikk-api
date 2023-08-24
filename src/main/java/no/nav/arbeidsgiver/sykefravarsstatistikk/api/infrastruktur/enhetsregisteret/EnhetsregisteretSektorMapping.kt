@@ -31,5 +31,5 @@ private val enhetsregisterSektorkoder = mapOf(
     "9000" to "3"
 )
 
-fun fraEnhetsregisteretSektor(fireSifferKode: String) =
-    enhetsregisterSektorkoder[fireSifferKode]?.let { Sektor.fraSektorkode(it) }
+fun fraEnhetsregisteretSektor(firesifretKode: String) =
+    enhetsregisterSektorkoder[firesifretKode]?.let { Sektor.fraSektorkode(it) }
