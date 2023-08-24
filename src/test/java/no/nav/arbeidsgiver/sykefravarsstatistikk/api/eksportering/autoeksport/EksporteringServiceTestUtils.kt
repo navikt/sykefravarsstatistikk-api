@@ -190,20 +190,6 @@ object EksporteringServiceTestUtils {
     }
 
     @JvmStatic
-    fun byggSykefraværStatistikkNæring(
-        virksomhetMetadata: VirksomhetMetadata, statistikkÅrstallOgKvartal: ÅrstallOgKvartal
-    ): SykefraværsstatistikkNæring {
-        return SykefraværsstatistikkNæring(
-            statistikkÅrstallOgKvartal.årstall,
-            statistikkÅrstallOgKvartal.kvartal,
-            virksomhetMetadata.primærnæring,
-            156,
-            BigDecimal(3678),
-            BigDecimal(188000)
-        )
-    }
-
-    @JvmStatic
     fun byggSykefraværStatistikkNæring5Siffer(
         virksomhetMetadata: VirksomhetMetadata, næringskode5Siffer: String
     ): SykefraværsstatistikkNæring5Siffer {
@@ -214,20 +200,6 @@ object EksporteringServiceTestUtils {
             100,
             BigDecimal(250),
             BigDecimal(25000)
-        )
-    }
-
-    @JvmStatic
-    fun byggSykefraværStatistikkNæring5Siffer(
-        statistikkÅrstallOgKvartal: ÅrstallOgKvartal, næringskode5Siffer: String
-    ): SykefraværsstatistikkNæring5Siffer {
-        return SykefraværsstatistikkNæring5Siffer(
-            statistikkÅrstallOgKvartal.årstall,
-            statistikkÅrstallOgKvartal.kvartal,
-            næringskode5Siffer,
-            200,
-            BigDecimal(300),
-            BigDecimal(10000)
         )
     }
 
