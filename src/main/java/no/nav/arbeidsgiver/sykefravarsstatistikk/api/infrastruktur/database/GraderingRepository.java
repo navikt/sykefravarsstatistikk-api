@@ -134,7 +134,7 @@ public class GraderingRepository {
               + " group by arstall, kvartal"
               + " order by arstall, kvartal",
           new MapSqlParameterSource()
-              .addValue("naringKoder", bransje.getKoderSomSpesifisererNæringer())
+              .addValue("naringKoder", bransje.getIdentifikatorer())
               .addValue("rectype", RECTYPE_FOR_VIRKSOMHET),
           (rs, rowNum) -> mapTilUmaskertSykefraværForEttKvartal(rs));
     } catch (EmptyResultDataAccessException e) {

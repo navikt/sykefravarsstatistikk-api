@@ -83,7 +83,7 @@ private fun sykefraværsstatistikkNæringRowMapper() = RowMapper { resultSet: Re
 }
 
 private fun getNæringerAndNæringskoderSomUtgjørBransjene(): Pair<List<String>, List<String>> {
-    val bransjer = Bransjeprogram.alleBransjer.map { it.koderSomSpesifisererNæringer }.flatten()
+    val bransjer = Bransjeprogram.alleBransjer.map { it.identifikatorer }.flatten()
     val næringer = bransjer.filter { it.length == 2 }
     val næringskoder = bransjer.filter { it.length == 5 }
     return Pair(næringer, næringskoder)
@@ -120,7 +120,7 @@ private fun hentStatistikkForNæringerSomTilhørerBransje(
     sykefraværsstatistikkNæringer: List<SykefraværsstatistikkNæring>,
     bransje: Bransje
 ): List<SykefraværsstatistikkNæring> {
-    val koderSomSpesifisererNæringer = bransje.koderSomSpesifisererNæringer
+    val koderSomSpesifisererNæringer = bransje.identifikatorer
     return sykefraværsstatistikkNæringer.filter { sykefraværsstatistikkNæring ->
         koderSomSpesifisererNæringer.contains(sykefraværsstatistikkNæring.næringkode)
     }

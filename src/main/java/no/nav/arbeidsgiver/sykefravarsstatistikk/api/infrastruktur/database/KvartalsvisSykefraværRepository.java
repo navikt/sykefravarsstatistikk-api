@@ -75,7 +75,7 @@ public class KvartalsvisSykefraværRepository {
               + "group by arstall, kvartal "
               + "ORDER BY arstall, kvartal ",
           new MapSqlParameterSource()
-              .addValue("naringKoder", bransje.getKoderSomSpesifisererNæringer()),
+              .addValue("naringKoder", bransje.getIdentifikatorer()),
           (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs));
     } catch (EmptyResultDataAccessException e) {
       return Collections.emptyList();

@@ -46,7 +46,7 @@ class VarighetRepository(
                         + " and varighet in ('A', 'B', 'C', 'D', 'E', 'F', 'X')"
                         + " order by arstall, kvartal, varighet",
                 MapSqlParameterSource()
-                    .addValue("naringKoder", bransje.koderSomSpesifisererNæringer)
+                    .addValue("naringKoder", bransje.identifikatorer)
             ) { rs: ResultSet, _: Int -> mapTilKvartalsvisSykefraværMedVarighet(rs) }
         } catch (e: EmptyResultDataAccessException) {
             emptyList()
