@@ -1,17 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori.BRANSJE;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori.NÆRING;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransjeprogram;
@@ -21,6 +9,14 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
+
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori.BRANSJE;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori.NÆRING;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 
 @Component
 public class GraderingRepository {
@@ -83,7 +79,7 @@ public class GraderingRepository {
 
   public Sykefraværsdata hentGradertSykefraværAlleKategorier(@NotNull Virksomhet virksomhet) {
 
-    Næring næring = new Næring(virksomhet.getNæringskode().getFemsifferIdentifikator(), "");
+    BedreNæring næring = virksomhet.getNæringskode().getNæring();
     Optional<Bransje> maybeBransje = Bransjeprogram.finnBransje(virksomhet.getNæringskode());
 
     Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> data = new HashMap<>();
@@ -100,7 +96,7 @@ public class GraderingRepository {
     return new Sykefraværsdata(data);
   }
 
-  public List<UmaskertSykefraværForEttKvartal> hentSykefraværMedGradering(Næring næring) {
+  public List<UmaskertSykefraværForEttKvartal> hentSykefraværMedGradering(BedreNæring næring) {
     try {
       return namedParameterJdbcTemplate.query(
           "select arstall, kvartal,"
@@ -115,7 +111,7 @@ public class GraderingRepository {
               + " group by arstall, kvartal"
               + " order by arstall, kvartal",
           new MapSqlParameterSource()
-              .addValue("naring", næring.getKode().substring(0, 2))
+              .addValue("naring", næring.getTosifferIdentifikator())
               .addValue("rectype", RECTYPE_FOR_VIRKSOMHET),
           (rs, rowNum) -> mapTilUmaskertSykefraværForEttKvartal(rs));
     } catch (EmptyResultDataAccessException e) {

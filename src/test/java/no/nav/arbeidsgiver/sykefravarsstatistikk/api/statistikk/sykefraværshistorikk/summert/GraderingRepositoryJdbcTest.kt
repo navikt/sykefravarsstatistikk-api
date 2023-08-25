@@ -48,7 +48,7 @@ open class GraderingRepositoryJdbcTest {
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
-            PRODUKSJON_AV_KLÆR.kode,
+            PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
             "14100",
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
             _2019_4,
@@ -60,7 +60,7 @@ open class GraderingRepositoryJdbcTest {
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
-            PRODUKSJON_AV_KLÆR.kode,
+            PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
             "14222",
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
             _2019_4,
@@ -72,7 +72,7 @@ open class GraderingRepositoryJdbcTest {
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
-            PRODUKSJON_AV_KLÆR.kode,
+            PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
             "14222",
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
             _2020_1,
@@ -102,7 +102,7 @@ open class GraderingRepositoryJdbcTest {
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
-            PRODUKSJON_AV_KLÆR.kode,
+            PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
             UNDERENHET_1_NÆRING_14.næringskode.femsifferIdentifikator,
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
             _2019_4,
@@ -114,7 +114,7 @@ open class GraderingRepositoryJdbcTest {
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
-            PRODUKSJON_AV_KLÆR.kode,
+            PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
             "14222",
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
             _2020_1,
@@ -126,7 +126,7 @@ open class GraderingRepositoryJdbcTest {
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
             UNDERENHET_3_NÆRING_14.orgnr.verdi,
-            PRODUKSJON_AV_KLÆR.kode,
+            PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
             "14222",
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
             _2020_1,
@@ -156,7 +156,7 @@ open class GraderingRepositoryJdbcTest {
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
-            PRODUKSJON_AV_KLÆR.kode,
+            PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
             UNDERENHET_1_NÆRING_14.næringskode.femsifferIdentifikator,
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
             _2019_4,
@@ -168,7 +168,7 @@ open class GraderingRepositoryJdbcTest {
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
             UNDERENHET_3_NÆRING_14.orgnr.verdi,
-            PRODUKSJON_AV_KLÆR.kode,
+            PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
             "14222",
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
             _2020_1,
@@ -316,7 +316,7 @@ open class GraderingRepositoryJdbcTest {
     }
 
     companion object {
-        private val PRODUKSJON_AV_KLÆR = Næring("14", "Produksjon av klær")
+        private val PRODUKSJON_AV_KLÆR = BedreNæring("14")
         private val PRODUKSJON_AV_LÆR_OG_LÆRVARER = Næring("15", "Produksjon av lær og lærvarer")
         private val HELSETJENESTER = Næring("86", "Helsetjenester")
 
