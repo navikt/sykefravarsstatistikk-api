@@ -10,8 +10,6 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datava
 public class DatavarehusRepositoryJdbcTestUtils {
 
   public static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
-    delete(jdbcTemplate, "dt_p.v_dim_ia_naring_sn2007");
-    delete(jdbcTemplate, "dt_p.v_dim_ia_sektor");
     delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_land_v");
     delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_v_2");
     delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_v");
@@ -20,23 +18,6 @@ public class DatavarehusRepositoryJdbcTestUtils {
   public static int delete(NamedParameterJdbcTemplate jdbcTemplate, String tabell) {
     return jdbcTemplate.update(
         String.format("delete from %s", tabell), new MapSqlParameterSource());
-  }
-
-  public static void insertNæringInDvhTabell(
-      NamedParameterJdbcTemplate jdbcTemplate,
-      String næringkode,
-      String næringsgruppekode,
-      String næringnavn) {
-    MapSqlParameterSource naringParams =
-        new MapSqlParameterSource()
-            .addValue("naringkode", næringkode)
-            .addValue("nargrpkode", næringsgruppekode)
-            .addValue("naringnavn", næringnavn);
-
-    jdbcTemplate.update(
-        "insert into dt_p.v_dim_ia_naring_sn2007 (naringkode, nargrpkode, naringnavn) "
-            + "values (:naringkode, :nargrpkode, :naringnavn)",
-        naringParams);
   }
 
   public static void insertOrgenhetInDvhTabell(
