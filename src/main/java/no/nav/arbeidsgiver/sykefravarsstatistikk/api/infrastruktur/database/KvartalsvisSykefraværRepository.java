@@ -52,14 +52,14 @@ public class KvartalsvisSykefraværRepository {
     }
   }
 
-  public List<SykefraværForEttKvartal> hentKvartalsvisSykefraværprosentNæring(Næring næring) {
+  public List<SykefraværForEttKvartal> hentKvartalsvisSykefraværprosentNæring(BedreNæring næring) {
     try {
       return namedParameterJdbcTemplate.query(
           "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal "
               + "FROM sykefravar_statistikk_naring "
-              + "where naring_kode = :naringKode "
+              + "where naring_kode = :naring "
               + "ORDER BY arstall, kvartal ",
-          new MapSqlParameterSource().addValue("naringKode", næring.getKode()),
+          new MapSqlParameterSource().addValue("naring", næring.getTosifferIdentifikator()),
           (rs, rowNum) -> mapTilKvartalsvisSykefraværprosent(rs));
     } catch (EmptyResultDataAccessException e) {
       return Collections.emptyList();

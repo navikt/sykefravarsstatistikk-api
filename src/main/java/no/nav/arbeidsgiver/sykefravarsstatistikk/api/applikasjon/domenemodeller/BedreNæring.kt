@@ -4,11 +4,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 class BedreNæring(
     val tosifferIdentifikator: String
 ) {
-    init {
-        require(næringer.containsKey(tosifferIdentifikator)) { "Fant ingen næring med identifikator '$tosifferIdentifikator'." }
-    }
-
-    val navn = næringer[tosifferIdentifikator]
+    val navn: String = næringer[tosifferIdentifikator]
+        ?: throw IllegalArgumentException("Fant ingen næring med identifikator '$tosifferIdentifikator'.")
 }
 
 private val næringer = mapOf(

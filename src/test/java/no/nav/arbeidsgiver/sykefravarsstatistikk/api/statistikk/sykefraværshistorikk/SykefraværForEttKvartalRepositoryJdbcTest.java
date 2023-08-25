@@ -91,8 +91,8 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
   }
 
   @Test
-  public void hentSykefraværprosentNæring__skal_returnere_riktig_sykefravær() {
-    Næring produksjonAvKlær = new Næring("14", "Produksjon av klær");
+  public void hentSykefraværprosentBedreNæring__skal_returnere_riktig_sykefravær() {
+    BedreNæring produksjonAvKlær = new BedreNæring("14");
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_naring (naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
             + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
@@ -104,7 +104,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_naring (naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
             + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-        parametre(new Næring("85", "Undervisning"), 2018, 4, 10, 5, 100));
+        parametre(new BedreNæring("85"), 2018, 4, 10, 5, 100));
 
     List<SykefraværForEttKvartal> resultat =
         kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentNæring(
@@ -122,25 +122,25 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
         "insert into sykefravar_statistikk_naring5siffer "
             + "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
             + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-        parametre(new Næring("87101", "Somatiske spesialsykehjem"), 2019, 2, 10, 5, 100));
+        parametre(new Næringskode("87101"), 2019, 2, 10, 5, 100));
 
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_naring5siffer "
             + "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
             + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-        parametre(new Næring("87101", "Somatiske spesialsykehjem"), 2019, 1, 10, 1, 100));
+        parametre(new Næringskode("87101"), 2019, 1, 10, 1, 100));
 
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_naring5siffer "
             + "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
             + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-        parametre(new Næring("87102", "Somatiske sykehjem"), 2019, 1, 10, 7, 100));
+        parametre(new Næringskode("87102"), 2019, 1, 10, 7, 100));
 
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_naring5siffer "
             + "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
             + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-        parametre(new Næring("87301", "Aldershjem"), 2018, 4, 10, 6, 100));
+        parametre(new Næringskode("87301"), 2018, 4, 10, 6, 100));
 
     Bransje sykehjem =
         new Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "Sykehjem", List.of("87101", "87102"));
@@ -260,14 +260,25 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
   }
 
   private MapSqlParameterSource parametre(
-      Næring næring,
-      int årstall,
-      int kvartal,
-      int antallPersoner,
-      int tapteDagsverk,
-      int muligeDagsverk) {
+          Næringskode næringskode,
+          int årstall,
+          int kvartal,
+          int antallPersoner,
+          int tapteDagsverk,
+          int muligeDagsverk) {
     return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
-        .addValue("naring_kode", næring.getKode());
+        .addValue("naring_kode", næringskode.getFemsifferIdentifikator());
+  }
+
+  private MapSqlParameterSource parametre(
+          BedreNæring næring,
+          int årstall,
+          int kvartal,
+          int antallPersoner,
+          int tapteDagsverk,
+          int muligeDagsverk) {
+    return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
+        .addValue("naring_kode", næring.getTosifferIdentifikator());
   }
 
   private MapSqlParameterSource parametre(

@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransjeprogram;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KlassifikasjonerRepository;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KvartalsvisSykefraværRepository;
 import org.springframework.stereotype.Component;
 
@@ -26,13 +25,10 @@ public class KvartalsvisSykefraværshistorikkService {
   public static final String SYKEFRAVÆRPROSENT_LAND_LABEL = "Norge";
 
   private final KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository;
-  private final KlassifikasjonerRepository klassifikasjonerRepository;
 
   public KvartalsvisSykefraværshistorikkService(
-      KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository,
-      KlassifikasjonerRepository klassifikasjonerRepository) {
+      KvartalsvisSykefraværRepository kvartalsvisSykefraværprosentRepository) {
     this.kvartalsvisSykefraværprosentRepository = kvartalsvisSykefraværprosentRepository;
-    this.klassifikasjonerRepository = klassifikasjonerRepository;
   }
 
   public List<KvartalsvisSykefraværshistorikk> hentSykefraværshistorikk(
@@ -99,7 +95,7 @@ public class KvartalsvisSykefraværshistorikkService {
         kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(ssbSektor));
   }
 
-  private KvartalsvisSykefraværshistorikk hentSykefraværshistorikkNæring(Næring næring) {
+  private KvartalsvisSykefraværshistorikk hentSykefraværshistorikkNæring(BedreNæring næring) {
     return new KvartalsvisSykefraværshistorikk(
         Statistikkategori.NÆRING,
         næring.getNavn(),
@@ -124,9 +120,9 @@ public class KvartalsvisSykefraværshistorikkService {
 
   protected CompletableFuture<KvartalsvisSykefraværshistorikk>
       uthentingAvSykefraværshistorikkNæring(Virksomhet underenhet) {
-    Næringskode næring5siffer = underenhet.getNæringskode();
-    return uthentingMedTimeout(
-            () -> klassifikasjonerRepository.hentNæring(næring5siffer.getNæring().getTosifferIdentifikator()))
+
+    return CompletableFuture.supplyAsync(() -> underenhet.getNæringskode().getNæring())
+            .orTimeout(TIMEOUT_UTHENTING_FRA_DB_I_SEKUNDER, TimeUnit.SECONDS)
         .thenCompose(
             næring ->
                 uthentingMedFeilhåndteringOgTimeout(
@@ -141,18 +137,12 @@ public class KvartalsvisSykefraværshistorikkService {
                 log.warn(
                     format(
                         "Fikk '%s' ved uthenting av næring '%s'. " + "Returnerer en tom liste",
-                        throwable.getMessage(), næring5siffer.getNæring().getTosifferIdentifikator()),
+                        throwable.getMessage(), underenhet.getNæringskode().getNæring().getTosifferIdentifikator()),
                     throwable);
                 return new KvartalsvisSykefraværshistorikk(
                     Statistikkategori.NÆRING, null, List.of());
               }
             });
-  }
-
-  private static CompletableFuture<Næring> uthentingMedTimeout(
-      Supplier<Næring> hentNæringSupplier) {
-    return CompletableFuture.supplyAsync(hentNæringSupplier)
-        .orTimeout(TIMEOUT_UTHENTING_FRA_DB_I_SEKUNDER, TimeUnit.SECONDS);
   }
 
   protected static CompletableFuture<KvartalsvisSykefraværshistorikk>

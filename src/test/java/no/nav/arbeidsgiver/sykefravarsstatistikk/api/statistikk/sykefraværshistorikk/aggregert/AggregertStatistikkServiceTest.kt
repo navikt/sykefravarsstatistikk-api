@@ -363,7 +363,7 @@ internal class AggregertStatistikkServiceTest {
             )
         )
         whenever(mockBransjeEllerNæringService.finnBransje(any()))
-            .thenReturn(BransjeEllerNæring(Næring("84", "Et langt navn")))
+            .thenReturn(BransjeEllerNæring(BedreNæring("84")))
 
         val årstallOgKvartal = ÅrstallOgKvartal(2022, 1)
         whenever(mockSykefraværRepository.hentTotaltSykefraværAlleKategorier(any(), any())).thenReturn(
@@ -444,7 +444,7 @@ internal class AggregertStatistikkServiceTest {
         assertThat(result?.prosentSiste4KvartalerTotalt).isEqualTo(
             listOf(
                 StatistikkDto(
-                    Statistikkategori.NÆRING, "Et langt navn", "6.8", 20, listOf(
+                    Statistikkategori.NÆRING, "Offentlig administrasjon og forsvar, og trygdeordninger underlagt offentlig forvaltning", "6.8", 20, listOf(
                         årstallOgKvartal
                     )
                 )
@@ -453,7 +453,7 @@ internal class AggregertStatistikkServiceTest {
         assertThat(result?.prosentSiste4KvartalerKorttid).isEqualTo(
             listOf(
                 StatistikkDto(
-                    Statistikkategori.NÆRING, "Et langt navn", "0.7", 20, listOf(
+                    Statistikkategori.NÆRING, "Offentlig administrasjon og forsvar, og trygdeordninger underlagt offentlig forvaltning", "0.7", 20, listOf(
                         årstallOgKvartal
                     )
                 )
@@ -462,7 +462,7 @@ internal class AggregertStatistikkServiceTest {
         assertThat(result?.prosentSiste4KvartalerLangtid).isEqualTo(
             listOf(
                 StatistikkDto(
-                    Statistikkategori.NÆRING, "Et langt navn", "6.1", 20, listOf(
+                    Statistikkategori.NÆRING, "Offentlig administrasjon og forsvar, og trygdeordninger underlagt offentlig forvaltning", "6.1", 20, listOf(
                         årstallOgKvartal
                     )
                 )

@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.Aggregeringskalkulator
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.BedreNæring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sykefraværsdata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal
@@ -41,7 +41,7 @@ internal class AggregeringskalkulatorTest {
             Sykefraværsdata(mutableMapOf(Statistikkategori.NÆRING to synkendeSykefravær)),
             TestUtils.SISTE_PUBLISERTE_KVARTAL
         )
-        val dummynæring = BransjeEllerNæring(Næring("00000", "Dummynæring"))
+        val dummynæring = BransjeEllerNæring(BedreNæring("00"))
         AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentBransjeEllerNæring(dummynæring).get().verdi)
             .isEqualTo("5.0")
     }
@@ -61,7 +61,7 @@ internal class AggregeringskalkulatorTest {
             Sykefraværsdata(mutableMapOf(Statistikkategori.NÆRING to synkendeSykefravær)),
             TestUtils.SISTE_PUBLISERTE_KVARTAL
         )
-        val dummynæring = BransjeEllerNæring(Næring("00000", "Dummynæring"))
+        val dummynæring = BransjeEllerNæring(BedreNæring("00"))
         AssertionsForClassTypes.assertThat(kalkulator.trendBransjeEllerNæring(dummynæring).get().verdi)
             .isEqualTo("-8.0")
     }

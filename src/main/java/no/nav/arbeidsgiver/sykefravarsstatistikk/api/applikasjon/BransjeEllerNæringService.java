@@ -1,80 +1,44 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon;
 
-import java.util.List;
-import java.util.Optional;
-
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.BedreNæring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Virksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.BransjeEllerNæring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransjeprogram;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KlassifikasjonerRepository;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 public class BransjeEllerNæringService {
+    @Deprecated
+    public BransjeEllerNæring bestemFraNæringskode(Næringskode næringskode5Siffer) {
+        Optional<Bransje> bransje = Bransjeprogram.finnBransje(næringskode5Siffer);
 
-  private final KlassifikasjonerRepository klassifikasjonerRepository;
+        boolean skalHenteDataPåNæring = bransje.isEmpty() || bransje.get().erDefinertPåTosiffernivå();
 
-  public BransjeEllerNæringService(KlassifikasjonerRepository klassifikasjonerRepository) {
-    this.klassifikasjonerRepository = klassifikasjonerRepository;
-  }
-
-  @Deprecated
-  public BransjeEllerNæring bestemFraNæringskode(Næringskode næringskode5Siffer) {
-    Optional<Bransje> bransje = Bransjeprogram.finnBransje(næringskode5Siffer);
-
-    boolean skalHenteDataPåNæring = bransje.isEmpty() || bransje.get().erDefinertPåTosiffernivå();
-
-    if (skalHenteDataPåNæring) {
-      return new BransjeEllerNæring(
-          klassifikasjonerRepository.hentNæring(næringskode5Siffer.getNæring().getTosifferIdentifikator()));
-    } else {
-      return new BransjeEllerNæring(bransje.get());
+        if (skalHenteDataPåNæring) {
+            String kode = næringskode5Siffer.getNæring().getTosifferIdentifikator();
+            return new BransjeEllerNæring(
+                    new BedreNæring(kode));
+        } else {
+            return new BransjeEllerNæring(bransje.get());
+        }
     }
-  }
 
-  public BransjeEllerNæring finnBransje(Virksomhet virksomhet) {
-    Optional<Bransje> bransje = Bransjeprogram.finnBransje(virksomhet);
+    public BransjeEllerNæring finnBransje(Virksomhet virksomhet) {
+        Optional<Bransje> bransje = Bransjeprogram.finnBransje(virksomhet);
 
-    return bransje
-        .map(BransjeEllerNæring::new)
-        .orElseGet(
-            () ->
-                new BransjeEllerNæring(
-                    klassifikasjonerRepository.hentNæring(
-                        virksomhet.getNæringskode().getNæring().getTosifferIdentifikator())));
-  }
+        return bransje
+                .map(BransjeEllerNæring::new)
+                .orElseGet(
+                        () ->
+                        {
+                            String kode = virksomhet.getNæringskode().getNæring().getTosifferIdentifikator();
+                            return new BransjeEllerNæring(
+                                    new BedreNæring(kode));
+                        });
+    }
 
-  public BransjeEllerNæring finnBransjeFraMetadata(
-      VirksomhetMetadata virksomhetMetaData, List<Næring> alleNæringer) {
-    UnderenhetLegacy virksomhet =
-        new UnderenhetLegacy(
-            new Orgnr(virksomhetMetaData.getOrgnr()),
-            new Orgnr(""),
-            virksomhetMetaData.getNavn(),
-            new Næringskode(
-                virksomhetMetaData.getNæringOgNæringskode5siffer().stream().findFirst().isPresent()
-                    ? virksomhetMetaData.getNæringOgNæringskode5siffer().stream()
-                    .findFirst()
-                    .get().getFemsifferIdentifikator()
-                    : "00000"
-            ),
-            0);
-
-    Optional<Bransje> bransje = Bransjeprogram.finnBransje(virksomhet);
-
-    return bransje
-        .map(BransjeEllerNæring::new)
-        .orElseGet(
-            () ->
-                new BransjeEllerNæring(hentNæringForVirksomhet(virksomhetMetaData, alleNæringer)));
-  }
-
-  private Næring hentNæringForVirksomhet(
-      VirksomhetMetadata virksomhetMetadata, List<Næring> næringer) {
-    return næringer.stream()
-        .filter(næring -> næring.getKode().equals(virksomhetMetadata.getPrimærnæring()))
-        .findFirst()
-        .orElse(new Næring(virksomhetMetadata.getPrimærnæring(), "Ukjent næring"));
-  }
 }
