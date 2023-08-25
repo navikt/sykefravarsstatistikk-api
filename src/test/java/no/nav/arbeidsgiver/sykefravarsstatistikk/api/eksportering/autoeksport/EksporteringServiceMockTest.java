@@ -85,8 +85,8 @@ public class EksporteringServiceMockTest {
                 .thenReturn(List.of(virksomhetEksportPerKvartal));
         virksomhetMetadata.leggTilNæringOgNæringskode5siffer(
                 Arrays.asList(
-                        new BedreNæringskode("11000"),
-                        new BedreNæringskode("85000")
+                        new Næringskode("11000"),
+                        new Næringskode("85000")
                 ));
         ÅrstallOgKvartal fraÅrstallOgKvartal = __2020_2.minusKvartaler(3);
 
@@ -147,8 +147,8 @@ public class EksporteringServiceMockTest {
                 virksomhet1_TilHørerBransjeMetadata(årstallOgKvartal);
         virksomhet1_TilHørerBransjeMetadata.leggTilNæringOgNæringskode5siffer(
                 Arrays.asList(
-                        new BedreNæringskode("86101"),
-                        new BedreNæringskode("86102")
+                        new Næringskode("86101"),
+                        new Næringskode("86102")
                 ));
 
         when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2))

@@ -207,9 +207,9 @@ open class GraderingRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværForEttKvartalMedGradering__skal_returnere_riktig_sykefravær_for_bransje() {
-        val (kode) = BedreNæringskode("86101")
-        val (kode1) = BedreNæringskode("86211")
-        val (kode2) = BedreNæringskode("86902")
+        val (kode) = Næringskode("86101")
+        val (kode1) = Næringskode("86211")
+        val (kode2) = Næringskode("86902")
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
@@ -278,7 +278,7 @@ open class GraderingRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværForEttKvartalMedGradering__henterIkkeUtGradertSykefraværForOverordnetEnhet() {
-        val (kode) = BedreNæringskode("86101")
+        val (kode) = Næringskode("86101")
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
             OVERORDNETENHET_1_NÆRING_86.orgnr.verdi,
@@ -323,7 +323,7 @@ open class GraderingRepositoryJdbcTest {
         private val OVERORDNETENHET_1_NÆRING_86 = OverordnetEnhet(
             orgnr = Orgnr("999999777"),
             navn = "Hospital",
-            næringskode = BedreNæringskode("86101"),
+            næringskode = Næringskode("86101"),
             sektor = Sektor.PRIVAT,
         )
 
@@ -331,21 +331,21 @@ open class GraderingRepositoryJdbcTest {
             Orgnr("999999999"),
             null,
             null.toString(),
-            BedreNæringskode("14120"),
+            Næringskode("14120"),
             null
         )
         private val UNDERENHET_2_NÆRING_15 = UnderenhetLegacy(
             Orgnr("888888888"),
             null,
             null.toString(),
-            BedreNæringskode("15100"),
+            Næringskode("15100"),
             null
         )
         private val UNDERENHET_3_NÆRING_14 = UnderenhetLegacy(
             Orgnr("777777777"),
             null,
             null.toString(),
-            BedreNæringskode("14120"),
+            Næringskode("14120"),
             null
         )
         private val _2020_1 = ÅrstallOgKvartal(2020, 1)

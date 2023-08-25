@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-data class BedreNæringskode(
+data class Næringskode(
     val femsifferIdentifikator: String
 ) {
     init {

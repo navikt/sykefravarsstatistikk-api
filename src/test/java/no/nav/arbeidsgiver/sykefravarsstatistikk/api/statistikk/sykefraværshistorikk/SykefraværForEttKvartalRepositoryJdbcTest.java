@@ -160,7 +160,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
             new Orgnr("999999999"),
             new Orgnr("1111111111"),
             "test Barnehage",
-            new BedreNæringskode("88911"),
+            new Næringskode("88911"),
             10);
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
@@ -192,7 +192,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
             new Orgnr("999999999"),
             new Orgnr("1111111111"),
             "test Barnehage",
-            new BedreNæringskode("88911"),
+            new Næringskode("88911"),
             10);
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk, varighet) "

@@ -131,7 +131,7 @@ public class TestUtils {
 
   public static void opprettStatistikkForNæringskode(
           NamedParameterJdbcTemplate jdbcTemplate,
-          BedreNæringskode næringskode5Siffer,
+          Næringskode næringskode5Siffer,
           int årstall,
           int kvartal,
           int tapteDagsverk,

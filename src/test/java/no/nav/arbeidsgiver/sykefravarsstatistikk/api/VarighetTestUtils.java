@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.BedreNæringskode;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -33,7 +33,7 @@ public class VarighetTestUtils {
 
   public static void leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
           NamedParameterJdbcTemplate jdbcTemplate,
-          BedreNæringskode næringskode,
+          Næringskode næringskode,
           ÅrstallOgKvartal årstallOgKvartal,
           int antallPersoner,
           int muligeDagsverk) {
@@ -50,7 +50,7 @@ public class VarighetTestUtils {
 
   public static void leggTilStatisitkkNæringMedVarighet(
           NamedParameterJdbcTemplate jdbcTemplate,
-          BedreNæringskode næringskode,
+          Næringskode næringskode,
           ÅrstallOgKvartal årstallOgKvartal,
           Varighetskategori varighetskategori,
           int tapteDagsverk) {
@@ -67,7 +67,7 @@ public class VarighetTestUtils {
 
   public static void leggTilStatisitkkNæringMedVarighet(
           NamedParameterJdbcTemplate jdbcTemplate,
-          BedreNæringskode næringskode,
+          Næringskode næringskode,
           int årstall,
           int kvartal,
           String varighet,

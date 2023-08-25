@@ -37,9 +37,9 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
     private SykefraværsstatistikkTilEksporteringRepository repository;
 
-    private final BedreNæringskode produksjonAvKlær =
-            new BedreNæringskode("14190");
-    private final BedreNæringskode undervisning = new BedreNæringskode("86907");
+    private final Næringskode produksjonAvKlær =
+            new Næringskode("14190");
+    private final Næringskode undervisning = new Næringskode("86907");
     private final Næring utdanning = new Næring("86", "Utdanning");
     private final Næring produksjon = new Næring("14", "Produksjon");
     private final String VIRKSOMHET_1 = "999999999";
@@ -459,14 +459,14 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
             int årstall,
             int kvartal,
             int antallPersoner,
-            BedreNæringskode BedreNæringskode,
+            Næringskode næringskode,
             int tapteDagsverk,
             int muligeDagsverk) {
         List<SykefraværsstatistikkForNæringskode> statistikkForNæring5Siffer =
                 actual.stream()
                         .filter(
                                 sfNæring ->
-                                        sfNæring.getNæringkode5siffer().equals(BedreNæringskode.getFemsifferIdentifikator())
+                                        sfNæring.getNæringkode5siffer().equals(næringskode.getFemsifferIdentifikator())
                                                 && sfNæring.getårstall() == årstall
                                                 && sfNæring.getKvartal() == kvartal)
                         .collect(Collectors.toList());
@@ -598,7 +598,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     }
 
     private void createStatistikkNæring5Siffer(
-            BedreNæringskode næringskode,
+            Næringskode næringskode,
             int årstall,
             int kvartal,
             int antallPersoner,

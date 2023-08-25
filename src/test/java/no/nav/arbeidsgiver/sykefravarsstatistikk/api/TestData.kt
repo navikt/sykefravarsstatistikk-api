@@ -43,8 +43,8 @@ object TestData {
 
     @JvmStatic
     @JvmOverloads
-    fun enNæringskode(kode: String? = "12345"): BedreNæringskode {
-        return BedreNæringskode(kode!!)
+    fun enNæringskode(kode: String? = "12345"): Næringskode {
+        return Næringskode(kode!!)
     }
 
     @JvmStatic

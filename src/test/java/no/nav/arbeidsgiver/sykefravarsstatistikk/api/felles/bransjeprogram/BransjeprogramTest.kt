@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.BedreNæringskode
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje.BARNEHAGER
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje.NÆRINGSMIDDELINDUSTRI
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransjeprogram
@@ -12,7 +12,7 @@ internal class BransjeprogramTest {
 
     @Test
     fun `finnBransje returnerer tom Optional hvis input er null`() {
-        val næringskode: BedreNæringskode? = null
+        val næringskode: Næringskode? = null
 
         assertThat(Bransjeprogram.finnBransje(næringskode)).isEmpty
     }
@@ -27,7 +27,7 @@ internal class BransjeprogramTest {
 
     @Test
     fun `finnBransje returnerer BARNEHAGE for næringskode 88911`() {
-        val næringskodenTilBarnehager = BedreNæringskode("88911")
+        val næringskodenTilBarnehager = Næringskode("88911")
 
         val barnehagebransjen = Bransjeprogram.finnBransje(næringskodenTilBarnehager).get().type
         assertEquals(BARNEHAGER, barnehagebransjen)
@@ -35,7 +35,7 @@ internal class BransjeprogramTest {
 
     @Test
     fun `finnBransje returnerer empty for næringskode 84300`() {
-        val næringskode = BedreNæringskode("84300")
+        val næringskode = Næringskode("84300")
 
         val bransje = Bransjeprogram.finnBransje(næringskode)
         assertThat(bransje).isEmpty
@@ -49,7 +49,7 @@ internal class BransjeprogramTest {
 
     @Test
     fun `finnBransje returnerer NÆRINGSMIDDELINDUSTRI for næringskode 10320`() {
-        val juicepressing = BedreNæringskode("10320")
+        val juicepressing = Næringskode("10320")
 
         val næringsmiddelbransjen = Bransjeprogram.finnBransje(juicepressing).get().type
         assertEquals(NÆRINGSMIDDELINDUSTRI, næringsmiddelbransjen)

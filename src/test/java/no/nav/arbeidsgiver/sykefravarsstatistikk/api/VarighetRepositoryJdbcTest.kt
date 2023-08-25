@@ -45,7 +45,7 @@ open class VarighetRepositoryJdbcTest {
             Orgnr("999999999"),
             Orgnr("1111111111"),
             "test Barnehage",
-            BedreNæringskode("88911"),
+            Næringskode("88911"),
             10
         )
         VarighetTestUtils.leggTilVirksomhetsstatistikkMedVarighet(
@@ -92,7 +92,7 @@ open class VarighetRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværForEttKvartalMedVarighet_for_næring__skal_returnere_riktig_sykefravær() {
-        val barnehager = BedreNæringskode("88911")
+        val barnehager = Næringskode("88911")
         VarighetTestUtils.leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
             jdbcTemplate, barnehager, ÅrstallOgKvartal(2019, 2), 1, 10
         )
@@ -131,8 +131,8 @@ open class VarighetRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværForEttKvartalMedVarighet_for_bransje__skal_returnere_riktig_sykefravær() {
-        val sykehus = BedreNæringskode("86101")
-        val legetjeneste = BedreNæringskode("86211")
+        val sykehus = Næringskode("86101")
+        val legetjeneste = Næringskode("86211")
         VarighetTestUtils.leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
             jdbcTemplate, sykehus, ÅrstallOgKvartal(2019, 2), 1, 10
         )
@@ -192,8 +192,8 @@ open class VarighetRepositoryJdbcTest {
 
     @Test
     fun `hent sykefravær med varighet for næring burde returnere sykefraværsstatistikk for alle inkluderte næringskoder`() {
-        val næringskode1 = BedreNæringskode("84300")
-        val næringskode2 = BedreNæringskode("84999")
+        val næringskode1 = Næringskode("84300")
+        val næringskode2 = Næringskode("84999")
         val næring1 = Næring(næringskode1.næring.tosifferIdentifikator, "Næring 1")
 
         // Populer databasen med statistikk for to næringskoder, som har felles næring

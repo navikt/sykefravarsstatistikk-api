@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.BedreNæringskode
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Virksomhet
 import java.util.*
 
@@ -46,5 +46,5 @@ object Bransjeprogram {
         Optional.ofNullable(alleBransjer.firstOrNull { it.inkludererNæringskode(næringskode5Siffer) })
 
     @JvmStatic
-    fun finnBransje(næringskode5Siffer: BedreNæringskode?): Optional<Bransje> = finnBransje(næringskode5Siffer?.femsifferIdentifikator)
+    fun finnBransje(næringskode5Siffer: Næringskode?): Optional<Bransje> = finnBransje(næringskode5Siffer?.femsifferIdentifikator)
 }

@@ -218,8 +218,8 @@ public class EksporteringServiceUtilsTest {
       getSykefraværMedKategoriForNæring5Siffer__returnerer_SykefraværMedKategori__med_sykefraværsstatistikk_for_næring_5_siffer() {
     virksomhet1Metadata_2020_4.leggTilNæringOgNæringskode5siffer(
         Arrays.asList(
-                new BedreNæringskode("85000"),
-                new BedreNæringskode("11000")
+                new Næringskode("85000"),
+                new Næringskode("11000")
         ));
     List<SykefraværMedKategori> resultat =
         getSykefraværMedKategoriForNæring5Siffer(
@@ -252,8 +252,8 @@ public class EksporteringServiceUtilsTest {
     VirksomhetMetadata virksomhetMetadata_2020_4_med_næring5siffer = virksomhet1Metadata_2020_4;
     virksomhetMetadata_2020_4_med_næring5siffer.leggTilNæringOgNæringskode5siffer(
         Arrays.asList(
-                new BedreNæringskode("11000"),
-                new BedreNæringskode("85000")));
+                new Næringskode("11000"),
+                new Næringskode("85000")));
     List<SykefraværsstatistikkForNæringskode> sykefraværsstatistikkForNæringskodeList =
         Arrays.asList(
             byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "11000"),

@@ -41,7 +41,7 @@ public class SykefraværRepositoryJdbcTest {
           new Orgnr("999999999"),
           new Orgnr("1111111111"),
           "test Barnehage",
-          new BedreNæringskode("88911"),
+          new Næringskode("88911"),
           10);
 
   static final Næring NÆRING = new Næring("10", "test Næring");

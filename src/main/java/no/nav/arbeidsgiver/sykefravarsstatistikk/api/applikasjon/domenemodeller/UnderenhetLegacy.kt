@@ -5,7 +5,7 @@ data class UnderenhetLegacy(
     override var orgnr: Orgnr,
     var overordnetEnhetOrgnr: Orgnr? = null,
     override var navn: String,
-    override var næringskode: BedreNæringskode,
+    override var næringskode: Næringskode,
     var antallAnsatte: Int? = null,
 ) : Virksomhet
 

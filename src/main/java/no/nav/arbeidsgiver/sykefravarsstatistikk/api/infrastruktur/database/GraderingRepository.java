@@ -33,7 +33,7 @@ public class GraderingRepository {
     this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
   }
 
-  public List<VirksomhetMetadataNæringskode5siffer> hentVirksomhetMetadataNæringskode5siffer(
+  public List<VirksomhetMetadataMedNæringskode> hentVirksomhetMetadataNæringskode5siffer(
       ÅrstallOgKvartal årstallOgKvartal) {
     try {
       return namedParameterJdbcTemplate.query(
@@ -48,10 +48,10 @@ public class GraderingRepository {
               .addValue("årstall", årstallOgKvartal.getÅrstall())
               .addValue("kvartal", årstallOgKvartal.getKvartal()),
           (rs, rowNum) ->
-              new VirksomhetMetadataNæringskode5siffer(
+              new VirksomhetMetadataMedNæringskode(
                   new Orgnr(rs.getString("orgnr")),
                   new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
-                  new BedreNæringskode(rs.getString("naring_kode"))
+                  new Næringskode(rs.getString("naring_kode"))
               ));
     } catch (EmptyResultDataAccessException e) {
       return Collections.emptyList();

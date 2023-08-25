@@ -1,9 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-class VirksomhetMetadataNæringskode5siffer(
+class VirksomhetMetadataMedNæringskode(
     private val orgnr: Orgnr,
     private val årstallOgKvartal: ÅrstallOgKvartal,
-    private val næringskode: BedreNæringskode
+    private val næringskode: Næringskode
 ) {
     fun getOrgnr(): String {
         return orgnr.verdi
@@ -21,7 +21,7 @@ class VirksomhetMetadataNæringskode5siffer(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
-        val that = other as VirksomhetMetadataNæringskode5siffer
+        val that = other as VirksomhetMetadataMedNæringskode
         if (orgnr != that.orgnr) return false
         return if (årstallOgKvartal != that.årstallOgKvartal) false else næringskode == that.næringskode
     }

@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.bransjep
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.enNæringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.etOrgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.BedreNæringskode
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UnderenhetLegacy
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje
@@ -26,49 +26,49 @@ class BransjeTest {
 
     @Test
     fun finnBransje__mapperBarnehageTilBarnehagebransjen() {
-        val enBarnehage = BedreNæringskode("88911")
+        val enBarnehage = Næringskode("88911")
         val (_, navn) = finnBransje(enBarnehage).orElseThrow()
         Assertions.assertThat(navn).isEqualTo("Barnehager")
     }
 
     @Test
     fun finnBransje__mapperBoligbyggelagTilByggebransjen() {
-        val etBoligbyggerlag = BedreNæringskode("41101")
+        val etBoligbyggerlag = Næringskode("41101")
         val (_, navn) = finnBransje(etBoligbyggerlag).orElseThrow()
         Assertions.assertThat(navn).isEqualTo("Bygg")
     }
 
     @Test
     fun finnBransje__mapperBroOgTunellbyggerTilAnleggsbransjen() {
-        val enByggerAvBroOgTunnel = BedreNæringskode("42130")
+        val enByggerAvBroOgTunnel = Næringskode("42130")
         val (_, navn) = finnBransje(enByggerAvBroOgTunnel).orElseThrow()
         Assertions.assertThat(navn).isEqualTo("Anlegg")
     }
 
     @Test
     fun finnBransje__mapperProdusentAvIskremTilNæringsmiddelindustrien() {
-        val enProdusentAvIskrem = BedreNæringskode("10520")
+        val enProdusentAvIskrem = Næringskode("10520")
         val (_, navn) = finnBransje(enProdusentAvIskrem).orElseThrow()
         Assertions.assertThat(navn).isEqualTo("Næringsmiddelsindustrien")
     }
 
     @Test
     fun finnBransje__mapperSomatiskeSpesialsykehusTilSykehusbransjen() {
-        val etSomatiskSpesialsykehus = BedreNæringskode("86102")
+        val etSomatiskSpesialsykehus = Næringskode("86102")
         val (_, navn) = finnBransje(etSomatiskSpesialsykehus).orElseThrow()
         Assertions.assertThat(navn).isEqualTo("Sykehus")
     }
 
     @Test
     fun finnBransje__mapperSykehjemTilSykehjemsbransjen() {
-        val etSomatiskSykehjem = BedreNæringskode("87102")
+        val etSomatiskSykehjem = Næringskode("87102")
         val (_, navn) = finnBransje(etSomatiskSykehjem).orElseThrow()
         Assertions.assertThat(navn).isEqualTo("Sykehjem")
     }
 
     @Test
     fun finnBransje__mapperTurbiltransportTilTransportbransjen() {
-        val enturbiltransportør = BedreNæringskode("49392")
+        val enturbiltransportør = Næringskode("49392")
         val (_, navn) = finnBransje(enturbiltransportør).orElseThrow()
         Assertions.assertThat(navn).isEqualTo("Rutebuss og persontrafikk (transport)")
     }

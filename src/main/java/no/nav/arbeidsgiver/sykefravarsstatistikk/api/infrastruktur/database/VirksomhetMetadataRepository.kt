@@ -43,9 +43,9 @@ open class VirksomhetMetadataRepository(
     }
 
     open fun opprettVirksomhetMetadataNæringskode5siffer(
-        virksomhetMetadataNæringskode5siffer: List<VirksomhetMetadataNæringskode5siffer>
+        virksomhetMetadataMedNæringskode: List<VirksomhetMetadataMedNæringskode>
     ): Int {
-        val batch = SqlParameterSourceUtils.createBatch(*virksomhetMetadataNæringskode5siffer.toTypedArray())
+        val batch = SqlParameterSourceUtils.createBatch(*virksomhetMetadataMedNæringskode.toTypedArray())
         val results = namedParameterJdbcTemplate.batchUpdate(
             """
                 |insert into virksomhet_metadata_naring_kode_5siffer
@@ -106,7 +106,7 @@ open class VirksomhetMetadataRepository(
 
     private fun assemble(
         virksomhetMetadata: List<VirksomhetMetadata>,
-        næringOgNæringskode5siffer: List<Pair<Orgnr, BedreNæringskode>>
+        næringOgNæringskode5siffer: List<Pair<Orgnr, Næringskode>>
     ): List<VirksomhetMetadata> {
 
         val map = næringOgNæringskode5siffer
@@ -122,7 +122,7 @@ open class VirksomhetMetadataRepository(
     private fun næringOgNæringskode5sifferRowMapper() = RowMapper { resultSet: ResultSet, _: Int ->
         Pair(
             Orgnr(resultSet.getString("orgnr")),
-            BedreNæringskode(resultSet.getString("naring_kode_5siffer"))
+            Næringskode(resultSet.getString("naring_kode_5siffer"))
         )
     }
 

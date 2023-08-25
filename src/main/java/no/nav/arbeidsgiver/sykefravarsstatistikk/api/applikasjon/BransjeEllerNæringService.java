@@ -20,7 +20,7 @@ public class BransjeEllerNæringService {
   }
 
   @Deprecated
-  public BransjeEllerNæring bestemFraNæringskode(BedreNæringskode næringskode5Siffer) {
+  public BransjeEllerNæring bestemFraNæringskode(Næringskode næringskode5Siffer) {
     Optional<Bransje> bransje = Bransjeprogram.finnBransje(næringskode5Siffer);
 
     boolean skalHenteDataPåNæring = bransje.isEmpty() || bransje.get().erDefinertPåTosiffernivå();
@@ -52,7 +52,7 @@ public class BransjeEllerNæringService {
             new Orgnr(virksomhetMetaData.getOrgnr()),
             new Orgnr(""),
             virksomhetMetaData.getNavn(),
-            new BedreNæringskode(
+            new Næringskode(
                 virksomhetMetaData.getNæringOgNæringskode5siffer().stream().findFirst().isPresent()
                     ? virksomhetMetaData.getNæringOgNæringskode5siffer().stream()
                     .findFirst()

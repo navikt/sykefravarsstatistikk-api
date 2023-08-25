@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import common.SpringIntegrationTestbase;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.VarighetTestUtils;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.BedreNæringskode;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
 import no.nav.security.mock.oauth2.MockOAuth2Server;
@@ -58,7 +58,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
   @LocalServerPort private String port;
 
   private final ObjectMapper objectMapper = new ObjectMapper();
-  private final BedreNæringskode BARNEHAGER = new BedreNæringskode("88911");
+  private final Næringskode BARNEHAGER = new Næringskode("88911");
 
   @Test
   public void hentAgreggertStatistikk_skalReturnere403NaarBrukerIkkeRepresentererBedriften()
@@ -197,10 +197,10 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
         0,
         100);
     VarighetTestUtils.leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
-        jdbcTemplate, new BedreNæringskode("10300"), new ÅrstallOgKvartal(2022, 1), 10, 100);
+        jdbcTemplate, new Næringskode("10300"), new ÅrstallOgKvartal(2022, 1), 10, 100);
     VarighetTestUtils.leggTilStatisitkkNæringMedVarighet(
         jdbcTemplate,
-        new BedreNæringskode("10300"),
+        new Næringskode("10300"),
         new ÅrstallOgKvartal(2022, 1),
         Varighetskategori._1_DAG_TIL_7_DAGER,
         10);
