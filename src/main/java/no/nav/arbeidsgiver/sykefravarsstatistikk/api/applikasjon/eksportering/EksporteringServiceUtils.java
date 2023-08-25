@@ -197,9 +197,9 @@ public class EksporteringServiceUtils {
 
   public static SykefraværMedKategori getSykefraværMedKategoriNæringForVirksomhet(
       VirksomhetMetadata virksomhetMetadata,
-      List<SykefraværsstatistikkNæring> sykefraværsstatistikkNæring) {
-    SykefraværsstatistikkNæring sfNæring =
-        sykefraværsstatistikkNæring.stream()
+      List<SykefraværsstatistikkForNæring> sykefraværsstatistikkForNæring) {
+    SykefraværsstatistikkForNæring sfNæring =
+        sykefraværsstatistikkForNæring.stream()
             .filter(
                 v ->
                     v.getNæringkode().equals(virksomhetMetadata.getPrimærnæring())
@@ -207,7 +207,7 @@ public class EksporteringServiceUtils {
                         && v.getKvartal() == virksomhetMetadata.getKvartal())
             .collect(
                 toSingleton(
-                    new SykefraværsstatistikkNæring(
+                    new SykefraværsstatistikkForNæring(
                         virksomhetMetadata.getÅrstall(),
                         virksomhetMetadata.getKvartal(),
                             virksomhetMetadata.getPrimærnæring(),

@@ -86,7 +86,7 @@ public class SykefraværsstatistikkTilEksporteringRepository {
 
   /* Sykefraværsprosent Næring */
 
-  public List<SykefraværsstatistikkNæring> hentSykefraværprosentAlleNæringer(
+  public List<SykefraværsstatistikkForNæring> hentSykefraværprosentAlleNæringer(
       ÅrstallOgKvartal sisteÅrstallOgKvartal, int antallKvartaler) {
     if (antallKvartaler == 2) {
       return hentSykefraværprosentAlleNæringer(sisteÅrstallOgKvartal);
@@ -96,12 +96,12 @@ public class SykefraværsstatistikkTilEksporteringRepository {
         sisteÅrstallOgKvartal, sisteÅrstallOgKvartal.minusKvartaler(antallKvartaler - 1));
   }
 
-  public List<SykefraværsstatistikkNæring> hentSykefraværprosentAlleNæringer(
+  public List<SykefraværsstatistikkForNæring> hentSykefraværprosentAlleNæringer(
       ÅrstallOgKvartal årstallOgKvartal) {
     return hentSykefraværprosentAlleNæringer(årstallOgKvartal, årstallOgKvartal);
   }
 
-  public List<SykefraværsstatistikkNæring> hentSykefraværprosentAlleNæringer(
+  public List<SykefraværsstatistikkForNæring> hentSykefraværprosentAlleNæringer(
       ÅrstallOgKvartal fraÅrstallOgKvartal, ÅrstallOgKvartal tilÅrstallOgKvartal) {
     try {
       return namedParameterJdbcTemplate.query(
@@ -116,12 +116,12 @@ public class SykefraværsstatistikkTilEksporteringRepository {
     }
   }
 
-  public List<SykefraværsstatistikkForNæringskode> hentSykefraværprosentAlleNæringer5Siffer(
+  public List<SykefraværsstatistikkForNæringskode> hentSykefraværprosentForAlleNæringskoder(
       ÅrstallOgKvartal årstallOgKvartal) {
-    return hentSykefraværprosentAlleNæringer5Siffer(årstallOgKvartal, årstallOgKvartal);
+    return hentSykefraværprosentForAlleNæringskoder(årstallOgKvartal, årstallOgKvartal);
   }
 
-  public List<SykefraværsstatistikkForNæringskode> hentSykefraværprosentAlleNæringer5Siffer(
+  public List<SykefraværsstatistikkForNæringskode> hentSykefraværprosentForAlleNæringskoder(
       ÅrstallOgKvartal fraÅrstallOgKvartal, ÅrstallOgKvartal tilÅrstallOgKvartal) {
 
     try {
@@ -163,7 +163,7 @@ public class SykefraværsstatistikkTilEksporteringRepository {
     }
   }
 
-  public List<SykefraværsstatistikkNæring> hentSykefraværAlleNæringerFraOgMed(
+  public List<SykefraværsstatistikkForNæring> hentSykefraværAlleNæringerFraOgMed(
       ÅrstallOgKvartal fraÅrstallOgKvartal) {
     try {
       return namedParameterJdbcTemplate.query(
@@ -245,9 +245,9 @@ public class SykefraværsstatistikkTilEksporteringRepository {
         rs.getBigDecimal("mulige_dagsverk"));
   }
 
-  public static SykefraværsstatistikkNæring mapTilSykefraværsstatistikkNæring(ResultSet rs)
+  public static SykefraværsstatistikkForNæring mapTilSykefraværsstatistikkNæring(ResultSet rs)
       throws SQLException {
-    return new SykefraværsstatistikkNæring(
+    return new SykefraværsstatistikkForNæring(
         rs.getInt("arstall"),
         rs.getInt("kvartal"),
         rs.getString("naring_kode"),

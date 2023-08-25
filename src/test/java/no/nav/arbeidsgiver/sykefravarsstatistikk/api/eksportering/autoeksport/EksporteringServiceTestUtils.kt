@@ -164,8 +164,8 @@ object EksporteringServiceTestUtils {
         antallPersoner: Int,
         tapteDagsverk: Int,
         muligeDagsverk: Int
-    ): SykefraværsstatistikkNæring {
-        return SykefraværsstatistikkNæring(
+    ): SykefraværsstatistikkForNæring {
+        return SykefraværsstatistikkForNæring(
             virksomhetMetadata.årstall,
             virksomhetMetadata.kvartal,
             virksomhetMetadata.primærnæring,
@@ -178,8 +178,8 @@ object EksporteringServiceTestUtils {
     @JvmStatic
     fun byggSykefraværStatistikkNæring(
         virksomhetMetadata: VirksomhetMetadata
-    ): SykefraværsstatistikkNæring {
-        return SykefraværsstatistikkNæring(
+    ): SykefraværsstatistikkForNæring {
+        return SykefraværsstatistikkForNæring(
             virksomhetMetadata.årstall,
             virksomhetMetadata.kvartal,
             virksomhetMetadata.primærnæring,
@@ -333,8 +333,8 @@ object EksporteringServiceTestUtils {
     @JvmOverloads
     fun sykefraværsstatistikkNæring(
         årstallOgKvartal: ÅrstallOgKvartal, næringskode: String? = "11"
-    ): SykefraværsstatistikkNæring {
-        return SykefraværsstatistikkNæring(
+    ): SykefraværsstatistikkForNæring {
+        return SykefraværsstatistikkForNæring(
             årstallOgKvartal.årstall,
             årstallOgKvartal.kvartal,
             næringskode!!,

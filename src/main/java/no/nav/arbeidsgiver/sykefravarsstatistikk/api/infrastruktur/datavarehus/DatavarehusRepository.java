@@ -116,7 +116,7 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
   }
 
-  public List<SykefraværsstatistikkNæring> hentSykefraværsstatistikkNæring(
+  public List<SykefraværsstatistikkForNæring> hentSykefraværsstatistikkNæring(
       ÅrstallOgKvartal årstallOgKvartal) {
     SqlParameterSource namedParameters =
         new MapSqlParameterSource()
@@ -134,7 +134,7 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
             + "group by arstall, kvartal, naring",
         namedParameters,
         (resultSet, rowNum) ->
-            new SykefraværsstatistikkNæring(
+            new SykefraværsstatistikkForNæring(
                 resultSet.getInt(ARSTALL),
                 resultSet.getInt(KVARTAL),
                 resultSet.getString(NARING),
@@ -143,7 +143,7 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
   }
 
-  public List<SykefraværsstatistikkNæring> hentSykefraværsstatistikkNæring5siffer(
+  public List<SykefraværsstatistikkForNæring> hentSykefraværsstatistikkNæring5siffer(
       ÅrstallOgKvartal årstallOgKvartal) {
     SqlParameterSource namedParameters =
         new MapSqlParameterSource()
@@ -160,7 +160,7 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
             + " group by arstall, kvartal, naering_kode",
         namedParameters,
         (resultSet, rowNum) ->
-            new SykefraværsstatistikkNæring(
+            new SykefraværsstatistikkForNæring(
                 resultSet.getInt(ARSTALL),
                 resultSet.getInt(KVARTAL),
                 resultSet.getString(NARING_5SIFFER),

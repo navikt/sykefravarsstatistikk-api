@@ -87,12 +87,12 @@ class EksporteringService(
             sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(
                 årstallOgKvartal
             )
-        val sykefraværsstatistikkNæring =
+        val sykefraværsstatistikkForNæringer =
             sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(
                 årstallOgKvartal
             )
-        val sykefraværsstatistikkNæring5Siffer =
-            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5Siffer(
+        val sykefraværsstatistikkForNæringskoder =
+            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentForAlleNæringskoder(
                 årstallOgKvartal
             )
         val sykefraværsstatistikkVirksomhetUtenVarighet =
@@ -122,8 +122,8 @@ class EksporteringService(
                 virksomheterMetadataIDenneSubset,
                 årstallOgKvartal,
                 sykefraværsstatistikkSektor,
-                sykefraværsstatistikkNæring,
-                sykefraværsstatistikkNæring5Siffer,
+                sykefraværsstatistikkForNæringer,
+                sykefraværsstatistikkForNæringskoder,
                 sykefraværsstatistikkVirksomhetUtenVarighet,
                 landSykefravær,
                 antallEksportert,
@@ -150,7 +150,7 @@ class EksporteringService(
         virksomheterMetadata: List<VirksomhetMetadata?>,
         årstallOgKvartal: ÅrstallOgKvartal,
         sykefraværsstatistikkSektor: List<SykefraværsstatistikkSektor?>?,
-        sykefraværsstatistikkNæring: List<SykefraværsstatistikkNæring?>?,
+        sykefraværsstatistikkForNæring: List<SykefraværsstatistikkForNæring?>?,
         sykefraværsstatistikkForNæringskode: List<SykefraværsstatistikkForNæringskode?>?,
         sykefraværsstatistikkVirksomhetUtenVarighet: List<SykefraværsstatistikkVirksomhetUtenVarighet?>?,
         landSykefravær: SykefraværMedKategori,
@@ -180,7 +180,7 @@ class EksporteringService(
                             virksomhetMetadata, sykefraværsstatistikkForNæringskode
                         ),
                         EksporteringServiceUtils.getSykefraværMedKategoriNæringForVirksomhet(
-                            virksomhetMetadata, sykefraværsstatistikkNæring
+                            virksomhetMetadata, sykefraværsstatistikkForNæring
                         ),
                         EksporteringServiceUtils.getSykefraværMedKategoriForSektor(
                             virksomhetMetadata,

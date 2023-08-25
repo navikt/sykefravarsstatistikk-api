@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkBransje
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkNæring
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkForNæring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransjeprogram
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
@@ -28,8 +28,8 @@ fun hentSykefraværsstatistikkForBransjerFraOgMed(
     }
 }
 
-operator fun SykefraværsstatistikkNæring.plus(other: SykefraværsstatistikkNæring): SykefraværsstatistikkNæring {
-    return SykefraværsstatistikkNæring(
+operator fun SykefraværsstatistikkForNæring.plus(other: SykefraværsstatistikkForNæring): SykefraværsstatistikkForNæring {
+    return SykefraværsstatistikkForNæring(
         this.årstall,
         this.kvartal,
         this.næringkode,
@@ -43,7 +43,7 @@ private fun hentSykefraværsstatistikkForAngitteNæringskoder(
     namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
     kvartal: ÅrstallOgKvartal,
     næringskoder: List<String>
-): List<SykefraværsstatistikkNæring> {
+): List<SykefraværsstatistikkForNæring> {
     return namedParameterJdbcTemplate.query(
         """
             select arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk
@@ -63,7 +63,7 @@ private fun hentSykefraværsstatistikkForAngitteNæringer(
     namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
     kvartal: ÅrstallOgKvartal,
     næringer: List<String>
-): List<SykefraværsstatistikkNæring> =
+): List<SykefraværsstatistikkForNæring> =
     namedParameterJdbcTemplate.query(
         """
             select arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk
@@ -94,7 +94,7 @@ private fun getKvartalsvisSykefraværsstatistikkNæringer(
     kvartal: ÅrstallOgKvartal,
     næringer: List<String>,
     næringskoder: List<String>
-): Map<ÅrstallOgKvartal, List<SykefraværsstatistikkNæring>> {
+): Map<ÅrstallOgKvartal, List<SykefraværsstatistikkForNæring>> {
 
     val statistikkNæringer = hentSykefraværsstatistikkForAngitteNæringer(
         namedParameterJdbcTemplate, kvartal, næringer
@@ -106,9 +106,9 @@ private fun getKvartalsvisSykefraværsstatistikkNæringer(
 }
 
 private fun summerSykefraværsstatistikkPerBransje(
-    kvartalsvisSykefraværsstatistikkNæringer: Map<ÅrstallOgKvartal, List<SykefraværsstatistikkNæring>>
+    kvartalsvisSykefraværsstatistikkForNæringer: Map<ÅrstallOgKvartal, List<SykefraværsstatistikkForNæring>>
 ): List<SykefraværsstatistikkBransje> {
-    return kvartalsvisSykefraværsstatistikkNæringer.flatMap { (_, sykefraværsstatistikkNæringer) ->
+    return kvartalsvisSykefraværsstatistikkForNæringer.flatMap { (_, sykefraværsstatistikkNæringer) ->
         Bransjeprogram.alleBransjer.mapNotNull { bransje ->
             val filtrertPåBransje = hentStatistikkForNæringerSomTilhørerBransje(sykefraværsstatistikkNæringer, bransje)
             summerSykefraværsstatistikkNæringForEttKvartal(filtrertPåBransje, bransje)
@@ -117,17 +117,17 @@ private fun summerSykefraværsstatistikkPerBransje(
 }
 
 private fun hentStatistikkForNæringerSomTilhørerBransje(
-    sykefraværsstatistikkNæringer: List<SykefraværsstatistikkNæring>,
+    sykefraværsstatistikkForNæringer: List<SykefraværsstatistikkForNæring>,
     bransje: Bransje
-): List<SykefraværsstatistikkNæring> {
+): List<SykefraværsstatistikkForNæring> {
     val koderSomSpesifisererNæringer = bransje.identifikatorer
-    return sykefraværsstatistikkNæringer.filter { sykefraværsstatistikkNæring ->
+    return sykefraværsstatistikkForNæringer.filter { sykefraværsstatistikkNæring ->
         koderSomSpesifisererNæringer.contains(sykefraværsstatistikkNæring.næringkode)
     }
 }
 
 private fun summerSykefraværsstatistikkNæringForEttKvartal(
-    filteredNæringer: List<SykefraværsstatistikkNæring>,
+    filteredNæringer: List<SykefraværsstatistikkForNæring>,
     bransje: Bransje,
 ): SykefraværsstatistikkBransje? {
     if (filteredNæringer.isEmpty()) {
@@ -161,7 +161,7 @@ private fun summerSykefraværsstatistikkNæringForEttKvartal(
     }
 }
 
-private fun allStatistikkErFraSammeKvartal(filteredNæringer: List<SykefraværsstatistikkNæring>) =
+private fun allStatistikkErFraSammeKvartal(filteredNæringer: List<SykefraværsstatistikkForNæring>) =
     filteredNæringer.all {
         it.årstall == filteredNæringer.first().årstall && it.kvartal == filteredNæringer.first().kvartal
     }
