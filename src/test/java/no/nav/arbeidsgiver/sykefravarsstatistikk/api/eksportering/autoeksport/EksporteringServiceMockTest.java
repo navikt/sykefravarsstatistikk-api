@@ -82,7 +82,7 @@ public class EksporteringServiceMockTest {
     @Test
     public void eksporter_sender_riktig_melding_til_kafka_og_returnerer_antall_meldinger_sendt() {
         when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2))
-                .thenReturn(Arrays.asList(virksomhetEksportPerKvartal));
+                .thenReturn(List.of(virksomhetEksportPerKvartal));
         virksomhetMetadata.leggTilNæringOgNæringskode5siffer(
                 Arrays.asList(
                         new BedreNæringskode("11000"),
@@ -91,9 +91,9 @@ public class EksporteringServiceMockTest {
         ÅrstallOgKvartal fraÅrstallOgKvartal = __2020_2.minusKvartaler(3);
 
         when(virksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(__2020_2))
-                .thenReturn(Arrays.asList(virksomhetMetadata));
+                .thenReturn(List.of(virksomhetMetadata));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(__2020_2))
-                .thenReturn(Arrays.asList(sykefraværsstatistikkSektor));
+                .thenReturn(List.of(sykefraværsstatistikkSektor));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(__2020_2))
                 .thenReturn(
                         Arrays.asList(
@@ -103,7 +103,7 @@ public class EksporteringServiceMockTest {
                                 sykefraværsstatistikkNæring(fraÅrstallOgKvartal.plussKvartaler(3))));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5Siffer(
                 __2020_2))
-                .thenReturn(Arrays.asList(sykefraværsstatistikkNæring5Siffer));
+                .thenReturn(List.of(sykefraværsstatistikkForNæringskode));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleVirksomheter(__2020_2))
                 .thenReturn(
                         Arrays.asList(
@@ -152,13 +152,13 @@ public class EksporteringServiceMockTest {
                 ));
 
         when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2))
-                .thenReturn(Arrays.asList(virksomhetEksportPerKvartal));
+                .thenReturn(List.of(virksomhetEksportPerKvartal));
 
         when(virksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(årstallOgKvartal))
-                .thenReturn(Arrays.asList(virksomhet1_TilHørerBransjeMetadata));
+                .thenReturn(List.of(virksomhet1_TilHørerBransjeMetadata));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(
                 årstallOgKvartal))
-                .thenReturn(Arrays.asList(sykefraværsstatistikkSektor));
+                .thenReturn(List.of(sykefraværsstatistikkSektor));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(__2020_2))
                 .thenReturn(
                         Arrays.asList(

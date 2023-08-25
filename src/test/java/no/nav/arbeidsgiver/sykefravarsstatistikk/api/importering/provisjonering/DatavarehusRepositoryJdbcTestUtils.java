@@ -126,7 +126,7 @@ public class DatavarehusRepositoryJdbcTestUtils {
       int kvartal,
       int antallPersoner,
       String orgnr,
-      String næringskode5siffer,
+      String næringskode,
       Varighetskategori varighet,
       String kjonn,
       long taptedagsverk,
@@ -139,7 +139,7 @@ public class DatavarehusRepositoryJdbcTestUtils {
             .addValue("antpers", antallPersoner)
             .addValue("orgnr", orgnr)
             .addValue("varighet", varighet.kode)
-            .addValue("naering_kode", næringskode5siffer)
+            .addValue("naering_kode", næringskode)
             .addValue("sektor", Sektor.PRIVAT.getSektorkode())
             .addValue("kjonn", kjonn)
             .addValue("taptedv", taptedagsverk)

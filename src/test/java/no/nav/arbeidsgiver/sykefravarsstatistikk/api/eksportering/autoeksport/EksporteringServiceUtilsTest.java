@@ -254,14 +254,14 @@ public class EksporteringServiceUtilsTest {
         Arrays.asList(
                 new BedreNæringskode("11000"),
                 new BedreNæringskode("85000")));
-    List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5SifferList =
+    List<SykefraværsstatistikkForNæringskode> sykefraværsstatistikkForNæringskodeList =
         Arrays.asList(
             byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "11000"),
             byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "45210"),
             byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "85000"));
-    List<SykefraværsstatistikkNæring5Siffer> resultat =
+    List<SykefraværsstatistikkForNæringskode> resultat =
         getSykefraværsstatistikkNæring5Siffers(
-            virksomhetMetadata_2020_4_med_næring5siffer, sykefraværsstatistikkNæring5SifferList);
+            virksomhetMetadata_2020_4_med_næring5siffer, sykefraværsstatistikkForNæringskodeList);
 
     assertThat(resultat.size()).isEqualTo(2);
     assertThat(

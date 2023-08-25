@@ -192,8 +192,8 @@ object EksporteringServiceTestUtils {
     @JvmStatic
     fun byggSykefraværStatistikkNæring5Siffer(
         virksomhetMetadata: VirksomhetMetadata, næringskode5Siffer: String
-    ): SykefraværsstatistikkNæring5Siffer {
-        return SykefraværsstatistikkNæring5Siffer(
+    ): SykefraværsstatistikkForNæringskode {
+        return SykefraværsstatistikkForNæringskode(
             virksomhetMetadata.årstall,
             virksomhetMetadata.kvartal,
             næringskode5Siffer,
@@ -353,8 +353,8 @@ object EksporteringServiceTestUtils {
         tapteDagsverk: BigDecimal = BigDecimal(100),
         muligeDagsverk: BigDecimal = BigDecimal(5000)
 
-    ): SykefraværsstatistikkNæring5Siffer {
-        return SykefraværsstatistikkNæring5Siffer(
+    ): SykefraværsstatistikkForNæringskode {
+        return SykefraværsstatistikkForNæringskode(
                 årstallOgKvartal.årstall,
                 årstallOgKvartal.kvartal,
                 næringskode,
@@ -365,7 +365,7 @@ object EksporteringServiceTestUtils {
     }
 
     @JvmField
-    val sykefraværsstatistikkNæring5Siffer = SykefraværsstatistikkNæring5Siffer(
+    val sykefraværsstatistikkForNæringskode = SykefraværsstatistikkForNæringskode(
         __2020_2.årstall,
         __2020_2.kvartal,
         "11000",
@@ -377,8 +377,8 @@ object EksporteringServiceTestUtils {
     @JvmStatic
     fun sykefraværsstatistikkNæring5SifferBransjeprogram(
         næringskode5Siffer: String, årstallOgKvartal: ÅrstallOgKvartal
-    ): SykefraværsstatistikkNæring5Siffer {
-        return SykefraværsstatistikkNæring5Siffer(
+    ): SykefraværsstatistikkForNæringskode {
+        return SykefraværsstatistikkForNæringskode(
             årstallOgKvartal.årstall,
             årstallOgKvartal.kvartal,
             næringskode5Siffer,

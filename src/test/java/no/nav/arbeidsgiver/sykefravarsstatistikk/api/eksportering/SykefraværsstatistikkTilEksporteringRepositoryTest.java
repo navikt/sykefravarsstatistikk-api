@@ -285,7 +285,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
         opprettStatistikkNæring5SifferTestData(
                 new ÅrstallOgKvartal(2019, 2), new ÅrstallOgKvartal(2019, 1));
 
-        List<SykefraværsstatistikkNæring5Siffer> resultat =
+        List<SykefraværsstatistikkForNæringskode> resultat =
                 repository.hentSykefraværprosentAlleNæringer5Siffer(new ÅrstallOgKvartal(2019, 2));
 
         assertSykefraværsstatistikkForBedreNæringskodeContains(
@@ -293,7 +293,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
         assertSykefraværsstatistikkForBedreNæringskodeContains(
                 resultat, 2019, 2, 10, undervisning, 5, 100);
 
-        List<SykefraværsstatistikkNæring5Siffer> resultat_2019_1 =
+        List<SykefraværsstatistikkForNæringskode> resultat_2019_1 =
                 repository.hentSykefraværprosentAlleNæringer5Siffer(new ÅrstallOgKvartal(2019, 1));
 
         assertThat(resultat_2019_1.size()).isEqualTo(2);
@@ -309,7 +309,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
         opprettStatistikkNæring5SifferTestData(
                 new ÅrstallOgKvartal(2019, 2), new ÅrstallOgKvartal(2019, 1));
 
-        List<SykefraværsstatistikkNæring5Siffer> resultat =
+        List<SykefraværsstatistikkForNæringskode> resultat =
                 repository.hentSykefraværprosentAlleNæringer5Siffer(new ÅrstallOgKvartal(2019, 2));
 
         assertSykefraværsstatistikkForBedreNæringskodeContains(
@@ -317,7 +317,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
         assertSykefraværsstatistikkForBedreNæringskodeContains(
                 resultat, 2019, 2, 10, undervisning, 5, 100);
 
-        List<SykefraværsstatistikkNæring5Siffer> resultat_2019_1_til_2019_2 =
+        List<SykefraværsstatistikkForNæringskode> resultat_2019_1_til_2019_2 =
                 repository.hentSykefraværprosentAlleNæringer5Siffer(
                         new ÅrstallOgKvartal(2019, 1), new ÅrstallOgKvartal(2019, 2));
 
@@ -455,14 +455,14 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     }
 
     private void assertSykefraværsstatistikkForBedreNæringskodeContains(
-            List<SykefraværsstatistikkNæring5Siffer> actual,
+            List<SykefraværsstatistikkForNæringskode> actual,
             int årstall,
             int kvartal,
             int antallPersoner,
             BedreNæringskode BedreNæringskode,
             int tapteDagsverk,
             int muligeDagsverk) {
-        List<SykefraværsstatistikkNæring5Siffer> statistikkForNæring5Siffer =
+        List<SykefraværsstatistikkForNæringskode> statistikkForNæring5Siffer =
                 actual.stream()
                         .filter(
                                 sfNæring ->
@@ -609,7 +609,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                         + "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "values (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
                 parametre(
-                        new SykefraværsstatistikkNæring5Siffer(
+                        new SykefraværsstatistikkForNæringskode(
                                 årstall,
                                 kvartal,
                                 næringskode.getFemsifferIdentifikator(),
@@ -656,12 +656,12 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     }
 
     private MapSqlParameterSource parametre(
-            SykefraværsstatistikkNæring5Siffer sykefraværsstatistikkNæring5Siffer) {
+            SykefraværsstatistikkForNæringskode sykefraværsstatistikkForNæringskode) {
         MapSqlParameterSource parametre =
                 new MapSqlParameterSource()
-                        .addValue("naring_kode", sykefraværsstatistikkNæring5Siffer.getNæringkode5siffer());
+                        .addValue("naring_kode", sykefraværsstatistikkForNæringskode.getNæringkode5siffer());
 
-        return leggTilParametreForSykefraværsstatistikk(parametre, sykefraværsstatistikkNæring5Siffer);
+        return leggTilParametreForSykefraværsstatistikk(parametre, sykefraværsstatistikkForNæringskode);
     }
 
     private MapSqlParameterSource parametre(

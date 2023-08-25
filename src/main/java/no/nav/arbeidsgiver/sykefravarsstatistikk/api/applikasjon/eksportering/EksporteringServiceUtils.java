@@ -226,11 +226,11 @@ public class EksporteringServiceUtils {
 
   public static List<SykefraværMedKategori> getSykefraværMedKategoriForNæring5Siffer(
       VirksomhetMetadata virksomhetMetadata,
-      List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5SifferList) {
+      List<SykefraværsstatistikkForNæringskode> sykefraværsstatistikkForNæringskodeList) {
 
-    List<SykefraværsstatistikkNæring5Siffer> filteredList =
+    List<SykefraværsstatistikkForNæringskode> filteredList =
         getSykefraværsstatistikkNæring5Siffers(
-            virksomhetMetadata, sykefraværsstatistikkNæring5SifferList);
+            virksomhetMetadata, sykefraværsstatistikkForNæringskodeList);
 
     List<SykefraværMedKategori> resultatList = new ArrayList<>();
 
@@ -250,10 +250,10 @@ public class EksporteringServiceUtils {
   }
 
   @NotNull
-  public static List<SykefraværsstatistikkNæring5Siffer> getSykefraværsstatistikkNæring5Siffers(
+  public static List<SykefraværsstatistikkForNæringskode> getSykefraværsstatistikkNæring5Siffers(
       VirksomhetMetadata virksomhetMetadata,
-      List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5SifferList) {
-    return sykefraværsstatistikkNæring5SifferList.stream()
+      List<SykefraværsstatistikkForNæringskode> sykefraværsstatistikkForNæringskodeList) {
+    return sykefraværsstatistikkForNæringskodeList.stream()
         .filter(
             næring5Siffer ->
                 virksomhetMetadata.getNæringOgNæringskode5siffer().stream()

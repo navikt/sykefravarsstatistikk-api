@@ -116,12 +116,12 @@ public class SykefraværsstatistikkTilEksporteringRepository {
     }
   }
 
-  public List<SykefraværsstatistikkNæring5Siffer> hentSykefraværprosentAlleNæringer5Siffer(
+  public List<SykefraværsstatistikkForNæringskode> hentSykefraværprosentAlleNæringer5Siffer(
       ÅrstallOgKvartal årstallOgKvartal) {
     return hentSykefraværprosentAlleNæringer5Siffer(årstallOgKvartal, årstallOgKvartal);
   }
 
-  public List<SykefraværsstatistikkNæring5Siffer> hentSykefraværprosentAlleNæringer5Siffer(
+  public List<SykefraværsstatistikkForNæringskode> hentSykefraværprosentAlleNæringer5Siffer(
       ÅrstallOgKvartal fraÅrstallOgKvartal, ÅrstallOgKvartal tilÅrstallOgKvartal) {
 
     try {
@@ -256,9 +256,9 @@ public class SykefraværsstatistikkTilEksporteringRepository {
         rs.getBigDecimal("mulige_dagsverk"));
   }
 
-  private SykefraværsstatistikkNæring5Siffer mapTilSykefraværsstatistikkNæring5Siffer(ResultSet rs)
+  private SykefraværsstatistikkForNæringskode mapTilSykefraværsstatistikkNæring5Siffer(ResultSet rs)
       throws SQLException {
-    return new SykefraværsstatistikkNæring5Siffer(
+    return new SykefraværsstatistikkForNæringskode(
         rs.getInt("arstall"),
         rs.getInt("kvartal"),
         rs.getString("naring_kode"),

@@ -62,7 +62,7 @@ open class HentSykefraværsstatistikkForBransjerTest {
     @Test
     fun `henSykefraværsstatistikkForBransjer skal for hver bransje summere opp riktig statistikk`() {
         listOf("87101", "87102", "86102").forEach {
-            TestUtils.opprettStatistikkForNæring5Siffer(
+            TestUtils.opprettStatistikkForNæringskode(
                 jdbcTemplate,
                 BedreNæringskode(it),
                 2023,

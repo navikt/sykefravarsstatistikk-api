@@ -1,17 +1,18 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
-import java.math.BigDecimal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+
+import java.math.BigDecimal;
 
 public class GraderingTestUtils {
 
   public static void insertDataMedGradering(
       NamedParameterJdbcTemplate jdbcTemplate,
       String orgnr,
-      String næringskodeToSiffer,
-      String næringskodeFemSiffer,
+      String næring,
+      String næringskode,
       String rectype,
       ÅrstallOgKvartal årstallOgKvartal,
       int antallPersoner,
@@ -47,8 +48,8 @@ public class GraderingTestUtils {
             + ":mulige_dagsverk)",
         new MapSqlParameterSource()
             .addValue("orgnr", orgnr)
-            .addValue("naring", næringskodeToSiffer)
-            .addValue("naring_kode", næringskodeFemSiffer)
+            .addValue("naring", næring)
+            .addValue("naring_kode", næringskode)
             .addValue("rectype", rectype)
             .addValue("arstall", årstallOgKvartal.getÅrstall())
             .addValue("kvartal", årstallOgKvartal.getKvartal())

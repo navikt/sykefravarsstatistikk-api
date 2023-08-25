@@ -1,14 +1,14 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
-import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.util.List;
-
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.statistikk.SykefraværsstatistikkSektorUtils;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.List;
 
 public class TestUtils {
 
@@ -129,7 +129,7 @@ public class TestUtils {
         .apply();
   }
 
-  public static void opprettStatistikkForNæring5Siffer(
+  public static void opprettStatistikkForNæringskode(
           NamedParameterJdbcTemplate jdbcTemplate,
           BedreNæringskode næringskode5Siffer,
           int årstall,

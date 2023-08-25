@@ -1,38 +1,13 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.apiIntegrationTest;
 
-import static com.google.common.net.HttpHeaders.AUTHORIZATION;
-import static java.net.http.HttpClient.newBuilder;
-import static java.net.http.HttpResponse.BodyHandlers.ofString;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.GraderingTestUtils.insertDataMedGradering;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.PRODUKSJON_NYTELSESMIDLER;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring5Siffer;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForVirksomhet;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.skrivSisteImporttidspunktTilDb;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAlleImporttidspunkt;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori.BRANSJE;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori.LAND;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori.VIRKSOMHET;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import common.SpringIntegrationTestbase;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.List;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.VarighetTestUtils;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.BedreNæringskode;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
 import no.nav.security.mock.oauth2.MockOAuth2Server;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +15,22 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.List;
+
+import static com.google.common.net.HttpHeaders.AUTHORIZATION;
+import static java.net.http.HttpClient.newBuilder;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.GraderingTestUtils.insertDataMedGradering;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.*;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori.*;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
 
@@ -231,7 +222,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
       hentAgreggertStatistikk_returnererIkkeVirksomhetstatistikkTilBrukerSomManglerIaRettigheter()
           throws Exception {
     ÅrstallOgKvartal ettÅrSiden = SISTE_PUBLISERTE_KVARTAL.minusEttÅr();
-    opprettStatistikkForNæring5Siffer(
+    opprettStatistikkForNæringskode(
         jdbcTemplate,
         BARNEHAGER,
         SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
@@ -239,7 +230,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
         5,
         100,
         10);
-    opprettStatistikkForNæring5Siffer(
+    opprettStatistikkForNæringskode(
         jdbcTemplate, BARNEHAGER, ettÅrSiden.getÅrstall(), ettÅrSiden.getKvartal(), 1, 100, 10);
     opprettStatistikkForLand(jdbcTemplate);
 
@@ -276,7 +267,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
   @Test
   public void hentAgreggertStatistikk_viserNavnetTilBransjenEllerNæringenSomLabel()
       throws Exception {
-    opprettStatistikkForNæring5Siffer(jdbcTemplate, BARNEHAGER, 2022, 1, 5, 100, 10);
+    opprettStatistikkForNæringskode(jdbcTemplate, BARNEHAGER, 2022, 1, 5, 100, 10);
 
     HttpResponse<String> response = utførAutorisertKall(ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER);
     JsonNode responseBody = objectMapper.readTree(response.body());
