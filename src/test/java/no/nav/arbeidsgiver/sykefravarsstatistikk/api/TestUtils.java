@@ -12,8 +12,7 @@ import java.util.List;
 
 public class TestUtils {
 
-  public static final Næring PRODUKSJON_NYTELSESMIDLER =
-      new Næring("10", "Produksjon av nærings- og nytelsesmidler");
+  public static final BedreNæring PRODUKSJON_NYTELSESMIDLER = new BedreNæring("10");
 
   public static final ÅrstallOgKvartal SISTE_PUBLISERTE_KVARTAL = new ÅrstallOgKvartal(2022, 1);
 
@@ -153,7 +152,7 @@ public class TestUtils {
   public static void opprettStatistikkForNæringer(NamedParameterJdbcTemplate jdbcTemplate) {
     opprettStatistikkForNæring(
         jdbcTemplate,
-        new Næring("10", ""),
+        new BedreNæring("10"),
         SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
         SISTE_PUBLISERTE_KVARTAL.getKvartal(),
         20000,
@@ -161,7 +160,7 @@ public class TestUtils {
         50);
     opprettStatistikkForNæring(
         jdbcTemplate,
-        new Næring("10", ""),
+        new BedreNæring("10"),
         SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getÅrstall(),
         SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getKvartal(),
         30000,
@@ -169,7 +168,7 @@ public class TestUtils {
         50);
     opprettStatistikkForNæring(
         jdbcTemplate,
-        new Næring("10", ""),
+        new BedreNæring("10"),
         SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getÅrstall(),
         SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getKvartal(),
         40000,
@@ -177,7 +176,7 @@ public class TestUtils {
         50);
     opprettStatistikkForNæring(
         jdbcTemplate,
-        new Næring("10", ""),
+        new BedreNæring("10"),
         SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getÅrstall(),
         SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getKvartal(),
         50000,
@@ -185,7 +184,7 @@ public class TestUtils {
         50);
     opprettStatistikkForNæring(
         jdbcTemplate,
-        new Næring("10", ""),
+        new BedreNæring("10"),
         SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4).getÅrstall(),
         SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4).getKvartal(),
         60000,
@@ -193,7 +192,7 @@ public class TestUtils {
         50);
     opprettStatistikkForNæring(
         jdbcTemplate,
-        new Næring("88", ""),
+        new BedreNæring("88"),
         SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
         SISTE_PUBLISERTE_KVARTAL.getKvartal(),
         25000,
@@ -201,7 +200,7 @@ public class TestUtils {
         50);
     opprettStatistikkForNæring(
         jdbcTemplate,
-        new Næring("88", ""),
+        new BedreNæring("88"),
         SISTE_PUBLISERTE_KVARTAL.minusEttÅr().getÅrstall(),
         SISTE_PUBLISERTE_KVARTAL.minusEttÅr().getKvartal(),
         30000,
@@ -211,7 +210,7 @@ public class TestUtils {
 
   public static void opprettStatistikkForNæring(
       NamedParameterJdbcTemplate jdbcTemplate,
-      Næring næring,
+      BedreNæring næring,
       int årstall,
       int kvartal,
       int tapteDagsverk,
@@ -220,7 +219,7 @@ public class TestUtils {
 
     MapSqlParameterSource parametre =
         parametreForStatistikk(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk);
-    parametre.addValue("naring_kode", næring.getKode());
+    parametre.addValue("naring_kode", næring.getTosifferIdentifikator());
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_naring "
             + "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, "
