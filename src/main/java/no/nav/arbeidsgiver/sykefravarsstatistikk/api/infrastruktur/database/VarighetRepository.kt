@@ -17,7 +17,7 @@ class VarighetRepository(
     @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate
 ) {
     fun hentSykefraværMedVarighet(
-        næring: Næring
+        næring: BedreNæring
     ): List<UmaskertSykefraværForEttKvartalMedVarighet> {
         return try {
             namedParameterJdbcTemplate.query(
@@ -27,7 +27,7 @@ class VarighetRepository(
                         + " naring_kode like :næring "
                         + " and varighet in ('A', 'B', 'C', 'D', 'E', 'F', 'X')"
                         + " order by arstall, kvartal, varighet",
-                MapSqlParameterSource().addValue("næring", "${næring.kode.substring(0, 2)}%")
+                MapSqlParameterSource().addValue("næring", "${næring.tosifferIdentifikator}%")
             ) { rs: ResultSet, _: Int -> mapTilKvartalsvisSykefraværMedVarighet(rs) }
         } catch (e: EmptyResultDataAccessException) {
             emptyList()
@@ -72,7 +72,7 @@ class VarighetRepository(
     }
 
     fun hentUmaskertSykefraværMedVarighetAlleKategorier(virksomhet: Virksomhet): Map<Statistikkategori, List<UmaskertSykefraværForEttKvartalMedVarighet>> {
-        val næring = Næring(virksomhet.næringskode.femsifferIdentifikator, "")
+        val næring = virksomhet.næringskode.næring
         val maybeBransje = finnBransje(virksomhet.næringskode)
         val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartalMedVarighet>> = EnumMap(
             Statistikkategori::class.java)
