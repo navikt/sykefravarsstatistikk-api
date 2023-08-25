@@ -180,7 +180,7 @@ open class GraderingRepositoryJdbcTest {
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
             UNDERENHET_2_NÆRING_15.orgnr.verdi,
-            PRODUKSJON_AV_LÆR_OG_LÆRVARER.kode,
+            PRODUKSJON_AV_LÆR_OG_LÆRVARER.tosifferIdentifikator,
             "15333",
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
             _2020_1,
@@ -213,7 +213,7 @@ open class GraderingRepositoryJdbcTest {
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
-            HELSETJENESTER.kode,
+            HELSETJENESTER.tosifferIdentifikator,
             kode,
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
             _2019_4,
@@ -225,7 +225,7 @@ open class GraderingRepositoryJdbcTest {
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
             UNDERENHET_3_NÆRING_14.orgnr.verdi,
-            HELSETJENESTER.kode,
+            HELSETJENESTER.tosifferIdentifikator,
             kode,
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
             _2020_1,
@@ -237,7 +237,7 @@ open class GraderingRepositoryJdbcTest {
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
             UNDERENHET_2_NÆRING_15.orgnr.verdi,
-            HELSETJENESTER.kode,
+            HELSETJENESTER.tosifferIdentifikator,
             kode1,
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
             _2020_1,
@@ -249,7 +249,7 @@ open class GraderingRepositoryJdbcTest {
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
             UNDERENHET_2_NÆRING_15.orgnr.verdi,
-            HELSETJENESTER.kode,
+            HELSETJENESTER.tosifferIdentifikator,
             kode2,
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
             _2020_1,
@@ -282,7 +282,7 @@ open class GraderingRepositoryJdbcTest {
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
             OVERORDNETENHET_1_NÆRING_86.orgnr.verdi,
-            HELSETJENESTER.kode,
+            HELSETJENESTER.tosifferIdentifikator,
             kode,
             DatavarehusRepository.RECTYPE_FOR_FORETAK,
             _2020_1,
@@ -294,7 +294,7 @@ open class GraderingRepositoryJdbcTest {
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
             UNDERENHET_3_NÆRING_14.orgnr.verdi,
-            HELSETJENESTER.kode,
+            HELSETJENESTER.tosifferIdentifikator,
             kode,
             DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
             _2020_1,
@@ -317,8 +317,8 @@ open class GraderingRepositoryJdbcTest {
 
     companion object {
         private val PRODUKSJON_AV_KLÆR = BedreNæring("14")
-        private val PRODUKSJON_AV_LÆR_OG_LÆRVARER = Næring("15", "Produksjon av lær og lærvarer")
-        private val HELSETJENESTER = Næring("86", "Helsetjenester")
+        private val PRODUKSJON_AV_LÆR_OG_LÆRVARER = BedreNæring("15")
+        private val HELSETJENESTER = BedreNæring("86")
 
         private val OVERORDNETENHET_1_NÆRING_86 = OverordnetEnhet(
             orgnr = Orgnr("999999777"),
