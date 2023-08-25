@@ -1,17 +1,17 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram
 
 import io.vavr.control.Either
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.BedreNæring
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
 
 class BransjeEllerNæring {
-    val verdi: Either<Bransje, BedreNæring>
+    val verdi: Either<Bransje, Næring>
 
     constructor(bransje: Bransje) {
         verdi = Either.left(bransje)
     }
 
-    constructor(næring: BedreNæring) {
+    constructor(næring: Næring) {
         verdi = Either.right(næring)
     }
 
@@ -32,6 +32,6 @@ class BransjeEllerNæring {
         return if (isBransje) verdi.left.navn else verdi.get().navn
     }
 
-    val næring: BedreNæring
+    val næring: Næring
         get() = verdi.get()
 }

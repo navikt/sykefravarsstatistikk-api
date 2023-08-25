@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.BedreNæring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Virksomhet;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje;
@@ -21,7 +21,7 @@ public class BransjeEllerNæringService {
         if (skalHenteDataPåNæring) {
             String kode = næringskode5Siffer.getNæring().getTosifferIdentifikator();
             return new BransjeEllerNæring(
-                    new BedreNæring(kode));
+                    new Næring(kode));
         } else {
             return new BransjeEllerNæring(bransje.get());
         }
@@ -37,7 +37,7 @@ public class BransjeEllerNæringService {
                         {
                             String kode = virksomhet.getNæringskode().getNæring().getTosifferIdentifikator();
                             return new BransjeEllerNæring(
-                                    new BedreNæring(kode));
+                                    new Næring(kode));
                         });
     }
 

@@ -92,7 +92,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
 
   @Test
   public void hentSykefraværprosentBedreNæring__skal_returnere_riktig_sykefravær() {
-    BedreNæring produksjonAvKlær = new BedreNæring("14");
+    Næring produksjonAvKlær = new Næring("14");
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_naring (naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
             + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
@@ -104,7 +104,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_naring (naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
             + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-        parametre(new BedreNæring("85"), 2018, 4, 10, 5, 100));
+        parametre(new Næring("85"), 2018, 4, 10, 5, 100));
 
     List<SykefraværForEttKvartal> resultat =
         kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentNæring(
@@ -271,7 +271,7 @@ public class SykefraværForEttKvartalRepositoryJdbcTest {
   }
 
   private MapSqlParameterSource parametre(
-          BedreNæring næring,
+          Næring næring,
           int årstall,
           int kvartal,
           int antallPersoner,

@@ -79,7 +79,7 @@ public class GraderingRepository {
 
   public Sykefraværsdata hentGradertSykefraværAlleKategorier(@NotNull Virksomhet virksomhet) {
 
-    BedreNæring næring = virksomhet.getNæringskode().getNæring();
+    Næring næring = virksomhet.getNæringskode().getNæring();
     Optional<Bransje> maybeBransje = Bransjeprogram.finnBransje(virksomhet.getNæringskode());
 
     Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> data = new HashMap<>();
@@ -96,7 +96,7 @@ public class GraderingRepository {
     return new Sykefraværsdata(data);
   }
 
-  public List<UmaskertSykefraværForEttKvartal> hentSykefraværMedGradering(BedreNæring næring) {
+  public List<UmaskertSykefraværForEttKvartal> hentSykefraværMedGradering(Næring næring) {
     try {
       return namedParameterJdbcTemplate.query(
           "select arstall, kvartal,"

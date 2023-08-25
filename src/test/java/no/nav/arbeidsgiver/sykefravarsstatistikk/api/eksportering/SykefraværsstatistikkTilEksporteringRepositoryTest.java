@@ -39,8 +39,8 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
     private final Næringskode produksjonAvKlær = new Næringskode("14190");
     private final Næringskode undervisning = new Næringskode("86907");
-    private final BedreNæring utdanning = new BedreNæring("86");
-    private final BedreNæring produksjon = new BedreNæring("14");
+    private final Næring utdanning = new Næring("86");
+    private final Næring produksjon = new Næring("14");
     private final String VIRKSOMHET_1 = "999999999";
     private final String VIRKSOMHET_2 = "999999998";
 
@@ -436,7 +436,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
             int årstall,
             int kvartal,
             int antallPersoner,
-            BedreNæring næring,
+            Næring næring,
             int tapteDagsverk,
             int muligeDagsverk) {
         List<SykefraværsstatistikkNæring> statistikkForNæring =
@@ -577,7 +577,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     }
 
     private void createStatistikkNæring(
-            BedreNæring næring,
+            Næring næring,
             int årstall,
             int kvartal,
             int antallPersoner,

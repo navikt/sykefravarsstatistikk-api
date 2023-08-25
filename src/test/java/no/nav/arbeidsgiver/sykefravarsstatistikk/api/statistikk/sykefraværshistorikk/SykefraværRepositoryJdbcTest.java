@@ -116,9 +116,9 @@ public class SykefraværRepositoryJdbcTest {
 
   @Test
   void hentUmaskertSykefraværForEttKvartalListe_skal_hente_riktig_data() {
-    persisterDatasetIDb(new BedreNæring("10"));
+    persisterDatasetIDb(new Næring("10"));
     List<UmaskertSykefraværForEttKvartal> resultat =
-        sykefraværRepository.hentUmaskertSykefravær(new BedreNæring("10"), new ÅrstallOgKvartal(2019, 1));
+        sykefraværRepository.hentUmaskertSykefravær(new Næring("10"), new ÅrstallOgKvartal(2019, 1));
     assertThat(resultat.size()).isEqualTo(2);
     assertThat(resultat.get(0)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 1, 3));
     assertThat(resultat.get(1)).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2));
@@ -168,7 +168,7 @@ public class SykefraværRepositoryJdbcTest {
         parametre(barnehage.getOrgnr(), 2018, 3, 10, 6, 100));
   }
 
-  private void persisterDatasetIDb(BedreNæring næring) {
+  private void persisterDatasetIDb(Næring næring) {
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_naring "
             + "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, "
@@ -184,7 +184,7 @@ public class SykefraværRepositoryJdbcTest {
             + "values "
             + "(:arstall, :kvartal, :næring, :antall_personer, :tapte_dagsverk, "
             + ":mulige_dagsverk)",
-        parametre(2019, 1, new BedreNæring("94"), 10, 3, 100));
+        parametre(2019, 1, new Næring("94"), 10, 3, 100));
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_naring "
             + "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, "
@@ -300,12 +300,12 @@ public class SykefraværRepositoryJdbcTest {
   }
 
   private MapSqlParameterSource parametre(
-      int årstall,
-      int kvartal,
-      BedreNæring næring,
-      int antallPersoner,
-      int tapteDagsverk,
-      int muligeDagsverk) {
+          int årstall,
+          int kvartal,
+          Næring næring,
+          int antallPersoner,
+          int tapteDagsverk,
+          int muligeDagsverk) {
     return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
         .addValue("næring", næring.getTosifferIdentifikator());
   }

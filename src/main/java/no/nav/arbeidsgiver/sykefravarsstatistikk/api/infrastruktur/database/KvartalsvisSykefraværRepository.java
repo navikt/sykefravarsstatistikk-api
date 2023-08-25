@@ -52,7 +52,7 @@ public class KvartalsvisSykefraværRepository {
     }
   }
 
-  public List<SykefraværForEttKvartal> hentKvartalsvisSykefraværprosentNæring(BedreNæring næring) {
+  public List<SykefraværForEttKvartal> hentKvartalsvisSykefraværprosentNæring(Næring næring) {
     try {
       return namedParameterJdbcTemplate.query(
           "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal "

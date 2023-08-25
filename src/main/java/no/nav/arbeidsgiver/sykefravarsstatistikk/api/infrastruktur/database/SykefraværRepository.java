@@ -88,7 +88,7 @@ public class SykefraværRepository {
   }
 
   public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefravær(
-          BedreNæring næring, ÅrstallOgKvartal fraÅrstallOgKvartal) {
+          Næring næring, ÅrstallOgKvartal fraÅrstallOgKvartal) {
     try {
       return sorterKronologisk(
           namedParameterJdbcTemplate.query(
@@ -137,7 +137,7 @@ public class SykefraværRepository {
 
   public Sykefraværsdata hentTotaltSykefraværAlleKategorier(
       Virksomhet virksomhet, ÅrstallOgKvartal fraÅrstallOgKvartal) {
-    BedreNæring næring = virksomhet.getNæringskode().getNæring();
+    Næring næring = virksomhet.getNæringskode().getNæring();
 
     Optional<Bransje> maybeBransje = Bransjeprogram.finnBransje(virksomhet.getNæringskode());
 

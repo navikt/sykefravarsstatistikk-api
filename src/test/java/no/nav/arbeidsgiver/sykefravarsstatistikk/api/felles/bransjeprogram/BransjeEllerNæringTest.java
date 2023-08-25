@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram;
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.BedreNæring;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.BransjeEllerNæring;
@@ -26,7 +26,7 @@ class BransjeEllerNæringTest {
 
     @Test
     public void BransjeEllerNæring_kan_opprettes_for_en_næring_og_returnerer_en_næring() {
-        BedreNæring næring = new BedreNæring("61");
+        Næring næring = new Næring("61");
         BransjeEllerNæring bransjeEllerNæring = new BransjeEllerNæring(næring);
 
         assertThat(bransjeEllerNæring.isBransje()).isEqualTo(false);

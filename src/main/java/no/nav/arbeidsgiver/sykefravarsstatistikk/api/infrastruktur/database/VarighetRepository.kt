@@ -17,7 +17,7 @@ class VarighetRepository(
     @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate
 ) {
     fun hentSykefraværMedVarighet(
-        næring: BedreNæring
+        næring: Næring
     ): List<UmaskertSykefraværForEttKvartalMedVarighet> {
         return try {
             namedParameterJdbcTemplate.query(

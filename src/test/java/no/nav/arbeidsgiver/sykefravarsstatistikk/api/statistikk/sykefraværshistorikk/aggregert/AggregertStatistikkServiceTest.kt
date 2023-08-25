@@ -363,7 +363,7 @@ internal class AggregertStatistikkServiceTest {
             )
         )
         whenever(mockBransjeEllerNæringService.finnBransje(any()))
-            .thenReturn(BransjeEllerNæring(BedreNæring("84")))
+            .thenReturn(BransjeEllerNæring(Næring("84")))
 
         val årstallOgKvartal = ÅrstallOgKvartal(2022, 1)
         whenever(mockSykefraværRepository.hentTotaltSykefraværAlleKategorier(any(), any())).thenReturn(

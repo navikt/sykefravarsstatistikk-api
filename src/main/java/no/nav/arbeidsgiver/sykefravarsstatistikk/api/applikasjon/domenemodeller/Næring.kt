@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
 
-class BedreNæring(
+class Næring(
     val tosifferIdentifikator: String
 ) {
     val navn: String = næringer[tosifferIdentifikator]

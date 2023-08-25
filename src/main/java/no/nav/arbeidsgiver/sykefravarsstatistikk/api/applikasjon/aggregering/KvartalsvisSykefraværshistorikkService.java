@@ -95,7 +95,7 @@ public class KvartalsvisSykefraværshistorikkService {
         kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(ssbSektor));
   }
 
-  private KvartalsvisSykefraværshistorikk hentSykefraværshistorikkNæring(BedreNæring næring) {
+  private KvartalsvisSykefraværshistorikk hentSykefraværshistorikkNæring(Næring næring) {
     return new KvartalsvisSykefraværshistorikk(
         Statistikkategori.NÆRING,
         næring.getNavn(),

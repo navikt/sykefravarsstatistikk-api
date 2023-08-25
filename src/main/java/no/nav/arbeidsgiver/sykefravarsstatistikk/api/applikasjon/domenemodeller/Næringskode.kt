@@ -8,5 +8,5 @@ data class Næringskode(
             "Næringskode skal være 5 siffer, men var $femsifferIdentifikator"
         }
     }
-    val næring = BedreNæring(femsifferIdentifikator.take(2))
+    val næring = Næring(femsifferIdentifikator.take(2))
 }

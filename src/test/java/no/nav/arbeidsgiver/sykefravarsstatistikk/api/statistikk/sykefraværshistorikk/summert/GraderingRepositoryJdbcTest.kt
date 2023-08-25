@@ -316,9 +316,9 @@ open class GraderingRepositoryJdbcTest {
     }
 
     companion object {
-        private val PRODUKSJON_AV_KLÆR = BedreNæring("14")
-        private val PRODUKSJON_AV_LÆR_OG_LÆRVARER = BedreNæring("15")
-        private val HELSETJENESTER = BedreNæring("86")
+        private val PRODUKSJON_AV_KLÆR = Næring("14")
+        private val PRODUKSJON_AV_LÆR_OG_LÆRVARER = Næring("15")
+        private val HELSETJENESTER = Næring("86")
 
         private val OVERORDNETENHET_1_NÆRING_86 = OverordnetEnhet(
             orgnr = Orgnr("999999777"),
