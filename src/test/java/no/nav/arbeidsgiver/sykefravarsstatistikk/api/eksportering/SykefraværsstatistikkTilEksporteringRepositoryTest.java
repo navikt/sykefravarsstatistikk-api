@@ -37,11 +37,10 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
     private SykefraværsstatistikkTilEksporteringRepository repository;
 
-    private final Næringskode produksjonAvKlær =
-            new Næringskode("14190");
+    private final Næringskode produksjonAvKlær = new Næringskode("14190");
     private final Næringskode undervisning = new Næringskode("86907");
-    private final Næring utdanning = new Næring("86", "Utdanning");
-    private final Næring produksjon = new Næring("14", "Produksjon");
+    private final BedreNæring utdanning = new BedreNæring("86");
+    private final BedreNæring produksjon = new BedreNæring("14");
     private final String VIRKSOMHET_1 = "999999999";
     private final String VIRKSOMHET_2 = "999999998";
 
@@ -437,12 +436,12 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
             int årstall,
             int kvartal,
             int antallPersoner,
-            Næring næring,
+            BedreNæring næring,
             int tapteDagsverk,
             int muligeDagsverk) {
         List<SykefraværsstatistikkNæring> statistikkForNæring =
                 actual.stream()
-                        .filter(sfNæring -> sfNæring.getNæringkode().equals(næring.getKode()))
+                        .filter(sfNæring -> sfNæring.getNæringkode().equals(næring.getTosifferIdentifikator()))
                         .toList();
         assertThat(statistikkForNæring.size()).isEqualTo(1);
         assertSykefraværsstatistikkIsEqual(
@@ -578,7 +577,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     }
 
     private void createStatistikkNæring(
-            Næring næring,
+            BedreNæring næring,
             int årstall,
             int kvartal,
             int antallPersoner,
@@ -591,7 +590,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                         new SykefraværsstatistikkNæring(
                                 årstall,
                                 kvartal,
-                                næring.getKode(),
+                                næring.getTosifferIdentifikator(),
                                 antallPersoner,
                                 new BigDecimal(tapteDagsverk),
                                 new BigDecimal(muligeDagsverk))));
