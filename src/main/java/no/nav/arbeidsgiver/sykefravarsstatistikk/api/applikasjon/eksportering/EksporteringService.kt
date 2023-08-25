@@ -151,7 +151,7 @@ class EksporteringService(
         årstallOgKvartal: ÅrstallOgKvartal,
         sykefraværsstatistikkSektor: List<SykefraværsstatistikkSektor?>?,
         sykefraværsstatistikkNæring: List<SykefraværsstatistikkNæring?>?,
-        sykefraværsstatistikkNæring5Siffer: List<SykefraværsstatistikkNæring5Siffer?>?,
+        sykefraværsstatistikkForNæringskode: List<SykefraværsstatistikkForNæringskode?>?,
         sykefraværsstatistikkVirksomhetUtenVarighet: List<SykefraværsstatistikkVirksomhetUtenVarighet?>?,
         landSykefravær: SykefraværMedKategori,
         antallEksportert: AtomicInteger,
@@ -177,7 +177,7 @@ class EksporteringService(
                             sykefraværsstatistikkVirksomhetForEttKvartalUtenVarighetMap
                         ),
                         EksporteringServiceUtils.getSykefraværMedKategoriForNæring5Siffer(
-                            virksomhetMetadata, sykefraværsstatistikkNæring5Siffer
+                            virksomhetMetadata, sykefraværsstatistikkForNæringskode
                         ),
                         EksporteringServiceUtils.getSykefraværMedKategoriNæringForVirksomhet(
                             virksomhetMetadata, sykefraværsstatistikkNæring

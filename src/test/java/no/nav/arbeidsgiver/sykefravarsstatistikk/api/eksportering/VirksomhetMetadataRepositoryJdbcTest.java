@@ -65,25 +65,27 @@ class VirksomhetMetadataRepositoryJdbcTest {
   @Test
   public void
       opprettVirksomhetMetadataNæringskode5siffer__oppretter_riktig_metadataNæringskode5siffer() {
-    VirksomhetMetadataNæringskode5siffer virksomhetMetadataNæringskode5siffer1 =
-        new VirksomhetMetadataNæringskode5siffer(
+    VirksomhetMetadataMedNæringskode virksomhetMetadataMedNæringskode1 =
+        new VirksomhetMetadataMedNæringskode(
             new Orgnr(ORGNR_VIRKSOMHET_1),
             new ÅrstallOgKvartal(2020, 3),
-            new NæringOgNæringskode5siffer(NÆRINGSKODE_2SIFFER, "10001"));
-    VirksomhetMetadataNæringskode5siffer virksomhetMetadataNæringskode5siffer2 =
-        new VirksomhetMetadataNæringskode5siffer(
+            new Næringskode("10001")
+        );
+    VirksomhetMetadataMedNæringskode virksomhetMetadataMedNæringskode2 =
+        new VirksomhetMetadataMedNæringskode(
             new Orgnr(ORGNR_VIRKSOMHET_1),
             new ÅrstallOgKvartal(2020, 3),
-            new NæringOgNæringskode5siffer(NÆRINGSKODE_2SIFFER, "10002"));
+            new Næringskode("10002")
+        );
 
     repository.opprettVirksomhetMetadataNæringskode5siffer(
         Arrays.asList(
-            virksomhetMetadataNæringskode5siffer1, virksomhetMetadataNæringskode5siffer2));
+                virksomhetMetadataMedNæringskode1, virksomhetMetadataMedNæringskode2));
 
-    List<VirksomhetMetadataNæringskode5siffer> results =
+    List<VirksomhetMetadataMedNæringskode> results =
         hentAlleVirksomhetMetadataNæringskode5siffer(namedParameterJdbcTemplate);
-    assertThat(results.get(0)).isEqualTo(virksomhetMetadataNæringskode5siffer1);
-    assertThat(results.get(1)).isEqualTo(virksomhetMetadataNæringskode5siffer2);
+    assertThat(results.get(0)).isEqualTo(virksomhetMetadataMedNæringskode1);
+    assertThat(results.get(1)).isEqualTo(virksomhetMetadataMedNæringskode2);
   }
 
   @Test
@@ -135,11 +137,11 @@ class VirksomhetMetadataRepositoryJdbcTest {
     assertThat(results.size()).isEqualTo(3);
     VirksomhetMetadata virksomhetMetadataVirksomhet1 =
         results.stream().filter(r -> ORGNR_VIRKSOMHET_1.equals(r.getOrgnr())).findFirst().get();
-    List<NæringOgNæringskode5siffer> næringOgNæringskode5siffer =
+    List<Næringskode> næringskoder =
         virksomhetMetadataVirksomhet1.getNæringOgNæringskode5siffer();
-    assertThat(næringOgNæringskode5siffer.contains(new NæringOgNæringskode5siffer("71", "71001")))
+    assertThat(næringskoder.contains(new Næringskode( "71001")))
         .isTrue();
-    assertThat(næringOgNæringskode5siffer.contains(new NæringOgNæringskode5siffer("71", "71002")))
+    assertThat(næringskoder.contains(new Næringskode( "71002")))
         .isTrue();
   }
 
@@ -159,17 +161,17 @@ class VirksomhetMetadataRepositoryJdbcTest {
                 new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal"))));
   }
 
-  private List<VirksomhetMetadataNæringskode5siffer> hentAlleVirksomhetMetadataNæringskode5siffer(
+  private List<VirksomhetMetadataMedNæringskode> hentAlleVirksomhetMetadataNæringskode5siffer(
       NamedParameterJdbcTemplate jdbcTemplate) {
     return jdbcTemplate.query(
         "select * from virksomhet_metadata_naring_kode_5siffer",
         new MapSqlParameterSource(),
         (rs, rowNum) ->
-            new VirksomhetMetadataNæringskode5siffer(
+            new VirksomhetMetadataMedNæringskode(
                 new Orgnr(rs.getString("orgnr")),
                 new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
-                new NæringOgNæringskode5siffer(
-                    rs.getString("naring_kode"), rs.getString("naring_kode_5siffer"))));
+                new Næringskode(rs.getString("naring_kode_5siffer"))
+            ));
   }
 
   private int opprettTestVirksomhetMetaData(int årstall, int kvartal) {

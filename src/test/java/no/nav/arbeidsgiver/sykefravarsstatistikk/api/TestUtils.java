@@ -1,17 +1,14 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
-import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.util.List;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode5Siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkSektor;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.statistikk.SykefraværsstatistikkSektorUtils;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImporttidspunktDto;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.List;
 
 public class TestUtils {
 
@@ -132,18 +129,18 @@ public class TestUtils {
         .apply();
   }
 
-  public static void opprettStatistikkForNæring5Siffer(
-      NamedParameterJdbcTemplate jdbcTemplate,
-      Næringskode5Siffer næringskode5Siffer,
-      int årstall,
-      int kvartal,
-      int tapteDagsverk,
-      int muligeDagsverk,
-      int antallPersoner) {
+  public static void opprettStatistikkForNæringskode(
+          NamedParameterJdbcTemplate jdbcTemplate,
+          Næringskode næringskode5Siffer,
+          int årstall,
+          int kvartal,
+          int tapteDagsverk,
+          int muligeDagsverk,
+          int antallPersoner) {
 
     MapSqlParameterSource parametre =
         parametreForStatistikk(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk);
-    parametre.addValue("naring_kode", næringskode5Siffer.getKode());
+    parametre.addValue("naring_kode", næringskode5Siffer.getFemsifferIdentifikator());
     jdbcTemplate.update(
         "insert into sykefravar_statistikk_naring5siffer "
             + "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, "

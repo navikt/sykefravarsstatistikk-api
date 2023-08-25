@@ -37,9 +37,9 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
     private SykefraværsstatistikkTilEksporteringRepository repository;
 
-    private final Næringskode5Siffer produksjonAvKlær =
-            new Næringskode5Siffer("14190", "Produksjon av klær");
-    private final Næringskode5Siffer undervisning = new Næringskode5Siffer("86907", "Undervisning");
+    private final Næringskode produksjonAvKlær =
+            new Næringskode("14190");
+    private final Næringskode undervisning = new Næringskode("86907");
     private final Næring utdanning = new Næring("86", "Utdanning");
     private final Næring produksjon = new Næring("14", "Produksjon");
     private final String VIRKSOMHET_1 = "999999999";
@@ -285,21 +285,21 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
         opprettStatistikkNæring5SifferTestData(
                 new ÅrstallOgKvartal(2019, 2), new ÅrstallOgKvartal(2019, 1));
 
-        List<SykefraværsstatistikkNæring5Siffer> resultat =
+        List<SykefraværsstatistikkForNæringskode> resultat =
                 repository.hentSykefraværprosentAlleNæringer5Siffer(new ÅrstallOgKvartal(2019, 2));
 
-        assertSykefraværsstatistikkForNæringskode5SifferContains(
+        assertSykefraværsstatistikkForBedreNæringskodeContains(
                 resultat, 2019, 2, 10, produksjonAvKlær, 3, 100);
-        assertSykefraværsstatistikkForNæringskode5SifferContains(
+        assertSykefraværsstatistikkForBedreNæringskodeContains(
                 resultat, 2019, 2, 10, undervisning, 5, 100);
 
-        List<SykefraværsstatistikkNæring5Siffer> resultat_2019_1 =
+        List<SykefraværsstatistikkForNæringskode> resultat_2019_1 =
                 repository.hentSykefraværprosentAlleNæringer5Siffer(new ÅrstallOgKvartal(2019, 1));
 
         assertThat(resultat_2019_1.size()).isEqualTo(2);
-        assertSykefraværsstatistikkForNæringskode5SifferContains(
+        assertSykefraværsstatistikkForBedreNæringskodeContains(
                 resultat_2019_1, 2019, 1, 10, produksjonAvKlær, 3, 100);
-        assertSykefraværsstatistikkForNæringskode5SifferContains(
+        assertSykefraværsstatistikkForBedreNæringskodeContains(
                 resultat_2019_1, 2019, 1, 10, undervisning, 5, 100);
     }
 
@@ -309,27 +309,27 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
         opprettStatistikkNæring5SifferTestData(
                 new ÅrstallOgKvartal(2019, 2), new ÅrstallOgKvartal(2019, 1));
 
-        List<SykefraværsstatistikkNæring5Siffer> resultat =
+        List<SykefraværsstatistikkForNæringskode> resultat =
                 repository.hentSykefraværprosentAlleNæringer5Siffer(new ÅrstallOgKvartal(2019, 2));
 
-        assertSykefraværsstatistikkForNæringskode5SifferContains(
+        assertSykefraværsstatistikkForBedreNæringskodeContains(
                 resultat, 2019, 2, 10, produksjonAvKlær, 3, 100);
-        assertSykefraværsstatistikkForNæringskode5SifferContains(
+        assertSykefraværsstatistikkForBedreNæringskodeContains(
                 resultat, 2019, 2, 10, undervisning, 5, 100);
 
-        List<SykefraværsstatistikkNæring5Siffer> resultat_2019_1_til_2019_2 =
+        List<SykefraværsstatistikkForNæringskode> resultat_2019_1_til_2019_2 =
                 repository.hentSykefraværprosentAlleNæringer5Siffer(
                         new ÅrstallOgKvartal(2019, 1), new ÅrstallOgKvartal(2019, 2));
 
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat_2019_1_til_2019_2.size()).isEqualTo(4);
-        assertSykefraværsstatistikkForNæringskode5SifferContains(
+        assertSykefraværsstatistikkForBedreNæringskodeContains(
                 resultat_2019_1_til_2019_2, 2019, 1, 10, produksjonAvKlær, 3, 100);
-        assertSykefraværsstatistikkForNæringskode5SifferContains(
+        assertSykefraværsstatistikkForBedreNæringskodeContains(
                 resultat_2019_1_til_2019_2, 2019, 1, 10, undervisning, 5, 100);
-        assertSykefraværsstatistikkForNæringskode5SifferContains(
+        assertSykefraværsstatistikkForBedreNæringskodeContains(
                 resultat_2019_1_til_2019_2, 2019, 2, 10, produksjonAvKlær, 3, 100);
-        assertSykefraværsstatistikkForNæringskode5SifferContains(
+        assertSykefraværsstatistikkForBedreNæringskodeContains(
                 resultat_2019_1_til_2019_2, 2019, 2, 10, undervisning, 5, 100);
     }
 
@@ -454,19 +454,19 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 muligeDagsverk);
     }
 
-    private void assertSykefraværsstatistikkForNæringskode5SifferContains(
-            List<SykefraværsstatistikkNæring5Siffer> actual,
+    private void assertSykefraværsstatistikkForBedreNæringskodeContains(
+            List<SykefraværsstatistikkForNæringskode> actual,
             int årstall,
             int kvartal,
             int antallPersoner,
-            Næringskode5Siffer næringskode5Siffer,
+            Næringskode næringskode,
             int tapteDagsverk,
             int muligeDagsverk) {
-        List<SykefraværsstatistikkNæring5Siffer> statistikkForNæring5Siffer =
+        List<SykefraværsstatistikkForNæringskode> statistikkForNæring5Siffer =
                 actual.stream()
                         .filter(
                                 sfNæring ->
-                                        sfNæring.getNæringkode5siffer().equals(næringskode5Siffer.getKode())
+                                        sfNæring.getNæringkode5siffer().equals(næringskode.getFemsifferIdentifikator())
                                                 && sfNæring.getårstall() == årstall
                                                 && sfNæring.getKvartal() == kvartal)
                         .collect(Collectors.toList());
@@ -598,7 +598,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     }
 
     private void createStatistikkNæring5Siffer(
-            Næringskode5Siffer næring5Siffer,
+            Næringskode næringskode,
             int årstall,
             int kvartal,
             int antallPersoner,
@@ -609,10 +609,10 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                         + "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "values (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
                 parametre(
-                        new SykefraværsstatistikkNæring5Siffer(
+                        new SykefraværsstatistikkForNæringskode(
                                 årstall,
                                 kvartal,
-                                næring5Siffer.getKode(),
+                                næringskode.getFemsifferIdentifikator(),
                                 antallPersoner,
                                 new BigDecimal(tapteDagsverk),
                                 new BigDecimal(muligeDagsverk))));
@@ -656,12 +656,12 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     }
 
     private MapSqlParameterSource parametre(
-            SykefraværsstatistikkNæring5Siffer sykefraværsstatistikkNæring5Siffer) {
+            SykefraværsstatistikkForNæringskode sykefraværsstatistikkForNæringskode) {
         MapSqlParameterSource parametre =
                 new MapSqlParameterSource()
-                        .addValue("naring_kode", sykefraværsstatistikkNæring5Siffer.getNæringkode5siffer());
+                        .addValue("naring_kode", sykefraværsstatistikkForNæringskode.getNæringkode5siffer());
 
-        return leggTilParametreForSykefraværsstatistikk(parametre, sykefraværsstatistikkNæring5Siffer);
+        return leggTilParametreForSykefraværsstatistikk(parametre, sykefraværsstatistikkForNæringskode);
     }
 
     private MapSqlParameterSource parametre(

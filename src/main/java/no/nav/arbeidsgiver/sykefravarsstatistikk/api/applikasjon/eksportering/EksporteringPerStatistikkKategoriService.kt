@@ -214,7 +214,7 @@ fun List<SykefraværsstatistikkNæring>.groupByNæring():
         Map<String, List<Sykefraværsstatistikk>> =
     this.groupBy({ it.næringkode }, { it })
 
-fun List<SykefraværsstatistikkNæring5Siffer>.groupByNæringskode():
+fun List<SykefraværsstatistikkForNæringskode>.groupByNæringskode():
         Map<String, List<Sykefraværsstatistikk>> =
     this.groupBy({ it.næringkode5siffer }, { it })
 

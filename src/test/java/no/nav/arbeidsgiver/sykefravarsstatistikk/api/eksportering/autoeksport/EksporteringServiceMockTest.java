@@ -82,17 +82,18 @@ public class EksporteringServiceMockTest {
     @Test
     public void eksporter_sender_riktig_melding_til_kafka_og_returnerer_antall_meldinger_sendt() {
         when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2))
-                .thenReturn(Arrays.asList(virksomhetEksportPerKvartal));
+                .thenReturn(List.of(virksomhetEksportPerKvartal));
         virksomhetMetadata.leggTilNæringOgNæringskode5siffer(
                 Arrays.asList(
-                        new NæringOgNæringskode5siffer("11", "11000"),
-                        new NæringOgNæringskode5siffer("85", "85000")));
+                        new Næringskode("11000"),
+                        new Næringskode("85000")
+                ));
         ÅrstallOgKvartal fraÅrstallOgKvartal = __2020_2.minusKvartaler(3);
 
         when(virksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(__2020_2))
-                .thenReturn(Arrays.asList(virksomhetMetadata));
+                .thenReturn(List.of(virksomhetMetadata));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(__2020_2))
-                .thenReturn(Arrays.asList(sykefraværsstatistikkSektor));
+                .thenReturn(List.of(sykefraværsstatistikkSektor));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(__2020_2))
                 .thenReturn(
                         Arrays.asList(
@@ -102,7 +103,7 @@ public class EksporteringServiceMockTest {
                                 sykefraværsstatistikkNæring(fraÅrstallOgKvartal.plussKvartaler(3))));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5Siffer(
                 __2020_2))
-                .thenReturn(Arrays.asList(sykefraværsstatistikkNæring5Siffer));
+                .thenReturn(List.of(sykefraværsstatistikkForNæringskode));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleVirksomheter(__2020_2))
                 .thenReturn(
                         Arrays.asList(
@@ -146,17 +147,18 @@ public class EksporteringServiceMockTest {
                 virksomhet1_TilHørerBransjeMetadata(årstallOgKvartal);
         virksomhet1_TilHørerBransjeMetadata.leggTilNæringOgNæringskode5siffer(
                 Arrays.asList(
-                        new NæringOgNæringskode5siffer("86", "86101"),
-                        new NæringOgNæringskode5siffer("86", "86102")));
+                        new Næringskode("86101"),
+                        new Næringskode("86102")
+                ));
 
         when(eksporteringRepository.hentVirksomhetEksportPerKvartal(__2020_2))
-                .thenReturn(Arrays.asList(virksomhetEksportPerKvartal));
+                .thenReturn(List.of(virksomhetEksportPerKvartal));
 
         when(virksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(årstallOgKvartal))
-                .thenReturn(Arrays.asList(virksomhet1_TilHørerBransjeMetadata));
+                .thenReturn(List.of(virksomhet1_TilHørerBransjeMetadata));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(
                 årstallOgKvartal))
-                .thenReturn(Arrays.asList(sykefraværsstatistikkSektor));
+                .thenReturn(List.of(sykefraværsstatistikkSektor));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(__2020_2))
                 .thenReturn(
                         Arrays.asList(

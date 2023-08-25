@@ -20,14 +20,14 @@ public class BransjeEllerNæringService {
   }
 
   @Deprecated
-  public BransjeEllerNæring bestemFraNæringskode(Næringskode5Siffer næringskode5Siffer) {
+  public BransjeEllerNæring bestemFraNæringskode(Næringskode næringskode5Siffer) {
     Optional<Bransje> bransje = Bransjeprogram.finnBransje(næringskode5Siffer);
 
     boolean skalHenteDataPåNæring = bransje.isEmpty() || bransje.get().erDefinertPåTosiffernivå();
 
     if (skalHenteDataPåNæring) {
       return new BransjeEllerNæring(
-          klassifikasjonerRepository.hentNæring(næringskode5Siffer.hentNæringskode2Siffer()));
+          klassifikasjonerRepository.hentNæring(næringskode5Siffer.getNæring().getTosifferIdentifikator()));
     } else {
       return new BransjeEllerNæring(bransje.get());
     }
@@ -42,7 +42,7 @@ public class BransjeEllerNæringService {
             () ->
                 new BransjeEllerNæring(
                     klassifikasjonerRepository.hentNæring(
-                        virksomhet.getNæringskode().hentNæringskode2Siffer())));
+                        virksomhet.getNæringskode().getNæring().getTosifferIdentifikator())));
   }
 
   public BransjeEllerNæring finnBransjeFraMetadata(
@@ -52,17 +52,13 @@ public class BransjeEllerNæringService {
             new Orgnr(virksomhetMetaData.getOrgnr()),
             new Orgnr(""),
             virksomhetMetaData.getNavn(),
-            new Næringskode5Siffer(
+            new Næringskode(
                 virksomhetMetaData.getNæringOgNæringskode5siffer().stream().findFirst().isPresent()
                     ? virksomhetMetaData.getNæringOgNæringskode5siffer().stream()
-                        .findFirst()
-                        .get().næringskode5Siffer
-                    : "00000",
-                virksomhetMetaData.getNæringOgNæringskode5siffer().stream().findFirst().isPresent()
-                    ? virksomhetMetaData.getNæringOgNæringskode5siffer().stream()
-                        .findFirst()
-                        .get().næring
-                    : ""),
+                    .findFirst()
+                    .get().getFemsifferIdentifikator()
+                    : "00000"
+            ),
             0);
 
     Optional<Bransje> bransje = Bransjeprogram.finnBransje(virksomhet);

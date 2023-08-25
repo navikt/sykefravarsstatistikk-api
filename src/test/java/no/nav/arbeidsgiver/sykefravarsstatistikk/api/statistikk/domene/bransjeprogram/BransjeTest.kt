@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.domene.bransjeprogram
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.enNæringskode5Siffer
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.enNæringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.etOrgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode5Siffer
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UnderenhetLegacy
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje
@@ -26,49 +26,49 @@ class BransjeTest {
 
     @Test
     fun finnBransje__mapperBarnehageTilBarnehagebransjen() {
-        val enBarnehage = Næringskode5Siffer("88911", "")
+        val enBarnehage = Næringskode("88911")
         val (_, navn) = finnBransje(enBarnehage).orElseThrow()
         Assertions.assertThat(navn).isEqualTo("Barnehager")
     }
 
     @Test
     fun finnBransje__mapperBoligbyggelagTilByggebransjen() {
-        val etBoligbyggerlag = Næringskode5Siffer("41101", "")
+        val etBoligbyggerlag = Næringskode("41101")
         val (_, navn) = finnBransje(etBoligbyggerlag).orElseThrow()
         Assertions.assertThat(navn).isEqualTo("Bygg")
     }
 
     @Test
     fun finnBransje__mapperBroOgTunellbyggerTilAnleggsbransjen() {
-        val enByggerAvBroOgTunnel = Næringskode5Siffer("42130", "")
+        val enByggerAvBroOgTunnel = Næringskode("42130")
         val (_, navn) = finnBransje(enByggerAvBroOgTunnel).orElseThrow()
         Assertions.assertThat(navn).isEqualTo("Anlegg")
     }
 
     @Test
     fun finnBransje__mapperProdusentAvIskremTilNæringsmiddelindustrien() {
-        val enProdusentAvIskrem = Næringskode5Siffer("10520", "")
+        val enProdusentAvIskrem = Næringskode("10520")
         val (_, navn) = finnBransje(enProdusentAvIskrem).orElseThrow()
         Assertions.assertThat(navn).isEqualTo("Næringsmiddelsindustrien")
     }
 
     @Test
     fun finnBransje__mapperSomatiskeSpesialsykehusTilSykehusbransjen() {
-        val etSomatiskSpesialsykehus = Næringskode5Siffer("86102", "")
+        val etSomatiskSpesialsykehus = Næringskode("86102")
         val (_, navn) = finnBransje(etSomatiskSpesialsykehus).orElseThrow()
         Assertions.assertThat(navn).isEqualTo("Sykehus")
     }
 
     @Test
     fun finnBransje__mapperSykehjemTilSykehjemsbransjen() {
-        val etSomatiskSykehjem = Næringskode5Siffer("87102", "")
+        val etSomatiskSykehjem = Næringskode("87102")
         val (_, navn) = finnBransje(etSomatiskSykehjem).orElseThrow()
         Assertions.assertThat(navn).isEqualTo("Sykehjem")
     }
 
     @Test
     fun finnBransje__mapperTurbiltransportTilTransportbransjen() {
-        val enturbiltransportør = Næringskode5Siffer("49392", "")
+        val enturbiltransportør = Næringskode("49392")
         val (_, navn) = finnBransje(enturbiltransportør).orElseThrow()
         Assertions.assertThat(navn).isEqualTo("Rutebuss og persontrafikk (transport)")
     }
@@ -109,12 +109,12 @@ class BransjeTest {
     fun inkludererVirksomhet__skal_returnere_hvorvidt_virksomhetens_næring_er_i_bransjen() {
         val bransje = Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "navn", listOf("12345", "34567", "56789"))
         Assertions.assertThat(bransje.inkludererVirksomhet(underenhetMedNæringskode("12345"))).isTrue()
-        Assertions.assertThat(bransje.inkludererVirksomhet(underenhetMedNæringskode("54321"))).isFalse()
+        Assertions.assertThat(bransje.inkludererVirksomhet(underenhetMedNæringskode("00000"))).isFalse()
     }
 
     private fun underenhetMedNæringskode(næringskode: String): UnderenhetLegacy {
         return UnderenhetLegacy(
-            etOrgnr(), Orgnr("053497180"), "Underenhet AS", enNæringskode5Siffer(næringskode), 40
+            etOrgnr(), Orgnr("053497180"), "Underenhet AS", enNæringskode(næringskode), 40
         )
     }
 }

@@ -37,14 +37,14 @@ object TestData {
     @JvmStatic
     fun enUnderenhet(orgnr: String?): UnderenhetLegacy {
         return UnderenhetLegacy(
-            Orgnr(orgnr!!), Orgnr("053497180"), "Underenhet AS", enNæringskode5Siffer(), 40
+            Orgnr(orgnr!!), Orgnr("053497180"), "Underenhet AS", enNæringskode(), 40
         )
     }
 
     @JvmStatic
     @JvmOverloads
-    fun enNæringskode5Siffer(kode: String? = "12345"): Næringskode5Siffer {
-        return Næringskode5Siffer(kode!!, "Spesiell næring")
+    fun enNæringskode(kode: String? = "12345"): Næringskode {
+        return Næringskode(kode!!)
     }
 
     @JvmStatic

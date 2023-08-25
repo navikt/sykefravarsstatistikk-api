@@ -85,34 +85,37 @@ class PostImporteringServiceTest {
 
     private void mockImportVirksomhetNæringskode5sifferMapping(
             ÅrstallOgKvartal årstallOgKvartal,
-            List<VirksomhetMetadataNæringskode5siffer> virksomhetMetadataNæringskode5sifferListe) {
+            List<VirksomhetMetadataMedNæringskode> virksomhetMetadataMedNæringskodeListe) {
         when(graderingRepository.hentVirksomhetMetadataNæringskode5siffer(årstallOgKvartal))
-                .thenReturn(virksomhetMetadataNæringskode5sifferListe);
+                .thenReturn(virksomhetMetadataMedNæringskodeListe);
         whenever(virksomhetMetadataRepository.opprettVirksomhetMetadataNæringskode5siffer(any()))
-                .thenReturn(virksomhetMetadataNæringskode5sifferListe.size());
+                .thenReturn(virksomhetMetadataMedNæringskodeListe.size());
     }
 
-    private List<VirksomhetMetadataNæringskode5siffer> getVirksomhetMetadataNæringskode5sifferListe(
+    private List<VirksomhetMetadataMedNæringskode> getVirksomhetMetadataNæringskode5sifferListe(
             ÅrstallOgKvartal årstallOgKvartal) {
-        List<VirksomhetMetadataNæringskode5siffer> virksomhetMetadataNæringskode5siffer =
+        List<VirksomhetMetadataMedNæringskode> virksomhetMetadataMedNæringskode =
                 new ArrayList<>();
-        virksomhetMetadataNæringskode5siffer.add(
-                new VirksomhetMetadataNæringskode5siffer(
+        virksomhetMetadataMedNæringskode.add(
+                new VirksomhetMetadataMedNæringskode(
                         new Orgnr(ORGNR_VIRKSOMHET_1),
                         årstallOgKvartal,
-                        new NæringOgNæringskode5siffer("10", "10101")));
-        virksomhetMetadataNæringskode5siffer.add(
-                new VirksomhetMetadataNæringskode5siffer(
+                        new Næringskode("10101")
+                ));
+        virksomhetMetadataMedNæringskode.add(
+                new VirksomhetMetadataMedNæringskode(
                         new Orgnr(ORGNR_VIRKSOMHET_1),
                         årstallOgKvartal,
-                        new NæringOgNæringskode5siffer("10", "10102")));
-        virksomhetMetadataNæringskode5siffer.add(
-                new VirksomhetMetadataNæringskode5siffer(
+                        new Næringskode("10102")
+                ));
+        virksomhetMetadataMedNæringskode.add(
+                new VirksomhetMetadataMedNæringskode(
                         new Orgnr(ORGNR_VIRKSOMHET_1),
                         årstallOgKvartal,
-                        new NæringOgNæringskode5siffer("20", "20101")));
+                        new Næringskode("20101")
+                ));
 
-        return virksomhetMetadataNæringskode5siffer;
+        return virksomhetMetadataMedNæringskode;
     }
 
     @NotNull

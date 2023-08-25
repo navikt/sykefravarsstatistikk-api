@@ -2,7 +2,10 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.BransjeEllerNæringService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sektor
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetMetadata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.ORGNR_VIRKSOMHET_1
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.ORGNR_VIRKSOMHET_2
@@ -24,7 +27,7 @@ class BransjeEllerNæringServiceTest {
 
     private val klassifikasjonerRepository: KlassifikasjonerRepository = mock()
 
-    private val barnehage = Næringskode5Siffer("88911", "Barnehager")
+    private val barnehage: Næringskode = Næringskode("88911")
     private val virksomhetMetadata = VirksomhetMetadata(
         ORGNR_VIRKSOMHET_1,
         "Virksomhet 1",
@@ -50,7 +53,7 @@ class BransjeEllerNæringServiceTest {
     fun skalHenteDataPåBransjeEllerNæringsnivå_skalReturnereNæring_forBedriftINæringsmiddelindustrien() {
         // En bedrift i næringsmiddelindustrien er i bransjeprogrammet, men data hentes likevel på
         // tosiffernivå, aka næringsnivå
-        val næringINæringsmiddelindustriBransjen = Næringskode5Siffer("10411", "test")
+        val næringINæringsmiddelindustriBransjen = Næringskode("10411")
         whenever(klassifikasjonerRepository.hentNæring(any())).thenReturn(Næring("10411", "test"))
 
         val actual = bransjeEllerNæringService!!.bestemFraNæringskode(næringINæringsmiddelindustriBransjen)
@@ -62,8 +65,8 @@ class BransjeEllerNæringServiceTest {
     fun finnBransejFraMetadata__skalFinneRiktigBransjeFraMetadata() {
         virksomhetMetadata.leggTilNæringOgNæringskode5siffer(
             listOf(
-                NæringOgNæringskode5siffer(barnehage.hentNæringskode2Siffer(), barnehage.kode),
-                NæringOgNæringskode5siffer("00", "00000")
+                barnehage,
+                Næringskode("00000"),
             )
         )
         val resultat = bransjeEllerNæringService!!.finnBransjeFraMetadata(virksomhetMetadata, listOf())

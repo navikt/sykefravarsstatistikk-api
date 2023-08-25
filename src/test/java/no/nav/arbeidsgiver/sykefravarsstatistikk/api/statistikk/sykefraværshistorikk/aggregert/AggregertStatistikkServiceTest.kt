@@ -529,7 +529,7 @@ internal class AggregertStatistikkServiceTest {
     private val enBarnehage = Underenhet.Næringsdrivende(
         orgnr = etOrgnr,
         navn = "En Barnehage",
-        næringskode = Næringskode5Siffer("88911", "Barnehage"),
+        næringskode = Næringskode("88911"),
         antallAnsatte = 10,
         overordnetEnhetOrgnr = etAnnetOrgnr
     )
@@ -539,6 +539,6 @@ internal class AggregertStatistikkServiceTest {
         overordnetEnhetOrgnr = etAnnetOrgnr,
         navn = "Virksomhet utenfor bransjeprogrammet",
         antallAnsatte = 20,
-        næringskode = Næringskode5Siffer("84300", "Næring")
+        næringskode = Næringskode("84300")
     )
 }

@@ -10,7 +10,7 @@ sealed class Underenhet {
         override val orgnr: Orgnr,
         override val overordnetEnhetOrgnr: Orgnr,
         override val navn: String,
-        override val næringskode: Næringskode5Siffer,
+        override val næringskode: Næringskode,
         override val antallAnsatte: Int
     ) : Underenhet(), Virksomhet
 

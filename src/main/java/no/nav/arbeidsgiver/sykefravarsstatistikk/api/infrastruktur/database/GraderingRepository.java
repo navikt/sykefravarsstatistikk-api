@@ -11,17 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.NæringOgNæringskode5siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetMetadataNæringskode5siffer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Virksomhet;
+
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransjeprogram;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sykefraværsdata;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -40,7 +33,7 @@ public class GraderingRepository {
     this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
   }
 
-  public List<VirksomhetMetadataNæringskode5siffer> hentVirksomhetMetadataNæringskode5siffer(
+  public List<VirksomhetMetadataMedNæringskode> hentVirksomhetMetadataNæringskode5siffer(
       ÅrstallOgKvartal årstallOgKvartal) {
     try {
       return namedParameterJdbcTemplate.query(
@@ -55,11 +48,11 @@ public class GraderingRepository {
               .addValue("årstall", årstallOgKvartal.getÅrstall())
               .addValue("kvartal", årstallOgKvartal.getKvartal()),
           (rs, rowNum) ->
-              new VirksomhetMetadataNæringskode5siffer(
+              new VirksomhetMetadataMedNæringskode(
                   new Orgnr(rs.getString("orgnr")),
                   new ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
-                  new NæringOgNæringskode5siffer(
-                      rs.getString("naring"), rs.getString("naring_kode"))));
+                  new Næringskode(rs.getString("naring_kode"))
+              ));
     } catch (EmptyResultDataAccessException e) {
       return Collections.emptyList();
     }
@@ -90,7 +83,7 @@ public class GraderingRepository {
 
   public Sykefraværsdata hentGradertSykefraværAlleKategorier(@NotNull Virksomhet virksomhet) {
 
-    Næring næring = new Næring(virksomhet.getNæringskode().getKode(), "");
+    Næring næring = new Næring(virksomhet.getNæringskode().getFemsifferIdentifikator(), "");
     Optional<Bransje> maybeBransje = Bransjeprogram.finnBransje(virksomhet.getNæringskode());
 
     Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> data = new HashMap<>();

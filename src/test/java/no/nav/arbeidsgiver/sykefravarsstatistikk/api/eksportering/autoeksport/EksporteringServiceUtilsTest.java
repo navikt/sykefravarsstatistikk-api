@@ -218,8 +218,9 @@ public class EksporteringServiceUtilsTest {
       getSykefraværMedKategoriForNæring5Siffer__returnerer_SykefraværMedKategori__med_sykefraværsstatistikk_for_næring_5_siffer() {
     virksomhet1Metadata_2020_4.leggTilNæringOgNæringskode5siffer(
         Arrays.asList(
-            new NæringOgNæringskode5siffer("85", "85000"),
-            new NæringOgNæringskode5siffer("11", "11000")));
+                new Næringskode("85000"),
+                new Næringskode("11000")
+        ));
     List<SykefraværMedKategori> resultat =
         getSykefraværMedKategoriForNæring5Siffer(
             virksomhet1Metadata_2020_4,
@@ -235,7 +236,7 @@ public class EksporteringServiceUtilsTest {
         byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "85000"),
         sykefraværMedKategori85000,
         Statistikkategori.NÆRINGSKODE,
-            virksomhet1Metadata_2020_4.getNæringOgNæringskode5siffer().get(0).næringskode5Siffer);
+            virksomhet1Metadata_2020_4.getNæringOgNæringskode5siffer().get(0).getFemsifferIdentifikator());
     SykefraværMedKategori sykefraværMedKategori11000 =
         resultat.stream().filter(r -> "11000".equals(r.kode)).findFirst().get();
 
@@ -243,7 +244,7 @@ public class EksporteringServiceUtilsTest {
         byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "11000"),
         sykefraværMedKategori11000,
         Statistikkategori.NÆRINGSKODE,
-            virksomhet1Metadata_2020_4.getNæringOgNæringskode5siffer().get(1).næringskode5Siffer);
+            virksomhet1Metadata_2020_4.getNæringOgNæringskode5siffer().get(1).getFemsifferIdentifikator());
   }
 
   @Test
@@ -251,16 +252,16 @@ public class EksporteringServiceUtilsTest {
     VirksomhetMetadata virksomhetMetadata_2020_4_med_næring5siffer = virksomhet1Metadata_2020_4;
     virksomhetMetadata_2020_4_med_næring5siffer.leggTilNæringOgNæringskode5siffer(
         Arrays.asList(
-            new NæringOgNæringskode5siffer("11", "11000"),
-            new NæringOgNæringskode5siffer("85", "85000")));
-    List<SykefraværsstatistikkNæring5Siffer> sykefraværsstatistikkNæring5SifferList =
+                new Næringskode("11000"),
+                new Næringskode("85000")));
+    List<SykefraværsstatistikkForNæringskode> sykefraværsstatistikkForNæringskodeList =
         Arrays.asList(
             byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "11000"),
             byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "45210"),
             byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "85000"));
-    List<SykefraværsstatistikkNæring5Siffer> resultat =
+    List<SykefraværsstatistikkForNæringskode> resultat =
         getSykefraværsstatistikkNæring5Siffers(
-            virksomhetMetadata_2020_4_med_næring5siffer, sykefraværsstatistikkNæring5SifferList);
+            virksomhetMetadata_2020_4_med_næring5siffer, sykefraværsstatistikkForNæringskodeList);
 
     assertThat(resultat.size()).isEqualTo(2);
     assertThat(

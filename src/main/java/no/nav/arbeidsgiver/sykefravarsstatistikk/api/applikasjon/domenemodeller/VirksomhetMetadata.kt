@@ -12,7 +12,7 @@ data class VirksomhetMetadata(
     val orgnr: String
         get() = orgnrObj.verdi
 
-    val næringOgNæringskode5siffer = mutableListOf<NæringOgNæringskode5siffer>()
+    val næringOgNæringskode5siffer: MutableList<Næringskode> = mutableListOf()
 
     @get:JvmName("getÅrstall")
     val årstall: Int
@@ -21,7 +21,7 @@ data class VirksomhetMetadata(
     val kvartal: Int
         get() = årstallOgKvartal.kvartal
 
-    fun leggTilNæringOgNæringskode5siffer(næringOgNæringskode5siffer: List<NæringOgNæringskode5siffer>?) {
+    fun leggTilNæringOgNæringskode5siffer(næringOgNæringskode5siffer: List<Næringskode>?) {
         if (!næringOgNæringskode5siffer.isNullOrEmpty()) {
             this.næringOgNæringskode5siffer.addAll(næringOgNæringskode5siffer)
         }

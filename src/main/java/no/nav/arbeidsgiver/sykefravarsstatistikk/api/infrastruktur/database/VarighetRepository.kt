@@ -72,7 +72,7 @@ class VarighetRepository(
     }
 
     fun hentUmaskertSykefraværMedVarighetAlleKategorier(virksomhet: Virksomhet): Map<Statistikkategori, List<UmaskertSykefraværForEttKvartalMedVarighet>> {
-        val næring = Næring(virksomhet.næringskode.kode, "")
+        val næring = Næring(virksomhet.næringskode.femsifferIdentifikator, "")
         val maybeBransje = finnBransje(virksomhet.næringskode)
         val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartalMedVarighet>> = EnumMap(
             Statistikkategori::class.java)
