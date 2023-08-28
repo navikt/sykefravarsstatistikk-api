@@ -23,10 +23,7 @@ data class UnderenhetResponseJson(
         )
     } else {
         Underenhet.IkkeNæringsdrivende(
-            orgnr = Orgnr(orgnr),
-            overordnetEnhetOrgnr = Orgnr(overordnetEnhet),
-            navn = navn,
-            antallAnsatte = antallAnsatte,
+            orgnr = Orgnr(orgnr)
         )
     }
 }
