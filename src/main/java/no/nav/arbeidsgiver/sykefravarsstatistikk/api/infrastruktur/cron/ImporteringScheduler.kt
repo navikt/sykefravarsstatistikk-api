@@ -62,6 +62,9 @@ class ImporteringScheduler(
 
         if (fullførteJobber.manglerJobben(IMPORTERT_STATISTIKK)) {
             importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_STATISTIKK, gjeldendeKvartal)
+
+            log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_import'")
+            vellykketImportCounter.increment()
         }
 
         if (fullførteJobber.manglerJobben(IMPORTERT_VIRKSOMHETDATA)) {
@@ -81,9 +84,6 @@ class ImporteringScheduler(
                 }
             importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_NÆRINGSKODEMAPPING, gjeldendeKvartal)
         }
-
-        log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_import'")
-        vellykketImportCounter.increment()
 
         if (fullførteJobber.manglerJobben(FORBEREDT_NESTE_EKSPORT_LEGACY)) {
             postImporteringService.forberedNesteEksport(gjeldendeKvartal, true)
@@ -130,7 +130,13 @@ class ImporteringScheduler(
                 gjeldendeKvartal
             )
 
-            log.info("Listen over fullførte jobber dette kvartalet: ${importEksportStatusRepository.hentFullførteJobber(gjeldendeKvartal)}")
+            log.info(
+                "Listen over fullførte jobber dette kvartalet: ${
+                    importEksportStatusRepository.hentFullførteJobber(
+                        gjeldendeKvartal
+                    )
+                }"
+            )
 
             log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_eksport'")
             vellykketEksportCounter.increment()
