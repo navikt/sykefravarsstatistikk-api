@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 import arrow.core.right
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.BransjeEllerNæringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PubliseringsdatoerService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.AggregertStatistikkService
@@ -45,9 +44,6 @@ internal class AggregertStatistikkServiceTest {
     private lateinit var mockEnhetsregisteretClient: EnhetsregisteretClient
 
     @Mock
-    private lateinit var mockBransjeEllerNæringService: BransjeEllerNæringService
-
-    @Mock
     private lateinit var mockVarighetRepository: VarighetRepository
 
     @Mock
@@ -73,7 +69,6 @@ internal class AggregertStatistikkServiceTest {
             mockGraderingRepository,
             mockVarighetRepository,
             mockEnhetsregisteretClient,
-            mockBransjeEllerNæringService,
             mockTilgangskontrollService
         )
     }
