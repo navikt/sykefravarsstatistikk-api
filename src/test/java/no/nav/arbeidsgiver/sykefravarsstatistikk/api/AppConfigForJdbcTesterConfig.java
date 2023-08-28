@@ -11,7 +11,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.Tilgangsk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.WebClientConfiguration;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.MockServer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.PrometheusMetrics;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.EksporteringController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.ImporteringController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.OrganisasjonerController;
@@ -40,7 +39,6 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
           type = FilterType.ASSIGNABLE_TYPE,
           value = {
             MockServer.class,
-            AltinnClient.class,
             TilgangskontrollUtils.class,
             EksporteringService.class,
             EksporteringPerStatistikkKategoriService.class,

@@ -1,33 +1,12 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
 
-import static com.google.common.net.HttpHeaders.AUTHORIZATION;
-import static java.net.http.HttpClient.newBuilder;
-import static java.net.http.HttpResponse.BodyHandlers.ofString;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.SELVBETJENING_ISSUER_ID;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForVirksomhet;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettTestVirksomhetMetaData;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.skrivSisteImporttidspunktTilDb;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllEksportDataFraDatabase;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAlleImporttidspunkt;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import common.SpringIntegrationTestbase;
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil;
 import no.nav.security.mock.oauth2.MockOAuth2Server;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.jetbrains.annotations.NotNull;
-import org.junit.AfterClass;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -44,6 +23,20 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import static com.google.common.net.HttpHeaders.AUTHORIZATION;
+import static java.net.http.HttpClient.newBuilder;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.SELVBETJENING_ISSUER_ID;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DirtiesContext
 @EmbeddedKafka(
@@ -108,12 +101,6 @@ public class EksporteringControllerApiIntegrationTest extends SpringIntegrationT
   public void tearDown() {
     container.stop();
     container.destroy();
-  }
-
-  @AfterClass
-  public void tearDownClass() {
-    container.destroy();
-    embeddedKafkaBroker.destroy();
   }
 
   @Test

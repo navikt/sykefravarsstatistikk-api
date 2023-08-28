@@ -4,6 +4,8 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
+import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.error.ProxyError
+import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.error.exceptions.AltinnException
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getInnloggetBruker
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getOrganisasjon
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService
@@ -13,7 +15,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.TilgangskontrollException
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.TilgangskontrollUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.CorrelationIdFilter
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnException
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnKlientWrapper
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetslog.Loggevent
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetslog.Sporbarhetslogg
@@ -47,7 +48,7 @@ class TilgangskontrollServiceTest {
     fun hentInnloggetBruker__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
         every {
             altinnKlientWrapper.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(any(), any())
-        } throws AltinnException("")
+        } throws AltinnException(ProxyError(500, "Bad", "Bad"))
         assertThrows(
             AltinnException::class.java
         ) { tilgangskontroll.hentBrukerKunIaRettigheter() }
@@ -55,7 +56,9 @@ class TilgangskontrollServiceTest {
 
     @Test
     fun hentInnloggetBrukerForAlleTilganger__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
-        every { altinnKlientWrapper.hentVirksomheterDerBrukerHarTilknytning(any(), any()) } throws AltinnException("")
+        every {
+            altinnKlientWrapper.hentVirksomheterDerBrukerHarTilknytning(any(), any())
+        } throws AltinnException(ProxyError(500, "Bad", "Bad"))
 
         assertThrows(
             AltinnException::class.java

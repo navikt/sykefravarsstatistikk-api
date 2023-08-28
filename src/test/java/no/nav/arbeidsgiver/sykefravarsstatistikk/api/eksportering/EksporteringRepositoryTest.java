@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetEksportPerKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetEksportPerKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.LocalOgUnitTestOidcConfiguration;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository;
@@ -24,14 +24,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_1;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_2;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_3;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettTestVirksomhetMetaData;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllEksportDataFraDatabase;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension.class)
@@ -186,7 +182,6 @@ class EksporteringRepositoryTest {
     int antallSlettet = eksporteringRepository.slettVirksomheterBekreftetEksportert();
 
     assertEquals(2, antallSlettet);
-    List<VirksomhetEksportPerKvartalMedDatoer> results = hentAlleVirksomhetEksportPerKvartal();
     assertEquals(0, hentAlleVirksomhetBekreftetEksportert().size());
   }
 
