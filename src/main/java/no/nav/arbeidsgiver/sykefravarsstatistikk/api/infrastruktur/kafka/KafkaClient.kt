@@ -4,15 +4,15 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.annotation.PropertyAccessor
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.PrometheusMetrics
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværMedKategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetSykefravær
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.PrometheusMetrics
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.KafkaTopicKey
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.KafkaTopicValue
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.Kafkamelding
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværMedKategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetSykefravær
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.support.SendResult
@@ -59,10 +59,10 @@ class KafkaClient internal constructor(
     fun send(
         årstallOgKvartal: ÅrstallOgKvartal,
         virksomhetSykefravær: VirksomhetSykefravær,
-        næring5SifferSykefravær: List<SykefraværMedKategori?>?,
-        næringSykefravær: SykefraværMedKategori?,
-        sektorSykefravær: SykefraværMedKategori?,
-        landSykefravær: SykefraværMedKategori?
+        næring5SifferSykefravær: List<SykefraværMedKategori>,
+        næringSykefravær: SykefraværMedKategori,
+        sektorSykefravær: SykefraværMedKategori,
+        landSykefravær: SykefraværMedKategori
     ) {
         // TODO bytt til Prometheus
         kafkaUtsendingRapport.leggTilMeldingMottattForUtsending()

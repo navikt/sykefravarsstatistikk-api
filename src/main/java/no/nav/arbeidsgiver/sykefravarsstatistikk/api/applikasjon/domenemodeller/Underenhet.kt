@@ -5,10 +5,10 @@ sealed class Underenhet {
 
     data class Næringsdrivende(
         override val orgnr: Orgnr,
-        override val overordnetEnhetOrgnr: Orgnr,
+        val overordnetEnhetOrgnr: Orgnr,
         override val navn: String,
         override val næringskode: Næringskode,
-        override val antallAnsatte: Int
+        val antallAnsatte: Int
     ) : Underenhet(), Virksomhet
 
     data class IkkeNæringsdrivende(override val orgnr: Orgnr) : Underenhet()
