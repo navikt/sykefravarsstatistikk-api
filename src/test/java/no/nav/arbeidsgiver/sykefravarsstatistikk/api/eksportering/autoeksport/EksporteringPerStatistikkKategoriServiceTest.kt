@@ -8,6 +8,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.Ek
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2019_4
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2020_1
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2020_2
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.sykefraværsstatistikkSektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
@@ -58,6 +59,29 @@ class EksporteringPerStatistikkKategoriServiceTest {
             node("kategori").isString.isEqualTo(Statistikkategori.LAND.name)
             node("kode").isString.isEqualTo("NO")
             node("sistePubliserteKvartal").isObject.node("årstall").isNumber.isEqualTo(BigDecimal("2020"))
+        }
+    }
+
+    @Test
+    fun eksporterSykefraværsstatistikkSektor__sender_riktig_melding_til_kafka() {
+        val testData = sykefraværsstatistikkSektor
+        whenever(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleSektorerFraOgMed(any()))
+                .thenReturn(listOf(testData))
+
+        service.eksporterPerStatistikkKategori(__2020_2, Statistikkategori.SEKTOR)
+
+        verify(kafkaClient)
+                .sendMelding(
+                        statistikkategoriKafkameldingCaptor.capture(),
+                        eq(KafkaTopic.SYKEFRAVARSSTATISTIKK_SEKTOR_V1)
+                )
+
+        assertThatJson(statistikkategoriKafkameldingCaptor.firstValue.innhold) {
+            isObject
+            node("kategori").isString.isEqualTo(Statistikkategori.SEKTOR.name)
+            node("kode").isString.isEqualTo("1")
+            node("sistePubliserteKvartal").isObject.node("årstall").isNumber.isEqualTo(BigDecimal("2020"))
+            node("sistePubliserteKvartal").isObject.node("kvartal").isNumber.isEqualTo(BigDecimal("2"))
         }
     }
 

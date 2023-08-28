@@ -64,7 +64,7 @@ class EksporteringPerStatistikkKategoriService(
             eksporterSykefraværsstatistikkPerKategori(
                 årstallOgKvartal = årstallOgKvartal,
                 sykefraværGruppertEtterKode = it,
-                statistikkategori = Statistikkategori.NÆRING,
+                statistikkategori = Statistikkategori.SEKTOR,
                 kafkaTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_SEKTOR_V1
             )
         }
