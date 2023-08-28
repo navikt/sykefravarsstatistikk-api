@@ -181,7 +181,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
 
         whenever(
                 sykefraværsstatistikkTilEksporteringRepository
-                        .hentSykefraværprosentAlleNæringer5Siffer(__2019_3, __2020_2)
+                        .hentSykefraværprosentForAlleNæringskoder(__2019_3, __2020_2)
         ).thenReturn(allData)
 
         // 2- Kall tjenesten
@@ -246,7 +246,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
 
         whenever(
                 sykefraværsstatistikkTilEksporteringRepository
-                        .hentSykefraværprosentAlleNæringer5Siffer(__2019_3, __2020_2)
+                        .hentSykefraværprosentForAlleNæringskoder(__2019_3, __2020_2)
         ).thenReturn(allData)
 
         service.eksporterPerStatistikkKategori(__2020_2, Statistikkategori.NÆRINGSKODE)

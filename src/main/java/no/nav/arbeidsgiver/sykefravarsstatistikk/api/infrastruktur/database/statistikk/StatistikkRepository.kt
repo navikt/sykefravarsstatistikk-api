@@ -74,19 +74,19 @@ class StatistikkRepository(
     }
 
     fun importSykefraværsstatistikkNæring(
-        sykefraværsstatistikkNæring: List<SykefraværsstatistikkNæring>,
+        sykefraværsstatistikkForNæring: List<SykefraværsstatistikkForNæring>,
         årstallOgKvartal: ÅrstallOgKvartal
     ): SlettOgOpprettResultat {
         val sykefraværsstatistikkNæringUtils = SykefraværsstatistikkNæringUtils(
             namedParameterJdbcTemplate
         )
         return importStatistikk(
-            "næring", sykefraværsstatistikkNæring, årstallOgKvartal, sykefraværsstatistikkNæringUtils
+            "næring", sykefraværsstatistikkForNæring, årstallOgKvartal, sykefraværsstatistikkNæringUtils
         )
     }
 
     fun importSykefraværsstatistikkNæring5siffer(
-        sykefraværsstatistikkNæring: List<SykefraværsstatistikkNæring>,
+        sykefraværsstatistikkForNæring: List<SykefraværsstatistikkForNæring>,
         årstallOgKvartal: ÅrstallOgKvartal
     ): SlettOgOpprettResultat {
         val sykefraværsstatistikkNæring5sifferUtils = SykefraværsstatistikkNæring5sifferUtils(
@@ -94,7 +94,7 @@ class StatistikkRepository(
         )
         return importStatistikk(
             "næring5siffer",
-            sykefraværsstatistikkNæring,
+            sykefraværsstatistikkForNæring,
             årstallOgKvartal,
             sykefraværsstatistikkNæring5sifferUtils
         )

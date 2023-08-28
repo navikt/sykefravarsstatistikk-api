@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 import arrow.core.right
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.BransjeEllerNæringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PubliseringsdatoerService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.AggregertStatistikkService
@@ -45,9 +44,6 @@ internal class AggregertStatistikkServiceTest {
     private lateinit var mockEnhetsregisteretClient: EnhetsregisteretClient
 
     @Mock
-    private lateinit var mockBransjeEllerNæringService: BransjeEllerNæringService
-
-    @Mock
     private lateinit var mockVarighetRepository: VarighetRepository
 
     @Mock
@@ -60,7 +56,6 @@ internal class AggregertStatistikkServiceTest {
             mockSykefraværRepository,
             mockGraderingRepository,
             mockVarighetRepository,
-            mockBransjeEllerNæringService,
             mockTilgangskontrollService,
             mockEnhetsregisteretClient,
             publiseringsdatoerService
@@ -74,7 +69,6 @@ internal class AggregertStatistikkServiceTest {
             mockGraderingRepository,
             mockVarighetRepository,
             mockEnhetsregisteretClient,
-            mockBransjeEllerNæringService,
             mockTilgangskontrollService
         )
     }
@@ -84,7 +78,6 @@ internal class AggregertStatistikkServiceTest {
         whenever(mockTilgangskontrollService.brukerRepresentererVirksomheten(any())).thenReturn(true)
         whenever(mockEnhetsregisteretClient.hentUnderenhet(any())).thenReturn(enBarnehage.right())
         whenever(mockTilgangskontrollService.brukerHarIaRettigheterIVirksomheten(any())).thenReturn(true)
-        whenever(mockBransjeEllerNæringService.finnBransje(any())).thenReturn(barnehager)
 
         // Helt tomt resultat skal ikke kræsje
         whenever(
@@ -362,8 +355,6 @@ internal class AggregertStatistikkServiceTest {
                 mutableMapOf()
             )
         )
-        whenever(mockBransjeEllerNæringService.finnBransje(any()))
-            .thenReturn(BransjeEllerNæring(Næring("84", "Et langt navn")))
 
         val årstallOgKvartal = ÅrstallOgKvartal(2022, 1)
         whenever(mockSykefraværRepository.hentTotaltSykefraværAlleKategorier(any(), any())).thenReturn(
@@ -444,7 +435,7 @@ internal class AggregertStatistikkServiceTest {
         assertThat(result?.prosentSiste4KvartalerTotalt).isEqualTo(
             listOf(
                 StatistikkDto(
-                    Statistikkategori.NÆRING, "Et langt navn", "6.8", 20, listOf(
+                    Statistikkategori.NÆRING, "Offentlig administrasjon og forsvar, og trygdeordninger underlagt offentlig forvaltning", "6.8", 20, listOf(
                         årstallOgKvartal
                     )
                 )
@@ -453,7 +444,7 @@ internal class AggregertStatistikkServiceTest {
         assertThat(result?.prosentSiste4KvartalerKorttid).isEqualTo(
             listOf(
                 StatistikkDto(
-                    Statistikkategori.NÆRING, "Et langt navn", "0.7", 20, listOf(
+                    Statistikkategori.NÆRING, "Offentlig administrasjon og forsvar, og trygdeordninger underlagt offentlig forvaltning", "0.7", 20, listOf(
                         årstallOgKvartal
                     )
                 )
@@ -462,7 +453,7 @@ internal class AggregertStatistikkServiceTest {
         assertThat(result?.prosentSiste4KvartalerLangtid).isEqualTo(
             listOf(
                 StatistikkDto(
-                    Statistikkategori.NÆRING, "Et langt navn", "6.1", 20, listOf(
+                    Statistikkategori.NÆRING, "Offentlig administrasjon og forsvar, og trygdeordninger underlagt offentlig forvaltning", "6.1", 20, listOf(
                         årstallOgKvartal
                     )
                 )
@@ -476,7 +467,6 @@ internal class AggregertStatistikkServiceTest {
         whenever(mockTilgangskontrollService.brukerRepresentererVirksomheten(any())).thenReturn(true)
         whenever(mockEnhetsregisteretClient.hentUnderenhet(any())).thenReturn(enBarnehage.right())
         whenever(mockTilgangskontrollService.brukerHarIaRettigheterIVirksomheten(any())).thenReturn(true)
-        whenever(mockBransjeEllerNæringService.finnBransje(any())).thenReturn(barnehager)
     }
 
     private fun genererTestSykefravær(offset: Int): List<UmaskertSykefraværForEttKvartal> {

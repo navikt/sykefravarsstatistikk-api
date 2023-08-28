@@ -103,9 +103,7 @@ open class VarighetRepositoryJdbcTest {
             Varighetskategori._1_DAG_TIL_7_DAGER,
             4
         )
-        val resultat = varighetRepository.hentSykefraværMedVarighet(
-            Næring(barnehager.næring.tosifferIdentifikator, "")
-        )
+        val resultat = varighetRepository.hentSykefraværMedVarighet(barnehager.næring)
         assertThat(resultat.size).isEqualTo(2)
         assertThat(resultat[0])
             .isEqualTo(
@@ -194,14 +192,13 @@ open class VarighetRepositoryJdbcTest {
     fun `hent sykefravær med varighet for næring burde returnere sykefraværsstatistikk for alle inkluderte næringskoder`() {
         val næringskode1 = Næringskode("84300")
         val næringskode2 = Næringskode("84999")
-        val næring1 = Næring(næringskode1.næring.tosifferIdentifikator, "Næring 1")
 
         // Populer databasen med statistikk for to næringskoder, som har felles næring
         VarighetTestUtils.leggTilStatisitkkNæringMedVarighet(jdbcTemplate, næringskode1, 2023, 1, "E", 20, 100, 1000)
         VarighetTestUtils.leggTilStatisitkkNæringMedVarighet(jdbcTemplate, næringskode2, 2023, 1, "E", 20, 400, 1000)
 
         // Kjør hentSykefraværMedVarighet() med et Næring-objekt som er opprettet fra en av nærignskodene
-        val resultat = varighetRepository.hentSykefraværMedVarighet(næring1)
+        val resultat = varighetRepository.hentSykefraværMedVarighet(næringskode1.næring)
 
         // Resultatet skal bli statistikk for BEGGE de to næringskodene
         assertThat(resultat.size).isEqualTo(2)

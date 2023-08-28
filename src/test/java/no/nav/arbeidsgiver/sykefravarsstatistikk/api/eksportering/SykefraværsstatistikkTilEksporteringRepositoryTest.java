@@ -37,11 +37,10 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
     private SykefraværsstatistikkTilEksporteringRepository repository;
 
-    private final Næringskode produksjonAvKlær =
-            new Næringskode("14190");
+    private final Næringskode produksjonAvKlær = new Næringskode("14190");
     private final Næringskode undervisning = new Næringskode("86907");
-    private final Næring utdanning = new Næring("86", "Utdanning");
-    private final Næring produksjon = new Næring("14", "Produksjon");
+    private final Næring utdanning = new Næring("86");
+    private final Næring produksjon = new Næring("14");
     private final String VIRKSOMHET_1 = "999999999";
     private final String VIRKSOMHET_2 = "999999998";
 
@@ -101,14 +100,14 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     void hentSykefraværprosentAlleNæringer__skal_hente_alle_næringer_for_ett_kvartal() {
         opprettStatistikkNæringTestData(new ÅrstallOgKvartal(2019, 1), new ÅrstallOgKvartal(2019, 2));
 
-        List<SykefraværsstatistikkNæring> resultat =
+        List<SykefraværsstatistikkForNæring> resultat =
                 repository.hentSykefraværprosentAlleNæringer(new ÅrstallOgKvartal(2019, 2));
 
         assertThat(resultat.size()).isEqualTo(2);
         assertSykefraværsstatistikkForNæringIsEqual(resultat, 2019, 2, 10, produksjon, 2, 100);
         assertSykefraværsstatistikkForNæringIsEqual(resultat, 2019, 2, 8, utdanning, 5, 100);
 
-        List<SykefraværsstatistikkNæring> resultat_2019_1 =
+        List<SykefraværsstatistikkForNæring> resultat_2019_1 =
                 repository.hentSykefraværprosentAlleNæringer(new ÅrstallOgKvartal(2019, 1));
 
         assertThat(resultat_2019_1.size()).isEqualTo(2);
@@ -119,44 +118,44 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     @Test
     void hentSykefraværprosentAlleNæringer_siste4Kvartaler_skal_hente_riktig_data() {
         opprettStatistikkForNæringer(jdbcTemplate);
-        List<SykefraværsstatistikkNæring> forventet =
+        List<SykefraværsstatistikkForNæring> forventet =
                 List.of(
-                        new SykefraværsstatistikkNæring(
+                        new SykefraværsstatistikkForNæring(
                                 SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
                                 SISTE_PUBLISERTE_KVARTAL.getKvartal(),
                                 "10",
                                 50,
                                 new BigDecimal(20000),
                                 new BigDecimal(1000000)),
-                        new SykefraværsstatistikkNæring(
+                        new SykefraværsstatistikkForNæring(
                                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getÅrstall(),
                                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getKvartal(),
                                 "10",
                                 50,
                                 new BigDecimal(30000),
                                 new BigDecimal(1000000)),
-                        new SykefraværsstatistikkNæring(
+                        new SykefraværsstatistikkForNæring(
                                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getÅrstall(),
                                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getKvartal(),
                                 "10",
                                 50,
                                 new BigDecimal(40000),
                                 new BigDecimal(1000000)),
-                        new SykefraværsstatistikkNæring(
+                        new SykefraværsstatistikkForNæring(
                                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getÅrstall(),
                                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getKvartal(),
                                 "10",
                                 50,
                                 new BigDecimal(50000),
                                 new BigDecimal(1000000)),
-                        new SykefraværsstatistikkNæring(
+                        new SykefraværsstatistikkForNæring(
                                 SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
                                 SISTE_PUBLISERTE_KVARTAL.getKvartal(),
                                 "88",
                                 50,
                                 new BigDecimal(25000),
                                 new BigDecimal(1000000)));
-        List<SykefraværsstatistikkNæring> resultat =
+        List<SykefraværsstatistikkForNæring> resultat =
                 repository.hentSykefraværprosentAlleNæringer(
                         SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3), SISTE_PUBLISERTE_KVARTAL);
         assertThat(resultat.size()).isEqualTo(5);
@@ -167,16 +166,16 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     void
     hentSykefraværprosentAlleNæringer_siste4Kvartaler_kan_likevel_hente_bare_siste_publiserte_kvartal() {
         opprettStatistikkForNæringer(jdbcTemplate);
-        List<SykefraværsstatistikkNæring> forventet =
+        List<SykefraværsstatistikkForNæring> forventet =
                 List.of(
-                        new SykefraværsstatistikkNæring(
+                        new SykefraværsstatistikkForNæring(
                                 SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
                                 SISTE_PUBLISERTE_KVARTAL.getKvartal(),
                                 "10",
                                 50,
                                 new BigDecimal(20000),
                                 new BigDecimal(1000000)),
-                        new SykefraværsstatistikkNæring(
+                        new SykefraværsstatistikkForNæring(
                                 SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
                                 SISTE_PUBLISERTE_KVARTAL.getKvartal(),
                                 "88",
@@ -184,7 +183,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                                 new BigDecimal(25000),
                                 new BigDecimal(1000000)));
 
-        List<SykefraværsstatistikkNæring> resultat =
+        List<SykefraværsstatistikkForNæring> resultat =
                 repository.hentSykefraværprosentAlleNæringer(SISTE_PUBLISERTE_KVARTAL, 1);
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat).containsExactlyInAnyOrderElementsOf(forventet);
@@ -192,7 +191,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
     @Test
     void hentSykefraværprosentAlleNæringer_siste4Kvartaler_skalIkkeKrasjeVedManglendeData() {
-        List<SykefraværsstatistikkNæring> resultat =
+        List<SykefraværsstatistikkForNæring> resultat =
                 repository.hentSykefraværprosentAlleNæringer(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3));
         assertThat(resultat.size()).isEqualTo(0);
         assertThat(resultat).containsExactlyInAnyOrderElementsOf(List.of());
@@ -201,44 +200,44 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     @Test
     void hentSykefraværAlleNæringer_siste4Kvartaler_skal_hente_riktig_data() {
         opprettStatistikkForNæringer(jdbcTemplate);
-        List<SykefraværsstatistikkNæring> forventet =
+        List<SykefraværsstatistikkForNæring> forventet =
                 List.of(
-                        new SykefraværsstatistikkNæring(
+                        new SykefraværsstatistikkForNæring(
                                 SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
                                 SISTE_PUBLISERTE_KVARTAL.getKvartal(),
                                 "10",
                                 50,
                                 new BigDecimal(20000),
                                 new BigDecimal(1000000)),
-                        new SykefraværsstatistikkNæring(
+                        new SykefraværsstatistikkForNæring(
                                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getÅrstall(),
                                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).getKvartal(),
                                 "10",
                                 50,
                                 new BigDecimal(30000),
                                 new BigDecimal(1000000)),
-                        new SykefraværsstatistikkNæring(
+                        new SykefraværsstatistikkForNæring(
                                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getÅrstall(),
                                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).getKvartal(),
                                 "10",
                                 50,
                                 new BigDecimal(40000),
                                 new BigDecimal(1000000)),
-                        new SykefraværsstatistikkNæring(
+                        new SykefraværsstatistikkForNæring(
                                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getÅrstall(),
                                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).getKvartal(),
                                 "10",
                                 50,
                                 new BigDecimal(50000),
                                 new BigDecimal(1000000)),
-                        new SykefraværsstatistikkNæring(
+                        new SykefraværsstatistikkForNæring(
                                 SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
                                 SISTE_PUBLISERTE_KVARTAL.getKvartal(),
                                 "88",
                                 50,
                                 new BigDecimal(25000),
                                 new BigDecimal(1000000)));
-        List<SykefraværsstatistikkNæring> resultat =
+        List<SykefraværsstatistikkForNæring> resultat =
                 repository.hentSykefraværAlleNæringerFraOgMed(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3));
         assertThat(resultat.size()).isEqualTo(5);
         assertThat(resultat).containsExactlyInAnyOrderElementsOf(forventet);
@@ -248,16 +247,16 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     void
     hentSykefraværAlleNæringer_siste4Kvartaler_kan_likevel_hente_bare_siste_publiserte_kvartal() {
         opprettStatistikkForNæringer(jdbcTemplate);
-        List<SykefraværsstatistikkNæring> forventet =
+        List<SykefraværsstatistikkForNæring> forventet =
                 List.of(
-                        new SykefraværsstatistikkNæring(
+                        new SykefraværsstatistikkForNæring(
                                 SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
                                 SISTE_PUBLISERTE_KVARTAL.getKvartal(),
                                 "10",
                                 50,
                                 new BigDecimal(20000),
                                 new BigDecimal(1000000)),
-                        new SykefraværsstatistikkNæring(
+                        new SykefraværsstatistikkForNæring(
                                 SISTE_PUBLISERTE_KVARTAL.getÅrstall(),
                                 SISTE_PUBLISERTE_KVARTAL.getKvartal(),
                                 "88",
@@ -265,7 +264,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                                 new BigDecimal(25000),
                                 new BigDecimal(1000000)));
 
-        List<SykefraværsstatistikkNæring> resultat = repository.hentSykefraværAlleNæringerFraOgMed(
+        List<SykefraværsstatistikkForNæring> resultat = repository.hentSykefraværAlleNæringerFraOgMed(
                 SISTE_PUBLISERTE_KVARTAL);
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat).containsExactlyInAnyOrderElementsOf(forventet);
@@ -273,7 +272,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
     @Test
     void hentSykefraværAlleNæringer_siste4Kvartaler_skalIkkeKrasjeVedManglendeData() {
-        List<SykefraværsstatistikkNæring> resultat =
+        List<SykefraværsstatistikkForNæring> resultat =
                 repository.hentSykefraværAlleNæringerFraOgMed(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3));
         assertThat(resultat.size()).isEqualTo(0);
         assertThat(resultat).containsExactlyInAnyOrderElementsOf(List.of());
@@ -286,7 +285,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 new ÅrstallOgKvartal(2019, 2), new ÅrstallOgKvartal(2019, 1));
 
         List<SykefraværsstatistikkForNæringskode> resultat =
-                repository.hentSykefraværprosentAlleNæringer5Siffer(new ÅrstallOgKvartal(2019, 2));
+                repository.hentSykefraværprosentForAlleNæringskoder(new ÅrstallOgKvartal(2019, 2));
 
         assertSykefraværsstatistikkForBedreNæringskodeContains(
                 resultat, 2019, 2, 10, produksjonAvKlær, 3, 100);
@@ -294,7 +293,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 resultat, 2019, 2, 10, undervisning, 5, 100);
 
         List<SykefraværsstatistikkForNæringskode> resultat_2019_1 =
-                repository.hentSykefraværprosentAlleNæringer5Siffer(new ÅrstallOgKvartal(2019, 1));
+                repository.hentSykefraværprosentForAlleNæringskoder(new ÅrstallOgKvartal(2019, 1));
 
         assertThat(resultat_2019_1.size()).isEqualTo(2);
         assertSykefraværsstatistikkForBedreNæringskodeContains(
@@ -310,7 +309,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 new ÅrstallOgKvartal(2019, 2), new ÅrstallOgKvartal(2019, 1));
 
         List<SykefraværsstatistikkForNæringskode> resultat =
-                repository.hentSykefraværprosentAlleNæringer5Siffer(new ÅrstallOgKvartal(2019, 2));
+                repository.hentSykefraværprosentForAlleNæringskoder(new ÅrstallOgKvartal(2019, 2));
 
         assertSykefraværsstatistikkForBedreNæringskodeContains(
                 resultat, 2019, 2, 10, produksjonAvKlær, 3, 100);
@@ -318,7 +317,7 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 resultat, 2019, 2, 10, undervisning, 5, 100);
 
         List<SykefraværsstatistikkForNæringskode> resultat_2019_1_til_2019_2 =
-                repository.hentSykefraværprosentAlleNæringer5Siffer(
+                repository.hentSykefraværprosentForAlleNæringskoder(
                         new ÅrstallOgKvartal(2019, 1), new ÅrstallOgKvartal(2019, 2));
 
         assertThat(resultat.size()).isEqualTo(2);
@@ -433,16 +432,16 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
     }
 
     private void assertSykefraværsstatistikkForNæringIsEqual(
-            List<SykefraværsstatistikkNæring> actual,
+            List<SykefraværsstatistikkForNæring> actual,
             int årstall,
             int kvartal,
             int antallPersoner,
             Næring næring,
             int tapteDagsverk,
             int muligeDagsverk) {
-        List<SykefraværsstatistikkNæring> statistikkForNæring =
+        List<SykefraværsstatistikkForNæring> statistikkForNæring =
                 actual.stream()
-                        .filter(sfNæring -> sfNæring.getNæringkode().equals(næring.getKode()))
+                        .filter(sfNæring -> sfNæring.getNæringkode().equals(næring.getTosifferIdentifikator()))
                         .toList();
         assertThat(statistikkForNæring.size()).isEqualTo(1);
         assertSykefraværsstatistikkIsEqual(
@@ -588,10 +587,10 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 "insert into sykefravar_statistikk_naring (naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                         + "values (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
                 parametre(
-                        new SykefraværsstatistikkNæring(
+                        new SykefraværsstatistikkForNæring(
                                 årstall,
                                 kvartal,
-                                næring.getKode(),
+                                næring.getTosifferIdentifikator(),
                                 antallPersoner,
                                 new BigDecimal(tapteDagsverk),
                                 new BigDecimal(muligeDagsverk))));
@@ -647,12 +646,12 @@ class SykefraværsstatistikkTilEksporteringRepositoryTest {
         return leggTilParametreForSykefraværsstatistikk(parametre, sykefraværsstatistikkSektor);
     }
 
-    private MapSqlParameterSource parametre(SykefraværsstatistikkNæring sykefraværsstatistikkNæring) {
+    private MapSqlParameterSource parametre(SykefraværsstatistikkForNæring sykefraværsstatistikkForNæring) {
         MapSqlParameterSource parametre =
                 new MapSqlParameterSource()
-                        .addValue("naring_kode", sykefraværsstatistikkNæring.getNæringkode());
+                        .addValue("naring_kode", sykefraværsstatistikkForNæring.getNæringkode());
 
-        return leggTilParametreForSykefraværsstatistikk(parametre, sykefraværsstatistikkNæring);
+        return leggTilParametreForSykefraværsstatistikk(parametre, sykefraværsstatistikkForNæring);
     }
 
     private MapSqlParameterSource parametre(

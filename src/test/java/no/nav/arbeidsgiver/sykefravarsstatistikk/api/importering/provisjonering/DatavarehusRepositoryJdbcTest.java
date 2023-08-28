@@ -440,18 +440,6 @@ public class DatavarehusRepositoryJdbcTest {
   }
 
   @Test
-  public void hentAlleNæringer__returnerer_eksisterende_Næring() {
-    insertNæringInDvhTabell(
-        namedParameterJdbcTemplate, "02", "01", "Skogbruk og tjenester tilknyttet skogbruk");
-    insertNæringInDvhTabell(namedParameterJdbcTemplate, "11", "10", "Produksjon av drikkevarer");
-
-    List<Næring> næringer = repository.hentAlleNæringer();
-
-    assertTrue(næringer.contains(new Næring("02", "Skogbruk og tjenester tilknyttet skogbruk")));
-    assertTrue(næringer.contains(new Næring("11", "Produksjon av drikkevarer")));
-  }
-
-  @Test
   public void hentVirksomhetMetadataEksportering__returnerer_virksomhetMetadataEksportering() {
     insertOrgenhetInDvhTabell(
         namedParameterJdbcTemplate,

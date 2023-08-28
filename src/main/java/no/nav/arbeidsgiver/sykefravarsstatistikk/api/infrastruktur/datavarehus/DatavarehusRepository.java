@@ -17,8 +17,6 @@ import java.util.List;
 @Component
 public class DatavarehusRepository implements KildeTilVirksomhetsdata {
 
-  public static final String NARINGKODE = "naringkode";
-  public static final String NARINGNAVN = "naringnavn";
   public static final String ARSTALL = "arstall";
   public static final String KVARTAL = "kvartal";
   public static final String SEKTOR = "sektor";
@@ -118,7 +116,7 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
   }
 
-  public List<SykefraværsstatistikkNæring> hentSykefraværsstatistikkNæring(
+  public List<SykefraværsstatistikkForNæring> hentSykefraværsstatistikkNæring(
       ÅrstallOgKvartal årstallOgKvartal) {
     SqlParameterSource namedParameters =
         new MapSqlParameterSource()
@@ -136,7 +134,7 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
             + "group by arstall, kvartal, naring",
         namedParameters,
         (resultSet, rowNum) ->
-            new SykefraværsstatistikkNæring(
+            new SykefraværsstatistikkForNæring(
                 resultSet.getInt(ARSTALL),
                 resultSet.getInt(KVARTAL),
                 resultSet.getString(NARING),
@@ -145,7 +143,7 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
   }
 
-  public List<SykefraværsstatistikkNæring> hentSykefraværsstatistikkNæring5siffer(
+  public List<SykefraværsstatistikkForNæring> hentSykefraværsstatistikkNæring5siffer(
       ÅrstallOgKvartal årstallOgKvartal) {
     SqlParameterSource namedParameters =
         new MapSqlParameterSource()
@@ -162,7 +160,7 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
             + " group by arstall, kvartal, naering_kode",
         namedParameters,
         (resultSet, rowNum) ->
-            new SykefraværsstatistikkNæring(
+            new SykefraværsstatistikkForNæring(
                 resultSet.getInt(ARSTALL),
                 resultSet.getInt(KVARTAL),
                 resultSet.getString(NARING_5SIFFER),
@@ -263,16 +261,6 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
                 resultSet.getInt(SUM_ANTALL_PERSONER),
                 resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)));
-  }
-
-  public List<Næring> hentAlleNæringer() {
-    SqlParameterSource namedParameters = new MapSqlParameterSource();
-
-    return namedParameterJdbcTemplate.query(
-        "select naringkode, naringnavn from dt_p.v_dim_ia_naring_sn2007",
-        namedParameters,
-        (resultSet, rowNum) ->
-            new Næring(resultSet.getString(NARINGKODE), resultSet.getString(NARINGNAVN)));
   }
 
   @NotNull

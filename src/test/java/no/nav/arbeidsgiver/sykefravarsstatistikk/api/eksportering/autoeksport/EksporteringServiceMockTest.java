@@ -101,7 +101,7 @@ public class EksporteringServiceMockTest {
                                 sykefraværsstatistikkNæring(fraÅrstallOgKvartal.plussKvartaler(1)),
                                 sykefraværsstatistikkNæring(fraÅrstallOgKvartal.plussKvartaler(2)),
                                 sykefraværsstatistikkNæring(fraÅrstallOgKvartal.plussKvartaler(3))));
-        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5Siffer(
+        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentForAlleNæringskoder(
                 __2020_2))
                 .thenReturn(List.of(sykefraværsstatistikkForNæringskode));
         when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleVirksomheter(__2020_2))
@@ -166,7 +166,7 @@ public class EksporteringServiceMockTest {
                                 sykefraværsstatistikkNæring(fraÅrstallOgKvartal.plussKvartaler(1)),
                                 sykefraværsstatistikkNæring(fraÅrstallOgKvartal.plussKvartaler(2)),
                                 sykefraværsstatistikkNæring(fraÅrstallOgKvartal.plussKvartaler(3))));
-        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer5Siffer(
+        when(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentForAlleNæringskoder(
                 __2020_2))
                 .thenReturn(
                         Arrays.asList(

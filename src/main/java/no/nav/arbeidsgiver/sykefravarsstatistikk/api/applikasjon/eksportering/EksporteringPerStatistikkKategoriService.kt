@@ -84,7 +84,7 @@ class EksporteringPerStatistikkKategoriService(
     }
 
     private fun eksporterSykefraværsstatistikkNæringskode(årstallOgKvartal: ÅrstallOgKvartal) {
-        tilEksporteringRepository.hentSykefraværprosentAlleNæringer5Siffer(
+        tilEksporteringRepository.hentSykefraværprosentForAlleNæringskoder(
             årstallOgKvartal.minusKvartaler(3),
             årstallOgKvartal
         ).groupByNæringskode().let {
@@ -210,7 +210,7 @@ fun List<SykefraværsstatistikkSektor>.groupBySektor():
         Map<String, List<Sykefraværsstatistikk>> =
     this.groupBy({ it.sektorkode }, { it })
 
-fun List<SykefraværsstatistikkNæring>.groupByNæring():
+fun List<SykefraværsstatistikkForNæring>.groupByNæring():
         Map<String, List<Sykefraværsstatistikk>> =
     this.groupBy({ it.næringkode }, { it })
 

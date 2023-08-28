@@ -2,20 +2,6 @@
 create schema dt_p;
 create schema dk_p;
 
-create table dt_p.v_dim_ia_sektor
-(
-    sektorkode char(1),
-    sektornavn varchar(60)
-);
-
-create table dt_p.v_dim_ia_naring_sn2007
-(
-    naringkode char(2)      not null,
-    nargrpkode char(2)      not null,
-    naringnavn varchar(100) not null,
-    constraint r1_naring_sn2007_pk primary key (naringkode)
-);
-
 create table dt_p.agg_ia_sykefravar_land_v
 (
     arstall      char(4) not null,

@@ -41,7 +41,7 @@ internal class AggregeringskalkulatorTest {
             Sykefraværsdata(mutableMapOf(Statistikkategori.NÆRING to synkendeSykefravær)),
             TestUtils.SISTE_PUBLISERTE_KVARTAL
         )
-        val dummynæring = BransjeEllerNæring(Næring("00000", "Dummynæring"))
+        val dummynæring = BransjeEllerNæring(Næring("00"))
         AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentBransjeEllerNæring(dummynæring).get().verdi)
             .isEqualTo("5.0")
     }
@@ -61,7 +61,7 @@ internal class AggregeringskalkulatorTest {
             Sykefraværsdata(mutableMapOf(Statistikkategori.NÆRING to synkendeSykefravær)),
             TestUtils.SISTE_PUBLISERTE_KVARTAL
         )
-        val dummynæring = BransjeEllerNæring(Næring("00000", "Dummynæring"))
+        val dummynæring = BransjeEllerNæring(Næring("00"))
         AssertionsForClassTypes.assertThat(kalkulator.trendBransjeEllerNæring(dummynæring).get().verdi)
             .isEqualTo("-8.0")
     }

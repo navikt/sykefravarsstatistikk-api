@@ -78,7 +78,7 @@ public class SykefraværRepository {
               + "group by arstall, kvartal "
               + "ORDER BY arstall, kvartal ",
           new MapSqlParameterSource()
-              .addValue("naringKoder", bransje.getKoderSomSpesifisererNæringer())
+              .addValue("naringKoder", bransje.getIdentifikatorer())
               .addValue("arstall", fraÅrstallOgKvartal.getÅrstall())
               .addValue("kvartal", fraÅrstallOgKvartal.getKvartal()),
           (rs, rowNum) -> mapTilUmaskertSykefraværForEttKvartal(rs));
@@ -88,7 +88,7 @@ public class SykefraværRepository {
   }
 
   public List<UmaskertSykefraværForEttKvartal> hentUmaskertSykefravær(
-      Næring næring, ÅrstallOgKvartal fraÅrstallOgKvartal) {
+          Næring næring, ÅrstallOgKvartal fraÅrstallOgKvartal) {
     try {
       return sorterKronologisk(
           namedParameterJdbcTemplate.query(
@@ -102,7 +102,7 @@ public class SykefraværRepository {
                   + ") "
                   + "ORDER BY arstall, kvartal ",
               new MapSqlParameterSource()
-                  .addValue("naringKode", næring.getKode().substring(0, 2))
+                  .addValue("naringKode", næring.getTosifferIdentifikator())
                   .addValue("arstall", fraÅrstallOgKvartal.getÅrstall())
                   .addValue("kvartal", fraÅrstallOgKvartal.getKvartal()),
               (rs, rowNum) -> mapTilUmaskertSykefraværForEttKvartal(rs)));
@@ -137,10 +137,8 @@ public class SykefraværRepository {
 
   public Sykefraværsdata hentTotaltSykefraværAlleKategorier(
       Virksomhet virksomhet, ÅrstallOgKvartal fraÅrstallOgKvartal) {
-    Næring næring = new Næring(virksomhet.getNæringskode().getFemsifferIdentifikator(), "");
+    Næring næring = virksomhet.getNæringskode().getNæring();
 
-
-    // TODO: virksomhet.hentNæringskode skal returnerer i henhold til logikk
     Optional<Bransje> maybeBransje = Bransjeprogram.finnBransje(virksomhet.getNæringskode());
 
     Map<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> data = new HashMap<>();
