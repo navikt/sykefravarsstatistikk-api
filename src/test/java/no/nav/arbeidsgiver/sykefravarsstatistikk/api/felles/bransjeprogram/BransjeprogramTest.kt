@@ -19,9 +19,9 @@ internal class BransjeprogramTest {
 
     @Test
     fun `finnBransje returnerer tom Optional hvis næringskoden ikke er i bransjeprogrammet`() {
-        val næringskodeUtenforBransjeprogrammet = "11111"
+        val utenforBransjeprogrammet = Næringskode("11111")
 
-        assertThat(Bransjeprogram.finnBransje(næringskodeUtenforBransjeprogrammet)).isEmpty
+        assertThat(Bransjeprogram.finnBransje(utenforBransjeprogrammet)).isEmpty
     }
 
 
@@ -35,15 +35,7 @@ internal class BransjeprogramTest {
 
     @Test
     fun `finnBransje returnerer empty for næringskode 84300`() {
-        val næringskode = Næringskode("84300")
-
-        val bransje = Bransjeprogram.finnBransje(næringskode)
-        assertThat(bransje).isEmpty
-    }
-
-    @Test
-    fun `finnBransje returnerer empty for en tom string`() {
-        val bransje = Bransjeprogram.finnBransje("")
+        val bransje = Bransjeprogram.finnBransje(Næringskode("84300"))
         assertThat(bransje).isEmpty
     }
 
@@ -53,5 +45,16 @@ internal class BransjeprogramTest {
 
         val næringsmiddelbransjen = Bransjeprogram.finnBransje(juicepressing).get().type
         assertEquals(NÆRINGSMIDDELINDUSTRI, næringsmiddelbransjen)
+    }
+    @Test
+    fun `bransje i næringsmiddelindustrien er definert på tosiffernivå`() {
+        // En bedrift i næringsmiddelindustrien er i bransjeprogrammet, men data hentes likevel på
+        // tosiffernivå, aka næringsnivå
+        val næringINæringsmiddelindustriBransjen = Næringskode("10411")
+
+        val actual = Bransjeprogram.finnBransje(næringINæringsmiddelindustriBransjen)
+
+        assertThat(actual).isNotEmpty()
+        assertThat(actual.get().identifikatorer).isEqualTo(listOf("10"))
     }
 }

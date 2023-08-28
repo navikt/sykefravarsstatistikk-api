@@ -1,10 +1,12 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UnderenhetLegacy
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Virksomhet
 
 data class Bransje(
-    val type: ArbeidsmiljøportalenBransje, val navn: String, val identifikatorer: List<String>
+    val type: ArbeidsmiljøportalenBransje,
+    val navn: String,
+    val identifikatorer: List<String>
 ) {
     init {
         require(erDefinertPåTosiffernivå() || erDefinertPåFemsiffernivå())
@@ -15,7 +17,7 @@ data class Bransje(
 
     fun erDefinertPåFemsiffernivå() = identifikatorer.all { it.length == 5 }
 
-    fun inkludererVirksomhet(underenhet: UnderenhetLegacy): Boolean {
+    fun inkludererVirksomhet(underenhet: Virksomhet): Boolean {
         return inkludererNæringskode(underenhet.næringskode)
     }
 

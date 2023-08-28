@@ -60,7 +60,6 @@ internal class AggregertStatistikkServiceTest {
             mockSykefraværRepository,
             mockGraderingRepository,
             mockVarighetRepository,
-            mockBransjeEllerNæringService,
             mockTilgangskontrollService,
             mockEnhetsregisteretClient,
             publiseringsdatoerService
@@ -84,7 +83,6 @@ internal class AggregertStatistikkServiceTest {
         whenever(mockTilgangskontrollService.brukerRepresentererVirksomheten(any())).thenReturn(true)
         whenever(mockEnhetsregisteretClient.hentUnderenhet(any())).thenReturn(enBarnehage.right())
         whenever(mockTilgangskontrollService.brukerHarIaRettigheterIVirksomheten(any())).thenReturn(true)
-        whenever(mockBransjeEllerNæringService.finnBransje(any())).thenReturn(barnehager)
 
         // Helt tomt resultat skal ikke kræsje
         whenever(
@@ -362,8 +360,6 @@ internal class AggregertStatistikkServiceTest {
                 mutableMapOf()
             )
         )
-        whenever(mockBransjeEllerNæringService.finnBransje(any()))
-            .thenReturn(BransjeEllerNæring(Næring("84")))
 
         val årstallOgKvartal = ÅrstallOgKvartal(2022, 1)
         whenever(mockSykefraværRepository.hentTotaltSykefraværAlleKategorier(any(), any())).thenReturn(
@@ -476,7 +472,6 @@ internal class AggregertStatistikkServiceTest {
         whenever(mockTilgangskontrollService.brukerRepresentererVirksomheten(any())).thenReturn(true)
         whenever(mockEnhetsregisteretClient.hentUnderenhet(any())).thenReturn(enBarnehage.right())
         whenever(mockTilgangskontrollService.brukerHarIaRettigheterIVirksomheten(any())).thenReturn(true)
-        whenever(mockBransjeEllerNæringService.finnBransje(any())).thenReturn(barnehager)
     }
 
     private fun genererTestSykefravær(offset: Int): List<UmaskertSykefraværForEttKvartal> {

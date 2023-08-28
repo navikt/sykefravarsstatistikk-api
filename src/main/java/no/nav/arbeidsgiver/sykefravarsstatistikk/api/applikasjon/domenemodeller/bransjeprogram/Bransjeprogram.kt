@@ -42,9 +42,9 @@ object Bransjeprogram {
     fun finnBransje(underenhet: Virksomhet?): Optional<Bransje> = finnBransje(underenhet?.næringskode)
 
     @JvmStatic
-    fun finnBransje(næringskode5Siffer: String?): Optional<Bransje> =
-        Optional.ofNullable(alleBransjer.firstOrNull { it.inkludererNæringskode(næringskode5Siffer) })
-
-    @JvmStatic
-    fun finnBransje(næringskode5Siffer: Næringskode?): Optional<Bransje> = finnBransje(næringskode5Siffer?.femsifferIdentifikator)
+    fun finnBransje(næringskode: Næringskode?): Optional<Bransje> =
+        Optional.ofNullable(alleBransjer.firstOrNull
+        {
+            it.inkludererNæringskode(næringskode?.femsifferIdentifikator)
+        })
 }

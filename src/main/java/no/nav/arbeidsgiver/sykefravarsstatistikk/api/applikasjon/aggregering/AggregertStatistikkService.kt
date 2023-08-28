@@ -3,11 +3,12 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.BransjeEllerNæringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PubliseringsdatoerService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.BransjeEllerNæring
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransjeprogram
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.EitherUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.GraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
@@ -21,7 +22,6 @@ class AggregertStatistikkService(
     private val sykefraværprosentRepository: SykefraværRepository,
     private val graderingRepository: GraderingRepository,
     private val varighetRepository: VarighetRepository,
-    private val bransjeEllerNæringService: BransjeEllerNæringService,
     private val tilgangskontrollService: TilgangskontrollService,
     private val enhetsregisteretClient: EnhetsregisteretClient,
     private val publiseringsdatoerService: PubliseringsdatoerService
@@ -85,7 +85,7 @@ class AggregertStatistikkService(
         val kalkulatorGradert = Aggregeringskalkulator(gradertFravær, sistePubliserteKvartal)
         val kalkulatorKorttid = Aggregeringskalkulator(korttidsfravær, sistePubliserteKvartal)
         val kalkulatorLangtid = Aggregeringskalkulator(langtidsfravær, sistePubliserteKvartal)
-        val bransjeEllerNæring = bransjeEllerNæringService.finnBransje(virksomhet)
+        val bransjeEllerNæring = finnBransjeEllerNæring(virksomhet)
 
         val prosentSisteFireKvartalerTotalt = EitherUtils.getRightsAndLogLefts(
             kalkulatorTotal.fraværsprosentVirksomhet(virksomhet.navn),
@@ -146,6 +146,7 @@ class AggregertStatistikkService(
         }
     }
 
+
     private fun hentLangtidsEllerKorttidsfravær(
         virksomhet: Virksomhet, entenLangtidEllerKorttid: (UmaskertSykefraværForEttKvartalMedVarighet) -> Boolean
     ) = Sykefraværsdata(
@@ -162,6 +163,16 @@ class AggregertStatistikkService(
         return fraværFlereKvartaler.groupBy(UmaskertSykefraværForEttKvartal::årstallOgKvartal)
             .mapValues { (_, fraværFlereKvartaler) -> fraværFlereKvartaler.reduce(UmaskertSykefraværForEttKvartal::add) }
             .values.toList()
+    }
+
+    fun finnBransjeEllerNæring(virksomhet: Virksomhet): BransjeEllerNæring {
+        val maybeBransje = Bransjeprogram.finnBransje(virksomhet)
+        return maybeBransje
+            .map { BransjeEllerNæring(it) }
+            .orElseGet {
+                val kode = virksomhet.næringskode.næring.tosifferIdentifikator
+                BransjeEllerNæring(Næring(kode))
+            }
     }
 }
 
