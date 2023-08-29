@@ -43,7 +43,7 @@ class ImporteringScheduler(
         noeFeilet = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
     }
 
-    @Scheduled(cron = "0 5 8 * * ?")
+    @Scheduled(fixedDelay = Long.MAX_VALUE)
     fun scheduledImporteringOgEksportering() {
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)

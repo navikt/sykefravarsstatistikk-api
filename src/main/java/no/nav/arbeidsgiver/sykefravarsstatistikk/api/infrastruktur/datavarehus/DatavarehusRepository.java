@@ -202,7 +202,8 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
     SqlParameterSource namedParameters =
         new MapSqlParameterSource()
             .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
-            .addValue(KVARTAL, årstallOgKvartal.getKvartal());
+            .addValue(KVARTAL, årstallOgKvartal.getKvartal())
+            .addValue(RECTYPE, RECTYPE_FOR_VIRKSOMHET);
 
     return namedParameterJdbcTemplate.query(
         "select arstall, kvartal, naering_kode, varighet, "
@@ -211,9 +212,7 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
             + "sum(muligedv) as sum_mulige_dagsverk "
             + "from dt_p.agg_ia_sykefravar_v "
             + "where arstall = :arstall and kvartal = :kvartal and varighet is not null "
-            + "and rectype='"
-            + RECTYPE_FOR_VIRKSOMHET
-            + "'"
+            + "and rectype= :rectype "
             + "group by arstall, kvartal, naering_kode, varighet",
         namedParameters,
         (resultSet, rowNum) ->
@@ -232,8 +231,7 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
     SqlParameterSource namedParameters =
         new MapSqlParameterSource()
             .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
-            .addValue(KVARTAL, årstallOgKvartal.getKvartal())
-            .addValue(RECTYPE, RECTYPE_FOR_VIRKSOMHET);
+            .addValue(KVARTAL, årstallOgKvartal.getKvartal());
 
     return namedParameterJdbcTemplate.query(
         "select arstall, kvartal, orgnr, naring, naering_kode, rectype, "
@@ -277,7 +275,6 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
             + "from dt_p.agg_ia_sykefravar_v_2 "
             + "where arstall = :arstall and kvartal = :kvartal "
             + "and length(trim(orgnr)) = 9 "
-            + "and rectype=2 "
             + "and primærnæringskode is not null "
             + "and primærnæringskode != '00.000'",
         namedParameters,
