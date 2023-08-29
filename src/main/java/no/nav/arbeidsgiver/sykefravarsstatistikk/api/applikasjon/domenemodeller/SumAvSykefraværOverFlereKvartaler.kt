@@ -44,14 +44,14 @@ data class SumAvSykefraværOverFlereKvartaler(
                     "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."
                 ).left()
         }
-        val prosent = StatistikkUtils.kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk)
+        StatistikkUtils.kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk)
             .getOrElse { return it.left() }
         val sykefraværForFlereKvartaler = SykefraværOverFlereKvartaler(
             kvartaler,
             tapteDagsverk,
             muligeDagsverk,
             umaskertSykefraværList.stream()
-                .map<SykefraværForEttKvartal?> { sf: UmaskertSykefraværForEttKvartal ->
+                .map { sf: UmaskertSykefraværForEttKvartal ->
                     SykefraværForEttKvartal(
                         sf.årstallOgKvartal,
                         sf.dagsverkTeller,
@@ -59,7 +59,7 @@ data class SumAvSykefraværOverFlereKvartaler(
                         sf.antallPersoner
                     )
                 }
-                .collect(Collectors.toList<SykefraværForEttKvartal?>()))
+                .collect(Collectors.toList()))
         return sykefraværForFlereKvartaler.right()
     }
 

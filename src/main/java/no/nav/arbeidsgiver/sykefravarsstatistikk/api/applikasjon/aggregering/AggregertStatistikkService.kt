@@ -9,7 +9,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.BransjeEllerNæring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransjeprogram
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.EitherUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.GraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VarighetRepository
@@ -87,30 +86,30 @@ class AggregertStatistikkService(
         val kalkulatorLangtid = Aggregeringskalkulator(langtidsfravær, sistePubliserteKvartal)
         val bransjeEllerNæring = finnBransjeEllerNæring(virksomhet)
 
-        val prosentSisteFireKvartalerTotalt = EitherUtils.getRightsAndLogLefts(
+        val prosentSisteFireKvartalerTotalt = getRights(
             kalkulatorTotal.fraværsprosentVirksomhet(virksomhet.navn),
             kalkulatorTotal.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
             kalkulatorTotal.fraværsprosentNorge()
         )
-        val prosentSisteFireKvartalerGradert = EitherUtils.getRightsAndLogLefts(
+        val prosentSisteFireKvartalerGradert = getRights(
             kalkulatorGradert.fraværsprosentVirksomhet(virksomhet.navn),
             kalkulatorGradert.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
         )
-        val prosentSisteFireKvartalerKorttid = EitherUtils.getRightsAndLogLefts(
+        val prosentSisteFireKvartalerKorttid = getRights(
             kalkulatorKorttid.fraværsprosentVirksomhet(virksomhet.navn),
             kalkulatorKorttid.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
         )
-        val prosentSisteFireKvartalerLangtid = EitherUtils.getRightsAndLogLefts(
+        val prosentSisteFireKvartalerLangtid = getRights(
             kalkulatorLangtid.fraværsprosentVirksomhet(virksomhet.navn),
             kalkulatorLangtid.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
         )
-        val trendTotalt = EitherUtils.getRightsAndLogLefts(
+        val trendTotalt = getRights(
             kalkulatorTotal.trendBransjeEllerNæring(bransjeEllerNæring)
         )
-        val tapteDagsverkTotalt = EitherUtils.getRightsAndLogLefts(
+        val tapteDagsverkTotalt = getRights(
             kalkulatorTotal.tapteDagsverkVirksomhet(virksomhet.navn)
         )
-        val muligeDagsverkTotalt = EitherUtils.getRightsAndLogLefts(
+        val muligeDagsverkTotalt = getRights(
             kalkulatorTotal.muligeDagsverkVirksomhet(virksomhet.navn)
         )
         return AggregertStatistikkDto(
@@ -164,6 +163,9 @@ class AggregertStatistikkService(
             .mapValues { (_, fraværFlereKvartaler) -> fraværFlereKvartaler.reduce(UmaskertSykefraværForEttKvartal::add) }
             .values.toList()
     }
+
+    private fun <L, R> getRights(vararg leftsAndRights: Either<L, R>): List<R> = leftsAndRights
+        .mapNotNull { it.getOrNull() }
 
     fun finnBransjeEllerNæring(virksomhet: Virksomhet): BransjeEllerNæring {
         val maybeBransje = Bransjeprogram.finnBransje(virksomhet)
