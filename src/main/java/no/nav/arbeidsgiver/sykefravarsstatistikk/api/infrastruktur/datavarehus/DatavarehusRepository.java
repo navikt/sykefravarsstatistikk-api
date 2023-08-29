@@ -275,6 +275,7 @@ public class DatavarehusRepository implements KildeTilVirksomhetsdata {
             + "from dt_p.agg_ia_sykefravar_v_2 "
             + "where arstall = :arstall and kvartal = :kvartal "
             + "and length(trim(orgnr)) = 9 "
+            + "and rectype in ('1', '2') "
             + "and primærnæringskode is not null "
             + "and primærnæringskode != '00.000'",
         namedParameters,
