@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
 
-import io.vavr.control.Either;
+import arrow.core.Either;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.StatistikkException;
 import org.assertj.core.api.Assertions;
@@ -49,7 +49,7 @@ class SumAvSykefraværOverFlereKvartalerTest {
 
     SumAvSykefraværOverFlereKvartaler result = kvartal1.leggSammen(kvartal2);
     SykefraværOverFlereKvartaler resultSykefraværOverFlereKvartaler =
-        result.regnUtProsentOgMapTilSykefraværForFlereKvartaler().get();
+        result.regnUtProsentOgMapTilSykefraværForFlereKvartaler().getOrNull();
 
     Assertions.assertThat(result.getMuligeDagsverk()).isEqualByComparingTo(new BigDecimal(430));
     Assertions.assertThat(result.getTapteDagsverk()).isEqualByComparingTo(new BigDecimal(110));
@@ -67,7 +67,7 @@ class SumAvSykefraværOverFlereKvartalerTest {
                     new ÅrstallOgKvartal(2022, 1), new BigDecimal(100), new BigDecimal(200), 4))
             .regnUtProsentOgMapTilDto(VIRKSOMHET, "");
 
-    Assertions.assertThat(maskertSykefravær.getLeft())
+    Assertions.assertThat(maskertSykefravær.swap().getOrNull())
         .isExactlyInstanceOf(SumAvSykefraværOverFlereKvartaler.MaskerteDataException.class);
   }
 
@@ -85,7 +85,7 @@ class SumAvSykefraværOverFlereKvartalerTest {
                     new ÅrstallOgKvartal(2022, 1), new BigDecimal(100), new BigDecimal(200), 10))
             .regnUtProsentOgMapTilDto(VIRKSOMHET, "");
 
-    Assertions.assertThat(sykefraværFemTilfeller.get().getVerdi()).isEqualTo("50.0");
-    Assertions.assertThat(sykefraværTiTilfeller.get().getVerdi()).isEqualTo("50.0");
+    Assertions.assertThat(sykefraværFemTilfeller.getOrNull().getVerdi()).isEqualTo("50.0");
+    Assertions.assertThat(sykefraværTiTilfeller.getOrNull().getVerdi()).isEqualTo("50.0");
   }
 }

@@ -20,7 +20,7 @@ internal class AggregeringskalkulatorTest {
             Sykefraværsdata(mutableMapOf(Statistikkategori.VIRKSOMHET to   synkendeSykefravær)),
             TestUtils.SISTE_PUBLISERTE_KVARTAL
         )
-        AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentVirksomhet("dummynavn").get().verdi)
+        AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentVirksomhet("dummynavn").getOrNull()?.verdi)
             .isEqualTo("5.0")
     }
 
@@ -31,7 +31,7 @@ internal class AggregeringskalkulatorTest {
             TestUtils.SISTE_PUBLISERTE_KVARTAL
         )
         val bransje = BransjeEllerNæring(Bransje(ArbeidsmiljøportalenBransje.BARNEHAGER, "Barnehager", listOf("88911")))
-        AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentBransjeEllerNæring(bransje).get().verdi)
+        AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentBransjeEllerNæring(bransje).getOrNull()?.verdi)
             .isEqualTo("5.0")
     }
 
@@ -42,7 +42,7 @@ internal class AggregeringskalkulatorTest {
             TestUtils.SISTE_PUBLISERTE_KVARTAL
         )
         val dummynæring = BransjeEllerNæring(Næring("00"))
-        AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentBransjeEllerNæring(dummynæring).get().verdi)
+        AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentBransjeEllerNæring(dummynæring).getOrNull()?.verdi)
             .isEqualTo("5.0")
     }
 
@@ -52,7 +52,7 @@ internal class AggregeringskalkulatorTest {
             Sykefraværsdata(mutableMapOf(Statistikkategori.LAND to synkendeSykefravær)),
             TestUtils.SISTE_PUBLISERTE_KVARTAL
         )
-        AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentNorge().get().verdi).isEqualTo("5.0")
+        AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentNorge().getOrNull()?.verdi).isEqualTo("5.0")
     }
 
     @Test
@@ -62,7 +62,7 @@ internal class AggregeringskalkulatorTest {
             TestUtils.SISTE_PUBLISERTE_KVARTAL
         )
         val dummynæring = BransjeEllerNæring(Næring("00"))
-        AssertionsForClassTypes.assertThat(kalkulator.trendBransjeEllerNæring(dummynæring).get().verdi)
+        AssertionsForClassTypes.assertThat(kalkulator.trendBransjeEllerNæring(dummynæring).getOrNull()?.verdi)
             .isEqualTo("-8.0")
     }
 

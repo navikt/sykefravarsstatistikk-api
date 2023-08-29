@@ -1,6 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-import io.vavr.control.Either
+import arrow.core.Either
+import arrow.core.getOrElse
+import arrow.core.left
+import arrow.core.right
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.StatistikkException
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.UtilstrekkeligDataException
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.StatistikkUtils
@@ -37,16 +40,12 @@ data class SumAvSykefraværOverFlereKvartaler(
 
     fun regnUtProsentOgMapTilSykefraværForFlereKvartaler(): Either<StatistikkException, SykefraværOverFlereKvartaler> {
         if (muligeDagsverk.compareTo(BigDecimal.ZERO) == 0) {
-            return Either.left(
-                UtilstrekkeligDataException(
+            return UtilstrekkeligDataException(
                     "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."
-                )
-            )
+                ).left()
         }
         val prosent = StatistikkUtils.kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk)
-        if (prosent.isLeft) {
-            return Either.left(prosent.left)
-        }
+            .getOrElse { return it.left() }
         val sykefraværForFlereKvartaler = SykefraværOverFlereKvartaler(
             kvartaler,
             tapteDagsverk,
@@ -61,22 +60,20 @@ data class SumAvSykefraværOverFlereKvartaler(
                     )
                 }
                 .collect(Collectors.toList<SykefraværForEttKvartal?>()))
-        return Either.right(sykefraværForFlereKvartaler)
+        return sykefraværForFlereKvartaler.right()
     }
 
     private fun kalkulerFraværsprosentMedMaskering(): Either<StatistikkException, BigDecimal> {
         if (datagrunnlagetErTomt()) {
-            return Either.left(UtilstrekkeligDataException())
+            return UtilstrekkeligDataException().left()
         }
         if (dataMåMaskeres()) {
-            return Either.left(MaskerteDataException())
+            return MaskerteDataException().left()
         }
         return if (muligeDagsverk.compareTo(BigDecimal.ZERO) == 0) {
-            Either.left(
                 UtilstrekkeligDataException(
                     "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."
-                )
-            )
+                ).left()
         } else StatistikkUtils.kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk)
     }
 
@@ -108,13 +105,11 @@ data class SumAvSykefraværOverFlereKvartaler(
         tapteEllerMuligeDagsverk: Supplier<BigDecimal>
     ): Either<StatistikkException, StatistikkDto> {
         if (datagrunnlagetErTomt()) {
-            return Either.left(UtilstrekkeligDataException())
+            return UtilstrekkeligDataException().left()
         }
         return if (dataMåMaskeres()) {
-            Either.left(MaskerteDataException())
-        } else Either.right(
-            tilStatistikkDto(type, virksomhetsnavn, tapteEllerMuligeDagsverk.get().toString())
-        )
+            MaskerteDataException().left()
+        } else tilStatistikkDto(type, virksomhetsnavn, tapteEllerMuligeDagsverk.get().toString()).right()
     }
 
     private fun datagrunnlagetErTomt(): Boolean {

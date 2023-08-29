@@ -24,7 +24,7 @@ class TrendkalkulatorTest {
                         umaskertSykefravær(new ÅrstallOgKvartal(2021, 1), 10, 3)),
                     SISTE_PUBLISERTE_KVARTAL)
                 .kalkulerTrend()
-                .getLeft())
+                .swap().getOrNull())
         .isExactlyInstanceOf(UtilstrekkeligDataException.class);
   }
 
@@ -37,7 +37,7 @@ class TrendkalkulatorTest {
                     List.of(umaskertSykefravær(k1, 3, 10), umaskertSykefravær(k2, 2, 10)),
                     SISTE_PUBLISERTE_KVARTAL)
                 .kalkulerTrend()
-                .get())
+                .getOrNull())
         .isEqualTo(new Trend(new BigDecimal("1.0"), 20, List.of(k1, k2)));
   }
 
@@ -54,13 +54,13 @@ class TrendkalkulatorTest {
             4,
             List.of(SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusEttÅr()));
 
-    assertThat(new Trendkalkulator(kvartalstall, SISTE_PUBLISERTE_KVARTAL).kalkulerTrend().get())
+    assertThat(new Trendkalkulator(kvartalstall, SISTE_PUBLISERTE_KVARTAL).kalkulerTrend().getOrNull())
         .isEqualTo(forventetTrend);
   }
 
   @Test
   void kalkulerTrend_girUtrilstrekkeligDataException_vedTomtDatagrunnlag() {
-    assertThat(new Trendkalkulator(List.of(), SISTE_PUBLISERTE_KVARTAL).kalkulerTrend().getLeft())
+    assertThat(new Trendkalkulator(List.of(), SISTE_PUBLISERTE_KVARTAL).kalkulerTrend().swap().getOrNull())
         .isExactlyInstanceOf(UtilstrekkeligDataException.class);
   }
 

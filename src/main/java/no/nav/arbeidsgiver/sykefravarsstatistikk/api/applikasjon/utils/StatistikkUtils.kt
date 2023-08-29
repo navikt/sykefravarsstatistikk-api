@@ -1,6 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils
 
-import io.vavr.control.Either
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import lombok.extern.slf4j.Slf4j
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.StatistikkException
 import java.math.BigDecimal
@@ -20,19 +22,15 @@ object StatistikkUtils {
         val ANTALL_SIFRE_I_RESULTAT = 1
 
         if (dagsverkTeller == null || dagsverkNevner == null || dagsverkNevner.compareTo(BigDecimal.ZERO) == 0) {
-            return Either.left(
-                StatistikkException(
-                    "Kan ikke regne ut prosent når antall dagsverk i nevner er lik $dagsverkNevner"
-                )
-            )
+            return StatistikkException(
+                "Kan ikke regne ut prosent når antall dagsverk i nevner er lik $dagsverkNevner"
+            ).left()
         }
 
-        return Either.right(
-            dagsverkTeller
-                .divide(dagsverkNevner, ANTALL_SIFRE_I_UTREGNING, RoundingMode.HALF_UP)
-                .multiply(BigDecimal(100))
-                .setScale(ANTALL_SIFRE_I_RESULTAT, RoundingMode.HALF_UP)
-        )
+        return dagsverkTeller
+            .divide(dagsverkNevner, ANTALL_SIFRE_I_UTREGNING, RoundingMode.HALF_UP)
+            .multiply(BigDecimal(100))
+            .setScale(ANTALL_SIFRE_I_RESULTAT, RoundingMode.HALF_UP).right()
     }
 }
 
