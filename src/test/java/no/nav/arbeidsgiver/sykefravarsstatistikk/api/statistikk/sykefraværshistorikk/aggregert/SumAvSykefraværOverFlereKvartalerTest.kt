@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SumAvSykefraværOverFlereKvartaler.MaskerteDataException
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SumAvSykefraværOverFlereKvartaler.MaskertDataFeil
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -58,7 +58,7 @@ internal class SumAvSykefraværOverFlereKvartalerTest {
         )
             .regnUtProsentOgMapTilDto(Statistikkategori.VIRKSOMHET, "")
         Assertions.assertThat(maskertSykefravær.swap().getOrNull())
-            .isExactlyInstanceOf(MaskerteDataException::class.java)
+            .isExactlyInstanceOf(MaskertDataFeil::class.java)
     }
 
     @Test

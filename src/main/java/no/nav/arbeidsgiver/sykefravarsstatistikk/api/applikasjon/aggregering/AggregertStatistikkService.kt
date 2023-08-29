@@ -86,30 +86,30 @@ class AggregertStatistikkService(
         val kalkulatorLangtid = Aggregeringskalkulator(langtidsfravær, sistePubliserteKvartal)
         val bransjeEllerNæring = finnBransjeEllerNæring(virksomhet)
 
-        val prosentSisteFireKvartalerTotalt = getRights(
+        val prosentSisteFireKvartalerTotalt = filterRights(
             kalkulatorTotal.fraværsprosentVirksomhet(virksomhet.navn),
             kalkulatorTotal.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
             kalkulatorTotal.fraværsprosentNorge()
         )
-        val prosentSisteFireKvartalerGradert = getRights(
+        val prosentSisteFireKvartalerGradert = filterRights(
             kalkulatorGradert.fraværsprosentVirksomhet(virksomhet.navn),
             kalkulatorGradert.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
         )
-        val prosentSisteFireKvartalerKorttid = getRights(
+        val prosentSisteFireKvartalerKorttid = filterRights(
             kalkulatorKorttid.fraværsprosentVirksomhet(virksomhet.navn),
             kalkulatorKorttid.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
         )
-        val prosentSisteFireKvartalerLangtid = getRights(
+        val prosentSisteFireKvartalerLangtid = filterRights(
             kalkulatorLangtid.fraværsprosentVirksomhet(virksomhet.navn),
             kalkulatorLangtid.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
         )
-        val trendTotalt = getRights(
+        val trendTotalt = filterRights(
             kalkulatorTotal.trendBransjeEllerNæring(bransjeEllerNæring)
         )
-        val tapteDagsverkTotalt = getRights(
+        val tapteDagsverkTotalt = filterRights(
             kalkulatorTotal.tapteDagsverkVirksomhet(virksomhet.navn)
         )
-        val muligeDagsverkTotalt = getRights(
+        val muligeDagsverkTotalt = filterRights(
             kalkulatorTotal.muligeDagsverkVirksomhet(virksomhet.navn)
         )
         return AggregertStatistikkDto(
@@ -164,7 +164,7 @@ class AggregertStatistikkService(
             .values.toList()
     }
 
-    private fun <L, R> getRights(vararg leftsAndRights: Either<L, R>): List<R> = leftsAndRights
+    private fun <L, R> filterRights(vararg leftsAndRights: Either<L, R>): List<R> = leftsAndRights
         .mapNotNull { it.getOrNull() }
 
     fun finnBransjeEllerNæring(virksomhet: Virksomhet): BransjeEllerNæring {

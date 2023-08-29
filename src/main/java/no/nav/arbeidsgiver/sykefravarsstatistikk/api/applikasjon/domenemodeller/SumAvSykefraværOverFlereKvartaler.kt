@@ -4,8 +4,8 @@ import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.StatistikkException
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.UtilstrekkeligDataException
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.Statistikkfeil
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.UtilstrekkeligData
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.StatistikkUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.Konstanter
 import java.math.BigDecimal
@@ -33,14 +33,14 @@ data class SumAvSykefraværOverFlereKvartaler(
 
     fun regnUtProsentOgMapTilDto(
         type: Statistikkategori, label: String
-    ): Either<StatistikkException, StatistikkDto> {
+    ): Either<Statistikkfeil, StatistikkDto> {
         return kalkulerFraværsprosentMedMaskering()
             .map { prosent: BigDecimal -> tilStatistikkDto(type, label, prosent.toString()) }
     }
 
-    fun regnUtProsentOgMapTilSykefraværForFlereKvartaler(): Either<StatistikkException, SykefraværOverFlereKvartaler> {
+    fun regnUtProsentOgMapTilSykefraværForFlereKvartaler(): Either<Statistikkfeil, SykefraværOverFlereKvartaler> {
         if (muligeDagsverk.compareTo(BigDecimal.ZERO) == 0) {
-            return UtilstrekkeligDataException(
+            return UtilstrekkeligData(
                     "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."
                 ).left()
         }
@@ -63,15 +63,15 @@ data class SumAvSykefraværOverFlereKvartaler(
         return sykefraværForFlereKvartaler.right()
     }
 
-    private fun kalkulerFraværsprosentMedMaskering(): Either<StatistikkException, BigDecimal> {
+    private fun kalkulerFraværsprosentMedMaskering(): Either<Statistikkfeil, BigDecimal> {
         if (datagrunnlagetErTomt()) {
-            return UtilstrekkeligDataException().left()
+            return UtilstrekkeligData().left()
         }
         if (dataMåMaskeres()) {
-            return MaskerteDataException().left()
+            return MaskertDataFeil().left()
         }
         return if (muligeDagsverk.compareTo(BigDecimal.ZERO) == 0) {
-                UtilstrekkeligDataException(
+                UtilstrekkeligData(
                     "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."
                 ).left()
         } else StatistikkUtils.kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk)
@@ -79,13 +79,13 @@ data class SumAvSykefraværOverFlereKvartaler(
 
     fun getTapteDagsverkOgMapTilDto(
         type: Statistikkategori, virksomhetsnavn: String
-    ): Either<StatistikkException, StatistikkDto> {
+    ): Either<Statistikkfeil, StatistikkDto> {
         return getAntallDagsverkOgMapTilDto(type, virksomhetsnavn, this::tapteDagsverk)
     }
 
     fun getMuligeDagsverkOgMapTilDto(
         type: Statistikkategori, virksomhetsnavn: String
-    ): Either<StatistikkException, StatistikkDto> {
+    ): Either<Statistikkfeil, StatistikkDto> {
         return getAntallDagsverkOgMapTilDto(type, virksomhetsnavn, this::muligeDagsverk)
     }
 
@@ -103,12 +103,12 @@ data class SumAvSykefraværOverFlereKvartaler(
         type: Statistikkategori,
         virksomhetsnavn: String,
         tapteEllerMuligeDagsverk: Supplier<BigDecimal>
-    ): Either<StatistikkException, StatistikkDto> {
+    ): Either<Statistikkfeil, StatistikkDto> {
         if (datagrunnlagetErTomt()) {
-            return UtilstrekkeligDataException().left()
+            return UtilstrekkeligData().left()
         }
         return if (dataMåMaskeres()) {
-            MaskerteDataException().left()
+            MaskertDataFeil().left()
         } else tilStatistikkDto(type, virksomhetsnavn, tapteEllerMuligeDagsverk.get().toString()).right()
     }
 
@@ -125,7 +125,7 @@ data class SumAvSykefraværOverFlereKvartaler(
         return StatistikkDto(type, label, verdi, høyesteAntallPersonerIEtKvartal, kvartaler)
     }
 
-    class MaskerteDataException : StatistikkException("Ikke nok personer i datagrunnlaget - data maskeres.")
+    class MaskertDataFeil : Statistikkfeil("Ikke nok personer i datagrunnlaget - data maskeres.")
 
     companion object {
         var NULLPUNKT =

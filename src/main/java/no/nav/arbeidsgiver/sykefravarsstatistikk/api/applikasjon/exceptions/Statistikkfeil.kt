@@ -1,8 +1,3 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions
 
-public class StatistikkException extends RuntimeException {
-
-  public StatistikkException(String message) {
-    super(message);
-  }
-}
+open class Statistikkfeil(val message: String?)

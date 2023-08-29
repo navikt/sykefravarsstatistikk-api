@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
 import arrow.core.Either
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.StatistikkException
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.Statistikkfeil
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.StatistikkUtils
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -54,7 +54,7 @@ open class UmaskertSykefraværForEttKvartal(
     val Årstall: Int
         get() = årstallOgKvartal.årstall
 
-    fun kalkulerSykefraværsprosent(): Either<StatistikkException, BigDecimal> {
+    fun kalkulerSykefraværsprosent(): Either<Statistikkfeil, BigDecimal> {
         return StatistikkUtils.kalkulerSykefraværsprosent(dagsverkTeller, dagsverkNevner)
     }
 
