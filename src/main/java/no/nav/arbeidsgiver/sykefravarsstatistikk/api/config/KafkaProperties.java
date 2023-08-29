@@ -1,13 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.config;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingRapport;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SslConfigs;
@@ -17,6 +13,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -84,20 +84,6 @@ public class KafkaProperties {
         ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, maxInFlightRequestsPerConnection);
 
     return props;
-  }
-
-  public String getTopicNavn(String eksportNavn) {
-    if (Statistikkategori.LAND.name().equals(eksportNavn) && topic.size() > 1) {
-      return topic.get(1);
-    } else if (Statistikkategori.VIRKSOMHET.name().equals(eksportNavn) && topic.size() > 2) {
-      return topic.get(2);
-    } else if (Statistikkategori.NÆRING.name().equals(eksportNavn) && topic.size() > 3) {
-      return topic.get(3);
-    } else if (Statistikkategori.SEKTOR.name().equals(eksportNavn) && topic.size() > 4) {
-      return topic.get(4);
-    } else {
-      return topic.get(0);
-    }
   }
 
   @Bean

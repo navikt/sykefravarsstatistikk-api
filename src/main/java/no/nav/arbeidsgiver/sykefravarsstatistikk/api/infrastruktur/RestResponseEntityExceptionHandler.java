@@ -1,15 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur;
 
-import java.nio.file.AccessDeniedException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnException;
+import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.error.exceptions.AltinnException;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.TilgangskontrollException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretIkkeTilgjengeligException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretMappingException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.IngenNæringException;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.OrgnrEksistererIkkeException;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.TilgangskontrollException;
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +17,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.nio.file.AccessDeniedException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {

@@ -2,10 +2,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregist
 
 public class EnhetsregisteretException extends RuntimeException {
 
-  EnhetsregisteretException(String msg, Exception e) {
-    super(msg, e);
-  }
-
   EnhetsregisteretException(String msg) {
     super(msg);
   }
