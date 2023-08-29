@@ -1,91 +1,81 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert
 
-import arrow.core.Either;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.StatistikkException;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SumAvSykefraværOverFlereKvartaler.MaskerteDataException
+import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 
-import java.math.BigDecimal;
-import java.util.List;
+internal class SumAvSykefraværOverFlereKvartalerTest {
+    @Test
+    fun leggSammenToKvartaler() {
+        val umaskertSykefravær_Q1 = UmaskertSykefraværForEttKvartal(
+            ÅrstallOgKvartal(2022, 1), BigDecimal(100), BigDecimal(200), 5
+        )
+        val umaskertSykefravær_Q2 = UmaskertSykefraværForEttKvartal(
+            ÅrstallOgKvartal(2022, 2), BigDecimal(10), BigDecimal(230), 5
+        )
+        val expected = SykefraværOverFlereKvartaler(
+            listOf(
+                umaskertSykefravær_Q1.årstallOgKvartal,
+                umaskertSykefravær_Q2.årstallOgKvartal
+            ),
+            BigDecimal(110),
+            BigDecimal(430),
+            listOf(
+                SykefraværForEttKvartal(
+                    umaskertSykefravær_Q1.årstallOgKvartal,
+                    umaskertSykefravær_Q1.dagsverkTeller,
+                    umaskertSykefravær_Q1.dagsverkNevner,
+                    umaskertSykefravær_Q1.antallPersoner
+                ),
+                SykefraværForEttKvartal(
+                    umaskertSykefravær_Q2.årstallOgKvartal,
+                    umaskertSykefravær_Q2.dagsverkTeller,
+                    umaskertSykefravær_Q2.dagsverkNevner,
+                    umaskertSykefravær_Q2.antallPersoner
+                )
+            )
+        )
+        val kvartal1 = SumAvSykefraværOverFlereKvartaler(umaskertSykefravær_Q1)
+        val kvartal2 = SumAvSykefraværOverFlereKvartaler(umaskertSykefravær_Q2)
+        val result = kvartal1.leggSammen(kvartal2)
+        val resultSykefraværOverFlereKvartaler = result.regnUtProsentOgMapTilSykefraværForFlereKvartaler().getOrNull()
+        Assertions.assertThat(result.muligeDagsverk).isEqualByComparingTo(BigDecimal(430))
+        Assertions.assertThat(result.tapteDagsverk).isEqualByComparingTo(BigDecimal(110))
+        Assertions.assertThat(resultSykefraværOverFlereKvartaler!!.prosent)
+            .isEqualByComparingTo(expected.prosent)
+        Assertions.assertThat(resultSykefraværOverFlereKvartaler.kvartaler)
+            .isEqualTo(expected.kvartaler)
+    }
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori.VIRKSOMHET;
+    @Test
+    fun kalkulerFraværsprosentMedMaskering_maskererDataHvisAntallTilfellerErUnderFem() {
+        val maskertSykefravær = SumAvSykefraværOverFlereKvartaler(
+            UmaskertSykefraværForEttKvartal(
+                ÅrstallOgKvartal(2022, 1), BigDecimal(100), BigDecimal(200), 4
+            )
+        )
+            .regnUtProsentOgMapTilDto(Statistikkategori.VIRKSOMHET, "")
+        Assertions.assertThat(maskertSykefravær.swap().getOrNull())
+            .isExactlyInstanceOf(MaskerteDataException::class.java)
+    }
 
-class SumAvSykefraværOverFlereKvartalerTest {
-
-  @Test
-  void leggSammenToKvartaler() {
-
-    UmaskertSykefraværForEttKvartal umaskertSykefravær_Q1 =
-        new UmaskertSykefraværForEttKvartal(
-            new ÅrstallOgKvartal(2022, 1), new BigDecimal(100), new BigDecimal(200), 5);
-    UmaskertSykefraværForEttKvartal umaskertSykefravær_Q2 =
-        new UmaskertSykefraværForEttKvartal(
-            new ÅrstallOgKvartal(2022, 2), new BigDecimal(10), new BigDecimal(230), 5);
-
-    SykefraværOverFlereKvartaler expected =
-        new SykefraværOverFlereKvartaler(
-            List.of(
-                umaskertSykefravær_Q1.getårstallOgKvartal(),
-                umaskertSykefravær_Q2.getårstallOgKvartal()),
-            new BigDecimal(110),
-            new BigDecimal(430),
-            List.of(
-                new SykefraværForEttKvartal(
-                    umaskertSykefravær_Q1.getårstallOgKvartal(),
-                    umaskertSykefravær_Q1.getDagsverkTeller(),
-                    umaskertSykefravær_Q1.getDagsverkNevner(),
-                    umaskertSykefravær_Q1.getAntallPersoner()),
-                new SykefraværForEttKvartal(
-                    umaskertSykefravær_Q2.getårstallOgKvartal(),
-                    umaskertSykefravær_Q2.getDagsverkTeller(),
-                    umaskertSykefravær_Q2.getDagsverkNevner(),
-                    umaskertSykefravær_Q2.getAntallPersoner())));
-
-    SumAvSykefraværOverFlereKvartaler kvartal1 =
-        new SumAvSykefraværOverFlereKvartaler(umaskertSykefravær_Q1);
-    SumAvSykefraværOverFlereKvartaler kvartal2 =
-        new SumAvSykefraværOverFlereKvartaler(umaskertSykefravær_Q2);
-
-    SumAvSykefraværOverFlereKvartaler result = kvartal1.leggSammen(kvartal2);
-    SykefraværOverFlereKvartaler resultSykefraværOverFlereKvartaler =
-        result.regnUtProsentOgMapTilSykefraværForFlereKvartaler().getOrNull();
-
-    Assertions.assertThat(result.getMuligeDagsverk()).isEqualByComparingTo(new BigDecimal(430));
-    Assertions.assertThat(result.getTapteDagsverk()).isEqualByComparingTo(new BigDecimal(110));
-    Assertions.assertThat(resultSykefraværOverFlereKvartaler.getProsent())
-        .isEqualByComparingTo(expected.getProsent());
-    Assertions.assertThat(resultSykefraværOverFlereKvartaler.getKvartaler())
-        .isEqualTo(expected.getKvartaler());
-  }
-
-  @Test
-  void kalkulerFraværsprosentMedMaskering_maskererDataHvisAntallTilfellerErUnderFem() {
-    Either<StatistikkException, StatistikkDto> maskertSykefravær =
-        new SumAvSykefraværOverFlereKvartaler(
-                new UmaskertSykefraværForEttKvartal(
-                    new ÅrstallOgKvartal(2022, 1), new BigDecimal(100), new BigDecimal(200), 4))
-            .regnUtProsentOgMapTilDto(VIRKSOMHET, "");
-
-    Assertions.assertThat(maskertSykefravær.swap().getOrNull())
-        .isExactlyInstanceOf(SumAvSykefraværOverFlereKvartaler.MaskerteDataException.class);
-  }
-
-  @Test
-  void kalkulerFraværsprosentMedMaskering_returnerProsentHvisAntallTilfellerErFemEllerMer() {
-    Either<StatistikkException, StatistikkDto> sykefraværFemTilfeller =
-        new SumAvSykefraværOverFlereKvartaler(
-                new UmaskertSykefraværForEttKvartal(
-                    new ÅrstallOgKvartal(2022, 1), new BigDecimal(100), new BigDecimal(200), 5))
-            .regnUtProsentOgMapTilDto(VIRKSOMHET, "");
-
-    Either<StatistikkException, StatistikkDto> sykefraværTiTilfeller =
-        new SumAvSykefraværOverFlereKvartaler(
-                new UmaskertSykefraværForEttKvartal(
-                    new ÅrstallOgKvartal(2022, 1), new BigDecimal(100), new BigDecimal(200), 10))
-            .regnUtProsentOgMapTilDto(VIRKSOMHET, "");
-
-    Assertions.assertThat(sykefraværFemTilfeller.getOrNull().getVerdi()).isEqualTo("50.0");
-    Assertions.assertThat(sykefraværTiTilfeller.getOrNull().getVerdi()).isEqualTo("50.0");
-  }
+    @Test
+    fun kalkulerFraværsprosentMedMaskering_returnerProsentHvisAntallTilfellerErFemEllerMer() {
+        val sykefraværFemTilfeller = SumAvSykefraværOverFlereKvartaler(
+            UmaskertSykefraværForEttKvartal(
+                ÅrstallOgKvartal(2022, 1), BigDecimal(100), BigDecimal(200), 5
+            )
+        )
+            .regnUtProsentOgMapTilDto(Statistikkategori.VIRKSOMHET, "")
+        val sykefraværTiTilfeller = SumAvSykefraværOverFlereKvartaler(
+            UmaskertSykefraværForEttKvartal(
+                ÅrstallOgKvartal(2022, 1), BigDecimal(100), BigDecimal(200), 10
+            )
+        )
+            .regnUtProsentOgMapTilDto(Statistikkategori.VIRKSOMHET, "")
+        Assertions.assertThat(sykefraværFemTilfeller.getOrNull()!!.verdi).isEqualTo("50.0")
+        Assertions.assertThat(sykefraværTiTilfeller.getOrNull()!!.verdi).isEqualTo("50.0")
+    }
 }

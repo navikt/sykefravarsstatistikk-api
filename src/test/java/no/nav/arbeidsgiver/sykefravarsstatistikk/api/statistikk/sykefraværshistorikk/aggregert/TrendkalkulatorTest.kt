@@ -1,72 +1,80 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.aggregert
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
-import static org.assertj.core.api.Assertions.assertThat;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.Trendkalkulator
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Trend
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.UtilstrekkeligDataException
+import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.Trendkalkulator;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Trend;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.UtilstrekkeligDataException;
-import org.junit.jupiter.api.Test;
-
-class TrendkalkulatorTest {
-
-  @Test
-  void kalkulerTrend_returnererManglendeDataException_nårEtKvartalMangler() {
-    assertThat(
-            new Trendkalkulator(
-                    List.of(
-                        umaskertSykefravær(new ÅrstallOgKvartal(2021, 2), 11, 1),
-                        umaskertSykefravær(new ÅrstallOgKvartal(2021, 1), 10, 3)),
-                    SISTE_PUBLISERTE_KVARTAL)
+internal class TrendkalkulatorTest {
+    @Test
+    fun kalkulerTrend_returnererManglendeDataException_nårEtKvartalMangler() {
+        Assertions.assertThat(
+            Trendkalkulator(
+                listOf(
+                    umaskertSykefravær(ÅrstallOgKvartal(2021, 2), 11.0, 1),
+                    umaskertSykefravær(ÅrstallOgKvartal(2021, 1), 10.0, 3)
+                ),
+                TestUtils.SISTE_PUBLISERTE_KVARTAL
+            )
                 .kalkulerTrend()
-                .swap().getOrNull())
-        .isExactlyInstanceOf(UtilstrekkeligDataException.class);
-  }
+                .swap().getOrNull()
+        )
+            .isExactlyInstanceOf(UtilstrekkeligDataException::class.java)
+    }
 
-  @Test
-  void kalkulerTrend_returnererPositivTrend_dersomSykefraværetØker() {
-    ÅrstallOgKvartal k1 = SISTE_PUBLISERTE_KVARTAL;
-    ÅrstallOgKvartal k2 = SISTE_PUBLISERTE_KVARTAL.minusEttÅr();
-    assertThat(
-            new Trendkalkulator(
-                    List.of(umaskertSykefravær(k1, 3, 10), umaskertSykefravær(k2, 2, 10)),
-                    SISTE_PUBLISERTE_KVARTAL)
+    @Test
+    fun kalkulerTrend_returnererPositivTrend_dersomSykefraværetØker() {
+        val k1 = TestUtils.SISTE_PUBLISERTE_KVARTAL
+        val k2 = TestUtils.SISTE_PUBLISERTE_KVARTAL.minusEttÅr()
+        Assertions.assertThat(
+            Trendkalkulator(
+                listOf(umaskertSykefravær(k1, 3.0, 10), umaskertSykefravær(k2, 2.0, 10)),
+                TestUtils.SISTE_PUBLISERTE_KVARTAL
+            )
                 .kalkulerTrend()
-                .getOrNull())
-        .isEqualTo(new Trend(new BigDecimal("1.0"), 20, List.of(k1, k2)));
-  }
+                .getOrNull()
+        )
+            .isEqualTo(Trend(BigDecimal("1.0"), 20, listOf(k1, k2)))
+    }
 
-  @Test
-  void kalkulerTrend_returnereNegativTrend_dersomSykefraværetMinker() {
-    List<UmaskertSykefraværForEttKvartal> kvartalstall =
-        List.of(
-            umaskertSykefravær(SISTE_PUBLISERTE_KVARTAL, 8, 1),
-            umaskertSykefravær(new ÅrstallOgKvartal(2020, 2), 13, 2),
-            umaskertSykefravær(SISTE_PUBLISERTE_KVARTAL.minusEttÅr(), 10, 3));
-    Trend forventetTrend =
-        new Trend(
-            new BigDecimal("-2.0"),
+    @Test
+    fun kalkulerTrend_returnereNegativTrend_dersomSykefraværetMinker() {
+        val kvartalstall = listOf(
+            umaskertSykefravær(TestUtils.SISTE_PUBLISERTE_KVARTAL, 8.0, 1),
+            umaskertSykefravær(ÅrstallOgKvartal(2020, 2), 13.0, 2),
+            umaskertSykefravær(TestUtils.SISTE_PUBLISERTE_KVARTAL.minusEttÅr(), 10.0, 3)
+        )
+        val forventetTrend = Trend(
+            BigDecimal("-2.0"),
             4,
-            List.of(SISTE_PUBLISERTE_KVARTAL, SISTE_PUBLISERTE_KVARTAL.minusEttÅr()));
+            listOf(TestUtils.SISTE_PUBLISERTE_KVARTAL, TestUtils.SISTE_PUBLISERTE_KVARTAL.minusEttÅr())
+        )
+        Assertions.assertThat(
+            Trendkalkulator(kvartalstall, TestUtils.SISTE_PUBLISERTE_KVARTAL).kalkulerTrend().getOrNull()
+        )
+            .isEqualTo(forventetTrend)
+    }
 
-    assertThat(new Trendkalkulator(kvartalstall, SISTE_PUBLISERTE_KVARTAL).kalkulerTrend().getOrNull())
-        .isEqualTo(forventetTrend);
-  }
+    @Test
+    fun kalkulerTrend_girUtrilstrekkeligDataException_vedTomtDatagrunnlag() {
+        Assertions.assertThat(
+            Trendkalkulator(listOf(), TestUtils.SISTE_PUBLISERTE_KVARTAL).kalkulerTrend().swap().getOrNull()
+        )
+            .isExactlyInstanceOf(UtilstrekkeligDataException::class.java)
+    }
 
-  @Test
-  void kalkulerTrend_girUtrilstrekkeligDataException_vedTomtDatagrunnlag() {
-    assertThat(new Trendkalkulator(List.of(), SISTE_PUBLISERTE_KVARTAL).kalkulerTrend().swap().getOrNull())
-        .isExactlyInstanceOf(UtilstrekkeligDataException.class);
-  }
-
-  private static UmaskertSykefraværForEttKvartal umaskertSykefravær(
-      ÅrstallOgKvartal årstallOgKvartal, double tapteDagsverk, int antallPersoner) {
-    return new UmaskertSykefraværForEttKvartal(
-        årstallOgKvartal, new BigDecimal(tapteDagsverk), new BigDecimal(100), antallPersoner);
-  }
+    companion object {
+        private fun umaskertSykefravær(
+            årstallOgKvartal: ÅrstallOgKvartal, tapteDagsverk: Double, antallPersoner: Int
+        ): UmaskertSykefraværForEttKvartal {
+            return UmaskertSykefraværForEttKvartal(
+                årstallOgKvartal, BigDecimal(tapteDagsverk), BigDecimal(100), antallPersoner
+            )
+        }
+    }
 }
