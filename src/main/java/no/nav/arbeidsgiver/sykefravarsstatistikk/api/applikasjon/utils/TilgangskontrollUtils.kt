@@ -84,7 +84,7 @@ open class TilgangskontrollUtils @Autowired constructor(
      * tokens from trustworthy sources. The purpose is simply to differentiate different
      * original issuers to extract the fnr. */
         val idp = claims.getStringClaim("idp")
-        return if (idp.matches("^https://oidc.*difi.*\\.no/idporten-oidc-provider/$".toRegex())) {
+        return if (idp.matches("^https://oidc.*difi.*\\.no/idporten-oidc-provider/$".toRegex()) || idp.matches("""^https://(test\.)?idporten\.no$""".toRegex())) {
             claims.getStringClaim("pid")
         } else if (idp.matches("^https://nav(no|test)b2c\\.b2clogin\\.com/.*$".toRegex())) {
             getFnrFraClaims(claims)
