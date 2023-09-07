@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringMetadataVirksomhetService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringPerStatistikkKategoriService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringService;
 import no.nav.security.token.support.core.api.Protected;
@@ -24,15 +23,13 @@ public class EksporteringController {
 
   private final EksporteringService eksporteringService;
   private final EksporteringPerStatistikkKategoriService eksporteringPerStatistikkKategoriService;
-  private final EksporteringMetadataVirksomhetService eksporteringMetadataVirksomhetService;
 
   public EksporteringController(
       EksporteringService eksporteringService,
-      EksporteringPerStatistikkKategoriService eksporteringPerStatistikkKategoriService,
-      EksporteringMetadataVirksomhetService eksporteringMetadataVirksomhetService) {
+      EksporteringPerStatistikkKategoriService eksporteringPerStatistikkKategoriService
+  ) {
     this.eksporteringService = eksporteringService;
     this.eksporteringPerStatistikkKategoriService = eksporteringPerStatistikkKategoriService;
-    this.eksporteringMetadataVirksomhetService = eksporteringMetadataVirksomhetService;
   }
 
   @PostMapping("/reeksport")
@@ -70,15 +67,5 @@ public class EksporteringController {
         new ÅrstallOgKvartal(årstall, kvartal), kategori);
 
     return ResponseEntity.ok(HttpStatus.OK);
-  }
-
-  @PostMapping("/reeksport/metadata")
-  public ResponseEntity<HttpStatus> reeksportMetadata(
-      @RequestParam int årstall, @RequestParam int kvartal) {
-    ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
-    return eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(årstallOgKvartal).fold(
-        left -> ResponseEntity.internalServerError().build(),
-        right -> ResponseEntity.ok(HttpStatus.OK)
-    );
   }
 }
