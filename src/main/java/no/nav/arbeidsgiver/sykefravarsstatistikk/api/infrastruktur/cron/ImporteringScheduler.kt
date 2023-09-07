@@ -43,7 +43,7 @@ class ImporteringScheduler(
         noeFeilet = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
     }
 
-    @Scheduled(fixedDelay = Long.MAX_VALUE)
+    @Scheduled(cron = "0 5 8 * * ?")
     fun scheduledImporteringOgEksportering() {
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
@@ -130,17 +130,17 @@ class ImporteringScheduler(
                 gjeldendeKvartal
             )
 
-            log.info(
-                "Listen over fullførte jobber dette kvartalet: ${
-                    importEksportStatusRepository.hentFullførteJobber(
-                        gjeldendeKvartal
-                    )
-                }"
-            )
 
             log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_eksport'")
             vellykketEksportCounter.increment()
         }
+        log.info(
+            "Listen over fullførte jobber dette kvartalet: ${
+                importEksportStatusRepository.hentFullførteJobber(
+                    gjeldendeKvartal
+                )
+            }"
+        )
     }
 }
 

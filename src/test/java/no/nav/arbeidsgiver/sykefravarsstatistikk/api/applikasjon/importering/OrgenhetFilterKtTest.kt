@@ -108,4 +108,14 @@ internal class OrgenhetFilterKtTest {
             ), fjernDupliserteOrgnr(orgenheter)
         )
     }
+
+    @Test
+    fun `Fylkeskommunal forvaltning skal ikke filtreres bort`() {
+        val orgenheter = listOf(
+            dummyvirksomhet.copy(
+                sektor = Sektor.FYLKESKOMMUNAL
+            ),
+        )
+        assertEquals(orgenheter, fjernDupliserteOrgnr(orgenheter))
+    }
 }
