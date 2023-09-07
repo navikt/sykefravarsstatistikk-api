@@ -10,7 +10,6 @@ spec:
   team: arbeidsgiver
   port: 8080
   ingresses:
-    - https://arbeidsgiver.nais.adeo.no/sykefravarsstatistikk-api/ # fra interne klienter, som swagger i vdi
     - https://sykefravarsstatistikk-api.prod-fss-pub.nais.io/ # bro mellom fss og gcp
   tokenx:
     enabled: true

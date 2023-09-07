@@ -12,7 +12,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.WebClientConfigurati
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.MockServer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.PrometheusMetrics;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.EksporteringController;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.ImporteringController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.OrganisasjonerController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.SykefraværshistorikkController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.healthcheck.HealthcheckController;
@@ -46,7 +45,6 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
             SykefraværsstatistikkImporteringService.class,
             PostImporteringService.class,
             OrganisasjonerController.class,
-            ImporteringController.class,
             EksporteringController.class,
             SykefraværshistorikkController.class,
             OrganisasjonerController.class,
