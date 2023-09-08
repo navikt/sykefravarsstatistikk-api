@@ -1,13 +1,13 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
 
-import java.util.HashMap;
-import java.util.Map;
 import no.nav.security.mock.oauth2.MockOAuth2Server;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class TestTokenUtil {
 
-  public static String SELVBETJENING_ISSUER_ID = "selvbetjening";
   public static String TOKENX_ISSUER_ID = "tokenx";
 
   public static String createMockIdportenTokenXToken(MockOAuth2Server mockOAuth2Server) {
@@ -35,8 +35,6 @@ public class TestTokenUtil {
     if (StringUtils.isNoneEmpty(pid)) {
       claims.put("pid", pid);
     }
-    String tokenIssuedByOAuth2Server =
-        oAuth2Server.issueToken(issuerId, sub, "someaudience", claims).serialize();
-    return tokenIssuedByOAuth2Server;
+      return oAuth2Server.issueToken(issuerId, sub, "someaudience", claims).serialize();
   }
 }

@@ -27,7 +27,7 @@ public class InternalControllerTestSpring extends SpringIntegrationTestbase {
                         URI.create(
                             "http://localhost:"
                                 + port
-                                + "/sykefravarsstatistikk-api/internal/healthcheck"))
+                                + "/sykefravarsstatistikk-api/internal/liveness"))
                     .GET()
                     .build(),
                 ofString());
