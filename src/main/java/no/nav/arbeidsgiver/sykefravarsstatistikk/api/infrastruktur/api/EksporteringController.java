@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringPerStatistikkKategoriService;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringService;
@@ -21,51 +20,30 @@ import org.springframework.web.bind.annotation.RestController;
 @Profile({"local", "dev", "prod", "mvc-test"})
 public class EksporteringController {
 
-  private final EksporteringService eksporteringService;
-  private final EksporteringPerStatistikkKategoriService eksporteringPerStatistikkKategoriService;
+    private final EksporteringService eksporteringService;
+    private final EksporteringPerStatistikkKategoriService eksporteringPerStatistikkKategoriService;
 
-  public EksporteringController(
-      EksporteringService eksporteringService,
-      EksporteringPerStatistikkKategoriService eksporteringPerStatistikkKategoriService
-  ) {
-    this.eksporteringService = eksporteringService;
-    this.eksporteringPerStatistikkKategoriService = eksporteringPerStatistikkKategoriService;
-  }
-
-  @PostMapping("/reeksport")
-  public ResponseEntity<HttpStatus> reeksportMedKafka(
-      @RequestParam int årstall,
-      @RequestParam int kvartal) {
-
-    ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
-    Integer antallEksportert =
-        eksporteringService.legacyEksporter(årstallOgKvartal).getOrNull();
-
-    if (antallEksportert != null) {
-      return ResponseEntity.ok(HttpStatus.CREATED);
-    } else {
-      return ResponseEntity.ok(HttpStatus.OK);
-    }
-  }
-
-  @PostMapping("/reeksport/statistikkkategori")
-  public ResponseEntity<HttpStatus> reeksportMedKafka(
-      @RequestParam int årstall,
-      @RequestParam int kvartal,
-      @RequestParam Statistikkategori kategori
-  ) {
-    if (Statistikkategori.LAND != kategori
-        && Statistikkategori.VIRKSOMHET != kategori
-        && Statistikkategori.NÆRING != kategori
-        && Statistikkategori.SEKTOR != kategori
-        && Statistikkategori.BRANSJE != kategori
-        && Statistikkategori.NÆRINGSKODE != kategori) {
-      return ResponseEntity.badRequest().build();
+    public EksporteringController(
+            EksporteringService eksporteringService,
+            EksporteringPerStatistikkKategoriService eksporteringPerStatistikkKategoriService
+    ) {
+        this.eksporteringService = eksporteringService;
+        this.eksporteringPerStatistikkKategoriService = eksporteringPerStatistikkKategoriService;
     }
 
-    eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(
-        new ÅrstallOgKvartal(årstall, kvartal), kategori);
+    @PostMapping("/reeksport")
+    public ResponseEntity<HttpStatus> reeksportMedKafka(
+            @RequestParam int årstall,
+            @RequestParam int kvartal) {
 
-    return ResponseEntity.ok(HttpStatus.OK);
-  }
+        ÅrstallOgKvartal årstallOgKvartal = new ÅrstallOgKvartal(årstall, kvartal);
+        Integer antallEksportert =
+                eksporteringService.legacyEksporter(årstallOgKvartal).getOrNull();
+
+        if (antallEksportert != null) {
+            return ResponseEntity.ok(HttpStatus.CREATED);
+        } else {
+            return ResponseEntity.ok(HttpStatus.OK);
+        }
+    }
 }
