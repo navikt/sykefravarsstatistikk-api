@@ -10,7 +10,6 @@ spec:
   team: arbeidsgiver
   port: 8080
   ingresses:
-    - https://arbeidsgiver.nais.adeo.no/sykefravarsstatistikk-api/ # fra interne klienter, som swagger i vdi
     - https://sykefravarsstatistikk-api.prod-fss-pub.nais.io/ # bro mellom fss og gcp
   tokenx:
     enabled: true
@@ -37,16 +36,14 @@ spec:
       external:
         - host: data.brreg.no
   liveness:
-    path: /sykefravarsstatistikk-api/internal/healthcheck
+    path: /sykefravarsstatistikk-api/internal/liveness
     initialDelay: 30
   readiness:
-    path: /sykefravarsstatistikk-api/internal/healthcheck
+    path: /sykefravarsstatistikk-api/internal/readiness
     initialDelay: 30
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: prod
-  envFrom:
-    - configmap: loginservice-idporten
   prometheus:
     enabled: true
     path: /sykefravarsstatistikk-api/internal/actuator/prometheus

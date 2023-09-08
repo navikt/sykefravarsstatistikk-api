@@ -39,29 +39,6 @@ password:
 driver-class-name: org.h2.Driver
 ```
 
-## Grafisk fremstilling av API-ene (swagger-ui)
-
-API-et kan sees og testes på:
-
-* Lokalt: `http://localhost:8080/sykefravarsstatistikk-api/swagger-ui/index.html`
-* På server:
-    - Dev: `https://arbeidsgiver.nais.preprod.local/sykefravarsstatistikk-api/swagger-ui/index.html`
-    - Prod: `https://arbeidsgiver.nais.adeo.no/sykefravarsstatistikk-api/swagger-ui.html`
-
-## Local Auth
-
-`GET` request som la deg hente en Cookie som kan brukes lokalt finner du i
-swagger `mock-login-controller`
-
-Bruk `try it out` og fyll ut følgende parametre i GUI:
-
-* `issuerId: selvbetjening`
-* `audience: someaudience`
-* `cookiename: selvbetjening-idtoken`
-
-Kjør `execute`. Etter det blir cookie `selvbetjening-idtoken` satt opp og du kan kjøre andre
-requests i Swagger GUI.
-
 ## Docker
 
 Bygg image

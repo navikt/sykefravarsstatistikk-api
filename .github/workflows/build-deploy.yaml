@@ -38,7 +38,7 @@ jobs:
   deploy-to-dev:
     name: Deploy to dev-fss
     needs: docker-build-push
-    if: github.ref == 'refs/heads/fiks-tokenx'
+    if: github.ref == 'refs/heads/fjern_endepunkter'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

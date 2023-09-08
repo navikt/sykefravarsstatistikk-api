@@ -36,40 +36,20 @@ open class TilgangskontrollUtils @Autowired constructor(
 
     fun hentInnloggetBruker(): InnloggetBruker {
         val context = contextHolder.tokenValidationContext
-        val claimsForIssuerSelvbetjening = getClaimsFor(context, ISSUER_SELVBETJENING)
-        if (claimsForIssuerSelvbetjening.isPresent) {
-            log.debug("Claims kommer fra issuer Selvbetjening (loginservice)")
-            return InnloggetBruker(Fnr(getFnrFraClaims(claimsForIssuerSelvbetjening.get())))
-        }
-        val claimsForIssuerTokenX = getClaimsFor(context, ISSUER_TOKENX)
-        if (claimsForIssuerTokenX.isPresent) {
+        val claims = getClaimsFor(context)
+        if (claims.isPresent) {
             log.debug("Claims kommer fra issuer TokenX")
-            val fnrString = getTokenXFnr(claimsForIssuerTokenX.get())
+            val fnrString = getTokenXFnr(claims.get())
             return InnloggetBruker(Fnr(fnrString))
         }
         throw TilgangskontrollException(
-            String.format(
-                "Kan ikke hente innlogget bruker. Finner ikke claims for issuer '%s' eller '%s'",
-                ISSUER_SELVBETJENING, ISSUER_TOKENX
-            )
+            "Kan ikke hente innlogget bruker. Finner ikke claims for issuer tokenx"
         )
     }
 
-    private fun getFnrFraClaims(claimsForIssuerSelvbetjening: JwtTokenClaims): String {
-        var fnrFromClaim = ""
-        if (claimsForIssuerSelvbetjening.getStringClaim("pid") != null) {
-            log.debug("Fnr hentet fra claims 'pid'")
-            fnrFromClaim = claimsForIssuerSelvbetjening.getStringClaim("pid")
-        } else if (claimsForIssuerSelvbetjening.getStringClaim("sub") != null) {
-            log.debug("Fnr hentet fra claims 'sub' skal snart fases ut")
-            fnrFromClaim = claimsForIssuerSelvbetjening.getStringClaim("sub")
-        }
-        return fnrFromClaim
-    }
-
-    private fun getClaimsFor(context: TokenValidationContext, issuer: String): Optional<JwtTokenClaims> {
-        return if (context.hasTokenFor(issuer)) {
-            Optional.of(context.getClaims(issuer))
+    private fun getClaimsFor(context: TokenValidationContext): Optional<JwtTokenClaims> {
+        return if (context.hasTokenFor(ISSUER_TOKENX)) {
+            Optional.of(context.getClaims(ISSUER_TOKENX))
         } else {
             Optional.empty()
         }
@@ -83,14 +63,11 @@ open class TilgangskontrollUtils @Autowired constructor(
         /* NOTE: This is not validation of original issuer. We trust TokenX to only issue
      * tokens from trustworthy sources. The purpose is simply to differentiate different
      * original issuers to extract the fnr. */
-        val idp = claims.getStringClaim("idp")
+        val idp = claims.getStringClaim("idp") ?: throw TilgangskontrollException("Mangler claim 'idp'")
         return if (idp.matches("^https://oidc.*difi.*\\.no/idporten-oidc-provider/$".toRegex()) || idp.matches("""^https://(test\.)?idporten\.no$""".toRegex())) {
             claims.getStringClaim("pid")
-        } else if (idp.matches("^https://nav(no|test)b2c\\.b2clogin\\.com/.*$".toRegex())) {
-            getFnrFraClaims(claims)
         } else if (idp.matches("https://fakedings.dev-gcp.nais.io/fake/idporten".toRegex())
-            && Arrays.stream(environment.activeProfiles)
-                .noneMatch { profile: String -> profile == "prod" }
+            && environment.activeProfiles.none { it == "prod" }
         ) {
             claims.getStringClaim("pid")
         } else {
@@ -99,8 +76,7 @@ open class TilgangskontrollUtils @Autowired constructor(
     }
 
     companion object {
-        const val ISSUER_SELVBETJENING = "selvbetjening"
         const val ISSUER_TOKENX = "tokenx"
-        private val VALID_ISSUERS: Set<String> = ImmutableSet.of(ISSUER_TOKENX, ISSUER_SELVBETJENING)
+        private val VALID_ISSUERS: Set<String> = ImmutableSet.of(ISSUER_TOKENX)
     }
 }
