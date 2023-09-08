@@ -13,9 +13,6 @@ Hensikten er å gjøre arbeidsgivere mer engasjert i eget sykefravær.
 Koden kan kjøres som en vanlig Spring Boot-applikasjon fra SykefraværsstatistikkApplication. Du må
 ha kjørende [naisdevice](https://doc.nais.io/device/) for at appen skal fungere.
 
-Helsesjekk (åpnes i
-browser): [http://localhost:8080/sykefravarsstatistikk-api/internal/healthcheck](http://localhost:8080/sykefravarsstatistikk-api/internal/healthcheck)
-
 Default spring-profil er local, og da er alle avhengigheter mocket på localhost:8081.
 
 Koden er formatert med Google Java Format. Anbefaler å installere Google Java Format plugin for
