@@ -12,7 +12,7 @@ import static java.net.http.HttpClient.newBuilder;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class HealthcheckControllerTestSpring extends SpringIntegrationTestbase {
+public class InternalControllerTestSpring extends SpringIntegrationTestbase {
 
   @LocalServerPort private String port;
 

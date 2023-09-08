@@ -13,7 +13,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.codec.DecodingException
-import org.springframework.http.*
+import org.springframework.http.HttpStatusCode
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.util.retry.Retry
@@ -92,7 +92,7 @@ open class EnhetsregisteretClient(
         false
     } else true
 
-    open fun healthcheck(): HttpStatusCode {
+    open fun clientIsReady(): HttpStatusCode {
         return try {
             webClient.get()
                 .uri(enhetsregisteretUrl)

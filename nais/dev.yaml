@@ -37,10 +37,10 @@ spec:
       external:
         - host: data.brreg.no
   liveness:
-    path: /sykefravarsstatistikk-api/internal/healthcheck
+    path: /sykefravarsstatistikk-api/internal/liveness
     initialDelay: 30
   readiness:
-    path: /sykefravarsstatistikk-api/internal/healthcheck
+    path: /sykefravarsstatistikk-api/internal/readiness
     initialDelay: 30
   env:
     - name: SPRING_PROFILES_ACTIVE

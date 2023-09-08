@@ -11,10 +11,9 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.Tilgangsk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.WebClientConfiguration;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.MockServer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.PrometheusMetrics;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.EksporteringController;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.InternalController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.OrganisasjonerController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.SykefraværshistorikkController;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.healthcheck.HealthcheckController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImporteringScheduler;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient;
@@ -45,13 +44,12 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
             SykefraværsstatistikkImporteringService.class,
             PostImporteringService.class,
             OrganisasjonerController.class,
-            EksporteringController.class,
             SykefraværshistorikkController.class,
             OrganisasjonerController.class,
             TilgangskontrollService.class,
             AggregertStatistikkService.class,
             EksporteringMetadataVirksomhetService.class,
-            HealthcheckController.class,
+            InternalController.class,
             EnhetsregisteretClient.class,
             WebClientConfiguration.class,
             PrometheusMetrics.class,
