@@ -43,7 +43,7 @@ kafka:
 no.nav.security.jwt:
   issuer:
     tokenx:
-      discoveryurl: https://fakedings.dev-gcp.nais.io/fake/.well-known/oauth-authorization-server
+      discoveryurl: https://fakedings.intern.dev.nav.no/fake/.well-known/oauth-authorization-server
       accepted_audience: dev-fss:arbeidsgiver:sykefravarsstatistikk-api
 
 tokenxclient:

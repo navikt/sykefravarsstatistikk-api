@@ -66,7 +66,7 @@ open class TilgangskontrollUtils @Autowired constructor(
         val idp = claims.getStringClaim("idp") ?: throw TilgangskontrollException("Mangler claim 'idp'")
         return if (idp.matches("^https://oidc.*difi.*\\.no/idporten-oidc-provider/$".toRegex()) || idp.matches("""^https://(test\.)?idporten\.no$""".toRegex())) {
             claims.getStringClaim("pid")
-        } else if (idp.matches("https://fakedings.dev-gcp.nais.io/fake/idporten".toRegex())
+        } else if (idp.matches("https://fakedings.intern.dev.nav.no/fake/idporten".toRegex())
             && environment.activeProfiles.none { it == "prod" }
         ) {
             claims.getStringClaim("pid")
