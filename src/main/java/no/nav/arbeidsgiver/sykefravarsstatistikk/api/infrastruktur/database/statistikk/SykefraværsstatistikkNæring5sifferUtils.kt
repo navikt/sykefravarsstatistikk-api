@@ -1,61 +1,44 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.statistikk;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.statistikk
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sykefraværsstatistikk;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sykefraværsstatistikk
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.jdbc.core.namedparam.SqlParameterSource
+import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils
+import java.util.*
 
-import java.util.Arrays;
-import java.util.List;
+class SykefraværsstatistikkNæring5sifferUtils(
+    namedParameterJdbcTemplate: NamedParameterJdbcTemplate?
+) : SykefraværsstatistikkIntegrasjon(namedParameterJdbcTemplate!!), SykefraværsstatistikkIntegrasjonUtils {
+    override fun getDeleteFunction(): DeleteSykefraværsstatistikkFunction {
+        return DeleteSykefraværsstatistikkFunction { (årstall, kvartal): ÅrstallOgKvartal ->
+            val namedParameters: SqlParameterSource = MapSqlParameterSource()
+                .addValue(ARSTALL, årstall)
+                .addValue(KVARTAL, kvartal)
+            val antallSlettet = namedParameterJdbcTemplate.update(
+                String.format(
+                    "delete from sykefravar_statistikk_naring5siffer where arstall = :%s and kvartal = :%s",
+                    ARSTALL, KVARTAL
+                ),
+                namedParameters
+            )
+            antallSlettet
+        }
+    }
 
-public class SykefraværsstatistikkNæring5sifferUtils extends SykefraværsstatistikkIntegrasjon
-    implements SykefraværsstatistikkIntegrasjonUtils {
-
-  public SykefraværsstatistikkNæring5sifferUtils(
-      NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-    super(namedParameterJdbcTemplate);
-  }
-
-  @Override
-  public DeleteSykefraværsstatistikkFunction getDeleteFunction() {
-    DeleteSykefraværsstatistikkFunction function =
-        (ÅrstallOgKvartal årstallOgKvartal) -> {
-          SqlParameterSource namedParameters =
-              new MapSqlParameterSource()
-                  .addValue(ARSTALL, årstallOgKvartal.getÅrstall())
-                  .addValue(KVARTAL, årstallOgKvartal.getKvartal());
-
-          int antallSlettet =
-              namedParameterJdbcTemplate.update(
-                  String.format(
-                      "delete from sykefravar_statistikk_naring5siffer where arstall = :%s and kvartal = :%s",
-                      ARSTALL, KVARTAL),
-                  namedParameters);
-          return antallSlettet;
-        };
-    return function;
-  }
-
-  @Override
-  public BatchCreateSykefraværsstatistikkFunction getBatchCreateFunction(
-      List<? extends Sykefraværsstatistikk> statistikk) {
-
-    BatchCreateSykefraværsstatistikkFunction function =
-        () -> {
-          SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(statistikk.toArray());
-
-          int[] results =
-              namedParameterJdbcTemplate.batchUpdate(
-                  "insert into sykefravar_statistikk_naring5siffer "
-                      + "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                      + "values "
-                      + "(:årstall, :kvartal, :næringkode, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
-                  batch);
-          return Arrays.stream(results).sum();
-        };
-
-    return function;
-  }
+    override fun getBatchCreateFunction(statistikk: List<Sykefraværsstatistikk>): BatchCreateSykefraværsstatistikkFunction {
+        return BatchCreateSykefraværsstatistikkFunction {
+            val batch =
+                SqlParameterSourceUtils.createBatch(*statistikk.toTypedArray<Sykefraværsstatistikk?>())
+            val results = namedParameterJdbcTemplate.batchUpdate(
+                "insert into sykefravar_statistikk_naring5siffer "
+                        + "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                        + "values "
+                        + "(:årstall, :kvartal, :næringkode, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
+                batch
+            )
+            Arrays.stream(results).sum()
+        }
+    }
 }
