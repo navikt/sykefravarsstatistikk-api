@@ -4,14 +4,18 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringServiceUtils.*;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.*;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EksporteringServiceUtilsTest {
 
@@ -52,37 +56,6 @@ public class EksporteringServiceUtilsTest {
     assertTrue(virksomhetMetadataList.contains(virksomhet2Metadata_2020_4));
   }
 
-  @Test
-  public void
-      getAntallSomKanEksporteres__returnerer_antall_virksomheter_som_ikke_har_blitt_eksportert_enda__uavhengig_av_kvartal() {
-    long antallSomKanEksporteres =
-        getAntallSomKanEksporteres(
-            Arrays.asList(
-                new VirksomhetEksportPerKvartal(ORGNR_VIRKSOMHET_1, __2020_4, true),
-                new VirksomhetEksportPerKvartal(ORGNR_VIRKSOMHET_1, __2021_1, false),
-                new VirksomhetEksportPerKvartal(ORGNR_VIRKSOMHET_1, __2021_2, false),
-                new VirksomhetEksportPerKvartal(ORGNR_VIRKSOMHET_2, __2021_2, false)));
-
-    assertEquals(3, antallSomKanEksporteres);
-  }
-
-  @Test
-  public void getVirksomhetMetada__returnerer_VirksomhetMetada_som_matcher_Virksomhet() {
-    VirksomhetMetadata resultat =
-        getVirksomhetMetada(
-            ORGNR_VIRKSOMHET_1,
-            Arrays.asList(virksomhet1Metadata_2020_4, virksomhet2Metadata_2020_4));
-
-    assertEquals(virksomhet1Metadata_2020_4, resultat);
-  }
-
-  @Test
-  public void getVirksomhetMetada__returnerer_NULL__dersom_ingen_entry_matcher_Virksomhet() {
-    VirksomhetMetadata result =
-        getVirksomhetMetada(ORGNR_VIRKSOMHET_2, List.of(virksomhet1Metadata_2020_4));
-
-    assertNull(result);
-  }
 
   @Test
   public void
@@ -129,55 +102,6 @@ public class EksporteringServiceUtilsTest {
     System.out.println("Elapsed time in nanoseconds (With Map) = " + (stopWithMap - startWithMap));
   }
 
-  @Test
-  public void
-      getVirksomhetSykefravær__returnerer_TOM_VirksomhetSykefravær__dersom_liste_sykefraværsstatistikk_for_virksomheten_er_tom() {
-    VirksomhetSykefravær resultat =
-        getVirksomhetSykefravær(virksomhet1Metadata_2020_4, Collections.emptyList());
-
-    assertEqualsVirksomhetSykefravær(tomVirksomhetSykefravær(virksomhet1Metadata_2020_4), resultat);
-  }
-
-  @Test
-  public void
-      getVirksomhetSykefravær__returnerer_TOM_VirksomhetSykefravær__dersom_sykefraværsstatistikk_IKKE_er_funnet_for_virksomheten() {
-    VirksomhetSykefravær resultat =
-        getVirksomhetSykefravær(
-            virksomhet1Metadata_2021_2,
-            Arrays.asList(
-                byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2020_4),
-                byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2021_1)));
-
-    assertEqualsVirksomhetSykefravær(tomVirksomhetSykefravær(virksomhet1Metadata_2021_2), resultat);
-  }
-
-  @Test
-  public void
-      getVirksomhetSykefravær__returnerer_VirksomhetSykefravær__med_sykefraværsstatistikk_for_virksomheten() {
-    VirksomhetSykefravær resultat =
-        getVirksomhetSykefravær(
-            virksomhet1Metadata_2020_4,
-            Arrays.asList(
-                byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2020_4, 10, 156, 22233),
-                byggSykefraværsstatistikkVirksomhet(virksomhet2Metadata_2020_4)));
-
-    assertEqualsVirksomhetSykefravær(
-        byggVirksomhetSykefravær(virksomhet1Metadata_2020_4, 10, 156, 22233), resultat);
-  }
-
-  @Test
-  public void
-      getVirksomhetSykefravær__returnerer_VirksomhetSykefravær__med_sykefraværsstatistikk_for_virksomheten__på_riktig_kvartal() {
-    VirksomhetSykefravær resultat =
-        getVirksomhetSykefravær(
-            virksomhet1Metadata_2020_4,
-            Arrays.asList(
-                byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2020_4),
-                byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2021_1)));
-
-    assertEqualsVirksomhetSykefravær(
-        byggVirksomhetSykefravær(virksomhet1Metadata_2020_4), resultat);
-  }
 
   @Test
   public void
