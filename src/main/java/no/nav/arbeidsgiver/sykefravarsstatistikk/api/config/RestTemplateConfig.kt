@@ -1,14 +1,13 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.config;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.config
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.web.client.RestTemplate
 
 @Configuration
-public class RestTemplateConfig {
-
-  @Bean
-  public RestTemplate restTemplate() {
-    return new RestTemplate();
-  }
+open class RestTemplateConfig {
+    @Bean
+    open fun restTemplate(): RestTemplate {
+        return RestTemplate()
+    }
 }
