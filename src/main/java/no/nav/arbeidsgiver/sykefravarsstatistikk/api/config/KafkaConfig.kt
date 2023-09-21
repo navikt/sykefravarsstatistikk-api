@@ -1,52 +1,52 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.config;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.config
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.clients.producer.RecordMetadata;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.ProducerListener;
+import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.clients.producer.RecordMetadata
+import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.kafka.core.DefaultKafkaProducerFactory
+import org.springframework.kafka.core.KafkaTemplate
+import org.springframework.kafka.support.ProducerListener
+import org.springframework.lang.Nullable
 
-@Slf4j
 @Configuration
-class KafkaConfig {
-  @Bean
-  KafkaTemplate<String, String> kafkaTemplate(KafkaProperties kafkaProperties) {
-    KafkaTemplate<String, String> kafkaTemplate =
-        new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(kafkaProperties.asProperties()));
-    kafkaTemplate.setProducerListener(getProducerListener());
-    return kafkaTemplate;
-  }
+internal open class KafkaConfig {
 
-  ProducerListener<String, String> getProducerListener() {
-    return new ProducerListener<>() {
-      @Override
-      public void onSuccess(
-          ProducerRecord<String, String> producerRecord, RecordMetadata recordMetadata) {
-        log.debug(
-            "ProducerListener mottok success for record med offset '{}' på topic '{}'",
-            recordMetadata.topic(),
-            recordMetadata.offset());
-      }
+    private val log = LoggerFactory.getLogger(this::class.java)
+    @Bean
+    open fun kafkaTemplate(kafkaProperties: KafkaProperties): KafkaTemplate<String, String> {
+        val kafkaTemplate = KafkaTemplate(DefaultKafkaProducerFactory<String, String>(kafkaProperties.asProperties()))
+        kafkaTemplate.setProducerListener(producerListener)
+        return kafkaTemplate
+    }
 
-      @Override
-      public void onError(
-          ProducerRecord<String, String> producerRecord,
-          RecordMetadata recordMetadata,
-          Exception exception) {
-        String topicNavn =
-            recordMetadata != null
-                ? recordMetadata.topic()
-                : "Ingen topic funnet (recordMetadat er null)";
-        long offset = recordMetadata != null ? recordMetadata.offset() : 0;
-        log.info(
-            "ProducerListener mottok en exception med melding '{}' for record med offset '{}' på topic '{}'",
-            exception.getMessage(),
-            topicNavn,
-            offset);
-      }
-    };
-  }
+    val producerListener: ProducerListener<String, String>
+        get() = object : ProducerListener<String, String> {
+            override fun onSuccess(
+                producerRecord: ProducerRecord<String?, String?>, recordMetadata: RecordMetadata
+            ) {
+                log.debug(
+                    "ProducerListener mottok success for record med offset '{}' på topic '{}'",
+                    recordMetadata.topic(),
+                    recordMetadata.offset()
+                )
+            }
+
+            override fun onError(
+                producerRecord: ProducerRecord<String, String>?,
+                @Nullable recordMetadata: RecordMetadata?,
+                exception: Exception?
+            ) {
+                val topicNavn =
+                    if (recordMetadata != null) recordMetadata.topic() else "Ingen topic funnet (recordMetadat er null)"
+                val offset = recordMetadata?.offset() ?: 0
+                log.info(
+                    "ProducerListener mottok en exception med melding '{}' for record med offset '{}' på topic '{}'",
+                    exception?.message,
+                    topicNavn,
+                    offset
+                )
+            }
+        }
 }
