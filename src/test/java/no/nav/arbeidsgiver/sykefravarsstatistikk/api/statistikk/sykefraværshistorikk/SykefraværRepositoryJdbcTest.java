@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk;
 
+import ia.felles.definisjoner.bransjer.Bransjer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +20,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.*;
@@ -45,7 +44,7 @@ public class SykefraværRepositoryJdbcTest {
           10);
 
   static final Bransje BARNEHAGEBRANSJEN =
-      new Bransje(ArbeidsmiljøportalenBransje.BARNEHAGER, "Barnehage", Collections.singletonList("88911"));
+      new Bransje(Bransjer.BARNEHAGER);
 
   @BeforeEach
   public void setUp() {

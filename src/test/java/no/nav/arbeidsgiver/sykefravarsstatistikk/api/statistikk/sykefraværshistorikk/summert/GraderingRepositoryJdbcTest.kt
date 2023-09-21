@@ -1,10 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk.summert
 
+import ia.felles.definisjoner.bransjer.Bransjer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.GraderingTestUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.LocalOgUnitTestOidcConfiguration
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.GraderingRepository
@@ -208,7 +208,7 @@ open class GraderingRepositoryJdbcTest {
     @Test
     fun hentSykefraværForEttKvartalMedGradering__skal_returnere_riktig_sykefravær_for_bransje() {
         val (kode) = Næringskode("86101")
-        val (kode1) = Næringskode("86211")
+        val (kode1) = Næringskode("86107")
         val (kode2) = Næringskode("86902")
         GraderingTestUtils.insertDataMedGradering(
             jdbcTemplate,
@@ -259,7 +259,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(3000)
         )
         val resultat = graderingRepository!!.hentSykefraværMedGradering(
-            Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "sykehus", listOf("86101", "86211"))
+            Bransje(Bransjer.SYKEHUS)
         )
         Assertions.assertThat(resultat.size).isEqualTo(2)
         Assertions.assertThat(resultat[0])
@@ -303,9 +303,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(20),
             BigDecimal(100)
         )
-        val resultat = graderingRepository!!.hentSykefraværMedGradering(
-            Bransje(ArbeidsmiljøportalenBransje.SYKEHUS, "sykehus", listOf("86101", "86211"))
-        )
+        val resultat = graderingRepository!!.hentSykefraværMedGradering(Bransje(Bransjer.SYKEHUS))
         Assertions.assertThat(resultat.size).isEqualTo(1)
         Assertions.assertThat(resultat[0])
             .isEqualTo(

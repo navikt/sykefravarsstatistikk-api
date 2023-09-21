@@ -1,14 +1,14 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje
+import ia.felles.definisjoner.bransjer.Bransjer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 
 data class MetadataVirksomhetKafkamelding(
     val orgnr: String,
     val årstallOgKvartal: ÅrstallOgKvartal,
     val næring: String,
-    val bransje: ArbeidsmiljøportalenBransje?,
+    val bransje: Bransjer?,
     val sektor: SektorKafkaDto,
 ) : Kafkamelding {
     override val nøkkel: String

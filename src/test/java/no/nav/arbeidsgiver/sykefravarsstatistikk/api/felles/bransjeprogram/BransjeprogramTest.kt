@@ -1,8 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram
 
+import ia.felles.definisjoner.bransjer.Bransjer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje.BARNEHAGER
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje.NÆRINGSMIDDELINDUSTRI
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransjeprogram
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -30,7 +29,7 @@ internal class BransjeprogramTest {
         val næringskodenTilBarnehager = Næringskode("88911")
 
         val barnehagebransjen = Bransjeprogram.finnBransje(næringskodenTilBarnehager).get().type
-        assertEquals(BARNEHAGER, barnehagebransjen)
+        assertEquals(Bransjer.BARNEHAGER, barnehagebransjen)
     }
 
     @Test
@@ -44,7 +43,7 @@ internal class BransjeprogramTest {
         val juicepressing = Næringskode("10320")
 
         val næringsmiddelbransjen = Bransjeprogram.finnBransje(juicepressing).get().type
-        assertEquals(NÆRINGSMIDDELINDUSTRI, næringsmiddelbransjen)
+        assertEquals(Bransjer.NÆRINGSMIDDELINDUSTRI, næringsmiddelbransjen)
     }
     @Test
     fun `bransje i næringsmiddelindustrien er definert på tosiffernivå`() {

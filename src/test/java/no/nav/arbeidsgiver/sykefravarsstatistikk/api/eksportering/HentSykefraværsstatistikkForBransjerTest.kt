@@ -1,11 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering
 
+import ia.felles.definisjoner.bransjer.Bransjer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkBransje
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.hentSykefraværsstatistikkForBransjerFraOgMed
 import org.assertj.core.api.Assertions.assertThat
@@ -78,7 +78,7 @@ open class HentSykefraværsstatistikkForBransjerTest {
             SykefraværsstatistikkBransje(
                 2023,
                 1,
-                ArbeidsmiljøportalenBransje.SYKEHJEM,
+                Bransjer.SYKEHJEM,
                 2,
                 BigDecimal.valueOf(2),
                 BigDecimal.valueOf(2)
@@ -86,7 +86,7 @@ open class HentSykefraværsstatistikkForBransjerTest {
             SykefraværsstatistikkBransje(
                 2023,
                 1,
-                ArbeidsmiljøportalenBransje.SYKEHUS,
+                Bransjer.SYKEHUS,
                 1,
                 BigDecimal.valueOf(1),
                 BigDecimal.valueOf(1)
@@ -100,7 +100,7 @@ val fireKvartalerAnleggsbransje = arrayOf(
     SykefraværsstatistikkBransje(
         2023,
         1,
-        ArbeidsmiljøportalenBransje.ANLEGG,
+        Bransjer.ANLEGG,
         1,
         BigDecimal.ONE,
         BigDecimal.ONE
@@ -108,7 +108,7 @@ val fireKvartalerAnleggsbransje = arrayOf(
     SykefraværsstatistikkBransje(
         2023,
         2,
-        ArbeidsmiljøportalenBransje.ANLEGG,
+        Bransjer.ANLEGG,
         1,
         BigDecimal.ONE,
         BigDecimal.ONE
@@ -116,7 +116,7 @@ val fireKvartalerAnleggsbransje = arrayOf(
     SykefraværsstatistikkBransje(
         2023,
         3,
-        ArbeidsmiljøportalenBransje.ANLEGG,
+        Bransjer.ANLEGG,
         1,
         BigDecimal.ONE,
         BigDecimal.ONE
@@ -124,7 +124,7 @@ val fireKvartalerAnleggsbransje = arrayOf(
     SykefraværsstatistikkBransje(
         2023,
         4,
-        ArbeidsmiljøportalenBransje.ANLEGG,
+        Bransjer.ANLEGG,
         1,
         BigDecimal.ONE,
         BigDecimal.ONE

@@ -1,13 +1,16 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram
 
+import ia.felles.definisjoner.bransjer.Bransjer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Virksomhet
 
 data class Bransje(
-    val type: ArbeidsmiljøportalenBransje,
-    val navn: String,
-    val identifikatorer: List<String>
+    val type: Bransjer,
 ) {
+
+    val navn = type.navn
+    val identifikatorer = type.næringskoder
+
     init {
         require(erDefinertPåTosiffernivå() || erDefinertPåFemsiffernivå())
         { "Støtter kun bransjer som er spesifisert av enten 2 eller 5 sifre" }

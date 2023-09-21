@@ -1,12 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.felles.bransjeprogram;
 
+import ia.felles.definisjoner.bransjer.Bransjer;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næring;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.BransjeEllerNæring;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,7 +15,7 @@ class BransjeEllerNæringTest {
 
     @Test
     public void BransjeEllerNæring_kan_opprettes_for_en_bransje_og_returnerer_en_bransje() {
-        Bransje bransje = new Bransje(ArbeidsmiljøportalenBransje.BARNEHAGER, "Barnehager", Collections.singletonList("88911"));
+        Bransje bransje = new Bransje(Bransjer.BARNEHAGER);
         BransjeEllerNæring bransjeEllerNæring = new BransjeEllerNæring(bransje);
 
         assertThat(bransjeEllerNæring.isBransje()).isEqualTo(true);

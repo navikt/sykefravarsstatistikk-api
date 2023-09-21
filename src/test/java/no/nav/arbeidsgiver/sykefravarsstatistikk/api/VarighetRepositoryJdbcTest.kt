@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api
 
+import ia.felles.definisjoner.bransjer.Bransjer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VarighetRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -151,20 +151,7 @@ open class VarighetRepositoryJdbcTest {
             Varighetskategori._1_DAG_TIL_7_DAGER,
             8
         )
-        val resultat = varighetRepository.hentSykefraværMedVarighet(
-            Bransje(
-                ArbeidsmiljøportalenBransje.SYKEHUS,
-                "Sykehus",
-                listOf(
-                    "86101",
-                    "86102",
-                    "86104",
-                    "86105",
-                    "86106",
-                    "86107"
-                )
-            )
-        )
+        val resultat = varighetRepository.hentSykefraværMedVarighet(Bransje(Bransjer.SYKEHUS))
         assertThat(resultat.size).isEqualTo(2)
         assertThat(resultat[0])
             .isEqualTo(

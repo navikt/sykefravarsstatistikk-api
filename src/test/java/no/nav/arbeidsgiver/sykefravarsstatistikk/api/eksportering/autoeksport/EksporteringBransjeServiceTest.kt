@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport
 
+import ia.felles.definisjoner.bransjer.Bransjer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringPerStatistikkKategoriService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
@@ -39,14 +39,14 @@ internal class EksporteringBransjeServiceTest {
                     SykefraværsstatistikkBransje(
                         årstall = 1990,
                         kvartal = 1,
-                        bransje = ArbeidsmiljøportalenBransje.ANLEGG,
+                        bransje = Bransjer.ANLEGG,
                         antallPersoner = 1,
                         tapteDagsverk = BigDecimal.ONE,
                         muligeDagsverk = BigDecimal.ONE
                     ), SykefraværsstatistikkBransje(
                         årstall = 2023,
                         kvartal = 1,
-                        bransje = ArbeidsmiljøportalenBransje.ANLEGG,
+                        bransje = Bransjer.ANLEGG,
                         antallPersoner = 1,
                         tapteDagsverk = BigDecimal.ONE,
                         muligeDagsverk = BigDecimal.ONE
@@ -69,7 +69,7 @@ internal class EksporteringBransjeServiceTest {
                 SykefraværsstatistikkBransje(
                     årstall = 1990,
                     kvartal = 1,
-                    bransje = ArbeidsmiljøportalenBransje.ANLEGG,
+                    bransje = Bransjer.ANLEGG,
                     antallPersoner = 1,
                     tapteDagsverk = BigDecimal.ONE,
                     muligeDagsverk = BigDecimal.ONE
@@ -92,7 +92,7 @@ internal class EksporteringBransjeServiceTest {
         val bransjestatistikk = SykefraværsstatistikkBransje(
             årstall = 2023,
             kvartal = 2,
-            bransje = ArbeidsmiljøportalenBransje.ANLEGG,
+            bransje = Bransjer.ANLEGG,
             antallPersoner = 5,
             tapteDagsverk = BigDecimal.ONE,
             muligeDagsverk = BigDecimal.ONE
@@ -110,7 +110,7 @@ internal class EksporteringBransjeServiceTest {
         val melding = StatistikkategoriKafkamelding(
             SykefraværMedKategori(
                 Statistikkategori.BRANSJE,
-                ArbeidsmiljøportalenBransje.ANLEGG.name,
+                Bransjer.ANLEGG.name,
                 2023,
                 2,
                 BigDecimal.ONE,

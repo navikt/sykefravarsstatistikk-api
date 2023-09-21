@@ -43,6 +43,15 @@
         <org.apache.logging.log4j.version>3.0.0-alpha1</org.apache.logging.log4j.version>
         <jetbrainsExposedVersion>0.42.0</jetbrainsExposedVersion>
     </properties>
+
+    <repositories>
+        <!-- ...andre repositories -->
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -88,10 +97,12 @@
             <scope>test</scope>
         </dependency>
 
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -128,6 +139,13 @@
             <artifactId>ojdbc8</artifactId>
             <version>${com.oracle.ojdbc.ojdbc8.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.github.navikt</groupId>
+            <artifactId>ia-felles</artifactId>
+            <version>0.0.5</version>
+        </dependency>
+
         <dependency>
             <groupId>no.nav</groupId>
             <artifactId>vault-jdbc</artifactId>

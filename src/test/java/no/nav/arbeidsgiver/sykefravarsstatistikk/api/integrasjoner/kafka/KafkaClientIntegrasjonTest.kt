@@ -1,8 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka
 
+import ia.felles.definisjoner.bransjer.Bransjer
 import net.javacrumbs.jsonunit.assertj.assertThatJson
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.SykefraværsstatistikkLocalTestApplication
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic.Companion.toStringArray
@@ -91,7 +91,7 @@ class KafkaClientIntegrasjonTest {
                 "999999999",
                 ÅrstallOgKvartal(2023, 2),
                 "86101",
-                ArbeidsmiljøportalenBransje.SYKEHUS,
+                Bransjer.SYKEHUS,
                 SektorKafkaDto.STATLIG
             ),
             KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1,
@@ -107,7 +107,7 @@ class KafkaClientIntegrasjonTest {
                 "999999999",
                 ÅrstallOgKvartal(2023, 2),
                 "86",
-                ArbeidsmiljøportalenBransje.SYKEHUS,
+                Bransjer.SYKEHUS,
                 SektorKafkaDto.STATLIG
             ),
             KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1,

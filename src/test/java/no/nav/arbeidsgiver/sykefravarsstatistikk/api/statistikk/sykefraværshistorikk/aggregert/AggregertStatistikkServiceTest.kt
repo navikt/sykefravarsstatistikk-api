@@ -6,9 +6,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.Publiseringsdat
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.AggregertStatistikkService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.BransjeEllerNæring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.GraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VarighetRepository
@@ -507,12 +504,6 @@ internal class AggregertStatistikkServiceTest {
         }
     }
 
-    private val barnehager = BransjeEllerNæring(
-        Bransje(
-            ArbeidsmiljøportalenBransje.BARNEHAGER, "En bransje",
-            listOf("88911")
-        )
-    )
     private val etOrgnr = Orgnr("999999999")
     private val etAnnetOrgnr = Orgnr("1111111111")
 

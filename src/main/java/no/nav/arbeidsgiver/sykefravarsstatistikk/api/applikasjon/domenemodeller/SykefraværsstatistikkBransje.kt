@@ -1,12 +1,12 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.ArbeidsmiljøportalenBransje
+import ia.felles.definisjoner.bransjer.Bransjer
 import java.math.BigDecimal
 
 data class SykefraværsstatistikkBransje(
     override val årstall: Int,
     override val kvartal: Int,
-    val bransje: ArbeidsmiljøportalenBransje,
+    val bransje: Bransjer,
     override val antallPersoner: Int,
     override val tapteDagsverk: BigDecimal,
     override val muligeDagsverk: BigDecimal,
