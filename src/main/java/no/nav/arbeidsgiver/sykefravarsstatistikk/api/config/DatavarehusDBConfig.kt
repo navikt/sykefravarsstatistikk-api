@@ -1,51 +1,46 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.config;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.config
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import java.util.*
+import javax.sql.DataSource
 
-import javax.sql.DataSource;
-import java.util.Properties;
-
-@Slf4j
 @Configuration
-public class DatavarehusDBConfig {
+open class DatavarehusDBConfig {
+    @Value("\${datavarehus.datasource.url}")
+    private val databaseUrl: String? = null
 
-  @Value("${datavarehus.datasource.url}")
-  private String databaseUrl;
+    @Value("\${datavarehus.datasource.username}")
+    private val username: String? = null
 
-  @Value("${datavarehus.datasource.username}")
-  private String username;
+    @Value("\${datavarehus.datasource.password}")
+    private val password: String? = null
 
-  @Value("${datavarehus.datasource.password}")
-  private String password;
+    @Value("\${datavarehus.datasource.driver-class-name}")
+    private val driverClassName: String? = null
+    @Bean(name = ["datavarehusDS"])
+    open fun datavarehusDataSource(): DataSource {
+        val properties = Properties()
+        properties["dataSource.oracle.jdbc.fanEnabled"] = false
+        val config = HikariConfig(properties)
+        config.poolName = "Datavarehus-connection-pool"
+        config.jdbcUrl = databaseUrl
+        config.username = username
+        config.password = password
+        config.maximumPoolSize = 2
+        config.driverClassName = driverClassName
+        return HikariDataSource(config)
+    }
 
-  @Value("${datavarehus.datasource.driver-class-name}")
-  private String driverClassName;
-
-  @Bean(name = "datavarehusDS")
-  public DataSource datavarehusDataSource() {
-    Properties properties = new Properties();
-    properties.put("dataSource.oracle.jdbc.fanEnabled", false);
-    HikariConfig config = new HikariConfig(properties);
-    config.setPoolName("Datavarehus-connection-pool");
-    config.setJdbcUrl(databaseUrl);
-    config.setUsername(username);
-    config.setPassword(password);
-    config.setMaximumPoolSize(2);
-    config.setDriverClassName(driverClassName);
-
-    return new HikariDataSource(config);
-  }
-
-  @Bean(name = "datavarehusJdbcTemplate")
-  public NamedParameterJdbcTemplate datavarehusJdbcTemplate(
-      @Qualifier("datavarehusDS") DataSource dataSource) {
-    return new NamedParameterJdbcTemplate(dataSource);
-  }
+    @Bean(name = ["datavarehusJdbcTemplate"])
+    open fun datavarehusJdbcTemplate(
+        @Qualifier("datavarehusDS") dataSource: DataSource
+    ): NamedParameterJdbcTemplate {
+        return NamedParameterJdbcTemplate(dataSource)
+    }
 }
