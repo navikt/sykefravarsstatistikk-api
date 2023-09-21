@@ -1,6 +1,5 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.statistikk;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.statistikk
 
-@FunctionalInterface
-public interface BatchCreateSykefraværsstatistikkFunction {
-  int apply();
+fun interface BatchCreateSykefraværsstatistikkFunction {
+    fun apply(): Int
 }

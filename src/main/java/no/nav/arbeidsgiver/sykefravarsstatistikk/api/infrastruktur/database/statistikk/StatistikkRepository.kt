@@ -18,6 +18,8 @@ import java.util.concurrent.atomic.AtomicInteger
 class StatistikkRepository(
     @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate
 ) {
+    val INSERT_BATCH_STØRRELSE = 10000
+
     private val log = LoggerFactory.getLogger(this::class.java)
     fun hentSisteÅrstallOgKvartalForSykefraværsstatistikk(type: Statistikkilde): ÅrstallOgKvartal {
         val alleÅrstallOgKvartal = hentAlleÅrstallOgKvartalForSykefraværsstatistikk(type)
@@ -289,6 +291,7 @@ class StatistikkRepository(
         return antallOpprettet.get()
     }
 
+
     private fun slett(
         årstallOgKvartal: ÅrstallOgKvartal, deleteFunction: DeleteSykefraværsstatistikkFunction
     ): Int {
@@ -316,9 +319,5 @@ class StatistikkRepository(
                 beskrivelse, årstallOgKvartal.årstall, årstallOgKvartal.kvartal, importSize
             )
         )
-    }
-
-    companion object {
-        const val INSERT_BATCH_STØRRELSE = 10000
     }
 }
