@@ -11,11 +11,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.UUID;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.Konstanter.CORRELATION_ID_HEADER_NAME;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Component
 public class CorrelationIdFilter extends OncePerRequestFilter {
+
+  public static final String CORRELATION_ID_HEADER_NAME = "X-Correlation-ID";
   public static final String CORRELATION_ID_MDC_NAME = "correlationId";
 
   @Override

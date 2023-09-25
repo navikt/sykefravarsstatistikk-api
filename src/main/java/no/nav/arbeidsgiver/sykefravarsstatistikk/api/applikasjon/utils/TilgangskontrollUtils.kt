@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils
 
 import com.google.common.collect.ImmutableSet
-import lombok.extern.slf4j.Slf4j
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Fnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.InnloggetBruker
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.TilgangskontrollException
@@ -15,7 +14,6 @@ import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 import java.util.*
 
-@Slf4j
 @Component
 open class TilgangskontrollUtils @Autowired constructor(
     private val contextHolder: TokenValidationContextHolder, private val environment: Environment

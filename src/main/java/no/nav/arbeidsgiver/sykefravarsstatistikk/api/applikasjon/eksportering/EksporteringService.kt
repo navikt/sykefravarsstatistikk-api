@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
 
 @Component
+@Deprecated("Brukes bare av legacy Kafka-strøm, som skal fases ut.")
 class EksporteringService(
     private val eksporteringRepository: EksporteringRepository,
     private val virksomhetMetadataRepository: VirksomhetMetadataRepository,
@@ -73,6 +74,7 @@ class EksporteringService(
     }
 
     @Throws(KafkaUtsendingException::class)
+    @Deprecated("Brukes bare av legacy Kafka-strøm, som skal fases ut.")
     protected fun legacyEksporter(
         virksomheterTilEksport: List<VirksomhetEksportPerKvartal>, årstallOgKvartal: ÅrstallOgKvartal
     ): Int {

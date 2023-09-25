@@ -1,15 +1,12 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal.Companion.range
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.PubliseringsdatoerRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.statistikk.Importeringsobjekt
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.statistikk.StatistikkRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.slf4j.LoggerFactory
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
-import java.util.function.Consumer
 
 @Component
 class SykefraværsstatistikkImporteringService(
@@ -68,26 +65,6 @@ class SykefraværsstatistikkImporteringService(
         publiseringsdatoerRepository.oppdaterSisteImporttidspunkt(gjeldendeÅrstallOgKvartal)
     }
 
-    fun reimporterSykefraværsstatistikk(fra: ÅrstallOgKvartal?, til: ÅrstallOgKvartal?) {
-        range(fra!!, til!!).forEach(Consumer { årstallOgKvartal: ÅrstallOgKvartal ->
-            importerNyStatistikk(
-                årstallOgKvartal
-            )
-        })
-    }
-
-    fun reimporterSykefraværsstatistikk(
-        fra: ÅrstallOgKvartal?, til: ÅrstallOgKvartal?, importeringsobjekter: List<Importeringsobjekt>
-    ) {
-        range(fra!!, til!!)
-            .forEach(
-                Consumer { årstallOgKvartal: ÅrstallOgKvartal ->
-                    importerSpesifiserteTypeNyStatistikk(
-                        årstallOgKvartal,
-                        importeringsobjekter
-                    )
-                })
-    }
 
     fun kanImportStartes(
         årstallOgKvartalForSfsDb: List<ÅrstallOgKvartal>,
@@ -136,29 +113,6 @@ class SykefraværsstatistikkImporteringService(
                 sisteÅrstallOgKvartalForSykefraværsstatistikk.kvartal
             )
             false
-        }
-    }
-
-    private fun importerSpesifiserteTypeNyStatistikk(
-        årstallOgKvartal: ÅrstallOgKvartal, importeringsobjekter: List<Importeringsobjekt>
-    ) {
-        if (importeringsobjekter.contains(Importeringsobjekt.LAND)) {
-            importSykefraværsstatistikkLand(årstallOgKvartal)
-        }
-        if (importeringsobjekter.contains(Importeringsobjekt.SEKTOR)) {
-            importSykefraværsstatistikkSektor(årstallOgKvartal)
-        }
-        if (importeringsobjekter.contains(Importeringsobjekt.NÆRING)) {
-            importSykefraværsstatistikkNæring(årstallOgKvartal)
-        }
-        if (importeringsobjekter.contains(Importeringsobjekt.NÆRING_5_SIFFER)) {
-            importSykefraværsstatistikkNæring5siffer(årstallOgKvartal)
-        }
-        if (importeringsobjekter.contains(Importeringsobjekt.VIRKSOMHET)) {
-            importSykefraværsstatistikkVirksomhet(årstallOgKvartal)
-        }
-        if (importeringsobjekter.contains(Importeringsobjekt.GRADERING)) {
-            importSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal)
         }
     }
 
