@@ -1,5 +1,5 @@
-name: Build and deploy
-run-name: Build and deploy || ${{ github.event.head_commit.message }}
+name: Build and deploy app
+run-name: Build and deploy app ~~ "${{ github.event.head_commit.message }}"
 on:
   push:
     branches:
@@ -68,44 +68,4 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           RESOURCE: nais/prod.yaml
 
-  deployTopicsToDev:
-    name: Deploy topics to dev
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/sektors'
-    steps:
-      - uses: actions/checkout@v3
-      - name: Deploy topics to dev-fss
-        uses: nais/deploy/actions/deploy@v1
-        env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: dev-gcp
-          RESOURCE: "\
-            nais/topics/topic-arbeidsgiver-sykefravaer-dev.yaml,\
-            nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-dev.yaml,\
-            nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-virksomhet-dev.yaml,\
-            nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-naring-dev.yaml,\
-            nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-sektor-dev.yaml,\
-            nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-bransje-dev.yaml,\
-            nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-metadata-virksomhet-dev.yaml,\
-            nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-naringskode-dev.yaml"
 
-  deployTopicsToProd:
-    name: Deploy topics to prod
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - uses: actions/checkout@v3
-      - name: Deploy topics to prod-fss
-        uses: nais/deploy/actions/deploy@v1
-        env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: prod-gcp
-          RESOURCE: "\
-            nais/topics/topic-arbeidsgiver-sykefravaer-prod.yaml,\
-            nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-prod.yaml,\
-            nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-virksomhet-prod.yaml,\
-            nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-naring-prod.yaml,\
-            nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-sektor-prod.yaml,\
-            nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-bransje-prod.yaml,\
-            nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-metadata-virksomhet-prod.yaml,\
-            nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-naringskode-prod.yaml"
