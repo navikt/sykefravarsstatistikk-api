@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - DEV_BRANCH
+      - eksport_enkeltkvartal
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
