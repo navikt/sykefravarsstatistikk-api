@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.statistikk
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sykefraværsstatistikk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
@@ -8,10 +8,9 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils
 import java.util.*
 
-class SykefraværsstatistikkSektorUtils(namedParameterJdbcTemplate: NamedParameterJdbcTemplate?) :
-    SykefraværsstatistikkIntegrasjon(
-        namedParameterJdbcTemplate!!
-    ), SykefraværsstatistikkIntegrasjonUtils {
+class SykefraværsstatistikkVirksomhetUtils(
+    namedParameterJdbcTemplate: NamedParameterJdbcTemplate?
+) : SykefraværsstatistikkIntegrasjon(namedParameterJdbcTemplate!!), SykefraværsstatistikkIntegrasjonUtils {
     override fun getDeleteFunction(): DeleteSykefraværsstatistikkFunction {
         return DeleteSykefraværsstatistikkFunction { (årstall, kvartal): ÅrstallOgKvartal ->
             val namedParameters: SqlParameterSource = MapSqlParameterSource()
@@ -19,7 +18,7 @@ class SykefraværsstatistikkSektorUtils(namedParameterJdbcTemplate: NamedParamet
                 .addValue(KVARTAL, kvartal)
             val antallSlettet = namedParameterJdbcTemplate.update(
                 String.format(
-                    "delete from sykefravar_statistikk_sektor where arstall = :%s and kvartal = :%s",
+                    "delete from sykefravar_statistikk_virksomhet where arstall = :%s and kvartal = :%s",
                     ARSTALL, KVARTAL
                 ),
                 namedParameters
@@ -33,10 +32,12 @@ class SykefraværsstatistikkSektorUtils(namedParameterJdbcTemplate: NamedParamet
             val batch =
                 SqlParameterSourceUtils.createBatch(*statistikk.toTypedArray<Sykefraværsstatistikk?>())
             val results = namedParameterJdbcTemplate.batchUpdate(
-                "insert into sykefravar_statistikk_sektor "
-                        + "(arstall, kvartal, sektor_kode, antall_personer, tapte_dagsverk, mulige_dagsverk) "
+                "insert into sykefravar_statistikk_virksomhet "
+                        + "(arstall, kvartal, orgnr, varighet, rectype, "
+                        + "antall_personer, tapte_dagsverk, mulige_dagsverk)  "
                         + "values "
-                        + "(:årstall, :kvartal, :sektorkode, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
+                        + "(:årstall, :kvartal, :orgnr, :varighet, :rectype, "
+                        + ":antallPersoner, :tapteDagsverk, :muligeDagsverk)",
                 batch
             )
             Arrays.stream(results).sum()

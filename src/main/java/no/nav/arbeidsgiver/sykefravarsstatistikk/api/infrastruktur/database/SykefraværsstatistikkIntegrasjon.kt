@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.statistikk
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 

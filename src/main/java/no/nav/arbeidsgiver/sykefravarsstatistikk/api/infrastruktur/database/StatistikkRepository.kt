@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.statistikk
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import com.google.common.collect.Lists
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
