@@ -7,7 +7,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.
 data class Bransje(
     val type: Bransjer,
 ) {
-
     val navn = type.navn
     val identifikatorer = type.næringskoder
 
@@ -24,19 +23,12 @@ data class Bransje(
         return inkludererNæringskode(underenhet.næringskode)
     }
 
-    private fun inkludererNæringskode(næringskode: Næringskode): Boolean {
-        return identifikatorer.stream().anyMatch { prefix: String? ->
-            næringskode.femsifferIdentifikator.startsWith(prefix!!)
+    fun inkludererNæringskode(næringskode: Næringskode?): Boolean {
+        if (næringskode == null) {
+            return false
         }
-    }
-
-    fun inkludererNæringskode(næringskode5Siffer: String?): Boolean {
-        return if (næringskode5Siffer == null) {
-            false
-        } else identifikatorer.stream().anyMatch { prefix: String? ->
-            næringskode5Siffer.startsWith(
-                prefix!!
-            )
+        return identifikatorer.any {
+            næringskode.femsifferIdentifikator.startsWith(it)
         }
     }
 }

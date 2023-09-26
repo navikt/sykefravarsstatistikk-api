@@ -25,7 +25,6 @@ import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.AssertUtils.assertBi
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.parametreForStatistikk;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.statistikk.StatistikkRepository.INSERT_BATCH_STØRRELSE;
 import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -77,7 +76,7 @@ public class StatistikkRepositoryJdbcTest {
     list.add(statistikkMedVarighet);
 
     statistikkRepository.batchOpprettSykefraværsstatistikkNæringMedVarighet(
-        list, INSERT_BATCH_STØRRELSE);
+        list, statistikkRepository.getINSERT_BATCH_STØRRELSE());
 
     List<UmaskertSykefraværForEttKvartalMedVarighet> resultList =
         hentSykefraværprosentNæringMedVarighet();
@@ -114,7 +113,7 @@ public class StatistikkRepositoryJdbcTest {
     list.add(gradertSykemelding);
 
     statistikkRepository.batchOpprettSykefraværsstatistikkVirksomhetMedGradering(
-        list, INSERT_BATCH_STØRRELSE);
+        list, statistikkRepository.getINSERT_BATCH_STØRRELSE());
 
     List<UmaskertSykefraværForEttKvartal> resultList = hentSykefraværprosentMedGradering();
     Assertions.assertThat(resultList.size()).isEqualTo(1);

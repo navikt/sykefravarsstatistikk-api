@@ -5,6 +5,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.
 interface SykefraværsstatistikkIntegrasjonUtils {
     fun getDeleteFunction(): DeleteSykefraværsstatistikkFunction
     fun getBatchCreateFunction(
-        list: List<Sykefraværsstatistikk>
+        statistikk: List<Sykefraværsstatistikk>
     ): BatchCreateSykefraværsstatistikkFunction
 }

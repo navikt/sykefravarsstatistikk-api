@@ -7,7 +7,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaCl
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +17,7 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Component
+@Deprecated
 public class EksporteringServiceUtils {
 
   public static final int OPPDATER_VIRKSOMHETER_SOM_ER_EKSPORTERT_BATCH_STØRRELSE = 1000;
@@ -88,56 +88,6 @@ public class EksporteringServiceUtils {
     return virksomheterMetadata;
   }
 
-  public static long getAntallSomKanEksporteres(
-      List<VirksomhetEksportPerKvartal> virksomhetEksportPerKvartal) {
-    return virksomhetEksportPerKvartal.stream().filter(v -> !v.eksportert()).count();
-  }
-
-  // TODO: er denne bare til test?
-  public static VirksomhetMetadata getVirksomhetMetada(
-      Orgnr orgnr, List<VirksomhetMetadata> virksomhetMetadataSet) {
-    List<VirksomhetMetadata> virksomhetMetadataFunnet =
-        virksomhetMetadataSet.stream()
-            .filter(v -> v.getOrgnr().equals(orgnr.getVerdi()))
-            .toList();
-
-    if (virksomhetMetadataFunnet.size() != 1) {
-      return null;
-    } else {
-      return virksomhetMetadataFunnet.get(0);
-    }
-  }
-
-  // TODO: bare brukt til tests?
-  public static VirksomhetSykefravær getVirksomhetSykefravær(
-      VirksomhetMetadata virksomhetMetadata,
-      List<SykefraværsstatistikkVirksomhetUtenVarighet>
-          sykefraværsstatistikkVirksomhetUtenVarighet) {
-    SykefraværsstatistikkVirksomhetUtenVarighet sfStatistikk =
-        sykefraværsstatistikkVirksomhetUtenVarighet.stream()
-            .filter(
-                v ->
-                    v.getOrgnr().equals(virksomhetMetadata.getOrgnr())
-                        && v.getårstall() == virksomhetMetadata.getÅrstall()
-                        && v.getKvartal() == virksomhetMetadata.getKvartal())
-            .collect(
-                toSingleton(
-                    new SykefraværsstatistikkVirksomhetUtenVarighet(
-                        virksomhetMetadata.getÅrstall(),
-                        virksomhetMetadata.getKvartal(),
-                        virksomhetMetadata.getOrgnr(),
-                        0,
-                        BigDecimal.ZERO,
-                        BigDecimal.ZERO)));
-
-    return new VirksomhetSykefravær(
-        virksomhetMetadata.getOrgnr(),
-            virksomhetMetadata.getNavn(),
-        new ÅrstallOgKvartal(virksomhetMetadata.getÅrstall(), virksomhetMetadata.getKvartal()),
-            sfStatistikk.getTapteDagsverk(),
-            sfStatistikk.getMuligeDagsverk(),
-            sfStatistikk.getAntallPersoner());
-  }
 
   public static VirksomhetSykefravær getVirksomhetSykefravær(
       VirksomhetMetadata virksomhetMetadata,

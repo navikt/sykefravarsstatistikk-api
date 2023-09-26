@@ -3,12 +3,10 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import lombok.extern.slf4j.Slf4j
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.Statistikkfeil
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-@Slf4j
 object StatistikkUtils {
     /**
      * Source of trouth for kalkulering av sykefraværsprosent basert på tapte dagsverk og mulige

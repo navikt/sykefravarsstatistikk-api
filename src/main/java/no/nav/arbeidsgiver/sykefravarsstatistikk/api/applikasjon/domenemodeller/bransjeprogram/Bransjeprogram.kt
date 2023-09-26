@@ -15,6 +15,6 @@ object Bransjeprogram {
     fun finnBransje(næringskode: Næringskode?): Optional<Bransje> =
         Optional.ofNullable(alleBransjer.firstOrNull
         {
-            it.inkludererNæringskode(næringskode?.femsifferIdentifikator)
+            it.inkludererNæringskode(næringskode)
         })
 }

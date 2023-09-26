@@ -29,7 +29,8 @@ import java.math.BigDecimal
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class, LocalOgUnitTestOidcConfiguration::class])
 open class GraderingRepositoryJdbcTest {
     @Autowired
-    private val jdbcTemplate: NamedParameterJdbcTemplate? = null
+    private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
+
     private var graderingRepository: GraderingRepository? = null
 
     @BeforeEach
