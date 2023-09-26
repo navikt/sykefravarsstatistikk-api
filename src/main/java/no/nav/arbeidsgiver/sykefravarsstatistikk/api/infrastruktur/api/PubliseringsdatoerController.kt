@@ -14,6 +14,6 @@ class PubliseringsdatoerController(private val publiseringsdatoerService: Publis
     fun hentPubliseringsdatoInfo(): Publiseringsdatoer {
         return publiseringsdatoerService
             .hentPubliseringsdatoer()
-            .getOrElseThrow { PubliseringsdatoerDatauthentingFeil("Klarte ikke hente publiseringsdatoer, prøv igjen senere") }
+            ?: throw PubliseringsdatoerDatauthentingFeil("Klarte ikke hente publiseringsdatoer, prøv igjen senere")
     }
 }

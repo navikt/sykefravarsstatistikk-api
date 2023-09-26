@@ -1,102 +1,90 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.when;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PubliseringsdatoerService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImporttidspunktDto
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.PubliseringsdatoDbDto
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Publiseringsdatoer
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.PubliseringsdatoerRepository
+import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.junit.jupiter.MockitoExtension
+import java.sql.Date
+import java.sql.Timestamp
+import java.time.LocalDateTime
 
-import io.vavr.control.Option;
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.List;
+@ExtendWith(MockitoExtension::class)
+internal class PubliseringsdatoerServiceTest {
+    private val publiseringsdatoer = listOf(
+        PubliseringsdatoDbDto(
+            202201,
+            Date.valueOf("2022-06-02"),
+            Date.valueOf("2021-11-01"),
+            "Sykefravær pr 1. kvartal 2022"
+        ),
+        PubliseringsdatoDbDto(
+            202104,
+            Date.valueOf("2022-03-03"),
+            Date.valueOf("2021-11-01"),
+            "Sykefravær pr 4. kvartal 2021"
+        ),
+        PubliseringsdatoDbDto(
+            202203,
+            Date.valueOf("2022-12-01"),
+            Date.valueOf("2021-11-01"),
+            "Sykefravær pr 3. kvartal 2022"
+        ),
+        PubliseringsdatoDbDto(
+            202202,
+            Date.valueOf("2022-09-08"),
+            Date.valueOf("2021-11-01"),
+            "Sykefravær pr 2. kvartal 2022"
+        )
+    )
+    private var serviceUnderTest: PubliseringsdatoerService? = null
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PubliseringsdatoerService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Publiseringsdatoer;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImporttidspunktDto;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.PubliseringsdatoDbDto;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.PubliseringsdatoerRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+    @Mock
+    private val mockPubliseringsdatoerRepository: PubliseringsdatoerRepository? = null
+    @BeforeEach
+    fun setUp() {
+        serviceUnderTest = PubliseringsdatoerService(mockPubliseringsdatoerRepository!!)
+    }
 
-@ExtendWith(MockitoExtension.class)
-class PubliseringsdatoerServiceTest {
+    @AfterEach
+    fun tearDown() {
+        Mockito.reset(mockPubliseringsdatoerRepository)
+    }
 
-  private final List<PubliseringsdatoDbDto> publiseringsdatoer =
-      List.of(
-          new PubliseringsdatoDbDto(
-              202201,
-              Date.valueOf("2022-06-02"),
-              Date.valueOf("2021-11-01"),
-              "Sykefravær pr 1. kvartal 2022"),
-          new PubliseringsdatoDbDto(
-              202104,
-              Date.valueOf("2022-03-03"),
-              Date.valueOf("2021-11-01"),
-              "Sykefravær pr 4. kvartal 2021"),
-          new PubliseringsdatoDbDto(
-              202203,
-              Date.valueOf("2022-12-01"),
-              Date.valueOf("2021-11-01"),
-              "Sykefravær pr 3. kvartal 2022"),
-          new PubliseringsdatoDbDto(
-              202202,
-              Date.valueOf("2022-09-08"),
-              Date.valueOf("2021-11-01"),
-              "Sykefravær pr 2. kvartal 2022"));
-  private PubliseringsdatoerService serviceUnderTest;
-  @Mock private PubliseringsdatoerRepository mockPubliseringsdatoerRepository;
+    @Test
+    fun hentPubliseringsdatoer_nårPubliseringHarSkjeddSomPlanlagt_publiseringsdatoerErRiktige() {
+        val sisteImporttidspunkt = ImporttidspunktDto(
+            Timestamp.valueOf(LocalDateTime.of(2022, 9, 8, 8, 0)),
+            ÅrstallOgKvartal(2022, 2)
+        )
+        Mockito.`when`(mockPubliseringsdatoerRepository!!.hentSisteImporttidspunkt())
+            .thenReturn(sisteImporttidspunkt)
+        Mockito.`when`(mockPubliseringsdatoerRepository.hentPubliseringsdatoer()).thenReturn(publiseringsdatoer)
+        val faktiskeDatoer = serviceUnderTest!!.hentPubliseringsdatoer()
+        val forventet = Publiseringsdatoer("2022-09-08", "2022-12-01", ÅrstallOgKvartal(2022, 2))
+        Assertions.assertThat(faktiskeDatoer).isEqualTo(forventet)
+    }
 
-  @BeforeEach
-  void setUp() {
-    serviceUnderTest = new PubliseringsdatoerService(mockPubliseringsdatoerRepository);
-  }
-
-  @AfterEach
-  void tearDown() {
-    reset(mockPubliseringsdatoerRepository);
-  }
-
-  @Test
-  void hentPubliseringsdatoer_nårPubliseringHarSkjeddSomPlanlagt_publiseringsdatoerErRiktige() {
-    final Option<ImporttidspunktDto> sisteImporttidspunkt =
-        Option.of(
-            new ImporttidspunktDto(
-                Timestamp.valueOf(LocalDateTime.of(2022, 9, 8, 8, 0)),
-                new ÅrstallOgKvartal(2022, 2)));
-
-    when(mockPubliseringsdatoerRepository.hentSisteImporttidspunkt())
-        .thenReturn(sisteImporttidspunkt);
-    when(mockPubliseringsdatoerRepository.hentPubliseringsdatoer()).thenReturn(publiseringsdatoer);
-
-    Publiseringsdatoer faktiskeDatoer = serviceUnderTest.hentPubliseringsdatoer().get();
-    Publiseringsdatoer forventet =
-        new Publiseringsdatoer("2022-09-08", "2022-12-01", new ÅrstallOgKvartal(2022, 2));
-
-    assertThat(faktiskeDatoer).isEqualTo(forventet);
-  }
-
-  @Test
-  void
-      hentPubliseringsdatoer_nårPubliseringSkjerEnDagForSent_returnererKorrektDatoForForrigePubliseringIstedenforPlanlagtDato() {
-    final Option<ImporttidspunktDto> enDagEtterPlanlagtImport =
-        Option.of(
-            new ImporttidspunktDto(
-                Timestamp.valueOf(LocalDateTime.of(2022, 6, 3, 8, 0)),
-                new ÅrstallOgKvartal(2022, 1)));
-
-    when(mockPubliseringsdatoerRepository.hentSisteImporttidspunkt())
-        .thenReturn(enDagEtterPlanlagtImport);
-    when(mockPubliseringsdatoerRepository.hentPubliseringsdatoer()).thenReturn(publiseringsdatoer);
-
-    Publiseringsdatoer faktiskeDatoer = serviceUnderTest.hentPubliseringsdatoer().get();
-    Publiseringsdatoer forventet =
-        new Publiseringsdatoer("2022-06-03", "2022-09-08", new ÅrstallOgKvartal(2022, 1));
-
-    assertThat(faktiskeDatoer).isEqualTo(forventet);
-  }
+    @Test
+    fun hentPubliseringsdatoer_nårPubliseringSkjerEnDagForSent_returnererKorrektDatoForForrigePubliseringIstedenforPlanlagtDato() {
+        val enDagEtterPlanlagtImport = ImporttidspunktDto(
+            Timestamp.valueOf(LocalDateTime.of(2022, 6, 3, 8, 0)),
+            ÅrstallOgKvartal(2022, 1)
+        )
+        Mockito.`when`(mockPubliseringsdatoerRepository!!.hentSisteImporttidspunkt())
+            .thenReturn(enDagEtterPlanlagtImport)
+        Mockito.`when`(mockPubliseringsdatoerRepository.hentPubliseringsdatoer()).thenReturn(publiseringsdatoer)
+        val faktiskeDatoer = serviceUnderTest!!.hentPubliseringsdatoer()
+        val forventet = Publiseringsdatoer("2022-06-03", "2022-09-08", ÅrstallOgKvartal(2022, 1))
+        Assertions.assertThat(faktiskeDatoer).isEqualTo(forventet)
+    }
 }
