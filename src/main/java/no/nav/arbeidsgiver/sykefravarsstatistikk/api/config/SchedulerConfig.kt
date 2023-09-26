@@ -17,13 +17,13 @@ import javax.sql.DataSource
 open class SchedulerConfig {
     @Bean
     open fun lockProvider(
-        @Qualifier("sykefravarsstatistikkDataSource") dataSource: DataSource?
+        @Qualifier("sykefravarsstatistikkDataSource") dataSource: DataSource
     ): LockProvider {
         return JdbcTemplateLockProvider(dataSource)
     }
 
     @Bean
-    open fun lockingTaskExecutor(lockProvider: LockProvider?): LockingTaskExecutor {
+    open fun lockingTaskExecutor(lockProvider: LockProvider): LockingTaskExecutor {
         return DefaultLockingTaskExecutor(lockProvider)
     }
 }
