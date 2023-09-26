@@ -9,7 +9,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PostImportering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringService
 import org.slf4j.LoggerFactory
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.time.Duration
 import java.time.Instant
@@ -31,8 +30,8 @@ class EksportAvEnkeltkvartalerScheduler(
         noeFeilet = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
     }
 
-    // TODO: Fjern scheduleringen etter at jobben har kjørt ÉN gang
-    @Scheduled(fixedDelay = Long.MAX_VALUE, initialDelay = 60*1000)
+    // Fjern scheduleringen etter at jobben har kjørt ÉN gang
+    //@Scheduled(fixedDelay = Long.MAX_VALUE, initialDelay = 60*1000)
     fun scheduledImporteringOgEksportering() {
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
