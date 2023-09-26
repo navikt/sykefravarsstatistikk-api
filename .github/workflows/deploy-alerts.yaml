@@ -1,25 +1,26 @@
-name: Deploy alerts to NAIS
+name: Deploy alerts
+run-name: Deploy alerts ~~ "${{ github.event.head_commit.message }}"
 on:
   push:
-    branches:
-      - master
     paths:
       - 'nais/alerts.yaml'
       - '.github/workflows/deploy-alerts.yaml'
 jobs:
   apply-alerts:
-    name: Apply alerts to cluster
+    name: Deploy alerts
     runs-on: ubuntu-latest
+    timeout-minutes: 2
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: deploy to dev-fss
+      - name: Deploy alerts to dev-fss
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: nais/alerts.yaml
-      - name: deploy to prod-fss
+      - name: Deploy alerts to prod-fss
+        if: github.ref == 'refs/heads/master'
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
