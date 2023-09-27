@@ -6,6 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.Publiseringsdat
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
 import org.slf4j.LoggerFactory
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.time.Duration
 import java.time.Instant
@@ -21,6 +22,7 @@ class FjernStatistikkEldreEnnFemÅrScheduler(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     //@Scheduled(cron = "0 0 0 0 1 ?") // månedlig kjøring
+    @Scheduled(cron = "0 0 11 27 9 2023")
     fun jobb() {
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
@@ -41,6 +43,6 @@ class FjernStatistikkEldreEnnFemÅrScheduler(
         log.info("Slettet $antallSlettetStatistikkVirksomhet rader fra sykefravar_statistikk_virksomhet")
 
         val antallSlettetStatistikkVirksomhetGradering = sykefravarStatistikkVirksomhetGraderingRepository.slettDataEldreEnn(femÅrSiden)
-        log.info("Slette $antallSlettetStatistikkVirksomhetGradering rader fra sykefravar_statistikk_virksomhet_med_gradering")
+        log.info("Slettet $antallSlettetStatistikkVirksomhetGradering rader fra sykefravar_statistikk_virksomhet_med_gradering")
     }
 }
