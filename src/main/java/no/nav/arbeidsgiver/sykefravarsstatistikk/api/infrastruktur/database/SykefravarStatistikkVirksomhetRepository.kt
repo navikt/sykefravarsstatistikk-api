@@ -17,11 +17,10 @@ class SykefravarStatistikkVirksomhetRepository(override val database: Database) 
     val tapteDagsverk = float("tapte_dagsverk")
     val muligeDagsverk = float("mulige_dagsverk")
 
-    fun slettDataEldreEnn(årstallOgKvartal: ÅrstallOgKvartal) {
-        transaction {
+    fun slettDataEldreEnn(årstallOgKvartal: ÅrstallOgKvartal): Int {
+        return transaction {
             deleteWhere {
-                årstall less årstallOgKvartal.årstall or
-                        ((årstall eq årstallOgKvartal.årstall) and (kvartal less årstallOgKvartal.kvartal))
+                årstall less årstallOgKvartal.årstall or ((årstall eq årstallOgKvartal.årstall) and (kvartal less årstallOgKvartal.kvartal))
             }
         }
     }
