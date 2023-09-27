@@ -2,11 +2,11 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import io.kotest.matchers.collections.shouldHaveSize
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -20,9 +20,9 @@ import org.springframework.test.context.ContextConfiguration
 @ExtendWith(org.springframework.test.context.junit.jupiter.SpringExtension::class)
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
-open class SykefravarStatistikkVirksomhetRepositoryTest {
+open class SykefravarStatistikkVirksomhetGraderingRepositoryTest {
     @Autowired
-    private lateinit var repo: SykefravarStatistikkVirksomhetRepository
+    private lateinit var repo: SykefravarStatistikkVirksomhetGraderingRepository
 
     val dummyKvartal = ÅrstallOgKvartal(2023, 2)
 
@@ -52,15 +52,19 @@ open class SykefravarStatistikkVirksomhetRepositoryTest {
         repo.hentAlt() shouldHaveSize 0
     }
 
-    private fun SykefravarStatistikkVirksomhetRepository.slettAlt() {
+    private fun SykefravarStatistikkVirksomhetGraderingRepository.slettAlt() {
         transaction {
             deleteAll()
         }
     }
 
-    private fun SykefravarStatistikkVirksomhetRepository.settInn(
+    private fun SykefravarStatistikkVirksomhetGraderingRepository.settInn(
         årstallOgKvartal: ÅrstallOgKvartal,
         orgnr: String = "999999999",
+        næringskode: Næringskode = Næringskode("99999"),
+        antallGraderteSykemeldinger: Int = 10,
+        tapteDagsverkGradertSykemelding: Float = 5f,
+        antallSykemeldinger: Int = 10,
         antallPersoner: Int = 10,
         tapteDagsverk: Float = 5f,
         muligeDagsverk: Float = 100f,
@@ -68,8 +72,13 @@ open class SykefravarStatistikkVirksomhetRepositoryTest {
         transaction {
             insert {
                 it[this.orgnr] = orgnr
+                it[this.næring] = næringskode.næring.tosifferIdentifikator
+                it[this.næringskode] = næringskode.femsifferIdentifikator
                 it[this.årstall] = årstallOgKvartal.årstall
                 it[this.kvartal] = årstallOgKvartal.kvartal
+                it[this.antallGraderteSykemeldinger] = antallGraderteSykemeldinger
+                it[this.tapteDagsverkGradertSykemelding] = tapteDagsverkGradertSykemelding
+                it[this.antallSykemeldinger] = antallSykemeldinger
                 it[this.antallPersoner] = antallPersoner
                 it[this.tapteDagsverk] = tapteDagsverk
                 it[this.muligeDagsverk] = muligeDagsverk
@@ -77,12 +86,11 @@ open class SykefravarStatistikkVirksomhetRepositoryTest {
         }
     }
 
-    private fun SykefravarStatistikkVirksomhetRepository.hentAlt(): List<ÅrstallOgKvartal> {
-        return transaction(database) {
+    private fun SykefravarStatistikkVirksomhetGraderingRepository.hentAlt(): List<ÅrstallOgKvartal> {
+        return org.jetbrains.exposed.sql.transactions.transaction(database) {
             selectAll().map {
                 ÅrstallOgKvartal(it[årstall], it[kvartal])
             }
         }
     }
 }
-

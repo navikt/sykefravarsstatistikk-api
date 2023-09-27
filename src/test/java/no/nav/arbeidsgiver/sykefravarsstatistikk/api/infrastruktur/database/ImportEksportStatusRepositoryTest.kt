@@ -50,7 +50,7 @@ open class ImportEksportStatusRepositoryTest {
     }
 
     private fun ImportEksportStatusRepository.slettAlt() {
-        transaction(database) {
+        transaction {
             deleteAll()
         }
     }
