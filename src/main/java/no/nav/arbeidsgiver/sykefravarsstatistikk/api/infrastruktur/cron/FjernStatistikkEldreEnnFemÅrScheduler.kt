@@ -16,8 +16,7 @@ class FjernStatistikkEldreEnnFemÅrScheduler(
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    // Fjern scheduleringen etter at jobben har kjørt ÉN gang
-    //@Scheduled(fixedDelay = Long.MAX_VALUE, initialDelay = 60*1000)
+    //@Scheduled(cron = "0 0 0 0 1 ?") // månedlig kjøring
     fun jobb() {
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
