@@ -15,6 +15,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.InternalC
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.OrganisasjonerController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.SykefraværshistorikkController;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.EksportAvEnkeltkvartalerScheduler;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.FjernStatistikkEldreEnnFemÅrScheduler;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImporteringScheduler;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient;
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient;
@@ -56,6 +57,7 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
             PrometheusMetrics.class,
             KafkaClient.class,
             EksportAvEnkeltkvartalerScheduler.class,
+            FjernStatistikkEldreEnnFemÅrScheduler.class,
           })
     })
 public class AppConfigForJdbcTesterConfig extends JdbcRepositoryConfigExtension {}

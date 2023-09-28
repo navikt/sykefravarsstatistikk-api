@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - eksport_enkeltkvartal
+      - slett-historikk-som-er-5-år-gammel
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

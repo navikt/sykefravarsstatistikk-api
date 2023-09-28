@@ -2,7 +2,10 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon
 
 import io.vavr.control.Option
 import io.vavr.control.Try
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.PubliseringsdatoDbDto
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Publiseringsdatoer
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.PubliseringsdatoerDatauthentingFeil
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.PubliseringsdatoerRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -15,21 +18,19 @@ class PubliseringsdatoerService(private val publiseringsdatoerRepository: Publis
     private val log = LoggerFactory.getLogger(this::class.java)
 
     fun hentSistePubliserteKvartal(): ÅrstallOgKvartal {
-        return publiseringsdatoerRepository.hentSisteImporttidspunkt()
-            .getOrElseThrow { PubliseringsdatoerDatauthentingFeil("Kunne ikke hente ut siste publiseringstidspunkt") }
-            .gjeldendePeriode
+        return publiseringsdatoerRepository.hentSisteImporttidspunkt()?.gjeldendePeriode
+            ?: throw PubliseringsdatoerDatauthentingFeil("Kunne ikke hente ut siste publiseringstidspunkt")
     }
 
-    fun hentPubliseringsdatoer(): Option<Publiseringsdatoer> {
+    fun hentPubliseringsdatoer(): Publiseringsdatoer? {
         val publiseringsdatoer = publiseringsdatoerRepository.hentPubliseringsdatoer()
         return publiseringsdatoerRepository
-            .hentSisteImporttidspunkt()
-            .map { forrigeImport: ImporttidspunktDto ->
+            .hentSisteImporttidspunkt()?.let {
                 Publiseringsdatoer(
-                    sistePubliseringsdato = forrigeImport.importertDato.toString(),
-                    gjeldendePeriode = forrigeImport.gjeldendePeriode,
-                    nestePubliseringsdato = finnNestePubliseringsdato(publiseringsdatoer, forrigeImport.importertDato)
-                        .map { it.toString() }
+                    sistePubliseringsdato = it.importertDato.toString(),
+                    gjeldendePeriode = it.gjeldendePeriode,
+                    nestePubliseringsdato = finnNestePubliseringsdato(publiseringsdatoer, it.importertDato)
+                        .map { localDate -> localDate.toString() }
                         .getOrElse("Neste publiseringsdato er utilgjengelig")
                 )
             }

@@ -1,7 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import io.vavr.control.Option
-import io.vavr.control.Try
 import lombok.extern.slf4j.Slf4j
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImporttidspunktDto
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.PubliseringsdatoDbDto
@@ -80,22 +78,15 @@ class PubliseringsdatoerRepository(
         log.info("Opprettet $updatedRows rader")
     }
 
-    fun hentSisteImporttidspunkt(): Option<ImporttidspunktDto> {
-        return Try.of { hentSisteImporttidspunktFraDb() }
-            .onFailure { feil: Throwable -> log.error("Klarte ikke hente ut siste importtidspunkt: $feil") }
-            .toOption()
-    }
-
-    private fun hentSisteImporttidspunktFraDb(): ImporttidspunktDto {
+    fun hentSisteImporttidspunkt(): ImporttidspunktDto? {
         return jdbcTemplate
             .query(
-                "select * from importtidspunkt order by importert desc " + "fetch first 1 rows only",
-                HashMap<String, Any?>()
-            ) { rs: ResultSet, _: Int ->
+                "select * from importtidspunkt order by importert desc fetch first 1 rows only",
+            ) { resultSet: ResultSet, _: Int ->
                 ImporttidspunktDto(
-                    rs.getTimestamp("importert"),
-                    ÅrstallOgKvartal(rs.getInt("aarstall"), rs.getInt("kvartal"))
+                    resultSet.getTimestamp("importert"),
+                    ÅrstallOgKvartal(resultSet.getInt("aarstall"), resultSet.getInt("kvartal"))
                 )
-            }[0]
+            }.getOrNull(0)
     }
 }
