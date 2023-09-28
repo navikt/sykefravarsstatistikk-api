@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.2</version>
+        <version>3.1.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -24,24 +24,35 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <kotlin.version>1.9.0</kotlin.version>
         <!-- versjon til avhengigheter -->
-        <token-support.version>3.1.2</token-support.version>
+        <token-support.version>3.1.5</token-support.version>
         <altinn-rettigheter-proxy-klient.version>3.1.0</altinn-rettigheter-proxy-klient.version>
-        <micrometer.version>1.11.2</micrometer.version>
+        <micrometer.version>1.11.4</micrometer.version>
         <prometheus.version>0.16.0</prometheus.version>
-        <wiremock.version>3.0.0-beta-10</wiremock.version>
-        <shedlock.version>5.6.0</shedlock.version>
+        <wiremock.version>3.0.1</wiremock.version>
+        <shedlock.version>5.8.0</shedlock.version>
         <shedlock.shedlock-provider-jdbc-template.version>4.33.0
         </shedlock.shedlock-provider-jdbc-template.version>
         <no.nav.common-log.version>2.2023.01.10_13.49-81ddc732df3a</no.nav.common-log.version>
         <net.minidev.json-smart.version>2.5.0</net.minidev.json-smart.version>
-        <com.nimbusds.nimbus-jose-jwt.version>9.31</com.nimbusds.nimbus-jose-jwt.version>
+        <com.nimbusds.nimbus-jose-jwt.version>9.35</com.nimbusds.nimbus-jose-jwt.version>
         <com.papertrailapp.logback-syslog4j.version>1.0.0</com.papertrailapp.logback-syslog4j.version>
         <com.squareup.okhttp3.version>5.0.0-alpha.11</com.squareup.okhttp3.version>
         <no.nav.vault-jdbc.version>1.3.10</no.nav.vault-jdbc.version>
         <com.oracle.ojdbc.ojdbc8.version>19.3.0.0</com.oracle.ojdbc.ojdbc8.version>
-        <com.h2database.h2.version>2.2.220</com.h2database.h2.version>
+        <com.h2database.h2.version>2.2.224</com.h2database.h2.version>
         <org.apache.logging.log4j.version>3.0.0-alpha1</org.apache.logging.log4j.version>
-        <jetbrainsExposedVersion>0.42.0</jetbrainsExposedVersion>
+        <jetbrainsExposedVersion>0.44.0</jetbrainsExposedVersion>
+        <kotest-assertions-core-jvm.version>5.7.2</kotest-assertions-core-jvm.version>
+        <mockk-jvm.version>1.13.8</mockk-jvm.version>
+        <flyway-maven-plugin.version>9.22.2</flyway-maven-plugin.version>
+        <ia-felles.version>0.0.5</ia-felles.version>
+        <springdoc-openapi-starter-webmvc-ui.version>2.2.0</springdoc-openapi-starter-webmvc-ui.version>
+        <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
+        <vavr.version>1.0.0-alpha-4</vavr.version>
+        <mockito-kotlin.version>5.1.0</mockito-kotlin.version>
+        <kotlinx-coroutines-core-jvm.version>1.7.3</kotlinx-coroutines-core-jvm.version>
+        <json-unit-assertj.version>3.2.2</json-unit-assertj.version>
+        <arrow-core.version>1.2.1</arrow-core.version>
     </properties>
 
     <repositories>
@@ -61,7 +72,7 @@
         <dependency>
             <groupId>io.mockk</groupId>
             <artifactId>mockk-jvm</artifactId>
-            <version>1.13.7</version>
+            <version>${mockk-jvm.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -127,7 +138,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-maven-plugin</artifactId>
-            <version>9.21.1</version>
+            <version>${flyway-maven-plugin.version}</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -143,7 +154,7 @@
         <dependency>
             <groupId>com.github.navikt</groupId>
             <artifactId>ia-felles</artifactId>
-            <version>0.0.5</version>
+            <version>${ia-felles.version}</version>
         </dependency>
 
         <dependency>
@@ -171,13 +182,13 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.1.0</version>
+            <version>${springdoc-openapi-starter-webmvc-ui.version}</version>
         </dependency>
 
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
-            <version>7.3</version>
+            <version>${logstash-logback-encoder.version}</version>
         </dependency>
         <dependency>
             <groupId>no.nav.common</groupId>
@@ -259,7 +270,7 @@
         <dependency>
             <groupId>io.vavr</groupId>
             <artifactId>vavr</artifactId>
-            <version>0.10.4</version>
+            <version>${vavr.version}</version>
         </dependency>
 
         <dependency>
@@ -278,7 +289,7 @@
         <dependency>
             <groupId>org.mockito.kotlin</groupId>
             <artifactId>mockito-kotlin</artifactId>
-            <version>4.1.0</version>
+            <version>${mockito-kotlin.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -299,26 +310,26 @@
         <dependency>
             <groupId>org.jetbrains.kotlinx</groupId>
             <artifactId>kotlinx-coroutines-core-jvm</artifactId>
-            <version>1.6.4</version>
+            <version>${kotlinx-coroutines-core-jvm.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.kotest</groupId>
             <artifactId>kotest-assertions-core-jvm</artifactId>
-            <version>5.6.2</version>
+            <version>${kotest-assertions-core-jvm.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>net.javacrumbs.json-unit</groupId>
             <artifactId>json-unit-assertj</artifactId>
-            <version>2.36.1</version>
+            <version>${json-unit-assertj.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.arrow-kt</groupId>
             <artifactId>arrow-core</artifactId>
-            <version>1.1.5</version>
+            <version>${arrow-core.version}</version>
         </dependency>
     </dependencies>
 

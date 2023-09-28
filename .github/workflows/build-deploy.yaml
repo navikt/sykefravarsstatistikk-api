@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - slett-historikk-som-er-5-år-gammel
+      - upgrade-dependencies
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
