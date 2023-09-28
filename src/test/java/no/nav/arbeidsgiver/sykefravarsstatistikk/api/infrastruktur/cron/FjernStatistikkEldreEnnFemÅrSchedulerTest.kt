@@ -21,17 +21,25 @@ class FjernStatistikkEldreEnnFemÅrSchedulerTest {
     )
 
     @Test
-    fun `sjekkAtSistePubliserteKvartalErForsvarlig skal returnere feil hvis siste kvartal er utenfor siste 3 måneder`() {
+    fun `sjekkAtSistePubliserteKvartalErForsvarlig skal returnere feil hvis siste kvartal er etter siste 6 måneder`() {
         val uforsvarligKvartalIFremtiden = ÅrstallOgKvartal(2024, 1)
         val resultat =
             fjernStatistikkEldreEnnFemÅrScheduler.sjekkAtSistePubliserteKvartalErForsvarlig(uforsvarligKvartalIFremtiden)
 
         resultat shouldBe FjernStatistikkEldreEnnFemÅrScheduler.SistePubliserteKvartalErIkkeForsvarlig.left()
    }
+    @Test
+    fun `sjekkAtSistePubliserteKvartalErForsvarlig skal returnere feil hvis siste kvartal er før siste 6 måneder`() {
+        val uforsvarligKvartalIFortiden = ÅrstallOgKvartal(2022, 2)
+        val resultat =
+            fjernStatistikkEldreEnnFemÅrScheduler.sjekkAtSistePubliserteKvartalErForsvarlig(uforsvarligKvartalIFortiden)
+
+        resultat shouldBe FjernStatistikkEldreEnnFemÅrScheduler.SistePubliserteKvartalErIkkeForsvarlig.left()
+   }
 
     @Test
-    fun `sjekkAtSistePubliserteKvartalErForsvarlig skal returnere Unit hvis siste kvartal er innenfor siste 3 måneder`() {
-        val forsvarligKvartal = ÅrstallOgKvartal(2023, 1)
+    fun `sjekkAtSistePubliserteKvartalErForsvarlig skal returnere Unit hvis siste kvartal er innenfor siste 6 måneder`() {
+        val forsvarligKvartal = ÅrstallOgKvartal(2022, 4)
         val resultat =
             fjernStatistikkEldreEnnFemÅrScheduler.sjekkAtSistePubliserteKvartalErForsvarlig(forsvarligKvartal)
 

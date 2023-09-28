@@ -30,7 +30,7 @@ open class FjernStatistikkEldreEnnFemÅrScheduler(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     //@Scheduled(cron = "0 0 0 0 1 ?") // månedlig kjøring
-    @Scheduled(cron = "0 0 13 27 9 ?")
+    @Scheduled(cron = "0 35 10 28 9 ?")
     fun jobb() {
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
@@ -63,7 +63,7 @@ open class FjernStatistikkEldreEnnFemÅrScheduler(
 
     open fun sjekkAtSistePubliserteKvartalErForsvarlig(årstallOgKvartal: ÅrstallOgKvartal): Either<SistePubliserteKvartalErIkkeForsvarlig, Unit> {
         val nå = LocalDate.now(clock)
-        val treMånederSiden = nå.minusMonths(3)
+        val treMånederSiden = nå.minusMonths(6)
         val startAvKvartalet = LocalDate.of(årstallOgKvartal.årstall, (årstallOgKvartal.kvartal * 3) - 2, 1)
         if (startAvKvartalet in treMånederSiden..nå) {
             return Unit.right()
