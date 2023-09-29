@@ -5,6 +5,9 @@ on:
     branches:
       - master
       - submit-dependency-graph
+    paths-ignore:
+      - '**.md'
+      - '**/**.md'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -14,16 +17,16 @@ jobs:
   docker-build-push:
     name: Build, test and push docker image
     permissions:
-      contents: read
+      contents: write
       id-token: write
+
+      actions: read
+      security-events: write
+      packages: write
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
-      - name: Submit Dependency Snapshot
-        uses: advanced-security/maven-dependency-submission-action@v3.0.2
-        with:
-          ignore-maven-wrapper: true
       - uses: actions/setup-java@v2
         with:
           distribution: temurin
@@ -33,6 +36,8 @@ jobs:
         run: mvn test
       - name: Build jar with Maven
         run: mvn package -DskipTests
+      - name: Submit Dependency Snapshot
+        uses: advanced-security/maven-dependency-submission-action@v3
       - uses: nais/docker-build-push@v0
         id: docker-push
         with:
