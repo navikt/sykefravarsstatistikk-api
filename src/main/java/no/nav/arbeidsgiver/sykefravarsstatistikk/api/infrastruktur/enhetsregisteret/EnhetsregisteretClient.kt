@@ -106,15 +106,15 @@ open class EnhetsregisteretClient(
     }
 
     sealed class HentEnhetFeil {
-        object FeilVedKallTilEnhetsregisteret : HentEnhetFeil()
-        object FeilVedDekodingAvJson : HentEnhetFeil()
-        object OrgnrMatcherIkke : HentEnhetFeil()
+        data object FeilVedKallTilEnhetsregisteret : HentEnhetFeil()
+        data object FeilVedDekodingAvJson : HentEnhetFeil()
+        data object OrgnrMatcherIkke : HentEnhetFeil()
     }
 
     sealed class HentUnderenhetFeil {
-        object EnhetsregisteretSvarerIkke : HentUnderenhetFeil()
-        object FeilVedDekodingAvJson : HentUnderenhetFeil()
-        object FeilVedKallTilEnhetsregisteret : HentUnderenhetFeil()
-        object OrgnrMatcherIkke : HentUnderenhetFeil()
+        data object EnhetsregisteretSvarerIkke : HentUnderenhetFeil()
+        data object FeilVedDekodingAvJson : HentUnderenhetFeil()
+        data object FeilVedKallTilEnhetsregisteret : HentUnderenhetFeil()
+        data object OrgnrMatcherIkke : HentUnderenhetFeil()
     }
 }
