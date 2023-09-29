@@ -4,7 +4,10 @@ on:
   push:
     branches:
       - master
-      - upgrade-dependencies
+      - submit-dependency-graph
+    paths-ignore:
+      - '**.md'
+      - '**/**.md'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -14,7 +17,7 @@ jobs:
   docker-build-push:
     name: Build, test and push docker image
     permissions:
-      contents: read
+      contents: write
       id-token: write
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -29,6 +32,8 @@ jobs:
         run: mvn test
       - name: Build jar with Maven
         run: mvn package -DskipTests
+      - name: Submit Dependency Snapshot
+        uses: advanced-security/maven-dependency-submission-action@v3
       - uses: nais/docker-build-push@v0
         id: docker-push
         with:
