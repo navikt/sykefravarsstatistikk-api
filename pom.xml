@@ -44,7 +44,7 @@
         <spring-boot-starter-parent.version>3.1.2</spring-boot-starter-parent.version>
         <mockk-jvm.version>1.13.7</mockk-jvm.version>
         <flyway-maven-plugin.version>9.21.1</flyway-maven-plugin.version>
-        <ia-felles.version>0.0.5</ia-felles.version>
+        <ia-felles.version>0.0.6</ia-felles.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.1.0</springdoc-openapi-starter-webmvc-ui.version>
         <logstash-logback-encoder.version>7.3</logstash-logback-encoder.version>
         <vavr.version>0.10.4</vavr.version>
