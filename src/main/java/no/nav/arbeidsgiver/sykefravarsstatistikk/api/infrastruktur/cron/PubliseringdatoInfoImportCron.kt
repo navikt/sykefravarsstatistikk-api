@@ -13,7 +13,7 @@ import java.time.temporal.ChronoUnit
 
 @Component
 @Slf4j
-class PubliseringdatoInfoImportScheduler(
+class PubliseringdatoInfoImportCron(
     private val taskExecutor: LockingTaskExecutor, private val importService: PubliseringsdatoerImportService
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)

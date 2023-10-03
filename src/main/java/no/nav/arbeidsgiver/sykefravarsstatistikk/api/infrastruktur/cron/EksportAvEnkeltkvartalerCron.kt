@@ -6,8 +6,10 @@ import io.micrometer.core.instrument.MeterRegistry
 import net.javacrumbs.shedlock.core.LockConfiguration
 import net.javacrumbs.shedlock.core.LockingTaskExecutor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PostImporteringService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringMetadataVirksomhetService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringPerStatistikkKategoriService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.time.Duration
@@ -15,24 +17,27 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit.MINUTES
 
 @Component
-class EksportAvEnkeltkvartalerScheduler(
+class EksportAvEnkeltkvartalerCron(
     registry: MeterRegistry,
     private val taskExecutor: LockingTaskExecutor,
+    private val eksporteringMetadataVirksomhetService: EksporteringMetadataVirksomhetService,
+    private val eksporteringPerStatistikkKategoriService: EksporteringPerStatistikkKategoriService,
     private val postImporteringService: PostImporteringService,
-    private val eksporteringsService: EksporteringService,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
-    private val noeFeilet: Counter
+    private val noeFeiletCounter: Counter
 
-    private val kvartaler = listOf(ÅrstallOgKvartal(2023, 1))
+    private val fraKvartal = ÅrstallOgKvartal(2019, 1)
+    private val tilKvartal = ÅrstallOgKvartal(2023, 2)
+    private val kategorier = listOf(Statistikkategori.BRANSJE)
 
     init {
-        noeFeilet = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
+        noeFeiletCounter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
     }
 
     // Fjern scheduleringen etter at jobben har kjørt ÉN gang
     //@Scheduled(fixedDelay = Long.MAX_VALUE, initialDelay = 60*1000)
-    fun scheduledImporteringOgEksportering() {
+    fun scheduledEksportAvEnkeltkvartal() {
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
         taskExecutor.executeWithLock(
@@ -42,53 +47,41 @@ class EksportAvEnkeltkvartalerScheduler(
     }
 
     fun gjennomførImportOgEksport() {
-        kvartaler.forEach { kvartal ->
+
+        for (kvartal in fraKvartal..tilKvartal) {
 
             log.info("EksportAvEnkeltkvartaler har startet for $kvartal")
 
             postImporteringService.overskrivMetadataForVirksomheter(kvartal)
                 .getOrElse {
-                    noeFeilet.increment()
+                    noeFeiletCounter.increment()
                     return
                 }
 
             postImporteringService.overskrivNæringskoderForVirksomheter(kvartal)
                 .getOrElse {
-                    noeFeilet.increment()
+                    noeFeiletCounter.increment()
                     return
                 }
 
-            postImporteringService.forberedNesteEksport(kvartal, true)
+            eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(kvartal)
                 .getOrElse {
-                    noeFeilet.increment()
+                    noeFeiletCounter.increment()
                     return
                 }
 
-
-            eksporteringsService.legacyEksporter(kvartal)
-                .getOrElse {
-                    noeFeilet.increment()
+            for (kategori in kategorier) {
+                runCatching {
+                    eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(
+                        kvartal,
+                        kategori
+                    )
+                }.getOrElse {
+                    log.error("Eksport av kategori $kategori feilet", it)
+                    noeFeiletCounter.increment()
                     return
                 }
-
-//            eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(kvartal)
-//                .getOrElse {
-//                    noeFeilet.increment()
-//                    return
-//                }
-//
-//            Statistikkategori.entries.forEach { kategori ->
-//                runCatching {
-//                    eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(
-//                        kvartal,
-//                        kategori
-//                    )
-//                }.getOrElse {
-//                    log.error("Eksport av kategori $kategori feilet", it)
-//                    noeFeilet.increment()
-//                    return
-//                }
-//            }
+            }
 
             log.info("EksportAvEnkeltkvartaler er ferdig for $kvartal")
         }
