@@ -97,12 +97,12 @@ class EksporteringPerStatistikkKategoriService(
         }
     }
 
-    private fun eksporterSykefraværsstatistikkBransje(årstallOgKvartal: ÅrstallOgKvartal) {
-        tilEksporteringRepository.hentSykefraværAlleBransjerFraOgMed(
-            årstallOgKvartal.minusKvartaler(3)
-        ).groupByBransje().let {
+    private fun eksporterSykefraværsstatistikkBransje(endInclusive: ÅrstallOgKvartal) {
+        ÅrstallOgKvartal.range(endInclusive.minusKvartaler(3), endInclusive).flatMap {
+            tilEksporteringRepository.hentSykefraværAlleBransjer(it)
+        }.groupByBransje().let {
             eksporterSykefraværsstatistikkPerKategori(
-                årstallOgKvartal = årstallOgKvartal,
+                årstallOgKvartal = endInclusive,
                 sykefraværGruppertEtterKode = it,
                 statistikkategori = Statistikkategori.BRANSJE,
                 kafkaTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_BRANSJE_V1

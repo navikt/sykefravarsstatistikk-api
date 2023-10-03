@@ -12,7 +12,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.math.BigDecimal.ZERO
 import java.sql.ResultSet
 
-fun hentSykefraværsstatistikkForBransjerFraOgMed(
+fun hentSykefraværsstatistikkForBransjer(
     kvartal: ÅrstallOgKvartal,
     namedParameterJdbcTemplate: NamedParameterJdbcTemplate
 ): List<SykefraværsstatistikkBransje> {
@@ -68,7 +68,7 @@ private fun hentSykefraværsstatistikkForAngitteNæringer(
         """
             select arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk
             from sykefravar_statistikk_naring
-            where (arstall = :arstall and kvartal >= :kvartal) or (arstall > :arstall)
+            where (arstall = :arstall and kvartal = :kvartal)
             and naring_kode in (:naringer)
             """.trimMargin(),
         MapSqlParameterSource()

@@ -7,7 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.hentSykefraværsstatistikkForBransjerFraOgMed
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.hentSykefraværsstatistikkForBransjer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -36,13 +36,13 @@ open class HentSykefraværsstatistikkForBransjerTest {
 
     @Test
     fun `hentSykefraværsstatistikkForBransjer skal returnere tom liste når det ikke finnes noen sykefraværsstatistikk`() {
-        val result = hentSykefraværsstatistikkForBransjerFraOgMed(ÅrstallOgKvartal(2023, 1), jdbcTemplate)
+        val result = hentSykefraværsstatistikkForBransjer(ÅrstallOgKvartal(2023, 1), jdbcTemplate)
 
         assertThat(result).isEmpty()
     }
 
     @Test
-    fun `henSykefraværsstatistikkForBransjer skal returnere fire kvartaler med statistikk`() {
+    fun `henSykefraværsstatistikkForBransjer skal returnere ett kvartal med statistikk`() {
         fireKvartalerAnleggsbransje.forEach {
             TestUtils.opprettStatistikkForNæring(
                 jdbcTemplate,
@@ -54,9 +54,9 @@ open class HentSykefraværsstatistikkForBransjerTest {
                 it.antallPersoner
             )
         }
-        val result = hentSykefraværsstatistikkForBransjerFraOgMed(ÅrstallOgKvartal(2023, 1), jdbcTemplate)
+        val result = hentSykefraværsstatistikkForBransjer(ÅrstallOgKvartal(2023, 1), jdbcTemplate)
 
-        assertThat(result).contains(*fireKvartalerAnleggsbransje)
+        assertThat(result).contains(fireKvartalerAnleggsbransje.first())
     }
 
     @Test
@@ -72,7 +72,7 @@ open class HentSykefraværsstatistikkForBransjerTest {
                 1
             )
         }
-        val result = hentSykefraværsstatistikkForBransjerFraOgMed(ÅrstallOgKvartal(2023, 1), jdbcTemplate)
+        val result = hentSykefraværsstatistikkForBransjer(ÅrstallOgKvartal(2023, 1), jdbcTemplate)
 
         assertThat(result).contains(
             SykefraværsstatistikkBransje(

@@ -11,7 +11,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringMetadataVirksomhetService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringPerStatistikkKategoriService
 import org.slf4j.LoggerFactory
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.time.Duration
 import java.time.Instant
@@ -34,7 +33,7 @@ class EksportAvEnkeltkvartalerCron(
     }
 
     // Fjern scheduleringen etter at jobben har kjørt ÉN gang
-    @Scheduled(fixedDelay = Long.MAX_VALUE, initialDelay = 60*1000)
+    // @Scheduled(fixedDelay = Long.MAX_VALUE, initialDelay = 60*1000)
     fun scheduledEksportAvEnkeltkvartal() {
         val fraKvartal = ÅrstallOgKvartal(2019, 1)
         val tilKvartal = ÅrstallOgKvartal(2023, 2)
