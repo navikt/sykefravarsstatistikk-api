@@ -34,7 +34,7 @@ class EksportAvEnkeltkvartalerCron(
     }
 
     // Fjern scheduleringen etter at jobben har kjørt ÉN gang
-    @Scheduled(fixedDelay = Long.MAX_VALUE)
+    @Scheduled(fixedDelay = Long.MAX_VALUE, initialDelay = 60*1000)
     fun scheduledEksportAvEnkeltkvartal() {
         val fraKvartal = ÅrstallOgKvartal(2019, 1)
         val tilKvartal = ÅrstallOgKvartal(2023, 2)
