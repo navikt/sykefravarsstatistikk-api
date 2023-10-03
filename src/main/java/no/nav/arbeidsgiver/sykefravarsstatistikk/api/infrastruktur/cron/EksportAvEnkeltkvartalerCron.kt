@@ -27,9 +27,6 @@ class EksportAvEnkeltkvartalerCron(
     private val log = LoggerFactory.getLogger(this::class.java)
     private val noeFeiletCounter: Counter
 
-    private val fraKvartal = ÅrstallOgKvartal(2019, 1)
-    private val tilKvartal = ÅrstallOgKvartal(2023, 2)
-    private val kategorier = listOf(Statistikkategori.BRANSJE)
 
     init {
         noeFeiletCounter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
@@ -38,17 +35,20 @@ class EksportAvEnkeltkvartalerCron(
     // Fjern scheduleringen etter at jobben har kjørt ÉN gang
     //@Scheduled(fixedDelay = Long.MAX_VALUE, initialDelay = 60*1000)
     fun scheduledEksportAvEnkeltkvartal() {
+        val fraKvartal = ÅrstallOgKvartal(2019, 1)
+        val tilKvartal = ÅrstallOgKvartal(2023, 2)
+        val kategorier = listOf(Statistikkategori.BRANSJE)
+
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
         taskExecutor.executeWithLock(
-            Runnable { gjennomførImportOgEksport() },
+            Runnable { gjennomførJobb(fraKvartal, tilKvartal, kategorier) },
             LockConfiguration(Instant.now(), "importering", lockAtMostFor, lockAtLeastFor)
         )
     }
 
-    fun gjennomførImportOgEksport() {
-
-        for (kvartal in fraKvartal..tilKvartal) {
+    fun gjennomførJobb(fraKvartal: ÅrstallOgKvartal, tilKvartal: ÅrstallOgKvartal, kategorier: List<Statistikkategori>) {
+        for (kvartal in ÅrstallOgKvartal.range(fraKvartal, tilKvartal)) {
 
             log.info("EksportAvEnkeltkvartaler har startet for $kvartal")
 

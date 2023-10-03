@@ -57,10 +57,6 @@ data class ÅrstallOgKvartal(
             .compare(this, other)
     }
 
-    operator fun rangeTo(other: ÅrstallOgKvartal): KvartalRange {
-        return KvartalRange(this, other)
-    }
-
     override fun toString(): String {
         return "$kvartal. kvartal $årstall"
     }
@@ -81,19 +77,4 @@ data class ÅrstallOgKvartal(
             return årstallOgKvartal
         }
     }
-}
-
-
-class KvartalRange(override val start: ÅrstallOgKvartal, override val endInclusive: ÅrstallOgKvartal) :
-    ClosedRange<ÅrstallOgKvartal> {
-    operator fun iterator(): Iterator<ÅrstallOgKvartal> {
-        return KvartalIterator(start, endInclusive)
-    }
-}
-
-class KvartalIterator(start: ÅrstallOgKvartal, private val endInclusive: ÅrstallOgKvartal) : Iterator<ÅrstallOgKvartal> {
-    private var previous = start.copy()
-    override fun hasNext() = previous <= endInclusive
-
-    override fun next(): ÅrstallOgKvartal = previous.plussKvartaler(1)
 }
