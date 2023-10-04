@@ -97,17 +97,19 @@ class EksporteringPerStatistikkKategoriService(
         }
     }
 
-    private fun eksporterSykefraværsstatistikkBransje(endInclusive: ÅrstallOgKvartal) {
-        ÅrstallOgKvartal.range(endInclusive.minusKvartaler(3), endInclusive).flatMap {
-            tilEksporteringRepository.hentSykefraværAlleBransjer(it)
-        }.groupByBransje().let {
-            eksporterSykefraværsstatistikkPerKategori(
-                årstallOgKvartal = endInclusive,
-                sykefraværGruppertEtterKode = it,
-                statistikkategori = Statistikkategori.BRANSJE,
-                kafkaTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_BRANSJE_V1
-            )
-        }
+    private fun eksporterSykefraværsstatistikkBransje(kvartal: ÅrstallOgKvartal) {
+
+        val foregåendeFireKvartaler = ÅrstallOgKvartal.range(kvartal.minusKvartaler(3), kvartal)
+
+        tilEksporteringRepository.hentSykefraværAlleBransjer(foregåendeFireKvartaler)
+            .groupByBransje().let {
+                eksporterSykefraværsstatistikkPerKategori(
+                    årstallOgKvartal = kvartal,
+                    sykefraværGruppertEtterKode = it,
+                    statistikkategori = Statistikkategori.BRANSJE,
+                    kafkaTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_BRANSJE_V1
+                )
+            }
     }
 
     private fun eksporterSykefraværsstatistikkVirksomhet(årstallOgKvartal: ÅrstallOgKvartal) {

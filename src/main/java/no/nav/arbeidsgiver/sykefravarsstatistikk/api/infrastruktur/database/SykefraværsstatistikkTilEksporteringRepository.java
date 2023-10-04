@@ -181,8 +181,8 @@ public class SykefraværsstatistikkTilEksporteringRepository {
     }
   }
 
-  public List<SykefraværsstatistikkBransje> hentSykefraværAlleBransjer(ÅrstallOgKvartal fraÅrstallOgKvartal) {
-    return hentSykefraværsstatistikkForBransjer(fraÅrstallOgKvartal, namedParameterJdbcTemplate);
+  public List<SykefraværsstatistikkBransje> hentSykefraværAlleBransjer(List<ÅrstallOgKvartal> kvartaler) {
+    return hentSykefraværsstatistikkForBransjer(kvartaler, namedParameterJdbcTemplate);
   }
 
 

@@ -36,7 +36,7 @@ open class HentSykefraværsstatistikkForBransjerTest {
 
     @Test
     fun `hentSykefraværsstatistikkForBransjer skal returnere tom liste når det ikke finnes noen sykefraværsstatistikk`() {
-        val result = hentSykefraværsstatistikkForBransjer(ÅrstallOgKvartal(2023, 1), jdbcTemplate)
+        val result = hentSykefraværsstatistikkForBransjer(listOf(ÅrstallOgKvartal(2023, 1)), jdbcTemplate)
 
         assertThat(result).isEmpty()
     }
@@ -54,7 +54,7 @@ open class HentSykefraværsstatistikkForBransjerTest {
                 it.antallPersoner
             )
         }
-        val result = hentSykefraværsstatistikkForBransjer(ÅrstallOgKvartal(2023, 1), jdbcTemplate)
+        val result = hentSykefraværsstatistikkForBransjer(listOf(ÅrstallOgKvartal(2023, 1)), jdbcTemplate)
 
         assertThat(result).contains(fireKvartalerAnleggsbransje.first())
     }
@@ -72,7 +72,7 @@ open class HentSykefraværsstatistikkForBransjerTest {
                 1
             )
         }
-        val result = hentSykefraværsstatistikkForBransjer(ÅrstallOgKvartal(2023, 1), jdbcTemplate)
+        val result = hentSykefraværsstatistikkForBransjer(listOf(ÅrstallOgKvartal(2023, 1)), jdbcTemplate)
 
         assertThat(result).contains(
             SykefraværsstatistikkBransje(
