@@ -187,7 +187,7 @@ public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(
                         URI.create(
-                                "http://localhost:"
+                                "http://127.0.0.1:"
                                         + port
                                         + "/sykefravarsstatistikk-api/"
                                         + orgnr

@@ -91,7 +91,7 @@ class TilgangskontrollServiceTest {
         bruker.brukerensOrganisasjoner = listOf(getOrganisasjon(orgnr.verdi))
         værInnloggetSom(bruker)
         val httpMetode = "GET"
-        val requestUrl = "http://localhost:8080/endepunkt"
+        val requestUrl = "http://127.0.0.1:8080/endepunkt"
         val correlationId = "flfkjdhzdnjb"
         MDC.put(CorrelationIdFilter.CORRELATION_ID_MDC_NAME, correlationId)
         tilgangskontroll.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(orgnr, httpMetode, requestUrl)
