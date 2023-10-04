@@ -20,7 +20,7 @@ altinn:
     edition: 1
 
 enhetsregisteret:
-  url: "http://localhost:${wiremock.mock.port}/enhetsregisteret/"
+  url: "http://127.0.0.1:${wiremock.mock.port}/enhetsregisteret/"
 
 
 applikasjon.datasource:
@@ -39,7 +39,7 @@ nais.cluster.name: mvc-test
 
 kafka:
   outbound:
-    bootstrapServers: localhost:9092
+    bootstrapServers: 127.0.0.1:9092
     securityProtocol: PLAINTEXT
 
 no.nav.security.jwt:

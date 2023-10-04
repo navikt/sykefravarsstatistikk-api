@@ -286,7 +286,7 @@ public class AggregertApiIntegrationTest extends SpringIntegrationTestbase {
                 .GET()
                 .uri(
                     URI.create(
-                        "http://localhost:"
+                        "http://127.0.0.1:"
                             + port
                             + "/sykefravarsstatistikk-api/"
                             + orgnr

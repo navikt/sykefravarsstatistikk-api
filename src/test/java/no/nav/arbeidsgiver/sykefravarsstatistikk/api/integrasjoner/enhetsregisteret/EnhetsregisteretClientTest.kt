@@ -19,7 +19,7 @@ import org.springframework.web.reactive.function.client.WebClient
 @WireMockTest
 @ExtendWith(StaticAppenderExtension::class)
 class EnhetsregisteretClientTest {
-    private val url get() = "http://localhost:${port}/enhetsregisteret"
+    private val url get() = "http://127.0.0.1:${port}/enhetsregisteret"
     private val webClient = ProxyWebClient(WebClient.builder())
     private val enhetsregisteretClient: EnhetsregisteretClient by lazy {
         EnhetsregisteretClient(

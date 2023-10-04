@@ -12,7 +12,7 @@ open class EmbeddedKafkaBrokerConfig {
         EmbeddedKafkaBroker(1, true, *KafkaTopic.values().map { it.navn }.toTypedArray())
 
     init {
-        embeddedKafkaBroker.brokerProperties(mapOf("listeners" to "PLAINTEXT://localhost:9092", "port" to "9092"))
+        embeddedKafkaBroker.brokerProperties(mapOf("listeners" to "PLAINTEXT://127.0.0.1:9092", "port" to "9092"))
     }
 
     @Bean("embeddedKafka", destroyMethod = "destroy")
