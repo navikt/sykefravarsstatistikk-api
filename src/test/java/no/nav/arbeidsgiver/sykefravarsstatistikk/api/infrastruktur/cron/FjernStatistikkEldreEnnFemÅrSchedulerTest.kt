@@ -12,7 +12,7 @@ import java.time.ZoneId
 
 class FjernStatistikkEldreEnnFemÅrSchedulerTest {
     val statiskKlokke: Clock = Clock.fixed(Instant.parse("2023-01-01T00:00:00.00Z"), ZoneId.of("Europe/Oslo"))
-    val fjernStatistikkEldreEnnFemÅrScheduler = FjernStatistikkEldreEnnFemÅrScheduler(
+    val fjernStatistikkEldreEnnFemÅrScheduler = FjernStatistikkEldreEnnFemÅrCron(
         mock(),
         mock(),
         mock(),
@@ -26,7 +26,7 @@ class FjernStatistikkEldreEnnFemÅrSchedulerTest {
         val resultat =
             fjernStatistikkEldreEnnFemÅrScheduler.sjekkAtSistePubliserteKvartalErForsvarlig(uforsvarligKvartalIFremtiden)
 
-        resultat shouldBe FjernStatistikkEldreEnnFemÅrScheduler.SistePubliserteKvartalErIkkeForsvarlig.left()
+        resultat shouldBe FjernStatistikkEldreEnnFemÅrCron.SistePubliserteKvartalErIkkeForsvarlig.left()
    }
     @Test
     fun `sjekkAtSistePubliserteKvartalErForsvarlig skal returnere feil hvis siste kvartal er før siste 6 måneder`() {
@@ -34,7 +34,7 @@ class FjernStatistikkEldreEnnFemÅrSchedulerTest {
         val resultat =
             fjernStatistikkEldreEnnFemÅrScheduler.sjekkAtSistePubliserteKvartalErForsvarlig(uforsvarligKvartalIFortiden)
 
-        resultat shouldBe FjernStatistikkEldreEnnFemÅrScheduler.SistePubliserteKvartalErIkkeForsvarlig.left()
+        resultat shouldBe FjernStatistikkEldreEnnFemÅrCron.SistePubliserteKvartalErIkkeForsvarlig.left()
    }
 
     @Test

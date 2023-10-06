@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.HentSykefraværsstatistikkForBransjerKt.hentSykefraværsstatistikkForBransjerFraOgMed;
+import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.HentSykefraværsstatistikkForBransjerKt.hentSykefraværsstatistikkForBransjer;
 
 @Component
 public class SykefraværsstatistikkTilEksporteringRepository {
@@ -181,8 +181,8 @@ public class SykefraværsstatistikkTilEksporteringRepository {
     }
   }
 
-  public List<SykefraværsstatistikkBransje> hentSykefraværAlleBransjerFraOgMed(ÅrstallOgKvartal fraÅrstallOgKvartal) {
-    return hentSykefraværsstatistikkForBransjerFraOgMed(fraÅrstallOgKvartal, namedParameterJdbcTemplate);
+  public List<SykefraværsstatistikkBransje> hentSykefraværAlleBransjer(List<ÅrstallOgKvartal> kvartaler) {
+    return hentSykefraværsstatistikkForBransjer(kvartaler, namedParameterJdbcTemplate);
   }
 
 

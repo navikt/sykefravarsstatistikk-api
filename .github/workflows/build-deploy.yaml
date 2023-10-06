@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - submit-dependency-graph
+      - bransjejobb
     paths-ignore:
       - '**.md'
       - '**/**.md'

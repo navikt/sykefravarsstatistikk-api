@@ -1,10 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkBransje
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkForNæring
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransjeprogram
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -12,17 +10,21 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.math.BigDecimal.ZERO
 import java.sql.ResultSet
 
-fun hentSykefraværsstatistikkForBransjerFraOgMed(
-    kvartal: ÅrstallOgKvartal,
+fun hentSykefraværsstatistikkForBransjer(
+    kvartaler: List<ÅrstallOgKvartal>,
     namedParameterJdbcTemplate: NamedParameterJdbcTemplate
 ): List<SykefraværsstatistikkBransje> {
     val (næringer, næringskoder) = getNæringerAndNæringskoderSomUtgjørBransjene()
 
     return try {
-        val kvartalsvisSykefraværsstatistikkNæringer = getKvartalsvisSykefraværsstatistikkNæringer(
-            namedParameterJdbcTemplate, kvartal, næringer, næringskoder
-        )
-        summerSykefraværsstatistikkPerBransje(kvartalsvisSykefraværsstatistikkNæringer)
+        summerSykefraværsstatistikkPerBransje(
+            kvartaler.associateWith {
+                hentSykefraværsstatistikkForAngitteNæringer(
+                    namedParameterJdbcTemplate, it, næringer
+                ) + hentSykefraværsstatistikkForAngitteNæringskoder(
+                    namedParameterJdbcTemplate, it, næringskoder
+                )
+            })
     } catch (e: EmptyResultDataAccessException) {
         emptyList()
     }
@@ -48,7 +50,7 @@ private fun hentSykefraværsstatistikkForAngitteNæringskoder(
         """
             select arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk
             from sykefravar_statistikk_naring5siffer
-            where (arstall = :arstall and kvartal >= :kvartal) or (arstall > :arstall)
+            where (arstall = :arstall and kvartal = :kvartal)
             and naring_kode in (:naringskoder)
         """.trimMargin(),
         MapSqlParameterSource()
@@ -68,7 +70,7 @@ private fun hentSykefraværsstatistikkForAngitteNæringer(
         """
             select arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk
             from sykefravar_statistikk_naring
-            where (arstall = :arstall and kvartal >= :kvartal) or (arstall > :arstall)
+            where (arstall = :arstall and kvartal = :kvartal)
             and naring_kode in (:naringer)
             """.trimMargin(),
         MapSqlParameterSource()
@@ -89,23 +91,7 @@ private fun getNæringerAndNæringskoderSomUtgjørBransjene(): Pair<List<String>
     return Pair(næringer, næringskoder)
 }
 
-private fun getKvartalsvisSykefraværsstatistikkNæringer(
-    namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
-    kvartal: ÅrstallOgKvartal,
-    næringer: List<String>,
-    næringskoder: List<String>
-): Map<ÅrstallOgKvartal, List<SykefraværsstatistikkForNæring>> {
-
-    val statistikkNæringer = hentSykefraværsstatistikkForAngitteNæringer(
-        namedParameterJdbcTemplate, kvartal, næringer
-    ) + hentSykefraværsstatistikkForAngitteNæringskoder(
-        namedParameterJdbcTemplate, kvartal, næringskoder
-    )
-
-    return statistikkNæringer.groupBy { ÅrstallOgKvartal(it.årstall, it.kvartal) }
-}
-
-private fun summerSykefraværsstatistikkPerBransje(
+fun summerSykefraværsstatistikkPerBransje(
     kvartalsvisSykefraværsstatistikkForNæringer: Map<ÅrstallOgKvartal, List<SykefraværsstatistikkForNæring>>
 ): List<SykefraværsstatistikkBransje> {
     return kvartalsvisSykefraværsstatistikkForNæringer.flatMap { (_, sykefraværsstatistikkNæringer) ->

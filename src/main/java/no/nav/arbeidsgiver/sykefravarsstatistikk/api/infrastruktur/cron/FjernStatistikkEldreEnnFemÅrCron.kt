@@ -20,7 +20,7 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit.MINUTES
 
 @Component
-open class FjernStatistikkEldreEnnFemÅrScheduler(
+open class FjernStatistikkEldreEnnFemÅrCron(
     private val taskExecutor: LockingTaskExecutor,
     private val publiseringsdatoerService: PubliseringsdatoerService,
     private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,

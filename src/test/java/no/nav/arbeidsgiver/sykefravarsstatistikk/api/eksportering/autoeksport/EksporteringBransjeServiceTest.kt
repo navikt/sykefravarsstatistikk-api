@@ -33,7 +33,7 @@ internal class EksporteringBransjeServiceTest {
 
     @Test
     fun `eksporterPerStatistikkKategori skal putte riktige kvartaler på topic`() {
-        whenever(repositoryMock.hentSykefraværAlleBransjerFraOgMed(any()))
+        whenever(repositoryMock.hentSykefraværAlleBransjer(any()))
             .thenReturn(
                 listOf(
                     SykefraværsstatistikkBransje(
@@ -64,7 +64,7 @@ internal class EksporteringBransjeServiceTest {
 
     @Test
     fun `eksporterPerStatistikkKategori skal kaste feil når forespurt kvartal ikke finnes i databasen`() {
-        whenever(repositoryMock.hentSykefraværAlleBransjerFraOgMed(any())).thenReturn(
+        whenever(repositoryMock.hentSykefraværAlleBransjer(any())).thenReturn(
             listOf(
                 SykefraværsstatistikkBransje(
                     årstall = 1990,
@@ -99,7 +99,7 @@ internal class EksporteringBransjeServiceTest {
         )
         val sykefraværsstatistikk = listOf(bransjestatistikk)
 
-        whenever(repositoryMock.hentSykefraværAlleBransjerFraOgMed(any()))
+        whenever(repositoryMock.hentSykefraværAlleBransjer(any()))
             .thenReturn(sykefraværsstatistikk)
 
         service.eksporterPerStatistikkKategori(
