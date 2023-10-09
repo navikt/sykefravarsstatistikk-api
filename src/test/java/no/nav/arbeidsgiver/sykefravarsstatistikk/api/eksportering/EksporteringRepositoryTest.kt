@@ -1,337 +1,284 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetEksportPerKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.LocalOgUnitTestOidcConfiguration;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
-import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.*;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettTestVirksomhetMetaData;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllEksportDataFraDatabase;
-import static org.junit.jupiter.api.Assertions.*;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_1
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_2
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_3
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettTestVirksomhetMetaData
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllEksportDataFraDatabase
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.VirksomhetEksportPerKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.LocalOgUnitTestOidcConfiguration
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
+import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.junit.jupiter.SpringExtension
+import java.sql.ResultSet
+import java.time.LocalDateTime
 
 @ActiveProfiles("db-test")
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {AppConfigForJdbcTesterConfig.class})
-@DataJdbcTest(
-    excludeAutoConfiguration = {
-      TestDatabaseAutoConfiguration.class,
-      LocalOgUnitTestOidcConfiguration.class
-    })
-class EksporteringRepositoryTest {
-
-  public static final Orgnr ORGNR_1 = new Orgnr(ORGNR_VIRKSOMHET_1);
-  public static final Orgnr ORGNR_2 = new Orgnr(ORGNR_VIRKSOMHET_2);
-  public static final Orgnr ORGNR_3 = new Orgnr(ORGNR_VIRKSOMHET_3);
-  public static final ÅrstallOgKvartal _2021_1 = new ÅrstallOgKvartal(2021, 1);
-
-  @Autowired private NamedParameterJdbcTemplate jdbcTemplate;
-
-  private EksporteringRepository eksporteringRepository;
-
-  @BeforeEach
-  void setUp() {
-    eksporteringRepository = new EksporteringRepository(jdbcTemplate);
-    slettAllEksportDataFraDatabase(jdbcTemplate);
-  }
-
-  @AfterEach
-  void tearDown() {
-    slettAllEksportDataFraDatabase(jdbcTemplate);
-  }
-
-  @Test
-  void hentVirksomhetEksportPerKvartal__returnerer_antall_VirksomhetEksportPerKvartal_funnet() {
-    createVirksomhetEksportPerKvartal(
-        new VirksomhetEksportPerKvartalMedDatoer(
-            new Orgnr("999999999"),
-            new ÅrstallOgKvartal(2019, 2),
-            true,
-            LocalDateTime.now(),
-            LocalDateTime.now()));
-    createVirksomhetEksportPerKvartal(
-        new VirksomhetEksportPerKvartalMedDatoer(
-            new Orgnr("999999998"),
-            new ÅrstallOgKvartal(2019, 2),
-            false,
-            LocalDateTime.now(),
-            null));
-    createVirksomhetEksportPerKvartal(
-        new VirksomhetEksportPerKvartalMedDatoer(
-            new Orgnr("999999998"),
-            new ÅrstallOgKvartal(2019, 3),
-            true,
-            LocalDateTime.now(),
-            LocalDateTime.now()));
-
-    List<VirksomhetEksportPerKvartal> resultat =
-        eksporteringRepository.hentVirksomhetEksportPerKvartal(new ÅrstallOgKvartal(2019, 2));
-
-    assertEquals(2, resultat.size());
-    assertTrue(
-        resultat.stream()
-            .anyMatch(
-                virksomhetEksportPerKvartal ->
-                    virksomhetEksportPerKvartal.getOrgnr().equals("999999998")
-                        && !virksomhetEksportPerKvartal.eksportert()
-                        && virksomhetEksportPerKvartal.getÅrstallOgKvartal().getÅrstall() == 2019
-                        && virksomhetEksportPerKvartal.getÅrstallOgKvartal().getKvartal() == 2));
-    assertTrue(
-        resultat.stream()
-            .anyMatch(
-                virksomhetEksportPerKvartal ->
-                    virksomhetEksportPerKvartal.getOrgnr().equals("999999999")
-                        && virksomhetEksportPerKvartal.eksportert()
-                        && virksomhetEksportPerKvartal.getÅrstallOgKvartal().getÅrstall() == 2019
-                        && virksomhetEksportPerKvartal.getÅrstallOgKvartal().getKvartal() == 2));
-  }
-
-  @Test
-  void oppdaterOgSetErEksportertTilTrue__skal_returnere_0_hvis_data_ikke_finnes() {
-    int oppdaterteRader = eksporteringRepository.opprettEksport(null);
-    assertEquals(0, oppdaterteRader);
-
-    oppdaterteRader = eksporteringRepository.opprettEksport(Collections.emptyList());
-    assertEquals(0, oppdaterteRader);
-  }
-
-  @Test
-  void batchOpprettVirksomheterBekreftetEksportert__oppretter_ingenting_hvis_lista_er_tom() {
-    List<String> virksomheterBekreftetEksportert = new ArrayList<>();
-
-    eksporteringRepository.batchOpprettVirksomheterBekreftetEksportert(
-        virksomheterBekreftetEksportert, new ÅrstallOgKvartal(2020, 2));
-
-    List<VirksomhetBekreftetEksportert> results = hentAlleVirksomhetBekreftetEksportert();
-    assertEquals(0, results.size());
-  }
-
-  @Test
-  void batchOpprettVirksomheterBekreftetEksportert__opprett_i_batch() {
-    List<String> virksomheterBekreftetEksportert = new ArrayList<>();
-    virksomheterBekreftetEksportert.add(ORGNR_VIRKSOMHET_1);
-    virksomheterBekreftetEksportert.add(ORGNR_VIRKSOMHET_2);
-    virksomheterBekreftetEksportert.add(ORGNR_VIRKSOMHET_3);
-
-    eksporteringRepository.batchOpprettVirksomheterBekreftetEksportert(
-        virksomheterBekreftetEksportert, new ÅrstallOgKvartal(2020, 2));
-
-    List<VirksomhetBekreftetEksportert> results = hentAlleVirksomhetBekreftetEksportert();
-    assertEquals(3, results.size());
-    assertVirksomhetBekreftetEksportert(results, ORGNR_VIRKSOMHET_1);
-    assertVirksomhetBekreftetEksportert(results, ORGNR_VIRKSOMHET_2);
-    assertVirksomhetBekreftetEksportert(results, ORGNR_VIRKSOMHET_3);
-  }
-
-  @Test
-  void
-      oppdaterVirksomheterIEksportTabell__oppdater_virksomheter_som_er_bekreftet_eksportert_og_returnerer_antall_oppdatert() {
-    LocalDateTime testStartDato = LocalDateTime.now();
-    createVirksomhetBekreftetEksportert(
-        new VirksomhetBekreftetEksportert(ORGNR_1, _2021_1, testStartDato));
-    createVirksomhetBekreftetEksportert(
-        new VirksomhetBekreftetEksportert(ORGNR_2, _2021_1, testStartDato));
-
-    createVirksomhetEksportPerKvartal(
-        new VirksomhetEksportPerKvartalMedDatoer(
-            ORGNR_1, _2021_1, true, testStartDato, testStartDato));
-    createVirksomhetEksportPerKvartal(
-        new VirksomhetEksportPerKvartalMedDatoer(ORGNR_2, _2021_1, false, testStartDato, null));
-    createVirksomhetEksportPerKvartal(
-        new VirksomhetEksportPerKvartalMedDatoer(ORGNR_3, _2021_1, false, testStartDato, null));
-
-    int antallOppdatert =
-        eksporteringRepository.oppdaterAlleVirksomheterIEksportTabellSomErBekrreftetEksportert();
-
-    assertEquals(1, antallOppdatert);
-    List<VirksomhetEksportPerKvartalMedDatoer> results = hentAlleVirksomhetEksportPerKvartal();
-    assertVirksomhetEksportPerKvartal(results, ORGNR_1.getVerdi(), true, testStartDato);
-    assertVirksomhetEksportPerKvartal(results, ORGNR_2.getVerdi(), true, testStartDato, true);
-    assertVirksomhetEksportPerKvartal(results, ORGNR_3.getVerdi(), false, testStartDato);
-  }
-
-  @Test
-  void
-      slettVirksomheterBekreftetEksportert__sletter_alle_rader_i_tabellen_og_returnerer_antall_slettet() {
-    createVirksomhetBekreftetEksportert(
-        new VirksomhetBekreftetEksportert(
-            new Orgnr(ORGNR_VIRKSOMHET_1), new ÅrstallOgKvartal(2020, 1), LocalDateTime.now()));
-    createVirksomhetBekreftetEksportert(
-        new VirksomhetBekreftetEksportert(
-            new Orgnr(ORGNR_VIRKSOMHET_2), new ÅrstallOgKvartal(2020, 1), LocalDateTime.now()));
-
-    int antallSlettet = eksporteringRepository.slettVirksomheterBekreftetEksportert();
-
-    assertEquals(2, antallSlettet);
-    assertEquals(0, hentAlleVirksomhetBekreftetEksportert().size());
-  }
-
-  @Test
-  void hentAntallIkkeEksportertRader__skal_retunere_riktig_tall() {
-
-    opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_1);
-    opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_2);
-    opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_3, true);
-
-    int antallIkkeFerdigEksportert = eksporteringRepository.hentAntallIkkeFerdigEksportert();
-    assertEquals(2, antallIkkeFerdigEksportert);
-  }
-
-  @Test
-  void slettEksportertPerKvartal__skal_slette_alt() {
-
-    opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_1);
-    opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_2);
-    opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_3, true);
-
-    int antallSlettet = eksporteringRepository.slettEksportertPerKvartal();
-    assertEquals(3, antallSlettet);
-    List<VirksomhetEksportPerKvartalMedDatoer> results = hentAlleVirksomhetEksportPerKvartal();
-    assertEquals(0, results.size());
-  }
-
-  private void assertVirksomhetEksportPerKvartal(
-      List<VirksomhetEksportPerKvartalMedDatoer> results,
-      String orgnr,
-      boolean expectedEksportert,
-      LocalDateTime oppdatertEtterDato) {
-
-    assertVirksomhetEksportPerKvartal(
-        results, orgnr, expectedEksportert, oppdatertEtterDato, false);
-  }
-
-  private void assertVirksomhetEksportPerKvartal(
-      List<VirksomhetEksportPerKvartalMedDatoer> results,
-      String orgnr,
-      boolean expectedEksportert,
-      LocalDateTime oppdatertEtterDato,
-      boolean sjekkOppdatertDatoErEndret) {
-    VirksomhetEksportPerKvartalMedDatoer actual =
-        results.stream().filter(v -> v.orgnr.getVerdi().equals(orgnr)).findFirst().get();
-    assertEquals(expectedEksportert, actual.eksportert);
-
-    if (!expectedEksportert) {
-      assertNull(actual.oppdatert);
+@ExtendWith(SpringExtension::class)
+@ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
+@DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class, LocalOgUnitTestOidcConfiguration::class])
+open class EksporteringRepositoryTest {
+    @Autowired
+    private val jdbcTemplate: NamedParameterJdbcTemplate? = null
+    private var eksporteringRepository: EksporteringRepository? = null
+    @BeforeEach
+    fun setUp() {
+        eksporteringRepository = EksporteringRepository(jdbcTemplate!!)
+        slettAllEksportDataFraDatabase(jdbcTemplate)
     }
 
-    if (sjekkOppdatertDatoErEndret) {
-      assertEquals(true, actual.oppdatert.isAfter(oppdatertEtterDato));
+    @AfterEach
+    fun tearDown() {
+        slettAllEksportDataFraDatabase(jdbcTemplate!!)
     }
-  }
 
-  private void assertVirksomhetBekreftetEksportert(
-      List<VirksomhetBekreftetEksportert> results, String orgnr) {
-    VirksomhetBekreftetEksportert actual =
-        results.stream().filter(v -> v.orgnr.getVerdi().equals(orgnr)).findFirst().get();
-    assertEquals(orgnr, actual.orgnr.getVerdi());
-  }
+    @Test
+    fun hentVirksomhetEksportPerKvartal__returnerer_antall_VirksomhetEksportPerKvartal_funnet() {
+        createVirksomhetEksportPerKvartal(
+            VirksomhetEksportPerKvartalMedDatoer(
+                Orgnr("999999999"),
+                ÅrstallOgKvartal(2019, 2),
+                true,
+                LocalDateTime.now()
+            )
+        )
+        createVirksomhetEksportPerKvartal(
+            VirksomhetEksportPerKvartalMedDatoer(
+                Orgnr("999999998"),
+                ÅrstallOgKvartal(2019, 2),
+                false,
+                null
+            )
+        )
+        createVirksomhetEksportPerKvartal(
+            VirksomhetEksportPerKvartalMedDatoer(
+                Orgnr("999999998"),
+                ÅrstallOgKvartal(2019, 3),
+                true,
+                LocalDateTime.now()
+            )
+        )
+        val resultat = eksporteringRepository!!.hentVirksomhetEksportPerKvartal(ÅrstallOgKvartal(2019, 2))
+        Assertions.assertEquals(2, resultat.size)
+        Assertions.assertTrue(
+            resultat.stream()
+                .anyMatch { virksomhetEksportPerKvartal: VirksomhetEksportPerKvartal -> virksomhetEksportPerKvartal.getOrgnr() == "999999998" && !virksomhetEksportPerKvartal.eksportert() && virksomhetEksportPerKvartal.ÅrstallOgKvartal.årstall == 2019 && virksomhetEksportPerKvartal.ÅrstallOgKvartal.kvartal == 2 })
+        Assertions.assertTrue(
+            resultat.stream()
+                .anyMatch { virksomhetEksportPerKvartal: VirksomhetEksportPerKvartal -> virksomhetEksportPerKvartal.getOrgnr() == "999999999" && virksomhetEksportPerKvartal.eksportert() && virksomhetEksportPerKvartal.ÅrstallOgKvartal.årstall == 2019 && virksomhetEksportPerKvartal.ÅrstallOgKvartal.kvartal == 2 })
+    }
 
-  private int createVirksomhetEksportPerKvartal(VirksomhetEksportPerKvartalMedDatoer virksomhet) {
-    MapSqlParameterSource parametre =
-        new MapSqlParameterSource()
-            .addValue("orgnr", virksomhet.orgnr.getVerdi())
-            .addValue("årstall", virksomhet.årstallOgKvartal.getÅrstall())
-            .addValue("kvartal", virksomhet.årstallOgKvartal.getKvartal())
+    @Test
+    fun oppdaterOgSetErEksportertTilTrue__skal_returnere_0_hvis_data_ikke_finnes() {
+        var oppdaterteRader = eksporteringRepository!!.opprettEksport(null)
+        Assertions.assertEquals(0, oppdaterteRader)
+        oppdaterteRader = eksporteringRepository!!.opprettEksport(emptyList<VirksomhetEksportPerKvartal>())
+        Assertions.assertEquals(0, oppdaterteRader)
+    }
+
+    @Test
+    fun batchOpprettVirksomheterBekreftetEksportert__oppretter_ingenting_hvis_lista_er_tom() {
+        val virksomheterBekreftetEksportert: List<String?> = ArrayList()
+        eksporteringRepository!!.batchOpprettVirksomheterBekreftetEksportert(
+            virksomheterBekreftetEksportert, ÅrstallOgKvartal(2020, 2)
+        )
+        val results = hentAlleVirksomhetBekreftetEksportert()
+        Assertions.assertEquals(0, results.size)
+    }
+
+    @Test
+    fun batchOpprettVirksomheterBekreftetEksportert__opprett_i_batch() {
+        val virksomheterBekreftetEksportert: MutableList<String?> = ArrayList()
+        virksomheterBekreftetEksportert.add(ORGNR_VIRKSOMHET_1)
+        virksomheterBekreftetEksportert.add(ORGNR_VIRKSOMHET_2)
+        virksomheterBekreftetEksportert.add(ORGNR_VIRKSOMHET_3)
+        eksporteringRepository!!.batchOpprettVirksomheterBekreftetEksportert(
+            virksomheterBekreftetEksportert, ÅrstallOgKvartal(2020, 2)
+        )
+        val results = hentAlleVirksomhetBekreftetEksportert()
+        Assertions.assertEquals(3, results.size)
+        assertVirksomhetBekreftetEksportert(results, ORGNR_VIRKSOMHET_1)
+        assertVirksomhetBekreftetEksportert(results, ORGNR_VIRKSOMHET_2)
+        assertVirksomhetBekreftetEksportert(results, ORGNR_VIRKSOMHET_3)
+    }
+
+    @Test
+    fun oppdaterVirksomheterIEksportTabell__oppdater_virksomheter_som_er_bekreftet_eksportert_og_returnerer_antall_oppdatert() {
+        val testStartDato = LocalDateTime.now()
+        createVirksomhetBekreftetEksportert(
+            VirksomhetBekreftetEksportert(ORGNR_1, _2021_1, testStartDato)
+        )
+        createVirksomhetBekreftetEksportert(
+            VirksomhetBekreftetEksportert(ORGNR_2, _2021_1, testStartDato)
+        )
+        createVirksomhetEksportPerKvartal(
+            VirksomhetEksportPerKvartalMedDatoer(
+                ORGNR_1, _2021_1, true, testStartDato
+            )
+        )
+        createVirksomhetEksportPerKvartal(
+            VirksomhetEksportPerKvartalMedDatoer(ORGNR_2, _2021_1, false, null)
+        )
+        createVirksomhetEksportPerKvartal(
+            VirksomhetEksportPerKvartalMedDatoer(ORGNR_3, _2021_1, false, null)
+        )
+        val antallOppdatert = eksporteringRepository!!.oppdaterAlleVirksomheterIEksportTabellSomErBekrreftetEksportert()
+        Assertions.assertEquals(1, antallOppdatert)
+        val results = hentAlleVirksomhetEksportPerKvartal()
+        assertVirksomhetEksportPerKvartal(results, ORGNR_1.verdi, true, testStartDato)
+        assertVirksomhetEksportPerKvartal(results, ORGNR_2.verdi, true, testStartDato, true)
+        assertVirksomhetEksportPerKvartal(results, ORGNR_3.verdi, false, testStartDato)
+    }
+
+    @Test
+    fun slettVirksomheterBekreftetEksportert__sletter_alle_rader_i_tabellen_og_returnerer_antall_slettet() {
+        createVirksomhetBekreftetEksportert(
+            VirksomhetBekreftetEksportert(
+                Orgnr(ORGNR_VIRKSOMHET_1), ÅrstallOgKvartal(2020, 1), LocalDateTime.now()
+            )
+        )
+        createVirksomhetBekreftetEksportert(
+            VirksomhetBekreftetEksportert(
+                Orgnr(ORGNR_VIRKSOMHET_2), ÅrstallOgKvartal(2020, 1), LocalDateTime.now()
+            )
+        )
+        val antallSlettet = eksporteringRepository!!.slettVirksomheterBekreftetEksportert()
+        Assertions.assertEquals(2, antallSlettet)
+        Assertions.assertEquals(0, hentAlleVirksomhetBekreftetEksportert().size)
+    }
+
+    @Test
+    fun hentAntallIkkeEksportertRader__skal_retunere_riktig_tall() {
+        opprettTestVirksomhetMetaData(jdbcTemplate!!, 2020, 2, ORGNR_VIRKSOMHET_1)
+        opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_2)
+        opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_3, true)
+        val antallIkkeFerdigEksportert = eksporteringRepository!!.hentAntallIkkeFerdigEksportert()
+        Assertions.assertEquals(2, antallIkkeFerdigEksportert)
+    }
+
+    @Test
+    fun slettEksportertPerKvartal__skal_slette_alt() {
+        opprettTestVirksomhetMetaData(jdbcTemplate!!, 2020, 2, ORGNR_VIRKSOMHET_1)
+        opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_2)
+        opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_3, true)
+        val antallSlettet = eksporteringRepository!!.slettEksportertPerKvartal()
+        Assertions.assertEquals(3, antallSlettet)
+        val results = hentAlleVirksomhetEksportPerKvartal()
+        Assertions.assertEquals(0, results.size)
+    }
+
+    private fun assertVirksomhetEksportPerKvartal(
+        results: List<VirksomhetEksportPerKvartalMedDatoer>,
+        orgnr: String,
+        expectedEksportert: Boolean,
+        oppdatertEtterDato: LocalDateTime,
+        sjekkOppdatertDatoErEndret: Boolean = false
+    ) {
+        val actual =
+            results.stream().filter { v: VirksomhetEksportPerKvartalMedDatoer -> v.orgnr.verdi == orgnr }.findFirst()
+                .get()
+        Assertions.assertEquals(expectedEksportert, actual.eksportert)
+        if (!expectedEksportert) {
+            Assertions.assertNull(actual.oppdatert)
+        }
+        if (sjekkOppdatertDatoErEndret) {
+            Assertions.assertEquals(true, actual.oppdatert!!.isAfter(oppdatertEtterDato))
+        }
+    }
+
+    private fun assertVirksomhetBekreftetEksportert(
+        results: List<VirksomhetBekreftetEksportert>, orgnr: String
+    ) {
+        val actual =
+            results.stream().filter { v: VirksomhetBekreftetEksportert -> v.orgnr.verdi == orgnr }.findFirst().get()
+        Assertions.assertEquals(orgnr, actual.orgnr.verdi)
+    }
+
+    private fun createVirksomhetEksportPerKvartal(virksomhet: VirksomhetEksportPerKvartalMedDatoer): Int {
+        val parametre = MapSqlParameterSource()
+            .addValue("orgnr", virksomhet.orgnr.verdi)
+            .addValue("årstall", virksomhet.årstallOgKvartal.årstall)
+            .addValue("kvartal", virksomhet.årstallOgKvartal.kvartal)
             .addValue("eksportert", virksomhet.eksportert)
-            .addValue("oppdatert", virksomhet.oppdatert);
-
-    return jdbcTemplate.update(
-        "insert into eksport_per_kvartal (orgnr, arstall, kvartal, eksportert, oppdatert) "
-            + "values (:orgnr, :årstall, :kvartal, :eksportert, :oppdatert)",
-        parametre);
-  }
-
-  private int createVirksomhetBekreftetEksportert(VirksomhetBekreftetEksportert virksomhet) {
-    MapSqlParameterSource parametre =
-        new MapSqlParameterSource()
-            .addValue("orgnr", virksomhet.orgnr.getVerdi())
-            .addValue("årstall", virksomhet.årstallOgKvartal.getÅrstall())
-            .addValue("kvartal", virksomhet.årstallOgKvartal.getKvartal())
-            .addValue("opprettet", virksomhet.opprettet);
-
-    return jdbcTemplate.update(
-        "insert into virksomheter_bekreftet_eksportert (orgnr, arstall, kvartal, opprettet) "
-            + "values (:orgnr, :årstall, :kvartal, :opprettet)",
-        parametre);
-  }
-
-  private List<VirksomhetEksportPerKvartalMedDatoer> hentAlleVirksomhetEksportPerKvartal() {
-    return jdbcTemplate.query(
-        "select orgnr, arstall, kvartal, eksportert, opprettet, oppdatert "
-            + "from eksport_per_kvartal ",
-        new MapSqlParameterSource(),
-        (resultSet, rowNum) ->
-            new VirksomhetEksportPerKvartalMedDatoer(
-                new Orgnr(resultSet.getString("orgnr")),
-                new ÅrstallOgKvartal(resultSet.getInt("arstall"), resultSet.getInt("kvartal")),
-                "true".equalsIgnoreCase(resultSet.getString("eksportert")),
-                resultSet.getTimestamp("opprettet").toLocalDateTime(),
-                resultSet.getTimestamp("oppdatert") != null
-                    ? resultSet.getTimestamp("oppdatert").toLocalDateTime()
-                    : null));
-  }
-
-  private List<VirksomhetBekreftetEksportert> hentAlleVirksomhetBekreftetEksportert() {
-    return jdbcTemplate.query(
-        "select orgnr, arstall, kvartal, opprettet " + "from virksomheter_bekreftet_eksportert ",
-        new MapSqlParameterSource(),
-        (resultSet, rowNum) ->
-            new VirksomhetBekreftetEksportert(
-                new Orgnr(resultSet.getString("orgnr")),
-                new ÅrstallOgKvartal(resultSet.getInt("arstall"), resultSet.getInt("kvartal")),
-                resultSet.getTimestamp("opprettet").toLocalDateTime()));
-  }
-
-  class VirksomhetEksportPerKvartalMedDatoer {
-    Orgnr orgnr;
-    ÅrstallOgKvartal årstallOgKvartal;
-    boolean eksportert;
-    LocalDateTime opprettet;
-    LocalDateTime oppdatert;
-
-    public VirksomhetEksportPerKvartalMedDatoer(
-        Orgnr orgnr,
-        ÅrstallOgKvartal årstallOgKvartal,
-        boolean eksportert,
-        LocalDateTime opprettet,
-        LocalDateTime oppdatert) {
-      this.orgnr = orgnr;
-      this.årstallOgKvartal = årstallOgKvartal;
-      this.eksportert = eksportert;
-      this.opprettet = opprettet;
-      this.oppdatert = oppdatert;
+            .addValue("oppdatert", virksomhet.oppdatert)
+        return jdbcTemplate!!.update(
+            "insert into eksport_per_kvartal (orgnr, arstall, kvartal, eksportert, oppdatert) "
+                    + "values (:orgnr, :årstall, :kvartal, :eksportert, :oppdatert)",
+            parametre
+        )
     }
-  }
 
-  class VirksomhetBekreftetEksportert {
-    Orgnr orgnr;
-    ÅrstallOgKvartal årstallOgKvartal;
-    LocalDateTime opprettet;
-
-    public VirksomhetBekreftetEksportert(
-        Orgnr orgnr, ÅrstallOgKvartal årstallOgKvartal, LocalDateTime opprettet) {
-      this.orgnr = orgnr;
-      this.årstallOgKvartal = årstallOgKvartal;
-      this.opprettet = opprettet;
+    private fun createVirksomhetBekreftetEksportert(virksomhet: VirksomhetBekreftetEksportert): Int {
+        val parametre = MapSqlParameterSource()
+            .addValue("orgnr", virksomhet.orgnr.verdi)
+            .addValue("årstall", virksomhet.årstallOgKvartal.årstall)
+            .addValue("kvartal", virksomhet.årstallOgKvartal.kvartal)
+            .addValue("opprettet", virksomhet.opprettet)
+        return jdbcTemplate!!.update(
+            "insert into virksomheter_bekreftet_eksportert (orgnr, arstall, kvartal, opprettet) "
+                    + "values (:orgnr, :årstall, :kvartal, :opprettet)",
+            parametre
+        )
     }
-  }
+
+    private fun hentAlleVirksomhetEksportPerKvartal(): List<VirksomhetEksportPerKvartalMedDatoer> {
+        return jdbcTemplate!!.query(
+            "select orgnr, arstall, kvartal, eksportert, opprettet, oppdatert "
+                    + "from eksport_per_kvartal ",
+            MapSqlParameterSource()
+        ) { resultSet: ResultSet, _: Int ->
+            VirksomhetEksportPerKvartalMedDatoer(
+                Orgnr(resultSet.getString("orgnr")),
+                ÅrstallOgKvartal(resultSet.getInt("arstall"), resultSet.getInt("kvartal")),
+                "true".equals(resultSet.getString("eksportert"), ignoreCase = true),
+                if (resultSet.getTimestamp("oppdatert") != null) resultSet.getTimestamp("oppdatert")
+                    .toLocalDateTime() else null
+            )
+        }
+    }
+
+    private fun hentAlleVirksomhetBekreftetEksportert(): List<VirksomhetBekreftetEksportert> {
+        return jdbcTemplate!!.query(
+            "select orgnr, arstall, kvartal, opprettet " + "from virksomheter_bekreftet_eksportert ",
+            MapSqlParameterSource()
+        ) { resultSet: ResultSet, _: Int ->
+            VirksomhetBekreftetEksportert(
+                Orgnr(resultSet.getString("orgnr")),
+                ÅrstallOgKvartal(resultSet.getInt("arstall"), resultSet.getInt("kvartal")),
+                resultSet.getTimestamp("opprettet").toLocalDateTime()
+            )
+        }
+    }
+
+    internal inner class VirksomhetEksportPerKvartalMedDatoer(
+        var orgnr: Orgnr,
+        var årstallOgKvartal: ÅrstallOgKvartal,
+        var eksportert: Boolean,
+        var oppdatert: LocalDateTime?
+    )
+
+    internal inner class VirksomhetBekreftetEksportert(
+        var orgnr: Orgnr, var årstallOgKvartal: ÅrstallOgKvartal, var opprettet: LocalDateTime
+    )
+
+    companion object {
+        val ORGNR_1 = Orgnr(ORGNR_VIRKSOMHET_1)
+        val ORGNR_2 = Orgnr(ORGNR_VIRKSOMHET_2)
+        val ORGNR_3 = Orgnr(ORGNR_VIRKSOMHET_3)
+        val _2021_1 = ÅrstallOgKvartal(2021, 1)
+    }
 }
