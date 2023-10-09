@@ -1,259 +1,278 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
-import org.junit.jupiter.api.Test;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringServiceUtils
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.ORGNR_VIRKSOMHET_1
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.ORGNR_VIRKSOMHET_2
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2020_4
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.__2021_2
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.assertEqualsVirksomhetSykefravær
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.byggSykefraværStatistikkNæring
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.byggSykefraværStatistikkNæring5Siffer
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.byggSykefraværStatistikkSektor
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.byggSykefraværsstatistikkVirksomhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.virksomhet1Metadata_2020_4
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.virksomhet1Metadata_2021_1
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.virksomhet1Metadata_2021_2
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.virksomhet2Metadata_2020_4
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.virksomhet3Metadata_2020_4
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+import java.math.BigDecimal
+import kotlin.collections.set
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+class EksporteringServiceUtilsTest {
+    @Test
+    fun virksomhetMetadataHashMap__returnerer_en_map_med_orgnr_som_key() {
+        val virksomhetMetadataHashMap = EksporteringServiceUtils.getVirksomhetMetadataHashMap(
+            listOf(virksomhet1Metadata_2020_4, virksomhet2Metadata_2020_4)
+        )
+        Assertions.assertEquals(2, virksomhetMetadataHashMap.size)
+        Assertions.assertEquals(
+            virksomhet1Metadata_2020_4,
+            virksomhetMetadataHashMap[virksomhet1Metadata_2020_4.orgnr]
+        )
+        Assertions.assertEquals(
+            virksomhet2Metadata_2020_4,
+            virksomhetMetadataHashMap[virksomhet2Metadata_2020_4.orgnr]
+        )
+    }
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringServiceUtils.*;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils.*;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-public class EksporteringServiceUtilsTest {
-
-  @Test
-  public void getVirksomhetMetadataHashMap__returnerer_en_map_med_orgnr_som_key() {
-    Map<String, VirksomhetMetadata> virksomhetMetadataHashMap =
-        getVirksomhetMetadataHashMap(
-            Arrays.asList(virksomhet1Metadata_2020_4, virksomhet2Metadata_2020_4));
-
-    assertEquals(2, virksomhetMetadataHashMap.size());
-    assertEquals(
-        virksomhet1Metadata_2020_4,
-        virksomhetMetadataHashMap.get(virksomhet1Metadata_2020_4.getOrgnr()));
-    assertEquals(
-        virksomhet2Metadata_2020_4,
-        virksomhetMetadataHashMap.get(virksomhet2Metadata_2020_4.getOrgnr()));
-  }
-
-  @Test
-  public void getVirksomheterMetadataFraSubset__returnerer_intersection() {
-    Map<String, VirksomhetMetadata> virksomhetMetadataHashMap = new HashMap<>();
-    virksomhetMetadataHashMap.put(
-        virksomhet1Metadata_2020_4.getOrgnr(), virksomhet1Metadata_2020_4);
-    virksomhetMetadataHashMap.put(
-        virksomhet2Metadata_2020_4.getOrgnr(), virksomhet2Metadata_2020_4);
-    virksomhetMetadataHashMap.put(
-        virksomhet3Metadata_2020_4.getOrgnr(), virksomhet3Metadata_2020_4);
-
-    List<VirksomhetMetadata> virksomhetMetadataList =
-        getVirksomheterMetadataFraSubset(
+    @Test
+    fun virksomheterMetadataFraSubset__returnerer_intersection() {
+        val virksomhetMetadataHashMap: MutableMap<String, VirksomhetMetadata> = HashMap()
+        virksomhetMetadataHashMap[virksomhet1Metadata_2020_4.orgnr] = virksomhet1Metadata_2020_4
+        virksomhetMetadataHashMap[virksomhet2Metadata_2020_4.orgnr] = virksomhet2Metadata_2020_4
+        virksomhetMetadataHashMap[virksomhet3Metadata_2020_4.orgnr] = virksomhet3Metadata_2020_4
+        val virksomhetMetadataList = EksporteringServiceUtils.getVirksomheterMetadataFraSubset(
             virksomhetMetadataHashMap,
-            Arrays.asList(
-                new VirksomhetEksportPerKvartal(ORGNR_VIRKSOMHET_1, __2020_4, false),
-                new VirksomhetEksportPerKvartal(ORGNR_VIRKSOMHET_2, __2020_4, false)));
+            listOf(
+                VirksomhetEksportPerKvartal(ORGNR_VIRKSOMHET_1, __2020_4, false),
+                VirksomhetEksportPerKvartal(ORGNR_VIRKSOMHET_2, __2020_4, false)
+            )
+        )
+        Assertions.assertEquals(2, virksomhetMetadataList.size)
+        Assertions.assertTrue(virksomhetMetadataList.contains(virksomhet1Metadata_2020_4))
+        Assertions.assertTrue(virksomhetMetadataList.contains(virksomhet2Metadata_2020_4))
+    }
 
-    assertEquals(2, virksomhetMetadataList.size());
-    assertTrue(virksomhetMetadataList.contains(virksomhet1Metadata_2020_4));
-    assertTrue(virksomhetMetadataList.contains(virksomhet2Metadata_2020_4));
-  }
-
-
-  @Test
-  public void
-      getVirksomhetSykefravær__returnerer_VirksomhetSykefravær_uten_statistikk__dersom_ingen_entry_matcher_Virksomhet() {
-    VirksomhetSykefravær actualVirksomhetSykefravær =
-        getVirksomhetSykefravær(
-            virksomhet1Metadata_2020_4, buildMapAvSykefraværsstatistikkPerVirksomhet(10));
-
-    VirksomhetSykefravær expectedVirksomhetSykefravær =
-        new VirksomhetSykefravær(
-            virksomhet1Metadata_2020_4.getOrgnr(),
-                virksomhet1Metadata_2020_4.getNavn(),
+    @Test
+    fun virksomhetSykefravær__returnerer_VirksomhetSykefravær_uten_statistikk__dersom_ingen_entry_matcher_Virksomhet() {
+        val actualVirksomhetSykefravær = EksporteringServiceUtils.getVirksomhetSykefravær(
+            virksomhet1Metadata_2020_4, buildMapAvSykefraværsstatistikkPerVirksomhet(10)
+        )
+        val expectedVirksomhetSykefravær = VirksomhetSykefravær(
+            virksomhet1Metadata_2020_4.orgnr,
+            virksomhet1Metadata_2020_4.navn,
             2020,
             4,
             null,
             null,
-            0);
-    assertEqualsVirksomhetSykefravær(expectedVirksomhetSykefravær, actualVirksomhetSykefravær);
-  }
+            0
+        )
+        assertEqualsVirksomhetSykefravær(expectedVirksomhetSykefravær, actualVirksomhetSykefravær)
+    }
 
-  @Test
-  public void getVirksomhetSykefravær__returnerer_VirksomhetSykefravær_som_matcher_Virksomhet() {
-    VirksomhetMetadata virksomhetToBeFound =
-        new VirksomhetMetadata(
-            new Orgnr("399000"), "Virksomhet 1", RECTYPE_FOR_VIRKSOMHET, Sektor.STATLIG, "11", "11111", __2020_4);
-    Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> bigMap =
-        buildMapAvSykefraværsstatistikkPerVirksomhet(500000);
-
-    long startWithMap = System.nanoTime();
-    VirksomhetSykefravær actualVirksomhetSykefravær =
-        getVirksomhetSykefravær(virksomhetToBeFound, bigMap);
-    long stopWithMap = System.nanoTime();
-
-    VirksomhetSykefravær expectedVirksomhetSykefravær =
-        new VirksomhetSykefravær(
-            virksomhetToBeFound.getOrgnr(),
-                virksomhetToBeFound.getNavn(),
+    @Test
+    fun virksomhetSykefravær__returnerer_VirksomhetSykefravær_som_matcher_Virksomhet() {
+        val virksomhetToBeFound = VirksomhetMetadata(
+            Orgnr("399000"),
+            "Virksomhet 1",
+            DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
+            Sektor.STATLIG,
+            "11",
+            "11111",
+            __2020_4
+        )
+        val bigMap = buildMapAvSykefraværsstatistikkPerVirksomhet(500000)
+        val startWithMap = System.nanoTime()
+        val actualVirksomhetSykefravær =
+            EksporteringServiceUtils.getVirksomhetSykefravær(virksomhetToBeFound, bigMap)
+        val stopWithMap = System.nanoTime()
+        val expectedVirksomhetSykefravær = VirksomhetSykefravær(
+            virksomhetToBeFound.orgnr,
+            virksomhetToBeFound.navn,
             2020,
             4,
-            new BigDecimal(100),
-            new BigDecimal(1000),
-            10);
-    assertEqualsVirksomhetSykefravær(expectedVirksomhetSykefravær, actualVirksomhetSykefravær);
-    System.out.println("Elapsed time in nanoseconds (With Map) = " + (stopWithMap - startWithMap));
-  }
+            BigDecimal(100),
+            BigDecimal(1000),
+            10
+        )
+        assertEqualsVirksomhetSykefravær(expectedVirksomhetSykefravær, actualVirksomhetSykefravær)
+        println("Elapsed time in nanoseconds (With Map) = " + (stopWithMap - startWithMap))
+    }
 
-
-  @Test
-  public void
-      getSykefraværMedKategoriForSektor__returnerer_SykefraværMedKategori__med_sykefraværsstatistikk_for_sektor() {
-    SykefraværMedKategori resultat =
-        getSykefraværMedKategoriForSektor(
+    @Test
+    fun sykefraværMedKategoriForSektor__returnerer_SykefraværMedKategori__med_sykefraværsstatistikk_for_sektor() {
+        val resultat = EksporteringServiceUtils.getSykefraværMedKategoriForSektor(
             virksomhet1Metadata_2020_4,
-            Arrays.asList(
+            listOf(
                 byggSykefraværStatistikkSektor(virksomhet1Metadata_2020_4, 10, 156, 22233),
-                byggSykefraværStatistikkSektor(virksomhet2Metadata_2020_4)));
+                byggSykefraværStatistikkSektor(virksomhet2Metadata_2020_4)
+            )
+        )
+        assertEqualsSykefraværMedKategori(
+            byggSykefraværStatistikkSektor(virksomhet1Metadata_2020_4, 10, 156, 22233),
+            resultat,
+            Statistikkategori.SEKTOR,
+            virksomhet1Metadata_2020_4.sektor.sektorkode
+        )
+    }
 
-    EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(
-        byggSykefraværStatistikkSektor(virksomhet1Metadata_2020_4, 10, 156, 22233),
-        resultat,
-        Statistikkategori.SEKTOR,
-            virksomhet1Metadata_2020_4.getSektor().getSektorkode());
-  }
-
-  @Test
-  public void
-      getSykefraværMedKategoriForNæring__returnerer_SykefraværMedKategori__med_sykefraværsstatistikk_for_næring() {
-    SykefraværMedKategori resultat =
-        getSykefraværMedKategoriNæringForVirksomhet(
+    @Test
+    fun sykefraværMedKategoriForNæring__returnerer_SykefraværMedKategori__med_sykefraværsstatistikk_for_næring() {
+        val resultat = EksporteringServiceUtils.getSykefraværMedKategoriNæringForVirksomhet(
             virksomhet1Metadata_2020_4,
-            Arrays.asList(
+            listOf(
                 byggSykefraværStatistikkNæring(virksomhet1Metadata_2020_4, 10, 156, 22233),
-                byggSykefraværStatistikkNæring(virksomhet2Metadata_2020_4)));
+                byggSykefraværStatistikkNæring(virksomhet2Metadata_2020_4)
+            )
+        )
+        assertEqualsSykefraværMedKategori(
+            byggSykefraværStatistikkNæring(virksomhet1Metadata_2020_4, 10, 156, 22233),
+            resultat,
+            Statistikkategori.NÆRING,
+            virksomhet1Metadata_2020_4.primærnæring
+        )
+    }
 
-    EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(
-        byggSykefraværStatistikkNæring(virksomhet1Metadata_2020_4, 10, 156, 22233),
-        resultat,
-        Statistikkategori.NÆRING,
-            virksomhet1Metadata_2020_4.getPrimærnæring());
-  }
-
-  @Test
-  public void
-      getSykefraværMedKategoriForNæring5Siffer__returnerer_SykefraværMedKategori__med_sykefraværsstatistikk_for_næring_5_siffer() {
-    virksomhet1Metadata_2020_4.leggTilNæringOgNæringskode5siffer(
-        Arrays.asList(
-                new Næringskode("85000"),
-                new Næringskode("11000")
-        ));
-    List<SykefraværMedKategori> resultat =
-        getSykefraværMedKategoriForNæring5Siffer(
+    @Test
+    fun sykefraværMedKategoriForNæring5Siffer__returnerer_SykefraværMedKategori__med_sykefraværsstatistikk_for_næring_5_siffer() {
+        virksomhet1Metadata_2020_4.leggTilNæringOgNæringskode5siffer(
+            listOf(
+                Næringskode("85000"),
+                Næringskode("11000")
+            )
+        )
+        val resultat = EksporteringServiceUtils.getSykefraværMedKategoriForNæring5Siffer(
             virksomhet1Metadata_2020_4,
-            Arrays.asList(
+            listOf(
                 byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "11000"),
-                byggSykefraværStatistikkNæring5Siffer(virksomhet2Metadata_2020_4, "85000")));
+                byggSykefraværStatistikkNæring5Siffer(virksomhet2Metadata_2020_4, "85000")
+            )
+        )
+        assertThat(resultat.size).isEqualTo(2)
+        val sykefraværMedKategori85000 = resultat.first { r: SykefraværMedKategori -> "85000" == r.kode }
+        assertEqualsSykefraværMedKategori(
+            byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "85000"),
+            sykefraværMedKategori85000,
+            Statistikkategori.NÆRINGSKODE,
+            virksomhet1Metadata_2020_4.næringOgNæringskode5siffer[1].femsifferIdentifikator
+        )
+        val sykefraværMedKategori11000 = resultat.first { r: SykefraværMedKategori -> "11000" == r.kode }
+        assertEqualsSykefraværMedKategori(
+            byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "11000"),
+            sykefraværMedKategori11000,
+            Statistikkategori.NÆRINGSKODE,
+            virksomhet1Metadata_2020_4.næringOgNæringskode5siffer[0].femsifferIdentifikator
+        )
+    }
 
-    assertThat(resultat.size()).isEqualTo(2);
-    SykefraværMedKategori sykefraværMedKategori85000 =
-        resultat.stream().filter(r -> "85000".equals(r.kode)).findFirst().get();
-
-    EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(
-        byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "85000"),
-        sykefraværMedKategori85000,
-        Statistikkategori.NÆRINGSKODE,
-            virksomhet1Metadata_2020_4.getNæringOgNæringskode5siffer().get(0).getFemsifferIdentifikator());
-    SykefraværMedKategori sykefraværMedKategori11000 =
-        resultat.stream().filter(r -> "11000".equals(r.kode)).findFirst().get();
-
-    EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori(
-        byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "11000"),
-        sykefraværMedKategori11000,
-        Statistikkategori.NÆRINGSKODE,
-            virksomhet1Metadata_2020_4.getNæringOgNæringskode5siffer().get(1).getFemsifferIdentifikator());
-  }
-
-  @Test
-  public void getSykefraværsstatistikkNæring5Siffers__skal_returnere_riktig_liste() {
-    VirksomhetMetadata virksomhetMetadata_2020_4_med_næring5siffer = virksomhet1Metadata_2020_4;
-    virksomhetMetadata_2020_4_med_næring5siffer.leggTilNæringOgNæringskode5siffer(
-        Arrays.asList(
-                new Næringskode("11000"),
-                new Næringskode("85000")));
-    List<SykefraværsstatistikkForNæringskode> sykefraværsstatistikkForNæringskodeList =
-        Arrays.asList(
+    @Test
+    fun sykefraværsstatistikkNæring5Siffers__skal_returnere_riktig_liste() {
+        val virksomhetMetadata_2020_4_med_næring5siffer: VirksomhetMetadata = virksomhet1Metadata_2020_4
+        virksomhetMetadata_2020_4_med_næring5siffer.leggTilNæringOgNæringskode5siffer(
+            listOf(
+                Næringskode("11000"),
+                Næringskode("85000")
+            )
+        )
+        val sykefraværsstatistikkForNæringskodeList = listOf(
             byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "11000"),
             byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "45210"),
-            byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "85000"));
-    List<SykefraværsstatistikkForNæringskode> resultat =
-        getSykefraværsstatistikkNæring5Siffers(
-            virksomhetMetadata_2020_4_med_næring5siffer, sykefraværsstatistikkForNæringskodeList);
+            byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "85000")
+        )
+        val resultat = EksporteringServiceUtils.getSykefraværsstatistikkNæring5Siffers(
+            virksomhetMetadata_2020_4_med_næring5siffer, sykefraværsstatistikkForNæringskodeList
+        )
+        assertThat(resultat.size).isEqualTo(2)
+        assertThat(
+            resultat.contains(
+                byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "11000")
+            )
+        )
+        assertThat(
+            resultat.contains(
+                byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "85000")
+            )
+        )
+        assertThat(
+            !resultat.contains(
+                byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "45210")
+            )
+        )
+    }
 
-    assertThat(resultat.size()).isEqualTo(2);
-    assertThat(
-        resultat.contains(
-            byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "11000")));
-    assertThat(
-        resultat.contains(
-            byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "85000")));
-    assertThat(
-        !resultat.contains(
-            byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "45210")));
-  }
-
-  @Test
-  public void filterByKvartal_skalIkkeFeile() {
-    assertThat(
-            filterByKvartal(
+    @Test
+    fun filterByKvartal_skalIkkeFeile() {
+        assertThat(
+            EksporteringServiceUtils.filterByKvartal(
                 SISTE_PUBLISERTE_KVARTAL,
-                List.of(byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2020_4))))
-        .isEmpty();
-  }
+                listOf(
+                    byggSykefraværsstatistikkVirksomhet(
+                        virksomhet1Metadata_2020_4
+                    )
+                )
+            )
+        )
+            .isEmpty()
+    }
 
-  @Test
-  public void filterByKvartal_skalReturnereRiktigKvartal() {
-    List<SykefraværsstatistikkVirksomhetUtenVarighet> ønskedeResultat__2021_2 =
-        List.of(byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2021_2));
-    List<SykefraværsstatistikkVirksomhetUtenVarighet> actual__2021_2 =
-        filterByKvartal(
+    @Test
+    fun filterByKvartal_skalReturnereRiktigKvartal() {
+        val ønskedeResultat__2021_2 = listOf(
+            byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2021_2)
+        )
+        val actual__2021_2 = EksporteringServiceUtils.filterByKvartal(
             __2021_2,
-            List.of(
+            listOf(
                 byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2020_4),
                 byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2021_1),
-                byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2021_2)));
-    assertThat(actual__2021_2).size().isEqualTo(1);
-    assertThat(actual__2021_2).containsExactlyInAnyOrderElementsOf(ønskedeResultat__2021_2);
-  }
+                byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2021_2)
+            )
+        )
+        assertThat(actual__2021_2).size().isEqualTo(1)
+        assertThat(actual__2021_2)
+            .containsExactlyInAnyOrderElementsOf(ønskedeResultat__2021_2)
+    }
 
-  @Test
-  public void filterByKvartal_skalReturnereAlleVirksomheterForØnskedeKvartal() {
-    List<SykefraværsstatistikkVirksomhetUtenVarighet> ønskedeResultat__2020_4 =
-        List.of(
+    @Test
+    fun filterByKvartal_skalReturnereAlleVirksomheterForØnskedeKvartal() {
+        val ønskedeResultat__2020_4 = listOf(
             byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2020_4),
-            byggSykefraværsstatistikkVirksomhet(virksomhet2Metadata_2020_4));
-    List<SykefraværsstatistikkVirksomhetUtenVarighet> actual__2020_4 =
-        filterByKvartal(
+            byggSykefraværsstatistikkVirksomhet(virksomhet2Metadata_2020_4)
+        )
+        val actual__2020_4 = EksporteringServiceUtils.filterByKvartal(
             __2020_4,
-            List.of(
+            listOf(
                 byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2020_4),
                 byggSykefraværsstatistikkVirksomhet(virksomhet2Metadata_2020_4),
                 byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2021_1),
-                byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2021_2)));
-    assertThat(actual__2020_4).size().isEqualTo(2);
-    assertThat(actual__2020_4).containsExactlyInAnyOrderElementsOf(ønskedeResultat__2020_4);
-  }
+                byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2021_2)
+            )
+        )
+        assertThat(actual__2020_4).size().isEqualTo(2)
+        assertThat(actual__2020_4)
+            .containsExactlyInAnyOrderElementsOf(ønskedeResultat__2020_4)
+    }
 
-  private static Map<String, SykefraværsstatistikkVirksomhetUtenVarighet>
-      buildMapAvSykefraværsstatistikkPerVirksomhet(int size) {
-    Map<String, SykefraværsstatistikkVirksomhetUtenVarighet>
-        sykefraværsstatistikkVirksomhetUtenVarighetMap = new HashMap<>();
-
-    int count = 1;
-    do {
-      sykefraværsstatistikkVirksomhetUtenVarighetMap.put(
-          Integer.toString(count),
-          new SykefraværsstatistikkVirksomhetUtenVarighet(
-              2020, 4, Integer.toString(count), 10, new BigDecimal(100), new BigDecimal(1000)));
-      count++;
-    } while (count < size);
-    return sykefraværsstatistikkVirksomhetUtenVarighetMap;
-  }
+    companion object {
+        private fun buildMapAvSykefraværsstatistikkPerVirksomhet(size: Int): Map<String, SykefraværsstatistikkVirksomhetUtenVarighet> {
+            val sykefraværsstatistikkVirksomhetUtenVarighetMap: MutableMap<String, SykefraværsstatistikkVirksomhetUtenVarighet> =
+                HashMap()
+            var count = 1
+            do {
+                sykefraværsstatistikkVirksomhetUtenVarighetMap[count.toString()] =
+                    SykefraværsstatistikkVirksomhetUtenVarighet(
+                        2020, 4, count.toString(), 10, BigDecimal(100), BigDecimal(1000)
+                    )
+                count++
+            } while (count < size)
+            return sykefraværsstatistikkVirksomhetUtenVarighetMap
+        }
+    }
 }
