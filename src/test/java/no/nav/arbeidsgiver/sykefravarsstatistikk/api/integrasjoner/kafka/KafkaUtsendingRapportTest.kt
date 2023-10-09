@@ -13,7 +13,7 @@ internal class KafkaUtsendingRapportTest {
         rapport.addDBOppdateringProcessingTime(8000, 8800)
         rapport.addUtsendingTilKafkaProcessingTime(1500, 1530)
         rapport.addDBOppdateringProcessingTime(2000, 3000)
-        Assertions.assertEquals(40, rapport.getSnittTidUtsendingTilKafka())
-        Assertions.assertEquals(900, rapport.getSnittTidOppdateringIDB())
+        Assertions.assertEquals(40, rapport.snittTidUtsendingTilKafka)
+        Assertions.assertEquals(900, rapport.snittTidOppdateringIDB)
     }
 }

@@ -42,7 +42,7 @@ class KafkaClient internal constructor(
     }
 
     val antallMeldingerMottattForUtsending: Int
-        get() = kafkaUtsendingRapport.antallMeldingerMottattForUtsending
+        get() = kafkaUtsendingRapport.antallMeldingerMottattForUtsending.toInt()
 
     fun sendMelding(melding: Kafkamelding, topic: KafkaTopic) {
         kafkaTemplate.send(topic.navn, melding.nøkkel, melding.innhold)
@@ -66,7 +66,7 @@ class KafkaClient internal constructor(
     ) {
         // TODO bytt til Prometheus
         kafkaUtsendingRapport.leggTilMeldingMottattForUtsending()
-        if (kafkaUtsendingRapport.antallMeldingerIError > 5) {
+        if (kafkaUtsendingRapport.antallMeldingerIError.toInt() > 5) {
             throw KafkaUtsendingException(
                 String.format(
                     "Antall error:'%d'. Avbryter eksportering. Totalt meldinger som var klar for sending er: '%d'."
