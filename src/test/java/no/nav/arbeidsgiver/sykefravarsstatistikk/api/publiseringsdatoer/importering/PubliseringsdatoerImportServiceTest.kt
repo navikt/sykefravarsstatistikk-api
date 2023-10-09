@@ -1,57 +1,55 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.importering;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.importering
 
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PubliseringsdatoerImportService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.PubliseringsdatoDbDto
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.PubliseringsdatoerRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.junit.jupiter.MockitoExtension
+import java.sql.Date
+import java.time.LocalDate
 
-import java.sql.Date;
-import java.time.LocalDate;
-import java.util.List;
+@ExtendWith(MockitoExtension::class)
+internal class PubliseringsdatoerImportServiceTest {
+    private var serviceUnderTest: PubliseringsdatoerImportService? = null
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PubliseringsdatoerImportService;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.PubliseringsdatoDbDto;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.PubliseringsdatoerRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+    @Mock
+    private val mockPubliseringsdatoerRepository: PubliseringsdatoerRepository? = null
 
-@ExtendWith(MockitoExtension.class)
-class PubliseringsdatoerImportServiceTest {
+    @Mock
+    private val mockDatavarehusRepository: DatavarehusRepository? = null
 
-  private PubliseringsdatoerImportService serviceUnderTest;
-  @Mock private PubliseringsdatoerRepository mockPubliseringsdatoerRepository;
-  @Mock private DatavarehusRepository mockDatavarehusRepository;
+    @BeforeEach
+    fun setUp() {
+        serviceUnderTest = PubliseringsdatoerImportService(
+            mockPubliseringsdatoerRepository!!, mockDatavarehusRepository!!
+        )
+    }
 
-  @BeforeEach
-  void setUp() {
-    serviceUnderTest =
-        new PubliseringsdatoerImportService(
-            mockPubliseringsdatoerRepository, mockDatavarehusRepository);
-  }
+    @AfterEach
+    fun tearDown() {
+        Mockito.reset(mockPubliseringsdatoerRepository, mockDatavarehusRepository)
+    }
 
-  @AfterEach
-  void tearDown() {
-    reset(mockPubliseringsdatoerRepository, mockDatavarehusRepository);
-  }
-
-  @Test
-  void importerDatoerFraDatavarehus_oppdaterPubliseringsdatoerBlirKjørtEnGang() {
-    List<PubliseringsdatoDbDto> publiseringsdatoDbDtoListe =
-        List.of(
-            new PubliseringsdatoDbDto(
+    @Test
+    fun importerDatoerFraDatavarehus_oppdaterPubliseringsdatoerBlirKjørtEnGang() {
+        val publiseringsdatoDbDtoListe = listOf(
+            PubliseringsdatoDbDto(
                 202202,
                 Date.valueOf(LocalDate.MIN),
                 Date.valueOf(LocalDate.MIN),
-                "sykefravær for en periode"));
-    when(mockDatavarehusRepository.hentPubliseringsdatoerFraDvh())
-        .thenReturn(publiseringsdatoDbDtoListe);
-    serviceUnderTest.importerDatoerFraDatavarehus();
-    verify(mockPubliseringsdatoerRepository, times(1))
-        .oppdaterPubliseringsdatoer(publiseringsdatoDbDtoListe);
-  }
+                "sykefravær for en periode"
+            )
+        )
+        Mockito.`when`(mockDatavarehusRepository!!.hentPubliseringsdatoerFraDvh())
+            .thenReturn(publiseringsdatoDbDtoListe)
+        serviceUnderTest!!.importerDatoerFraDatavarehus()
+        Mockito.verify(mockPubliseringsdatoerRepository, Mockito.times(1))
+            ?.oppdaterPubliseringsdatoer(publiseringsdatoDbDtoListe)
+    }
 }
