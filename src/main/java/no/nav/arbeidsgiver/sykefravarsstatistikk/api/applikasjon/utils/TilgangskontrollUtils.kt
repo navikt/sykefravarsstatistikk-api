@@ -20,7 +20,7 @@ open class TilgangskontrollUtils @Autowired constructor(
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    fun hentInnloggetJwtToken(): JwtToken? {
+    fun hentInnloggetJwtToken(): JwtToken {
         return VALID_ISSUERS.stream()
             .map { issuer: String ->
                 getJwtTokenFor(
