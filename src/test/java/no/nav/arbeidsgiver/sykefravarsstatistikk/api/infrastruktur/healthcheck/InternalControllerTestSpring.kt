@@ -1,37 +1,35 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.healthcheck;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.healthcheck
 
-import common.SpringIntegrationTestbase;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.web.server.LocalServerPort;
+import common.SpringIntegrationTestbase
+import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.Test
+import org.springframework.boot.test.web.server.LocalServerPort
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse.BodyHandlers
 
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-
-import static java.net.http.HttpClient.newBuilder;
-import static java.net.http.HttpResponse.BodyHandlers.ofString;
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class InternalControllerTestSpring extends SpringIntegrationTestbase {
-
-  @LocalServerPort private String port;
-
-  @Test
-  public void healthcheck_returnerer_OK__når_applikasjon_kjører() throws Exception {
-    HttpResponse<String> response =
-        newBuilder()
+class InternalControllerTestSpring : SpringIntegrationTestbase() {
+    @LocalServerPort
+    private val port: String? = null
+    @Test
+    @Throws(Exception::class)
+    fun healthcheck_returnerer_OK__når_applikasjon_kjører() {
+        val response = HttpClient.newBuilder()
             .build()
             .send(
                 HttpRequest.newBuilder()
                     .uri(
                         URI.create(
                             "http://localhost:"
-                                + port
-                                + "/sykefravarsstatistikk-api/internal/liveness"))
+                                    + port
+                                    + "/sykefravarsstatistikk-api/internal/liveness"
+                        )
+                    )
                     .GET()
                     .build(),
-                ofString());
-
-    assertThat(response.statusCode()).isEqualTo(200);
-  }
+                BodyHandlers.ofString()
+            )
+        Assertions.assertThat(response.statusCode()).isEqualTo(200)
+    }
 }
