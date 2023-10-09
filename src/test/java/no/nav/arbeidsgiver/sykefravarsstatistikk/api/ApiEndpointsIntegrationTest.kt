@@ -1,208 +1,226 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
+@file:Suppress("SpringJavaInjectionPointsAutowiringInspection")
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import common.SpringIntegrationTestbase;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori;
-import no.nav.security.mock.oauth2.MockOAuth2Server;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.common.net.HttpHeaders
+import common.SpringIntegrationTestbase
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.TOKENX_ISSUER_ID
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.createToken
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.PRODUKSJON_NYTELSESMIDLER
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForLand
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForSektor
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForVirksomhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.skrivSisteImporttidspunktTilDb
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAlleImporttidspunkt
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
+import no.nav.security.mock.oauth2.MockOAuth2Server
+import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import java.io.IOException
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.net.http.HttpResponse.BodyHandlers
+import java.util.*
+import java.util.stream.Collectors
 
-import static com.google.common.net.HttpHeaders.AUTHORIZATION;
-import static java.net.http.HttpClient.newBuilder;
-import static java.net.http.HttpResponse.BodyHandlers.ofString;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestTokenUtil.TOKENX_ISSUER_ID;
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.*;
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class ApiEndpointsIntegrationTest extends SpringIntegrationTestbase {
-
-    private final int SISTE_ÅRSTALL = SISTE_PUBLISERTE_KVARTAL.getÅrstall();
-    private final int SISTE_KVARTAL = SISTE_PUBLISERTE_KVARTAL.getKvartal();
+class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
+    private val SISTE_ÅRSTALL: Int = SISTE_PUBLISERTE_KVARTAL.årstall
+    private val SISTE_KVARTAL: Int = SISTE_PUBLISERTE_KVARTAL.kvartal
 
     @Autowired
-    MockOAuth2Server mockOAuth2Server;
+    lateinit var mockOAuth2Server: MockOAuth2Server
 
     @Autowired
-    private NamedParameterJdbcTemplate jdbcTemplate;
+    lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     @LocalServerPort
-    private String port;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private static final String ORGNR_UNDERENHET = "910969439";
-    private static final String ORGNR_OVERORDNET_ENHET = "999263550";
-    private static final String ORGNR_UNDERENHET_INGEN_TILGANG = "777777777";
-
+    private val port: String? = null
+    private val objectMapper = ObjectMapper()
     @BeforeEach
-    public void setUp() {
-        slettAllStatistikkFraDatabase(jdbcTemplate);
-        slettAlleImporttidspunkt(jdbcTemplate);
-        skrivSisteImporttidspunktTilDb(jdbcTemplate);
+    fun setUp() {
+        slettAllStatistikkFraDatabase(jdbcTemplate)
+        slettAlleImporttidspunkt(jdbcTemplate)
+        skrivSisteImporttidspunktTilDb(jdbcTemplate)
     }
 
     @Test
-    public void sykefraværshistorikk__skal_ikke_tillate_selvbetjening_token()
-            throws Exception {
-        String jwtTokenIssuedByLoginservice =
-                TestTokenUtil.createToken(mockOAuth2Server, "15008462396", "selvbetjening", "");
-        opprettGenerellStatistikk();
-        HttpResponse<String> respons = gjørKallMotKvartalsvis(ORGNR_UNDERENHET, jwtTokenIssuedByLoginservice);
-        assertThat(respons.statusCode()).isEqualTo(401);
+    @Throws(Exception::class)
+    fun sykefraværshistorikk__skal_ikke_tillate_selvbetjening_token() {
+        val jwtTokenIssuedByLoginservice = createToken(mockOAuth2Server, "15008462396", "selvbetjening", "")
+        opprettGenerellStatistikk()
+        val respons = gjørKallMotKvartalsvis(ORGNR_UNDERENHET, jwtTokenIssuedByLoginservice)
+        Assertions.assertThat(respons.statusCode()).isEqualTo(401)
     }
 
     @Test
-    public void
-    sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_idporten()
-            throws Exception {
-        String jwtToken =
-                TestTokenUtil.createToken(
-                        mockOAuth2Server,
-                        "15008462396",
-                        TOKENX_ISSUER_ID,
-                        "https://oidc.difi.no/idporten-oidc-provider/");
-        opprettGenerellStatistikk();
-        sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtToken);
+    @Throws(Exception::class)
+    fun sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_idporten() {
+        val jwtToken = createToken(
+            mockOAuth2Server,
+            "15008462396",
+            TOKENX_ISSUER_ID,
+            "https://oidc.difi.no/idporten-oidc-provider/"
+        )
+        opprettGenerellStatistikk()
+        sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtToken)
     }
 
-    private void opprettGenerellStatistikk() {
-        opprettStatistikkForLand(jdbcTemplate);
-        opprettStatistikkForSektor(jdbcTemplate);
+    private fun opprettGenerellStatistikk() {
+        opprettStatistikkForLand(jdbcTemplate)
+        opprettStatistikkForSektor(jdbcTemplate)
         opprettStatistikkForNæring(
-                jdbcTemplate, PRODUKSJON_NYTELSESMIDLER, SISTE_ÅRSTALL, SISTE_KVARTAL, 5, 100, 10);
+            jdbcTemplate, PRODUKSJON_NYTELSESMIDLER, SISTE_ÅRSTALL, SISTE_KVARTAL, 5, 100, 10
+        )
         opprettStatistikkForVirksomhet(
-                jdbcTemplate, ORGNR_UNDERENHET, SISTE_ÅRSTALL, SISTE_KVARTAL, 9, 200, 10);
+            jdbcTemplate, ORGNR_UNDERENHET, SISTE_ÅRSTALL, SISTE_KVARTAL, 9, 200, 10
+        )
         opprettStatistikkForVirksomhet(
-                jdbcTemplate, ORGNR_OVERORDNET_ENHET, SISTE_ÅRSTALL, SISTE_KVARTAL, 7, 200, 10);
+            jdbcTemplate, ORGNR_OVERORDNET_ENHET, SISTE_ÅRSTALL, SISTE_KVARTAL, 7, 200, 10
+        )
     }
 
-    private void sjekkAtSykefraværshistorikkReturnereRiktigObjekt(String jwtToken) throws Exception {
-        HttpResponse<String> response = gjørKallMotKvartalsvis(ORGNR_UNDERENHET, "Bearer " + jwtToken);
-
-        assertThat(response.statusCode()).isEqualTo(200);
-        JsonNode alleSykefraværshistorikk = objectMapper.readTree(response.body());
-
-        assertThat(
-                alleSykefraværshistorikk.findValues("type").stream()
-                        .map(JsonNode::textValue)
-                        .collect(Collectors.toList()))
-                .containsExactlyInAnyOrderElementsOf(
-                        Arrays.asList(
-                                Statistikkategori.LAND.toString(),
-                                Statistikkategori.SEKTOR.toString(),
-                                Statistikkategori.NÆRING.toString(),
-                                Statistikkategori.VIRKSOMHET.toString(),
-                                Statistikkategori.OVERORDNET_ENHET.toString()));
-
-        assertThat(alleSykefraværshistorikk.get(0).get("label"))
-                .isEqualTo(objectMapper.readTree("\"Norge\""));
-        assertThat(alleSykefraværshistorikk.get(0).get("kvartalsvisSykefraværsprosent"))
-                .contains(
-                        objectMapper.readTree(
-                                "{\"prosent\":4.0,\"tapteDagsverk\":4.0,\"muligeDagsverk\":100.0,"
-                                        + "\"erMaskert\":false,\"årstall\":"
-                                        + SISTE_ÅRSTALL
-                                        + ",\"kvartal\":"
-                                        + SISTE_KVARTAL
-                                        + "}"));
-        assertThat(alleSykefraværshistorikk.get(1).get("label"))
-                .isEqualTo(objectMapper.readTree("\"Statlig forvaltning\""));
-        assertThat(alleSykefraværshistorikk.get(1).get("kvartalsvisSykefraværsprosent").get(0))
-                .isEqualTo(
-                        objectMapper.readTree(
-                                "{\"prosent\":4.9,\"tapteDagsverk\":657853.3,\"muligeDagsverk\":1"
-                                        + ".35587109E7,\"erMaskert\":false,\"årstall\":"
-                                        + SISTE_ÅRSTALL
-                                        + ",\"kvartal\":"
-                                        + SISTE_KVARTAL
-                                        + "}"));
-        assertThat(alleSykefraværshistorikk.get(2).get("label"))
-                .isEqualTo(objectMapper.readTree("\"Produksjon av nærings- og nytelsesmidler\""));
-        assertThat(alleSykefraværshistorikk.get(2).get("kvartalsvisSykefraværsprosent").get(0))
-                .isEqualTo(
-                        objectMapper.readTree(
-                                "{\"prosent\":5.0,\"tapteDagsverk\":5.0,\"muligeDagsverk\":100.0,"
-                                        + "\"erMaskert\":false,\"årstall\":"
-                                        + SISTE_ÅRSTALL
-                                        + ",\"kvartal\":"
-                                        + SISTE_KVARTAL
-                                        + "}"));
-        assertThat(alleSykefraværshistorikk.get(3).get("label"))
-                .isEqualTo(objectMapper.readTree("\"NAV ARBEID OG YTELSER AVD OSLO\""));
-        assertThat(alleSykefraværshistorikk.get(3).get("kvartalsvisSykefraværsprosent").get(0))
-                .isEqualTo(
-                        objectMapper.readTree(
-                                "{\"prosent\":4.5,\"tapteDagsverk\":9.0,\"muligeDagsverk\":200.0,"
-                                        + "\"erMaskert\":false,\"årstall\":"
-                                        + SISTE_ÅRSTALL
-                                        + ",\"kvartal\":"
-                                        + SISTE_KVARTAL
-                                        + "}"));
-        assertThat(alleSykefraværshistorikk.get(4).get("label"))
-                .isEqualTo(objectMapper.readTree("\"NAV ARBEID OG YTELSER\""));
-        assertThat(alleSykefraværshistorikk.get(4).get("kvartalsvisSykefraværsprosent").get(0))
-                .isEqualTo(
-                        objectMapper.readTree(
-                                "{\"prosent\":3.5,\"tapteDagsverk\":7.0,\"muligeDagsverk\":200.0,"
-                                        + "\"erMaskert\":false,\"årstall\":"
-                                        + SISTE_ÅRSTALL
-                                        + ",\"kvartal\":"
-                                        + SISTE_KVARTAL
-                                        + "}"));
+    @Throws(Exception::class)
+    private fun sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtToken: String) {
+        val response = gjørKallMotKvartalsvis(ORGNR_UNDERENHET, "Bearer $jwtToken")
+        Assertions.assertThat(response.statusCode()).isEqualTo(200)
+        val alleSykefraværshistorikk = objectMapper.readTree(response.body())
+        Assertions.assertThat(
+            alleSykefraværshistorikk.findValues("type").stream()
+                .map { obj: JsonNode -> obj.textValue() }
+                .collect(Collectors.toList()))
+            .containsExactlyInAnyOrderElementsOf(
+                listOf(
+                    Statistikkategori.LAND.toString(),
+                    Statistikkategori.SEKTOR.toString(),
+                    Statistikkategori.NÆRING.toString(),
+                    Statistikkategori.VIRKSOMHET.toString(),
+                    Statistikkategori.OVERORDNET_ENHET.toString()
+                )
+            )
+        Assertions.assertThat(alleSykefraværshistorikk[0]["label"])
+            .isEqualTo(objectMapper.readTree("\"Norge\""))
+        Assertions.assertThat(alleSykefraværshistorikk[0]["kvartalsvisSykefraværsprosent"])
+            .contains(
+                objectMapper.readTree(
+                    "{\"prosent\":4.0,\"tapteDagsverk\":4.0,\"muligeDagsverk\":100.0,"
+                            + "\"erMaskert\":false,\"årstall\":"
+                            + SISTE_ÅRSTALL
+                            + ",\"kvartal\":"
+                            + SISTE_KVARTAL
+                            + "}"
+                )
+            )
+        Assertions.assertThat(alleSykefraværshistorikk[1]["label"])
+            .isEqualTo(objectMapper.readTree("\"Statlig forvaltning\""))
+        Assertions.assertThat(alleSykefraværshistorikk[1]["kvartalsvisSykefraværsprosent"][0])
+            .isEqualTo(
+                objectMapper.readTree(
+                    "{\"prosent\":4.9,\"tapteDagsverk\":657853.3,\"muligeDagsverk\":1"
+                            + ".35587109E7,\"erMaskert\":false,\"årstall\":"
+                            + SISTE_ÅRSTALL
+                            + ",\"kvartal\":"
+                            + SISTE_KVARTAL
+                            + "}"
+                )
+            )
+        Assertions.assertThat(alleSykefraværshistorikk[2]["label"])
+            .isEqualTo(objectMapper.readTree("\"Produksjon av nærings- og nytelsesmidler\""))
+        Assertions.assertThat(alleSykefraværshistorikk[2]["kvartalsvisSykefraværsprosent"][0])
+            .isEqualTo(
+                objectMapper.readTree(
+                    "{\"prosent\":5.0,\"tapteDagsverk\":5.0,\"muligeDagsverk\":100.0,"
+                            + "\"erMaskert\":false,\"årstall\":"
+                            + SISTE_ÅRSTALL
+                            + ",\"kvartal\":"
+                            + SISTE_KVARTAL
+                            + "}"
+                )
+            )
+        Assertions.assertThat(alleSykefraværshistorikk[3]["label"])
+            .isEqualTo(objectMapper.readTree("\"NAV ARBEID OG YTELSER AVD OSLO\""))
+        Assertions.assertThat(alleSykefraværshistorikk[3]["kvartalsvisSykefraværsprosent"][0])
+            .isEqualTo(
+                objectMapper.readTree(
+                    "{\"prosent\":4.5,\"tapteDagsverk\":9.0,\"muligeDagsverk\":200.0,"
+                            + "\"erMaskert\":false,\"årstall\":"
+                            + SISTE_ÅRSTALL
+                            + ",\"kvartal\":"
+                            + SISTE_KVARTAL
+                            + "}"
+                )
+            )
+        Assertions.assertThat(alleSykefraværshistorikk[4]["label"])
+            .isEqualTo(objectMapper.readTree("\"NAV ARBEID OG YTELSER\""))
+        Assertions.assertThat(alleSykefraværshistorikk[4]["kvartalsvisSykefraværsprosent"][0])
+            .isEqualTo(
+                objectMapper.readTree(
+                    "{\"prosent\":3.5,\"tapteDagsverk\":7.0,\"muligeDagsverk\":200.0,"
+                            + "\"erMaskert\":false,\"årstall\":"
+                            + SISTE_ÅRSTALL
+                            + ",\"kvartal\":"
+                            + SISTE_KVARTAL
+                            + "}"
+                )
+            )
     }
 
     @Test
-    public void sykefraværshistorikk_sektor__skal_utføre_tilgangskontroll()
-            throws IOException, InterruptedException {
-        HttpResponse<String> response = gjørKallMotKvartalsvis(ORGNR_UNDERENHET_INGEN_TILGANG, getBearerMedJwt());
-        assertThat(response.statusCode()).isEqualTo(403);
-        assertThat(response.body())
-                .isEqualTo("{\"message\":\"You don't have access to this resource\"}");
+    @Throws(IOException::class, InterruptedException::class)
+    fun sykefraværshistorikk_sektor__skal_utføre_tilgangskontroll() {
+        val response = gjørKallMotKvartalsvis(ORGNR_UNDERENHET_INGEN_TILGANG, bearerMedJwt)
+        Assertions.assertThat(response.statusCode()).isEqualTo(403)
+        Assertions.assertThat(response.body())
+            .isEqualTo("{\"message\":\"You don't have access to this resource\"}")
     }
 
     @Test
-    public void sykefraværshistorikk__skal_IKKE_godkjenne_en_token_uten_sub_eller_pid()
-            throws Exception {
-        String jwtToken =
-                TestTokenUtil.createToken(mockOAuth2Server, "", "", TOKENX_ISSUER_ID, "");
-
-        HttpResponse<String> response = gjørKallMotKvartalsvis(ORGNR_UNDERENHET_INGEN_TILGANG, jwtToken);
-        assertThat(response.statusCode()).isEqualTo(401);
-        assertThat(response.body())
-                .isEqualTo("{\"message\":\"You are not authorized to access this resource\"}");
+    @Throws(Exception::class)
+    fun sykefraværshistorikk__skal_IKKE_godkjenne_en_token_uten_sub_eller_pid() {
+        val jwtToken = createToken(mockOAuth2Server, "", "", TOKENX_ISSUER_ID, "")
+        val response = gjørKallMotKvartalsvis(ORGNR_UNDERENHET_INGEN_TILGANG, jwtToken)
+        Assertions.assertThat(response.statusCode()).isEqualTo(401)
+        Assertions.assertThat(response.body())
+            .isEqualTo("{\"message\":\"You are not authorized to access this resource\"}")
     }
 
-    private HttpResponse<String> gjørKallMotKvartalsvis(String orgnr, String jwtToken) throws IOException, InterruptedException {
-        HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(
-                        URI.create(
-                                "http://127.0.0.1:"
-                                        + port
-                                        + "/sykefravarsstatistikk-api/"
-                                        + orgnr
-                                        + "/sykefravarshistorikk/kvartalsvis"))
-                .header(AUTHORIZATION, jwtToken)
-                .GET()
-                .build();
-
-        return newBuilder()
-                .build()
-                .send(httpRequest, ofString());
+    @Throws(IOException::class, InterruptedException::class)
+    private fun gjørKallMotKvartalsvis(orgnr: String, jwtToken: String): HttpResponse<String> {
+        val httpRequest = HttpRequest.newBuilder()
+            .uri(
+                URI.create(
+                    "http://127.0.0.1:"
+                            + port
+                            + "/sykefravarsstatistikk-api/"
+                            + orgnr
+                            + "/sykefravarshistorikk/kvartalsvis"
+                )
+            )
+            .header(HttpHeaders.AUTHORIZATION, jwtToken)
+            .GET()
+            .build()
+        return HttpClient.newBuilder()
+            .build()
+            .send(httpRequest, BodyHandlers.ofString())
     }
 
-    private String getBearerMedJwt() {
-        return "Bearer "
-                + TestTokenUtil.createToken(mockOAuth2Server, "15008462396", TOKENX_ISSUER_ID, "");
+    private val bearerMedJwt: String
+        get() = ("Bearer "
+                + createToken(mockOAuth2Server, "15008462396", TOKENX_ISSUER_ID, ""))
+
+    companion object {
+        private const val ORGNR_UNDERENHET = "910969439"
+        private const val ORGNR_OVERORDNET_ENHET = "999263550"
+        private const val ORGNR_UNDERENHET_INGEN_TILGANG = "777777777"
     }
 }
