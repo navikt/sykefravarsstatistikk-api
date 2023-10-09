@@ -1,26 +1,24 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import org.assertj.core.api.Assertions
+import java.math.BigDecimal
+import java.math.RoundingMode
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class AssertUtils {
-
-  public static final int SCALE = 6;
-
-  public static void assertBigDecimalIsEqual(BigDecimal actual, float expected) {
-    assertThat(actual.setScale(SCALE, RoundingMode.HALF_UP))
-        .isEqualTo(BigDecimal.valueOf(expected).setScale(SCALE, RoundingMode.HALF_UP));
-  }
-
-  public static void assertBigDecimalIsEqual(BigDecimal actual, BigDecimal expected) {
-    if (actual == null || expected == null) {
-      assertThat(actual).isEqualTo(expected);
-      return;
+object AssertUtils {
+    const val SCALE = 6
+    @JvmStatic
+    fun assertBigDecimalIsEqual(actual: BigDecimal, expected: Float) {
+        Assertions.assertThat(actual.setScale(SCALE, RoundingMode.HALF_UP))
+            .isEqualTo(BigDecimal.valueOf(expected.toDouble()).setScale(SCALE, RoundingMode.HALF_UP))
     }
 
-    assertThat(actual.setScale(SCALE, RoundingMode.HALF_UP))
-        .isEqualTo(expected.setScale(SCALE, RoundingMode.HALF_UP));
-  }
+    @JvmStatic
+    fun assertBigDecimalIsEqual(actual: BigDecimal?, expected: BigDecimal?) {
+        if (actual == null || expected == null) {
+            Assertions.assertThat(actual).isEqualTo(expected)
+            return
+        }
+        Assertions.assertThat(actual.setScale(SCALE, RoundingMode.HALF_UP))
+            .isEqualTo(expected.setScale(SCALE, RoundingMode.HALF_UP))
+    }
 }
