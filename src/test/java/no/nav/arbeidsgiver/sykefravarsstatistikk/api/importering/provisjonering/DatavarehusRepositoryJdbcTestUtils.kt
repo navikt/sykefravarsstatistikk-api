@@ -1,234 +1,240 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sektor;
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sektor
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET;
+object DatavarehusRepositoryJdbcTestUtils {
+    @JvmStatic
+    fun cleanUpTestDb(jdbcTemplate: NamedParameterJdbcTemplate) {
+        delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_land_v")
+        delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_v_2")
+        delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_v")
+    }
 
-public class DatavarehusRepositoryJdbcTestUtils {
+    fun delete(jdbcTemplate: NamedParameterJdbcTemplate, tabell: String?): Int {
+        return jdbcTemplate.update("delete from $tabell", MapSqlParameterSource())
+    }
 
-  public static void cleanUpTestDb(NamedParameterJdbcTemplate jdbcTemplate) {
-    delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_land_v");
-    delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_v_2");
-    delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_v");
-  }
-
-  public static int delete(NamedParameterJdbcTemplate jdbcTemplate, String tabell) {
-    return jdbcTemplate.update(
-        String.format("delete from %s", tabell), new MapSqlParameterSource());
-  }
-
-  public static void insertOrgenhetInDvhTabell(
-      NamedParameterJdbcTemplate jdbcTemplate,
-      String orgnr,
-      String sektor,
-      String næring,
-      String primærnæringskode,
-      int årstall,
-      int kvartal) {
-    MapSqlParameterSource naringParams =
-        new MapSqlParameterSource()
+    @JvmStatic
+    fun insertOrgenhetInDvhTabell(
+        jdbcTemplate: NamedParameterJdbcTemplate,
+        orgnr: String?,
+        sektor: String?,
+        næring: String?,
+        primærnæringskode: String?,
+        årstall: Int,
+        kvartal: Int
+    ) {
+        val naringParams = MapSqlParameterSource()
             .addValue("orgnr", orgnr)
             .addValue("sektor", sektor)
             .addValue("naring", næring)
             .addValue("primærnæringskode", primærnæringskode)
             .addValue("årstall", årstall)
-            .addValue("kvartal", kvartal);
+            .addValue("kvartal", kvartal)
+        jdbcTemplate.update(
+            "insert into dt_p.agg_ia_sykefravar_v_2 (orgnr, rectype, sektor, naring, primærnæringskode, arstall, kvartal) "
+                    + "values (:orgnr, '2', :sektor, :naring, :primærnæringskode, :årstall, :kvartal)",
+            naringParams
+        )
+    }
 
-    jdbcTemplate.update(
-        "insert into dt_p.agg_ia_sykefravar_v_2 (orgnr, rectype, sektor, naring, primærnæringskode, arstall, kvartal) "
-            + "values (:orgnr, '2', :sektor, :naring, :primærnæringskode, :årstall, :kvartal)",
-        naringParams);
-  }
-
-  public static void insertSykefraværsstatistikkLandInDvhTabell(
-      NamedParameterJdbcTemplate jdbcTemplate,
-      int årstall,
-      int kvartal,
-      int antallPersoner,
-      long taptedagsverk,
-      long muligedagsverk) {
-    MapSqlParameterSource params =
-        new MapSqlParameterSource()
+    @JvmStatic
+    fun insertSykefraværsstatistikkLandInDvhTabell(
+        jdbcTemplate: NamedParameterJdbcTemplate,
+        årstall: Int,
+        kvartal: Int,
+        antallPersoner: Int,
+        taptedagsverk: Long,
+        muligedagsverk: Long
+    ) {
+        val params = MapSqlParameterSource()
             .addValue("arstall", årstall)
             .addValue("kvartal", kvartal)
             .addValue("antpers", antallPersoner)
             .addValue("taptedv", taptedagsverk)
-            .addValue("muligedv", muligedagsverk);
+            .addValue("muligedv", muligedagsverk)
+        jdbcTemplate.update(
+            "insert into dt_p.agg_ia_sykefravar_land_v ("
+                    + "arstall, kvartal, "
+                    + "naring, naringnavn, "
+                    + "alder, kjonn, "
+                    + "fylkbo, fylknavn, "
+                    + "varighet, sektor, sektornavn, "
+                    + "taptedv, muligedv, antpers) "
+                    + "values ("
+                    + ":arstall, :kvartal, "
+                    + "'41', 'Bygge- og anleggsvirksomhet', "
+                    + "'D', 'M', "
+                    + "'06', 'Buskerud', "
+                    + "'B', '1', 'Statlig forvaltning', "
+                    + ":taptedv, :muligedv, :antpers)",
+            params
+        )
+    }
 
-    jdbcTemplate.update(
-        "insert into dt_p.agg_ia_sykefravar_land_v ("
-            + "arstall, kvartal, "
-            + "naring, naringnavn, "
-            + "alder, kjonn, "
-            + "fylkbo, fylknavn, "
-            + "varighet, sektor, sektornavn, "
-            + "taptedv, muligedv, antpers) "
-            + "values ("
-            + ":arstall, :kvartal, "
-            + "'41', 'Bygge- og anleggsvirksomhet', "
-            + "'D', 'M', "
-            + "'06', 'Buskerud', "
-            + "'B', '1', 'Statlig forvaltning', "
-            + ":taptedv, :muligedv, :antpers)",
-        params);
-  }
+    @JvmStatic
+    fun insertSykefraværsstatistikkVirksomhetInDvhTabell(
+        jdbcTemplate: NamedParameterJdbcTemplate,
+        årstall: Int,
+        kvartal: Int,
+        antallPersoner: Int,
+        orgnr: String?,
+        næringskode5siffer: String?,
+        varighet: Varighetskategori,
+        kjonn: String?,
+        taptedagsverk: Long,
+        muligedagsverk: Long
+    ) {
+        insertSykefraværsstatistikkVirksomhetInDvhTabell(
+            jdbcTemplate,
+            årstall,
+            kvartal,
+            antallPersoner,
+            orgnr,
+            næringskode5siffer,
+            varighet,
+            kjonn,
+            taptedagsverk,
+            muligedagsverk,
+            DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET
+        )
+    }
 
-  public static void insertSykefraværsstatistikkVirksomhetInDvhTabell(
-      NamedParameterJdbcTemplate jdbcTemplate,
-      int årstall,
-      int kvartal,
-      int antallPersoner,
-      String orgnr,
-      String næringskode5siffer,
-      Varighetskategori varighet,
-      String kjonn,
-      long taptedagsverk,
-      long muligedagsverk) {
-    insertSykefraværsstatistikkVirksomhetInDvhTabell(
-        jdbcTemplate,
-        årstall,
-        kvartal,
-        antallPersoner,
-        orgnr,
-        næringskode5siffer,
-        varighet,
-        kjonn,
-        taptedagsverk,
-        muligedagsverk,
-        RECTYPE_FOR_VIRKSOMHET);
-  }
-
-  public static void insertSykefraværsstatistikkVirksomhetInDvhTabell(
-      NamedParameterJdbcTemplate jdbcTemplate,
-      int årstall,
-      int kvartal,
-      int antallPersoner,
-      String orgnr,
-      String næringskode,
-      Varighetskategori varighet,
-      String kjonn,
-      long taptedagsverk,
-      long muligedagsverk,
-      String rectype) {
-    MapSqlParameterSource params =
-        new MapSqlParameterSource()
+    @JvmStatic
+    fun insertSykefraværsstatistikkVirksomhetInDvhTabell(
+        jdbcTemplate: NamedParameterJdbcTemplate,
+        årstall: Int,
+        kvartal: Int,
+        antallPersoner: Int,
+        orgnr: String?,
+        næringskode: String?,
+        varighet: Varighetskategori,
+        kjonn: String?,
+        taptedagsverk: Long,
+        muligedagsverk: Long,
+        rectype: String?
+    ) {
+        val params = MapSqlParameterSource()
             .addValue("arstall", årstall)
             .addValue("kvartal", kvartal)
             .addValue("antpers", antallPersoner)
             .addValue("orgnr", orgnr)
             .addValue("varighet", varighet.kode)
             .addValue("naering_kode", næringskode)
-            .addValue("sektor", Sektor.PRIVAT.getSektorkode())
+            .addValue("sektor", Sektor.PRIVAT.sektorkode)
             .addValue("kjonn", kjonn)
             .addValue("taptedv", taptedagsverk)
             .addValue("muligedv", muligedagsverk)
-            .addValue("rectype", rectype);
+            .addValue("rectype", rectype)
+        jdbcTemplate.update(
+            "insert into dt_p.agg_ia_sykefravar_v ("
+                    + "arstall, kvartal, "
+                    + "orgnr, naering_kode, sektor, storrelse, fylkarb, "
+                    + "alder, kjonn,  fylkbo, "
+                    + "sftype, varighet, "
+                    + "taptedv, muligedv, antpers, rectype) "
+                    + "values ("
+                    + ":arstall, :kvartal, "
+                    + ":orgnr, :naering_kode, :sektor, 'G', '03', "
+                    + "'B', :kjonn, '02', "
+                    + "'L', :varighet, "
+                    + ":taptedv, :muligedv, :antpers, :rectype)",
+            params
+        )
+    }
 
-    jdbcTemplate.update(
-        "insert into dt_p.agg_ia_sykefravar_v ("
-            + "arstall, kvartal, "
-            + "orgnr, naering_kode, sektor, storrelse, fylkarb, "
-            + "alder, kjonn,  fylkbo, "
-            + "sftype, varighet, "
-            + "taptedv, muligedv, antpers, rectype) "
-            + "values ("
-            + ":arstall, :kvartal, "
-            + ":orgnr, :naering_kode, :sektor, 'G', '03', "
-            + "'B', :kjonn, '02', "
-            + "'L', :varighet, "
-            + ":taptedv, :muligedv, :antpers, :rectype)",
-        params);
-  }
-
-  public static void insertSykefraværsstatistikkNæringInDvhTabell(
-      NamedParameterJdbcTemplate jdbcTemplate,
-      int årstall,
-      int kvartal,
-      int antallPersoner,
-      String næring,
-      String kjonn,
-      long taptedagsverk,
-      long muligedagsverk) {
-    MapSqlParameterSource params =
-        new MapSqlParameterSource()
+    @JvmStatic
+    fun insertSykefraværsstatistikkNæringInDvhTabell(
+        jdbcTemplate: NamedParameterJdbcTemplate,
+        årstall: Int,
+        kvartal: Int,
+        antallPersoner: Int,
+        næring: String?,
+        kjonn: String?,
+        taptedagsverk: Long,
+        muligedagsverk: Long
+    ) {
+        val params = MapSqlParameterSource()
             .addValue("arstall", årstall)
             .addValue("kvartal", kvartal)
             .addValue("antpers", antallPersoner)
             .addValue("naring", næring)
             .addValue("kjonn", kjonn)
             .addValue("taptedv", taptedagsverk)
-            .addValue("muligedv", muligedagsverk);
+            .addValue("muligedv", muligedagsverk)
+        jdbcTemplate.update(
+            "insert into dt_p.v_agg_ia_sykefravar_naring ("
+                    + "arstall, kvartal, "
+                    + "naring, "
+                    + "alder, kjonn, "
+                    + "taptedv, muligedv, antpers) "
+                    + "values ("
+                    + ":arstall, :kvartal, "
+                    + ":naring, "
+                    + "'A', :kjonn, "
+                    + ":taptedv, :muligedv, :antpers)",
+            params
+        )
+    }
 
-    jdbcTemplate.update(
-        "insert into dt_p.v_agg_ia_sykefravar_naring ("
-            + "arstall, kvartal, "
-            + "naring, "
-            + "alder, kjonn, "
-            + "taptedv, muligedv, antpers) "
-            + "values ("
-            + ":arstall, :kvartal, "
-            + ":naring, "
-            + "'A', :kjonn, "
-            + ":taptedv, :muligedv, :antpers)",
-        params);
-  }
-
-  public static void insertSykefraværsstatistikkNærin5SiffergInDvhTabell(
-      NamedParameterJdbcTemplate jdbcTemplate,
-      int årstall,
-      int kvartal,
-      int antallPersoner,
-      String næringKode,
-      String kjonn,
-      long taptedagsverk,
-      long muligedagsverk) {
-    MapSqlParameterSource params =
-        new MapSqlParameterSource()
+    @JvmStatic
+    fun insertSykefraværsstatistikkNærin5SiffergInDvhTabell(
+        jdbcTemplate: NamedParameterJdbcTemplate,
+        årstall: Int,
+        kvartal: Int,
+        antallPersoner: Int,
+        næringKode: String?,
+        kjonn: String?,
+        taptedagsverk: Long,
+        muligedagsverk: Long
+    ) {
+        val params = MapSqlParameterSource()
             .addValue("arstall", årstall)
             .addValue("kvartal", kvartal)
             .addValue("antpers", antallPersoner)
             .addValue("næringKode", næringKode)
             .addValue("kjonn", kjonn)
             .addValue("taptedv", taptedagsverk)
-            .addValue("muligedv", muligedagsverk);
+            .addValue("muligedv", muligedagsverk)
+        jdbcTemplate.update(
+            "insert into dt_p.agg_ia_sykefravar_naring_kode ("
+                    + "arstall, kvartal, "
+                    + "naering_kode, "
+                    + "alder, kjonn, "
+                    + "taptedv, muligedv, antpers) "
+                    + "values ("
+                    + ":arstall, :kvartal, "
+                    + ":næringKode, "
+                    + "'A', :kjonn, "
+                    + ":taptedv, :muligedv, :antpers)",
+            params
+        )
+    }
 
-    jdbcTemplate.update(
-        "insert into dt_p.agg_ia_sykefravar_naring_kode ("
-            + "arstall, kvartal, "
-            + "naering_kode, "
-            + "alder, kjonn, "
-            + "taptedv, muligedv, antpers) "
-            + "values ("
-            + ":arstall, :kvartal, "
-            + ":næringKode, "
-            + "'A', :kjonn, "
-            + ":taptedv, :muligedv, :antpers)",
-        params);
-  }
-
-  public static void insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
-      NamedParameterJdbcTemplate jdbcTemplate,
-      int årstall,
-      int kvartal,
-      int antallPersoner,
-      String orgnr,
-      String næring,
-      String næringskode5siffer,
-      String alder,
-      String kjonn,
-      String fylkbo,
-      String kommnr,
-      long taptedagsverkGradertSykemelding,
-      int antallGradertSykemeldinger,
-      int antallSykemeldinger,
-      long taptedagsverk,
-      long muligedagsverk,
-      String rectype) {
-    MapSqlParameterSource params =
-        new MapSqlParameterSource()
+    fun insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
+        jdbcTemplate: NamedParameterJdbcTemplate,
+        årstall: Int,
+        kvartal: Int,
+        antallPersoner: Int,
+        orgnr: String?,
+        næring: String?,
+        næringskode5siffer: String?,
+        alder: String?,
+        kjonn: String?,
+        fylkbo: String?,
+        kommnr: String?,
+        taptedagsverkGradertSykemelding: Long,
+        antallGradertSykemeldinger: Int,
+        antallSykemeldinger: Int,
+        taptedagsverk: Long,
+        muligedagsverk: Long,
+        rectype: String?
+    ) {
+        val params = MapSqlParameterSource()
             .addValue("arstall", årstall)
             .addValue("kvartal", kvartal)
             .addValue("orgnr", orgnr)
@@ -244,58 +250,61 @@ public class DatavarehusRepositoryJdbcTestUtils {
             .addValue("antall", antallSykemeldinger)
             .addValue("taptedv", taptedagsverk)
             .addValue("mulige_dv", muligedagsverk)
-            .addValue("antpers", antallPersoner);
+            .addValue("antpers", antallPersoner)
+        jdbcTemplate.update(
+            "insert into dt_p.agg_ia_sykefravar_v_2 ("
+                    + "arstall, kvartal, "
+                    + "orgnr, naring, naering_kode, "
+                    + "alder, kjonn,  fylkbo, "
+                    + "kommnr, rectype, "
+                    + "antall_gs, taptedv_gs, "
+                    + "antall, "
+                    + "taptedv, mulige_dv, antpers) "
+                    + "values ("
+                    + ":arstall, :kvartal, "
+                    + ":orgnr,:naring, :naering_kode, :alder, "
+                    + ":kjonn, :fylkbo, :kommnr, "
+                    + ":rectype, "
+                    + ":antall_gs, :taptedv_gs, "
+                    + ":antall, "
+                    + ":taptedv, :mulige_dv, :antpers)",
+            params
+        )
+    }
 
-    jdbcTemplate.update(
-        "insert into dt_p.agg_ia_sykefravar_v_2 ("
-            + "arstall, kvartal, "
-            + "orgnr, naring, naering_kode, "
-            + "alder, kjonn,  fylkbo, "
-            + "kommnr, rectype, "
-            + "antall_gs, taptedv_gs, "
-            + "antall, "
-            + "taptedv, mulige_dv, antpers) "
-            + "values ("
-            + ":arstall, :kvartal, "
-            + ":orgnr,:naring, :naering_kode, :alder, "
-            + ":kjonn, :fylkbo, :kommnr, "
-            + ":rectype, "
-            + ":antall_gs, :taptedv_gs, "
-            + ":antall, "
-            + ":taptedv, :mulige_dv, :antpers)",
-        params);
-  }
-
-  public static void insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
-      NamedParameterJdbcTemplate namedParameterJdbcTemplate,
-      int årstall,
-      int kvartal,
-      int antallPersoner,
-      String orgnrVirksomhet1,
-      String næringskode2siffer,
-      String næringskode5siffer,
-      long tapteDagsverkGradertSykemelding,
-      int antallGradertSykemeldinger,
-      int antallSykemeldinger,
-      long tapteDagsverk,
-      long muligeDagsverk) {
-    insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
-        namedParameterJdbcTemplate,
-        årstall,
-        kvartal,
-        antallPersoner,
-        orgnrVirksomhet1,
-        næringskode2siffer,
-        næringskode5siffer,
-        "A",
-        "M",
-        "03",
-        "4200",
-        tapteDagsverkGradertSykemelding,
-        antallGradertSykemeldinger,
-        antallSykemeldinger,
-        tapteDagsverk,
-        muligeDagsverk,
-        RECTYPE_FOR_VIRKSOMHET);
-  }
+    @JvmStatic
+    fun insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
+        namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
+        årstall: Int,
+        kvartal: Int,
+        antallPersoner: Int,
+        orgnrVirksomhet1: String?,
+        næringskode2siffer: String?,
+        næringskode5siffer: String?,
+        tapteDagsverkGradertSykemelding: Long,
+        antallGradertSykemeldinger: Int,
+        antallSykemeldinger: Int,
+        tapteDagsverk: Long,
+        muligeDagsverk: Long
+    ) {
+        insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
+            namedParameterJdbcTemplate,
+            årstall,
+            kvartal,
+            antallPersoner,
+            orgnrVirksomhet1,
+            næringskode2siffer,
+            næringskode5siffer,
+            "A",
+            "M",
+            "03",
+            "4200",
+            tapteDagsverkGradertSykemelding,
+            antallGradertSykemeldinger,
+            antallSykemeldinger,
+            tapteDagsverk,
+            muligeDagsverk,
+            DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET
+        )
+    }
 }
