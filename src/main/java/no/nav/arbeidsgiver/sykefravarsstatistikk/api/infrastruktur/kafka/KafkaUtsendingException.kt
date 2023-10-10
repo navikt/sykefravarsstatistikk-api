@@ -1,8 +1,3 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka
 
-public class KafkaUtsendingException extends RuntimeException {
-
-  public KafkaUtsendingException(String melding) {
-    super(melding);
-  }
-}
+class KafkaUtsendingException(melding: String?) : RuntimeException(melding)
