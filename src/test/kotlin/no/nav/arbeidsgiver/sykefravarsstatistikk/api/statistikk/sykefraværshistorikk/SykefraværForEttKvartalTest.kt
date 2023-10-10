@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshistorikk
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import lombok.SneakyThrows
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.etÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværFlereKvartalerForEksport.Companion.utenStatistikk
@@ -129,7 +128,6 @@ class SykefraværForEttKvartalTest {
     }
 
     @Test
-    @SneakyThrows
     fun sykefraværprosent__skal_bare_inkludere_relevante_felt_i_json_konvertering() {
         val mapper = ObjectMapper()
         val sykefravær = SykefraværForEttKvartal(

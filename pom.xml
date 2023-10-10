@@ -42,7 +42,7 @@
         <log4j.version>3.0.0-alpha1</log4j.version>
         <jetbrainsExposedVersion>0.42.0</jetbrainsExposedVersion>
         <spring-boot-starter-parent.version>3.1.2</spring-boot-starter-parent.version>
-        <mockk-jvm.version>1.13.7</mockk-jvm.version>
+        <mockk-jvm.version>1.13.8</mockk-jvm.version>
         <flyway-maven-plugin.version>9.21.1</flyway-maven-plugin.version>
         <ia-felles.version>0.0.6</ia-felles.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.1.0</springdoc-openapi-starter-webmvc-ui.version>
@@ -97,12 +97,6 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -299,12 +293,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.mockk</groupId>
-            <artifactId>mockk-jvm</artifactId>
-            <version>1.13.8</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>io.arrow-kt</groupId>
             <artifactId>arrow-core</artifactId>
             <version>${arrow-core.version}</version>
@@ -380,32 +368,6 @@
                     <source>17</source>
                     <target>17</target>
                 </configuration>
-                <executions>
-                    <!-- Replacing default-compile as it is treated specially by maven -->
-                    <execution>
-                        <id>default-compile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <!-- Replacing default-testCompile as it is treated specially by maven -->
-                    <execution>
-                        <id>default-testCompile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>java-compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>java-test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

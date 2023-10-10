@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import lombok.extern.slf4j.Slf4j
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImporttidspunktDto
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.PubliseringsdatoDbDto
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Component
 import java.sql.ResultSet
 import java.time.LocalDateTime
 
-@Slf4j
 @Component
 class PubliseringsdatoerRepository(
     @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val jdbcTemplate: NamedParameterJdbcTemplate

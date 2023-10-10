@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import lombok.extern.slf4j.Slf4j
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.fjernDupliserteOrgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository
@@ -14,7 +13,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.util.stream.Collectors
 
-@Slf4j
 @Component
 class PostImporteringService(
     private val datavarehusRepository: KildeTilVirksomhetsdata,

@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering
 
-import lombok.extern.slf4j.Slf4j
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
@@ -9,7 +8,6 @@ import java.util.function.Consumer
 import java.util.stream.Collector
 import java.util.stream.Collectors
 
-@Slf4j
 @Component
 @Deprecated("")
 object EksporteringServiceUtils {

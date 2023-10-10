@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron
 
-import lombok.extern.slf4j.Slf4j
 import net.javacrumbs.shedlock.core.LockConfiguration
 import net.javacrumbs.shedlock.core.LockingTaskExecutor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PubliseringsdatoerImportService
@@ -12,7 +11,6 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 @Component
-@Slf4j
 class PubliseringdatoInfoImportCron(
     private val taskExecutor: LockingTaskExecutor, private val importService: PubliseringsdatoerImportService
 ) {
