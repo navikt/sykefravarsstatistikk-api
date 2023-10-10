@@ -116,7 +116,7 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     ): ResponseEntity<Any> {
         val body = HashMap(bodyTillegg)
         body["message"] = melding
-        Companion.logger.info(
+        Companion.logger.debug(
             String.format(
                 "Returnerer følgende HttpStatus '%s' med melding '%s' pga exception '%s'",
                 status.toString(), melding, e.message
