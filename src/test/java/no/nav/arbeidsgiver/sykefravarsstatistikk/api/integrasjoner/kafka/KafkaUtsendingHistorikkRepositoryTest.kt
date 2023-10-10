@@ -26,26 +26,27 @@ import java.time.LocalDateTime
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 open class KafkaUtsendingHistorikkRepositoryTest {
     @Autowired
-    private val jdbcTemplate: NamedParameterJdbcTemplate? = null
-    private var kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository? = null
+    lateinit var jdbcTemplate: NamedParameterJdbcTemplate
+    private val kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository by lazy {
+        KafkaUtsendingHistorikkRepository(jdbcTemplate)
+    }
     @BeforeEach
     fun setUp() {
-        kafkaUtsendingHistorikkRepository = KafkaUtsendingHistorikkRepository(jdbcTemplate)
-        slettAllEksportDataFraDatabase(jdbcTemplate!!)
+        slettAllEksportDataFraDatabase(jdbcTemplate)
     }
 
     @AfterEach
     fun tearDown() {
-        slettAllEksportDataFraDatabase(jdbcTemplate!!)
+        slettAllEksportDataFraDatabase(jdbcTemplate)
     }
 
     @Test
     fun opprettHistorikk__oppretter_historikk() {
         val startTime = LocalDateTime.now()
-        kafkaUtsendingHistorikkRepository!!.opprettHistorikk(
+        kafkaUtsendingHistorikkRepository.opprettHistorikk(
             "987654321", "{\"orgnr\": \"987654321\"}", "{\"statistikk\": \"....\"}"
         )
-        val results = hentAlleKafkaUtsendingHistorikkData(jdbcTemplate!!)
+        val results = hentAlleKafkaUtsendingHistorikkData(jdbcTemplate)
         val kafkaUtsendingHistorikkData = results[0]
         Assertions.assertEquals("987654321", kafkaUtsendingHistorikkData.orgnr)
         Assertions.assertEquals("{\"orgnr\": \"987654321\"}", kafkaUtsendingHistorikkData.key)
@@ -56,13 +57,13 @@ open class KafkaUtsendingHistorikkRepositoryTest {
     @Test
     fun slettHistorikk__sletter_historikk() {
         opprettUtsendingHistorikk(
-            jdbcTemplate!!, KafkaUtsendingHistorikkData("988777999", "key", "value", LocalDateTime.now())
+            jdbcTemplate, KafkaUtsendingHistorikkData("988777999", "key", "value", LocalDateTime.now())
         )
         opprettUtsendingHistorikk(
             jdbcTemplate, KafkaUtsendingHistorikkData("988999777", "key", "value", LocalDateTime.now())
         )
         Assertions.assertEquals(2, hentAlleKafkaUtsendingHistorikkData(jdbcTemplate).size)
-        val antallSlettet = kafkaUtsendingHistorikkRepository!!.slettHistorikk()
+        val antallSlettet = kafkaUtsendingHistorikkRepository.slettHistorikk()
         val results = hentAlleKafkaUtsendingHistorikkData(jdbcTemplate)
         Assertions.assertEquals(0, results.size)
         Assertions.assertEquals(2, antallSlettet)

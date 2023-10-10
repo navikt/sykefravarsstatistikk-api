@@ -72,14 +72,6 @@ class KafkaUtsendingRapport {
         }
     }
 
-    fun getAntallMeldingerSent(): Int {
-        return antallMeldingerSent.get()
-    }
-
-    fun getAntallMeldingerIError(): Int {
-        return antallMeldingerIError.get()
-    }
-
     val snittTidUtsendingTilKafka: Long
         get() = if (antallUtsendigerMålet.get() == 0) {
             0
