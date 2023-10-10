@@ -1,11 +1,6 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret
 
-public class EnhetsregisteretMappingException extends RuntimeException {
-  EnhetsregisteretMappingException(String msg, Exception e) {
-    super(msg, e);
-  }
-
-  EnhetsregisteretMappingException(String msg) {
-    super(msg);
-  }
+class EnhetsregisteretMappingException : RuntimeException {
+    internal constructor(msg: String?, e: Exception?) : super(msg, e)
+    internal constructor(msg: String?) : super(msg)
 }

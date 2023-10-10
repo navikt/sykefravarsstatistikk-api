@@ -1,7 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret
 
-public class EnhetsregisteretIkkeTilgjengeligException extends RuntimeException {
-  EnhetsregisteretIkkeTilgjengeligException(String msg, Exception e) {
-    super(msg, e);
-  }
-}
+class EnhetsregisteretIkkeTilgjengeligException internal constructor(msg: String?, e: Exception?) :
+    RuntimeException(msg, e)
