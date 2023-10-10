@@ -30,49 +30,53 @@ import java.util.stream.Collectors
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     @Autowired
-    private val jdbcTemplate: NamedParameterJdbcTemplate? = null
-    private var repository: SykefraværsstatistikkTilEksporteringRepository? = null
+    lateinit var jdbcTemplate: NamedParameterJdbcTemplate
+    private val repository: SykefraværsstatistikkTilEksporteringRepository by lazy {
+        SykefraværsstatistikkTilEksporteringRepository(
+            jdbcTemplate
+        )
+    }
     private val produksjonAvKlær = Næringskode("14190")
     private val undervisning = Næringskode("86907")
     private val utdanning = Næring("86")
     private val produksjon = Næring("14")
     private val VIRKSOMHET_1 = "999999999"
     private val VIRKSOMHET_2 = "999999998"
+
     @BeforeEach
     fun setUp() {
-        slettAllStatistikkFraDatabase(jdbcTemplate!!)
-        repository = SykefraværsstatistikkTilEksporteringRepository(jdbcTemplate)
+        slettAllStatistikkFraDatabase(jdbcTemplate)
     }
 
     @AfterEach
     fun tearDown() {
-        slettAllStatistikkFraDatabase(jdbcTemplate!!)
+        slettAllStatistikkFraDatabase(jdbcTemplate)
     }
 
     @Test
     fun hentSykefraværprosentLand__returnerer_NULL_dersom_ingen_statistikk_er_funnet_for_kvartal() {
         opprettStatistikkLandTestData()
-        Assertions.assertNull(repository!!.hentSykefraværprosentLand(ÅrstallOgKvartal(2019, 4)))
+        Assertions.assertNull(repository.hentSykefraværprosentLand(ÅrstallOgKvartal(2019, 4)))
     }
 
     @Test
     fun hentSykefraværprosentLand__skal_hente_sykefravær_land_for_ett_kvartal() {
         opprettStatistikkLandTestData()
-        Assertions.assertNull(repository!!.hentSykefraværprosentLand(ÅrstallOgKvartal(2019, 4)))
-        val resultat = repository!!.hentSykefraværprosentLand(ÅrstallOgKvartal(2019, 2))
-        assertSykefraværsstatistikkIsEqual(resultat, 2019, 2, 2500000, 256800, 60000000)
-        val resultat_2019_1 = repository!!.hentSykefraværprosentLand(ÅrstallOgKvartal(2019, 1))
-        assertSykefraværsstatistikkIsEqual(resultat_2019_1, 2019, 1, 2750000, 350000, 71000000)
+        Assertions.assertNull(repository.hentSykefraværprosentLand(ÅrstallOgKvartal(2019, 4)))
+        val resultat = repository.hentSykefraværprosentLand(ÅrstallOgKvartal(2019, 2))
+        assertSykefraværsstatistikkIsEqual(resultat!!, 2019, 2, 2500000, 256800, 60000000)
+        val resultat_2019_1 = repository.hentSykefraværprosentLand(ÅrstallOgKvartal(2019, 1))
+        assertSykefraværsstatistikkIsEqual(resultat_2019_1!!, 2019, 1, 2750000, 350000, 71000000)
     }
 
     @Test
     fun hentSykefraværprosentAlleSektorer__skal_hente_alle_sektorer_for_ett_kvartal() {
         opprettStatistikkSektorTestData()
-        val resultat = repository!!.hentSykefraværprosentAlleSektorer(ÅrstallOgKvartal(2019, 2))
+        val resultat = repository.hentSykefraværprosentAlleSektorer(ÅrstallOgKvartal(2019, 2))
         org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(2)
         assertSykefraværsstatistikkForSektorIsEqual(resultat, 2019, 2, 3, Sektor.KOMMUNAL, 1, 60)
         assertSykefraværsstatistikkForSektorIsEqual(resultat, 2019, 2, 4, Sektor.PRIVAT, 9, 100)
-        val resultat_2019_1 = repository!!.hentSykefraværprosentAlleSektorer(ÅrstallOgKvartal(2019, 1))
+        val resultat_2019_1 = repository.hentSykefraværprosentAlleSektorer(ÅrstallOgKvartal(2019, 1))
         org.assertj.core.api.Assertions.assertThat(resultat_2019_1.size).isEqualTo(2)
         assertSykefraværsstatistikkForSektorIsEqual(
             resultat_2019_1, 2019, 1, 40, Sektor.KOMMUNAL, 20, 115
@@ -85,11 +89,11 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     @Test
     fun hentSykefraværprosentAlleNæringer__skal_hente_alle_næringer_for_ett_kvartal() {
         opprettStatistikkNæringTestData(ÅrstallOgKvartal(2019, 1), ÅrstallOgKvartal(2019, 2))
-        val resultat = repository!!.hentSykefraværprosentAlleNæringer(ÅrstallOgKvartal(2019, 2))
+        val resultat = repository.hentSykefraværprosentAlleNæringer(ÅrstallOgKvartal(2019, 2))
         org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(2)
         assertSykefraværsstatistikkForNæringIsEqual(resultat, 2019, 2, 10, produksjon, 2, 100)
         assertSykefraværsstatistikkForNæringIsEqual(resultat, 2019, 2, 8, utdanning, 5, 100)
-        val resultat_2019_1 = repository!!.hentSykefraværprosentAlleNæringer(ÅrstallOgKvartal(2019, 1))
+        val resultat_2019_1 = repository.hentSykefraværprosentAlleNæringer(ÅrstallOgKvartal(2019, 1))
         org.assertj.core.api.Assertions.assertThat(resultat_2019_1.size).isEqualTo(2)
         assertSykefraværsstatistikkForNæringIsEqual(resultat_2019_1, 2019, 1, 10, produksjon, 2, 100)
         assertSykefraværsstatistikkForNæringIsEqual(resultat_2019_1, 2019, 1, 8, utdanning, 5, 100)
@@ -97,7 +101,7 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
     @Test
     fun hentSykefraværprosentAlleNæringer_siste4Kvartaler_skal_hente_riktig_data() {
-        opprettStatistikkForNæringer(jdbcTemplate!!)
+        opprettStatistikkForNæringer(jdbcTemplate)
         val forventet = java.util.List.of<SykefraværsstatistikkForNæring>(
             SykefraværsstatistikkForNæring(
                 SISTE_PUBLISERTE_KVARTAL.årstall,
@@ -140,16 +144,16 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 BigDecimal(1000000)
             )
         )
-        val resultat: List<SykefraværsstatistikkForNæring> = repository?.hentSykefraværprosentAlleNæringer(
+        val resultat: List<SykefraværsstatistikkForNæring> = repository.hentSykefraværprosentAlleNæringer(
             SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3), SISTE_PUBLISERTE_KVARTAL
-        )?.toList()!!
-        org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(5 )
+        ).toList()
+        org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(5)
         org.assertj.core.api.Assertions.assertThat(resultat).containsExactlyInAnyOrderElementsOf(forventet)
     }
 
     @Test
     fun hentSykefraværprosentAlleNæringer_siste4Kvartaler_kan_likevel_hente_bare_siste_publiserte_kvartal() {
-        opprettStatistikkForNæringer(jdbcTemplate!!)
+        opprettStatistikkForNæringer(jdbcTemplate)
         val forventet = java.util.List.of<SykefraværsstatistikkForNæring>(
             SykefraværsstatistikkForNæring(
                 SISTE_PUBLISERTE_KVARTAL.årstall,
@@ -168,21 +172,21 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 BigDecimal(1000000)
             )
         )
-        val resultat = repository!!.hentSykefraværprosentAlleNæringer(SISTE_PUBLISERTE_KVARTAL, 1)
+        val resultat = repository.hentSykefraværprosentAlleNæringer(SISTE_PUBLISERTE_KVARTAL, 1)
         org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(2)
         org.assertj.core.api.Assertions.assertThat(resultat).containsExactlyInAnyOrderElementsOf(forventet)
     }
 
     @Test
     fun hentSykefraværprosentAlleNæringer_siste4Kvartaler_skalIkkeKrasjeVedManglendeData() {
-        val resultat = repository!!.hentSykefraværprosentAlleNæringer(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3))
+        val resultat = repository.hentSykefraværprosentAlleNæringer(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3))
         org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(0)
         org.assertj.core.api.Assertions.assertThat(resultat).containsExactlyInAnyOrderElementsOf(listOf())
     }
 
     @Test
     fun hentSykefraværAlleNæringer_siste4Kvartaler_skal_hente_riktig_data() {
-        opprettStatistikkForNæringer(jdbcTemplate!!)
+        opprettStatistikkForNæringer(jdbcTemplate)
         val forventet = java.util.List.of<SykefraværsstatistikkForNæring>(
             SykefraværsstatistikkForNæring(
                 SISTE_PUBLISERTE_KVARTAL.årstall,
@@ -225,14 +229,14 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 BigDecimal(1000000)
             )
         )
-        val resultat = repository!!.hentSykefraværAlleNæringerFraOgMed(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3))
+        val resultat = repository.hentSykefraværAlleNæringerFraOgMed(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3))
         org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(5)
         org.assertj.core.api.Assertions.assertThat(resultat).containsExactlyInAnyOrderElementsOf(forventet)
     }
 
     @Test
     fun hentSykefraværAlleNæringer_siste4Kvartaler_kan_likevel_hente_bare_siste_publiserte_kvartal() {
-        opprettStatistikkForNæringer(jdbcTemplate!!)
+        opprettStatistikkForNæringer(jdbcTemplate)
         val forventet = java.util.List.of<SykefraværsstatistikkForNæring>(
             SykefraværsstatistikkForNæring(
                 SISTE_PUBLISERTE_KVARTAL.årstall,
@@ -251,7 +255,7 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 BigDecimal(1000000)
             )
         )
-        val resultat = repository!!.hentSykefraværAlleNæringerFraOgMed(
+        val resultat = repository.hentSykefraværAlleNæringerFraOgMed(
             SISTE_PUBLISERTE_KVARTAL
         )
         org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(2)
@@ -260,7 +264,7 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
     @Test
     fun hentSykefraværAlleNæringer_siste4Kvartaler_skalIkkeKrasjeVedManglendeData() {
-        val resultat = repository!!.hentSykefraværAlleNæringerFraOgMed(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3))
+        val resultat = repository.hentSykefraværAlleNæringerFraOgMed(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3))
         org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(0)
         org.assertj.core.api.Assertions.assertThat(resultat).containsExactlyInAnyOrderElementsOf(listOf())
     }
@@ -270,14 +274,14 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
         opprettStatistikkNæring5SifferTestData(
             ÅrstallOgKvartal(2019, 2), ÅrstallOgKvartal(2019, 1)
         )
-        val resultat = repository!!.hentSykefraværprosentForAlleNæringskoder(ÅrstallOgKvartal(2019, 2))
+        val resultat = repository.hentSykefraværprosentForAlleNæringskoder(ÅrstallOgKvartal(2019, 2))
         assertSykefraværsstatistikkForBedreNæringskodeContains(
             resultat, 2019, 2, 10, produksjonAvKlær, 3, 100
         )
         assertSykefraværsstatistikkForBedreNæringskodeContains(
             resultat, 2019, 2, 10, undervisning, 5, 100
         )
-        val resultat_2019_1 = repository!!.hentSykefraværprosentForAlleNæringskoder(ÅrstallOgKvartal(2019, 1))
+        val resultat_2019_1 = repository.hentSykefraværprosentForAlleNæringskoder(ÅrstallOgKvartal(2019, 1))
         org.assertj.core.api.Assertions.assertThat(resultat_2019_1.size).isEqualTo(2)
         assertSykefraværsstatistikkForBedreNæringskodeContains(
             resultat_2019_1, 2019, 1, 10, produksjonAvKlær, 3, 100
@@ -292,14 +296,14 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
         opprettStatistikkNæring5SifferTestData(
             ÅrstallOgKvartal(2019, 2), ÅrstallOgKvartal(2019, 1)
         )
-        val resultat = repository!!.hentSykefraværprosentForAlleNæringskoder(ÅrstallOgKvartal(2019, 2))
+        val resultat = repository.hentSykefraværprosentForAlleNæringskoder(ÅrstallOgKvartal(2019, 2))
         assertSykefraværsstatistikkForBedreNæringskodeContains(
             resultat, 2019, 2, 10, produksjonAvKlær, 3, 100
         )
         assertSykefraværsstatistikkForBedreNæringskodeContains(
             resultat, 2019, 2, 10, undervisning, 5, 100
         )
-        val resultat_2019_1_til_2019_2 = repository!!.hentSykefraværprosentForAlleNæringskoder(
+        val resultat_2019_1_til_2019_2 = repository.hentSykefraværprosentForAlleNæringskoder(
             ÅrstallOgKvartal(2019, 1), ÅrstallOgKvartal(2019, 2)
         )
         org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(2)
@@ -321,7 +325,7 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     @Test
     fun hentSykefraværprosentAlleVirksomheter__skal_hente_alle_virksomheter_for_ett_eller_flere_kvartaler() {
         opprettStatistikkVirksomhetTestData()
-        val resultat_2019_2 = repository!!.hentSykefraværAlleVirksomheter(ÅrstallOgKvartal(2019, 2))
+        val resultat_2019_2 = repository.hentSykefraværAlleVirksomheter(ÅrstallOgKvartal(2019, 2))
         org.assertj.core.api.Assertions.assertThat(resultat_2019_2.size).isEqualTo(2)
         assertSykefraværsstatistikkForVirksomhetIsEqual(
             resultat_2019_2, 2019, 2, 3, VIRKSOMHET_1, 1, 60
@@ -329,7 +333,7 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
         assertSykefraværsstatistikkForVirksomhetIsEqual(
             resultat_2019_2, 2019, 2, 4, VIRKSOMHET_2, 9, 100
         )
-        val resultat_2019_1_TIL_2019_2 = repository!!.hentSykefraværAlleVirksomheter(
+        val resultat_2019_1_TIL_2019_2 = repository.hentSykefraværAlleVirksomheter(
             ÅrstallOgKvartal(2019, 1), ÅrstallOgKvartal(2019, 2)
         )
         org.assertj.core.api.Assertions.assertThat(resultat_2019_1_TIL_2019_2.size).isEqualTo(4)
@@ -345,7 +349,7 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
         assertSykefraværsstatistikkForVirksomhetIsEqual(
             resultat_2019_1_TIL_2019_2, 2019, 2, 4, VIRKSOMHET_2, 9, 100
         )
-        val resultat_2018_3_TIL_2019_2 = repository!!.hentSykefraværAlleVirksomheter(
+        val resultat_2018_3_TIL_2019_2 = repository.hentSykefraværAlleVirksomheter(
             ÅrstallOgKvartal(2018, 3), ÅrstallOgKvartal(2019, 2)
         )
         org.assertj.core.api.Assertions.assertThat(resultat_2018_3_TIL_2019_2.size).isEqualTo(8)
@@ -531,7 +535,7 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     private fun createStatistikkLand(
         årstall: Int, kvartal: Int, antallPersoner: Int, tapteDagsverk: Int, muligeDagsverk: Int
     ) {
-        jdbcTemplate!!.update(
+        jdbcTemplate.update(
             "insert into sykefravar_statistikk_land "
                     + "(arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                     + "values (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
@@ -556,7 +560,7 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
         tapteDagsverk: Int,
         muligeDagsverk: Int
     ) {
-        jdbcTemplate!!.update(
+        jdbcTemplate.update(
             "insert into sykefravar_statistikk_sektor "
                     + "(sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                     + "values (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
@@ -581,7 +585,7 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
         tapteDagsverk: Int,
         muligeDagsverk: Int
     ) {
-        jdbcTemplate!!.update(
+        jdbcTemplate.update(
             "insert into sykefravar_statistikk_naring (naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                     + "values (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
             parametre(
@@ -605,7 +609,7 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
         tapteDagsverk: Int,
         muligeDagsverk: Int
     ) {
-        jdbcTemplate!!.update(
+        jdbcTemplate.update(
             "insert into sykefravar_statistikk_naring5siffer "
                     + "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                     + "values (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
@@ -630,7 +634,7 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
         tapteDagsverk: Int,
         muligeDagsverk: Int
     ) {
-        jdbcTemplate!!.update(
+        jdbcTemplate.update(
             "insert into sykefravar_statistikk_virksomhet "
                     + "(arstall, kvartal, orgnr, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                     + "values (:arstall, :kvartal, :orgnr, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",

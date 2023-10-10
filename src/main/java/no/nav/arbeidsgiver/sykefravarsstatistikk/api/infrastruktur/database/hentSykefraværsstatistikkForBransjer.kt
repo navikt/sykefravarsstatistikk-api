@@ -1,8 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkBransje
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværsstatistikkForNæring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransjeprogram
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -80,7 +82,7 @@ private fun hentSykefraværsstatistikkForAngitteNæringer(
         sykefraværsstatistikkNæringRowMapper(),
     )
 
-private fun sykefraværsstatistikkNæringRowMapper() = RowMapper { resultSet: ResultSet?, _: Int ->
+private fun sykefraværsstatistikkNæringRowMapper() = RowMapper { resultSet: ResultSet, _: Int ->
     SykefraværsstatistikkTilEksporteringRepository.mapTilSykefraværsstatistikkNæring(resultSet)
 }
 

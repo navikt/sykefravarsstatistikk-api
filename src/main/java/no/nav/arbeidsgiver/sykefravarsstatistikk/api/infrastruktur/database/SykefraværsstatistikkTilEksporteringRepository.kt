@@ -1,280 +1,272 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database;
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Component;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.HentSykefraværsstatistikkForBransjerKt.hentSykefraværsstatistikkForBransjer;
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal.Companion.range
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.dao.EmptyResultDataAccessException
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.stereotype.Component
+import java.sql.ResultSet
+import java.sql.SQLException
+import java.util.*
+import java.util.stream.Collectors
 
 @Component
-public class SykefraværsstatistikkTilEksporteringRepository {
-
-  private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-
-  public SykefraværsstatistikkTilEksporteringRepository(
-      @Qualifier("sykefravarsstatistikkJdbcTemplate")
-          NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-    this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-  }
-
-  public SykefraværsstatistikkLand hentSykefraværprosentLand(ÅrstallOgKvartal årstallOgKvartal) {
-    try {
-      List<SykefraværsstatistikkLand> resultat =
-          namedParameterJdbcTemplate.query(
-              "select arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk "
-                  + "from sykefravar_statistikk_land "
-                  + "where arstall = :arstall and kvartal = :kvartal order by arstall, kvartal",
-              new MapSqlParameterSource()
-                  .addValue("arstall", årstallOgKvartal.getÅrstall())
-                  .addValue("kvartal", årstallOgKvartal.getKvartal()),
-              (rs, rowNum) -> mapTilSykefraværsstatistikkLand(rs));
-
-      if (resultat.size() != 1) {
-        return null;
-      }
-      return resultat.get(0);
-    } catch (EmptyResultDataAccessException e) {
-      return null;
-    }
-  }
-
-  public List<SykefraværsstatistikkSektor> hentSykefraværprosentAlleSektorer(
-      ÅrstallOgKvartal årstallOgKvartal) {
-    try {
-      return namedParameterJdbcTemplate.query(
-          "select sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk "
-              + "from sykefravar_statistikk_sektor "
-              + "where arstall = :arstall and kvartal = :kvartal "
-              + "order by arstall, kvartal, sektor_kode",
-          new MapSqlParameterSource()
-              .addValue("arstall", årstallOgKvartal.getÅrstall())
-              .addValue("kvartal", årstallOgKvartal.getKvartal()),
-          (rs, rowNum) -> mapTilSykefraværsstatistikkSektor(rs));
-    } catch (EmptyResultDataAccessException e) {
-      return Collections.emptyList();
-    }
-  }
-
-  public List<SykefraværsstatistikkSektor> hentSykefraværAlleSektorerFraOgMed(
-      ÅrstallOgKvartal årstallOgKvartal) {
-    try {
-      return namedParameterJdbcTemplate.query(
-          "select sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk "
-              + "from sykefravar_statistikk_sektor "
-              + "where (arstall = :arstall and kvartal >= :kvartal) "
-              + "or (arstall > :arstall) "
-              + "order by arstall, kvartal, sektor_kode",
-          new MapSqlParameterSource()
-              .addValue("arstall", årstallOgKvartal.getÅrstall())
-              .addValue("kvartal", årstallOgKvartal.getKvartal()),
-          (rs, rowNum) -> mapTilSykefraværsstatistikkSektor(rs));
-    } catch (EmptyResultDataAccessException e) {
-      return Collections.emptyList();
-    }
-  }
-
-  /* Sykefraværsprosent Næring */
-
-  public List<SykefraværsstatistikkForNæring> hentSykefraværprosentAlleNæringer(
-      ÅrstallOgKvartal sisteÅrstallOgKvartal, int antallKvartaler) {
-    if (antallKvartaler == 2) {
-      return hentSykefraværprosentAlleNæringer(sisteÅrstallOgKvartal);
+class SykefraværsstatistikkTilEksporteringRepository(
+    @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate
+) {
+    fun hentSykefraværprosentLand(årstallOgKvartal: ÅrstallOgKvartal): SykefraværsstatistikkLand? {
+        return try {
+            val resultat = namedParameterJdbcTemplate.query(
+                "select arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk "
+                        + "from sykefravar_statistikk_land "
+                        + "where arstall = :arstall and kvartal = :kvartal order by arstall, kvartal",
+                MapSqlParameterSource()
+                    .addValue("arstall", årstallOgKvartal.årstall)
+                    .addValue("kvartal", årstallOgKvartal.kvartal)
+            ) { rs: ResultSet, _: Int -> mapTilSykefraværsstatistikkLand(rs) }
+            if (resultat.size != 1) {
+                null
+            } else resultat[0]
+        } catch (e: EmptyResultDataAccessException) {
+            null
+        }
     }
 
-    return hentSykefraværprosentAlleNæringer(
-        sisteÅrstallOgKvartal, sisteÅrstallOgKvartal.minusKvartaler(antallKvartaler - 1));
-  }
-
-  public List<SykefraværsstatistikkForNæring> hentSykefraværprosentAlleNæringer(
-      ÅrstallOgKvartal årstallOgKvartal) {
-    return hentSykefraværprosentAlleNæringer(årstallOgKvartal, årstallOgKvartal);
-  }
-
-  public List<SykefraværsstatistikkForNæring> hentSykefraværprosentAlleNæringer(
-      ÅrstallOgKvartal fraÅrstallOgKvartal, ÅrstallOgKvartal tilÅrstallOgKvartal) {
-    try {
-      return namedParameterJdbcTemplate.query(
-          "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk "
-              + "from sykefravar_statistikk_naring "
-              + " where "
-              + getWhereClause(fraÅrstallOgKvartal, tilÅrstallOgKvartal)
-              + "order by (arstall, kvartal) desc, naring_kode",
-          (rs, rowNum) -> mapTilSykefraværsstatistikkNæring(rs));
-    } catch (EmptyResultDataAccessException e) {
-      return Collections.emptyList();
+    fun hentSykefraværprosentAlleSektorer(
+        årstallOgKvartal: ÅrstallOgKvartal
+    ): List<SykefraværsstatistikkSektor> {
+        return try {
+            namedParameterJdbcTemplate.query(
+                "select sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk "
+                        + "from sykefravar_statistikk_sektor "
+                        + "where arstall = :arstall and kvartal = :kvartal "
+                        + "order by arstall, kvartal, sektor_kode",
+                MapSqlParameterSource()
+                    .addValue("arstall", årstallOgKvartal.årstall)
+                    .addValue("kvartal", årstallOgKvartal.kvartal)
+            ) { rs: ResultSet, _: Int -> mapTilSykefraværsstatistikkSektor(rs) }
+        } catch (e: EmptyResultDataAccessException) {
+            emptyList()
+        }
     }
-  }
 
-  public List<SykefraværsstatistikkForNæringskode> hentSykefraværprosentForAlleNæringskoder(
-      ÅrstallOgKvartal årstallOgKvartal) {
-    return hentSykefraværprosentForAlleNæringskoder(årstallOgKvartal, årstallOgKvartal);
-  }
-
-  public List<SykefraværsstatistikkForNæringskode> hentSykefraværprosentForAlleNæringskoder(
-      ÅrstallOgKvartal fraÅrstallOgKvartal, ÅrstallOgKvartal tilÅrstallOgKvartal) {
-
-    try {
-      return namedParameterJdbcTemplate.query(
-          "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk "
-              + "from sykefravar_statistikk_naring5siffer "
-              + " where "
-              + getWhereClause(fraÅrstallOgKvartal, tilÅrstallOgKvartal)
-              + "order by (arstall, kvartal) desc, naring_kode",
-          new MapSqlParameterSource()
-              .addValue("arstall", fraÅrstallOgKvartal.getÅrstall())
-              .addValue("kvartal", fraÅrstallOgKvartal.getKvartal()),
-          (rs, rowNum) -> mapTilSykefraværsstatistikkNæring5Siffer(rs));
-    } catch (EmptyResultDataAccessException e) {
-      return Collections.emptyList();
+    fun hentSykefraværAlleSektorerFraOgMed(
+        årstallOgKvartal: ÅrstallOgKvartal
+    ): List<SykefraværsstatistikkSektor> {
+        return try {
+            namedParameterJdbcTemplate.query(
+                "select sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk "
+                        + "from sykefravar_statistikk_sektor "
+                        + "where (arstall = :arstall and kvartal >= :kvartal) "
+                        + "or (arstall > :arstall) "
+                        + "order by arstall, kvartal, sektor_kode",
+                MapSqlParameterSource()
+                    .addValue("arstall", årstallOgKvartal.årstall)
+                    .addValue("kvartal", årstallOgKvartal.kvartal)
+            ) { rs: ResultSet, _: Int -> mapTilSykefraværsstatistikkSektor(rs) }
+        } catch (e: EmptyResultDataAccessException) {
+            emptyList()
+        }
     }
-  }
 
-  public List<SykefraværsstatistikkVirksomhetUtenVarighet> hentSykefraværAlleVirksomheter(
-      ÅrstallOgKvartal fraÅrstallOgKvartal) {
-    return hentSykefraværAlleVirksomheter(fraÅrstallOgKvartal, fraÅrstallOgKvartal);
-  }
-
-  public List<SykefraværsstatistikkVirksomhetUtenVarighet> hentSykefraværAlleVirksomheter(
-      ÅrstallOgKvartal fraÅrstallOgKvartal, ÅrstallOgKvartal tilÅrstallOgKvartal) {
-    try {
-      return namedParameterJdbcTemplate.query(
-          "select arstall, kvartal, orgnr, "
-              + "sum(tapte_dagsverk) as tapte_dagsverk, "
-              + "sum(mulige_dagsverk) as mulige_dagsverk, "
-              + "sum(antall_personer) as antall_personer "
-              + "from sykefravar_statistikk_virksomhet "
-              + " where "
-              + getWhereClause(fraÅrstallOgKvartal, tilÅrstallOgKvartal)
-              + " group by arstall, kvartal, orgnr",
-          (rs, rowNum) -> mapTilSykefraværsstatistikkVirksomhet(rs));
-    } catch (EmptyResultDataAccessException e) {
-      return Collections.emptyList();
+    /* Sykefraværsprosent Næring */
+    fun hentSykefraværprosentAlleNæringer(
+        sisteÅrstallOgKvartal: ÅrstallOgKvartal, antallKvartaler: Int
+    ): List<SykefraværsstatistikkForNæring> {
+        return if (antallKvartaler == 2) {
+            hentSykefraværprosentAlleNæringer(sisteÅrstallOgKvartal)
+        } else hentSykefraværprosentAlleNæringer(
+            sisteÅrstallOgKvartal, sisteÅrstallOgKvartal.minusKvartaler(antallKvartaler - 1)
+        )
     }
-  }
 
-  public List<SykefraværsstatistikkForNæring> hentSykefraværAlleNæringerFraOgMed(
-      ÅrstallOgKvartal fraÅrstallOgKvartal) {
-    try {
-      return namedParameterJdbcTemplate.query(
-          "select arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk "
-              + "from sykefravar_statistikk_naring "
-              + "where (arstall = :arstall and kvartal >= :kvartal) "
-              + "or (arstall > :arstall) "
-              + "group by arstall, kvartal, id order by arstall, kvartal, naring_kode",
-          new MapSqlParameterSource()
-              .addValue("arstall", fraÅrstallOgKvartal.getÅrstall())
-              .addValue("kvartal", fraÅrstallOgKvartal.getKvartal()),
-          (rs, rowNum) -> mapTilSykefraværsstatistikkNæring(rs));
-    } catch (EmptyResultDataAccessException e) {
-      return Collections.emptyList();
+    fun hentSykefraværprosentAlleNæringer(
+        årstallOgKvartal: ÅrstallOgKvartal?
+    ): List<SykefraværsstatistikkForNæring> {
+        return hentSykefraværprosentAlleNæringer(årstallOgKvartal, årstallOgKvartal)
     }
-  }
 
-  public List<SykefraværsstatistikkBransje> hentSykefraværAlleBransjer(List<ÅrstallOgKvartal> kvartaler) {
-    return hentSykefraværsstatistikkForBransjer(kvartaler, namedParameterJdbcTemplate);
-  }
+    fun hentSykefraværprosentAlleNæringer(
+        fraÅrstallOgKvartal: ÅrstallOgKvartal?, tilÅrstallOgKvartal: ÅrstallOgKvartal?
+    ): List<SykefraværsstatistikkForNæring> {
+        return try {
+            namedParameterJdbcTemplate.query(
+                "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk "
+                        + "from sykefravar_statistikk_naring "
+                        + " where "
+                        + getWhereClause(fraÅrstallOgKvartal, tilÅrstallOgKvartal)
+                        + "order by (arstall, kvartal) desc, naring_kode"
+            ) { rs: ResultSet, _: Int -> mapTilSykefraværsstatistikkNæring(rs) }
+        } catch (e: EmptyResultDataAccessException) {
+            emptyList()
+        }
+    }
 
+    fun hentSykefraværprosentForAlleNæringskoder(
+        årstallOgKvartal: ÅrstallOgKvartal
+    ): List<SykefraværsstatistikkForNæringskode> {
+        return hentSykefraværprosentForAlleNæringskoder(årstallOgKvartal, årstallOgKvartal)
+    }
 
-  // Utilities
-  @NotNull
-  private static String getWhereClause(
-      ÅrstallOgKvartal fraÅrstallOgKvartal, ÅrstallOgKvartal tilÅrstallOgKvartal) {
-    // Alltid sjekk input før verdi skal til SQL
-    sjekkÅrstallOgKvartal(fraÅrstallOgKvartal, tilÅrstallOgKvartal);
+    fun hentSykefraværprosentForAlleNæringskoder(
+        fraÅrstallOgKvartal: ÅrstallOgKvartal, tilÅrstallOgKvartal: ÅrstallOgKvartal?
+    ): List<SykefraværsstatistikkForNæringskode> {
+        return try {
+            namedParameterJdbcTemplate.query(
+                "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk "
+                        + "from sykefravar_statistikk_naring5siffer "
+                        + " where "
+                        + getWhereClause(fraÅrstallOgKvartal, tilÅrstallOgKvartal)
+                        + "order by (arstall, kvartal) desc, naring_kode",
+                MapSqlParameterSource()
+                    .addValue("arstall", fraÅrstallOgKvartal.årstall)
+                    .addValue("kvartal", fraÅrstallOgKvartal.kvartal)
+            ) { rs: ResultSet, _: Int -> mapTilSykefraværsstatistikkNæring5Siffer(rs) }
+        } catch (e: EmptyResultDataAccessException) {
+            emptyList()
+        }
+    }
 
-    List<ÅrstallOgKvartal> årstallOgKvartalListe =
-        ÅrstallOgKvartal.range(fraÅrstallOgKvartal, tilÅrstallOgKvartal);
-    return årstallOgKvartalListe.stream()
-        .map(
-            årstallOgKvartal ->
-                String.format(
-                    "(arstall = %d and kvartal = %d) ",
-                    årstallOgKvartal.getÅrstall(), årstallOgKvartal.getKvartal()))
-        .collect(Collectors.joining("or "));
-  }
+    @JvmOverloads
+    fun hentSykefraværAlleVirksomheter(
+        fraÅrstallOgKvartal: ÅrstallOgKvartal?, tilÅrstallOgKvartal: ÅrstallOgKvartal? = fraÅrstallOgKvartal
+    ): List<SykefraværsstatistikkVirksomhetUtenVarighet> {
+        return try {
+            namedParameterJdbcTemplate.query(
+                "select arstall, kvartal, orgnr, "
+                        + "sum(tapte_dagsverk) as tapte_dagsverk, "
+                        + "sum(mulige_dagsverk) as mulige_dagsverk, "
+                        + "sum(antall_personer) as antall_personer "
+                        + "from sykefravar_statistikk_virksomhet "
+                        + " where "
+                        + getWhereClause(fraÅrstallOgKvartal, tilÅrstallOgKvartal)
+                        + " group by arstall, kvartal, orgnr"
+            ) { rs: ResultSet, _: Int -> mapTilSykefraværsstatistikkVirksomhet(rs) }
+        } catch (e: EmptyResultDataAccessException) {
+            emptyList()
+        }
+    }
 
-  private static void sjekkÅrstallOgKvartal(ÅrstallOgKvartal... årstallOgKvartalListe) {
-    Arrays.stream(årstallOgKvartalListe)
-        .forEach(
-            årstallOgKvartal -> {
-              if (årstallOgKvartal.getÅrstall() < 2010 || årstallOgKvartal.getÅrstall() > 2100) {
-                throw new IllegalArgumentException(
+    fun hentSykefraværAlleNæringerFraOgMed(
+        fraÅrstallOgKvartal: ÅrstallOgKvartal
+    ): List<SykefraværsstatistikkForNæring> {
+        return try {
+            namedParameterJdbcTemplate.query(
+                "select arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk "
+                        + "from sykefravar_statistikk_naring "
+                        + "where (arstall = :arstall and kvartal >= :kvartal) "
+                        + "or (arstall > :arstall) "
+                        + "group by arstall, kvartal, id order by arstall, kvartal, naring_kode",
+                MapSqlParameterSource()
+                    .addValue("arstall", fraÅrstallOgKvartal.årstall)
+                    .addValue("kvartal", fraÅrstallOgKvartal.kvartal)
+            ) { rs: ResultSet, _: Int -> mapTilSykefraværsstatistikkNæring(rs) }
+        } catch (e: EmptyResultDataAccessException) {
+            emptyList()
+        }
+    }
+
+    fun hentSykefraværAlleBransjer(kvartaler: List<ÅrstallOgKvartal>): List<SykefraværsstatistikkBransje> {
+        return hentSykefraværsstatistikkForBransjer(kvartaler, namedParameterJdbcTemplate)
+    }
+
+    @Throws(SQLException::class)
+    private fun mapTilSykefraværsstatistikkLand(rs: ResultSet): SykefraværsstatistikkLand {
+        return SykefraværsstatistikkLand(
+            rs.getInt("arstall"),
+            rs.getInt("kvartal"),
+            rs.getInt("antall_personer"),
+            rs.getBigDecimal("tapte_dagsverk"),
+            rs.getBigDecimal("mulige_dagsverk")
+        )
+    }
+
+    @Throws(SQLException::class)
+    private fun mapTilSykefraværsstatistikkSektor(rs: ResultSet): SykefraværsstatistikkSektor {
+        return SykefraværsstatistikkSektor(
+            rs.getInt("arstall"),
+            rs.getInt("kvartal"),
+            rs.getString("sektor_kode"),
+            rs.getInt("antall_personer"),
+            rs.getBigDecimal("tapte_dagsverk"),
+            rs.getBigDecimal("mulige_dagsverk")
+        )
+    }
+
+    @Throws(SQLException::class)
+    private fun mapTilSykefraværsstatistikkNæring5Siffer(rs: ResultSet): SykefraværsstatistikkForNæringskode {
+        return SykefraværsstatistikkForNæringskode(
+            rs.getInt("arstall"),
+            rs.getInt("kvartal"),
+            rs.getString("naring_kode"),
+            rs.getInt("antall_personer"),
+            rs.getBigDecimal("tapte_dagsverk"),
+            rs.getBigDecimal("mulige_dagsverk")
+        )
+    }
+
+    @Throws(SQLException::class)
+    private fun mapTilSykefraværsstatistikkVirksomhet(
+        rs: ResultSet
+    ): SykefraværsstatistikkVirksomhetUtenVarighet {
+        return SykefraværsstatistikkVirksomhetUtenVarighet(
+            rs.getInt("arstall"),
+            rs.getInt("kvartal"),
+            rs.getString("orgnr"),
+            rs.getInt("antall_personer"),
+            rs.getBigDecimal("tapte_dagsverk"),
+            rs.getBigDecimal("mulige_dagsverk")
+        )
+    }
+
+    companion object {
+        // Utilities
+        private fun getWhereClause(
+            fraÅrstallOgKvartal: ÅrstallOgKvartal?, tilÅrstallOgKvartal: ÅrstallOgKvartal?
+        ): String {
+            // Alltid sjekk input før verdi skal til SQL
+            sjekkÅrstallOgKvartal(fraÅrstallOgKvartal!!, tilÅrstallOgKvartal!!)
+            val årstallOgKvartalListe = range(fraÅrstallOgKvartal, tilÅrstallOgKvartal)
+            return årstallOgKvartalListe.stream()
+                .map { (årstall, kvartal): ÅrstallOgKvartal ->
                     String.format(
-                        "Årstall skal være mellom 2010 og 2100. Fikk '%d'",
-                        årstallOgKvartal.getÅrstall()));
-              }
+                        "(arstall = %d and kvartal = %d) ",
+                        årstall, kvartal
+                    )
+                }
+                .collect(Collectors.joining("or "))
+        }
 
-              if (årstallOgKvartal.getKvartal() < 1 || årstallOgKvartal.getKvartal() > 4) {
-                throw new IllegalArgumentException(
-                    String.format(
-                        "Kvartal skal være mellom 1 og 4. Fikk '%d'",
-                        årstallOgKvartal.getKvartal()));
-              }
-            });
-  }
+        private fun sjekkÅrstallOgKvartal(vararg årstallOgKvartalListe: ÅrstallOgKvartal) {
+            Arrays.stream(årstallOgKvartalListe)
+                .forEach { (årstall, kvartal): ÅrstallOgKvartal ->
+                    require(!(årstall < 2010 || årstall > 2100)) {
+                        String.format(
+                            "Årstall skal være mellom 2010 og 2100. Fikk '%d'",
+                            årstall
+                        )
+                    }
+                    require(!(kvartal < 1 || kvartal > 4)) {
+                        String.format(
+                            "Kvartal skal være mellom 1 og 4. Fikk '%d'",
+                            kvartal
+                        )
+                    }
+                }
+        }
 
-  private SykefraværsstatistikkLand mapTilSykefraværsstatistikkLand(ResultSet rs)
-      throws SQLException {
-    return new SykefraværsstatistikkLand(
-        rs.getInt("arstall"),
-        rs.getInt("kvartal"),
-        rs.getInt("antall_personer"),
-        rs.getBigDecimal("tapte_dagsverk"),
-        rs.getBigDecimal("mulige_dagsverk"));
-  }
-
-  private SykefraværsstatistikkSektor mapTilSykefraværsstatistikkSektor(ResultSet rs)
-      throws SQLException {
-    return new SykefraværsstatistikkSektor(
-        rs.getInt("arstall"),
-        rs.getInt("kvartal"),
-        rs.getString("sektor_kode"),
-        rs.getInt("antall_personer"),
-        rs.getBigDecimal("tapte_dagsverk"),
-        rs.getBigDecimal("mulige_dagsverk"));
-  }
-
-  public static SykefraværsstatistikkForNæring mapTilSykefraværsstatistikkNæring(ResultSet rs)
-      throws SQLException {
-    return new SykefraværsstatistikkForNæring(
-        rs.getInt("arstall"),
-        rs.getInt("kvartal"),
-        rs.getString("naring_kode"),
-        rs.getInt("antall_personer"),
-        rs.getBigDecimal("tapte_dagsverk"),
-        rs.getBigDecimal("mulige_dagsverk"));
-  }
-
-  private SykefraværsstatistikkForNæringskode mapTilSykefraværsstatistikkNæring5Siffer(ResultSet rs)
-      throws SQLException {
-    return new SykefraværsstatistikkForNæringskode(
-        rs.getInt("arstall"),
-        rs.getInt("kvartal"),
-        rs.getString("naring_kode"),
-        rs.getInt("antall_personer"),
-        rs.getBigDecimal("tapte_dagsverk"),
-        rs.getBigDecimal("mulige_dagsverk"));
-  }
-
-  private SykefraværsstatistikkVirksomhetUtenVarighet mapTilSykefraværsstatistikkVirksomhet(
-      ResultSet rs) throws SQLException {
-    return new SykefraværsstatistikkVirksomhetUtenVarighet(
-        rs.getInt("arstall"),
-        rs.getInt("kvartal"),
-        rs.getString("orgnr"),
-        rs.getInt("antall_personer"),
-        rs.getBigDecimal("tapte_dagsverk"),
-        rs.getBigDecimal("mulige_dagsverk"));
-  }
+        @Throws(SQLException::class)
+        fun mapTilSykefraværsstatistikkNæring(rs: ResultSet): SykefraværsstatistikkForNæring {
+            return SykefraværsstatistikkForNæring(
+                rs.getInt("arstall"),
+                rs.getInt("kvartal"),
+                rs.getString("naring_kode"),
+                rs.getInt("antall_personer"),
+                rs.getBigDecimal("tapte_dagsverk"),
+                rs.getBigDecimal("mulige_dagsverk")
+            )
+        }
+    }
 }
