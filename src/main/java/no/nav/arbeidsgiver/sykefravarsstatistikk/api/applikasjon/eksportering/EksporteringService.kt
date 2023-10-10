@@ -101,18 +101,19 @@ class EksporteringService(
             sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleVirksomheter(
                 årstallOgKvartal
             )
+        val umaskertSykefraværForEttKvartal = EksporteringServiceUtils.hentSisteKvartalIBeregningen(
+            umaskertSykefraværsstatistikkSistePublisertKvartalLand, årstallOgKvartal
+        )
         val landSykefravær = EksporteringServiceUtils.getSykefraværMedKategoriForLand(
             årstallOgKvartal,
             EksporteringServiceUtils.mapToSykefraværsstatistikkLand(
-                EksporteringServiceUtils.hentSisteKvartalIBeregningen(
-                    umaskertSykefraværsstatistikkSistePublisertKvartalLand, årstallOgKvartal
-                )
+                umaskertSykefraværForEttKvartal!!
             )
         )
         val virksomhetMetadataMap = EksporteringServiceUtils.getVirksomhetMetadataHashMap(virksomhetMetadataListe)
         val subsets = Lists.partition(virksomheterTilEksport, EksporteringServiceUtils.EKSPORT_BATCH_STØRRELSE)
         val antallEksportert = AtomicInteger()
-        subsets.forEach { subset: List<VirksomhetEksportPerKvartal?> ->
+        subsets.forEach { subset: List<VirksomhetEksportPerKvartal> ->
             val virksomheterMetadataIDenneSubset =
                 EksporteringServiceUtils.getVirksomheterMetadataFraSubset(virksomhetMetadataMap, subset)
             log.info(
@@ -149,19 +150,19 @@ class EksporteringService(
     }
 
     private fun sendIBatch(
-        virksomheterMetadata: List<VirksomhetMetadata?>,
+        virksomheterMetadata: List<VirksomhetMetadata>,
         årstallOgKvartal: ÅrstallOgKvartal,
-        sykefraværsstatistikkSektor: List<SykefraværsstatistikkSektor?>?,
-        sykefraværsstatistikkForNæring: List<SykefraværsstatistikkForNæring?>?,
-        sykefraværsstatistikkForNæringskode: List<SykefraværsstatistikkForNæringskode?>?,
-        sykefraværsstatistikkVirksomhetUtenVarighet: List<SykefraværsstatistikkVirksomhetUtenVarighet?>?,
+        sykefraværsstatistikkSektor: List<SykefraværsstatistikkSektor>,
+        sykefraværsstatistikkForNæring: List<SykefraværsstatistikkForNæring>,
+        sykefraværsstatistikkForNæringskode: List<SykefraværsstatistikkForNæringskode>,
+        sykefraværsstatistikkVirksomhetUtenVarighet: List<SykefraværsstatistikkVirksomhetUtenVarighet>,
         landSykefravær: SykefraværMedKategori,
         antallEksportert: AtomicInteger,
         antallTotaltStatistikk: Int
     ) {
         val antallSentTilEksport = AtomicInteger()
         val antallVirksomheterLagretSomEksportertIDb = AtomicInteger()
-        val eksporterteVirksomheterListe: List<String> = ArrayList()
+        val eksporterteVirksomheterListe: MutableList<String> = ArrayList()
         val sykefraværsstatistikkVirksomhetForEttKvartalUtenVarighetMap = EksporteringServiceUtils.toMap(
             EksporteringServiceUtils.filterByKvartal(
                 årstallOgKvartal,
@@ -169,7 +170,7 @@ class EksporteringService(
             )
         )
         virksomheterMetadata.forEach(
-            Consumer<VirksomhetMetadata?> { virksomhetMetadata: VirksomhetMetadata? ->
+            Consumer { virksomhetMetadata: VirksomhetMetadata? ->
                 val startUtsendingProcess = System.nanoTime()
                 if (virksomhetMetadata != null) {
                     kafkaClient.send(
