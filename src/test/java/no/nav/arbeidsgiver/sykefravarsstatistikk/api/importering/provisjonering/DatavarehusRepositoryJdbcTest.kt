@@ -37,26 +37,25 @@ import java.math.BigDecimal
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 open class DatavarehusRepositoryJdbcTest {
     @Autowired
-    private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate? = null
-    private var repository: DatavarehusRepository? = null
+    lateinit var namedParameterJdbcTemplate: NamedParameterJdbcTemplate
+    private val repository: DatavarehusRepository by lazy { DatavarehusRepository(namedParameterJdbcTemplate) }
 
     @BeforeEach
     fun setUp() {
-        repository = DatavarehusRepository(namedParameterJdbcTemplate)
-        cleanUpTestDb(namedParameterJdbcTemplate!!)
+        cleanUpTestDb(namedParameterJdbcTemplate)
     }
 
     @AfterEach
     fun tearDown() {
-        cleanUpTestDb(namedParameterJdbcTemplate!!)
+        cleanUpTestDb(namedParameterJdbcTemplate)
     }
 
     @Test
     fun hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Land_og_sektor() {
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate!!, 2019, 4, 4, 5, 100)
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 4, 4, 5, 100)
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 4, 6, 10, 100)
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2020, 1, 1, 1, 10)
-        val sisteÅrstallOgKvartal = repository!!.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
+        val sisteÅrstallOgKvartal = repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
             StatistikkildeDvh.LAND_OG_SEKTOR
         )
         AssertionsForClassTypes.assertThat(sisteÅrstallOgKvartal).isEqualTo(ÅrstallOgKvartal(2020, 1))
@@ -65,25 +64,25 @@ open class DatavarehusRepositoryJdbcTest {
     @Test
     fun hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Næring() {
         insertSykefraværsstatistikkNæringInDvhTabell(
-            namedParameterJdbcTemplate!!, 2019, 4, 4, "23", "K", 5, 100
+            namedParameterJdbcTemplate, 2019, 4, 4, "23", "K", 5, 100
         )
         insertSykefraværsstatistikkNæringInDvhTabell(
             namedParameterJdbcTemplate, 2022, 3, 2, "90", "M", 12, 100
         )
         val sisteÅrstallOgKvartal =
-            repository!!.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh.NÆRING)
+            repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh.NÆRING)
         AssertionsForClassTypes.assertThat(sisteÅrstallOgKvartal).isEqualTo(ÅrstallOgKvartal(2022, 3))
     }
 
     @Test
     fun hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Næring5Siffer() {
         insertSykefraværsstatistikkNærin5SiffergInDvhTabell(
-            namedParameterJdbcTemplate!!, 2022, 3, 4, "01110", "K", 5, 100
+            namedParameterJdbcTemplate, 2022, 3, 4, "01110", "K", 5, 100
         )
         insertSykefraværsstatistikkNærin5SiffergInDvhTabell(
             namedParameterJdbcTemplate, 2020, 1, 2, "01110", "M", 12, 100
         )
-        val sisteÅrstallOgKvartal = repository!!.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
+        val sisteÅrstallOgKvartal = repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
             StatistikkildeDvh.NÆRING_5_SIFFER
         )
         AssertionsForClassTypes.assertThat(sisteÅrstallOgKvartal).isEqualTo(ÅrstallOgKvartal(2022, 3))
@@ -92,7 +91,7 @@ open class DatavarehusRepositoryJdbcTest {
     @Test
     fun hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Virksomhet() {
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
-            namedParameterJdbcTemplate!!,
+            namedParameterJdbcTemplate,
             2018,
             4,
             4,
@@ -114,16 +113,16 @@ open class DatavarehusRepositoryJdbcTest {
             101
         )
         val sisteÅrstallOgKvartal =
-            repository!!.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh.VIRKSOMHET)
+            repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh.VIRKSOMHET)
         AssertionsForClassTypes.assertThat(sisteÅrstallOgKvartal).isEqualTo(ÅrstallOgKvartal(2019, 1))
     }
 
     @Test
     fun hentSykefraværsstatistikkSektor__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate!!, 2018, 4, 1, 5, 100)
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 1, 5, 100)
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, 10, 100)
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10)
-        val sykefraværsstatistikkSektor = repository!!.hentSykefraværsstatistikkSektor(ÅrstallOgKvartal(2018, 4))
+        val sykefraværsstatistikkSektor = repository.hentSykefraværsstatistikkSektor(ÅrstallOgKvartal(2018, 4))
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkSektor.size).isEqualTo(1)
         val sykefraværsstatistikkSektorExpected =
             SykefraværsstatistikkSektor(2018, 4, "1", 4, BigDecimal(15), BigDecimal(200))
@@ -136,10 +135,10 @@ open class DatavarehusRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværsstatistikkLand__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate!!, 2018, 4, 4, 5, 100)
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, 5, 100)
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, 10, 100)
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10)
-        val sykefraværsstatistikkLand = repository!!.hentSykefraværsstatistikkLand(ÅrstallOgKvartal(2018, 4))
+        val sykefraværsstatistikkLand = repository.hentSykefraværsstatistikkLand(ÅrstallOgKvartal(2018, 4))
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkLand.size).isEqualTo(1)
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkLand[0])
             .isEqualTo(
@@ -150,7 +149,7 @@ open class DatavarehusRepositoryJdbcTest {
     @Test
     fun hentSykefraværsstatistikkVirksomhet__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
-            namedParameterJdbcTemplate!!,
+            namedParameterJdbcTemplate,
             2018,
             4,
             4,
@@ -205,7 +204,7 @@ open class DatavarehusRepositoryJdbcTest {
             99
         )
         val sykefraværsstatistikkVirksomhet =
-            repository!!.hentSykefraværsstatistikkVirksomhet(ÅrstallOgKvartal(2018, 4))
+            repository.hentSykefraværsstatistikkVirksomhet(ÅrstallOgKvartal(2018, 4))
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkVirksomhet.size).isEqualTo(2)
         val expected = SykefraværsstatistikkVirksomhet(
             2018,
@@ -223,7 +222,7 @@ open class DatavarehusRepositoryJdbcTest {
     @Test
     fun hentSykefraværsstatistikkNæringMedVarighet__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk_med_varighet() {
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
-            namedParameterJdbcTemplate!!,
+            namedParameterJdbcTemplate,
             2018,
             4,
             4,
@@ -312,7 +311,7 @@ open class DatavarehusRepositoryJdbcTest {
             99
         )
         val sykefraværsstatistikkNæringMedVarighet =
-            repository!!.hentSykefraværsstatistikkNæringMedVarighet(ÅrstallOgKvartal(2018, 4))
+            repository.hentSykefraværsstatistikkNæringMedVarighet(ÅrstallOgKvartal(2018, 4))
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkNæringMedVarighet.size).isEqualTo(3)
         val expected = SykefraværsstatistikkNæringMedVarighet(
             2018,
@@ -331,7 +330,7 @@ open class DatavarehusRepositoryJdbcTest {
     @Test
     fun hentSykefraværsstatistikkVirksomhetMedGradering__lager_sum_og_returnerer_antall_tapte_dagsverk_i_gradert_sykemelding_og_mulige_dagsverk() {
         insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
-            namedParameterJdbcTemplate!!,
+            namedParameterJdbcTemplate,
             2018,
             4,
             13,
@@ -373,7 +372,7 @@ open class DatavarehusRepositoryJdbcTest {
             100
         )
         val sykefraværsstatistikkVirksomhetMedGradering =
-            repository!!.hentSykefraværsstatistikkVirksomhetMedGradering(ÅrstallOgKvartal(2018, 4))
+            repository.hentSykefraværsstatistikkVirksomhetMedGradering(ÅrstallOgKvartal(2018, 4))
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkVirksomhetMedGradering.size).isEqualTo(2)
         val expected = SykefraværsstatistikkVirksomhetMedGradering(
             2018,
@@ -413,15 +412,15 @@ open class DatavarehusRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværsstatistikkLand__returnerer_en_tom_liste_dersom_ingen_data_finnes_i_DVH() {
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate!!, 2019, 1, 1, 1, 10)
-        val sykefraværsstatistikkLand = repository!!.hentSykefraværsstatistikkLand(ÅrstallOgKvartal(2018, 4))
+        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10)
+        val sykefraværsstatistikkLand = repository.hentSykefraværsstatistikkLand(ÅrstallOgKvartal(2018, 4))
         Assertions.assertTrue(sykefraværsstatistikkLand.isEmpty())
     }
 
     @Test
     fun hentVirksomhetMetadataEksportering__returnerer_virksomhetMetadataEksportering() {
         insertOrgenhetInDvhTabell(
-            namedParameterJdbcTemplate!!,
+            namedParameterJdbcTemplate,
             ORGNR_VIRKSOMHET_1,
             Sektor.PRIVAT.sektorkode,
             NÆRINGSKODE_2SIFFER,
@@ -429,7 +428,7 @@ open class DatavarehusRepositoryJdbcTest {
             2020,
             3
         )
-        val orgenhetList = repository!!.hentVirksomheter(ÅrstallOgKvartal(2020, 3))
+        val orgenhetList = repository.hentVirksomheter(ÅrstallOgKvartal(2020, 3))
         Assertions.assertTrue(
             orgenhetList.contains(
                 Orgenhet(
