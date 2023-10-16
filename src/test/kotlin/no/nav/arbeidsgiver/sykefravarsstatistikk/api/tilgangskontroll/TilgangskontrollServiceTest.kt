@@ -13,7 +13,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.InnloggetBruker
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.TilgangskontrollException
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.TilgangskontrollUtils
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TokenService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.CorrelationIdFilter
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnKlientWrapper
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetslog.Loggevent
@@ -26,13 +26,13 @@ import org.slf4j.MDC
 
 class TilgangskontrollServiceTest {
     private val altinnKlientWrapper: AltinnKlientWrapper = mockk()
-    private val tilgangskontrollUtils: TilgangskontrollUtils = mockk(relaxed = true)
+    private val tokenService: TokenService = mockk(relaxed = true)
     private val tokenXClient: TokenXClient = mockk(relaxed = true)
     private val sporbarhetslogg: Sporbarhetslogg = spyk()
 
     private val tilgangskontroll: TilgangskontrollService = TilgangskontrollService(
         altinnKlientWrapper,
-        tilgangskontrollUtils,
+        tokenService,
         sporbarhetslogg,
         IAWEB_SERVICE_CODE,
         IAWEB_SERVICE_EDITION,
@@ -113,7 +113,7 @@ class TilgangskontrollServiceTest {
     }
 
     private fun værInnloggetSom(bruker: InnloggetBruker) {
-        every { tilgangskontrollUtils.hentInnloggetBruker() } returns bruker
+        every { tokenService.hentInnloggetBruker() } returns bruker
 
         every {
             altinnKlientWrapper.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(

@@ -7,7 +7,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.OverordnetEnhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Virksomhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.TilgangskontrollException
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.TilgangskontrollUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnKlientWrapper
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetslog.Loggevent
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetslog.Sporbarhetslogg
@@ -21,7 +20,7 @@ import java.text.ParseException
 @Component
 class TilgangskontrollService(
     private val altinnKlientWrapper: AltinnKlientWrapper,
-    private val tokenUtils: TilgangskontrollUtils,
+    private val tokenUtils: TokenService,
     private val sporbarhetslogg: Sporbarhetslogg,
     @param:Value("\${altinn.iaweb.service.code}") private val iawebServiceCode: String,
     @param:Value("\${altinn.iaweb.service.edition}") private val iawebServiceEdition: String,

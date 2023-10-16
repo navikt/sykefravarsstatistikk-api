@@ -7,7 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.Ek
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringPerStatistikkKategoriService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.SykefraværsstatistikkImporteringService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.TilgangskontrollUtils
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TokenService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.WebClientConfiguration
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.MockServer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.PrometheusMetrics
@@ -37,7 +37,7 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
     excludeFilters = [ComponentScan.Filter(
         type = FilterType.ASSIGNABLE_TYPE,
         value = [MockServer::class,
-            TilgangskontrollUtils::class,
+            TokenService::class,
             EksporteringService::class,
             EksporteringPerStatistikkKategoriService::class,
             ImporteringScheduler::class,

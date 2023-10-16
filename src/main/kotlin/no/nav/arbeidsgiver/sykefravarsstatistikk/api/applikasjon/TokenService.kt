@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon
 
 import com.google.common.collect.ImmutableSet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Fnr
@@ -9,14 +9,14 @@ import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.security.token.support.core.jwt.JwtTokenClaims
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-open class TilgangskontrollUtils @Autowired constructor(
-    private val contextHolder: TokenValidationContextHolder, private val environment: Environment
+open class TokenService(
+    private val contextHolder: TokenValidationContextHolder,
+    private val environment: Environment
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 

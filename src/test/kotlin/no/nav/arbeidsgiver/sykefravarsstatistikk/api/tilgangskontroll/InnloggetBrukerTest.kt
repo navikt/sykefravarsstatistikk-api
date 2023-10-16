@@ -41,6 +41,6 @@ class InnloggetBrukerTest {
         val organisasjoner = listOf(getOrganisasjon(null), getOrganisasjon(DUMMY_ORGNR))
         bruker.brukerensOrganisasjoner = organisasjoner
 
-        bruker.harTilgang(Orgnr(DUMMY_FNR)) shouldBe true
+        bruker.harTilgang(Orgnr(DUMMY_ORGNR)) shouldBe true
     }
 }
