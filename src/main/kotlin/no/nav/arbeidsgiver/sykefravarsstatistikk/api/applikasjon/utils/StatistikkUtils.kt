@@ -12,7 +12,7 @@ object StatistikkUtils {
      * Source of trouth for kalkulering av sykefraværsprosent basert på tapte dagsverk og mulige
      * dagsverk.
      */
-    @JvmStatic
+
     fun kalkulerSykefraværsprosent(
         dagsverkTeller: BigDecimal?, dagsverkNevner: BigDecimal?
     ): Either<Statistikkfeil, BigDecimal> {

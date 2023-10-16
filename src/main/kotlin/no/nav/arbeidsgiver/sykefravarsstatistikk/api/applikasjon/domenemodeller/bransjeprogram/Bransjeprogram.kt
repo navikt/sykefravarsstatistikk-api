@@ -8,10 +8,10 @@ import java.util.*
 object Bransjeprogram {
     val alleBransjer: List<Bransje> = Bransjer.entries.map { Bransje(it) }
 
-    @JvmStatic
+
     fun finnBransje(underenhet: Virksomhet?): Optional<Bransje> = finnBransje(underenhet?.næringskode)
 
-    @JvmStatic
+
     fun finnBransje(næringskode: Næringskode?): Optional<Bransje> =
         Optional.ofNullable(alleBransjer.firstOrNull
         {

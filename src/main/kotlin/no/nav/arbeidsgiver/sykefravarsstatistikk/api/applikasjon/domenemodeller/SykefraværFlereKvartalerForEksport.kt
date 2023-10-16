@@ -47,7 +47,7 @@ data class SykefraværFlereKvartalerForEksport(
     }
 
     companion object {
-        @JvmStatic
+
         fun utenStatistikk(): SykefraværFlereKvartalerForEksport {
             return SykefraværFlereKvartalerForEksport(listOf())
         }

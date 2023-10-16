@@ -6,7 +6,7 @@ object TestTokenUtil {
     @JvmField
     var TOKENX_ISSUER_ID = "tokenx"
 
-    @JvmStatic
+
     fun createMockIdportenTokenXToken(mockOAuth2Server: MockOAuth2Server): String {
         return createToken(
             mockOAuth2Server,
@@ -16,14 +16,14 @@ object TestTokenUtil {
         )
     }
 
-    @JvmStatic
+
     fun createToken(
         oAuth2Server: MockOAuth2Server, pid: String?, issuerId: String?, idp: String?
     ): String {
         return createToken(oAuth2Server, pid, "IKKE_I_BRUK_LENGER", issuerId, idp)
     }
 
-    @JvmStatic
+
     fun createToken(
         oAuth2Server: MockOAuth2Server, pid: String?, sub: String?, issuerId: String?, idp: String?
     ): String {

@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 object VarighetTestUtils {
-    @JvmStatic
+
     fun leggTilVirksomhetsstatistikkMedVarighet(
         jdbcTemplate: NamedParameterJdbcTemplate,
         orgnr: String?,
@@ -33,7 +33,7 @@ object VarighetTestUtils {
         )
     }
 
-    @JvmStatic
+
     fun leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
         jdbcTemplate: NamedParameterJdbcTemplate,
         næringskode: Næringskode,
@@ -53,7 +53,7 @@ object VarighetTestUtils {
         )
     }
 
-    @JvmStatic
+
     fun leggTilStatisitkkNæringMedVarighet(
         jdbcTemplate: NamedParameterJdbcTemplate,
         næringskode: Næringskode,

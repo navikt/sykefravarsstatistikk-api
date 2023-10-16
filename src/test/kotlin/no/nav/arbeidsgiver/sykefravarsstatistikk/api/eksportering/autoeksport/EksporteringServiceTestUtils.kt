@@ -111,7 +111,7 @@ object EksporteringServiceTestUtils {
         ORGNR_VIRKSOMHET_1, "Virksomhet 1", DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET, Sektor.STATLIG, "11", "11111", __2021_2
     )
 
-    @JvmStatic
+
     fun virksomhet1_TilHørerBransjeMetadata(
         årstallOgKvartal: ÅrstallOgKvartal?
     ): VirksomhetMetadata {
@@ -126,7 +126,7 @@ object EksporteringServiceTestUtils {
         )
     }
 
-    @JvmStatic
+
     @JvmOverloads
     fun byggSykefraværsstatistikkVirksomhet(
         virksomhetMetadata: VirksomhetMetadata,
@@ -144,7 +144,7 @@ object EksporteringServiceTestUtils {
         )
     }
 
-    @JvmStatic
+
     fun tomVirksomhetSykefravær(
         virksomhetMetadata: VirksomhetMetadata
     ): VirksomhetSykefravær {
@@ -158,7 +158,7 @@ object EksporteringServiceTestUtils {
         )
     }
 
-    @JvmStatic
+
     fun byggSykefraværStatistikkNæring(
         virksomhetMetadata: VirksomhetMetadata,
         antallPersoner: Int,
@@ -175,7 +175,7 @@ object EksporteringServiceTestUtils {
         )
     }
 
-    @JvmStatic
+
     fun byggSykefraværStatistikkNæring(
         virksomhetMetadata: VirksomhetMetadata
     ): SykefraværsstatistikkForNæring {
@@ -189,7 +189,7 @@ object EksporteringServiceTestUtils {
         )
     }
 
-    @JvmStatic
+
     fun byggSykefraværStatistikkNæring5Siffer(
         virksomhetMetadata: VirksomhetMetadata, næringskode5Siffer: String
     ): SykefraværsstatistikkForNæringskode {
@@ -203,7 +203,7 @@ object EksporteringServiceTestUtils {
         )
     }
 
-    @JvmStatic
+
     fun byggSykefraværStatistikkSektor(
         virksomhetMetadata: VirksomhetMetadata,
         antallPersoner: Int,
@@ -220,7 +220,7 @@ object EksporteringServiceTestUtils {
         )
     }
 
-    @JvmStatic
+
     fun byggSykefraværStatistikkSektor(
         virksomhetMetadata: VirksomhetMetadata
     ): SykefraværsstatistikkSektor {
@@ -234,7 +234,7 @@ object EksporteringServiceTestUtils {
         )
     }
 
-    @JvmStatic
+
     fun byggVirksomhetSykefravær(
         virksomhetMetadata: VirksomhetMetadata,
         antallPersoner: Int,
@@ -251,7 +251,7 @@ object EksporteringServiceTestUtils {
         )
     }
 
-    @JvmStatic
+
     fun byggVirksomhetSykefravær(
         virksomhetMetadata: VirksomhetMetadata
     ): VirksomhetSykefravær {
@@ -265,7 +265,7 @@ object EksporteringServiceTestUtils {
         )
     }
 
-    @JvmStatic
+
     fun sykefraværsstatistikkVirksomhet(
         årstallOgKvartal: ÅrstallOgKvartal, orgnr: String
     ): SykefraværsstatistikkVirksomhetUtenVarighet {
@@ -290,7 +290,7 @@ object EksporteringServiceTestUtils {
     @JvmField
     val virksomhetMetadata = VirksomhetMetadata(Orgnr("987654321"), "Virksomhet 1", "2", Sektor.STATLIG, "11", "11111", __2020_2)
 
-    @JvmStatic
+
     fun sykefraværsstatistikkLandSiste4Kvartaler(
         årstallOgKvartal: ÅrstallOgKvartal
     ): List<UmaskertSykefraværForEttKvartal> {
@@ -329,7 +329,7 @@ object EksporteringServiceTestUtils {
         BigDecimal(88000)
     )
 
-    @JvmStatic
+
     @JvmOverloads
     fun sykefraværsstatistikkNæring(
         årstallOgKvartal: ÅrstallOgKvartal, næringskode: String? = "11"
@@ -344,7 +344,7 @@ object EksporteringServiceTestUtils {
         )
     }
 
-    @JvmStatic
+
     @JvmOverloads
     fun sykefraværsstatistikkNæringskode(
         årstallOgKvartal: ÅrstallOgKvartal,
@@ -374,7 +374,7 @@ object EksporteringServiceTestUtils {
         BigDecimal(4000)
     )
 
-    @JvmStatic
+
     fun sykefraværsstatistikkNæring5SifferBransjeprogram(
         næringskode5Siffer: String, årstallOgKvartal: ÅrstallOgKvartal
     ): SykefraværsstatistikkForNæringskode {
@@ -388,7 +388,7 @@ object EksporteringServiceTestUtils {
         )
     }
 
-    @JvmStatic
+
     fun assertEqualsVirksomhetSykefravær(
         expected: VirksomhetSykefravær, actual: VirksomhetSykefravær
     ) {
@@ -399,7 +399,7 @@ object EksporteringServiceTestUtils {
         AssertUtils.assertBigDecimalIsEqual(actual.tapteDagsverk, expected.tapteDagsverk)
     }
 
-    @JvmStatic
+
     fun assertEqualsSykefraværMedKategori(
         expected: Sykefraværsstatistikk,
         actual: SykefraværMedKategori,
@@ -414,7 +414,7 @@ object EksporteringServiceTestUtils {
         AssertUtils.assertBigDecimalIsEqual(actual.tapteDagsverk, expected.tapteDagsverk)
     }
 
-    @JvmStatic
+
     fun assertEqualsSykefraværMedKategori(
         expected: SykefraværMedKategori, actual: SykefraværMedKategori
     ) {

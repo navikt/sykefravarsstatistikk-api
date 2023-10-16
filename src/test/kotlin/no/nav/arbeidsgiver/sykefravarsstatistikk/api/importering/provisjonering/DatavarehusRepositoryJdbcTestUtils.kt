@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 object DatavarehusRepositoryJdbcTestUtils {
-    @JvmStatic
+
     fun cleanUpTestDb(jdbcTemplate: NamedParameterJdbcTemplate) {
         delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_land_v")
         delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_v_2")
@@ -18,7 +18,7 @@ object DatavarehusRepositoryJdbcTestUtils {
         return jdbcTemplate.update("delete from $tabell", MapSqlParameterSource())
     }
 
-    @JvmStatic
+
     fun insertOrgenhetInDvhTabell(
         jdbcTemplate: NamedParameterJdbcTemplate,
         orgnr: String?,
@@ -42,7 +42,7 @@ object DatavarehusRepositoryJdbcTestUtils {
         )
     }
 
-    @JvmStatic
+
     fun insertSykefraværsstatistikkLandInDvhTabell(
         jdbcTemplate: NamedParameterJdbcTemplate,
         årstall: Int,
@@ -76,7 +76,7 @@ object DatavarehusRepositoryJdbcTestUtils {
         )
     }
 
-    @JvmStatic
+
     fun insertSykefraværsstatistikkVirksomhetInDvhTabell(
         jdbcTemplate: NamedParameterJdbcTemplate,
         årstall: Int,
@@ -104,7 +104,7 @@ object DatavarehusRepositoryJdbcTestUtils {
         )
     }
 
-    @JvmStatic
+
     fun insertSykefraværsstatistikkVirksomhetInDvhTabell(
         jdbcTemplate: NamedParameterJdbcTemplate,
         årstall: Int,
@@ -147,7 +147,7 @@ object DatavarehusRepositoryJdbcTestUtils {
         )
     }
 
-    @JvmStatic
+
     fun insertSykefraværsstatistikkNæringInDvhTabell(
         jdbcTemplate: NamedParameterJdbcTemplate,
         årstall: Int,
@@ -181,7 +181,7 @@ object DatavarehusRepositoryJdbcTestUtils {
         )
     }
 
-    @JvmStatic
+
     fun insertSykefraværsstatistikkNærin5SiffergInDvhTabell(
         jdbcTemplate: NamedParameterJdbcTemplate,
         årstall: Int,
@@ -272,7 +272,7 @@ object DatavarehusRepositoryJdbcTestUtils {
         )
     }
 
-    @JvmStatic
+
     fun insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
         namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
         årstall: Int,

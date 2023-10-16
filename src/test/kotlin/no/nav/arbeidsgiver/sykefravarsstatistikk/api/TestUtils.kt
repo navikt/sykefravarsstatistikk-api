@@ -18,7 +18,7 @@ object TestUtils {
         return SISTE_PUBLISERTE_KVARTAL.minusKvartaler(n)
     }
 
-    @JvmStatic
+
     fun parametreForStatistikk(
         årstall: Int, kvartal: Int, antallPersoner: Int, tapteDagsverk: Int, muligeDagsverk: Int
     ): MapSqlParameterSource {
@@ -30,7 +30,7 @@ object TestUtils {
             .addValue("mulige_dagsverk", muligeDagsverk)
     }
 
-    @JvmStatic
+
     fun slettAllStatistikkFraDatabase(jdbcTemplate: NamedParameterJdbcTemplate) {
         jdbcTemplate.update(
             "delete from sykefravar_statistikk_virksomhet", MapSqlParameterSource()
@@ -49,7 +49,7 @@ object TestUtils {
         jdbcTemplate.update("delete from sykefravar_statistikk_land", MapSqlParameterSource())
     }
 
-    @JvmStatic
+
     fun slettAllEksportDataFraDatabase(jdbcTemplate: NamedParameterJdbcTemplate) {
         jdbcTemplate.update("delete from virksomhet_metadata", MapSqlParameterSource())
         jdbcTemplate.update("delete from eksport_per_kvartal", MapSqlParameterSource())
@@ -59,14 +59,14 @@ object TestUtils {
         )
     }
 
-    @JvmStatic
+
     fun opprettTestVirksomhetMetaData(
         jdbcTemplate: NamedParameterJdbcTemplate, årstall: Int, kvartal: Int, orgnr: String?
     ) {
         opprettTestVirksomhetMetaData(jdbcTemplate, årstall, kvartal, orgnr, false)
     }
 
-    @JvmStatic
+
     fun opprettTestVirksomhetMetaData(
         jdbcTemplate: NamedParameterJdbcTemplate,
         årstall: Int,
@@ -88,7 +88,7 @@ object TestUtils {
         )
     }
 
-    @JvmStatic
+
     fun opprettStatistikkForLand(jdbcTemplate: NamedParameterJdbcTemplate) {
         jdbcTemplate.update(
             "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, "
@@ -131,7 +131,7 @@ object TestUtils {
         )
     }
 
-    @JvmStatic
+
     fun opprettStatistikkForSektor(jdbcTemplate: NamedParameterJdbcTemplate?) {
         SykefraværsstatistikkSektorUtils(jdbcTemplate)
             .getBatchCreateFunction(
@@ -149,7 +149,7 @@ object TestUtils {
             .apply()
     }
 
-    @JvmStatic
+
     fun opprettStatistikkForNæringskode(
         jdbcTemplate: NamedParameterJdbcTemplate,
         næringskode5Siffer: Næringskode,
@@ -171,7 +171,7 @@ object TestUtils {
         )
     }
 
-    @JvmStatic
+
     fun opprettStatistikkForNæringer(jdbcTemplate: NamedParameterJdbcTemplate) {
         opprettStatistikkForNæring(
             jdbcTemplate,
@@ -238,7 +238,7 @@ object TestUtils {
         )
     }
 
-    @JvmStatic
+
     fun opprettStatistikkForNæring(
         jdbcTemplate: NamedParameterJdbcTemplate,
         næring: Næring,
@@ -260,7 +260,7 @@ object TestUtils {
         )
     }
 
-    @JvmStatic
+
     fun opprettStatistikkForVirksomhet(
         jdbcTemplate: NamedParameterJdbcTemplate,
         orgnr: String?,
@@ -281,12 +281,12 @@ object TestUtils {
         )
     }
 
-    @JvmStatic
+
     fun slettAlleImporttidspunkt(jdbcTemplate: NamedParameterJdbcTemplate) {
         jdbcTemplate.update("delete from importtidspunkt", MapSqlParameterSource())
     }
 
-    @JvmStatic
+
     fun skrivSisteImporttidspunktTilDb(jdbcTemplate: NamedParameterJdbcTemplate) {
         skrivImporttidspunktTilDb(
             jdbcTemplate,
@@ -296,7 +296,7 @@ object TestUtils {
         )
     }
 
-    @JvmStatic
+
     fun hentAlleKafkaUtsendingHistorikkData(
         jdbcTemplate: NamedParameterJdbcTemplate
     ): List<KafkaUtsendingHistorikkData> {
@@ -313,7 +313,7 @@ object TestUtils {
         }
     }
 
-    @JvmStatic
+
     fun opprettUtsendingHistorikk(
         jdbcTemplate: NamedParameterJdbcTemplate,
         kafkaUtsendingHistorikkData: KafkaUtsendingHistorikkData
