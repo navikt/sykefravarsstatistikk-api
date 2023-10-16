@@ -17,7 +17,7 @@ object TestData {
     @JvmStatic
     fun getInnloggetBruker(fnr: String?): InnloggetBruker {
         val bruker = InnloggetBruker(Fnr(fnr!!))
-        bruker.brukerensOrganisasjoner = Arrays.asList(getOrganisasjon("999999999"), getOrganisasjon("111111111"))
+        bruker.brukerensOrganisasjoner = listOf(getOrganisasjon("999999999"), getOrganisasjon("111111111"))
         return bruker
     }
 

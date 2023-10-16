@@ -20,15 +20,10 @@ open class TilgangskontrollUtils @Autowired constructor(
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
+    val ISSUER_TOKENX = "tokenx"
+
     fun hentInnloggetJwtToken(): JwtToken {
-        return VALID_ISSUERS.stream()
-            .map { issuer: String ->
-                getJwtTokenFor(
-                    contextHolder.tokenValidationContext, issuer
-                )
-            }
-            .flatMap { obj: Optional<JwtToken> -> obj.stream() }
-            .findFirst()
+        return getJwtTokenFor(contextHolder.tokenValidationContext, ISSUER_TOKENX)
             .orElseThrow { TilgangskontrollException(String.format("Finner ikke gyldig jwt token")) }
     }
 
