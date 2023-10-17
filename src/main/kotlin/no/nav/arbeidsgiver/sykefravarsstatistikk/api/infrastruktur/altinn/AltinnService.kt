@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
-open class AltinnKlientWrapper(
+open class AltinnService(
     @Autowired val klient: AltinnrettigheterProxyKlient,
     @param:Value("\${altinn.iaweb.service.code}") private val serviceCode: String,
     @param:Value("\${altinn.iaweb.service.edition}") private val serviceEdition: String

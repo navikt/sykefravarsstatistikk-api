@@ -4,7 +4,6 @@ import com.nimbusds.oauth2.sdk.`as`.AuthorizationServerMetadata
 import com.nimbusds.oauth2.sdk.id.Issuer
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TokenService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.tokenx.TokenXClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.tokenx.TokenXException
 import no.nav.security.mock.oauth2.MockOAuth2Server
@@ -84,7 +83,7 @@ class TokenXClientTest {
         get() {
             val fnr = "01010112345"
             return oAuth2Server.issueToken(
-                TokenService.ISSUER_TOKENX, fnr, "default", mapOf("pid" to fnr)
+                "tokenx", fnr, "default", mapOf("pid" to fnr)
             ).serialize()
         }
 }

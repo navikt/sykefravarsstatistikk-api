@@ -145,20 +145,6 @@ object EksporteringServiceTestUtils {
     }
 
 
-    fun tomVirksomhetSykefravær(
-        virksomhetMetadata: VirksomhetMetadata
-    ): VirksomhetSykefravær {
-        return VirksomhetSykefravær(
-            virksomhetMetadata.orgnr,
-            virksomhetMetadata.navn,
-            ÅrstallOgKvartal(virksomhetMetadata.årstall, virksomhetMetadata.kvartal),
-            null,
-            null,
-            0
-        )
-    }
-
-
     fun byggSykefraværStatistikkNæring(
         virksomhetMetadata: VirksomhetMetadata,
         antallPersoner: Int,
@@ -231,37 +217,6 @@ object EksporteringServiceTestUtils {
             156,
             BigDecimal(3678),
             BigDecimal(188000)
-        )
-    }
-
-
-    fun byggVirksomhetSykefravær(
-        virksomhetMetadata: VirksomhetMetadata,
-        antallPersoner: Int,
-        tapteDagsverk: Int,
-        muligeDagsverk: Int
-    ): VirksomhetSykefravær {
-        return VirksomhetSykefravær(
-            virksomhetMetadata.orgnr,
-            virksomhetMetadata.navn,
-            ÅrstallOgKvartal(virksomhetMetadata.årstall, virksomhetMetadata.kvartal),
-            BigDecimal(tapteDagsverk),
-            BigDecimal(muligeDagsverk),
-            antallPersoner
-        )
-    }
-
-
-    fun byggVirksomhetSykefravær(
-        virksomhetMetadata: VirksomhetMetadata
-    ): VirksomhetSykefravær {
-        return VirksomhetSykefravær(
-            virksomhetMetadata.orgnr,
-            virksomhetMetadata.navn,
-            ÅrstallOgKvartal(virksomhetMetadata.årstall, virksomhetMetadata.kvartal),
-            BigDecimal(3678),
-            BigDecimal(188000),
-            156
         )
     }
 

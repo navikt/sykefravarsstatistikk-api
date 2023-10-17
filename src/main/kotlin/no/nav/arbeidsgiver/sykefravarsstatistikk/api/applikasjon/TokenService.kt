@@ -1,16 +1,16 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon
 
-import com.google.common.collect.ImmutableSet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Fnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.InnloggetBruker
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.TilgangskontrollException
 import no.nav.security.token.support.core.context.TokenValidationContext
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.security.token.support.core.jwt.JwtTokenClaims
 import org.slf4j.LoggerFactory
 import org.springframework.core.env.Environment
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
+import org.springframework.web.bind.annotation.ResponseStatus
 import java.util.*
 
 @Component
@@ -23,8 +23,8 @@ open class TokenService(
     val ISSUER_TOKENX = "tokenx"
 
     fun hentInnloggetJwtToken(): JwtToken {
-        return getJwtTokenFor(contextHolder.tokenValidationContext, ISSUER_TOKENX)
-            .orElseThrow { TilgangskontrollException(String.format("Finner ikke gyldig jwt token")) }
+        return contextHolder.tokenValidationContext.getJwtToken(ISSUER_TOKENX)
+            ?: throw (TilgangskontrollException(String.format("Finner ikke gyldig jwt token")))
     }
 
     fun hentInnloggetBruker(): InnloggetBruker {
@@ -48,10 +48,6 @@ open class TokenService(
         }
     }
 
-    private fun getJwtTokenFor(context: TokenValidationContext, issuer: String): Optional<JwtToken> {
-        return Optional.ofNullable(context.getJwtToken(issuer))
-    }
-
     private fun getTokenXFnr(claims: JwtTokenClaims): String {
         /* NOTE: This is not validation of original issuer. We trust TokenX to only issue
      * tokens from trustworthy sources. The purpose is simply to differentiate different
@@ -67,9 +63,7 @@ open class TokenService(
             throw TilgangskontrollException("Ukjent idp fra tokendings")
         }
     }
-
-    companion object {
-        const val ISSUER_TOKENX = "tokenx"
-        private val VALID_ISSUERS: Set<String> = ImmutableSet.of(ISSUER_TOKENX)
-    }
 }
+
+@ResponseStatus(HttpStatus.FORBIDDEN)
+class TilgangskontrollException(msg: String) : RuntimeException(msg)
