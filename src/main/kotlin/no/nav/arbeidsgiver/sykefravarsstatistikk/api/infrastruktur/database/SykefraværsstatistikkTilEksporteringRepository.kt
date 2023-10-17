@@ -151,7 +151,7 @@ class SykefraværsstatistikkTilEksporteringRepository(
 
     fun hentSykefraværAlleVirksomheterGradert(
         fraÅrstallOgKvartal: ÅrstallOgKvartal,
-        tilÅrstallOgKvartal: ÅrstallOgKvartal = fraÅrstallOgKvartal,
+        tilÅrstallOgKvartal: ÅrstallOgKvartal,
     ): List<SykefraværsstatistikkVirksomhetMedGradering> {
         return runCatching {
             // language=PostgreSQL

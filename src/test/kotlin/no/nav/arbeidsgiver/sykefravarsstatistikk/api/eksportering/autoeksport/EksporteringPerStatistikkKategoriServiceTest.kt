@@ -12,6 +12,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.Ek
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.GradertStatistikkategoriKafkamelding
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.StatistikkategoriKafkamelding
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -29,6 +30,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
     )
 
     private val statistikkategoriKafkameldingCaptor = argumentCaptor<StatistikkategoriKafkamelding>()
+    private val gradertStatistikkategoriKafkameldingCaptor = argumentCaptor<GradertStatistikkategoriKafkamelding>()
 
     @BeforeEach
     fun setUp() {
@@ -133,6 +135,53 @@ class EksporteringPerStatistikkKategoriServiceTest {
             node("kode").isString.isEqualTo("987654321")
             node("sistePubliserteKvartal").isObject.node("årstall").isNumber.isEqualTo(BigDecimal("2020"))
             node("siste4Kvartal").isObject.node("prosent").isNumber.isEqualTo(BigDecimal("2.0"))
+        }
+    }
+
+    @Test
+    fun `eksporter statistikk for virksomhet gradert sender riktig melding til kafka`() {
+        val allData = listOf(
+            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhetGradert(__2020_2, "11"),
+            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhetGradert(__2020_1, "11"),
+            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhetGradert(__2019_4, "11"),
+            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhetGradert(__2019_3, "11")
+        )
+
+        whenever(
+            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleVirksomheterGradert(__2019_3, __2020_2)
+        ).thenReturn(allData)
+
+        service.eksporterPerStatistikkKategori(
+            __2020_2,
+            Statistikkategori.VIRKSOMHET_GRADERT
+        )
+
+        verify(kafkaClient)
+            .sendMelding(
+                gradertStatistikkategoriKafkameldingCaptor.capture(),
+                eq(KafkaTopic.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_GRADERT_V1)
+            )
+
+        assertThatJson(gradertStatistikkategoriKafkameldingCaptor.firstValue.innhold) {
+            isObject
+            node("kategori").isString.isEqualTo(Statistikkategori.VIRKSOMHET_GRADERT.name)
+            node("kode").isString.isEqualTo("11")
+            node("sistePubliserteKvartal").isObject.node("årstall").isNumber.isEqualTo(BigDecimal("2020"))
+            node("sistePubliserteKvartal").isObject.node("kvartal").isNumber.isEqualTo(BigDecimal("2"))
+            node("sistePubliserteKvartal").isObject.node("prosent").isNumber.isEqualTo(BigDecimal("50.0"))
+            node("sistePubliserteKvartal").isObject.node("tapteDagsverkGradert").isNumber.isEqualTo(BigDecimal("5.0"))
+            node("sistePubliserteKvartal").isObject.node("tapteDagsverk").isNumber.isEqualTo(BigDecimal("10.0"))
+            node("siste4Kvartal").isObject.node("prosent").isNumber.isEqualTo(BigDecimal("50.0"))
+            node("siste4Kvartal").isObject.node("tapteDagsverkGradert").isNumber.isEqualTo(BigDecimal("20.0"))
+            node("siste4Kvartal").isObject.node("tapteDagsverk").isNumber.isEqualTo(BigDecimal("40.0"))
+        }
+
+        assertThatJson(gradertStatistikkategoriKafkameldingCaptor.firstValue.nøkkel) {
+            isObject
+            node("kategori").isString.isEqualTo(Statistikkategori.VIRKSOMHET_GRADERT.name)
+            node("kode").isString.isEqualTo("11")
+            node("kvartal").isString.isEqualTo("2")
+            node("årstall").isString.isEqualTo("2020")
         }
     }
 

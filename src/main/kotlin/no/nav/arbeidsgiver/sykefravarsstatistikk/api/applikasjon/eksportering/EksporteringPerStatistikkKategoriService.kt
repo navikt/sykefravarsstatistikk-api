@@ -6,6 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic.Companion
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.GradertStatistikkategoriKafkamelding
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.StatistikkategoriKafkamelding
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -168,10 +169,22 @@ class EksporteringPerStatistikkKategoriService(
             )
 
             if (erValidertStatistikk) {
-                val melding = StatistikkategoriKafkamelding(
-                    sykefraværMedKategoriSisteKvartal,
-                    SykefraværFlereKvartalerForEksport(umaskertSykefraværsstatistikkSiste4Kvartaler)
-                )
+                val melding = when(statistikkategori) {
+                    Statistikkategori.LAND,
+                    Statistikkategori.SEKTOR,
+                    Statistikkategori.NÆRING,
+                    Statistikkategori.BRANSJE,
+                    Statistikkategori.OVERORDNET_ENHET,
+                    Statistikkategori.VIRKSOMHET,
+                    Statistikkategori.NÆRINGSKODE -> StatistikkategoriKafkamelding(
+                        sykefraværMedKategoriSisteKvartal,
+                        SykefraværFlereKvartalerForEksport(umaskertSykefraværsstatistikkSiste4Kvartaler)
+                    )
+                    Statistikkategori.VIRKSOMHET_GRADERT -> GradertStatistikkategoriKafkamelding(
+                        sykefraværMedKategoriSisteKvartal,
+                        SykefraværFlereKvartalerForEksport(umaskertSykefraværsstatistikkSiste4Kvartaler)
+                    )
+                }
                 kafkaClient.sendMelding(melding, kafkaTopic)
                 antallStatistikkEksportert++
             }
