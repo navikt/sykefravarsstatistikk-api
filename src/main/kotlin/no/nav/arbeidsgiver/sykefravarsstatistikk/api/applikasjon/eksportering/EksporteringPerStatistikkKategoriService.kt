@@ -37,7 +37,11 @@ class EksporteringPerStatistikkKategoriService(
             Statistikkategori.NÆRINGSKODE -> eksporterSykefraværsstatistikkNæringskode(årstallOgKvartal)
             Statistikkategori.BRANSJE -> eksporterSykefraværsstatistikkBransje(årstallOgKvartal)
             Statistikkategori.VIRKSOMHET -> eksporterSykefraværsstatistikkVirksomhet(årstallOgKvartal)
-            else -> log.warn("Ikke implementert eksport for kategori '{}'", statistikkategori.name)
+            Statistikkategori.VIRKSOMHET_GRADERT -> eksporterSykefraværsstatistikkVirksomhetGradert(årstallOgKvartal)
+            Statistikkategori.OVERORDNET_ENHET -> log.warn(
+                "Ikke implementert eksport for kategori '{}'",
+                statistikkategori.name
+            )
         }
 
         log.info("Eksportering av kategori '{}' er ferdig.", statistikkategori.name)
@@ -126,6 +130,20 @@ class EksporteringPerStatistikkKategoriService(
             }
     }
 
+    private fun eksporterSykefraværsstatistikkVirksomhetGradert(årstallOgKvartal: ÅrstallOgKvartal) {
+        tilEksporteringRepository.hentSykefraværAlleVirksomheterGradert(
+            årstallOgKvartal.minusKvartaler(3), årstallOgKvartal
+        )
+            .groupByVirksomhetGradert().let {
+                eksporterSykefraværsstatistikkPerKategori(
+                    årstallOgKvartal = årstallOgKvartal,
+                    sykefraværGruppertEtterKode = it,
+                    statistikkategori = Statistikkategori.VIRKSOMHET_GRADERT,
+                    kafkaTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_GRADERT_V1
+                )
+            }
+    }
+
 
     private fun eksporterSykefraværsstatistikkPerKategori(
         årstallOgKvartal: ÅrstallOgKvartal,
@@ -193,12 +211,27 @@ class EksporteringPerStatistikkKategoriService(
 
 fun List<Sykefraværsstatistikk>.tilUmaskertSykefraværForEttKvartal() =
     this.map {
-        UmaskertSykefraværForEttKvartal(
-            ÅrstallOgKvartal(it.årstall, it.kvartal),
-            it.tapteDagsverk!!,
-            it.muligeDagsverk!!,
-            it.antallPersoner
-        )
+        when (it) {
+            is SykefraværsstatistikkBransje,
+            is SykefraværsstatistikkForNæring,
+            is SykefraværsstatistikkForNæringskode,
+            is SykefraværsstatistikkLand,
+            is SykefraværsstatistikkNæringMedVarighet,
+            is SykefraværsstatistikkSektor,
+            is SykefraværsstatistikkVirksomhetUtenVarighet,
+            is SykefraværsstatistikkVirksomhet -> UmaskertSykefraværForEttKvartal(
+                ÅrstallOgKvartal(it.årstall, it.kvartal),
+                it.tapteDagsverk!!,
+                it.muligeDagsverk!!,
+                it.antallPersoner
+            )
+            is SykefraværsstatistikkVirksomhetMedGradering -> UmaskertSykefraværForEttKvartal(
+                ÅrstallOgKvartal(it.årstall, it.kvartal),
+                it.tapteDagsverkGradertSykemelding,
+                it.tapteDagsverk,
+                it.antallPersoner
+            )
+        }
     }
 
 fun List<UmaskertSykefraværForEttKvartal>.tilSykefraværsstatistikkLand() =
@@ -225,6 +258,10 @@ fun List<SykefraværsstatistikkBransje>.groupByBransje():
     this.groupBy({ it.bransje.name }, { it })
 
 fun List<SykefraværsstatistikkVirksomhetUtenVarighet>.groupByVirksomhet():
+        Map<String, List<Sykefraværsstatistikk>> =
+    this.groupBy({ it.orgnr }, { it })
+
+fun List<SykefraværsstatistikkVirksomhetMedGradering>.groupByVirksomhetGradert():
         Map<String, List<Sykefraværsstatistikk>> =
     this.groupBy({ it.orgnr }, { it })
 
