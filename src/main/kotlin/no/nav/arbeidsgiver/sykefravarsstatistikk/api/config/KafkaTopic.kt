@@ -5,7 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.
 enum class KafkaTopic(val navn: String) {
     SYKEFRAVARSSTATISTIKK_LAND_V1("arbeidsgiver.sykefravarsstatistikk-land-v1"),
     SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1("arbeidsgiver.sykefravarsstatistikk-virksomhet-v1"),
-    SYKEFRAVARSSTATISTIKK_VIRKSOMHET_GRADERT_V1("arbeidsgiver.sykefravarsstatistikk-virksomhet-gradering-v1"),
+    SYKEFRAVARSSTATISTIKK_VIRKSOMHET_GRADERT_V1("arbeidsgiver.sykefravarsstatistikk-virksomhet-gradert-v1"),
     SYKEFRAVARSSTATISTIKK_NARING_V1("arbeidsgiver.sykefravarsstatistikk-naring-v1"),
     SYKEFRAVARSSTATISTIKK_SEKTOR_V1("arbeidsgiver.sykefravarsstatistikk-sektor-v1"),
     SYKEFRAVARSSTATISTIKK_BRANSJE_V1("arbeidsgiver.sykefravarsstatistikk-bransje-v1"),
