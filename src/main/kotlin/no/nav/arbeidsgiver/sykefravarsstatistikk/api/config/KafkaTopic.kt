@@ -18,7 +18,7 @@ enum class KafkaTopic(val navn: String) {
     SYKEFRAVARSSTATISTIKK_V1("arbeidsgiver.sykefravarsstatistikk-v1");
 
     companion object {
-        @JvmStatic
+
         fun from(statistikkategori: Statistikkategori): KafkaTopic? {
             return when (statistikkategori) {
                 Statistikkategori.LAND -> SYKEFRAVARSSTATISTIKK_LAND_V1
@@ -31,7 +31,7 @@ enum class KafkaTopic(val navn: String) {
             }
         }
 
-        @JvmStatic
+
         fun toStringArray() = entries.map { it.navn }.toTypedArray()
 
     }

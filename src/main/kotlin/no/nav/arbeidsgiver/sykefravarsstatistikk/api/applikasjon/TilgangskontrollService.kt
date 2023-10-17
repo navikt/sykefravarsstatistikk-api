@@ -6,9 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.OverordnetEnhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Virksomhet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.TilgangskontrollException
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.TilgangskontrollUtils
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnKlientWrapper
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetslog.Loggevent
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetslog.Sporbarhetslogg
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.tokenx.TokenXClient
@@ -20,20 +18,20 @@ import java.text.ParseException
 
 @Component
 class TilgangskontrollService(
-    private val altinnKlientWrapper: AltinnKlientWrapper,
-    private val tokenUtils: TilgangskontrollUtils,
+    private val altinnService: AltinnService,
+    private val tokenService: TokenService,
     private val sporbarhetslogg: Sporbarhetslogg,
     @param:Value("\${altinn.iaweb.service.code}") private val iawebServiceCode: String,
     @param:Value("\${altinn.iaweb.service.edition}") private val iawebServiceEdition: String,
     private val tokenXClient: TokenXClient
 ) {
     fun hentBrukerKunIaRettigheter(): InnloggetBruker {
-        val innloggetBruker = tokenUtils.hentInnloggetBruker()
+        val innloggetBruker = tokenService.hentInnloggetBruker()
         try {
             val exchangedTokenToAltinnProxy =
-                tokenXClient.exchangeTokenToAltinnProxy(tokenUtils.hentInnloggetJwtToken())
+                tokenXClient.exchangeTokenToAltinnProxy(tokenService.hentInnloggetJwtToken())
             innloggetBruker.brukerensOrganisasjoner =
-                altinnKlientWrapper.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(
+                altinnService.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(
                     exchangedTokenToAltinnProxy, innloggetBruker.fnr
                 )
         } catch (e: ParseException) {
@@ -59,11 +57,11 @@ class TilgangskontrollService(
     }
 
     fun hentInnloggetBrukerForAlleRettigheter(): InnloggetBruker {
-        val innloggetBruker = tokenUtils.hentInnloggetBruker()
+        val innloggetBruker = tokenService.hentInnloggetBruker()
         try {
             val exchangedTokenToAltinnProxy =
-                tokenXClient.exchangeTokenToAltinnProxy(tokenUtils.hentInnloggetJwtToken())
-            innloggetBruker.brukerensOrganisasjoner = altinnKlientWrapper.hentVirksomheterDerBrukerHarTilknytning(
+                tokenXClient.exchangeTokenToAltinnProxy(tokenService.hentInnloggetJwtToken())
+            innloggetBruker.brukerensOrganisasjoner = altinnService.hentVirksomheterDerBrukerHarTilknytning(
                 exchangedTokenToAltinnProxy, innloggetBruker.fnr
             )
         } catch (e: ParseException) {

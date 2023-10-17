@@ -1,35 +1,30 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon
 
-import com.google.common.collect.ImmutableSet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Fnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.InnloggetBruker
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.TilgangskontrollException
 import no.nav.security.token.support.core.context.TokenValidationContext
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.security.token.support.core.jwt.JwtTokenClaims
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
+import org.springframework.web.bind.annotation.ResponseStatus
 import java.util.*
 
 @Component
-open class TilgangskontrollUtils @Autowired constructor(
-    private val contextHolder: TokenValidationContextHolder, private val environment: Environment
+open class TokenService(
+    private val contextHolder: TokenValidationContextHolder,
+    private val environment: Environment
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
+    val ISSUER_TOKENX = "tokenx"
+
     fun hentInnloggetJwtToken(): JwtToken {
-        return VALID_ISSUERS.stream()
-            .map { issuer: String ->
-                getJwtTokenFor(
-                    contextHolder.tokenValidationContext, issuer
-                )
-            }
-            .flatMap { obj: Optional<JwtToken> -> obj.stream() }
-            .findFirst()
-            .orElseThrow { TilgangskontrollException(String.format("Finner ikke gyldig jwt token")) }
+        return contextHolder.tokenValidationContext.getJwtToken(ISSUER_TOKENX)
+            ?: throw (TilgangskontrollException(String.format("Finner ikke gyldig jwt token")))
     }
 
     fun hentInnloggetBruker(): InnloggetBruker {
@@ -53,10 +48,6 @@ open class TilgangskontrollUtils @Autowired constructor(
         }
     }
 
-    private fun getJwtTokenFor(context: TokenValidationContext, issuer: String): Optional<JwtToken> {
-        return Optional.ofNullable(context.getJwtToken(issuer))
-    }
-
     private fun getTokenXFnr(claims: JwtTokenClaims): String {
         /* NOTE: This is not validation of original issuer. We trust TokenX to only issue
      * tokens from trustworthy sources. The purpose is simply to differentiate different
@@ -72,9 +63,7 @@ open class TilgangskontrollUtils @Autowired constructor(
             throw TilgangskontrollException("Ukjent idp fra tokendings")
         }
     }
-
-    companion object {
-        const val ISSUER_TOKENX = "tokenx"
-        private val VALID_ISSUERS: Set<String> = ImmutableSet.of(ISSUER_TOKENX)
-    }
 }
+
+@ResponseStatus(HttpStatus.FORBIDDEN)
+class TilgangskontrollException(msg: String) : RuntimeException(msg)

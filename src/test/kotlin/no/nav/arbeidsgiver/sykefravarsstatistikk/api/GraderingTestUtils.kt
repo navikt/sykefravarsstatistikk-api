@@ -6,7 +6,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.math.BigDecimal
 
 object GraderingTestUtils {
-    @JvmStatic
+
     fun insertDataMedGradering(
         jdbcTemplate: NamedParameterJdbcTemplate,
         orgnr: String?,

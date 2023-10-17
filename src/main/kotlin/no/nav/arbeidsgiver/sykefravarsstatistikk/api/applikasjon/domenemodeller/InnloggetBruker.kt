@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.TilgangskontrollException
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnOrganisasjon
 import java.util.*
 import java.util.stream.Collectors
@@ -9,12 +8,6 @@ data class InnloggetBruker(
     val fnr: Fnr,
     var brukerensOrganisasjoner: List<AltinnOrganisasjon> = emptyList()
 ) {
-
-    fun sjekkTilgang(orgnr: Orgnr) {
-        if (!harTilgang(orgnr)) {
-            throw TilgangskontrollException("Har ikke tilgang til statistikk for denne bedriften.")
-        }
-    }
 
     fun harTilgang(orgnr: Orgnr): Boolean {
         val orgnumreBrukerHarTilgangTil = brukerensOrganisasjoner.stream()

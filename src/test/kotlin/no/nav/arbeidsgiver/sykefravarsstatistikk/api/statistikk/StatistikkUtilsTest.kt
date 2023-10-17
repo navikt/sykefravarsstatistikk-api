@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.Statistikkfeil
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.Statistikkfeil
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.StatistikkUtils.kalkulerSykefraværsprosent
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test

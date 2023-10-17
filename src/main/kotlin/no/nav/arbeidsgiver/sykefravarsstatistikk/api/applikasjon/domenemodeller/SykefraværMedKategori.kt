@@ -66,7 +66,7 @@ class SykefraværMedKategori : SykefraværForEttKvartal {
     }
 
     companion object {
-        @JvmStatic
+
         fun utenStatistikk(
             kategori: Statistikkategori, kode: String, årstallOgKvartal: ÅrstallOgKvartal?
         ): SykefraværMedKategori {

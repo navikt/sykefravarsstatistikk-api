@@ -62,11 +62,11 @@ data class ÅrstallOgKvartal(
     }
 
     companion object {
-        @JvmStatic
+
         fun sisteFireKvartaler(årstallOgKvartal: ÅrstallOgKvartal): List<ÅrstallOgKvartal> =
             (0..3).map(årstallOgKvartal::minusKvartaler).sorted()
 
-        @JvmStatic
+
         fun range(fra: ÅrstallOgKvartal, til: ÅrstallOgKvartal): List<ÅrstallOgKvartal> {
             val årstallOgKvartal: MutableList<ÅrstallOgKvartal> = ArrayList()
             var i = fra

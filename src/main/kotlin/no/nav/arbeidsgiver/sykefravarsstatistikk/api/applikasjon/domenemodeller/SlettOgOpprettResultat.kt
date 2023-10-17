@@ -7,7 +7,7 @@ data class SlettOgOpprettResultat(var antallRadSlettet: Int = 0, var antallRadOp
     }
 
     companion object {
-        @JvmStatic
+
         fun tomtResultat(): SlettOgOpprettResultat {
             return SlettOgOpprettResultat(0, 0)
         }

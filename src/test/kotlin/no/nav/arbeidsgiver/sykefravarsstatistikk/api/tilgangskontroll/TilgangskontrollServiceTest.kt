@@ -8,14 +8,14 @@ import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.error.ProxyError
 import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.error.exceptions.AltinnException
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getInnloggetBruker
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getOrganisasjon
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollException
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Fnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.InnloggetBruker
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.TilgangskontrollException
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.TilgangskontrollUtils
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TokenService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.CorrelationIdFilter
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnKlientWrapper
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetslog.Loggevent
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetslog.Sporbarhetslogg
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.tokenx.TokenXClient
@@ -25,14 +25,14 @@ import org.junit.jupiter.api.Test
 import org.slf4j.MDC
 
 class TilgangskontrollServiceTest {
-    private val altinnKlientWrapper: AltinnKlientWrapper = mockk()
-    private val tilgangskontrollUtils: TilgangskontrollUtils = mockk(relaxed = true)
+    private val altinnService: AltinnService = mockk()
+    private val tokenService: TokenService = mockk(relaxed = true)
     private val tokenXClient: TokenXClient = mockk(relaxed = true)
     private val sporbarhetslogg: Sporbarhetslogg = spyk()
 
     private val tilgangskontroll: TilgangskontrollService = TilgangskontrollService(
-        altinnKlientWrapper,
-        tilgangskontrollUtils,
+        altinnService,
+        tokenService,
         sporbarhetslogg,
         IAWEB_SERVICE_CODE,
         IAWEB_SERVICE_EDITION,
@@ -47,7 +47,7 @@ class TilgangskontrollServiceTest {
     @Test
     fun hentInnloggetBruker__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
         every {
-            altinnKlientWrapper.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(any(), any())
+            altinnService.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(any(), any())
         } throws AltinnException(ProxyError(500, "Bad", "Bad"))
         assertThrows(
             AltinnException::class.java
@@ -57,7 +57,7 @@ class TilgangskontrollServiceTest {
     @Test
     fun hentInnloggetBrukerForAlleTilganger__skal_feile_med_riktig_exception_hvis_altinn_feiler() {
         every {
-            altinnKlientWrapper.hentVirksomheterDerBrukerHarTilknytning(any(), any())
+            altinnService.hentVirksomheterDerBrukerHarTilknytning(any(), any())
         } throws AltinnException(ProxyError(500, "Bad", "Bad"))
 
         assertThrows(
@@ -113,16 +113,16 @@ class TilgangskontrollServiceTest {
     }
 
     private fun værInnloggetSom(bruker: InnloggetBruker) {
-        every { tilgangskontrollUtils.hentInnloggetBruker() } returns bruker
+        every { tokenService.hentInnloggetBruker() } returns bruker
 
         every {
-            altinnKlientWrapper.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(
+            altinnService.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(
                 any(), any()
             )
         } returns bruker.brukerensOrganisasjoner
 
         every {
-            altinnKlientWrapper.hentVirksomheterDerBrukerHarTilknytning(
+            altinnService.hentVirksomheterDerBrukerHarTilknytning(
                 any(), any()
             )
         } returns bruker.brukerensOrganisasjoner

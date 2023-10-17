@@ -4,8 +4,8 @@ import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.Statistikkfeil
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.exceptions.UtilstrekkeligData
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.Statistikkfeil
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.UtilstrekkeligData
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.StatistikkUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.Konstanter
 import java.math.BigDecimal
