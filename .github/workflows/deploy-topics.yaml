@@ -25,7 +25,8 @@ jobs:
               nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-sektor-dev.yaml,\
               nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-bransje-dev.yaml,\
               nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-metadata-virksomhet-dev.yaml,\
-              nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-naringskode-dev.yaml"
+              nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-naringskode-dev.yaml,\
+              nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-virksomhet-gradert-dev.yaml"
       - name: Deploy topics to prod-gcp
         if: github.ref == 'refs/heads/master'
         uses: nais/deploy/actions/deploy@v1
@@ -40,4 +41,5 @@ jobs:
               nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-sektor-prod.yaml,\
               nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-bransje-prod.yaml,\
               nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-metadata-virksomhet-prod.yaml,\
-              nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-naringskode-prod.yaml"
+              nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-naringskode-prod.yaml,\
+              nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-virksomhet-gradert-prod.yaml"
