@@ -157,7 +157,7 @@ class SykefraværsstatistikkTilEksporteringRepository(
             // language=PostgreSQL
             namedParameterJdbcTemplate.query(
                 """
-                    select arstall, kvartal, orgnr,
+                    select arstall, kvartal, orgnr, naring, naring_kode, rectype,
                     sum(antall_graderte_sykemeldinger) as antall_graderte_sykemeldinger,
                     sum(tapte_dagsverk_gradert_sykemelding) as tapte_dagsverk_gradert_sykemelding,
                     sum(antall_personer) as antall_personer,
