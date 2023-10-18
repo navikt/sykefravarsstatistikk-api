@@ -5,10 +5,11 @@ import arrow.core.left
 import arrow.core.right
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PubliseringsdatoerService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.UmaskertSykefraværForEttKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.BransjeEllerNæring
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.bransjeprogram.Bransjeprogram
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.felles.UmaskertSykefraværForEttKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.aggregert.Sykefraværsdata
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.aggregert.UmaskertSykefraværForEttKvartalMedVarighet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.felles.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.json.AggregertStatistikkJson
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.GraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VarighetRepository
@@ -35,7 +36,7 @@ class AggregertStatistikkService(
 
     fun hentAggregertStatistikk(
         orgnr: Orgnr
-    ): Either<HentAggregertStatistikkFeil, AggregertStatistikkDto> {
+    ): Either<HentAggregertStatistikkFeil, AggregertStatistikkJson> {
         if (!tilgangskontrollService.brukerRepresentererVirksomheten(orgnr)) {
             log.warn("Bruker mangler tilgang til denne virksomheten {}", orgnr.verdi)
             return HentAggregertStatistikkFeil.BrukerManglerTilgang.left()
@@ -78,7 +79,7 @@ class AggregertStatistikkService(
         gradertFravær: Sykefraværsdata,
         korttidsfravær: Sykefraværsdata,
         langtidsfravær: Sykefraværsdata
-    ): AggregertStatistikkDto {
+    ): AggregertStatistikkJson {
         val sistePubliserteKvartal = publiseringsdatoerService.hentSistePubliserteKvartal()
         val kalkulatorTotal = Aggregeringskalkulator(totalfravær, sistePubliserteKvartal)
         val kalkulatorGradert = Aggregeringskalkulator(gradertFravær, sistePubliserteKvartal)
@@ -112,7 +113,7 @@ class AggregertStatistikkService(
         val muligeDagsverkTotalt = filterRights(
             kalkulatorTotal.muligeDagsverkVirksomhet(virksomhet.navn)
         )
-        return AggregertStatistikkDto(
+        return AggregertStatistikkJson(
             prosentSisteFireKvartalerTotalt,
             prosentSisteFireKvartalerGradert,
             prosentSisteFireKvartalerKorttid,

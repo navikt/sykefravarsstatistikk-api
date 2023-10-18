@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.eksportering.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.felles.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
 import org.springframework.stereotype.Component
@@ -9,7 +10,7 @@ import java.util.stream.Collector
 import java.util.stream.Collectors
 
 @Component
-@Deprecated("")
+@Deprecated("Slettes når Salesforce-teamet har gått over til eksport per kategori")
 object EksporteringServiceUtils {
     const val OPPDATER_VIRKSOMHETER_SOM_ER_EKSPORTERT_BATCH_STØRRELSE = 1000
     const val EKSPORT_BATCH_STØRRELSE = 10000

@@ -2,10 +2,10 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon
 
 import io.vavr.control.Option
 import io.vavr.control.Try
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.PubliseringsdatoDbDto
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Publiseringsdatoer
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.PubliseringsdatoerDatauthentingFeil
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.publiseringsdato.Publiseringsdato
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.json.PubliseringsdatoerJson
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.publiseringsdato.PubliseringsdatoerDatauthentingFeil
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.felles.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.PubliseringsdatoerRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -22,11 +22,11 @@ class PubliseringsdatoerService(private val publiseringsdatoerRepository: Publis
             ?: throw PubliseringsdatoerDatauthentingFeil("Kunne ikke hente ut siste publiseringstidspunkt")
     }
 
-    fun hentPubliseringsdatoer(): Publiseringsdatoer? {
+    fun hentPubliseringsdatoer(): PubliseringsdatoerJson? {
         val publiseringsdatoer = publiseringsdatoerRepository.hentPubliseringsdatoer()
         return publiseringsdatoerRepository
             .hentSisteImporttidspunkt()?.let {
-                Publiseringsdatoer(
+                PubliseringsdatoerJson(
                     sistePubliseringsdato = it.importertDato.toString(),
                     gjeldendePeriode = it.gjeldendePeriode,
                     nestePubliseringsdato = finnNestePubliseringsdato(publiseringsdatoer, it.importertDato)
@@ -37,7 +37,7 @@ class PubliseringsdatoerService(private val publiseringsdatoerRepository: Publis
     }
 
     private fun finnNestePubliseringsdato(
-        publiseringsdatoer: List<PubliseringsdatoDbDto>, forrigeImporttidspunkt: LocalDate
+        publiseringsdatoer: List<Publiseringsdato>, forrigeImporttidspunkt: LocalDate
     ): Option<LocalDate> {
         val fremtidigePubliseringsdatoer = sorterEldsteDatoerFørst(
             filtrerBortDatoerEldreEnnForrigeLanseringsdato(
@@ -50,10 +50,10 @@ class PubliseringsdatoerService(private val publiseringsdatoerRepository: Publis
     }
 
     private fun filtrerBortDatoerEldreEnnForrigeLanseringsdato(
-        publiseringsdatoer: List<PubliseringsdatoDbDto>, forrigePubliseringsdato: LocalDate
-    ): List<PubliseringsdatoDbDto> {
+        publiseringsdatoer: List<Publiseringsdato>, forrigePubliseringsdato: LocalDate
+    ): List<Publiseringsdato> {
         return publiseringsdatoer.stream()
-            .filter { (_, offentligDato): PubliseringsdatoDbDto ->
+            .filter { (_, offentligDato): Publiseringsdato ->
                 offentligDato.toLocalDate().isAfter(forrigePubliseringsdato)
             }
             .collect(Collectors.toList())
@@ -61,10 +61,10 @@ class PubliseringsdatoerService(private val publiseringsdatoerRepository: Publis
 
     companion object {
         private fun sorterEldsteDatoerFørst(
-            datoer: List<PubliseringsdatoDbDto>
-        ): List<PubliseringsdatoDbDto> {
+            datoer: List<Publiseringsdato>
+        ): List<Publiseringsdato> {
             return datoer.stream()
-                .sorted { obj: PubliseringsdatoDbDto, annen: PubliseringsdatoDbDto? ->
+                .sorted { obj: Publiseringsdato, annen: Publiseringsdato? ->
                     obj.sammenlignPubliseringsdatoer(
                         annen!!
                     )

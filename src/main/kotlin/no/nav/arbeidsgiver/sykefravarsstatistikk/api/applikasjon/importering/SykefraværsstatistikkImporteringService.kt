@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.felles.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.importering.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.PubliseringsdatoerRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.StatistikkRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
@@ -33,7 +34,7 @@ class SykefraværsstatistikkImporteringService(
             ),
             statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
                 Statistikkilde.VIRKSOMHET
-            )
+            ),
         )
         val årstallOgKvartalForDvh = listOf(
             datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
@@ -47,7 +48,7 @@ class SykefraværsstatistikkImporteringService(
             ),
             datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
                 StatistikkildeDvh.VIRKSOMHET
-            )
+            ),
         )
         val gjeldendeÅrstallOgKvartal = årstallOgKvartalForDvh[0]
         return if (kanImportStartes(årstallOgKvartalForSykefraværsstatistikk, årstallOgKvartalForDvh)) {

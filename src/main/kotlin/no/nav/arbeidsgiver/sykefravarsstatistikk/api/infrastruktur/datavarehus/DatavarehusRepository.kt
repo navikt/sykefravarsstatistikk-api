@@ -1,8 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.KildeTilVirksomhetsdata
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Sektor.Companion.fraSektorkode
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.felles.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.felles.Sektor.Companion.fraSektorkode
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.importering.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.publiseringsdato.Publiseringsdato
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -267,7 +269,7 @@ class DatavarehusRepository(
         }
     }
 
-    fun hentPubliseringsdatoerFraDvh(): List<PubliseringsdatoDbDto> {
+    fun hentPubliseringsdatoerFraDvh(): List<Publiseringsdato> {
         return try {
             namedParameterJdbcTemplate.query(
                 "select rapport_periode, offentlig_dato, oppdatert_dato, aktivitet "
@@ -277,7 +279,7 @@ class DatavarehusRepository(
                         + "order by offentlig_dato desc",
                 HashMap<String, Any?>()
             ) { rs: ResultSet, _: Int ->
-                PubliseringsdatoDbDto(
+                Publiseringsdato(
                     rs.getInt("rapport_periode"),
                     rs.getDate("offentlig_dato"),
                     rs.getDate("oppdatert_dato"),
