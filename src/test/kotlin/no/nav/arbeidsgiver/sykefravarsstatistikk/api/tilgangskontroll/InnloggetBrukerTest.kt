@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.tilgangskontroll
 import io.kotest.matchers.shouldBe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getInnloggetBruker
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.getOrganisasjon
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.felles.Orgnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
 import org.junit.jupiter.api.Test
 
 class InnloggetBrukerTest {

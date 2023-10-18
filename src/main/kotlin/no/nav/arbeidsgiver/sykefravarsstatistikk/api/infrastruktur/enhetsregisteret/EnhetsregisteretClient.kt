@@ -3,9 +3,9 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregist
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.felles.Orgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.felles.OverordnetEnhet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.felles.Underenhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.OverordnetEnhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Underenhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.ProxyWebClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.json.OverordnetEnhetResponseJson
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.json.UnderenhetResponseJson

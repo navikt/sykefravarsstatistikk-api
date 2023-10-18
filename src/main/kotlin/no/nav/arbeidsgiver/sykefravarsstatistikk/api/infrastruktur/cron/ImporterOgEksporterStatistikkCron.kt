@@ -5,9 +5,9 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import net.javacrumbs.shedlock.core.LockConfiguration
 import net.javacrumbs.shedlock.core.LockingTaskExecutor
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PostImporteringService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.VirksomhetMetadataService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImportEksportJobb.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.felles.Statistikkategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringMetadataVirksomhetService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringPerStatistikkKategoriService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringService
@@ -26,7 +26,7 @@ class ImporteringScheduler(
     private val taskExecutor: LockingTaskExecutor,
     private val importeringService: SykefraværsstatistikkImporteringService,
     private val importEksportStatusRepository: ImportEksportStatusRepository,
-    private val postImporteringService: PostImporteringService,
+    private val virksomhetMetadataService: VirksomhetMetadataService,
     private val eksporteringsService: EksporteringService,
     private val eksporteringPerStatistikkKategoriService: EksporteringPerStatistikkKategoriService,
     private val eksporteringMetadataVirksomhetService: EksporteringMetadataVirksomhetService,
@@ -67,7 +67,7 @@ class ImporteringScheduler(
         }
 
         if (fullførteJobber.manglerJobben(IMPORTERT_VIRKSOMHETDATA)) {
-            postImporteringService.overskrivMetadataForVirksomheter(gjeldendeKvartal)
+            virksomhetMetadataService.overskrivMetadataForVirksomheter(gjeldendeKvartal)
                 .getOrElse {
                     noeFeilet.increment()
                     return
@@ -76,7 +76,7 @@ class ImporteringScheduler(
         }
 
         if (fullførteJobber.manglerJobben(IMPORTERT_NÆRINGSKODEMAPPING)) {
-            postImporteringService.overskrivNæringskoderForVirksomheter(gjeldendeKvartal)
+            virksomhetMetadataService.overskrivNæringskoderForVirksomheter(gjeldendeKvartal)
                 .getOrElse {
                     noeFeilet.increment()
                     return
@@ -85,7 +85,7 @@ class ImporteringScheduler(
         }
 
         if (fullførteJobber.manglerJobben(FORBEREDT_NESTE_EKSPORT_LEGACY)) {
-            postImporteringService.forberedNesteEksport(gjeldendeKvartal, true)
+            virksomhetMetadataService.forberedNesteEksport(gjeldendeKvartal, true)
                 .getOrElse {
                     noeFeilet.increment()
                     return

@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.aggregert.Sykefraværsstatistikk
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.felles.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sykefraværsstatistikk
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.core.namedparam.SqlParameterSource
@@ -24,11 +24,11 @@ class SykefraværsstatistikkLandUtils(namedParameterJdbcTemplate: NamedParameter
     }
 
     override fun getBatchCreateFunction(
-        list: List<Sykefraværsstatistikk>
+        statistikk: List<Sykefraværsstatistikk>
     ): BatchCreateSykefraværsstatistikkFunction {
         return BatchCreateSykefraværsstatistikkFunction {
             val batch =
-                SqlParameterSourceUtils.createBatch(*list.toTypedArray<Sykefraværsstatistikk?>())
+                SqlParameterSourceUtils.createBatch(*statistikk.toTypedArray<Sykefraværsstatistikk?>())
             namedParameterJdbcTemplate.batchUpdate(
                 "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) values (:årstall, :kvartal, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
                 batch

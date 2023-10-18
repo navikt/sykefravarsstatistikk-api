@@ -2,13 +2,13 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api
 
 import arrow.core.getOrElse
 import jakarta.servlet.http.HttpServletRequest
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.AggregertStatistikkService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.KvartalsvisSykefraværshistorikkService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.json.AggregertStatistikkJson
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.json.KvartalsvisSykefraværshistorikkJson
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.felles.Orgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.felles.Underenhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.TilgangskontrollService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.AggregertStatistikkService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.KvartalsvisSykefraværshistorikkService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.AggregertStatistikkJson
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.KvartalsvisSykefraværshistorikkJson
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Underenhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient.HentEnhetFeil
 import no.nav.security.token.support.core.api.Protected

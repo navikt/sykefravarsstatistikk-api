@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.config
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.felles.Statistikkategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 
 enum class KafkaTopic(val navn: String) {
     SYKEFRAVARSSTATISTIKK_LAND_V1("arbeidsgiver.sykefravarsstatistikk-land-v1"),
@@ -30,10 +30,6 @@ enum class KafkaTopic(val navn: String) {
                 Statistikkategori.OVERORDNET_ENHET -> null
             }
         }
-
-
-        fun toStringArray() = entries.map { it.navn }.toTypedArray()
-
     }
 }
 
