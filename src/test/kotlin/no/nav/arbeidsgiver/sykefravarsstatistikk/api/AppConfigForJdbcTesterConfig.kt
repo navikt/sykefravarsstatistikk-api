@@ -38,7 +38,7 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
             TokenService::class,
             EksporteringService::class,
             EksporteringPerStatistikkKategoriService::class,
-            ImporteringScheduler::class,
+            ImporterOgEksporterStatistikkCron::class,
             SykefraværsstatistikkImporteringService::class,
             PostImporteringService::class,
             OrganisasjonerController::class,
