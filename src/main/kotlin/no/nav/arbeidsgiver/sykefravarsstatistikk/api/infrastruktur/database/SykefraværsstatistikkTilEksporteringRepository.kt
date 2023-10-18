@@ -165,7 +165,7 @@ class SykefraværsstatistikkTilEksporteringRepository(
                     sum(mulige_dagsverk) as mulige_dagsverk
                     from sykefravar_statistikk_virksomhet_med_gradering
                     where ${getWhereClause(fraÅrstallOgKvartal, tilÅrstallOgKvartal)}
-                    group by arstall, kvartal, orgnr
+                    group by arstall, kvartal, orgnr, naring, naring_kode, rectype
                 """.trimIndent()
             ) { rs: ResultSet, _: Int -> mapTilSykefraværsstatistikkVirksomhetMedGradering(rs) }
         }.getOrElse {
