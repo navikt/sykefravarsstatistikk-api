@@ -161,6 +161,7 @@ class SykefraværsstatistikkTilEksporteringRepository(
                     sum(antall_graderte_sykemeldinger) as antall_graderte_sykemeldinger,
                     sum(tapte_dagsverk_gradert_sykemelding) as tapte_dagsverk_gradert_sykemelding,
                     sum(antall_personer) as antall_personer,
+                    sum(antall_sykemeldinger) as antall_sykemeldinger,
                     sum(tapte_dagsverk) as tapte_dagsverk,
                     sum(mulige_dagsverk) as mulige_dagsverk
                     from sykefravar_statistikk_virksomhet_med_gradering
