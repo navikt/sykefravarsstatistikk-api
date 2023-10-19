@@ -169,7 +169,7 @@ class EksporteringPerStatistikkKategoriService(
             )
 
             if (erValidertStatistikk) {
-                val melding = when(statistikkategori) {
+                val melding = when (statistikkategori) {
                     Statistikkategori.LAND,
                     Statistikkategori.SEKTOR,
                     Statistikkategori.NÆRING,
@@ -210,6 +210,7 @@ class EksporteringPerStatistikkKategoriService(
 
             when (statistikkategori) {
                 Statistikkategori.NÆRINGSKODE,
+                Statistikkategori.VIRKSOMHET_GRADERT,
                 Statistikkategori.VIRKSOMHET -> {
                     log.info("$message. Ingen kafka melding blir sendt. Fortsetter eksport. ")
                 }
