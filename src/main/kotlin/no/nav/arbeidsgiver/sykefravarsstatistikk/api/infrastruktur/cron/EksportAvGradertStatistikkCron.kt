@@ -29,7 +29,7 @@ class EksportAvGradertStatistikkCron(
 
     // Fjern scheduleringen etter at jobben har kjørt ÉN gang
     // Cron jobb that runs at 12 once a year
-    @Scheduled(cron = "0 45 9 19 10 ?")
+    @Scheduled(cron = "0 10 10 19 10 ?")
     fun scheduledEksportAvGradertStatistikk() {
         val fraKvartal = ÅrstallOgKvartal(2019, 1)
         val tilKvartal = ÅrstallOgKvartal(2023, 2)
