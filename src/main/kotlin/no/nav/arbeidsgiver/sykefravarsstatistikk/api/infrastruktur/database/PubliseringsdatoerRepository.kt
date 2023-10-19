@@ -84,6 +84,6 @@ class PubliseringsdatoerRepository(
                     resultSet.getTimestamp("importert"),
                     ÅrstallOgKvartal(resultSet.getInt("aarstall"), resultSet.getInt("kvartal"))
                 )
-            }.getOrNull(0)
+            }.firstOrNull()
     }
 }

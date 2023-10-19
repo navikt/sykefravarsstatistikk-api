@@ -54,8 +54,7 @@ data class KafkaProperties(
                 * 10 // størrelse av en melding er mellom 1000 bytes og 20K bytes (virksomhet med 70+ 5siffer næringskoder)
                 )
         props[ProducerConfig.ACKS_CONFIG] = "1"
-        props[ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION] =
-            5 // default
+        props[ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION] = 5 // default
         return props
     }
 
