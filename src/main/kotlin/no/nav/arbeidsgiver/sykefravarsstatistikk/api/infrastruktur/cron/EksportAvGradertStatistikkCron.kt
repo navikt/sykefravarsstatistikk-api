@@ -29,7 +29,7 @@ class EksportAvGradertStatistikkCron(
 
     // Fjern scheduleringen etter at jobben har kjørt ÉN gang
     // Cron jobb that runs at 12 once a year
-    @Scheduled(cron = "0 30 10 19 10 ?")
+    @Scheduled(cron = "0 0 11 19 10 ?")
     fun scheduledEksportAvGradertStatistikk() {
         val fraKvartal = ÅrstallOgKvartal(2019, 1)
         val tilKvartal = ÅrstallOgKvartal(2023, 2)
@@ -43,6 +43,7 @@ class EksportAvGradertStatistikkCron(
     }
 
     fun gjennomførJobb(fraKvartal: ÅrstallOgKvartal, tilKvartal: ÅrstallOgKvartal) {
+        log.info("Eksport av gradert statistikk har startet")
         for (kvartal in ÅrstallOgKvartal.range(fraKvartal, tilKvartal)) {
 
             log.info("eksport av gradert statistikk har startet for $kvartal")
@@ -63,5 +64,6 @@ class EksportAvGradertStatistikkCron(
 
             log.info("eksport av gradert statistikk er ferdig for $kvartal")
         }
+        log.info("Eksport av gradert statistikk er ferdig")
     }
 }

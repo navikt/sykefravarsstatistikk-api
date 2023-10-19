@@ -208,16 +208,13 @@ class EksporteringPerStatistikkKategoriService(
                         "er ikke lik forespurt kvartal '${årstallOgKvartal.årstall}-${årstallOgKvartal.kvartal}'. " +
                         "Kategori er '${statistikkategori.name}' og kode er '$kode'"
 
-            when (statistikkategori) {
+            return when (statistikkategori) {
                 Statistikkategori.NÆRINGSKODE,
                 Statistikkategori.VIRKSOMHET_GRADERT,
-                Statistikkategori.VIRKSOMHET -> {
-                    log.info("$message. Ingen kafka melding blir sendt. Fortsetter eksport. ")
-                }
+                Statistikkategori.VIRKSOMHET -> false
 
                 else -> throw RuntimeException("Stopper eksport av kategori ${statistikkategori.name} pga: '$message'")
             }
-            return false
         }
         return true
     }
