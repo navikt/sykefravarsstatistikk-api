@@ -1,8 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api
 
 import common.SpringIntegrationTestbase
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.skrivSisteImporttidspunktTilDb
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.settInnFakeImporttidspunkt
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAlleImporttidspunkt
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
 import org.assertj.core.api.AssertionsForClassTypes
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -21,22 +22,25 @@ class PubliseringsdatoerApiIntegrationTest : SpringIntegrationTestbase() {
     private val port: String? = null
 
     @Autowired
+    private lateinit var importtidspunktRepository: ImporttidspunktRepository
+
+    @Autowired
     var jdbcTemplate: NamedParameterJdbcTemplate? = null
 
     @BeforeEach
     fun setUp() {
-        slettAlleImporttidspunkt(jdbcTemplate!!)
+        importtidspunktRepository.slettAlleImporttidspunkt()
     }
 
     @AfterEach
     fun tearDown() {
-        slettAlleImporttidspunkt(jdbcTemplate!!)
+        importtidspunktRepository.slettAlleImporttidspunkt()
     }
 
     @Test
     @Throws(IOException::class, InterruptedException::class)
     fun hentPubliseringsdatoer_skalReturnereResponsMedKorrektFormat() {
-        skrivSisteImporttidspunktTilDb(jdbcTemplate!!)
+        importtidspunktRepository.settInnFakeImporttidspunkt()
         val response = HttpClient.newBuilder()
             .build()
             .send(

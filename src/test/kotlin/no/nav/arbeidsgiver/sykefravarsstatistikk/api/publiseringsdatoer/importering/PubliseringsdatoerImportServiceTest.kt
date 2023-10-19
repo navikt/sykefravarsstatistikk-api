@@ -11,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
-import java.sql.Date
 import java.time.LocalDate
 
 @ExtendWith(MockitoExtension::class)
@@ -41,8 +40,8 @@ internal class PubliseringsdatoerImportServiceTest {
         val publiseringsdatoListe = listOf(
             Publiseringsdato(
                 202202,
-                Date.valueOf(LocalDate.MIN),
-                Date.valueOf(LocalDate.MIN),
+                LocalDate.MIN,
+                LocalDate.MIN,
                 "sykefravær for en periode"
             )
         )

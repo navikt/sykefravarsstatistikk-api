@@ -14,10 +14,11 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForSektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForVirksomhet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.skrivSisteImporttidspunktTilDb
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.settInnFakeImporttidspunkt
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAlleImporttidspunkt
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -44,14 +45,17 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
     @Autowired
     lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
+    @Autowired
+    lateinit var importtidspunktRepository: ImporttidspunktRepository
+
     @LocalServerPort
     private val port: String? = null
     private val objectMapper = ObjectMapper()
     @BeforeEach
     fun setUp() {
         slettAllStatistikkFraDatabase(jdbcTemplate)
-        slettAlleImporttidspunkt(jdbcTemplate)
-        skrivSisteImporttidspunktTilDb(jdbcTemplate)
+        importtidspunktRepository.slettAlleImporttidspunkt()
+        importtidspunktRepository.settInnFakeImporttidspunkt()
     }
 
     @Test

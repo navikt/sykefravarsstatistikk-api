@@ -281,8 +281,8 @@ class DatavarehusRepository(
             ) { rs: ResultSet, _: Int ->
                 Publiseringsdato(
                     rs.getInt("rapport_periode"),
-                    rs.getDate("offentlig_dato"),
-                    rs.getDate("oppdatert_dato"),
+                    rs.getDate("offentlig_dato").toLocalDate(),
+                    rs.getDate("oppdatert_dato").toLocalDate(),
                     rs.getString("aktivitet")
                 )
             }

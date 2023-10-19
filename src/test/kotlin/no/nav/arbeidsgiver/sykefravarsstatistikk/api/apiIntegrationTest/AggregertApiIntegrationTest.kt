@@ -11,7 +11,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForVirksomhet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.skrivSisteImporttidspunktTilDb
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.settInnFakeImporttidspunkt
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAlleImporttidspunkt
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.VarighetTestUtils.leggTilStatisitkkNæringMedVarighet
@@ -21,6 +21,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.N�
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.assertj.core.api.Assertions
@@ -45,17 +46,20 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     @Autowired
     lateinit var mockOAuth2Server: MockOAuth2Server
 
+    @Autowired
+    lateinit var importtidspunktRepository: ImporttidspunktRepository
+
     @BeforeEach
     fun setUp() {
         slettAllStatistikkFraDatabase(jdbcTemplate!!)
-        slettAlleImporttidspunkt(jdbcTemplate)
-        skrivSisteImporttidspunktTilDb(jdbcTemplate)
+        importtidspunktRepository.slettAlleImporttidspunkt()
+        importtidspunktRepository.settInnFakeImporttidspunkt()
     }
 
     @AfterEach
     fun tearDown() {
         slettAllStatistikkFraDatabase(jdbcTemplate!!)
-        slettAlleImporttidspunkt(jdbcTemplate)
+        importtidspunktRepository.slettAlleImporttidspunkt()
     }
 
     @LocalServerPort
@@ -303,7 +307,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
 
     @Throws(IOException::class, InterruptedException::class)
     private fun utførAutorisertKall(orgnr: String): HttpResponse<String> {
-        val jwtToken = createMockIdportenTokenXToken(mockOAuth2Server!!)
+        val jwtToken = createMockIdportenTokenXToken(mockOAuth2Server)
         return HttpClient.newBuilder()
             .build()
             .send(
