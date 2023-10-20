@@ -1,10 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import io.kotest.matchers.shouldBe
-import io.mockk.mockk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.AppConfigForJdbcTesterConfig
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
-import org.jetbrains.exposed.sql.Database
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,16 +23,16 @@ internal open class ImporttidspunktRepositoryTest {
     lateinit var importtidspunktRepository: ImporttidspunktRepository
 
     @Test
-    fun `hentSisteImporttidspunkt skal returnerer siste importtidspunkt`() {
+    fun `hentSisteImporttidspunkt skal returnerer nyeste importerte kvartal`() {
 
 
         importtidspunktRepository.settInnImporttidspunkt(ÅrstallOgKvartal(2023, 1))
         importtidspunktRepository.settInnImporttidspunkt(ÅrstallOgKvartal(2023, 3))
+        importtidspunktRepository.settInnImporttidspunkt(ÅrstallOgKvartal(2022, 4))
         importtidspunktRepository.settInnImporttidspunkt(ÅrstallOgKvartal(2023, 2))
 
-        val resultat = importtidspunktRepository.hentSisteImporttidspunkt()
+        val resultat = importtidspunktRepository.hentNyesteImporterteKvartal()
 
-        resultat.gjeldendePeriode shouldBe ÅrstallOgKvartal(2023, 3)
+        resultat?.gjeldendePeriode shouldBe ÅrstallOgKvartal(2023, 3)
     }
-
 }

@@ -2,9 +2,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykef
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.domene.SykefraværsstatistikkNæringMedVarighet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.domene.SykefraværsstatistikkVirksomhet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.domene.SykefraværsstatistikkVirksomhetMedGradering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkNæringMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering

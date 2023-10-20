@@ -13,13 +13,13 @@ class PubliseringsdatoerService(
 ) {
 
     fun hentSistePubliserteKvartal(): ÅrstallOgKvartal {
-        return importtidspunktRepository.hentSisteImporttidspunkt()?.gjeldendePeriode
+        return importtidspunktRepository.hentNyesteImporterteKvartal()?.gjeldendePeriode
             ?: throw PubliseringsdatoerDatauthentingFeil("Kunne ikke hente ut siste publiseringstidspunkt")
     }
 
     fun hentPubliseringsdatoer(): PubliseringsdatoerJson {
         val publiseringsdatoer = publiseringsdatoerRepository.hentPubliseringsdatoer()
-        val sisteImporttidspunkt = importtidspunktRepository.hentSisteImporttidspunkt()
+        val sisteImporttidspunkt = importtidspunktRepository.hentNyesteImporterteKvartal()
             ?: throw PubliseringsdatoerDatauthentingFeil("Klarte ikke hente forrige publiseringstidspunkt fra databasen")
 
         val nestePubliseringsdato =

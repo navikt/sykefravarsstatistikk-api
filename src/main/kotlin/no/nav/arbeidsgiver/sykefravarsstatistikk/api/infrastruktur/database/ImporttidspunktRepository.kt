@@ -35,10 +35,11 @@ class ImporttidspunktRepository(
     }
 
 
-    fun hentSisteImporttidspunkt(): ImporttidspunktDto? {
+    fun hentNyesteImporterteKvartal(): ImporttidspunktDto? {
         return transaction {
             selectAll()
-                .orderBy(importert to SortOrder.DESC)
+                .orderBy(årstall to SortOrder.DESC)
+                .orderBy(kvartal to SortOrder.DESC)
                 .limit(1)
                 .map {
                     ImporttidspunktDto(
