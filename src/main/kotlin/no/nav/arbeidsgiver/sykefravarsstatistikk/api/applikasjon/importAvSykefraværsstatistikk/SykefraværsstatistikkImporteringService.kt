@@ -6,6 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Å
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.StatistikkRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.slf4j.LoggerFactory
 import org.springframework.core.env.Environment
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component
 @Component
 class SykefraværsstatistikkImporteringService(
     private val statistikkRepository: StatistikkRepository,
+    private val statistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
     private val datavarehusRepository: DatavarehusRepository,
     private val importtidspunktRepository: ImporttidspunktRepository,
     private val environment: Environment
@@ -179,8 +181,10 @@ class SykefraværsstatistikkImporteringService(
         } else {
             SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhet(årstallOgKvartal)
         }
-        val resultat = statistikkRepository.importSykefraværsstatistikkVirksomhet(statistikk, årstallOgKvartal)
-        loggResultat(årstallOgKvartal, resultat, "virksomhet")
+        val antallSlettet = statistikkVirksomhetRepository.slettForKvartal(årstallOgKvartal)
+        val antallSattInn = statistikkVirksomhetRepository.settInn(statistikk)
+
+        loggResultat(årstallOgKvartal, SlettOgOpprettResultat(antallSlettet, antallSattInn), "virksomhet")
     }
 
     private fun importSykefraværsstatistikkVirksomhetMedGradering(

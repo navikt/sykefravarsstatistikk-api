@@ -17,8 +17,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sy
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.StatistikkRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.assertj.core.api.Assertions
+import org.jetbrains.exposed.sql.selectAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -42,6 +44,10 @@ open class StatistikkRepositoryJdbcTest {
     @Autowired
     private val jdbcTemplate: NamedParameterJdbcTemplate? = null
     private var statistikkRepository: StatistikkRepository? = null
+
+    @Autowired
+    private lateinit var sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
+
     @BeforeEach
     fun setUp() {
         statistikkRepository = StatistikkRepository(jdbcTemplate!!)
@@ -126,7 +132,7 @@ open class StatistikkRepositoryJdbcTest {
     }
 
     @Test
-    fun batchOpprettSykefraværsstatistikkVirksomhet__skal_lagre_data_i_tabellen_med_rectype() {
+    fun `settInn skal lagre riktige data i tabellen`() {
         val list: MutableList<SykefraværsstatistikkVirksomhet> = ArrayList()
         val sykefraværsstatistikkVirksomhet = SykefraværsstatistikkVirksomhet(
             2019,
@@ -139,11 +145,14 @@ open class StatistikkRepositoryJdbcTest {
             BigDecimal(100).setScale(6)
         )
         list.add(sykefraværsstatistikkVirksomhet)
-        statistikkRepository!!.importSykefraværsstatistikkVirksomhet(list, ÅrstallOgKvartal(2019, 3))
-        val resultList = hentRawDataStatistikkVirksomhet()
-        Assertions.assertThat(resultList.size).isEqualTo(1)
-        assertIsEquals(
-            resultList[0],
+
+        sykefravarStatistikkVirksomhetRepository.settInn(list)
+
+        val statistikkIDatabasen = sykefravarStatistikkVirksomhetRepository.hentAlt()
+
+        Assertions.assertThat(statistikkIDatabasen.size).isEqualTo(1)
+        assertEquals(
+            statistikkIDatabasen.first(),
             RawDataStatistikkVirksomhet(
                 2019,
                 3,
@@ -216,21 +225,20 @@ open class StatistikkRepositoryJdbcTest {
         }
     }
 
-    private fun hentRawDataStatistikkVirksomhet(): List<RawDataStatistikkVirksomhet> {
-        return jdbcTemplate!!.query(
-            "select * from sykefravar_statistikk_virksomhet",
-            MapSqlParameterSource()
-        ) { rs: ResultSet, rowNum: Int ->
-            RawDataStatistikkVirksomhet(
-                rs.getInt("arstall"),
-                rs.getInt("kvartal"),
-                rs.getString("orgnr"),
-                rs.getString("varighet"),
-                rs.getString("rectype"),
-                rs.getBigDecimal("tapte_dagsverk"),
-                rs.getBigDecimal("mulige_dagsverk"),
-                rs.getInt("antall_personer")
-            )
+    private fun SykefravarStatistikkVirksomhetRepository.hentAlt(): List<RawDataStatistikkVirksomhet> {
+        return transaction {
+            selectAll().map {
+                RawDataStatistikkVirksomhet(
+                    årstall = it[årstall],
+                    kvartal = it[kvartal],
+                    orgnr = it[orgnr],
+                    varighet = it[varighet].toString(),
+                    rectype = it[virksomhetstype].toString(),
+                    tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
+                    muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
+                    antallPersoner = it[antallPersoner],
+                )
+            }
         }
     }
 
@@ -246,7 +254,7 @@ open class StatistikkRepositoryJdbcTest {
     )
 
     companion object {
-        fun assertIsEquals(
+        fun assertEquals(
             actual: RawDataStatistikkVirksomhet, expected: RawDataStatistikkVirksomhet
         ) {
             Assertions.assertThat(actual.årstall).isEqualTo(expected.årstall)
