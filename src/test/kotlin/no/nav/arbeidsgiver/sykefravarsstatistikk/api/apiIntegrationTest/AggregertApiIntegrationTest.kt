@@ -11,7 +11,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForNæringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.opprettStatistikkForVirksomhet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.settInnFakeImporttidspunkt
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAllStatistikkFraDatabase
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAlleImporttidspunkt
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.VarighetTestUtils.leggTilStatisitkkNæringMedVarighet
@@ -38,6 +37,7 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.net.http.HttpResponse.BodyHandlers
+import java.time.LocalDate
 
 class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     @Autowired
@@ -53,7 +53,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     fun setUp() {
         slettAllStatistikkFraDatabase(jdbcTemplate!!)
         importtidspunktRepository.slettAlleImporttidspunkt()
-        importtidspunktRepository.settInnFakeImporttidspunkt()
+        importtidspunktRepository.settInnImporttidspunkt(SISTE_PUBLISERTE_KVARTAL, LocalDate.parse("2022-06-02"))
     }
 
     @AfterEach

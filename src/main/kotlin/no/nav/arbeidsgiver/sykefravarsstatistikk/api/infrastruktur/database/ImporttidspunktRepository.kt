@@ -18,14 +18,17 @@ class ImporttidspunktRepository(
     val kvartal = varchar("kvartal", length = 1)
     val importert = date("importert")
 
-    fun settInnImporttidspunkt(årstallOgKvartal: ÅrstallOgKvartal) {
+    fun settInnImporttidspunkt(
+        årstallOgKvartal: ÅrstallOgKvartal,
+        importertTidspunkt: LocalDate = LocalDate.now()
+    ) {
         log.info("Oppdaterer tidspunkt for import av sykefraværstatistikk for $årstallOgKvartal")
 
         val antallOppdatert = transaction {
             insert {
                 it[årstall] = årstallOgKvartal.årstall.toString()
                 it[kvartal] = årstallOgKvartal.kvartal.toString()
-                it[importert] = LocalDate.now()
+                it[importert] = importertTidspunkt
             }
         }
         log.info("Opprettet $antallOppdatert rader i importtidspunkt-tabellen")

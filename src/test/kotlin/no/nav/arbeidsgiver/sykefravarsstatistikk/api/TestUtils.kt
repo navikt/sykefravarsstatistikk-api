@@ -294,17 +294,6 @@ object TestUtils {
     }
 
 
-    fun ImporttidspunktRepository.settInnFakeImporttidspunkt() {
-        transaction {
-            insert {
-                it[årstall] = SISTE_PUBLISERTE_KVARTAL.årstall.toString()
-                it[kvartal] = SISTE_PUBLISERTE_KVARTAL.kvartal.toString()
-                it[importert] = LocalDate.parse("2022-06-02")
-            }
-        }
-    }
-
-
     fun hentAlleKafkaUtsendingHistorikkData(
         jdbcTemplate: NamedParameterJdbcTemplate
     ): List<KafkaUtsendingHistorikkData> {

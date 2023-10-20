@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api
 
 import common.SpringIntegrationTestbase
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.settInnFakeImporttidspunkt
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAlleImporttidspunkt
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
 import org.assertj.core.api.AssertionsForClassTypes
@@ -16,6 +16,7 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse.BodyHandlers
+import java.time.LocalDate
 
 class PubliseringsdatoerApiIntegrationTest : SpringIntegrationTestbase() {
     @LocalServerPort
@@ -40,7 +41,7 @@ class PubliseringsdatoerApiIntegrationTest : SpringIntegrationTestbase() {
     @Test
     @Throws(IOException::class, InterruptedException::class)
     fun hentPubliseringsdatoer_skalReturnereResponsMedKorrektFormat() {
-        importtidspunktRepository.settInnFakeImporttidspunkt()
+        importtidspunktRepository.settInnImporttidspunkt(SISTE_PUBLISERTE_KVARTAL, LocalDate.parse("2022-06-02"))
         val response = HttpClient.newBuilder()
             .build()
             .send(
