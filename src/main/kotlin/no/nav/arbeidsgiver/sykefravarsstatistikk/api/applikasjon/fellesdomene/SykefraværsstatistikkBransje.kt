@@ -1,7 +1,6 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene
 
 import ia.felles.definisjoner.bransjer.Bransjer
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sykefraværsstatistikk
 import java.math.BigDecimal
 
 data class SykefraværsstatistikkBransje(
