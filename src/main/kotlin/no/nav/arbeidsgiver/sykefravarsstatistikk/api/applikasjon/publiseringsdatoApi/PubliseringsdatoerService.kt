@@ -6,7 +6,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.Publ
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.ResponseStatus
-import java.time.LocalDate
 
 @Service
 class PubliseringsdatoerService(
@@ -25,7 +24,9 @@ class PubliseringsdatoerService(
             ?: return null
 
         val nestePubliseringsdato =
-            finnNestePubliseringsdato(publiseringsdatoer, nyesteImport.sistImportertTidspunkt)
+            publiseringsdatoer
+                .filter { it.offentligDato.isAfter(nyesteImport.sistImportertTidspunkt) }
+                .minOfOrNull { it.offentligDato }
 
         return Publiseringsdatoer(
             sistePubliseringsdato = nyesteImport.sistImportertTidspunkt,
@@ -34,11 +35,6 @@ class PubliseringsdatoerService(
         )
     }
 
-    private fun finnNestePubliseringsdato(
-        publiseringsdatoer: List<Publiseringsdato>, forrigeImporttidspunkt: LocalDate
-    ) = publiseringsdatoer
-        .filter { it.offentligDato.isAfter(forrigeImporttidspunkt) }
-        .minOfOrNull { it.offentligDato }
 }
 
 
