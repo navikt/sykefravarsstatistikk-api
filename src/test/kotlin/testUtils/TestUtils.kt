@@ -1,12 +1,13 @@
 package testUtils
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkData
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkSektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkSektorUtils
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkData
 import org.jetbrains.exposed.sql.deleteAll
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -36,11 +37,14 @@ object TestUtils {
             .addValue("mulige_dagsverk", muligeDagsverk)
     }
 
+    private fun SykefravarStatistikkVirksomhetRepository.slettAlt() {
+        transaction { deleteAll() }
+    }
 
-    fun slettAllStatistikkFraDatabase(jdbcTemplate: NamedParameterJdbcTemplate) {
-        jdbcTemplate.update(
-            "delete from sykefravar_statistikk_virksomhet", MapSqlParameterSource()
-        )
+    fun slettAllStatistikkFraDatabase(jdbcTemplate: NamedParameterJdbcTemplate, sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository? = null) {
+
+        sykefravarStatistikkVirksomhetRepository?.slettAlt()
+
         jdbcTemplate.update("delete from sykefravar_statistikk_naring", MapSqlParameterSource())
         jdbcTemplate.update(
             "delete from sykefravar_statistikk_naring_med_varighet", MapSqlParameterSource()

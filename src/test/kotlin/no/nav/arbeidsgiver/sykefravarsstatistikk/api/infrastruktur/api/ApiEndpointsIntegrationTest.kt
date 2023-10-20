@@ -6,6 +6,16 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.net.HttpHeaders
 import config.SpringIntegrationTestbase
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
+import no.nav.security.mock.oauth2.MockOAuth2Server
+import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import testUtils.TestTokenUtil.TOKENX_ISSUER_ID
 import testUtils.TestTokenUtil.createToken
 import testUtils.TestUtils.PRODUKSJON_NYTELSESMIDLER
@@ -16,15 +26,6 @@ import testUtils.TestUtils.opprettStatistikkForSektor
 import testUtils.TestUtils.opprettStatistikkForVirksomhet
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import testUtils.TestUtils.slettAlleImporttidspunkt
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
-import no.nav.security.mock.oauth2.MockOAuth2Server
-import org.assertj.core.api.Assertions
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.io.IOException
 import java.net.URI
 import java.net.http.HttpClient
@@ -46,6 +47,9 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
     lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     @Autowired
+    lateinit var sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
+
+    @Autowired
     lateinit var importtidspunktRepository: ImporttidspunktRepository
 
     @LocalServerPort
@@ -54,7 +58,7 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
 
     @BeforeEach
     fun setUp() {
-        slettAllStatistikkFraDatabase(jdbcTemplate)
+        slettAllStatistikkFraDatabase(jdbcTemplate, sykefravarStatistikkVirksomhetRepository)
         importtidspunktRepository.slettAlleImporttidspunkt()
         importtidspunktRepository.settInnImporttidspunkt(SISTE_PUBLISERTE_KVARTAL, LocalDate.parse("2022-06-02"))
     }

@@ -7,10 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvar
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.leggTilStatisitkkNæringMedVarighet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.leggTilVirksomhetsstatistikkMedVarighet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.assertj.core.api.Assertions
@@ -47,18 +44,21 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     lateinit var mockOAuth2Server: MockOAuth2Server
 
     @Autowired
+    lateinit var sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
+
+    @Autowired
     lateinit var importtidspunktRepository: ImporttidspunktRepository
 
     @BeforeEach
     fun setUp() {
-        slettAllStatistikkFraDatabase(jdbcTemplate!!)
+        slettAllStatistikkFraDatabase(jdbcTemplate!!, sykefravarStatistikkVirksomhetRepository)
         importtidspunktRepository.slettAlleImporttidspunkt()
         importtidspunktRepository.settInnImporttidspunkt(SISTE_PUBLISERTE_KVARTAL, LocalDate.parse("2022-06-02"))
     }
 
     @AfterEach
     fun tearDown() {
-        slettAllStatistikkFraDatabase(jdbcTemplate!!)
+        slettAllStatistikkFraDatabase(jdbcTemplate!!, sykefravarStatistikkVirksomhetRepository)
         importtidspunktRepository.slettAlleImporttidspunkt()
     }
 
