@@ -5,16 +5,15 @@ import arrow.core.right
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PostImporteringService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PostImporteringService.IngenRaderImportert
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb.IMPORTERT_STATISTIKK
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImportEksportJobb.IMPORTERT_VIRKSOMHETDATA
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringMetadataVirksomhetService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringPerStatistikkKategoriService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.SykefraværsstatistikkImporteringService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.VirksomhetMetadataService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.VirksomhetMetadataService.IngenRaderImportert
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImportEksportJobb.IMPORTERT_STATISTIKK
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImportEksportJobb.IMPORTERT_VIRKSOMHETDATA
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringMetadataVirksomhetService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringPerStatistikkKategoriService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.SykefraværsstatistikkImporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImportEksportStatusRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,7 +21,7 @@ import org.junit.jupiter.api.Test
 class ImporterOgEksporterStatistikkCronTest {
     private val importeringService = mockk<SykefraværsstatistikkImporteringService>()
     private val importEksportStatusRepository = mockk<ImportEksportStatusRepository>(relaxed = true)
-    private val postImporteringService = mockk<PostImporteringService>()
+    private val virksomhetMetadataService = mockk<VirksomhetMetadataService>()
     private val eksporteringsService = mockk<EksporteringService>()
     private val eksporteringPerStatistikkKategoriService = mockk<EksporteringPerStatistikkKategoriService>()
     private val eksporteringMetadataVirksomhetService = mockk<EksporteringMetadataVirksomhetService>()
@@ -31,7 +30,7 @@ class ImporterOgEksporterStatistikkCronTest {
         importeringService = importeringService,
         registry = mockk(relaxed = true),
         importEksportStatusRepository = importEksportStatusRepository,
-        postImporteringService = postImporteringService,
+        virksomhetMetadataService = virksomhetMetadataService,
         eksporteringsService = eksporteringsService,
         eksporteringPerStatistikkKategoriService = eksporteringPerStatistikkKategoriService,
         eksporteringMetadataVirksomhetService = eksporteringMetadataVirksomhetService,
@@ -42,9 +41,9 @@ class ImporterOgEksporterStatistikkCronTest {
     fun beforeEach() {
         // Defaults to happy case
         every { importeringService.importerHvisDetFinnesNyStatistikk() } returns årstallOgKvartal
-        every { postImporteringService.overskrivMetadataForVirksomheter(any()) } returns 1.right()
-        every { postImporteringService.overskrivNæringskoderForVirksomheter(any()) } returns 1.right()
-        every { postImporteringService.forberedNesteEksport(any(), any()) } returns 1.right()
+        every { virksomhetMetadataService.overskrivMetadataForVirksomheter(any()) } returns 1.right()
+        every { virksomhetMetadataService.overskrivNæringskoderForVirksomheter(any()) } returns 1.right()
+        every { virksomhetMetadataService.forberedNesteEksport(any(), any()) } returns 1.right()
         every { eksporteringsService.legacyEksporter(any()) } returns 1.right()
         every { eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(any()) } returns Unit.right()
         every { eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(any(), any()) } returns Unit
@@ -54,7 +53,7 @@ class ImporterOgEksporterStatistikkCronTest {
     fun `importEksport burde ikke legge til jobb i lista over fullførte jobber når jobben ikke fullfører`() {
         every { importeringService.importerHvisDetFinnesNyStatistikk() } returns årstallOgKvartal
         every { importEksportStatusRepository.hentFullførteJobber(any()) } returns listOf(IMPORTERT_STATISTIKK)
-        every { postImporteringService.overskrivMetadataForVirksomheter(any()) } returns IngenRaderImportert.left()
+        every { virksomhetMetadataService.overskrivMetadataForVirksomheter(any()) } returns IngenRaderImportert.left()
 
         importerOgEksporterStatistikkCron.gjennomførImportOgEksport()
 
@@ -63,7 +62,7 @@ class ImporterOgEksporterStatistikkCronTest {
 
     @Test
     fun `importEksport burde markere IMPORTERT_STATUISTIKK-jobb som kjørt når det finnes ny statistikk men resten feiler`() {
-        every { postImporteringService.overskrivMetadataForVirksomheter(any()) } returns IngenRaderImportert.left()
+        every { virksomhetMetadataService.overskrivMetadataForVirksomheter(any()) } returns IngenRaderImportert.left()
 
         importerOgEksporterStatistikkCron.gjennomførImportOgEksport()
 
@@ -85,7 +84,7 @@ class ImporterOgEksporterStatistikkCronTest {
         every { importEksportStatusRepository.hentFullførteJobber(any()) } returns listOf(IMPORTERT_STATISTIKK, IMPORTERT_VIRKSOMHETDATA)
         importerOgEksporterStatistikkCron.gjennomførImportOgEksport()
 
-        verify(exactly = 0) { postImporteringService.overskrivMetadataForVirksomheter(any()) }
-        verify(exactly = 1) { postImporteringService.overskrivNæringskoderForVirksomheter(any())}
+        verify(exactly = 0) { virksomhetMetadataService.overskrivMetadataForVirksomheter(any()) }
+        verify(exactly = 1) { virksomhetMetadataService.overskrivNæringskoderForVirksomheter(any())}
     }
 }

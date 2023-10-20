@@ -5,11 +5,11 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import net.javacrumbs.shedlock.core.LockConfiguration
 import net.javacrumbs.shedlock.core.LockingTaskExecutor
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PostImporteringService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringMetadataVirksomhetService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.EksporteringPerStatistikkKategoriService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.VirksomhetMetadataService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringMetadataVirksomhetService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringPerStatistikkKategoriService
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -23,7 +23,7 @@ class EksportAvEnkeltkvartalerCron(
     private val taskExecutor: LockingTaskExecutor,
     private val eksporteringMetadataVirksomhetService: EksporteringMetadataVirksomhetService,
     private val eksporteringPerStatistikkKategoriService: EksporteringPerStatistikkKategoriService,
-    private val postImporteringService: PostImporteringService,
+    private val virksomhetMetadataService: VirksomhetMetadataService,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
     private val noeFeiletCounter: Counter
@@ -54,13 +54,13 @@ class EksportAvEnkeltkvartalerCron(
 
             log.info("EksportAvEnkeltkvartaler har startet for $kvartal")
 
-            postImporteringService.overskrivMetadataForVirksomheter(kvartal)
+            virksomhetMetadataService.overskrivMetadataForVirksomheter(kvartal)
                 .getOrElse {
                     noeFeiletCounter.increment()
                     return
                 }
 
-            postImporteringService.overskrivNæringskoderForVirksomheter(kvartal)
+            virksomhetMetadataService.overskrivNæringskoderForVirksomheter(kvartal)
                 .getOrElse {
                     noeFeiletCounter.increment()
                     return

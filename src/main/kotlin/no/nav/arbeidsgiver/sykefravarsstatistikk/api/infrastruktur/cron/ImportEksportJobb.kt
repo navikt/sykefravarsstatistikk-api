@@ -1,0 +1,11 @@
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron
+
+enum class ImportEksportJobb {
+    IMPORTERT_STATISTIKK,
+    IMPORTERT_VIRKSOMHETDATA,
+    IMPORTERT_NÆRINGSKODEMAPPING,
+    FORBEREDT_NESTE_EKSPORT_LEGACY,
+    EKSPORTERT_LEGACY,
+    EKSPORTERT_METADATA_VIRKSOMHET,
+    EKSPORTERT_PER_STATISTIKKATEGORI
+}

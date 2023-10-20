@@ -2,13 +2,13 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api
 
 import arrow.core.getOrElse
 import jakarta.servlet.http.HttpServletRequest
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.AggregertStatistikkService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.KvartalsvisSykefraværshistorikkService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.AggregertStatistikkDto
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.KvartalsvisSykefraværshistorikk
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Orgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Underenhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.TilgangskontrollService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.AggregertStatistikkService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.KvartalsvisSykefraværshistorikkService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.AggregertStatistikkJson
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.KvartalsvisSykefraværshistorikkJson
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Underenhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient.HentEnhetFeil
 import no.nav.security.token.support.core.api.Protected
@@ -30,7 +30,7 @@ class SykefraværshistorikkController(
     @GetMapping(value = ["/{orgnr}/sykefravarshistorikk/kvartalsvis"])
     fun hentSykefraværshistorikk(
         @PathVariable("orgnr") orgnrStr: String, request: HttpServletRequest
-    ): ResponseEntity<List<KvartalsvisSykefraværshistorikk>> {
+    ): ResponseEntity<List<KvartalsvisSykefraværshistorikkJson>> {
         val orgnr = Orgnr(orgnrStr)
         val bruker = tilgangskontrollService.hentBrukerKunIaRettigheter()
         tilgangskontrollService.sjekkTilgangTilOrgnrOgLoggSikkerhetshendelse(
@@ -87,7 +87,7 @@ class SykefraværshistorikkController(
     @GetMapping("/{orgnr}/v1/sykefravarshistorikk/aggregert")
     fun hentAggregertStatistikk(
         @PathVariable("orgnr") orgnr: String
-    ): ResponseEntity<AggregertStatistikkDto> {
+    ): ResponseEntity<AggregertStatistikkJson> {
         val statistikk = aggregertHistorikkService.hentAggregertStatistikk(Orgnr(orgnr))
             .getOrElse {
                 return when (it) {

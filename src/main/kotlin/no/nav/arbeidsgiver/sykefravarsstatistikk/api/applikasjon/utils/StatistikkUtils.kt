@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.Statistikkfeil
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.Statistikkfeil
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -12,7 +12,6 @@ object StatistikkUtils {
      * Source of trouth for kalkulering av sykefraværsprosent basert på tapte dagsverk og mulige
      * dagsverk.
      */
-
     fun kalkulerSykefraværsprosent(
         dagsverkTeller: BigDecimal?, dagsverkNevner: BigDecimal?
     ): Either<Statistikkfeil, BigDecimal> {

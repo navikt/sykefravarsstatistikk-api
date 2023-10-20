@@ -17,10 +17,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils.slettAlleImportti
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.VarighetTestUtils.leggTilStatisitkkNæringMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.VarighetTestUtils.leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.VarighetTestUtils.leggTilVirksomhetsstatistikkMedVarighet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Næringskode
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Statistikkategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.Varighetskategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.domene.Varighetskategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.assertj.core.api.Assertions

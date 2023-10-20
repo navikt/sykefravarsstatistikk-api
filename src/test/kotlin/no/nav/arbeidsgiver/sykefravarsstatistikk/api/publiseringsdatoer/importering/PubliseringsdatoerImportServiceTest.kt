@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.importering
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PubliseringsdatoerImportService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.PubliseringsdatoDbDto
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoApi.PubliseringsdatoerImportService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoApi.Publiseringsdato
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.PubliseringsdatoerRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.junit.jupiter.api.AfterEach
@@ -38,8 +38,8 @@ internal class PubliseringsdatoerImportServiceTest {
 
     @Test
     fun importerDatoerFraDatavarehus_oppdaterPubliseringsdatoerBlirKjørtEnGang() {
-        val publiseringsdatoDbDtoListe = listOf(
-            PubliseringsdatoDbDto(
+        val publiseringsdatoListe = listOf(
+            Publiseringsdato(
                 202202,
                 Date.valueOf(LocalDate.MIN),
                 Date.valueOf(LocalDate.MIN),
@@ -47,9 +47,9 @@ internal class PubliseringsdatoerImportServiceTest {
             )
         )
         Mockito.`when`(mockDatavarehusRepository!!.hentPubliseringsdatoerFraDvh())
-            .thenReturn(publiseringsdatoDbDtoListe)
+            .thenReturn(publiseringsdatoListe)
         serviceUnderTest!!.importerDatoerFraDatavarehus()
         Mockito.verify(mockPubliseringsdatoerRepository, Mockito.times(1))
-            ?.oppdaterPubliseringsdatoer(publiseringsdatoDbDtoListe)
+            ?.oppdaterPubliseringsdatoer(publiseringsdatoListe)
     }
 }

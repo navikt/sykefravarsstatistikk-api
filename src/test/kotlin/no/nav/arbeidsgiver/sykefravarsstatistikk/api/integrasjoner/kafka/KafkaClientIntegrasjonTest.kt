@@ -3,9 +3,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.integrasjoner.kafka
 import ia.felles.definisjoner.bransjer.Bransjer
 import net.javacrumbs.jsonunit.assertj.assertThatJson
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.SykefraværsstatistikkLocalTestApplication
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic.Companion.toStringArray
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.eksportering.autoeksport.EksporteringServiceTestUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.MetadataVirksomhetKafkamelding
@@ -139,6 +138,6 @@ class KafkaClientIntegrasjonTest {
     }
 
     companion object {
-        private val TOPIC_NAMES = toStringArray()
+        private val TOPIC_NAMES = KafkaTopic.entries.map { it.navn }.toTypedArray()
     }
 }

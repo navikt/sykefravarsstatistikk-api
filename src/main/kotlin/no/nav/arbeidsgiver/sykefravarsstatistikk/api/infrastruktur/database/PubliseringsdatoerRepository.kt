@@ -1,8 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ImporttidspunktDto
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.PubliseringsdatoDbDto
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoApi.Publiseringsdato
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.dao.EmptyResultDataAccessException
@@ -17,13 +16,13 @@ class PubliseringsdatoerRepository(
     @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val jdbcTemplate: NamedParameterJdbcTemplate
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
-    fun hentPubliseringsdatoer(): List<PubliseringsdatoDbDto> {
+    fun hentPubliseringsdatoer(): List<Publiseringsdato> {
         return try {
             jdbcTemplate.query(
                 "select * from publiseringsdatoer",
                 HashMap<String, Any?>()
             ) { rs: ResultSet, _: Int ->
-                PubliseringsdatoDbDto(
+                Publiseringsdato(
                     rs.getInt("rapport_periode"),
                     rs.getDate("offentlig_dato"),
                     rs.getDate("oppdatert_i_dvh"),
@@ -36,11 +35,11 @@ class PubliseringsdatoerRepository(
         }
     }
 
-    fun oppdaterPubliseringsdatoer(data: List<PubliseringsdatoDbDto>) {
+    fun oppdaterPubliseringsdatoer(data: List<Publiseringsdato>) {
         val antallRadetSlettet = jdbcTemplate.update("delete from publiseringsdatoer", MapSqlParameterSource())
         log.info("Antall rader slettet fra 'publiseringsdatoer': $antallRadetSlettet")
         val antallRaderSattInn = data.stream()
-            .mapToInt { (rapportPeriode, offentligDato, oppdatertDato, aktivitet): PubliseringsdatoDbDto ->
+            .mapToInt { (rapportPeriode, offentligDato, oppdatertDato, aktivitet): Publiseringsdato ->
                 jdbcTemplate.update(
                     "insert into publiseringsdatoer "
                             + "(rapport_periode, "

@@ -2,10 +2,15 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 import arrow.core.right
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestUtils
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.PubliseringsdatoerService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.TilgangskontrollService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.AggregertStatistikkService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoApi.PubliseringsdatoerService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.TilgangskontrollService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.AggregertStatistikkService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.domene.Sykefraværsdata
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.domene.UmaskertSykefraværForEttKvartalMedVarighet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.domene.Varighetskategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.AggregertStatistikkJson
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.StatistikkJson
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.GraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VarighetRepository
@@ -87,7 +92,7 @@ internal class AggregertStatistikkServiceTest {
                 mutableMapOf()
             )
         )
-        assertThat(serviceUnderTest.hentAggregertStatistikk(etOrgnr).getOrNull()).isEqualTo(AggregertStatistikkDto())
+        assertThat(serviceUnderTest.hentAggregertStatistikk(etOrgnr).getOrNull()).isEqualTo(AggregertStatistikkJson())
 
         // Resultat med statistikkategori og tomme lister skal heller ikke kræsje
         whenever(
@@ -113,7 +118,7 @@ internal class AggregertStatistikkServiceTest {
                 )
             )
         )
-        assertThat(serviceUnderTest.hentAggregertStatistikk(etOrgnr).getOrNull()).isEqualTo(AggregertStatistikkDto())
+        assertThat(serviceUnderTest.hentAggregertStatistikk(etOrgnr).getOrNull()).isEqualTo(AggregertStatistikkJson())
     }
 
     @Test
@@ -148,12 +153,12 @@ internal class AggregertStatistikkServiceTest {
         val forventedeTrendtyper = listOf(Statistikkategori.BRANSJE)
         val prosentstatistikk =
             serviceUnderTest.hentAggregertStatistikk(etOrgnr).getOrNull()?.prosentSiste4KvartalerTotalt?.stream()
-                ?.map(StatistikkDto::statistikkategori)?.collect(Collectors.toList())
+                ?.map(StatistikkJson::statistikkategori)?.collect(Collectors.toList())
         val gradertProsentstatistikk =
             serviceUnderTest.hentAggregertStatistikk(etOrgnr).getOrNull()?.prosentSiste4KvartalerGradert?.stream()
-                ?.map(StatistikkDto::statistikkategori)?.collect(Collectors.toList())
+                ?.map(StatistikkJson::statistikkategori)?.collect(Collectors.toList())
         val trendstatistikk = serviceUnderTest.hentAggregertStatistikk(etOrgnr).getOrNull()?.trendTotalt?.stream()
-            ?.map(StatistikkDto::statistikkategori)?.collect(Collectors.toList())
+            ?.map(StatistikkJson::statistikkategori)?.collect(Collectors.toList())
         assertThat(prosentstatistikk).isEqualTo(forventedeProsenttyper)
         assertThat(gradertProsentstatistikk).isEqualTo(forventedeGraderingstyper)
         assertThat(trendstatistikk).isEqualTo(forventedeTrendtyper)
@@ -200,7 +205,7 @@ internal class AggregertStatistikkServiceTest {
                 )
             )
         )
-        val forventet = StatistikkDto(
+        val forventet = StatistikkJson(
             Statistikkategori.VIRKSOMHET,
             "En Barnehage",
             "40.0",
@@ -248,7 +253,7 @@ internal class AggregertStatistikkServiceTest {
                 )
             )
         )
-        val forventet = StatistikkDto(
+        val forventet = StatistikkJson(
             Statistikkategori.VIRKSOMHET,
             "En Barnehage",
             "27.5",
@@ -431,7 +436,7 @@ internal class AggregertStatistikkServiceTest {
 
         assertThat(result?.prosentSiste4KvartalerTotalt).isEqualTo(
             listOf(
-                StatistikkDto(
+                StatistikkJson(
                     Statistikkategori.NÆRING, "Offentlig administrasjon og forsvar, og trygdeordninger underlagt offentlig forvaltning", "6.8", 20, listOf(
                         årstallOgKvartal
                     )
@@ -440,7 +445,7 @@ internal class AggregertStatistikkServiceTest {
         )
         assertThat(result?.prosentSiste4KvartalerKorttid).isEqualTo(
             listOf(
-                StatistikkDto(
+                StatistikkJson(
                     Statistikkategori.NÆRING, "Offentlig administrasjon og forsvar, og trygdeordninger underlagt offentlig forvaltning", "0.7", 20, listOf(
                         årstallOgKvartal
                     )
@@ -449,7 +454,7 @@ internal class AggregertStatistikkServiceTest {
         )
         assertThat(result?.prosentSiste4KvartalerLangtid).isEqualTo(
             listOf(
-                StatistikkDto(
+                StatistikkJson(
                     Statistikkategori.NÆRING, "Offentlig administrasjon og forsvar, og trygdeordninger underlagt offentlig forvaltning", "6.1", 20, listOf(
                         årstallOgKvartal
                     )

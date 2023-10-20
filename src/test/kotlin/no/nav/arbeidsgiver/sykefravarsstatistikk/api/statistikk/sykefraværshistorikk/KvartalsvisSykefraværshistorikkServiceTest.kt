@@ -2,8 +2,13 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.enNæringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.etOrgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregering.KvartalsvisSykefraværshistorikkService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.KvartalsvisSykefraværshistorikkService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværForEttKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.UnderenhetLegacy
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.KvartalsvisSykefraværshistorikkJson
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KvartalsvisSykefraværRepository
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -41,7 +46,7 @@ class KvartalsvisSykefraværshistorikkServiceTest {
     @Test
     fun hentSykefraværshistorikk__skal_returnere_en_næring_dersom_virksomhet_er_i_bransjeprogram_på_2_siffer_nivå() {
         val underenhet = UnderenhetLegacy(etOrgnr(), etOrgnr(), "Underenhet AS", enNæringskode("10300"), 40)
-        val kvartalsvisSykefraværshistorikk: List<KvartalsvisSykefraværshistorikk> =
+        val kvartalsvisSykefraværshistorikk: List<KvartalsvisSykefraværshistorikkJson> =
             kvartalsvisSykefraværshistorikkService!!.hentSykefraværshistorikk(
                 underenhet, Sektor.PRIVAT
             )
@@ -58,13 +63,13 @@ class KvartalsvisSykefraværshistorikkServiceTest {
 
     companion object {
         private fun assertThatHistorikkHarKategori(
-            kvartalsvisSykefraværshistorikk: List<KvartalsvisSykefraværshistorikk>,
+            kvartalsvisSykefraværshistorikkJson: List<KvartalsvisSykefraværshistorikkJson>,
             statistikkategori: Statistikkategori,
             expected: Boolean
         ) {
             Assertions.assertThat(
-                kvartalsvisSykefraværshistorikk.stream()
-                    .anyMatch { (type): KvartalsvisSykefraværshistorikk -> type == statistikkategori })
+                kvartalsvisSykefraværshistorikkJson.stream()
+                    .anyMatch { (type): KvartalsvisSykefraværshistorikkJson -> type == statistikkategori })
                 .isEqualTo(expected)
         }
 
