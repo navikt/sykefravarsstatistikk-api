@@ -160,7 +160,6 @@ class StatistikkRepository(
         return SlettOgOpprettResultat(antallSlettet, antallOprettet)
     }
 
-    // Slett metoder
     fun slettSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal: ÅrstallOgKvartal): Int {
         val namedParameters: SqlParameterSource = MapSqlParameterSource()
             .addValue(SykefraværsstatistikkIntegrasjon.ARSTALL, årstallOgKvartal.årstall)
@@ -187,7 +186,6 @@ class StatistikkRepository(
         )
     }
 
-    // batchOpprett metoder
     fun batchOpprettSykefraværsstatistikkNæringMedVarighet(
         sykefraværsstatistikk: List<Sykefraværsstatistikk>, insertBatchStørrelse: Int
     ): Int {
@@ -214,7 +212,6 @@ class StatistikkRepository(
         return antallOpprettet.get()
     }
 
-    // opprett metoder
     fun opprettSykefraværsstatistikkNæringMedVarighet(
         sykefraværsstatistikk: List<Sykefraværsstatistikk?>
     ): Int {

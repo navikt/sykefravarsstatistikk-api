@@ -54,7 +54,7 @@ class SykefraværForEttKvartalTest {
                         6
                     )
                 )
-            ) == utenStatistikk()
+            ) == SykefraværFlereKvartalerForEksport(listOf())
         )
             .isFalse()
     }

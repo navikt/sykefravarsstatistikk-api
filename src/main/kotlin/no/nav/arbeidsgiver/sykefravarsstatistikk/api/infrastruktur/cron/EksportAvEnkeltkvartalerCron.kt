@@ -72,7 +72,7 @@ class EksportAvEnkeltkvartalerCron(
                     return
                 }
 
-            for (kategori in kategorier) {
+            kategorier.forEach { kategori ->
                 runCatching {
                     eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(
                         kvartal,

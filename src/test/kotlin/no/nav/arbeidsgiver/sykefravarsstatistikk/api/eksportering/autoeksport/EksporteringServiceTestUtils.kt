@@ -226,12 +226,31 @@ object EksporteringServiceTestUtils {
         årstallOgKvartal: ÅrstallOgKvartal, orgnr: String
     ): SykefraværsstatistikkVirksomhetUtenVarighet {
         return SykefraværsstatistikkVirksomhetUtenVarighet(
-            årstallOgKvartal.årstall,
-            årstallOgKvartal.kvartal,
-            orgnr,
-            6,
-            BigDecimal(10),
-            BigDecimal(500)
+            årstall = årstallOgKvartal.årstall,
+            kvartal = årstallOgKvartal.kvartal,
+            orgnr = orgnr,
+            antallPersoner = 6,
+            tapteDagsverk = BigDecimal(10),
+            muligeDagsverk = BigDecimal(500)
+        )
+    }
+
+    fun sykefraværsstatistikkVirksomhetGradert(
+        årstallOgKvartal: ÅrstallOgKvartal, orgnr: String
+    ): SykefraværsstatistikkVirksomhetMedGradering {
+        return SykefraværsstatistikkVirksomhetMedGradering(
+            årstall = årstallOgKvartal.årstall,
+            kvartal = årstallOgKvartal.kvartal,
+            orgnr = orgnr,
+            næring = "10",
+            næringkode = "10111",
+            rectype = "3",
+            antallGraderteSykemeldinger = 100,
+            tapteDagsverkGradertSykemelding = BigDecimal(5),
+            antallSykemeldinger = 200,
+            antallPersoner = 6,
+            tapteDagsverk = BigDecimal(10),
+            muligeDagsverk = BigDecimal(100),
         )
     }
 
