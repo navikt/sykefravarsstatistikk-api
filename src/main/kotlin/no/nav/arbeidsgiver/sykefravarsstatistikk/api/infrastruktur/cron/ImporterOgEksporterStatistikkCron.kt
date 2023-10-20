@@ -22,7 +22,7 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit.MINUTES
 
 @Component
-class ImporteringScheduler(
+class ImporterOgEksporterStatistikkCron(
     registry: MeterRegistry,
     private val taskExecutor: LockingTaskExecutor,
     private val importeringService: SykefraværsstatistikkImporteringService,

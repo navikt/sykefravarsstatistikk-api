@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.etÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværFlereKvartalerForEksport.Companion.utenStatistikk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.domenemodeller.SykefraværMedKategori.Companion.utenStatistikk
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
@@ -50,7 +49,7 @@ class SykefraværForEttKvartalTest {
                         6
                     )
                 )
-            ) == utenStatistikk()
+            ) == SykefraværFlereKvartalerForEksport(listOf())
         )
             .isFalse()
     }

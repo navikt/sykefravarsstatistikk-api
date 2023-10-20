@@ -149,6 +149,35 @@ class SykefraværsstatistikkTilEksporteringRepository(
         }
     }
 
+    fun hentSykefraværAlleVirksomheterGradert(
+        fraÅrstallOgKvartal: ÅrstallOgKvartal,
+        tilÅrstallOgKvartal: ÅrstallOgKvartal,
+    ): List<SykefraværsstatistikkVirksomhetMedGradering> {
+        return runCatching {
+            // language=PostgreSQL
+            namedParameterJdbcTemplate.query(
+                """
+                    select arstall, kvartal, orgnr, naring, naring_kode, rectype,
+                    sum(antall_graderte_sykemeldinger) as antall_graderte_sykemeldinger,
+                    sum(tapte_dagsverk_gradert_sykemelding) as tapte_dagsverk_gradert_sykemelding,
+                    sum(antall_personer) as antall_personer,
+                    sum(antall_sykemeldinger) as antall_sykemeldinger,
+                    sum(tapte_dagsverk) as tapte_dagsverk,
+                    sum(mulige_dagsverk) as mulige_dagsverk
+                    from sykefravar_statistikk_virksomhet_med_gradering
+                    where ${getWhereClause(fraÅrstallOgKvartal, tilÅrstallOgKvartal)}
+                    group by arstall, kvartal, orgnr, naring, naring_kode, rectype
+                """.trimIndent()
+            ) { rs: ResultSet, _: Int -> mapTilSykefraværsstatistikkVirksomhetMedGradering(rs) }
+        }.getOrElse {
+            if (it is EmptyResultDataAccessException) {
+                emptyList()
+            } else {
+                throw it
+            }
+        }
+    }
+
     fun hentSykefraværAlleNæringerFraOgMed(
         fraÅrstallOgKvartal: ÅrstallOgKvartal
     ): List<SykefraværsstatistikkForNæring> {
@@ -218,8 +247,28 @@ class SykefraværsstatistikkTilEksporteringRepository(
             rs.getInt("antall_personer"),
             rs.getBigDecimal("tapte_dagsverk"),
             rs.getBigDecimal("mulige_dagsverk")
+
+
         )
     }
+
+    @Throws(SQLException::class)
+    private fun mapTilSykefraværsstatistikkVirksomhetMedGradering(
+        resultSet: ResultSet
+    ): SykefraværsstatistikkVirksomhetMedGradering = SykefraværsstatistikkVirksomhetMedGradering(
+        årstall = resultSet.getInt("arstall"),
+        kvartal = resultSet.getInt("kvartal"),
+        orgnr = resultSet.getString("orgnr"),
+        næring = resultSet.getString("naring"),
+        næringkode = resultSet.getString("naring_kode"),
+        rectype = resultSet.getString("rectype"),
+        antallGraderteSykemeldinger = resultSet.getInt("antall_graderte_sykemeldinger"),
+        tapteDagsverkGradertSykemelding = resultSet.getBigDecimal("tapte_dagsverk_gradert_sykemelding"),
+        antallSykemeldinger = resultSet.getInt("antall_sykemeldinger"),
+        antallPersoner = resultSet.getInt("antall_personer"),
+        tapteDagsverk = resultSet.getBigDecimal("tapte_dagsverk"),
+        muligeDagsverk = resultSet.getBigDecimal("mulige_dagsverk"),
+    )
 
     companion object {
         // Utilities
