@@ -6,8 +6,8 @@ import arrow.core.left
 import arrow.core.right
 import net.javacrumbs.shedlock.core.LockConfiguration
 import net.javacrumbs.shedlock.core.LockingTaskExecutor
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoApi.PubliseringsdatoerService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoApi.PubliseringsdatoerService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
 import org.slf4j.LoggerFactory
@@ -41,6 +41,10 @@ open class FjernStatistikkEldreEnnFemÅrCron(
 
     fun slettDataEldreEnnFemÅr() {
         val sistePubliserteKvartal = publiseringsdatoerService.hentSistePubliserteKvartal()
+            ?: run {
+                log.error("Fant ikke siste publiserte kvartal")
+                return
+            }
 
         sjekkAtSistePubliserteKvartalErForsvarlig(sistePubliserteKvartal).getOrElse {
             log.error("Siste publiserte kvartal $sistePubliserteKvartal er ikke forsvarlig")

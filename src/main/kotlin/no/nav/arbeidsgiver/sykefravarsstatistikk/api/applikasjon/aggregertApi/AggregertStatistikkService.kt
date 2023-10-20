@@ -3,11 +3,11 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoApi.PubliseringsdatoerService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.TilgangskontrollService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.domene.Sykefraværsdata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.domene.UmaskertSykefraværForEttKvartalMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoApi.PubliseringsdatoerService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.TilgangskontrollService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.GraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VarighetRepository
@@ -79,6 +79,7 @@ class AggregertStatistikkService(
         langtidsfravær: Sykefraværsdata
     ): AggregertStatistikkJson {
         val sistePubliserteKvartal = publiseringsdatoerService.hentSistePubliserteKvartal()
+            ?: throw IllegalStateException("Fant ikke siste publiserte kvartal")
         val kalkulatorTotal = Aggregeringskalkulator(totalfravær, sistePubliserteKvartal)
         val kalkulatorGradert = Aggregeringskalkulator(gradertFravær, sistePubliserteKvartal)
         val kalkulatorKorttid = Aggregeringskalkulator(korttidsfravær, sistePubliserteKvartal)
@@ -123,8 +124,10 @@ class AggregertStatistikkService(
     }
 
     private fun hentTotalfraværSisteFemKvartaler(forBedrift: Virksomhet): Sykefraværsdata {
+        val fraÅrstallOgKvartal = publiseringsdatoerService.hentSistePubliserteKvartal()?.minusKvartaler(4)
+            ?: throw IllegalStateException("Fant ikke siste publiserte kvartal")
         return sykefraværprosentRepository.hentTotaltSykefraværAlleKategorier(
-            forBedrift, publiseringsdatoerService.hentSistePubliserteKvartal().minusKvartaler(4)
+            forBedrift, fraÅrstallOgKvartal
         )
     }
 
