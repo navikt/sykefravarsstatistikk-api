@@ -3,7 +3,9 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsda
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.PubliseringsdatoerRepository
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.bind.annotation.ResponseStatus
 import java.time.LocalDate
 
 @Service
@@ -14,22 +16,21 @@ class PubliseringsdatoerService(
 
     fun hentSistePubliserteKvartal(): ÅrstallOgKvartal {
         return importtidspunktRepository.hentNyesteImporterteKvartal()?.gjeldendePeriode
-            ?: throw PubliseringsdatoerDatauthentingFeil("Kunne ikke hente ut siste publiseringstidspunkt")
+            ?: throw PubliseringsdatoerDatauthentingFeil("Kunne ikke hente ut siste publiserte kvartal")
     }
 
-    fun hentPubliseringsdatoer(): PubliseringsdatoerJson {
+    fun hentPubliseringsdatoer(): Publiseringsdatoer? {
         val publiseringsdatoer = publiseringsdatoerRepository.hentPubliseringsdatoer()
-        val sisteImporttidspunkt = importtidspunktRepository.hentNyesteImporterteKvartal()
-            ?: throw PubliseringsdatoerDatauthentingFeil("Klarte ikke hente forrige publiseringstidspunkt fra databasen")
+        val nyesteImport = importtidspunktRepository.hentNyesteImporterteKvartal()
+            ?: return null
 
         val nestePubliseringsdato =
-            finnNestePubliseringsdato(publiseringsdatoer, sisteImporttidspunkt.sistImportertTidspunkt)
+            finnNestePubliseringsdato(publiseringsdatoer, nyesteImport.sistImportertTidspunkt)
 
-        return PubliseringsdatoerJson(
-            sistePubliseringsdato = sisteImporttidspunkt.sistImportertTidspunkt.toString(),
-            gjeldendePeriode = sisteImporttidspunkt.gjeldendePeriode,
-            nestePubliseringsdato = nestePubliseringsdato?.toString()
-                ?: "Neste publiseringsdato er utilgjengelig"
+        return Publiseringsdatoer(
+            sistePubliseringsdato = nyesteImport.sistImportertTidspunkt,
+            gjeldendePeriode = nyesteImport.gjeldendePeriode,
+            nestePubliseringsdato = nestePubliseringsdato
         )
     }
 
@@ -39,3 +40,7 @@ class PubliseringsdatoerService(
         .filter { it.offentligDato.isAfter(forrigeImporttidspunkt) }
         .minOfOrNull { it.offentligDato }
 }
+
+
+@ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
+class PubliseringsdatoerDatauthentingFeil(message: String?) : RuntimeException(message)

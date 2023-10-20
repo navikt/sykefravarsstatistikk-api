@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.publiseringsdatoer.api
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoApi.PubliseringsdatoerService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktDto
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoApi.Publiseringsdato
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoApi.PubliseringsdatoerJson
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoApi.Publiseringsdatoer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.PubliseringsdatoerRepository
@@ -76,7 +76,13 @@ internal class PubliseringsdatoerServiceTest {
             .thenReturn(sisteImporttidspunkt)
         Mockito.`when`(mockPubliseringsdatoerRepository?.hentPubliseringsdatoer()).thenReturn(publiseringsdatoer)
         val faktiskeDatoer = serviceUnderTest!!.hentPubliseringsdatoer()
-        val forventet = PubliseringsdatoerJson("2022-09-08", "2022-12-01", ÅrstallOgKvartal(2022, 2))
+
+        val forventet = Publiseringsdatoer(
+            LocalDate.parse("2022-09-08"),
+            ÅrstallOgKvartal(2022, 2),
+            LocalDate.parse("2022-12-01")
+        )
+
         Assertions.assertThat(faktiskeDatoer).isEqualTo(forventet)
     }
 
@@ -90,7 +96,11 @@ internal class PubliseringsdatoerServiceTest {
             .thenReturn(enDagEtterPlanlagtImport)
         Mockito.`when`(mockPubliseringsdatoerRepository?.hentPubliseringsdatoer()).thenReturn(publiseringsdatoer)
         val faktiskeDatoer = serviceUnderTest!!.hentPubliseringsdatoer()
-        val forventet = PubliseringsdatoerJson("2022-06-03", "2022-09-08", ÅrstallOgKvartal(2022, 1))
+        val forventet = Publiseringsdatoer(
+            LocalDate.parse("2022-06-03"),
+            ÅrstallOgKvartal(2022, 1),
+            LocalDate.parse("2022-09-08")
+        )
         Assertions.assertThat(faktiskeDatoer).isEqualTo(forventet)
     }
 }
