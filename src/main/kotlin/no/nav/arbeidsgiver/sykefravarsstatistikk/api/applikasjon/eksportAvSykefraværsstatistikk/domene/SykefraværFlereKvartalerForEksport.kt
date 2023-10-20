@@ -36,11 +36,4 @@ data class SykefraværFlereKvartalerForEksport(
             if (umaskertSykefravær.isEmpty()) 0
             else umaskertSykefravær.maxByOrNull { it.årstallOgKvartal }!!.antallPersoner
     }
-
-    companion object {
-
-        fun utenStatistikk(): SykefraværFlereKvartalerForEksport {
-            return SykefraværFlereKvartalerForEksport(listOf())
-        }
-    }
 }

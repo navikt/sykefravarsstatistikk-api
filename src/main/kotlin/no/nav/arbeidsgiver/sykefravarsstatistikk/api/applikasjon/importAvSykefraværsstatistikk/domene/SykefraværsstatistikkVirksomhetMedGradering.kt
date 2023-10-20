@@ -4,16 +4,16 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sy
 import java.math.BigDecimal
 
 data class SykefraværsstatistikkVirksomhetMedGradering(
-    override val årstall: Int = 0,
-    override val kvartal: Int = 0,
-    val orgnr: String? = null,
-    val næring: String? = null,
-    val næringkode: String? = null,
-    val rectype: String? = null,
-    val antallGraderteSykemeldinger: Int = 0,
-    val tapteDagsverkGradertSykemelding: BigDecimal? = null,
-    val antallSykemeldinger: Int = 0,
-    override val antallPersoner: Int = 0,
+    override val årstall: Int,
+    override val kvartal: Int,
+    val orgnr: String,
+    val næring: String,
+    val næringkode: String,
+    val rectype: String,
+    val antallGraderteSykemeldinger: Int,
+    val tapteDagsverkGradertSykemelding: BigDecimal,
+    val antallSykemeldinger: Int,
+    override val antallPersoner: Int,
     override val tapteDagsverk: BigDecimal,
     override val muligeDagsverk: BigDecimal
 ) : Sykefraværsstatistikk

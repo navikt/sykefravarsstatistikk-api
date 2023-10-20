@@ -18,14 +18,14 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.Impo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class ImporteringSchedulerTest {
+class ImporterOgEksporterStatistikkCronTest {
     private val importeringService = mockk<SykefraværsstatistikkImporteringService>()
     private val importEksportStatusRepository = mockk<ImportEksportStatusRepository>(relaxed = true)
     private val virksomhetMetadataService = mockk<VirksomhetMetadataService>()
     private val eksporteringsService = mockk<EksporteringService>()
     private val eksporteringPerStatistikkKategoriService = mockk<EksporteringPerStatistikkKategoriService>()
     private val eksporteringMetadataVirksomhetService = mockk<EksporteringMetadataVirksomhetService>()
-    private val importeringScheduler = ImporteringScheduler(
+    private val importerOgEksporterStatistikkCron = ImporterOgEksporterStatistikkCron(
         taskExecutor = mockk(),
         importeringService = importeringService,
         registry = mockk(relaxed = true),
@@ -55,7 +55,7 @@ class ImporteringSchedulerTest {
         every { importEksportStatusRepository.hentFullførteJobber(any()) } returns listOf(IMPORTERT_STATISTIKK)
         every { virksomhetMetadataService.overskrivMetadataForVirksomheter(any()) } returns IngenRaderImportert.left()
 
-        importeringScheduler.gjennomførImportOgEksport()
+        importerOgEksporterStatistikkCron.gjennomførImportOgEksport()
 
         verify(exactly = 0) { importEksportStatusRepository.leggTilFullførtJobb(any(), any()) }
     }
@@ -64,7 +64,7 @@ class ImporteringSchedulerTest {
     fun `importEksport burde markere IMPORTERT_STATUISTIKK-jobb som kjørt når det finnes ny statistikk men resten feiler`() {
         every { virksomhetMetadataService.overskrivMetadataForVirksomheter(any()) } returns IngenRaderImportert.left()
 
-        importeringScheduler.gjennomførImportOgEksport()
+        importerOgEksporterStatistikkCron.gjennomførImportOgEksport()
 
         verify(exactly = 1) { importEksportStatusRepository.leggTilFullførtJobb(any(), any()) }
         verify(exactly = 1) { importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_STATISTIKK, any()) }
@@ -72,7 +72,7 @@ class ImporteringSchedulerTest {
 
     @Test
     fun `importEksport burde markere alle jobber som kjørt når det finnes ny statistikk og ingenting feiler`() {
-        importeringScheduler.gjennomførImportOgEksport()
+        importerOgEksporterStatistikkCron.gjennomførImportOgEksport()
 
         verify(exactly = ImportEksportJobb.entries.size) {
             importEksportStatusRepository.leggTilFullførtJobb(any(), any())
@@ -82,7 +82,7 @@ class ImporteringSchedulerTest {
     @Test
     fun `importEksport bør fortsette der den slapp`() {
         every { importEksportStatusRepository.hentFullførteJobber(any()) } returns listOf(IMPORTERT_STATISTIKK, IMPORTERT_VIRKSOMHETDATA)
-        importeringScheduler.gjennomførImportOgEksport()
+        importerOgEksporterStatistikkCron.gjennomførImportOgEksport()
 
         verify(exactly = 0) { virksomhetMetadataService.overskrivMetadataForVirksomheter(any()) }
         verify(exactly = 1) { virksomhetMetadataService.overskrivNæringskoderForVirksomheter(any())}

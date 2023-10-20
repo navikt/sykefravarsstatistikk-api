@@ -14,9 +14,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.PrometheusMet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.InternalController
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.OrganisasjonerController
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.SykefraværshistorikkController
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.EksportAvEnkeltkvartalerCron
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.FjernStatistikkEldreEnnFemÅrCron
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImporteringScheduler
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
 import org.springframework.boot.SpringBootConfiguration
@@ -40,7 +38,7 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
             TokenService::class,
             EksporteringService::class,
             EksporteringPerStatistikkKategoriService::class,
-            ImporteringScheduler::class,
+            ImporterOgEksporterStatistikkCron::class,
             SykefraværsstatistikkImporteringService::class,
             VirksomhetMetadataService::class,
             OrganisasjonerController::class,
@@ -55,7 +53,8 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
             PrometheusMetrics::class,
             KafkaClient::class,
             EksportAvEnkeltkvartalerCron::class,
-            FjernStatistikkEldreEnnFemÅrCron::class]
+            FjernStatistikkEldreEnnFemÅrCron::class,
+            EksportAvGradertStatistikkCron::class]
     )]
 )
 open class AppConfigForJdbcTesterConfig : JdbcRepositoryConfigExtension()

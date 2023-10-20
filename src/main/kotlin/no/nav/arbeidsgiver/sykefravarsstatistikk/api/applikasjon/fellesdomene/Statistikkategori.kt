@@ -7,5 +7,6 @@ enum class Statistikkategori {
     BRANSJE,
     OVERORDNET_ENHET,
     VIRKSOMHET,
-    NÆRINGSKODE
+    VIRKSOMHET_GRADERT,
+    NÆRINGSKODE,
 }
