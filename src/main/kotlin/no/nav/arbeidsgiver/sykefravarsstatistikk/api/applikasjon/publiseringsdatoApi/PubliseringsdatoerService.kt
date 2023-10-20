@@ -11,10 +11,6 @@ class PubliseringsdatoerService(
     private val importtidspunktRepository: ImporttidspunktRepository
 ) {
 
-    fun hentSistePubliserteKvartal(): ÅrstallOgKvartal? {
-        return importtidspunktRepository.hentNyesteImporterteKvartal()?.gjeldendePeriode
-    }
-
     fun hentPubliseringsdatoer(): Publiseringsdatoer? {
         val publiseringsdatoer = publiseringsdatoerRepository.hentPubliseringsdatoer()
         val nyesteImport = importtidspunktRepository.hentNyesteImporterteKvartal()

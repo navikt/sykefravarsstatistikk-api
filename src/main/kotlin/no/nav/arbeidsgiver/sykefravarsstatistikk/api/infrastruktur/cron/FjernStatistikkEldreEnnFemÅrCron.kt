@@ -7,7 +7,7 @@ import arrow.core.right
 import net.javacrumbs.shedlock.core.LockConfiguration
 import net.javacrumbs.shedlock.core.LockingTaskExecutor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoApi.PubliseringsdatoerService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
 import org.slf4j.LoggerFactory
@@ -22,7 +22,7 @@ import java.time.temporal.ChronoUnit.MINUTES
 @Component
 open class FjernStatistikkEldreEnnFemÅrCron(
     private val taskExecutor: LockingTaskExecutor,
-    private val publiseringsdatoerService: PubliseringsdatoerService,
+    private val importtidspunktRepository: ImporttidspunktRepository,
     private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
     private val sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
     private val clock: Clock,
@@ -40,11 +40,12 @@ open class FjernStatistikkEldreEnnFemÅrCron(
     }
 
     fun slettDataEldreEnnFemÅr() {
-        val sistePubliserteKvartal = publiseringsdatoerService.hentSistePubliserteKvartal()
-            ?: run {
-                log.error("Fant ikke siste publiserte kvartal")
-                return
-            }
+        val sistePubliserteKvartal =
+            importtidspunktRepository.hentNyesteImporterteKvartal()?.gjeldendePeriode
+                ?: run {
+                    log.error("Fant ikke siste publiserte kvartal")
+                    return
+                }
 
         sjekkAtSistePubliserteKvartalErForsvarlig(sistePubliserteKvartal).getOrElse {
             log.error("Siste publiserte kvartal $sistePubliserteKvartal er ikke forsvarlig")

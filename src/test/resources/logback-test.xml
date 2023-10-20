@@ -14,7 +14,7 @@
         <logger name="org.springframework.web" level="info"/>
     </springProfile>
 
-    <appender name="static-appender" class="common.StaticAppender"/>
+    <appender name="static-appender" class="config.StaticAppender"/>
     <root level="error">
         <appender-ref ref="static-appender"/>
     </root>
