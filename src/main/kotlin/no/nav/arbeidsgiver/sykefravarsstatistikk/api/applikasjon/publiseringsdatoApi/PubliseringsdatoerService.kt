@@ -1,72 +1,42 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoApi
 
-import io.vavr.control.Option
-import io.vavr.control.Try
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.PubliseringsdatoerRepository
-import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import java.time.LocalDate
-import java.util.stream.Collectors
+import org.springframework.web.bind.annotation.ResponseStatus
 
 @Service
-class PubliseringsdatoerService(private val publiseringsdatoerRepository: PubliseringsdatoerRepository) {
-
-    private val log = LoggerFactory.getLogger(this::class.java)
+class PubliseringsdatoerService(
+    private val publiseringsdatoerRepository: PubliseringsdatoerRepository,
+    private val importtidspunktRepository: ImporttidspunktRepository
+) {
 
     fun hentSistePubliserteKvartal(): ÅrstallOgKvartal {
-        return publiseringsdatoerRepository.hentSisteImporttidspunkt()?.gjeldendePeriode
-            ?: throw PubliseringsdatoerDatauthentingFeil("Kunne ikke hente ut siste publiseringstidspunkt")
+        return importtidspunktRepository.hentNyesteImporterteKvartal()?.gjeldendePeriode
+            ?: throw PubliseringsdatoerDatauthentingFeil("Kunne ikke hente ut siste publiserte kvartal")
     }
 
-    fun hentPubliseringsdatoer(): PubliseringsdatoerJson? {
+    fun hentPubliseringsdatoer(): Publiseringsdatoer? {
         val publiseringsdatoer = publiseringsdatoerRepository.hentPubliseringsdatoer()
-        return publiseringsdatoerRepository
-            .hentSisteImporttidspunkt()?.let {
-                PubliseringsdatoerJson(
-                    sistePubliseringsdato = it.importertDato.toString(),
-                    gjeldendePeriode = it.gjeldendePeriode,
-                    nestePubliseringsdato = finnNestePubliseringsdato(publiseringsdatoer, it.importertDato)
-                        .map { localDate -> localDate.toString() }
-                        .getOrElse("Neste publiseringsdato er utilgjengelig")
-                )
-            }
-    }
+        val nyesteImport = importtidspunktRepository.hentNyesteImporterteKvartal()
+            ?: return null
 
-    private fun finnNestePubliseringsdato(
-        publiseringsdatoer: List<Publiseringsdato>, forrigeImporttidspunkt: LocalDate
-    ): Option<LocalDate> {
-        val fremtidigePubliseringsdatoer = sorterEldsteDatoerFørst(
-            filtrerBortDatoerEldreEnnForrigeLanseringsdato(
-                publiseringsdatoer, forrigeImporttidspunkt
-            )
+        val nestePubliseringsdato =
+            publiseringsdatoer
+                .filter { it.offentligDato.isAfter(nyesteImport.sistImportertTidspunkt) }
+                .minOfOrNull { it.offentligDato }
+
+        return Publiseringsdatoer(
+            sistePubliseringsdato = nyesteImport.sistImportertTidspunkt,
+            gjeldendePeriode = nyesteImport.gjeldendePeriode,
+            nestePubliseringsdato = nestePubliseringsdato
         )
-        return Try.of { fremtidigePubliseringsdatoer[0].offentligDato.toLocalDate() }
-            .onFailure { log.warn("Ingen senere publiseringsdatoer er tilgjengelige i kalenderen") }
-            .toOption()
     }
 
-    private fun filtrerBortDatoerEldreEnnForrigeLanseringsdato(
-        publiseringsdatoer: List<Publiseringsdato>, forrigePubliseringsdato: LocalDate
-    ): List<Publiseringsdato> {
-        return publiseringsdatoer.stream()
-            .filter { (_, offentligDato): Publiseringsdato ->
-                offentligDato.toLocalDate().isAfter(forrigePubliseringsdato)
-            }
-            .collect(Collectors.toList())
-    }
-
-    companion object {
-        private fun sorterEldsteDatoerFørst(
-            datoer: List<Publiseringsdato>
-        ): List<Publiseringsdato> {
-            return datoer.stream()
-                .sorted { obj: Publiseringsdato, annen: Publiseringsdato? ->
-                    obj.sammenlignPubliseringsdatoer(
-                        annen!!
-                    )
-                }
-                .collect(Collectors.toList())
-        }
-    }
 }
+
+
+@ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
+class PubliseringsdatoerDatauthentingFeil(message: String?) : RuntimeException(message)

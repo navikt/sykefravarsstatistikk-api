@@ -4,7 +4,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sy
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.PubliseringsdatoerRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.StatistikkRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.slf4j.LoggerFactory
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component
 class SykefraværsstatistikkImporteringService(
     private val statistikkRepository: StatistikkRepository,
     private val datavarehusRepository: DatavarehusRepository,
-    private val publiseringsdatoerRepository: PubliseringsdatoerRepository,
+    private val importtidspunktRepository: ImporttidspunktRepository,
     private val environment: Environment
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -65,7 +65,7 @@ class SykefraværsstatistikkImporteringService(
     }
 
     private fun oppdaterPubliseringsstatus(gjeldendeÅrstallOgKvartal: ÅrstallOgKvartal) {
-        publiseringsdatoerRepository.oppdaterSisteImporttidspunkt(gjeldendeÅrstallOgKvartal)
+        importtidspunktRepository.settInnImporttidspunkt(gjeldendeÅrstallOgKvartal)
     }
 
 

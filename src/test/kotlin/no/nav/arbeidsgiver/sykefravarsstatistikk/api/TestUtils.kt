@@ -4,18 +4,21 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.N�
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkSektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktDto
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkSektorUtils
+import org.jetbrains.exposed.sql.deleteAll
+import org.jetbrains.exposed.sql.insert
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.core.namedparam.SqlParameterSource
 import java.math.BigDecimal
 import java.sql.ResultSet
-import java.sql.Timestamp
+import java.time.LocalDate
 
 object TestUtils {
     @JvmField
     val PRODUKSJON_NYTELSESMIDLER = Næring("10")
+
     @JvmField
     val SISTE_PUBLISERTE_KVARTAL = ÅrstallOgKvartal(2022, 1)
     fun sisteKvartalMinus(n: Int): ÅrstallOgKvartal {
@@ -139,7 +142,7 @@ object TestUtils {
     fun opprettStatistikkForSektor(jdbcTemplate: NamedParameterJdbcTemplate?) {
         SykefraværsstatistikkSektorUtils(jdbcTemplate)
             .getBatchCreateFunction(
-                java.util.List.of(
+                listOf(
                     SykefraværsstatistikkSektor(
                         SISTE_PUBLISERTE_KVARTAL.årstall,
                         SISTE_PUBLISERTE_KVARTAL.kvartal,
@@ -286,18 +289,8 @@ object TestUtils {
     }
 
 
-    fun slettAlleImporttidspunkt(jdbcTemplate: NamedParameterJdbcTemplate) {
-        jdbcTemplate.update("delete from importtidspunkt", MapSqlParameterSource())
-    }
-
-
-    fun skrivSisteImporttidspunktTilDb(jdbcTemplate: NamedParameterJdbcTemplate) {
-        skrivImporttidspunktTilDb(
-            jdbcTemplate,
-            ImporttidspunktDto(
-                Timestamp.valueOf("2022-06-02 10:00:00.0"), SISTE_PUBLISERTE_KVARTAL
-            )
-        )
+    fun ImporttidspunktRepository.slettAlleImporttidspunkt() {
+        transaction { deleteAll() }
     }
 
 
@@ -330,19 +323,6 @@ object TestUtils {
             "insert into kafka_utsending_historikk (orgnr, key_json, value_json) "
                     + "VALUES (:orgnr, :key, :value)",
             parametre
-        )
-    }
-
-    private fun skrivImporttidspunktTilDb(
-        jdbcTemplate: NamedParameterJdbcTemplate, importtidspunkt: ImporttidspunktDto
-    ) {
-        jdbcTemplate.update(
-            "insert into importtidspunkt (aarstall, kvartal, importert) values "
-                    + "(:aarstall, :kvartal, :importert)",
-            MapSqlParameterSource()
-                .addValue("aarstall", importtidspunkt.gjeldendePeriode.årstall)
-                .addValue("kvartal", importtidspunkt.gjeldendePeriode.kvartal)
-                .addValue("importert", importtidspunkt.importertDato)
         )
     }
 }
