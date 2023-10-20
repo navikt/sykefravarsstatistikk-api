@@ -2,14 +2,9 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.statistikk.sykefraværshis
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.etÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.domene.SykefraværFlereKvartalerForEksport.Companion.utenStatistikk
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.domene.SykefraværMedKategori.Companion.utenStatistikk
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.domene.SykefraværFlereKvartalerForEksport
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværForEttKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportering.domene.SykefraværMedKategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.UmaskertSykefraværForEttKvartal
 import org.assertj.core.api.Assertions
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.SykefraværMedKategori.Companion.utenStatistikk
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.SykefraværFlereKvartalerForEksport
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 

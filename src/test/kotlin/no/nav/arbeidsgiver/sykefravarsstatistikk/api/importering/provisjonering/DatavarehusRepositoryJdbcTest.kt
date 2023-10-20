@@ -8,7 +8,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_2
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.TestData.ORGNR_VIRKSOMHET_3
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.domene.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.DatavarehusRepositoryJdbcTestUtils.cleanUpTestDb
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.DatavarehusRepositoryJdbcTestUtils.insertOrgenhetInDvhTabell
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.importering.provisjonering.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkLandInDvhTabell

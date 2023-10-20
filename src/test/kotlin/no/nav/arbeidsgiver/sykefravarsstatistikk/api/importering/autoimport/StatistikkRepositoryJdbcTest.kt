@@ -12,10 +12,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.do
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertApi.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.UmaskertSykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.domene.Statistikkilde
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.domene.SykefraværsstatistikkNæringMedVarighet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.domene.SykefraværsstatistikkVirksomhet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importering.domene.SykefraværsstatistikkVirksomhetMedGradering
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Statistikkilde
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkNæringMedVarighet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.StatistikkRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.assertj.core.api.Assertions
