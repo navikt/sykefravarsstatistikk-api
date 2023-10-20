@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - gradert-topic
+      - idiomatisk-kotlin
     paths-ignore:
       - '**.md'
       - '**/**.md'

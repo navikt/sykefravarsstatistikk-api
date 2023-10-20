@@ -25,7 +25,6 @@ internal open class ImporttidspunktRepositoryTest {
     @Test
     fun `hentSisteImporttidspunkt skal returnerer nyeste importerte kvartal`() {
 
-
         importtidspunktRepository.settInnImporttidspunkt(ÅrstallOgKvartal(2023, 1))
         importtidspunktRepository.settInnImporttidspunkt(ÅrstallOgKvartal(2023, 3))
         importtidspunktRepository.settInnImporttidspunkt(ÅrstallOgKvartal(2022, 4))
