@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoApi
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer
 
 import java.time.LocalDate
 

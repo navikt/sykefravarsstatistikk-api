@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKva
 
 import arrow.core.right
 import testUtils.TestUtils
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoApi.PubliseringsdatoerService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.TilgangskontrollService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Sykefraværsdata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
@@ -47,9 +46,6 @@ internal class AggregertStatistikkServiceTest {
     @Mock
     private lateinit var mockVarighetRepository: VarighetRepository
 
-    @Mock
-    private lateinit var publiseringsdatoerService: PubliseringsdatoerService
-
     @BeforeEach
     fun setUp() {
         whenever(
@@ -62,7 +58,6 @@ internal class AggregertStatistikkServiceTest {
             mockVarighetRepository,
             mockTilgangskontrollService,
             mockEnhetsregisteretClient,
-            publiseringsdatoerService,
             mockImporttidspunktRepository
         )
     }
