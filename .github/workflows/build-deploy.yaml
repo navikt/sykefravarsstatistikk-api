@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - idiomatisk_kotlin
+      - test_vault
     paths-ignore:
       - '**.md'
       - '**/**.md'
