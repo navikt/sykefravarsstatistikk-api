@@ -14,36 +14,9 @@ import java.util.*
 
 @Component
 class SykefraværRepository(
-    @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate
+    @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
+    private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
 ) {
-    fun hentUmaskertSykefravær(
-        virksomhet: Virksomhet, fraÅrstallOgKvartal: ÅrstallOgKvartal
-    ): List<UmaskertSykefraværForEttKvartal> {
-        return try {
-            namedParameterJdbcTemplate.query(
-                "SELECT sum(tapte_dagsverk) as tapte_dagsverk,"
-                        + "sum(mulige_dagsverk) as mulige_dagsverk,"
-                        + "sum(antall_personer) as antall_personer,"
-                        + "arstall, kvartal "
-                        + "FROM sykefravar_statistikk_virksomhet "
-                        + "where orgnr = :orgnr "
-                        + "and ("
-                        + "  (arstall = :arstall and kvartal >= :kvartal) "
-                        + "  or "
-                        + "  (arstall > :arstall)"
-                        + ") "
-                        + "GROUP BY arstall, kvartal "
-                        + "ORDER BY arstall, kvartal ",
-                MapSqlParameterSource()
-                    .addValue("orgnr", virksomhet.orgnr.verdi)
-                    .addValue("arstall", fraÅrstallOgKvartal.årstall)
-                    .addValue("kvartal", fraÅrstallOgKvartal.kvartal)
-            ) { rs: ResultSet, _: Int -> mapTilUmaskertSykefraværForEttKvartal(rs) }.sorted()
-        } catch (e: EmptyResultDataAccessException) {
-            emptyList()
-        }
-    }
-
     fun hentUmaskertSykefravær(
         bransje: Bransje, fraÅrstallOgKvartal: ÅrstallOgKvartal
     ): List<UmaskertSykefraværForEttKvartal> {
@@ -127,7 +100,7 @@ class SykefraværRepository(
         val maybeBransje = finnBransje(virksomhet.næringskode)
         val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> =
             EnumMap(Statistikkategori::class.java)
-        data[Statistikkategori.VIRKSOMHET] = hentUmaskertSykefravær(virksomhet, fraÅrstallOgKvartal)
+        data[Statistikkategori.VIRKSOMHET] = sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(virksomhet, fraÅrstallOgKvartal)
         data[Statistikkategori.LAND] = hentUmaskertSykefraværForNorge(fraÅrstallOgKvartal)
         if (maybeBransje.isEmpty) {
             data[Statistikkategori.NÆRING] = hentUmaskertSykefravær(næring, fraÅrstallOgKvartal)

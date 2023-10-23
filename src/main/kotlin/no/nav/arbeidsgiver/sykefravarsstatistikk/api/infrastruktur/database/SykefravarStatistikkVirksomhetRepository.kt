@@ -1,5 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.UmaskertSykefraværForEttKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Virksomhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -17,6 +20,55 @@ class SykefravarStatistikkVirksomhetRepository(
     val antallPersoner = integer("antall_personer")
     val tapteDagsverk = float("tapte_dagsverk")
     val muligeDagsverk = float("mulige_dagsverk")
+    val varighet = char("varighet")
+    val virksomhetstype = char("rectype")
+
+    fun hentUmaskertSykefravær(
+        virksomhet: Virksomhet, fraÅrstallOgKvartal: ÅrstallOgKvartal
+    ): List<UmaskertSykefraværForEttKvartal> {
+        return transaction {
+            slice(
+                tapteDagsverk.sum(),
+                muligeDagsverk.sum(),
+                antallPersoner.sum(),
+                årstall,
+                kvartal
+            ).select {
+                orgnr eq virksomhet.orgnr.verdi and ((årstall eq fraÅrstallOgKvartal.årstall) and (kvartal greaterEq fraÅrstallOgKvartal.kvartal)) or (årstall greater fraÅrstallOgKvartal.årstall)
+            }
+                .groupBy(årstall, kvartal)
+                .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
+                .map {
+                    UmaskertSykefraværForEttKvartal(
+                        ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                        it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                        it[muligeDagsverk.sum()]!!.toBigDecimal(),
+                        it[antallPersoner.sum()]!!
+                    )
+                }.sorted()
+        }
+    }
+
+    fun settInn(data: List<SykefraværsstatistikkVirksomhet>): Int {
+        return transaction {
+            batchInsert(data) {
+                this[orgnr] = it.orgnr!!
+                this[årstall] = it.årstall
+                this[kvartal] = it.kvartal
+                this[antallPersoner] = it.antallPersoner
+                this[tapteDagsverk] = it.tapteDagsverk.toFloat()
+                this[muligeDagsverk] = it.muligeDagsverk.toFloat()
+                this[varighet] = it.varighet!!.first()
+                this[virksomhetstype] = it.rectype!!.first()
+            }.count()
+        }
+    }
+
+    fun slettForKvartal(årstallOgKvartal: ÅrstallOgKvartal): Int {
+        return transaction {
+            deleteWhere { (årstall eq årstallOgKvartal.årstall) and (kvartal eq årstallOgKvartal.kvartal) }
+        }
+    }
 
     fun slettDataEldreEnn(årstallOgKvartal: ÅrstallOgKvartal): Int {
         return transaction {

@@ -17,11 +17,12 @@ import java.util.concurrent.atomic.AtomicInteger
 
 @Component
 class StatistikkRepository(
-    @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate
+    @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
 ) {
     val INSERT_BATCH_STØRRELSE = 10000
 
     private val log = LoggerFactory.getLogger(this::class.java)
+
     fun hentSisteÅrstallOgKvartalForSykefraværsstatistikk(type: Statistikkilde): ÅrstallOgKvartal {
         val alleÅrstallOgKvartal = hentAlleÅrstallOgKvartalForSykefraværsstatistikk(type)
         log.info("Henter statistikk for type {}", type.tabell)
@@ -52,7 +53,6 @@ class StatistikkRepository(
         }
     }
 
-    // IMPORT metoder
     fun importSykefraværsstatistikkLand(
         landStatistikk: List<SykefraværsstatistikkLand>, årstallOgKvartal: ÅrstallOgKvartal
     ): SlettOgOpprettResultat {
@@ -100,21 +100,6 @@ class StatistikkRepository(
             sykefraværsstatistikkForNæring,
             årstallOgKvartal,
             sykefraværsstatistikkNæring5sifferUtils
-        )
-    }
-
-    fun importSykefraværsstatistikkVirksomhet(
-        sykefraværsstatistikkVirksomhet: List<SykefraværsstatistikkVirksomhet>,
-        årstallOgKvartal: ÅrstallOgKvartal
-    ): SlettOgOpprettResultat {
-        val sykefraværsstatistikkVirksomhetUtils = SykefraværsstatistikkVirksomhetUtils(
-            namedParameterJdbcTemplate
-        )
-        return importStatistikk(
-            "virksomhet",
-            sykefraværsstatistikkVirksomhet,
-            årstallOgKvartal,
-            sykefraværsstatistikkVirksomhetUtils
         )
     }
 
