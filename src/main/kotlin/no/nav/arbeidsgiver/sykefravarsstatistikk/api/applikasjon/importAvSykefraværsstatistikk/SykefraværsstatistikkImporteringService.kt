@@ -7,6 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefra
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.StatistikkRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.slf4j.LoggerFactory
 import org.springframework.core.env.Environment
@@ -18,6 +19,7 @@ class SykefraværsstatistikkImporteringService(
     private val statistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
     private val datavarehusRepository: DatavarehusRepository,
     private val importtidspunktRepository: ImporttidspunktRepository,
+    private val sykefraværsstatistikkLandRepository: SykefraværStatistikkLandRepository,
     private val environment: Environment
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -134,11 +136,15 @@ class SykefraværsstatistikkImporteringService(
     private fun importSykefraværsstatistikkLand(
         årstallOgKvartal: ÅrstallOgKvartal
     ): SlettOgOpprettResultat {
-        val sykefraværsstatistikkLand = datavarehusRepository.hentSykefraværsstatistikkLand(årstallOgKvartal)
-        val resultat = statistikkRepository.importSykefraværsstatistikkLand(
-            sykefraværsstatistikkLand, årstallOgKvartal
-        )
-        loggResultat(årstallOgKvartal, resultat, "land")
+
+        val statistikk =  datavarehusRepository.hentSykefraværsstatistikkLand(årstallOgKvartal)
+
+        val antallSlettet = sykefraværsstatistikkLandRepository.slettForKvartal(årstallOgKvartal)
+        val antallOpprettet = sykefraværsstatistikkLandRepository.settInn(statistikk)
+
+        val resultat = SlettOgOpprettResultat(antallSlettet, antallOpprettet)
+
+        loggResultat(årstallOgKvartal, SlettOgOpprettResultat(antallSlettet, antallOpprettet), "land")
         return resultat
     }
 

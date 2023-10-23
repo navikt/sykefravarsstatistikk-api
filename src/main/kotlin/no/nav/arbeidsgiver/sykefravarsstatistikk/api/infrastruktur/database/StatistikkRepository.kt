@@ -53,17 +53,6 @@ class StatistikkRepository(
         }
     }
 
-    fun importSykefraværsstatistikkLand(
-        landStatistikk: List<SykefraværsstatistikkLand>, årstallOgKvartal: ÅrstallOgKvartal
-    ): SlettOgOpprettResultat {
-        val sykefraværsstatistikkLandUtils = SykefraværsstatistikkLandUtils(
-            namedParameterJdbcTemplate
-        )
-        return importStatistikk(
-            "land", landStatistikk, årstallOgKvartal, sykefraværsstatistikkLandUtils
-        )
-    }
-
     fun importSykefraværsstatistikkSektor(
         sykefraværsstatistikkSektor: List<SykefraværsstatistikkSektor>,
         årstallOgKvartal: ÅrstallOgKvartal

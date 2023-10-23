@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 
 class ImporteringServiceTest {
-    var importeringService = SykefraværsstatistikkImporteringService(mock(), mock(), mock(),  mock(), mock())
+    var importeringService = SykefraværsstatistikkImporteringService(mock(), mock(), mock(),  mock(), mock(), mock())
 
     @Test
     fun kanImportStartes__returnerer_TRUE_dersom_alle_årstall_og_kvartal_er_like_OG_sykefraværsstatistikk_ligger_ett_kvartal_bak_Dvh() {
