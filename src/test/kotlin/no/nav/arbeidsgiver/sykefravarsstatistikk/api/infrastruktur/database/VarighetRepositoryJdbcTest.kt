@@ -38,17 +38,23 @@ open class VarighetRepositoryJdbcTest {
     @BeforeEach
     fun setUp() {
         varighetRepository = VarighetRepository(jdbcTemplate)
-        TestUtils.slettAllStatistikkFraDatabase(jdbcTemplate)
+        TestUtils.slettAllStatistikkFraDatabase(
+            jdbcTemplate = jdbcTemplate,
+            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository
+        )
     }
 
     @AfterEach
     fun tearDown() {
-        TestUtils.slettAllStatistikkFraDatabase(jdbcTemplate)
+        TestUtils.slettAllStatistikkFraDatabase(
+            jdbcTemplate = jdbcTemplate,
+            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository
+        )
     }
 
     @Test
     fun hentSykefraværForEttKvartalMedVarighet__skal_returnere_riktig_sykefravær() {
-        val barnehage = UnderenhetLegacy(
+        val barnehage = Underenhet.Næringsdrivende(
             Orgnr("999999999"),
             Orgnr("1111111111"),
             "test Barnehage",
@@ -97,8 +103,8 @@ open class VarighetRepositoryJdbcTest {
             .isEqualTo(
                 UmaskertSykefraværForEttKvartalMedVarighet(
                     ÅrstallOgKvartal(2019, 2),
-                    BigDecimal(0),
-                    BigDecimal(100),
+                    BigDecimal("0.0"),
+                    BigDecimal("100.0"),
                     6,
                     Varighetskategori.TOTAL
                 )

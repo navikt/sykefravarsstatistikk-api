@@ -42,21 +42,21 @@ import java.sql.ResultSet
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 open class StatistikkRepositoryJdbcTest {
     @Autowired
-    private val jdbcTemplate: NamedParameterJdbcTemplate? = null
-    private var statistikkRepository: StatistikkRepository? = null
+    private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
+    @Autowired
+    private lateinit var statistikkRepository: StatistikkRepository
 
     @Autowired
     private lateinit var sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
 
     @BeforeEach
     fun setUp() {
-        statistikkRepository = StatistikkRepository(jdbcTemplate!!)
-        slettAllStatistikkFraDatabase(jdbcTemplate)
+        slettAllStatistikkFraDatabase(jdbcTemplate, sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository)
     }
 
     @AfterEach
     fun tearDown() {
-        slettAllStatistikkFraDatabase(jdbcTemplate!!)
+        slettAllStatistikkFraDatabase(jdbcTemplate, sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository)
     }
 
     @Test

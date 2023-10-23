@@ -41,6 +41,10 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
             jdbcTemplate
         )
     }
+
+    @Autowired
+    lateinit var sykefraværsstatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
+
     private val produksjonAvKlær = Næringskode("14190")
     private val undervisning = Næringskode("86907")
     private val utdanning = Næring("86")
@@ -726,31 +730,6 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
         )
     }
 
-    private fun createStatistikkVirksomhet(
-        orgnr: String,
-        årstall: Int,
-        kvartal: Int,
-        antallPersoner: Int,
-        tapteDagsverk: Int,
-        muligeDagsverk: Int
-    ) {
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_virksomhet "
-                    + "(arstall, kvartal, orgnr, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "values (:arstall, :kvartal, :orgnr, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(
-                SykefraværsstatistikkVirksomhetUtenVarighet(
-                    årstall,
-                    kvartal,
-                    orgnr,
-                    antallPersoner,
-                    BigDecimal(tapteDagsverk),
-                    BigDecimal(muligeDagsverk)
-                )
-            )
-        )
-    }
-
     private fun parametre(sykefraværsstatistikkSektor: SykefraværsstatistikkSektor): MapSqlParameterSource {
         val parametre = MapSqlParameterSource()
             .addValue("sektor_kode", sykefraværsstatistikkSektor.sektorkode)
@@ -787,9 +766,5 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
             .addValue("antall_personer", sykefraværsstatistikk.antallPersoner)
             .addValue("tapte_dagsverk", sykefraværsstatistikk.tapteDagsverk)
             .addValue("mulige_dagsverk", sykefraværsstatistikk.muligeDagsverk)
-    }
-
-    @Test
-    fun hentSykefraværAlleBransjerFraOgMed() {
     }
 }

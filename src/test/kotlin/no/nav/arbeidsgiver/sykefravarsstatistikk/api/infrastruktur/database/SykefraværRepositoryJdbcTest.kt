@@ -44,12 +44,20 @@ open class SykefraværRepositoryJdbcTest {
 
     @BeforeEach
     fun setUp() {
-        slettAllStatistikkFraDatabase(jdbcTemplate, sykefravarStatistikkVirksomhetRepository)
+        slettAllStatistikkFraDatabase(
+            jdbcTemplate = jdbcTemplate,
+            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
+            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository
+        )
     }
 
     @AfterEach
     fun tearDown() {
-        slettAllStatistikkFraDatabase(jdbcTemplate, sykefravarStatistikkVirksomhetRepository)
+        slettAllStatistikkFraDatabase(
+            jdbcTemplate = jdbcTemplate,
+            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
+            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository
+        )
     }
 
     @Test
@@ -339,7 +347,7 @@ open class SykefraværRepositoryJdbcTest {
     }
 
     companion object {
-        val BARNEHAGE = UnderenhetLegacy(
+        val BARNEHAGE = Underenhet.Næringsdrivende(
             Orgnr("999999999"),
             Orgnr("1111111111"),
             "test Barnehage",

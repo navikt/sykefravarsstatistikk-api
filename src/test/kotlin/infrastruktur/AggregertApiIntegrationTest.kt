@@ -39,7 +39,7 @@ import java.time.LocalDate
 
 class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     @Autowired
-    private val jdbcTemplate: NamedParameterJdbcTemplate? = null
+    private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     @Autowired
     lateinit var mockOAuth2Server: MockOAuth2Server
@@ -104,7 +104,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     @Throws(Exception::class)
     fun hentAgreggertStatistikk_returnererForventedeTyperForBedriftSomHarAlleTyperData() {
         val (årstall, kvartal) = SISTE_PUBLISERTE_KVARTAL.minusEttÅr()
-        opprettStatistikkForLand(jdbcTemplate!!)
+        opprettStatistikkForLand(jdbcTemplate)
         opprettStatistikkForNæring(
             jdbcTemplate,
             PRODUKSJON_NYTELSESMIDLER,

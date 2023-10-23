@@ -18,7 +18,7 @@ class SykefravarStatistikkVirksomhetRepository(
     val antallPersoner = integer("antall_personer")
     val tapteDagsverk = float("tapte_dagsverk")
     val muligeDagsverk = float("mulige_dagsverk")
-    val varighet = char("varighet")
+    val varighet = char("varighet").nullable()
     val virksomhetstype = char("rectype")
 
     fun hentUmaskertSykefravær(

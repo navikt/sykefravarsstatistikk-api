@@ -9,7 +9,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvar
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.assertj.core.api.AssertionsForClassTypes
-import org.jetbrains.exposed.sql.Database
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -46,7 +45,8 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
     fun setUp() {
         slettAllStatistikkFraDatabase(
             jdbcTemplate,
-            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository
+            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
+            sykefravarStatistikkVirksomhetRepository = sykefraværStatistikkVirksomhetRepository,
         )
     }
 
@@ -54,7 +54,8 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
     fun tearDown() {
         slettAllStatistikkFraDatabase(
             jdbcTemplate,
-            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository
+            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
+            sykefravarStatistikkVirksomhetRepository = sykefraværStatistikkVirksomhetRepository,
         )
     }
 
@@ -109,7 +110,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
     }
 
     @Test
-    fun hentSykefraværprosentBedreNæring__skal_returnere_riktig_sykefravær() {
+    fun hentSykefraværprosentNæring__skal_returnere_riktig_sykefravær() {
         val produksjonAvKlær = Næring("14")
         jdbcTemplate.update(
             "insert into sykefravar_statistikk_naring (naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
@@ -233,7 +234,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværprosentVirksomhet__skal_summere_sykefravær_på_varighet() {
-        val barnehage = UnderenhetLegacy(
+        val barnehage = Underenhet.Næringsdrivende(
             Orgnr("999999999"),
             Orgnr("1111111111"),
             "test Barnehage",
@@ -323,19 +324,5 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
     ): MapSqlParameterSource {
         return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
             .addValue("naring_kode", næring.tosifferIdentifikator)
-    }
-
-    private fun parametre(
-        orgnr: Orgnr,
-        årstall: Int,
-        kvartal: Int,
-        antallPersoner: Int,
-        tapteDagsverk: Int,
-        muligeDagsverk: Int,
-        varighet: Varighetskategori
-    ): MapSqlParameterSource {
-        return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
-            .addValue("orgnr", orgnr.verdi)
-            .addValue("varighet", varighet.kode)
     }
 }
