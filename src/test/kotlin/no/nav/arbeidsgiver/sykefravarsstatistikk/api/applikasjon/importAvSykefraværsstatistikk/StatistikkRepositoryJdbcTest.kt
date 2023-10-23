@@ -154,14 +154,14 @@ open class StatistikkRepositoryJdbcTest {
         assertEquals(
             statistikkIDatabasen.first(),
             RawDataStatistikkVirksomhet(
-                2019,
-                3,
-                ORGNR_VIRKSOMHET_1,
-                Varighetskategori._1_DAG_TIL_7_DAGER.kode,
-                DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
-                BigDecimal("16"),
-                BigDecimal("100"),
-                1
+                årstall = 2019,
+                kvartal = 3,
+                orgnr = ORGNR_VIRKSOMHET_1,
+                varighet = Varighetskategori._1_DAG_TIL_7_DAGER.kode,
+                rectype = DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
+                tapteDagsverk = BigDecimal("16"),
+                muligeDagsverk = BigDecimal("100"),
+                antallPersoner = 1
             )
         )
     }

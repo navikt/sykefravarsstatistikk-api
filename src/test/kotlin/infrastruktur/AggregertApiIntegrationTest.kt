@@ -6,6 +6,7 @@ import config.SpringIntegrationTestbase
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import scala.reflect.internal.Types.TypeVar
 import testUtils.GraderingTestUtils.insertDataMedGradering
 import testUtils.TestTokenUtil.createMockIdportenTokenXToken
 import testUtils.TestUtils.PRODUKSJON_NYTELSESMIDLER
@@ -24,7 +26,6 @@ import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import testUtils.TestUtils.opprettStatistikkForLand
 import testUtils.TestUtils.opprettStatistikkForNæring
 import testUtils.TestUtils.opprettStatistikkForNæringskode
-import testUtils.TestUtils.opprettStatistikkForVirksomhet
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import testUtils.TestUtils.slettAlleImporttidspunkt
 import java.io.IOException
@@ -54,14 +55,22 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
 
     @BeforeEach
     fun setUp() {
-        slettAllStatistikkFraDatabase(jdbcTemplate!!, sykefravarStatistikkVirksomhetRepository, sykefraværStatistikkLandRepository)
+        slettAllStatistikkFraDatabase(
+            jdbcTemplate,
+            sykefravarStatistikkVirksomhetRepository,
+            sykefraværStatistikkLandRepository
+        )
         importtidspunktRepository.slettAlleImporttidspunkt()
         importtidspunktRepository.settInnImporttidspunkt(SISTE_PUBLISERTE_KVARTAL, LocalDate.parse("2022-06-02"))
     }
 
     @AfterEach
     fun tearDown() {
-        slettAllStatistikkFraDatabase(jdbcTemplate!!, sykefravarStatistikkVirksomhetRepository, sykefraværStatistikkLandRepository)
+        slettAllStatistikkFraDatabase(
+            jdbcTemplate,
+            sykefravarStatistikkVirksomhetRepository,
+            sykefraværStatistikkLandRepository
+        )
         importtidspunktRepository.slettAlleImporttidspunkt()
     }
 
@@ -114,14 +123,19 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
             100,
             10
         )
-        opprettStatistikkForVirksomhet(
-            jdbcTemplate,
-            ORGNR_UNDERENHET,
-            SISTE_PUBLISERTE_KVARTAL.årstall,
-            SISTE_PUBLISERTE_KVARTAL.kvartal,
-            5,
-            100,
-            10
+        sykefravarStatistikkVirksomhetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkVirksomhet(
+                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
+                    orgnr = ORGNR_UNDERENHET,
+                    tapteDagsverk = 5.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal(),
+                    antallPersoner = 10,
+                    varighet = "A",
+                    rectype = "2",
+                )
+            )
         )
         insertDataMedGradering(
             jdbcTemplate,
@@ -188,32 +202,40 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     @Test
     @Throws(Exception::class)
     fun hentAggregertStatistikk_returnererLangtidOgKorttidForVirksomhetOgBransje() {
-        leggTilVirksomhetsstatistikkMedVarighet(
-            jdbcTemplate!!,
-            ORGNR_UNDERENHET,
-            ÅrstallOgKvartal(2022, 1),
-            Varighetskategori._1_DAG_TIL_7_DAGER,
-            0,
-            2,
-            0
-        )
-        leggTilVirksomhetsstatistikkMedVarighet(
-            jdbcTemplate,
-            ORGNR_UNDERENHET,
-            ÅrstallOgKvartal(2022, 1),
-            Varighetskategori._8_UKER_TIL_20_UKER,
-            0,
-            4,
-            0
-        )
-        leggTilVirksomhetsstatistikkMedVarighet(
-            jdbcTemplate,
-            ORGNR_UNDERENHET,
-            ÅrstallOgKvartal(2022, 1),
-            Varighetskategori.TOTAL,
-            10,
-            0,
-            100
+
+        sykefravarStatistikkVirksomhetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkVirksomhet(
+                    årstall = 2022,
+                    kvartal = 1,
+                    ORGNR_UNDERENHET,
+                    varighet = Varighetskategori._1_DAG_TIL_7_DAGER.kode,
+                    rectype = "2",
+                    tapteDagsverk = BigDecimal(2),
+                    muligeDagsverk = BigDecimal(0),
+                    antallPersoner = 0,
+                ),
+                SykefraværsstatistikkVirksomhet(
+                    årstall = 2022,
+                    kvartal = 1,
+                    orgnr = ORGNR_UNDERENHET,
+                    varighet = Varighetskategori._8_UKER_TIL_20_UKER.kode,
+                    rectype = "2",
+                    tapteDagsverk = BigDecimal(4),
+                    muligeDagsverk = BigDecimal(0),
+                    antallPersoner = 0,
+                ),
+                SykefraværsstatistikkVirksomhet(
+                    årstall = 2022,
+                    kvartal = 1,
+                    orgnr = ORGNR_UNDERENHET,
+                    varighet = Varighetskategori.TOTAL.kode,
+                    rectype = "2",
+                    tapteDagsverk = BigDecimal(0),
+                    muligeDagsverk = BigDecimal(100),
+                    antallPersoner = 10
+                )
+            )
         )
         leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
             jdbcTemplate, Næringskode("10300"), ÅrstallOgKvartal(2022, 1), 10, 100
@@ -281,14 +303,19 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     @Test
     @Throws(Exception::class)
     fun hentAgreggertStatistikk_kræsjerIkkeDersomMuligeDagsverkErZero() {
-        opprettStatistikkForVirksomhet(
-            jdbcTemplate!!,
-            ORGNR_UNDERENHET,
-            SISTE_PUBLISERTE_KVARTAL.årstall,
-            SISTE_PUBLISERTE_KVARTAL.kvartal,
-            5,
-            0,
-            10
+        sykefravarStatistikkVirksomhetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkVirksomhet(
+                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
+                    orgnr = ORGNR_UNDERENHET,
+                    tapteDagsverk = 5.toBigDecimal(),
+                    muligeDagsverk = 0.toBigDecimal(),
+                    antallPersoner = 10,
+                    varighet = "A",
+                    rectype = "2",
+                )
+            )
         )
         val response = utførAutorisertKall(ORGNR_UNDERENHET)
         val responseBody = objectMapper.readTree(response.body())

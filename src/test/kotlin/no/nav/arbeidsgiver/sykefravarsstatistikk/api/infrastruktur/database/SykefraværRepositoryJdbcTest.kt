@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import config.AppConfigForJdbcTesterConfig
 import ia.felles.definisjoner.bransjer.Bransjer
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.assertj.core.api.Assertions
 import org.jetbrains.exposed.sql.Database
@@ -19,7 +20,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
-import testUtils.TestUtils.opprettStatistikkForLand
+import testUtils.TestUtils.opprettStatistikkForLandExposed
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import java.math.BigDecimal
 
@@ -32,14 +33,14 @@ open class SykefraværRepositoryJdbcTest {
     private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     @Autowired
-    private lateinit var database: Database
+    private lateinit var sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
 
-    private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository by lazy {
-        SykefravarStatistikkVirksomhetRepository(database)
-    }
-    private val sykefraværRepository: SykefraværRepository by lazy {
-        SykefraværRepository(jdbcTemplate, sykefravarStatistikkVirksomhetRepository)
-    }
+    @Autowired
+    private lateinit var sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository
+
+    @Autowired
+    private lateinit var sykefraværRepository: SykefraværRepository
+
 
     @BeforeEach
     fun setUp() {
@@ -53,7 +54,9 @@ open class SykefraværRepositoryJdbcTest {
 
     @Test
     fun hentUmaskertSykefraværForNorge_skal_hente_riktig_data() {
-        opprettStatistikkForLand(jdbcTemplate)
+
+        opprettStatistikkForLandExposed(sykefraværStatistikkLandRepository)
+
         val resultat = sykefraværRepository.hentUmaskertSykefraværForNorge(
             SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1)
         )
@@ -78,14 +81,16 @@ open class SykefraværRepositoryJdbcTest {
     @Test
     fun hentSykefraværprosentVirksomhet__skal_returnerer_empty_list_dersom_ingen_data_funnet_for_årstall_og_kvartal() {
         persisterDatasetIDb(BARNEHAGE)
-        val resultat = sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(BARNEHAGE, ÅrstallOgKvartal(2021, 4))
+        val resultat =
+            sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(BARNEHAGE, ÅrstallOgKvartal(2021, 4))
         Assertions.assertThat(resultat.size).isEqualTo(0)
     }
 
     @Test
     fun hentSykefraværprosentVirksomhet__skal_returnere_riktig_sykefravær() {
         persisterDatasetIDb(BARNEHAGE)
-        val resultat = sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(BARNEHAGE, ÅrstallOgKvartal(2018, 3))
+        val resultat =
+            sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(BARNEHAGE, ÅrstallOgKvartal(2018, 3))
         Assertions.assertThat(resultat.size).isEqualTo(4)
         Assertions.assertThat(resultat[0]).isEqualTo(sykefraværForEtÅrstallOgKvartal(2018, 3, 6))
         Assertions.assertThat(resultat[3]).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2))
@@ -94,7 +99,8 @@ open class SykefraværRepositoryJdbcTest {
     @Test
     fun hentSykefraværprosentVirksomhet__skal_returnere_riktig_sykefravær_for_ønskede_kvartaler() {
         persisterDatasetIDb(BARNEHAGE)
-        val resultat = sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(BARNEHAGE, ÅrstallOgKvartal(2019, 1))
+        val resultat =
+            sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(BARNEHAGE, ÅrstallOgKvartal(2019, 1))
         Assertions.assertThat(resultat.size).isEqualTo(2)
         Assertions.assertThat(resultat[0]).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 1, 3))
         Assertions.assertThat(resultat[1]).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2))
@@ -120,32 +126,57 @@ open class SykefraværRepositoryJdbcTest {
         Assertions.assertThat(resultat[1]).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2))
     }
 
-    private fun SykefravarStatistikkVirksomhetRepository.settInn(
-        orgnr: Orgnr,
-        årstall: Int,
-        kvartal: Int,
-        antallPersoner: Int,
-        tapteDagsverk: Int,
-        muligeDagsverk: Int = 100
-    ) {
-        transaction {
-            insert {
-                it[this.orgnr] = orgnr.verdi
-                it[this.årstall] = årstall
-                it[this.kvartal] = kvartal
-                it[this.antallPersoner] = antallPersoner
-                it[this.tapteDagsverk] = tapteDagsverk.toFloat()
-                it[this.muligeDagsverk] = muligeDagsverk.toFloat()
-            }
-        }
-    }
-
-    private fun persisterDatasetIDb(barnehage: UnderenhetLegacy) {
-        sykefravarStatistikkVirksomhetRepository.settInn(barnehage.orgnr, 2019, 2, 10, 2)
-        sykefravarStatistikkVirksomhetRepository.settInn(Orgnr("987654321"), 2019, 1, 10, 3)
-        sykefravarStatistikkVirksomhetRepository.settInn(barnehage.orgnr, 2019, 1, 10, 3)
-        sykefravarStatistikkVirksomhetRepository.settInn(barnehage.orgnr, 2018, 4, 10, 5)
-        sykefravarStatistikkVirksomhetRepository.settInn(barnehage.orgnr, 2018, 3, 10, 6)
+    private fun persisterDatasetIDb(barnehage: Underenhet.Næringsdrivende) {
+        SykefraværsstatistikkVirksomhet(
+            orgnr = barnehage.orgnr.verdi,
+            årstall = 2019,
+            kvartal = 2,
+            antallPersoner = 10,
+            tapteDagsverk = BigDecimal(2),
+            muligeDagsverk = BigDecimal(100),
+            rectype = "2",
+            varighet = Varighetskategori.TOTAL.kode
+        )
+        SykefraværsstatistikkVirksomhet(
+            orgnr = "987654321",
+            årstall = 2019,
+            kvartal = 1,
+            antallPersoner = 10,
+            tapteDagsverk = BigDecimal(3),
+            muligeDagsverk = BigDecimal(100),
+            rectype = "2",
+            varighet = Varighetskategori.TOTAL.kode
+        )
+        SykefraværsstatistikkVirksomhet(
+            orgnr = barnehage.orgnr.verdi,
+            årstall = 2019,
+            kvartal = 1,
+            antallPersoner = 10,
+            tapteDagsverk = BigDecimal(3),
+            muligeDagsverk = BigDecimal(100),
+            rectype = "2",
+            varighet = Varighetskategori.TOTAL.kode
+        )
+        SykefraværsstatistikkVirksomhet(
+            orgnr = barnehage.orgnr.verdi,
+            årstall = 2018,
+            kvartal = 4,
+            antallPersoner = 10,
+            tapteDagsverk = BigDecimal(5),
+            muligeDagsverk = BigDecimal(100),
+            rectype = "2",
+            varighet = Varighetskategori.TOTAL.kode
+        )
+        SykefraværsstatistikkVirksomhet(
+            orgnr = barnehage.orgnr.verdi,
+            årstall = 2018,
+            kvartal = 3,
+            antallPersoner = 10,
+            tapteDagsverk = BigDecimal(6),
+            muligeDagsverk = BigDecimal(100),
+            rectype = "2",
+            varighet = Varighetskategori.TOTAL.kode
+        )
     }
 
     private fun persisterDatasetIDb(næring: Næring) {

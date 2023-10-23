@@ -38,6 +38,7 @@ object TestUtils {
     private fun SykefravarStatistikkVirksomhetRepository.slettAlt() {
         transaction { deleteAll() }
     }
+
     private fun SykefraværStatistikkLandRepository.slettAlt() {
         transaction { deleteAll() }
     }
@@ -111,13 +112,15 @@ object TestUtils {
                 10,
                 BigDecimal(4),
                 BigDecimal(100)
-            ),SykefraværsstatistikkLand(
+            ),
+            SykefraværsstatistikkLand(
                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).årstall,
                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).kvartal,
                 10,
                 BigDecimal(5),
                 BigDecimal(100)
-            ),SykefraværsstatistikkLand(
+            ),
+            SykefraværsstatistikkLand(
                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).årstall,
                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).kvartal,
                 10,
@@ -126,6 +129,20 @@ object TestUtils {
             ),
         )
         sykefraværStatistikkLandRepository.settInn(statistikk)
+    }
+
+    fun opprettStatistikkForLandExposed(repository: SykefraværStatistikkLandRepository) {
+        repository.settInn(
+            listOf(
+                SykefraværsstatistikkLand(
+                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(4),
+                    muligeDagsverk = BigDecimal(100)
+                )
+            )
+        )
     }
 
     fun opprettStatistikkForLand(jdbcTemplate: NamedParameterJdbcTemplate) {
@@ -295,27 +312,6 @@ object TestUtils {
                     + "mulige_dagsverk) "
                     + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, "
                     + ":tapte_dagsverk, :mulige_dagsverk)",
-            parametre
-        )
-    }
-
-
-    fun opprettStatistikkForVirksomhet(
-        jdbcTemplate: NamedParameterJdbcTemplate,
-        orgnr: String?,
-        årstall: Int,
-        kvartal: Int,
-        tapteDagsverk: Int,
-        muligeDagsverk: Int,
-        antallPersoner: Int
-    ) {
-        val parametre = parametreForStatistikk(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
-        parametre.addValue("orgnr", orgnr)
-        parametre.addValue("varighet", "A")
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_virksomhet (arstall, kvartal, orgnr, varighet,"
-                    + " antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:arstall, :kvartal, :orgnr, :varighet, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
             parametre
         )
     }

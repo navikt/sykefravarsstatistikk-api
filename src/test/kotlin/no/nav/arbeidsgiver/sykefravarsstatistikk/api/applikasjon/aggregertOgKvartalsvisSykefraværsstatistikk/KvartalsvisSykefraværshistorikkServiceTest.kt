@@ -10,6 +10,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.St
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.UnderenhetLegacy
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KvartalsvisSykefraværRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -18,11 +19,13 @@ import java.math.BigDecimal
 
 class KvartalsvisSykefraværshistorikkServiceTest {
     private val kvartalsvisSykefraværprosentRepository: KvartalsvisSykefraværRepository = mockk()
+    private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository = mockk()
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository = mockk()
     private val kvartalsvisSykefraværshistorikkService: KvartalsvisSykefraværshistorikkService =
         KvartalsvisSykefraværshistorikkService(
             kvartalsvisSykefraværprosentRepository,
-            sykefraværStatistikkLandRepository
+            sykefravarStatistikkVirksomhetRepository,
+            sykefraværStatistikkLandRepository,
         )
 
 
@@ -32,9 +35,7 @@ class KvartalsvisSykefraværshistorikkServiceTest {
         every { kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(any()) } returns listOf(
             sykefraværprosent()
         )
-        every { kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(any()) } returns listOf(
-            sykefraværprosent()
-        )
+        every { sykefravarStatistikkVirksomhetRepository.hentAlt(any()) } returns listOf(sykefraværprosent())
     }
 
     @Test

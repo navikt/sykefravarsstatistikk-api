@@ -1,13 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.UmaskertSykefraværForEttKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Virksomhet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.less
 import org.springframework.stereotype.Component
+import java.sql.ResultSet
 
 @Component
 class SykefravarStatistikkVirksomhetRepository(
@@ -61,6 +59,29 @@ class SykefravarStatistikkVirksomhetRepository(
                 this[varighet] = it.varighet!!.first()
                 this[virksomhetstype] = it.rectype!!.first()
             }.count()
+        }
+    }
+
+    fun hentAlt(organisasjonsnummer: Orgnr): List<SykefraværForEttKvartal> {
+        return transaction {
+            slice(
+                tapteDagsverk.sum(),
+                muligeDagsverk.sum(),
+                antallPersoner.sum(),
+                årstall,
+                kvartal,
+            )
+                .select { orgnr eq organisasjonsnummer.verdi }
+                .groupBy(årstall, kvartal)
+                .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
+                .map {
+                    SykefraværForEttKvartal(
+                        årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                        tapteDagsverk = it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                        muligeDagsverk = it[muligeDagsverk.sum()]!!.toBigDecimal(),
+                        antallPersoner = it[antallPersoner.sum()]!!
+                    )
+                }
         }
     }
 
