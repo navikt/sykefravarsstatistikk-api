@@ -14,19 +14,6 @@ import java.sql.SQLException
 class KvartalsvisSykefraværRepository(
     @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate
 ) {
-    fun hentKvartalsvisSykefraværprosentLand(): List<SykefraværForEttKvartal> {
-        return try {
-            namedParameterJdbcTemplate.query(
-                "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal "
-                        + "FROM sykefravar_statistikk_land "
-                        + "ORDER BY arstall, kvartal ",
-                HashMap<String, Any?>()
-            ) { rs: ResultSet, _: Int -> mapTilKvartalsvisSykefraværprosent(rs) }
-        } catch (e: EmptyResultDataAccessException) {
-            emptyList()
-        }
-    }
-
     fun hentKvartalsvisSykefraværprosentSektor(sektor: Sektor): List<SykefraværForEttKvartal> {
         return try {
             namedParameterJdbcTemplate.query(

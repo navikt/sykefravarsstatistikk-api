@@ -47,18 +47,21 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     lateinit var sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
 
     @Autowired
+    lateinit var sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository
+
+    @Autowired
     lateinit var importtidspunktRepository: ImporttidspunktRepository
 
     @BeforeEach
     fun setUp() {
-        slettAllStatistikkFraDatabase(jdbcTemplate!!, sykefravarStatistikkVirksomhetRepository)
+        slettAllStatistikkFraDatabase(jdbcTemplate!!, sykefravarStatistikkVirksomhetRepository, sykefraværStatistikkLandRepository)
         importtidspunktRepository.slettAlleImporttidspunkt()
         importtidspunktRepository.settInnImporttidspunkt(SISTE_PUBLISERTE_KVARTAL, LocalDate.parse("2022-06-02"))
     }
 
     @AfterEach
     fun tearDown() {
-        slettAllStatistikkFraDatabase(jdbcTemplate!!, sykefravarStatistikkVirksomhetRepository)
+        slettAllStatistikkFraDatabase(jdbcTemplate!!, sykefravarStatistikkVirksomhetRepository, sykefraværStatistikkLandRepository)
         importtidspunktRepository.slettAlleImporttidspunkt()
     }
 

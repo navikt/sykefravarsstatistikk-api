@@ -1,5 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk
 
+import io.mockk.every
+import io.mockk.mockk
 import testUtils.TestData.enNæringskode
 import testUtils.TestData.etOrgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværForEttKvartal
@@ -8,44 +10,38 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.St
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.UnderenhetLegacy
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KvartalsvisSykefraværRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
 import java.math.BigDecimal
 
-@ExtendWith(MockitoExtension::class)
 class KvartalsvisSykefraværshistorikkServiceTest {
-    @Mock
-    private val kvartalsvisSykefraværprosentRepository: KvartalsvisSykefraværRepository? = null
-    var kvartalsvisSykefraværshistorikkService: KvartalsvisSykefraværshistorikkService? = null
+    private val kvartalsvisSykefraværprosentRepository: KvartalsvisSykefraværRepository = mockk()
+    private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository = mockk()
+    private val kvartalsvisSykefraværshistorikkService: KvartalsvisSykefraværshistorikkService =
+        KvartalsvisSykefraværshistorikkService(
+            kvartalsvisSykefraværprosentRepository,
+            sykefraværStatistikkLandRepository
+        )
+
 
     @BeforeEach
     fun setUp() {
-        kvartalsvisSykefraværshistorikkService = KvartalsvisSykefraværshistorikkService(
-            kvartalsvisSykefraværprosentRepository!!
+        every { sykefraværStatistikkLandRepository.hentAlt() } returns listOf(sykefraværprosent())
+        every { kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(any()) } returns listOf(
+            sykefraværprosent()
         )
-        whenever(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentLand())
-            .thenReturn(listOf(sykefraværprosent()))
-        whenever(kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(any()))
-            .thenReturn(listOf(sykefraværprosent()))
-        whenever(
-            kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(
-                any()
-            )
+        every { kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(any()) } returns listOf(
+            sykefraværprosent()
         )
-            .thenReturn(listOf(sykefraværprosent()))
     }
 
     @Test
     fun hentSykefraværshistorikk__skal_returnere_en_næring_dersom_virksomhet_er_i_bransjeprogram_på_2_siffer_nivå() {
         val underenhet = UnderenhetLegacy(etOrgnr(), etOrgnr(), "Underenhet AS", enNæringskode("10300"), 40)
         val kvartalsvisSykefraværshistorikk: List<KvartalsvisSykefraværshistorikkJson> =
-            kvartalsvisSykefraværshistorikkService!!.hentSykefraværshistorikk(
+            kvartalsvisSykefraværshistorikkService.hentSykefraværshistorikk(
                 underenhet, Sektor.PRIVAT
             )
         assertThatHistorikkHarKategori(kvartalsvisSykefraværshistorikk, Statistikkategori.NÆRING, true)

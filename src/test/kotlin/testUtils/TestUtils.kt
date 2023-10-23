@@ -1,11 +1,9 @@
 package testUtils
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næring
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkSektor
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkSektorUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkData
 import org.jetbrains.exposed.sql.deleteAll
@@ -40,8 +38,15 @@ object TestUtils {
     private fun SykefravarStatistikkVirksomhetRepository.slettAlt() {
         transaction { deleteAll() }
     }
+    private fun SykefraværStatistikkLandRepository.slettAlt() {
+        transaction { deleteAll() }
+    }
 
-    fun slettAllStatistikkFraDatabase(jdbcTemplate: NamedParameterJdbcTemplate, sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository? = null) {
+    fun slettAllStatistikkFraDatabase(
+        jdbcTemplate: NamedParameterJdbcTemplate,
+        sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository? = null,
+        sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository? = null,
+    ) {
 
         sykefravarStatistikkVirksomhetRepository?.slettAlt()
 
@@ -56,7 +61,7 @@ object TestUtils {
             "delete from sykefravar_statistikk_naring5siffer", MapSqlParameterSource()
         )
         jdbcTemplate.update("delete from sykefravar_statistikk_sektor", MapSqlParameterSource())
-        jdbcTemplate.update("delete from sykefravar_statistikk_land", MapSqlParameterSource())
+        sykefraværStatistikkLandRepository?.slettAlt()
     }
 
 
@@ -98,6 +103,30 @@ object TestUtils {
         )
     }
 
+    fun opprettStatistikkForLand(sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository) {
+        val statistikk = listOf(
+            SykefraværsstatistikkLand(
+                SISTE_PUBLISERTE_KVARTAL.årstall,
+                SISTE_PUBLISERTE_KVARTAL.kvartal,
+                10,
+                BigDecimal(4),
+                BigDecimal(100)
+            ),SykefraværsstatistikkLand(
+                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).årstall,
+                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).kvartal,
+                10,
+                BigDecimal(5),
+                BigDecimal(100)
+            ),SykefraværsstatistikkLand(
+                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).årstall,
+                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).kvartal,
+                10,
+                BigDecimal(6),
+                BigDecimal(100)
+            ),
+        )
+        sykefraværStatistikkLandRepository.settInn(statistikk)
+    }
 
     fun opprettStatistikkForLand(jdbcTemplate: NamedParameterJdbcTemplate) {
         jdbcTemplate.update(

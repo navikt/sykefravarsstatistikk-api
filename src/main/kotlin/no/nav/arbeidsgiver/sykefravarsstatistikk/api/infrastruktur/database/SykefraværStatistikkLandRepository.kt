@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkLand
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import org.jetbrains.exposed.sql.*
@@ -29,6 +30,21 @@ class SykefraværStatistikkLandRepository(override val database: Database) :
                 this[tapteDagsverk] = it.tapteDagsverk.toFloat()
                 this[muligeDagsverk] = it.muligeDagsverk.toFloat()
             }.count()
+        }
+    }
+
+    fun hentAlt(): List<SykefraværForEttKvartal> {
+        return transaction {
+            selectAll()
+                .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
+                .map {
+                    SykefraværForEttKvartal(
+                        ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                        it[tapteDagsverk].toBigDecimal(),
+                        it[muligeDagsverk].toBigDecimal(),
+                        it[antallPersoner],
+                    )
+                }
         }
     }
 }

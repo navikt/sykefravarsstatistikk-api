@@ -9,6 +9,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvar
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.assertj.core.api.AssertionsForClassTypes
+import org.jetbrains.exposed.sql.Database
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -29,26 +30,40 @@ import java.math.BigDecimal
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 open class SykefraværForEttKvartalRepositoryJdbcTest {
     @Autowired
-    private val jdbcTemplate: NamedParameterJdbcTemplate? = null
-    private var kvartalsvisSykefraværprosentRepository: KvartalsvisSykefraværRepository? = null
+    private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
+    private val kvartalsvisSykefraværprosentRepository: KvartalsvisSykefraværRepository by lazy {
+        KvartalsvisSykefraværRepository(jdbcTemplate)
+    }
+
+    @Autowired
+    private lateinit var database: Database
+    private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository by lazy {
+        SykefraværStatistikkLandRepository(database)
+    }
+
 
     @BeforeEach
     fun setUp() {
-        kvartalsvisSykefraværprosentRepository = KvartalsvisSykefraværRepository(jdbcTemplate!!)
-        slettAllStatistikkFraDatabase(jdbcTemplate)
+        slettAllStatistikkFraDatabase(
+            jdbcTemplate,
+            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository
+        )
     }
 
     @AfterEach
     fun tearDown() {
-        slettAllStatistikkFraDatabase(jdbcTemplate!!)
+        slettAllStatistikkFraDatabase(
+            jdbcTemplate,
+            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository
+        )
     }
 
     @Test
     fun hentSykefraværprosentLand__skal_returnere_riktig_sykefravær() {
-        opprettStatistikkForLand(jdbcTemplate!!)
-        val resultat = kvartalsvisSykefraværprosentRepository!!.hentKvartalsvisSykefraværprosentLand()
+        opprettStatistikkForLand(sykefraværStatistikkLandRepository)
+        val resultat = sykefraværStatistikkLandRepository.hentAlt()
         AssertionsForClassTypes.assertThat(resultat.size).isEqualTo(3)
-        AssertionsForClassTypes.assertThat<SykefraværForEttKvartal>(resultat[0])
+        AssertionsForClassTypes.assertThat(resultat[0])
             .isEqualTo(
                 SykefraværForEttKvartal(
                     SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2),
@@ -61,7 +76,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværprosentSektor__skal_returnere_riktig_sykefravær() {
-        jdbcTemplate!!.update(
+        jdbcTemplate.update(
             "insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                     + "VALUES (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
             parametre(Sektor.STATLIG, 2019, 2, 10, 2, 100)
@@ -81,7 +96,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
                     + "VALUES (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
             parametre(Sektor.KOMMUNAL, 2018, 4, 10, 5, 100)
         )
-        val resultat = kvartalsvisSykefraværprosentRepository!!.hentKvartalsvisSykefraværprosentSektor(
+        val resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(
             Sektor.STATLIG
         )
         AssertionsForClassTypes.assertThat(resultat.size).isEqualTo(3)
@@ -96,7 +111,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
     @Test
     fun hentSykefraværprosentBedreNæring__skal_returnere_riktig_sykefravær() {
         val produksjonAvKlær = Næring("14")
-        jdbcTemplate!!.update(
+        jdbcTemplate.update(
             "insert into sykefravar_statistikk_naring (naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                     + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
             parametre(produksjonAvKlær, 2019, 2, 10, 2, 100)
@@ -111,7 +126,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
                     + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
             parametre(Næring("85"), 2018, 4, 10, 5, 100)
         )
-        val resultat = kvartalsvisSykefraværprosentRepository!!.hentKvartalsvisSykefraværprosentNæring(
+        val resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentNæring(
             produksjonAvKlær
         )
         AssertionsForClassTypes.assertThat(resultat.size).isEqualTo(2)
@@ -125,7 +140,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværprosentBransje__skal_returnere_riktig_sykefravær() {
-        jdbcTemplate!!.update(
+        jdbcTemplate.update(
             "insert into sykefravar_statistikk_naring5siffer "
                     + "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                     + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
@@ -150,7 +165,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
             parametre(Næringskode("87301"), 2018, 4, 10, 6, 100)
         )
         val sykehjem = Bransje(Bransjer.SYKEHJEM)
-        val resultat = kvartalsvisSykefraværprosentRepository!!.hentKvartalsvisSykefraværprosentBransje(sykehjem)
+        val resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentBransje(sykehjem)
         AssertionsForClassTypes.assertThat(resultat.size).isEqualTo(2)
         AssertionsForClassTypes.assertThat(resultat[0])
             .isEqualTo(
@@ -169,7 +184,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
             Næringskode("88911"),
             10
         )
-        jdbcTemplate!!.update(
+        jdbcTemplate.update(
             "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                     + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
             parametre(barnehage.orgnr, 2019, 2, 10, 2, 100, Varighetskategori._1_DAG_TIL_7_DAGER)
@@ -184,7 +199,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
                     + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
             parametre(barnehage.orgnr, 2018, 4, 10, 5, 100, Varighetskategori._1_DAG_TIL_7_DAGER)
         )
-        val resultat = kvartalsvisSykefraværprosentRepository!!.hentKvartalsvisSykefraværprosentVirksomhet(
+        val resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(
             barnehage
         )
         AssertionsForClassTypes.assertThat(resultat.size).isEqualTo(2)
@@ -205,7 +220,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
             Næringskode("88911"),
             10
         )
-        jdbcTemplate!!.update(
+        jdbcTemplate.update(
             "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk, varighet) "
                     + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk, :varighet)",
             parametre(barnehage.orgnr, 2019, 2, 10, 2, 100, Varighetskategori._1_DAG_TIL_7_DAGER)
@@ -215,7 +230,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
                     + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk, :varighet)",
             parametre(barnehage.orgnr, 2019, 2, 10, 5, 100, Varighetskategori._8_UKER_TIL_20_UKER)
         )
-        val resultat = kvartalsvisSykefraværprosentRepository!!.hentKvartalsvisSykefraværprosentVirksomhet(
+        val resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(
             barnehage
         )
         AssertionsForClassTypes.assertThat(resultat)
@@ -226,29 +241,6 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
                     )
                 )
             )
-    }
-
-    @Test
-    fun hentSykefraværprosentLand__maskerer_sf_dersom_antall_ansatte_er_for_lav() {
-        jdbcTemplate!!.update(
-            "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(2019, 2, 4, 4, 100)
-        )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(2019, 1, 10, 5, 100)
-        )
-        val resultat = kvartalsvisSykefraværprosentRepository!!.hentKvartalsvisSykefraværprosentLand()
-        AssertionsForClassTypes.assertThat(resultat.size).isEqualTo(2)
-        val ikkeMaskertSykefraværForEttKvartal = resultat[0]
-        AssertionsForClassTypes.assertThat(ikkeMaskertSykefraværForEttKvartal.erMaskert).isFalse()
-        AssertionsForClassTypes.assertThat(ikkeMaskertSykefraværForEttKvartal.prosent!!.setScale(2))
-            .isEqualTo(BigDecimal(5).setScale(2))
-        val maskertSykefraværForEttKvartal = resultat[1]
-        AssertionsForClassTypes.assertThat(maskertSykefraværForEttKvartal.erMaskert).isTrue()
-        AssertionsForClassTypes.assertThat(maskertSykefraværForEttKvartal.prosent).isNull()
     }
 
     private fun parametre(
