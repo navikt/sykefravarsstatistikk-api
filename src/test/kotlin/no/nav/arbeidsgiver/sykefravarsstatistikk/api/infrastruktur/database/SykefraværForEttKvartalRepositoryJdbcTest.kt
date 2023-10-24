@@ -9,7 +9,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvar
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.assertj.core.api.AssertionsForClassTypes
-import org.jetbrains.exposed.sql.Database
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -31,22 +30,23 @@ import java.math.BigDecimal
 open class SykefraværForEttKvartalRepositoryJdbcTest {
     @Autowired
     private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
-    private val kvartalsvisSykefraværprosentRepository: KvartalsvisSykefraværRepository by lazy {
-        KvartalsvisSykefraværRepository(jdbcTemplate)
-    }
 
     @Autowired
-    private lateinit var database: Database
-    private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository by lazy {
-        SykefraværStatistikkLandRepository(database)
-    }
+    private lateinit var kvartalsvisSykefraværprosentRepository: KvartalsvisSykefraværRepository
+
+    @Autowired
+    private lateinit var sykefraværStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
+
+    @Autowired
+    private lateinit var sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository
 
 
     @BeforeEach
     fun setUp() {
         slettAllStatistikkFraDatabase(
             jdbcTemplate,
-            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository
+            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
+            sykefravarStatistikkVirksomhetRepository = sykefraværStatistikkVirksomhetRepository,
         )
     }
 
@@ -54,7 +54,8 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
     fun tearDown() {
         slettAllStatistikkFraDatabase(
             jdbcTemplate,
-            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository
+            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
+            sykefravarStatistikkVirksomhetRepository = sykefraværStatistikkVirksomhetRepository,
         )
     }
 
@@ -109,7 +110,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
     }
 
     @Test
-    fun hentSykefraværprosentBedreNæring__skal_returnere_riktig_sykefravær() {
+    fun hentSykefraværprosentNæring__skal_returnere_riktig_sykefravær() {
         val produksjonAvKlær = Næring("14")
         jdbcTemplate.update(
             "insert into sykefravar_statistikk_naring (naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
@@ -177,31 +178,51 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværprosentVirksomhet__skal_returnere_riktig_sykefravær() {
-        val barnehage = UnderenhetLegacy(
+        val barnehage = Underenhet.Næringsdrivende(
             Orgnr("999999999"),
             Orgnr("1111111111"),
             "test Barnehage",
             Næringskode("88911"),
             10
         )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(barnehage.orgnr, 2019, 2, 10, 2, 100, Varighetskategori._1_DAG_TIL_7_DAGER)
+
+        sykefraværStatistikkVirksomhetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkVirksomhet(
+                    årstall = 2019,
+                    kvartal = 2,
+                    orgnr = barnehage.orgnr.verdi,
+                    varighet = Varighetskategori._1_DAG_TIL_7_DAGER.kode,
+                    rectype = "2",
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(2),
+                    muligeDagsverk = BigDecimal(100)
+                ),
+                SykefraværsstatistikkVirksomhet(
+                    årstall = 2019,
+                    kvartal = 1,
+                    orgnr = "987654321",
+                    varighet = Varighetskategori._1_DAG_TIL_7_DAGER.kode,
+                    rectype = "2",
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(3),
+                    muligeDagsverk = BigDecimal(100)
+                ),
+                SykefraværsstatistikkVirksomhet(
+                    årstall = 2018,
+                    kvartal = 4,
+                    antallPersoner = 10,
+                    tapteDagsverk = 5.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal(),
+                    orgnr = barnehage.orgnr.verdi,
+                    varighet = Varighetskategori._1_DAG_TIL_7_DAGER.kode,
+                    rectype = "2"
+                )
+            )
         )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(Orgnr("987654321"), 2019, 1, 10, 3, 100, Varighetskategori._1_DAG_TIL_7_DAGER)
-        )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(barnehage.orgnr, 2018, 4, 10, 5, 100, Varighetskategori._1_DAG_TIL_7_DAGER)
-        )
-        val resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(
-            barnehage
-        )
+
+        val resultat = sykefraværStatistikkVirksomhetRepository.hentAlt(barnehage.orgnr)
+
         AssertionsForClassTypes.assertThat(resultat.size).isEqualTo(2)
         AssertionsForClassTypes.assertThat(resultat[0])
             .isEqualTo(
@@ -213,26 +234,41 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværprosentVirksomhet__skal_summere_sykefravær_på_varighet() {
-        val barnehage = UnderenhetLegacy(
+        val barnehage = Underenhet.Næringsdrivende(
             Orgnr("999999999"),
             Orgnr("1111111111"),
             "test Barnehage",
             Næringskode("88911"),
             10
         )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk, varighet) "
-                    + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk, :varighet)",
-            parametre(barnehage.orgnr, 2019, 2, 10, 2, 100, Varighetskategori._1_DAG_TIL_7_DAGER)
+
+        sykefraværStatistikkVirksomhetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkVirksomhet(
+                    årstall = 2019,
+                    kvartal = 2,
+                    orgnr = barnehage.orgnr.verdi,
+                    varighet = Varighetskategori._1_DAG_TIL_7_DAGER.kode,
+                    rectype = "2",
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(2),
+                    muligeDagsverk = BigDecimal(100)
+                ),
+                SykefraværsstatistikkVirksomhet(
+                    årstall = 2019,
+                    kvartal = 2,
+                    antallPersoner = 10,
+                    tapteDagsverk = 5.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal(),
+                    orgnr = barnehage.orgnr.verdi,
+                    varighet = Varighetskategori._8_UKER_TIL_20_UKER.kode,
+                    rectype = "2"
+                )
+            )
         )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_virksomhet (orgnr, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk, varighet) "
-                    + "VALUES (:orgnr, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk, :varighet)",
-            parametre(barnehage.orgnr, 2019, 2, 10, 5, 100, Varighetskategori._8_UKER_TIL_20_UKER)
-        )
-        val resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(
-            barnehage
-        )
+
+        val resultat = sykefraværStatistikkVirksomhetRepository.hentAlt(barnehage.orgnr)
+
         AssertionsForClassTypes.assertThat(resultat)
             .isEqualTo(
                 listOf(
@@ -288,19 +324,5 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
     ): MapSqlParameterSource {
         return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
             .addValue("naring_kode", næring.tosifferIdentifikator)
-    }
-
-    private fun parametre(
-        orgnr: Orgnr,
-        årstall: Int,
-        kvartal: Int,
-        antallPersoner: Int,
-        tapteDagsverk: Int,
-        muligeDagsverk: Int,
-        varighet: Varighetskategori
-    ): MapSqlParameterSource {
-        return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
-            .addValue("orgnr", orgnr.verdi)
-            .addValue("varighet", varighet.kode)
     }
 }

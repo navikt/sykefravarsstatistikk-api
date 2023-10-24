@@ -8,44 +8,36 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.__2020_1
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.__2020_2
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.sykefraværsstatistikkSektor
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.GradertStatistikkategoriKafkamelding
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.StatistikkategoriKafkamelding
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.*
 import java.math.BigDecimal
 
+
 class EksporteringPerStatistikkKategoriServiceTest {
-    private val sykefraværRepository = mock<SykefraværRepository>()
     private val sykefraværsstatistikkTilEksporteringRepository = mock<SykefraværsstatistikkTilEksporteringRepository>()
+    private val sykefraværStatistikkLandRepository = mock<SykefraværStatistikkLandRepository>()
     private val kafkaClient = mock<KafkaClient>()
-    private var service: EksporteringPerStatistikkKategoriService = EksporteringPerStatistikkKategoriService(
-        sykefraværRepository,
+
+    private val service: EksporteringPerStatistikkKategoriService = EksporteringPerStatistikkKategoriService(
         sykefraværsstatistikkTilEksporteringRepository,
+        sykefraværStatistikkLandRepository,
         kafkaClient,
     )
 
     private val statistikkategoriKafkameldingCaptor = argumentCaptor<StatistikkategoriKafkamelding>()
     private val gradertStatistikkategoriKafkameldingCaptor = argumentCaptor<GradertStatistikkategoriKafkamelding>()
 
-    @BeforeEach
-    fun setUp() {
-        service = EksporteringPerStatistikkKategoriService(
-            sykefraværRepository,
-            sykefraværsstatistikkTilEksporteringRepository,
-            kafkaClient,
-        )
-    }
-
     @Test
     fun eksporterSykefraværsstatistikkLand__sender_riktig_melding_til_kafka() {
         val umaskertSykefraværForEttKvartalListe =
             EksporteringServiceTestUtils.sykefraværsstatistikkLandSiste4Kvartaler(__2020_2)
-        whenever(sykefraværRepository.hentUmaskertSykefraværForNorge(any()))
+        whenever(sykefraværStatistikkLandRepository.hentForKvartaler(any()))
             .thenReturn(umaskertSykefraværForEttKvartalListe)
 
         service.eksporterPerStatistikkKategori(__2020_2, Statistikkategori.LAND)
@@ -68,15 +60,15 @@ class EksporteringPerStatistikkKategoriServiceTest {
     fun eksporterSykefraværsstatistikkSektor__sender_riktig_melding_til_kafka() {
         val testData = sykefraværsstatistikkSektor
         whenever(sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleSektorerFraOgMed(any()))
-                .thenReturn(listOf(testData))
+            .thenReturn(listOf(testData))
 
         service.eksporterPerStatistikkKategori(__2020_2, Statistikkategori.SEKTOR)
 
         verify(kafkaClient)
-                .sendMelding(
-                        statistikkategoriKafkameldingCaptor.capture(),
-                        eq(KafkaTopic.SYKEFRAVARSSTATISTIKK_SEKTOR_V1)
-                )
+            .sendMelding(
+                statistikkategoriKafkameldingCaptor.capture(),
+                eq(KafkaTopic.SYKEFRAVARSSTATISTIKK_SEKTOR_V1)
+            )
 
         assertThatJson(statistikkategoriKafkameldingCaptor.firstValue.innhold) {
             isObject
@@ -117,8 +109,8 @@ class EksporteringPerStatistikkKategoriServiceTest {
 
         // 2- Kall tjenesten
         service.eksporterPerStatistikkKategori(
-                __2020_2,
-                Statistikkategori.VIRKSOMHET
+            __2020_2,
+            Statistikkategori.VIRKSOMHET
         )
 
 
@@ -203,8 +195,9 @@ class EksporteringPerStatistikkKategoriServiceTest {
 
         // 2- Kall tjenesten
         service.eksporterPerStatistikkKategori(
-                __2020_2,
-                Statistikkategori.NÆRING)
+            __2020_2,
+            Statistikkategori.NÆRING
+        )
 
         // 3- Sjekk hva Kafka har fått
         verify(kafkaClient)
@@ -265,8 +258,8 @@ class EksporteringPerStatistikkKategoriServiceTest {
         )
 
         whenever(
-                sykefraværsstatistikkTilEksporteringRepository
-                        .hentSykefraværprosentForAlleNæringskoder(__2019_3, __2020_2)
+            sykefraværsstatistikkTilEksporteringRepository
+                .hentSykefraværprosentForAlleNæringskoder(__2019_3, __2020_2)
         ).thenReturn(allData)
 
         // 2- Kall tjenesten
@@ -274,10 +267,10 @@ class EksporteringPerStatistikkKategoriServiceTest {
 
         // 3- Sjekk hva Kafka har fått
         verify(kafkaClient, times(2))
-                .sendMelding(
-                        statistikkategoriKafkameldingCaptor.capture(),
-                        eq(KafkaTopic.SYKEFRAVARSSTATISTIKK_NARINGSKODE_V1)
-                )
+            .sendMelding(
+                statistikkategoriKafkameldingCaptor.capture(),
+                eq(KafkaTopic.SYKEFRAVARSSTATISTIKK_NARINGSKODE_V1)
+            )
 
         assertThatJson(statistikkategoriKafkameldingCaptor.firstValue.innhold) {
             isObject
@@ -290,8 +283,12 @@ class EksporteringPerStatistikkKategoriServiceTest {
             node("siste4Kvartal").isObject.node("tapteDagsverk").isNumber.isEqualTo(BigDecimal("400.0"))
             node("siste4Kvartal").isObject.node("muligeDagsverk").isNumber.isEqualTo(BigDecimal("20000.0"))
             node("siste4Kvartal").isObject.node("kvartaler").isArray.size().isEqualTo(4)
-            node("siste4Kvartal").isObject.node("kvartaler").isArray.first().isObject.node("årstall").isNumber.isEqualByComparingTo(BigDecimal(2020))
-            node("siste4Kvartal").isObject.node("kvartaler").isArray.last().isObject.node("årstall").isNumber.isEqualByComparingTo(BigDecimal(2019))
+            node("siste4Kvartal").isObject.node("kvartaler").isArray.first().isObject.node("årstall").isNumber.isEqualByComparingTo(
+                BigDecimal(2020)
+            )
+            node("siste4Kvartal").isObject.node("kvartaler").isArray.last().isObject.node("årstall").isNumber.isEqualByComparingTo(
+                BigDecimal(2019)
+            )
         }
 
         assertThatJson(statistikkategoriKafkameldingCaptor.secondValue.innhold) {
@@ -305,7 +302,9 @@ class EksporteringPerStatistikkKategoriServiceTest {
             node("siste4Kvartal").isObject.node("tapteDagsverk").isNumber.isEqualTo(BigDecimal("25.0"))
             node("siste4Kvartal").isObject.node("muligeDagsverk").isNumber.isEqualTo(BigDecimal("200.0"))
             node("siste4Kvartal").isObject.node("kvartaler").isArray.size().isEqualTo(2)
-            node("siste4Kvartal").isObject.node("kvartaler").isArray.first().isObject.node("årstall").isNumber.isEqualByComparingTo(BigDecimal(2020))
+            node("siste4Kvartal").isObject.node("kvartaler").isArray.first().isObject.node("årstall").isNumber.isEqualByComparingTo(
+                BigDecimal(2020)
+            )
         }
 
         assertThatJson(statistikkategoriKafkameldingCaptor.firstValue.nøkkel) {
@@ -348,20 +347,20 @@ class EksporteringPerStatistikkKategoriServiceTest {
                 årstallOgKvartal = __2019_4,
                 næringskode = "33003"
             ),
-                )
+        )
 
         whenever(
-                sykefraværsstatistikkTilEksporteringRepository
-                        .hentSykefraværprosentForAlleNæringskoder(__2019_3, __2020_2)
+            sykefraværsstatistikkTilEksporteringRepository
+                .hentSykefraværprosentForAlleNæringskoder(__2019_3, __2020_2)
         ).thenReturn(allData)
 
         service.eksporterPerStatistikkKategori(__2020_2, Statistikkategori.NÆRINGSKODE)
 
         verify(kafkaClient, times(2))
-                .sendMelding(
-                        statistikkategoriKafkameldingCaptor.capture(),
-                        eq(KafkaTopic.SYKEFRAVARSSTATISTIKK_NARINGSKODE_V1)
-                )
+            .sendMelding(
+                statistikkategoriKafkameldingCaptor.capture(),
+                eq(KafkaTopic.SYKEFRAVARSSTATISTIKK_NARINGSKODE_V1)
+            )
 
         assertThatJson(statistikkategoriKafkameldingCaptor.firstValue.innhold) {
             isObject

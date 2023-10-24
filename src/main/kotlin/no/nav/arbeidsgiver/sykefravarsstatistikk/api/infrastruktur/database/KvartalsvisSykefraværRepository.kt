@@ -58,26 +58,6 @@ class KvartalsvisSykefraværRepository(
         }
     }
 
-    fun hentKvartalsvisSykefraværprosentVirksomhet(
-        virksomhet: Virksomhet
-    ): List<SykefraværForEttKvartal> {
-        return try {
-            namedParameterJdbcTemplate.query(
-                "SELECT sum(tapte_dagsverk) as tapte_dagsverk,"
-                        + "sum(mulige_dagsverk) as mulige_dagsverk,"
-                        + "sum(antall_personer) as antall_personer,"
-                        + "arstall, kvartal "
-                        + "FROM sykefravar_statistikk_virksomhet "
-                        + "where orgnr = :orgnr "
-                        + "GROUP BY arstall, kvartal "
-                        + "ORDER BY arstall, kvartal ",
-                MapSqlParameterSource().addValue("orgnr", virksomhet.orgnr.verdi)
-            ) { rs: ResultSet, _: Int -> mapTilKvartalsvisSykefraværprosent(rs) }
-        } catch (e: EmptyResultDataAccessException) {
-            emptyList()
-        }
-    }
-
     @Throws(SQLException::class)
     private fun mapTilKvartalsvisSykefraværprosent(rs: ResultSet): SykefraværForEttKvartal {
         return SykefraværForEttKvartal(

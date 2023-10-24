@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkLand
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.UmaskertSykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -16,6 +17,22 @@ class SykefraværStatistikkLandRepository(override val database: Database) :
     val antallPersoner = integer("antall_personer")
     val tapteDagsverk = float("tapte_dagsverk")
     val muligeDagsverk = float("mulige_dagsverk")
+
+    fun hentForKvartaler(kvartaler: List<ÅrstallOgKvartal>): List<UmaskertSykefraværForEttKvartal> {
+        return transaction {
+            select {
+                årstall to kvartal inList kvartaler.map { it.årstall to it.kvartal }
+            }.orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
+                .map {
+                    UmaskertSykefraværForEttKvartal(
+                        årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                        dagsverkTeller = it[tapteDagsverk].toBigDecimal(),
+                        dagsverkNevner = it[muligeDagsverk].toBigDecimal(),
+                        antallPersoner = it[antallPersoner]
+                    )
+                }
+        }
+    }
 
     fun slettForKvartal(årstallOgKvartal: ÅrstallOgKvartal) = transaction {
         deleteWhere { (årstall eq årstallOgKvartal.årstall) and (kvartal eq årstallOgKvartal.kvartal) }

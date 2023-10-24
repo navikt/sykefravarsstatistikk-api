@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKva
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Bransjeprogram.finnBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KvartalsvisSykefraværRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -15,6 +16,7 @@ import java.util.stream.Stream
 @Component
 class KvartalsvisSykefraværshistorikkService(
     private val kvartalsvisSykefraværprosentRepository: KvartalsvisSykefraværRepository,
+    private val sykefraværStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -113,23 +115,21 @@ class KvartalsvisSykefraværshistorikkService(
         return KvartalsvisSykefraværshistorikkJson(
             type,
             virksomhet.navn,
-            kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentVirksomhet(
-                virksomhet
-            )
+            sykefraværStatistikkVirksomhetRepository.hentAlt(virksomhet.orgnr)
         )
     }
 
     protected fun uthentingAvSykefraværshistorikkNæring(underenhet: Virksomhet): CompletableFuture<KvartalsvisSykefraværshistorikkJson> {
         return CompletableFuture.supplyAsync<Næring> { underenhet.næringskode.næring }
             .orTimeout(TIMEOUT_UTHENTING_FRA_DB_I_SEKUNDER.toLong(), TimeUnit.SECONDS)
-            .thenCompose<KvartalsvisSykefraværshistorikkJson> { næring: Næring ->
+            .thenCompose { næring: Næring ->
                 uthentingMedFeilhåndteringOgTimeout(
                     { hentSykefraværshistorikkNæring(næring) },
                     Statistikkategori.NÆRING,
                     næring.navn
                 )
             }
-            .handle<KvartalsvisSykefraværshistorikkJson> { result: KvartalsvisSykefraværshistorikkJson?, throwable: Throwable? ->
+            .handle { result: KvartalsvisSykefraværshistorikkJson?, throwable: Throwable? ->
                 if (throwable == null) {
                     return@handle result
                 } else {

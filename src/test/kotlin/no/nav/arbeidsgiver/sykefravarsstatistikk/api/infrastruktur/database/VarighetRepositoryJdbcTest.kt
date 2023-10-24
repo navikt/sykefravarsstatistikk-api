@@ -29,64 +29,82 @@ open class VarighetRepositoryJdbcTest {
     @Autowired
     private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
+    @Autowired
     private lateinit var varighetRepository: VarighetRepository
+
+    @Autowired
+    private lateinit var sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
 
     @BeforeEach
     fun setUp() {
         varighetRepository = VarighetRepository(jdbcTemplate)
-        TestUtils.slettAllStatistikkFraDatabase(jdbcTemplate)
+        TestUtils.slettAllStatistikkFraDatabase(
+            jdbcTemplate = jdbcTemplate,
+            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository
+        )
     }
 
     @AfterEach
     fun tearDown() {
-        TestUtils.slettAllStatistikkFraDatabase(jdbcTemplate)
+        TestUtils.slettAllStatistikkFraDatabase(
+            jdbcTemplate = jdbcTemplate,
+            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository
+        )
     }
 
     @Test
     fun hentSykefraværForEttKvartalMedVarighet__skal_returnere_riktig_sykefravær() {
-        val barnehage = UnderenhetLegacy(
+        val barnehage = Underenhet.Næringsdrivende(
             Orgnr("999999999"),
             Orgnr("1111111111"),
             "test Barnehage",
             Næringskode("88911"),
             10
         )
-        leggTilVirksomhetsstatistikkMedVarighet(
-            jdbcTemplate,
-            barnehage.orgnr.verdi,
-            ÅrstallOgKvartal(2019, 2),
-            Varighetskategori._1_DAG_TIL_7_DAGER,
-            0,
-            4,
-            0
+
+        sykefravarStatistikkVirksomhetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkVirksomhet(
+                    årstall = 2019,
+                    kvartal = 2,
+                    orgnr = barnehage.orgnr.verdi,
+                    tapteDagsverk = BigDecimal(4),
+                    muligeDagsverk = BigDecimal(0),
+                    antallPersoner = 0,
+                    varighet = Varighetskategori._1_DAG_TIL_7_DAGER.kode,
+                    rectype = "2"
+                ),
+                SykefraværsstatistikkVirksomhet(
+                    årstall = 2019,
+                    kvartal = 2,
+                    orgnr = barnehage.orgnr.verdi,
+                    varighet = Varighetskategori.TOTAL.kode,
+                    rectype = "2",
+                    antallPersoner = 6,
+                    tapteDagsverk = 0.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                )
+            )
         )
-        leggTilVirksomhetsstatistikkMedVarighet(
-            jdbcTemplate,
-            barnehage.orgnr.verdi,
-            ÅrstallOgKvartal(2019, 2),
-            Varighetskategori.TOTAL,
-            6,
-            0,
-            100
-        )
+
         val resultat = varighetRepository.hentSykefraværMedVarighet(barnehage)
         assertThat(resultat.size).isEqualTo(2)
         assertThat(resultat[0])
             .isEqualTo(
                 UmaskertSykefraværForEttKvartalMedVarighet(
-                    ÅrstallOgKvartal(2019, 2),
-                    BigDecimal(4),
-                    BigDecimal(0),
-                    0,
-                    Varighetskategori._1_DAG_TIL_7_DAGER
+                    årstallOgKvartal = ÅrstallOgKvartal(2019, 2),
+                    tapteDagsverk = BigDecimal("4.0"),
+                    muligeDagsverk = BigDecimal("0.0"),
+                    antallPersoner = 0,
+                    varighet = Varighetskategori._1_DAG_TIL_7_DAGER
                 )
             )
         assertThat(resultat[1])
             .isEqualTo(
                 UmaskertSykefraværForEttKvartalMedVarighet(
                     ÅrstallOgKvartal(2019, 2),
-                    BigDecimal(0),
-                    BigDecimal(100),
+                    BigDecimal("0.0"),
+                    BigDecimal("100.0"),
                     6,
                     Varighetskategori.TOTAL
                 )

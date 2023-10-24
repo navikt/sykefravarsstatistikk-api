@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk
 
 import config.AppConfigForJdbcTesterConfig
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import testUtils.AssertUtils.assertBigDecimalIsEqual
 import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import testUtils.TestUtils.opprettStatistikkForNæringer
@@ -9,6 +10,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sy
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkForNæringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetUtenVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
@@ -39,6 +41,10 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
             jdbcTemplate
         )
     }
+
+    @Autowired
+    lateinit var sykefraværsstatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
+
     private val produksjonAvKlær = Næringskode("14190")
     private val undervisning = Næringskode("86907")
     private val utdanning = Næring("86")
@@ -503,16 +509,111 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     }
 
     private fun opprettStatistikkVirksomhetTestData() {
-        createStatistikkVirksomhet(VIRKSOMHET_1, 2018, 2, 3, 1, 60)
-        createStatistikkVirksomhet(VIRKSOMHET_2, 2018, 2, 4, 9, 100)
-        createStatistikkVirksomhet(VIRKSOMHET_1, 2018, 3, 3, 1, 60)
-        createStatistikkVirksomhet(VIRKSOMHET_1, 2018, 4, 40, 20, 115)
-        createStatistikkVirksomhet(VIRKSOMHET_2, 2018, 3, 4, 9, 100)
-        createStatistikkVirksomhet(VIRKSOMHET_2, 2018, 4, 7, 12, 100)
-        createStatistikkVirksomhet(VIRKSOMHET_1, 2019, 2, 3, 1, 60)
-        createStatistikkVirksomhet(VIRKSOMHET_1, 2019, 1, 40, 20, 115)
-        createStatistikkVirksomhet(VIRKSOMHET_2, 2019, 2, 4, 9, 100)
-        createStatistikkVirksomhet(VIRKSOMHET_2, 2019, 1, 7, 12, 100)
+
+        sykefraværsstatistikkVirksomhetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkVirksomhet(
+                    orgnr = VIRKSOMHET_1,
+                    årstall = 2018,
+                    kvartal = 2,
+                    antallPersoner = 3,
+                    tapteDagsverk = BigDecimal(1),
+                    muligeDagsverk = BigDecimal(60),
+                    rectype = "2",
+                    varighet = Varighetskategori.TOTAL.kode
+                ),
+                SykefraværsstatistikkVirksomhet(
+                    orgnr = VIRKSOMHET_2,
+                    årstall = 2018,
+                    kvartal = 2,
+                    antallPersoner = 4,
+                    tapteDagsverk = BigDecimal(9),
+                    muligeDagsverk = BigDecimal(100),
+                    rectype = "2",
+                    varighet = Varighetskategori.TOTAL.kode
+                ),
+                SykefraværsstatistikkVirksomhet(
+                    orgnr = VIRKSOMHET_1,
+                    årstall = 2018,
+                    kvartal = 3,
+                    antallPersoner = 3,
+                    tapteDagsverk = BigDecimal(1),
+                    muligeDagsverk = BigDecimal(60),
+                    rectype = "2",
+                    varighet = Varighetskategori.TOTAL.kode
+                ),
+                SykefraværsstatistikkVirksomhet(
+                    orgnr = VIRKSOMHET_1,
+                    årstall = 2018,
+                    kvartal = 4,
+                    antallPersoner = 40,
+                    tapteDagsverk = BigDecimal(20),
+                    muligeDagsverk = BigDecimal(115),
+                    rectype = "2",
+                    varighet = Varighetskategori.TOTAL.kode
+                ),
+                SykefraværsstatistikkVirksomhet(
+                    orgnr = VIRKSOMHET_2,
+                    årstall = 2018,
+                    kvartal = 3,
+                    antallPersoner = 4,
+                    tapteDagsverk = BigDecimal(9),
+                    muligeDagsverk = BigDecimal(100),
+                    rectype = "2",
+                    varighet = Varighetskategori.TOTAL.kode
+                ),
+                SykefraværsstatistikkVirksomhet(
+                    orgnr = VIRKSOMHET_2,
+                    årstall = 2018,
+                    kvartal = 4,
+                    antallPersoner = 7,
+                    tapteDagsverk = BigDecimal(12),
+                    muligeDagsverk = BigDecimal(100),
+                    rectype = "2",
+                    varighet = Varighetskategori.TOTAL.kode
+                ),
+                SykefraværsstatistikkVirksomhet(
+                    orgnr = VIRKSOMHET_1,
+                    årstall = 2019,
+                    kvartal = 2,
+                    antallPersoner = 3,
+                    tapteDagsverk = BigDecimal(1),
+                    muligeDagsverk = BigDecimal(60),
+                    rectype = "2",
+                    varighet = Varighetskategori.TOTAL.kode
+                ),
+                SykefraværsstatistikkVirksomhet(
+                    orgnr = VIRKSOMHET_1,
+                    årstall = 2019,
+                    kvartal = 1,
+                    antallPersoner = 40,
+                    tapteDagsverk = BigDecimal(20),
+                    muligeDagsverk = BigDecimal(115),
+                    rectype = "2",
+                    varighet = Varighetskategori.TOTAL.kode
+                ),
+                SykefraværsstatistikkVirksomhet(
+                    orgnr = VIRKSOMHET_2,
+                    årstall = 2019,
+                    kvartal = 2,
+                    antallPersoner = 4,
+                    tapteDagsverk = BigDecimal(9),
+                    muligeDagsverk = BigDecimal(100),
+                    rectype = "2",
+                    varighet = Varighetskategori.TOTAL.kode
+                ),
+                SykefraværsstatistikkVirksomhet(
+                    orgnr = VIRKSOMHET_2,
+                    årstall = 2019,
+                    kvartal = 1,
+                    antallPersoner = 7,
+                    tapteDagsverk = BigDecimal(12),
+                    muligeDagsverk = BigDecimal(100),
+                    rectype = "2",
+                    varighet = Varighetskategori.TOTAL.kode
+                ),
+            )
+        )
     }
 
     private fun opprettStatistikkNæringTestData(vararg årstallOgKvartal: ÅrstallOgKvartal) {
@@ -629,31 +730,6 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
         )
     }
 
-    private fun createStatistikkVirksomhet(
-        orgnr: String,
-        årstall: Int,
-        kvartal: Int,
-        antallPersoner: Int,
-        tapteDagsverk: Int,
-        muligeDagsverk: Int
-    ) {
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_virksomhet "
-                    + "(arstall, kvartal, orgnr, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "values (:arstall, :kvartal, :orgnr, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(
-                SykefraværsstatistikkVirksomhetUtenVarighet(
-                    årstall,
-                    kvartal,
-                    orgnr,
-                    antallPersoner,
-                    BigDecimal(tapteDagsverk),
-                    BigDecimal(muligeDagsverk)
-                )
-            )
-        )
-    }
-
     private fun parametre(sykefraværsstatistikkSektor: SykefraværsstatistikkSektor): MapSqlParameterSource {
         val parametre = MapSqlParameterSource()
             .addValue("sektor_kode", sykefraværsstatistikkSektor.sektorkode)
@@ -690,9 +766,5 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
             .addValue("antall_personer", sykefraværsstatistikk.antallPersoner)
             .addValue("tapte_dagsverk", sykefraværsstatistikk.tapteDagsverk)
             .addValue("mulige_dagsverk", sykefraværsstatistikk.muligeDagsverk)
-    }
-
-    @Test
-    fun hentSykefraværAlleBransjerFraOgMed() {
     }
 }

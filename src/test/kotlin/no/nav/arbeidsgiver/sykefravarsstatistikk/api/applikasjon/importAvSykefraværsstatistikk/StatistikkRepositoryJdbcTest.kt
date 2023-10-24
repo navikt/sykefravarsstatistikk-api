@@ -42,21 +42,21 @@ import java.sql.ResultSet
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 open class StatistikkRepositoryJdbcTest {
     @Autowired
-    private val jdbcTemplate: NamedParameterJdbcTemplate? = null
-    private var statistikkRepository: StatistikkRepository? = null
+    private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
+    @Autowired
+    private lateinit var statistikkRepository: StatistikkRepository
 
     @Autowired
     private lateinit var sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
 
     @BeforeEach
     fun setUp() {
-        statistikkRepository = StatistikkRepository(jdbcTemplate!!)
-        slettAllStatistikkFraDatabase(jdbcTemplate)
+        slettAllStatistikkFraDatabase(jdbcTemplate, sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository)
     }
 
     @AfterEach
     fun tearDown() {
-        slettAllStatistikkFraDatabase(jdbcTemplate!!)
+        slettAllStatistikkFraDatabase(jdbcTemplate, sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository)
     }
 
     @Test
@@ -154,14 +154,14 @@ open class StatistikkRepositoryJdbcTest {
         assertEquals(
             statistikkIDatabasen.first(),
             RawDataStatistikkVirksomhet(
-                2019,
-                3,
-                ORGNR_VIRKSOMHET_1,
-                Varighetskategori._1_DAG_TIL_7_DAGER.kode,
-                DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
-                BigDecimal("16"),
-                BigDecimal("100"),
-                1
+                årstall = 2019,
+                kvartal = 3,
+                orgnr = ORGNR_VIRKSOMHET_1,
+                varighet = Varighetskategori._1_DAG_TIL_7_DAGER.kode,
+                rectype = DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
+                tapteDagsverk = BigDecimal("16"),
+                muligeDagsverk = BigDecimal("100"),
+                antallPersoner = 1
             )
         )
     }

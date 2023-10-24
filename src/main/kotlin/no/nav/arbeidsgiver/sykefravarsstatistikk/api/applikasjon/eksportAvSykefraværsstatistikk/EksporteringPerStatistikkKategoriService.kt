@@ -7,7 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sy
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic.Companion.from
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.GradertStatistikkategoriKafkamelding
@@ -17,8 +17,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class EksporteringPerStatistikkKategoriService(
-    private val sykefraværRepository: SykefraværRepository,
     private val tilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository,
+    private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
     private val kafkaClient: KafkaClient,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -53,9 +53,10 @@ class EksporteringPerStatistikkKategoriService(
     }
 
     private fun eksporterSykefraværsstatistikkLand(årstallOgKvartal: ÅrstallOgKvartal) {
-        sykefraværRepository.hentUmaskertSykefraværForNorge(
-            årstallOgKvartal.minusKvartaler(3)
-        ).tilSykefraværsstatistikkLand()
+        val kvartaler = ÅrstallOgKvartal.range(årstallOgKvartal.minusKvartaler(3), årstallOgKvartal)
+
+        sykefraværStatistikkLandRepository.hentForKvartaler(kvartaler)
+            .tilSykefraværsstatistikkLand()
             .groupByLand().let {
                 eksporterSykefraværsstatistikkPerKategori(
                     årstallOgKvartal = årstallOgKvartal,

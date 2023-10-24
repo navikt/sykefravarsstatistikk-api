@@ -7,8 +7,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sy
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.UmaskertSykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringPerStatistikkKategoriService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.StatistikkategoriKafkamelding
@@ -22,9 +22,14 @@ internal class EksporteringBransjeServiceTest {
 
     private val repositoryMock = mock<SykefraværsstatistikkTilEksporteringRepository>()
     private val kafkaClientMock = mock<KafkaClient>()
+    private val sykefraværStatistikkLandRepositoryMock = mock<SykefraværStatistikkLandRepository>()
 
     private val service =
-        EksporteringPerStatistikkKategoriService(mock(), repositoryMock, kafkaClientMock)
+        EksporteringPerStatistikkKategoriService(
+            repositoryMock,
+            sykefraværStatistikkLandRepositoryMock,
+            kafkaClientMock
+        )
 
     @Test
     fun `eksporterPerStatistikkKategori skal ikke putte noe på kafkastrømmen dersom datagrunnalget er tomt`() {

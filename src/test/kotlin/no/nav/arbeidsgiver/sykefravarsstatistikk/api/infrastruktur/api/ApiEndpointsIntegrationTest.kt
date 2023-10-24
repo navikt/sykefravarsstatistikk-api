@@ -7,8 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.net.HttpHeaders
 import config.SpringIntegrationTestbase
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -21,9 +23,9 @@ import testUtils.TestTokenUtil.createToken
 import testUtils.TestUtils.PRODUKSJON_NYTELSESMIDLER
 import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import testUtils.TestUtils.opprettStatistikkForLand
+import testUtils.TestUtils.opprettStatistikkForLandExposed
 import testUtils.TestUtils.opprettStatistikkForNæring
 import testUtils.TestUtils.opprettStatistikkForSektor
-import testUtils.TestUtils.opprettStatistikkForVirksomhet
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import testUtils.TestUtils.slettAlleImporttidspunkt
 import java.io.IOException
@@ -50,6 +52,9 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
     lateinit var sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
 
     @Autowired
+    lateinit var sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository
+
+    @Autowired
     lateinit var importtidspunktRepository: ImporttidspunktRepository
 
     @LocalServerPort
@@ -67,43 +72,61 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
     @Throws(Exception::class)
     fun sykefraværshistorikk__skal_ikke_tillate_selvbetjening_token() {
         val jwtTokenIssuedByLoginservice = createToken(mockOAuth2Server, "15008462396", "selvbetjening", "")
-        opprettGenerellStatistikk()
         val respons = gjørKallMotKvartalsvis(ORGNR_UNDERENHET, jwtTokenIssuedByLoginservice)
         Assertions.assertThat(respons.statusCode()).isEqualTo(401)
     }
 
     @Test
-    @Throws(Exception::class)
-    fun sykefraværshistorikk__skal_returnere_riktig_objekt_med_en_token_fra_tokenx_og_opprinnelig_provider_er_idporten() {
+    fun `kvartalsvis skal returnere riktig JSON`() {
         val jwtToken = createToken(
             mockOAuth2Server,
             "15008462396",
             TOKENX_ISSUER_ID,
             "https://oidc.difi.no/idporten-oidc-provider/"
         )
-        opprettGenerellStatistikk()
-        sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtToken)
-    }
+        opprettStatistikkForLand(sykefraværStatistikkLandRepository)
 
-    private fun opprettGenerellStatistikk() {
-        opprettStatistikkForLand(jdbcTemplate)
+        opprettStatistikkForLandExposed(sykefraværStatistikkLandRepository)
+
         opprettStatistikkForSektor(jdbcTemplate)
         opprettStatistikkForNæring(
             jdbcTemplate, PRODUKSJON_NYTELSESMIDLER, SISTE_ÅRSTALL, SISTE_KVARTAL, 5, 100, 10
         )
-        opprettStatistikkForVirksomhet(
-            jdbcTemplate, ORGNR_UNDERENHET, SISTE_ÅRSTALL, SISTE_KVARTAL, 9, 200, 10
+        sykefravarStatistikkVirksomhetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkVirksomhet(
+                    årstall = SISTE_ÅRSTALL,
+                    kvartal = SISTE_KVARTAL,
+                    orgnr = ORGNR_UNDERENHET,
+                    tapteDagsverk = 9.toBigDecimal(),
+                    muligeDagsverk = 200.toBigDecimal(),
+                    antallPersoner = 10,
+                    varighet = "A",
+                    rectype = "2",
+                )
+            )
         )
-        opprettStatistikkForVirksomhet(
-            jdbcTemplate, ORGNR_OVERORDNET_ENHET, SISTE_ÅRSTALL, SISTE_KVARTAL, 7, 200, 10
+        sykefravarStatistikkVirksomhetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkVirksomhet(
+                    årstall = SISTE_ÅRSTALL,
+                    kvartal = SISTE_KVARTAL,
+                    orgnr = ORGNR_OVERORDNET_ENHET,
+                    tapteDagsverk = 7.toBigDecimal(),
+                    muligeDagsverk = 200.toBigDecimal(),
+                    antallPersoner = 10,
+                    varighet = "A",
+                    rectype = "1",
+                )
+            )
         )
-    }
 
-    @Throws(Exception::class)
-    private fun sjekkAtSykefraværshistorikkReturnereRiktigObjekt(jwtToken: String) {
         val response = gjørKallMotKvartalsvis(ORGNR_UNDERENHET, "Bearer $jwtToken")
+
         Assertions.assertThat(response.statusCode()).isEqualTo(200)
+
         val alleSykefraværshistorikk = objectMapper.readTree(response.body())
+
         Assertions.assertThat(
             alleSykefraværshistorikk.findValues("type").stream()
                 .map { obj: JsonNode -> obj.textValue() }
@@ -182,6 +205,7 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
                             + "}"
                 )
             )
+
     }
 
     @Test

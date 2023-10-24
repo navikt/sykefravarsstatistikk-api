@@ -7,10 +7,7 @@ import com.google.common.collect.Lists
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingException
 import org.slf4j.LoggerFactory
@@ -25,7 +22,7 @@ class EksporteringService(
     private val eksporteringRepository: EksporteringRepository,
     private val virksomhetMetadataRepository: VirksomhetMetadataRepository,
     private val sykefraværsstatistikkTilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository,
-    private val sykefraværRepository: SykefraværRepository,
+    private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
     private val kafkaClient: KafkaClient,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -83,9 +80,10 @@ class EksporteringService(
         kafkaClient.nullstillUtsendingRapport(
             virksomheterTilEksport.size, KafkaTopic.SYKEFRAVARSSTATISTIKK_V1
         )
-        val virksomhetMetadataListe = virksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(årstallOgKvartal)
+        val virksomhetMetadataListe =
+            virksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(årstallOgKvartal)
         val umaskertSykefraværsstatistikkSistePublisertKvartalLand =
-            sykefraværRepository.hentUmaskertSykefraværForNorge(årstallOgKvartal)
+            sykefraværStatistikkLandRepository.hentForKvartaler(listOf(årstallOgKvartal))
         val sykefraværsstatistikkSektor =
             sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(
                 årstallOgKvartal
