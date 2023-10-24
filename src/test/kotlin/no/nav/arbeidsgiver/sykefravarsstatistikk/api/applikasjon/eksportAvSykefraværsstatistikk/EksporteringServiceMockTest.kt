@@ -27,13 +27,9 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.virksomhetEksportPerKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.virksomhetMetadata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.virksomhetSykefravær
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
 import org.assertj.core.api.Assertions
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
@@ -52,39 +48,30 @@ class EksporteringServiceMockTest {
 
     private val sykefraværsstatistikkTilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository = mock()
 
-    private val sykefraværsRepository: SykefraværRepository = mock()
-
     private val kafkaClient: KafkaClient = mock()
-    private var service: EksporteringService = EksporteringService(
+    private val sykefraværStatistikkLandRepository = mock<SykefraværStatistikkLandRepository>()
+
+    private val service: EksporteringService = EksporteringService(
         eksporteringRepository,
         virksomhetMetadataRepository,
         sykefraværsstatistikkTilEksporteringRepository,
-        sykefraværsRepository,
+        sykefraværStatistikkLandRepository,
         kafkaClient
     )
 
     val årstallOgKvartalArgumentCaptor: KArgumentCaptor<ÅrstallOgKvartal> = argumentCaptor<ÅrstallOgKvartal>()
 
-    val virksomhetSykefraværArgumentCaptor: KArgumentCaptor<VirksomhetSykefravær> = argumentCaptor<VirksomhetSykefravær>()
+    val virksomhetSykefraværArgumentCaptor: KArgumentCaptor<VirksomhetSykefravær> =
+        argumentCaptor<VirksomhetSykefravær>()
 
-    val næring5SifferSykefraværArgumentCaptor: KArgumentCaptor<List<SykefraværMedKategori>> = argumentCaptor<List<SykefraværMedKategori>>()
+    val næring5SifferSykefraværArgumentCaptor: KArgumentCaptor<List<SykefraværMedKategori>> =
+        argumentCaptor<List<SykefraværMedKategori>>()
 
     val næringSykefraværArgumentCaptor: KArgumentCaptor<SykefraværMedKategori> = argumentCaptor<SykefraværMedKategori>()
 
     val sektorSykefraværArgumentCaptor: KArgumentCaptor<SykefraværMedKategori> = argumentCaptor<SykefraværMedKategori>()
 
     val landSykefraværArgumentCaptor: KArgumentCaptor<SykefraværMedKategori> = argumentCaptor<SykefraværMedKategori>()
-
-    @BeforeEach
-    fun setUp() {
-        service = EksporteringService(
-            eksporteringRepository,
-            virksomhetMetadataRepository,
-            sykefraværsstatistikkTilEksporteringRepository,
-            sykefraværsRepository,
-            kafkaClient
-        )
-    }
 
     @Test
     fun eksporter_returnerer_feil_når_det_ikke_finnes_statistikk() {
@@ -154,9 +141,7 @@ class EksporteringServiceMockTest {
                 )
             )
         whenever(
-            sykefraværsRepository.hentUmaskertSykefraværForNorge(
-                any()
-            )
+            sykefraværStatistikkLandRepository.hentForKvartaler(any())
         )
             .thenReturn(sykefraværsstatistikkLandSiste4Kvartaler(__2020_2))
         val antallEksporterte = service.legacyEksporter(__2020_2).getOrNull()!!
@@ -261,7 +246,7 @@ class EksporteringServiceMockTest {
                     )
                 )
             )
-        whenever(sykefraværsRepository.hentUmaskertSykefraværForNorge(any()))
+        whenever(sykefraværStatistikkLandRepository.hentForKvartaler(any()))
             .thenReturn(sykefraværsstatistikkLandSiste4Kvartaler(årstallOgKvartal))
         val antallEksporterte = service.legacyEksporter(årstallOgKvartal).getOrNull()
         Mockito.verify(kafkaClient)

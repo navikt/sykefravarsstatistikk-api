@@ -16,6 +16,7 @@ import java.util.*
 class SykefraværRepository(
     @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
     private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
+    private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
 ) {
     fun hentUmaskertSykefravær(
         bransje: Bransje, fraÅrstallOgKvartal: ÅrstallOgKvartal
@@ -69,39 +70,21 @@ class SykefraværRepository(
         }
     }
 
-    // TODO: fungerer ikke hvis 'fra' er eldre enn sisteKvartal.minus(3)
-    fun hentUmaskertSykefraværForNorge(
-        fra: ÅrstallOgKvartal
-    ): List<UmaskertSykefraværForEttKvartal> {
-        return try {
-            try {
-                namedParameterJdbcTemplate.query(
-                    "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal "
-                            + "FROM sykefravar_statistikk_land "
-                            + "WHERE (arstall = :arstall and kvartal >= :kvartal) "
-                            + "  or (arstall > :arstall) "
-                            + "ORDER BY arstall, kvartal ",
-                    MapSqlParameterSource()
-                        .addValue("arstall", fra.årstall)
-                        .addValue("kvartal", fra.kvartal)
-                ) { rs: ResultSet, _: Int -> mapTilUmaskertSykefraværForEttKvartal(rs) }.sorted()
-            } catch (e: EmptyResultDataAccessException) {
-                emptyList()
-            }
-        } catch (e: EmptyResultDataAccessException) {
-            emptyList()
-        }
-    }
 
     fun hentTotaltSykefraværAlleKategorier(
-        virksomhet: Virksomhet, fraÅrstallOgKvartal: ÅrstallOgKvartal
+        virksomhet: Virksomhet, kvartaler: List<ÅrstallOgKvartal>
     ): Sykefraværsdata {
+
         val næring = virksomhet.næringskode.næring
         val maybeBransje = finnBransje(virksomhet.næringskode)
         val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> =
             EnumMap(Statistikkategori::class.java)
-        data[Statistikkategori.VIRKSOMHET] = sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(virksomhet, fraÅrstallOgKvartal)
-        data[Statistikkategori.LAND] = hentUmaskertSykefraværForNorge(fraÅrstallOgKvartal)
+        val fraÅrstallOgKvartal = kvartaler.minOf { it }
+
+        data[Statistikkategori.VIRKSOMHET] = sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(virksomhet,
+            fraÅrstallOgKvartal
+        )
+        data[Statistikkategori.LAND] = sykefraværStatistikkLandRepository.hentForKvartaler(kvartaler)
         if (maybeBransje.isEmpty) {
             data[Statistikkategori.NÆRING] = hentUmaskertSykefravær(næring, fraÅrstallOgKvartal)
         } else if (maybeBransje.get().erDefinertPåFemsiffernivå()) {

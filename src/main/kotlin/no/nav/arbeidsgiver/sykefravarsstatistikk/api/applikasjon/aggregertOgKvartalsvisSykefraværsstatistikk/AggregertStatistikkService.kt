@@ -130,8 +130,10 @@ class AggregertStatistikkService(
         val fraÅrstallOgKvartal = gjeldendePeriode?.minusKvartaler(4)
             ?: throw IllegalStateException("Fant ikke siste publiserte kvartal")
 
+        val kvartaler = ÅrstallOgKvartal.range(fraÅrstallOgKvartal, gjeldendePeriode)
+
         return sykefraværprosentRepository.hentTotaltSykefraværAlleKategorier(
-            forBedrift, fraÅrstallOgKvartal
+            forBedrift, kvartaler
         )
     }
 
