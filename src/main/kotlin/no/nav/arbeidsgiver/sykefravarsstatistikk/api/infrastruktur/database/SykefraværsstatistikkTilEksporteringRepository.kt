@@ -282,6 +282,7 @@ class SykefraværsstatistikkTilEksporteringRepository(
         private fun getWhereClause(
             fraÅrstallOgKvartal: ÅrstallOgKvartal?, tilÅrstallOgKvartal: ÅrstallOgKvartal?
         ): String {
+
             // Alltid sjekk input før verdi skal til SQL
             sjekkÅrstallOgKvartal(fraÅrstallOgKvartal!!, tilÅrstallOgKvartal!!)
             val årstallOgKvartalListe = range(fraÅrstallOgKvartal, tilÅrstallOgKvartal)

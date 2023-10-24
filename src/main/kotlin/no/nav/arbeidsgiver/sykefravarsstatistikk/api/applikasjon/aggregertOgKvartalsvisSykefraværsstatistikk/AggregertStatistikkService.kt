@@ -126,14 +126,10 @@ class AggregertStatistikkService(
 
     private fun hentTotalfraværSisteFemKvartaler(forBedrift: Virksomhet): Sykefraværsdata {
         val gjeldendePeriode = importtidspunktRepository.hentNyesteImporterteKvartal()?.gjeldendePeriode
-
-        val fraÅrstallOgKvartal = gjeldendePeriode?.minusKvartaler(4)
             ?: throw IllegalStateException("Fant ikke siste publiserte kvartal")
 
-        val kvartaler = ÅrstallOgKvartal.range(fraÅrstallOgKvartal, gjeldendePeriode)
-
         return sykefraværprosentRepository.hentTotaltSykefraværAlleKategorier(
-            forBedrift, kvartaler
+            forBedrift, (gjeldendePeriode inkludertTidligere 4)
         )
     }
 
