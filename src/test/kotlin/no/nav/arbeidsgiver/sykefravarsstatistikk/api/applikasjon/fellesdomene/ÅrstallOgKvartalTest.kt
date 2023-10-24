@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import io.kotest.matchers.shouldBe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal.Companion.range
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
@@ -80,6 +80,20 @@ class ÅrstallOgKvartalTest {
                     ÅrstallOgKvartal(2002, 3)
                 )
             )
+    }
+
+    @Test
+    fun `inkludertForrige skal regne seg bakover n kvartaler`() {
+        val kvartal = ÅrstallOgKvartal(2023, 1)
+        kvartal inkludertTidligere -1 shouldBe emptyList()
+        kvartal inkludertTidligere 0 shouldBe listOf(kvartal)
+        kvartal inkludertTidligere 1 shouldBe listOf(kvartal, ÅrstallOgKvartal(2022, 4))
+
+        ÅrstallOgKvartal(2040, 3) inkludertTidligere 2 shouldBe listOf(
+            ÅrstallOgKvartal(2040, 3),
+            ÅrstallOgKvartal(2040, 2),
+            ÅrstallOgKvartal(2040, 1),
+        )
     }
 
     @Test

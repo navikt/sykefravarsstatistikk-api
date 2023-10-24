@@ -8,7 +8,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Br
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.UmaskertSykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal.Companion.sisteFireKvartaler
 
 class Aggregeringskalkulator(
     private var sykefraværsdata: Sykefraværsdata,
@@ -83,7 +82,7 @@ class Aggregeringskalkulator(
     ): List<UmaskertSykefraværForEttKvartal> {
         return statistikk
             .filter {
-                sisteFireKvartaler(sistePubliserteKvartal).contains(it.årstallOgKvartal)
+                (sistePubliserteKvartal inkludertTidligere 3).contains(it.årstallOgKvartal)
             }.sorted()
     }
 }

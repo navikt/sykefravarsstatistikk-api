@@ -30,7 +30,8 @@ class EksportAvEnkeltkvartalerCronTest {
         whenever(virksomhetMetadataService.overskrivNæringskoderForVirksomheter(any())).thenReturn(1.right())
         whenever(eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(any())).thenReturn(Unit.right())
 
-        jobb.gjennomførJobb(ÅrstallOgKvartal(2020, 1), ÅrstallOgKvartal(2021, 4), listOf(Statistikkategori.BRANSJE))
+        val kvartaler =  ÅrstallOgKvartal(2021, 4) inkludertTidligere 7
+        jobb.gjennomførJobb(kvartaler, listOf(Statistikkategori.BRANSJE))
 
         verify(eksporteringMetadataVirksomhetService, times(8)).eksporterMetadataVirksomhet(any())
     }

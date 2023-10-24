@@ -33,24 +33,22 @@ class EksportAvEnkeltkvartalerCron(
         noeFeiletCounter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
     }
 
-    // Fjern scheduleringen etter at jobben har kjørt ÉN gang
-    // Cron jobb that runs at 12 once a year
-    @Scheduled(cron = "0 0 12 6 10 ?")
-    fun scheduledEksportAvEnkeltkvartal() {
-        val fraKvartal = ÅrstallOgKvartal(2019, 1)
-        val tilKvartal = ÅrstallOgKvartal(2023, 2)
+    @Scheduled(cron = "-")
+    fun scheduledEksportAvEnkeltkvartaler() {
         val kategorier = listOf(Statistikkategori.BRANSJE)
+        val femÅrMedKvartaler = 4 * 5
+        val sisteFemÅr = ÅrstallOgKvartal(2023, 2) inkludertTidligere femÅrMedKvartaler
 
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
         taskExecutor.executeWithLock(
-            Runnable { gjennomførJobb(fraKvartal, tilKvartal, kategorier) },
+            Runnable { gjennomførJobb(sisteFemÅr, kategorier) },
             LockConfiguration(Instant.now(), "importering", lockAtMostFor, lockAtLeastFor)
         )
     }
 
-    fun gjennomførJobb(fraKvartal: ÅrstallOgKvartal, tilKvartal: ÅrstallOgKvartal, kategorier: List<Statistikkategori>) {
-        for (kvartal in ÅrstallOgKvartal.range(fraKvartal, tilKvartal)) {
+    fun gjennomførJobb(kvartaler: List<ÅrstallOgKvartal>, kategorier: List<Statistikkategori>) {
+        for (kvartal in kvartaler) {
 
             log.info("EksportAvEnkeltkvartaler har startet for $kvartal")
 
