@@ -31,12 +31,12 @@ class EksportAvGradertStatistikkCron(
     fun scheduledEksportAvGradertStatistikk() {
         val tilKvartal = ÅrstallOgKvartal(2023, 2)
 
-        val fireÅrMedKvartaler = 4 * 4
+        val fireÅrMedKvartaler = tilKvartal inkludertTidligere 4 * 4 - 1
 
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
         taskExecutor.executeWithLock(
-            Runnable { gjennomførJobb(tilKvartal inkludertTidligere fireÅrMedKvartaler) },
+            Runnable { gjennomførJobb(fireÅrMedKvartaler) },
             LockConfiguration(Instant.now(), "eksport-gradert-statistikk", lockAtMostFor, lockAtLeastFor)
         )
     }

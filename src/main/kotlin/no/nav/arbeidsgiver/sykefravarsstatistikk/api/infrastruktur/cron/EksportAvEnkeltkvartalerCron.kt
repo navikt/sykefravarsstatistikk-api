@@ -36,13 +36,12 @@ class EksportAvEnkeltkvartalerCron(
     @Scheduled(cron = "-")
     fun scheduledEksportAvEnkeltkvartaler() {
         val kategorier = listOf(Statistikkategori.BRANSJE)
-        val femÅrMedKvartaler = 4 * 5
-        val sisteFemÅr = ÅrstallOgKvartal(2023, 2) inkludertTidligere femÅrMedKvartaler
+        val sisteFireÅr = ÅrstallOgKvartal(2023, 2) inkludertTidligere 4 * 4 - 1
 
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
         taskExecutor.executeWithLock(
-            Runnable { gjennomførJobb(sisteFemÅr, kategorier) },
+            Runnable { gjennomførJobb(sisteFireÅr, kategorier) },
             LockConfiguration(Instant.now(), "importering", lockAtMostFor, lockAtLeastFor)
         )
     }

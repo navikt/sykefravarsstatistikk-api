@@ -83,7 +83,7 @@ class ÅrstallOgKvartalTest {
     }
 
     @Test
-    fun `inkludertForrige skal regne seg bakover n kvartaler`() {
+    fun `inkludertTidligere skal regne seg bakover n kvartaler`() {
         val kvartal = ÅrstallOgKvartal(2023, 1)
         kvartal inkludertTidligere -1 shouldBe emptyList()
         kvartal inkludertTidligere 0 shouldBe listOf(kvartal)
