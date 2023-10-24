@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene
 
 data class ÅrstallOgKvartal(
-    @get:JvmName("getÅrstall") val årstall: Int,
+    val årstall: Int,
     val kvartal: Int
 ) : Comparable<ÅrstallOgKvartal> {
 

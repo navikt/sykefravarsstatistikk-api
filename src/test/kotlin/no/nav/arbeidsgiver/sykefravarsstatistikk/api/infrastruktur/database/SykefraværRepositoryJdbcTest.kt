@@ -5,8 +5,6 @@ import ia.felles.definisjoner.bransjer.Bransjer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.assertj.core.api.Assertions
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.insert
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -64,10 +62,9 @@ open class SykefraværRepositoryJdbcTest {
     fun hentUmaskertSykefraværForNorge_skal_hente_riktig_data() {
 
         opprettStatistikkForLandExposed(sykefraværStatistikkLandRepository)
+        val kvartaler = ÅrstallOgKvartal.range(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), SISTE_PUBLISERTE_KVARTAL)
+        val resultat = sykefraværStatistikkLandRepository.hentForKvartaler(kvartaler)
 
-        val resultat = sykefraværRepository.hentUmaskertSykefraværForNorge(
-            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1)
-        )
         Assertions.assertThat(resultat.size).isEqualTo(2)
         Assertions.assertThat(resultat)
             .containsExactlyInAnyOrderElementsOf(
@@ -135,55 +132,60 @@ open class SykefraværRepositoryJdbcTest {
     }
 
     private fun persisterDatasetIDb(barnehage: Underenhet.Næringsdrivende) {
-        SykefraværsstatistikkVirksomhet(
-            orgnr = barnehage.orgnr.verdi,
-            årstall = 2019,
-            kvartal = 2,
-            antallPersoner = 10,
-            tapteDagsverk = BigDecimal(2),
-            muligeDagsverk = BigDecimal(100),
-            rectype = "2",
-            varighet = Varighetskategori.TOTAL.kode
-        )
-        SykefraværsstatistikkVirksomhet(
-            orgnr = "987654321",
-            årstall = 2019,
-            kvartal = 1,
-            antallPersoner = 10,
-            tapteDagsverk = BigDecimal(3),
-            muligeDagsverk = BigDecimal(100),
-            rectype = "2",
-            varighet = Varighetskategori.TOTAL.kode
-        )
-        SykefraværsstatistikkVirksomhet(
-            orgnr = barnehage.orgnr.verdi,
-            årstall = 2019,
-            kvartal = 1,
-            antallPersoner = 10,
-            tapteDagsverk = BigDecimal(3),
-            muligeDagsverk = BigDecimal(100),
-            rectype = "2",
-            varighet = Varighetskategori.TOTAL.kode
-        )
-        SykefraværsstatistikkVirksomhet(
-            orgnr = barnehage.orgnr.verdi,
-            årstall = 2018,
-            kvartal = 4,
-            antallPersoner = 10,
-            tapteDagsverk = BigDecimal(5),
-            muligeDagsverk = BigDecimal(100),
-            rectype = "2",
-            varighet = Varighetskategori.TOTAL.kode
-        )
-        SykefraværsstatistikkVirksomhet(
-            orgnr = barnehage.orgnr.verdi,
-            årstall = 2018,
-            kvartal = 3,
-            antallPersoner = 10,
-            tapteDagsverk = BigDecimal(6),
-            muligeDagsverk = BigDecimal(100),
-            rectype = "2",
-            varighet = Varighetskategori.TOTAL.kode
+
+        sykefravarStatistikkVirksomhetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkVirksomhet(
+                    orgnr = barnehage.orgnr.verdi,
+                    årstall = 2019,
+                    kvartal = 2,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(2),
+                    muligeDagsverk = BigDecimal(100),
+                    rectype = "2",
+                    varighet = Varighetskategori.TOTAL.kode
+                ),
+                SykefraværsstatistikkVirksomhet(
+                    orgnr = "987654321",
+                    årstall = 2019,
+                    kvartal = 1,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(3),
+                    muligeDagsverk = BigDecimal(100),
+                    rectype = "2",
+                    varighet = Varighetskategori.TOTAL.kode
+                ),
+                SykefraværsstatistikkVirksomhet(
+                    orgnr = barnehage.orgnr.verdi,
+                    årstall = 2019,
+                    kvartal = 1,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(3),
+                    muligeDagsverk = BigDecimal(100),
+                    rectype = "2",
+                    varighet = Varighetskategori.TOTAL.kode
+                ),
+                SykefraværsstatistikkVirksomhet(
+                    orgnr = barnehage.orgnr.verdi,
+                    årstall = 2018,
+                    kvartal = 4,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(5),
+                    muligeDagsverk = BigDecimal(100),
+                    rectype = "2",
+                    varighet = Varighetskategori.TOTAL.kode
+                ),
+                SykefraværsstatistikkVirksomhet(
+                    orgnr = barnehage.orgnr.verdi,
+                    årstall = 2018,
+                    kvartal = 3,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(6),
+                    muligeDagsverk = BigDecimal(100),
+                    rectype = "2",
+                    varighet = Varighetskategori.TOTAL.kode
+                ),
+            )
         )
     }
 

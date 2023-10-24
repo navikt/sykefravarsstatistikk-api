@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import scala.reflect.internal.Types.TypeVar
 import testUtils.GraderingTestUtils.insertDataMedGradering
 import testUtils.TestTokenUtil.createMockIdportenTokenXToken
 import testUtils.TestUtils.PRODUKSJON_NYTELSESMIDLER
@@ -104,7 +103,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     @Throws(Exception::class)
     fun hentAgreggertStatistikk_returnererForventedeTyperForBedriftSomHarAlleTyperData() {
         val (årstall, kvartal) = SISTE_PUBLISERTE_KVARTAL.minusEttÅr()
-        opprettStatistikkForLand(jdbcTemplate)
+        opprettStatistikkForLand(sykefraværStatistikkLandRepository)
         opprettStatistikkForNæring(
             jdbcTemplate,
             PRODUKSJON_NYTELSESMIDLER,
@@ -273,7 +272,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     fun hentAgreggertStatistikk_returnererIkkeVirksomhetstatistikkTilBrukerSomManglerIaRettigheter() {
         val (årstall, kvartal) = SISTE_PUBLISERTE_KVARTAL.minusEttÅr()
         opprettStatistikkForNæringskode(
-            jdbcTemplate!!,
+            jdbcTemplate,
             BARNEHAGER,
             SISTE_PUBLISERTE_KVARTAL.årstall,
             SISTE_PUBLISERTE_KVARTAL.kvartal,
@@ -284,7 +283,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
         opprettStatistikkForNæringskode(
             jdbcTemplate, BARNEHAGER, årstall, kvartal, 1, 100, 10
         )
-        opprettStatistikkForLand(jdbcTemplate)
+        opprettStatistikkForLand(sykefraværStatistikkLandRepository)
         val response = utførAutorisertKall(ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER)
         val responseBody = objectMapper.readTree(response.body())
         Assertions.assertThat(
@@ -328,7 +327,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     @Test
     @Throws(Exception::class)
     fun hentAgreggertStatistikk_viserNavnetTilBransjenEllerNæringenSomLabel() {
-        opprettStatistikkForNæringskode(jdbcTemplate!!, BARNEHAGER, 2022, 1, 5, 100, 10)
+        opprettStatistikkForNæringskode(jdbcTemplate, BARNEHAGER, 2022, 1, 5, 100, 10)
         val response = utførAutorisertKall(ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER)
         val responseBody = objectMapper.readTree(response.body())
         val barnehageJson = responseBody["prosentSiste4KvartalerTotalt"][0]

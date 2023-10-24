@@ -140,49 +140,21 @@ object TestUtils {
                     antallPersoner = 10,
                     tapteDagsverk = BigDecimal(4),
                     muligeDagsverk = BigDecimal(100)
-                )
-            )
-        )
-    }
-
-    fun opprettStatistikkForLand(jdbcTemplate: NamedParameterJdbcTemplate) {
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, "
-                    + "tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, "
-                    + ":mulige_dagsverk)",
-            parametreForStatistikk(
-                SISTE_PUBLISERTE_KVARTAL.årstall,
-                SISTE_PUBLISERTE_KVARTAL.kvartal,
-                10,
-                4,
-                100
-            )
-        )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, "
-                    + "tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, "
-                    + ":mulige_dagsverk)",
-            parametreForStatistikk(
-                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).årstall,
-                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).kvartal,
-                10,
-                5,
-                100
-            )
-        )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, "
-                    + "tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, "
-                    + ":mulige_dagsverk)",
-            parametreForStatistikk(
-                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).årstall,
-                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).kvartal,
-                10,
-                6,
-                100
+                ),
+                SykefraværsstatistikkLand(
+                    årstall = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).kvartal,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(5),
+                    muligeDagsverk = BigDecimal(100)
+                ),
+                SykefraværsstatistikkLand(
+                    årstall = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).kvartal,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(6),
+                    muligeDagsverk = BigDecimal(100)
+                ),
             )
         )
     }

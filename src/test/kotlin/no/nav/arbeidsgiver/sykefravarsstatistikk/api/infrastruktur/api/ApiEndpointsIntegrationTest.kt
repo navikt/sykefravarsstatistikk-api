@@ -84,7 +84,7 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
             TOKENX_ISSUER_ID,
             "https://oidc.difi.no/idporten-oidc-provider/"
         )
-        opprettStatistikkForLand(jdbcTemplate)
+        opprettStatistikkForLand(sykefraværStatistikkLandRepository)
 
         opprettStatistikkForLandExposed(sykefraværStatistikkLandRepository)
 
