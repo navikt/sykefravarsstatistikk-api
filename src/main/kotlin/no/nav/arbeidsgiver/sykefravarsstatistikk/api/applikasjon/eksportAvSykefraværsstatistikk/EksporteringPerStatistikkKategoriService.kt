@@ -1,12 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.SykefraværFlereKvartalerForEksport
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.SykefraværMedKategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkNæringMedVarighet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic.Companion.from
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Component
 class EksporteringPerStatistikkKategoriService(
     private val tilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository,
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
+    private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
     private val kafkaClient: KafkaClient,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -120,7 +120,7 @@ class EksporteringPerStatistikkKategoriService(
     }
 
     private fun eksporterSykefraværsstatistikkVirksomhet(årstallOgKvartal: ÅrstallOgKvartal) {
-        tilEksporteringRepository.hentSykefraværAlleVirksomheter(
+        sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(
             årstallOgKvartal.minusKvartaler(3), årstallOgKvartal
         )
             .groupByVirksomhet().let {

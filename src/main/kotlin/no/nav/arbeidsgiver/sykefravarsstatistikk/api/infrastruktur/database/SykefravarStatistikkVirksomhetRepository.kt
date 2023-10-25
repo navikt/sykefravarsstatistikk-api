@@ -5,7 +5,6 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.less
 import org.springframework.stereotype.Component
-import java.sql.ResultSet
 
 @Component
 class SykefravarStatistikkVirksomhetRepository(
@@ -47,6 +46,37 @@ class SykefravarStatistikkVirksomhetRepository(
         }
     }
 
+    fun hentSykefraværAlleVirksomheter(
+        fra: ÅrstallOgKvartal, til: ÅrstallOgKvartal = fra
+    ): List<SykefraværsstatistikkVirksomhetUtenVarighet> {
+        require(fra <= til)
+
+        val kvartaler = ÅrstallOgKvartal.range(fra, til).map { it.årstall to it.kvartal }
+
+        return transaction {
+            slice(
+                årstall,
+                kvartal,
+                orgnr,
+                tapteDagsverk.sum(),
+                muligeDagsverk.sum(),
+                antallPersoner.sum(),
+            ).select {
+                (årstall to kvartal) inList kvartaler
+            }.groupBy(årstall, kvartal, orgnr)
+                .map {
+                    SykefraværsstatistikkVirksomhetUtenVarighet(
+                        årstall = it[årstall],
+                        kvartal = it[kvartal],
+                        orgnr = it[orgnr],
+                        tapteDagsverk = it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                        muligeDagsverk = it[muligeDagsverk.sum()]!!.toBigDecimal(),
+                        antallPersoner = it[antallPersoner.sum()]!!
+                    )
+                }
+        }
+    }
+
     fun settInn(data: List<SykefraværsstatistikkVirksomhet>): Int {
         return transaction {
             batchInsert(data) {
@@ -57,7 +87,7 @@ class SykefravarStatistikkVirksomhetRepository(
                 this[tapteDagsverk] = it.tapteDagsverk.toFloat()
                 this[muligeDagsverk] = it.muligeDagsverk.toFloat()
                 this[varighet] = it.varighet!!.first()
-                this[virksomhetstype] = it.rectype!!.first()
+                this[virksomhetstype] = it.rectype.first()
             }.count()
         }
     }

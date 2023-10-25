@@ -54,6 +54,7 @@ class VarighetRepository(
         }
     }
 
+    // TODO: Konverter til exposed
     fun hentSykefraværMedVarighet(
         virksomhet: Virksomhet
     ): List<UmaskertSykefraværForEttKvartalMedVarighet> {

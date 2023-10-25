@@ -24,6 +24,7 @@ class EksporteringService(
     private val sykefraværsstatistikkTilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository,
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
     private val kafkaClient: KafkaClient,
+    private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -67,8 +68,8 @@ class EksporteringService(
     }
 
     sealed class LegacyEksportFeil {
-        object EksportFeilet : LegacyEksportFeil()
-        object IngenNyStatistikk : LegacyEksportFeil()
+        data object EksportFeilet : LegacyEksportFeil()
+        data object IngenNyStatistikk : LegacyEksportFeil()
     }
 
     @Throws(KafkaUtsendingException::class)
@@ -97,8 +98,8 @@ class EksporteringService(
                 årstallOgKvartal
             )
         val sykefraværsstatistikkVirksomhetUtenVarighet =
-            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleVirksomheter(
-                årstallOgKvartal
+            sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(
+                årstallOgKvartal, årstallOgKvartal
             )
         val umaskertSykefraværForEttKvartal = EksporteringServiceUtils.hentSisteKvartalIBeregningen(
             umaskertSykefraværsstatistikkSistePublisertKvartalLand, årstallOgKvartal

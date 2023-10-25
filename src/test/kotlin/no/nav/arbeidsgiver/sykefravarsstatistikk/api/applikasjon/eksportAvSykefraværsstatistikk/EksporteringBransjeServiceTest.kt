@@ -3,8 +3,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykef
 import ia.felles.definisjoner.bransjer.Bransjer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.SykefraværFlereKvartalerForEksport
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.SykefraværMedKategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.UmaskertSykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
@@ -26,9 +26,10 @@ internal class EksporteringBransjeServiceTest {
 
     private val service =
         EksporteringPerStatistikkKategoriService(
-            repositoryMock,
-            sykefraværStatistikkLandRepositoryMock,
-            kafkaClientMock
+            tilEksporteringRepository = repositoryMock,
+            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepositoryMock,
+            sykefravarStatistikkVirksomhetRepository = mock(),
+            kafkaClient = kafkaClientMock,
         )
 
     @Test
