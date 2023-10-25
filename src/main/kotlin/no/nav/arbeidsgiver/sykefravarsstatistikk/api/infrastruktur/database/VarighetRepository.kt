@@ -15,7 +15,8 @@ import java.util.*
 
 @Component
 class VarighetRepository(
-    @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate
+    @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
+    private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
 ) {
     fun hentSykefraværMedVarighet(
         næring: Næring
@@ -54,31 +55,14 @@ class VarighetRepository(
         }
     }
 
-    // TODO: Konverter til exposed
-    fun hentSykefraværMedVarighet(
-        virksomhet: Virksomhet
-    ): List<UmaskertSykefraværForEttKvartalMedVarighet> {
-        return try {
-            namedParameterJdbcTemplate.query(
-                "select tapte_dagsverk, mulige_dagsverk, antall_personer, varighet, arstall, kvartal "
-                        + " from sykefravar_statistikk_virksomhet "
-                        + " where "
-                        + " orgnr = :orgnr "
-                        + " and varighet in ('A', 'B', 'C', 'D', 'E', 'F', 'X')"
-                        + " order by arstall, kvartal, varighet",
-                MapSqlParameterSource().addValue("orgnr", virksomhet.orgnr.verdi)
-            ) { rs: ResultSet, _: Int -> mapTilKvartalsvisSykefraværMedVarighet(rs) }
-        } catch (e: EmptyResultDataAccessException) {
-            emptyList()
-        }
-    }
-
     fun hentUmaskertSykefraværMedVarighetAlleKategorier(virksomhet: Virksomhet): Map<Statistikkategori, List<UmaskertSykefraværForEttKvartalMedVarighet>> {
         val næring = virksomhet.næringskode.næring
         val maybeBransje = finnBransje(virksomhet.næringskode)
         val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartalMedVarighet>> = EnumMap(
-            Statistikkategori::class.java)
-        data[Statistikkategori.VIRKSOMHET] = hentSykefraværMedVarighet(virksomhet)
+            Statistikkategori::class.java
+        )
+        data[Statistikkategori.VIRKSOMHET] =
+            sykefravarStatistikkVirksomhetRepository.hentSykefraværMedVarighet(virksomhet.orgnr)
         if (maybeBransje.isEmpty) {
             data[Statistikkategori.NÆRING] = hentSykefraværMedVarighet(næring)
         } else if (maybeBransje.get().erDefinertPåFemsiffernivå()) {

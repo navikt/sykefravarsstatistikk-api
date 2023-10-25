@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene
 
-enum class Varighetskategori(@JvmField val kode: String?) {
+enum class Varighetskategori(val kode: String?) {
     _1_DAG_TIL_7_DAGER("A"),
     _8_DAGER_TIL_16_DAGER("B"),
     _17_DAGER_TIL_8_UKER("C"),

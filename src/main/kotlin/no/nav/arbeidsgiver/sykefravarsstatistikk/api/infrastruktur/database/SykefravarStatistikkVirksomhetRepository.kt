@@ -1,5 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -43,6 +45,32 @@ class SykefravarStatistikkVirksomhetRepository(
                         it[antallPersoner.sum()]!!
                     )
                 }.sorted()
+        }
+    }
+
+    fun hentSykefraværMedVarighet(
+        organisasjonsnummer: Orgnr
+    ): List<UmaskertSykefraværForEttKvartalMedVarighet> {
+        return transaction {
+            select {
+                (orgnr eq organisasjonsnummer.verdi) and
+                        (varighet inList listOf('A', 'B', 'C', 'D', 'E', 'F', 'X'))
+            }.orderBy(
+                årstall to SortOrder.ASC,
+                kvartal to SortOrder.ASC,
+                varighet to SortOrder.ASC
+            ).map {
+                UmaskertSykefraværForEttKvartalMedVarighet(
+                    årstallOgKvartal = ÅrstallOgKvartal(
+                        årstall = it[årstall],
+                        kvartal = it[kvartal]
+                    ),
+                    tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
+                    muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
+                    antallPersoner = it[antallPersoner],
+                    varighet = Varighetskategori.fraKode(it[varighet]?.toString())
+                )
+            }
         }
     }
 

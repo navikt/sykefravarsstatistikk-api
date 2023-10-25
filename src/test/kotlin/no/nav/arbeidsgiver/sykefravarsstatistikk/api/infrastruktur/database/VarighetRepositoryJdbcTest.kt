@@ -37,7 +37,6 @@ open class VarighetRepositoryJdbcTest {
 
     @BeforeEach
     fun setUp() {
-        varighetRepository = VarighetRepository(jdbcTemplate)
         TestUtils.slettAllStatistikkFraDatabase(
             jdbcTemplate = jdbcTemplate,
             sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository
@@ -87,7 +86,8 @@ open class VarighetRepositoryJdbcTest {
             )
         )
 
-        val resultat = varighetRepository.hentSykefraværMedVarighet(barnehage)
+        val resultat =
+            sykefravarStatistikkVirksomhetRepository.hentSykefraværMedVarighet(barnehage.orgnr)
         assertThat(resultat.size).isEqualTo(2)
         assertThat(resultat[0])
             .isEqualTo(
@@ -211,32 +211,6 @@ open class VarighetRepositoryJdbcTest {
         // Resultatet skal bli statistikk for BEGGE de to næringskodene
         assertThat(resultat.size).isEqualTo(2)
     }
-}
-
-
-fun leggTilVirksomhetsstatistikkMedVarighet(
-    jdbcTemplate: NamedParameterJdbcTemplate,
-    orgnr: String?,
-    årstallOgKvartal: ÅrstallOgKvartal,
-    varighetskategori: Varighetskategori,
-    antallPersoner: Int,
-    tapteDagsverk: Int,
-    muligeDagsverk: Int
-) {
-    jdbcTemplate.update(
-        "insert into sykefravar_statistikk_virksomhet (arstall, kvartal, orgnr, varighet, "
-                + "antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                + "VALUES (:arstall, :kvartal, :orgnr, :varighet, :antall_personer, "
-                + ":tapte_dagsverk, :mulige_dagsverk)",
-        MapSqlParameterSource()
-            .addValue("arstall", årstallOgKvartal.årstall)
-            .addValue("kvartal", årstallOgKvartal.kvartal)
-            .addValue("orgnr", orgnr)
-            .addValue("varighet", varighetskategori.kode)
-            .addValue("antall_personer", antallPersoner)
-            .addValue("tapte_dagsverk", tapteDagsverk)
-            .addValue("mulige_dagsverk", muligeDagsverk)
-    )
 }
 
 
