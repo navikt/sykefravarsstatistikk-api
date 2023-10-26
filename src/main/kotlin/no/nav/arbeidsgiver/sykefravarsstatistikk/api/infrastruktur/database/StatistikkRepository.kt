@@ -2,8 +2,9 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import com.google.common.collect.Lists
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.SlettOgOpprettResultat
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.SlettOgOpprettResultat.Companion.tomtResultat
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Statistikkilde
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -110,26 +111,6 @@ class StatistikkRepository(
         return SlettOgOpprettResultat(antallSlettet, antallOprettet)
     }
 
-    fun importSykefraværsstatistikkVirksomhetMedGradering(
-        sykefraværsstatistikkVirksomhetMedGradering: List<SykefraværsstatistikkVirksomhetMedGradering>,
-        årstallOgKvartal: ÅrstallOgKvartal
-    ): SlettOgOpprettResultat {
-        if (sykefraværsstatistikkVirksomhetMedGradering.isEmpty()) {
-            loggInfoIngenDataTilImport(årstallOgKvartal, "virksomhet gradert sykemelding")
-            return tomtResultat()
-        }
-        loggInfoImportStarter(
-            sykefraværsstatistikkVirksomhetMedGradering.size,
-            "virksomhet gradert sykemelding",
-            årstallOgKvartal
-        )
-        val antallSlettet = slettSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal)
-        val antallOprettet = batchOpprettSykefraværsstatistikkVirksomhetMedGradering(
-            sykefraværsstatistikkVirksomhetMedGradering, INSERT_BATCH_STØRRELSE
-        )
-        return SlettOgOpprettResultat(antallSlettet, antallOprettet)
-    }
-
     fun slettSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal: ÅrstallOgKvartal): Int {
         val namedParameters: SqlParameterSource = MapSqlParameterSource()
             .addValue(SykefraværsstatistikkIntegrasjon.ARSTALL, årstallOgKvartal.årstall)
@@ -137,19 +118,6 @@ class StatistikkRepository(
         return namedParameterJdbcTemplate.update(
             String.format(
                 "delete from sykefravar_statistikk_naring_med_varighet where arstall = :%s and kvartal = :%s",
-                SykefraværsstatistikkIntegrasjon.ARSTALL, SykefraværsstatistikkIntegrasjon.KVARTAL
-            ),
-            namedParameters
-        )
-    }
-
-    fun slettSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal: ÅrstallOgKvartal): Int {
-        val namedParameters: SqlParameterSource = MapSqlParameterSource()
-            .addValue(SykefraværsstatistikkIntegrasjon.ARSTALL, årstallOgKvartal.årstall)
-            .addValue(SykefraværsstatistikkIntegrasjon.KVARTAL, årstallOgKvartal.kvartal)
-        return namedParameterJdbcTemplate.update(
-            String.format(
-                "delete from sykefravar_statistikk_virksomhet_med_gradering where arstall = :%s and kvartal = :%s",
                 SykefraværsstatistikkIntegrasjon.ARSTALL, SykefraværsstatistikkIntegrasjon.KVARTAL
             ),
             namedParameters
@@ -169,19 +137,6 @@ class StatistikkRepository(
         return antallOpprettet.get()
     }
 
-    fun batchOpprettSykefraværsstatistikkVirksomhetMedGradering(
-        sykefraværsstatistikk: List<Sykefraværsstatistikk>, insertBatchStørrelse: Int
-    ): Int {
-        val subsets = Lists.partition(sykefraværsstatistikk, insertBatchStørrelse)
-        val antallOpprettet = AtomicInteger()
-        subsets.forEach { subset: List<Sykefraværsstatistikk?> ->
-            val opprettet = opprettSykefraværsstatistikkVirksomhetMedGradering(subset)
-            val opprettetHittilNå = antallOpprettet.addAndGet(opprettet)
-            log.info(String.format("Opprettet %d rader", opprettetHittilNå))
-        }
-        return antallOpprettet.get()
-    }
-
     fun opprettSykefraværsstatistikkNæringMedVarighet(
         sykefraværsstatistikk: List<Sykefraværsstatistikk?>
     ): Int {
@@ -191,26 +146,6 @@ class StatistikkRepository(
                     + "(arstall, kvartal, naring_kode, varighet, antall_personer, tapte_dagsverk, mulige_dagsverk) "
                     + "values "
                     + "(:årstall, :kvartal, :næringkode, :varighet, :antallPersoner, :tapteDagsverk, :muligeDagsverk)",
-            batch
-        )
-        return Arrays.stream(results).sum()
-    }
-
-    private fun opprettSykefraværsstatistikkVirksomhetMedGradering(
-        sykefraværsstatistikk: List<Sykefraværsstatistikk?>
-    ): Int {
-        val batch = SqlParameterSourceUtils.createBatch(*sykefraværsstatistikk.toTypedArray())
-        val results = namedParameterJdbcTemplate.batchUpdate(
-            "insert into sykefravar_statistikk_virksomhet_med_gradering "
-                    + "(arstall, kvartal, orgnr, naring, naring_kode, rectype, "
-                    + "antall_graderte_sykemeldinger, tapte_dagsverk_gradert_sykemelding, "
-                    + "antall_sykemeldinger, "
-                    + "antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "values "
-                    + "(:årstall, :kvartal, :orgnr, :næring, :næringkode, :rectype, "
-                    + ":antallGraderteSykemeldinger, :tapteDagsverkGradertSykemelding, "
-                    + ":antallSykemeldinger, "
-                    + ":antallPersoner, :tapteDagsverk, :muligeDagsverk)",
             batch
         )
         return Arrays.stream(results).sum()

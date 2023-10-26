@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetMetadataMedNæringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -32,6 +33,35 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
             deleteWhere {
                 årstall less årstallOgKvartal.årstall or ((årstall eq årstallOgKvartal.årstall) and (kvartal less årstallOgKvartal.kvartal))
             }
+        }
+    }
+
+    fun slettDataFor(årstallOgKvartal: ÅrstallOgKvartal): Int {
+        return transaction {
+            deleteWhere {
+                (årstall eq årstallOgKvartal.årstall) and (kvartal eq årstallOgKvartal.kvartal)
+            }
+        }
+    }
+
+    fun opprettSykefraværsstatistikkVirksomhetMedGradering(
+        sykefraværsstatistikk: List<SykefraværsstatistikkVirksomhetMedGradering>
+    ): Int {
+        return transaction {
+            batchInsert(sykefraværsstatistikk, shouldReturnGeneratedValues = false) {
+                this[orgnr] = it.orgnr
+                this[næring] = it.næring
+                this[næringskode] = it.næringkode
+                this[årstall] = it.årstall
+                this[kvartal] = it.kvartal
+                this[antallGraderteSykemeldinger] = it.antallGraderteSykemeldinger
+                this[tapteDagsverkGradertSykemelding] = it.tapteDagsverkGradertSykemelding.toFloat()
+                this[antallSykemeldinger] = it.antallSykemeldinger
+                this[antallPersoner] = it.antallPersoner
+                this[tapteDagsverk] = it.tapteDagsverk.toFloat()
+                this[muligeDagsverk] = it.muligeDagsverk.toFloat()
+                this[rectype] = it.rectype
+            }.count()
         }
     }
 

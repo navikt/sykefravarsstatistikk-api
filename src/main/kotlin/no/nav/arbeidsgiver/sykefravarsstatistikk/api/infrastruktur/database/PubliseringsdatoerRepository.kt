@@ -37,7 +37,7 @@ class PubliseringsdatoerRepository(
         log.info("Antall rader slettet fra 'publiseringsdatoer': $antallRaderSlettet")
 
         val antallRaderSattInn = transaction {
-            batchInsert(data) {
+            batchInsert(data, shouldReturnGeneratedValues = false) {
                 this[rapportPeriode] = it.rapportPeriode
                 this[offentligDato] = it.offentligDato
                 this[oppdatertIDvh] = it.oppdatertDato
