@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import testUtils.GraderingTestUtils.insertDataMedGradering
 import testUtils.TestTokenUtil.createMockIdportenTokenXToken
 import testUtils.TestUtils.PRODUKSJON_NYTELSESMIDLER
 import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
@@ -27,6 +26,7 @@ import testUtils.TestUtils.opprettStatistikkForNæring
 import testUtils.TestUtils.opprettStatistikkForNæringskode
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import testUtils.TestUtils.slettAlleImporttidspunkt
+import testUtils.insertData
 import java.io.IOException
 import java.math.BigDecimal
 import java.net.URI
@@ -47,6 +47,9 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     lateinit var sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
 
     @Autowired
+    lateinit var sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository
+
+    @Autowired
     lateinit var sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository
 
     @Autowired
@@ -55,9 +58,10 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     @BeforeEach
     fun setUp() {
         slettAllStatistikkFraDatabase(
-            jdbcTemplate,
-            sykefravarStatistikkVirksomhetRepository,
-            sykefraværStatistikkLandRepository
+            jdbcTemplate = jdbcTemplate,
+            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
+            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
+            sykefravarStatistikkVirksomhetGraderingRepository = sykefravarStatistikkVirksomhetGraderingRepository,
         )
         importtidspunktRepository.slettAlleImporttidspunkt()
         importtidspunktRepository.settInnImporttidspunkt(SISTE_PUBLISERTE_KVARTAL, LocalDate.parse("2022-06-02"))
@@ -66,9 +70,10 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     @AfterEach
     fun tearDown() {
         slettAllStatistikkFraDatabase(
-            jdbcTemplate,
-            sykefravarStatistikkVirksomhetRepository,
-            sykefraværStatistikkLandRepository
+            jdbcTemplate = jdbcTemplate,
+            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
+            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
+            sykefravarStatistikkVirksomhetGraderingRepository = sykefravarStatistikkVirksomhetGraderingRepository
         )
         importtidspunktRepository.slettAlleImporttidspunkt()
     }
@@ -136,8 +141,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
                 )
             )
         )
-        insertDataMedGradering(
-            jdbcTemplate,
+        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
             ORGNR_UNDERENHET,
             "10",
             "10300",
@@ -148,8 +152,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
             BigDecimal(20),
             BigDecimal(100)
         )
-        insertDataMedGradering(
-            jdbcTemplate,
+        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
             ORGNR_UNDERENHET,
             "10",
             "10300",
@@ -160,8 +163,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
             BigDecimal(20),
             BigDecimal(100)
         )
-        insertDataMedGradering(
-            jdbcTemplate,
+        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
             ORGNR_UNDERENHET,
             "10",
             "10300",

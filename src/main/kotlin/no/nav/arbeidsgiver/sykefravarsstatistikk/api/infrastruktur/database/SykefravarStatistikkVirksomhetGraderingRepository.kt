@@ -1,10 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetMetadataMedNæringskode
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.less
@@ -83,6 +81,35 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
                         Orgnr(it[orgnr]),
                         ÅrstallOgKvartal(it[årstall], it[kvartal]),
                         Næringskode(it[næringskode])
+                    )
+                }
+        }
+    }
+
+    fun hentForBransje(bransje: Bransje): List<UmaskertSykefraværForEttKvartal> {
+        val bransjeidentifikator = if (bransje.erDefinertPåFemsiffernivå()) {
+            næringskode
+        } else {
+            næring
+        }
+        return transaction {
+            slice(
+                årstall,
+                kvartal,
+                tapteDagsverkGradertSykemelding.sum(),
+                tapteDagsverk.sum(),
+                antallPersoner.sum(),
+            ).select {
+                (bransjeidentifikator inList bransje.identifikatorer) and
+                        (rectype eq DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET)
+            }.groupBy(årstall, kvartal)
+                .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
+                .map {
+                    UmaskertSykefraværForEttKvartal(
+                        ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                        it[tapteDagsverkGradertSykemelding.sum()]!!.toBigDecimal(),
+                        it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                        it[antallPersoner.sum()]!!
                     )
                 }
         }

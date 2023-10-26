@@ -16,6 +16,7 @@ import java.util.*
 @Component
 class GraderingRepository(
     @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
+    private val sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
 ) {
     fun hentSykefraværMedGradering(virksomhet: Virksomhet): List<UmaskertSykefraværForEttKvartal> {
         return try {
@@ -47,10 +48,8 @@ class GraderingRepository(
         data[Statistikkategori.VIRKSOMHET] = hentSykefraværMedGradering(virksomhet)
         if (maybeBransje.isEmpty) {
             data[Statistikkategori.NÆRING] = hentSykefraværMedGradering(næring)
-        } else if (maybeBransje.get().erDefinertPåFemsiffernivå()) {
-            data[Statistikkategori.BRANSJE] = hentSykefraværMedGradering(maybeBransje.get())
-        } else {
-            data[Statistikkategori.BRANSJE] = hentSykefraværMedGradering(næring)
+        }  else {
+            data[Statistikkategori.BRANSJE] = sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(maybeBransje.get())
         }
         return Sykefraværsdata(data)
     }
@@ -71,29 +70,6 @@ class GraderingRepository(
                         + " order by arstall, kvartal",
                 MapSqlParameterSource()
                     .addValue("naring", næring.tosifferIdentifikator)
-                    .addValue("rectype", DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET)
-            ) { rs: ResultSet, _: Int -> mapTilUmaskertSykefraværForEttKvartal(rs) }
-        } catch (e: EmptyResultDataAccessException) {
-            emptyList()
-        }
-    }
-
-    fun hentSykefraværMedGradering(bransje: Bransje): List<UmaskertSykefraværForEttKvartal> {
-        return try {
-            namedParameterJdbcTemplate.query(
-                "select arstall, kvartal,"
-                        + " sum(tapte_dagsverk_gradert_sykemelding) as "
-                        + "sum_tapte_dagsverk_gradert_sykemelding, "
-                        + " sum(tapte_dagsverk) as sum_tapte_dagsverk, "
-                        + " sum(antall_personer) as sum_antall_personer "
-                        + " from sykefravar_statistikk_virksomhet_med_gradering "
-                        + " where "
-                        + " naring_kode in (:naringKoder) "
-                        + " and rectype = :rectype "
-                        + " group by arstall, kvartal"
-                        + " order by arstall, kvartal",
-                MapSqlParameterSource()
-                    .addValue("naringKoder", bransje.identifikatorer)
                     .addValue("rectype", DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET)
             ) { rs: ResultSet, _: Int -> mapTilUmaskertSykefraværForEttKvartal(rs) }
         } catch (e: EmptyResultDataAccessException) {

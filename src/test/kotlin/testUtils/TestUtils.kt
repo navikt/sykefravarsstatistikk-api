@@ -1,10 +1,7 @@
 package testUtils
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkSektorUtils
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkData
 import org.jetbrains.exposed.sql.deleteAll
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -47,6 +44,7 @@ object TestUtils {
         jdbcTemplate: NamedParameterJdbcTemplate,
         sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository? = null,
         sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository? = null,
+        sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository? = null
     ) {
 
         sykefravarStatistikkVirksomhetRepository?.slettAlt()
@@ -55,9 +53,7 @@ object TestUtils {
         jdbcTemplate.update(
             "delete from sykefravar_statistikk_naring_med_varighet", MapSqlParameterSource()
         )
-        jdbcTemplate.update(
-            "delete from sykefravar_statistikk_virksomhet_med_gradering", MapSqlParameterSource()
-        )
+        sykefravarStatistikkVirksomhetGraderingRepository?.slettAlt()
         jdbcTemplate.update(
             "delete from sykefravar_statistikk_naring5siffer", MapSqlParameterSource()
         )
@@ -324,5 +320,8 @@ object TestUtils {
                     + "VALUES (:orgnr, :key, :value)",
             parametre
         )
+    }
+    private fun SykefravarStatistikkVirksomhetGraderingRepository.slettAlt() {
+        transaction { deleteAll() }
     }
 }

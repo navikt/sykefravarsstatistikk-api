@@ -17,8 +17,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import testUtils.GraderingTestUtils
 import testUtils.TestUtils
+import testUtils.insertData
 import java.math.BigDecimal
 
 @ActiveProfiles("db-test")
@@ -32,20 +32,28 @@ open class GraderingRepositoryJdbcTest {
     @Autowired
     private lateinit var graderingRepository: GraderingRepository
 
+    @Autowired
+    private lateinit var sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository
+
     @BeforeEach
     fun setUp() {
-        TestUtils.slettAllStatistikkFraDatabase(jdbcTemplate)
+        TestUtils.slettAllStatistikkFraDatabase(
+            jdbcTemplate = jdbcTemplate,
+            sykefravarStatistikkVirksomhetGraderingRepository = sykefravarStatistikkVirksomhetGraderingRepository
+        )
     }
 
     @AfterEach
     fun tearDown() {
-        TestUtils.slettAllStatistikkFraDatabase(jdbcTemplate)
+        TestUtils.slettAllStatistikkFraDatabase(
+            jdbcTemplate = jdbcTemplate,
+            sykefravarStatistikkVirksomhetGraderingRepository = sykefravarStatistikkVirksomhetGraderingRepository
+        )
     }
 
     @Test
     fun hentSykefraværForEttKvartalMedGradering__skal_returnere_riktig_sykefravær() {
-        GraderingTestUtils.insertDataMedGradering(
-            jdbcTemplate,
+        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
             PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
             "14100",
@@ -56,8 +64,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(20),
             BigDecimal(100)
         )
-        GraderingTestUtils.insertDataMedGradering(
-            jdbcTemplate,
+        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
             PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
             "14222",
@@ -68,8 +75,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(20),
             BigDecimal(100)
         )
-        GraderingTestUtils.insertDataMedGradering(
-            jdbcTemplate,
+        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
             PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
             "14222",
@@ -98,8 +104,7 @@ open class GraderingRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværForEttKvartalMedGradering__skal_returnere_riktig_underenhet_sykefravær() {
-        GraderingTestUtils.insertDataMedGradering(
-            jdbcTemplate,
+        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
             PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
             UNDERENHET_1_NÆRING_14.næringskode.femsifferIdentifikator,
@@ -110,8 +115,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(20),
             BigDecimal(100)
         )
-        GraderingTestUtils.insertDataMedGradering(
-            jdbcTemplate,
+        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
             PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
             "14222",
@@ -122,8 +126,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(20),
             BigDecimal(100)
         )
-        GraderingTestUtils.insertDataMedGradering(
-            jdbcTemplate,
+        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
             UNDERENHET_3_NÆRING_14.orgnr.verdi,
             PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
             "14222",
@@ -152,8 +155,7 @@ open class GraderingRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværForEttKvartalMedGradering__skal_returnere_riktig_sykefravær_for_næring() {
-        GraderingTestUtils.insertDataMedGradering(
-            jdbcTemplate,
+        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
             PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
             UNDERENHET_1_NÆRING_14.næringskode.femsifferIdentifikator,
@@ -164,8 +166,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(20),
             BigDecimal(100)
         )
-        GraderingTestUtils.insertDataMedGradering(
-            jdbcTemplate,
+        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
             UNDERENHET_3_NÆRING_14.orgnr.verdi,
             PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
             "14222",
@@ -176,8 +177,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(20),
             BigDecimal(100)
         )
-        GraderingTestUtils.insertDataMedGradering(
-            jdbcTemplate,
+        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
             UNDERENHET_2_NÆRING_15.orgnr.verdi,
             PRODUKSJON_AV_LÆR_OG_LÆRVARER.tosifferIdentifikator,
             "15333",
@@ -209,8 +209,7 @@ open class GraderingRepositoryJdbcTest {
         val (kode) = Næringskode("86101")
         val (kode1) = Næringskode("86107")
         val (kode2) = Næringskode("86902")
-        GraderingTestUtils.insertDataMedGradering(
-            jdbcTemplate,
+        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
             HELSETJENESTER.tosifferIdentifikator,
             kode,
@@ -221,8 +220,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(20),
             BigDecimal(100)
         )
-        GraderingTestUtils.insertDataMedGradering(
-            jdbcTemplate,
+        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
             UNDERENHET_3_NÆRING_14.orgnr.verdi,
             HELSETJENESTER.tosifferIdentifikator,
             kode,
@@ -233,8 +231,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(20),
             BigDecimal(100)
         )
-        GraderingTestUtils.insertDataMedGradering(
-            jdbcTemplate,
+        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
             UNDERENHET_2_NÆRING_15.orgnr.verdi,
             HELSETJENESTER.tosifferIdentifikator,
             kode1,
@@ -245,8 +242,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(50),
             BigDecimal(300)
         )
-        GraderingTestUtils.insertDataMedGradering(
-            jdbcTemplate,
+        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
             UNDERENHET_2_NÆRING_15.orgnr.verdi,
             HELSETJENESTER.tosifferIdentifikator,
             kode2,
@@ -257,7 +253,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(66),
             BigDecimal(3000)
         )
-        val resultat = graderingRepository.hentSykefraværMedGradering(
+        val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(
             Bransje(Bransjer.SYKEHUS)
         )
         Assertions.assertThat(resultat.size).isEqualTo(2)
@@ -278,8 +274,7 @@ open class GraderingRepositoryJdbcTest {
     @Test
     fun hentSykefraværForEttKvartalMedGradering__henterIkkeUtGradertSykefraværForOverordnetEnhet() {
         val (kode) = Næringskode("86101")
-        GraderingTestUtils.insertDataMedGradering(
-            jdbcTemplate,
+        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
             OVERORDNETENHET_1_NÆRING_86.orgnr.verdi,
             HELSETJENESTER.tosifferIdentifikator,
             kode,
@@ -290,8 +285,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(20),
             BigDecimal(100)
         )
-        GraderingTestUtils.insertDataMedGradering(
-            jdbcTemplate,
+        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
             UNDERENHET_3_NÆRING_14.orgnr.verdi,
             HELSETJENESTER.tosifferIdentifikator,
             kode,
@@ -302,7 +296,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(20),
             BigDecimal(100)
         )
-        val resultat = graderingRepository.hentSykefraværMedGradering(Bransje(Bransjer.SYKEHUS))
+        val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(Bransje(Bransjer.SYKEHUS))
         Assertions.assertThat(resultat.size).isEqualTo(1)
         Assertions.assertThat(resultat[0])
             .isEqualTo(
