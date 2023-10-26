@@ -1,5 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetMetadataMedNæringskode
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -29,6 +32,29 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
             deleteWhere {
                 årstall less årstallOgKvartal.årstall or ((årstall eq årstallOgKvartal.årstall) and (kvartal less årstallOgKvartal.kvartal))
             }
+        }
+    }
+
+    fun hentVirksomhetMetadataNæringskode5Siffer(
+        årstallOgKvartal: ÅrstallOgKvartal
+    ): List<VirksomhetMetadataMedNæringskode> {
+        return transaction {
+            slice(orgnr, årstall, kvartal, næringskode)
+                .select {
+                    (årstall eq årstallOgKvartal.årstall) and (kvartal eq årstallOgKvartal.kvartal)
+                }.groupBy(årstall, kvartal, orgnr, næringskode)
+                .orderBy(
+                    årstall to SortOrder.ASC,
+                    kvartal to SortOrder.ASC,
+                    orgnr to SortOrder.ASC,
+                    næringskode to SortOrder.ASC
+                ).map {
+                    VirksomhetMetadataMedNæringskode(
+                        Orgnr(it[orgnr]),
+                        ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                        Næringskode(it[næringskode])
+                    )
+                }
         }
     }
 }

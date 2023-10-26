@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Sykefraværsdata
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetMetadataMedNæringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Bransjeprogram.finnBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
@@ -16,35 +15,8 @@ import java.util.*
 
 @Component
 class GraderingRepository(
-    @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate
+    @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
 ) {
-    fun hentVirksomhetMetadataNæringskode5siffer(
-        årstallOgKvartal: ÅrstallOgKvartal
-    ): List<VirksomhetMetadataMedNæringskode> {
-        return try {
-            namedParameterJdbcTemplate.query(
-                "select arstall, kvartal, orgnr, naring, naring_kode"
-                        + " from sykefravar_statistikk_virksomhet_med_gradering "
-                        + " where "
-                        + " arstall = :årstall "
-                        + " and kvartal = :kvartal "
-                        + " group by arstall, kvartal, orgnr, naring, naring_kode"
-                        + " order by arstall, kvartal, orgnr, naring, naring_kode",
-                MapSqlParameterSource()
-                    .addValue("årstall", årstallOgKvartal.årstall)
-                    .addValue("kvartal", årstallOgKvartal.kvartal)
-            ) { rs: ResultSet, _: Int ->
-                VirksomhetMetadataMedNæringskode(
-                    Orgnr(rs.getString("orgnr")),
-                    ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
-                    Næringskode(rs.getString("naring_kode"))
-                )
-            }
-        } catch (e: EmptyResultDataAccessException) {
-            emptyList()
-        }
-    }
-
     fun hentSykefraværMedGradering(virksomhet: Virksomhet): List<UmaskertSykefraværForEttKvartal> {
         return try {
             namedParameterJdbcTemplate.query(

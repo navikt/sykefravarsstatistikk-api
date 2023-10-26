@@ -1,9 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import ia.felles.definisjoner.bransjer.Bransjer
 import config.AppConfigForJdbcTesterConfig
-import testUtils.GraderingTestUtils
-import testUtils.TestUtils
+import ia.felles.definisjoner.bransjer.Bransjer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.LocalOgUnitTestOidcConfiguration
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
@@ -19,6 +17,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import testUtils.GraderingTestUtils
+import testUtils.TestUtils
 import java.math.BigDecimal
 
 @ActiveProfiles("db-test")
@@ -29,11 +29,11 @@ open class GraderingRepositoryJdbcTest {
     @Autowired
     private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
-    private var graderingRepository: GraderingRepository? = null
+    @Autowired
+    private lateinit var graderingRepository: GraderingRepository
 
     @BeforeEach
     fun setUp() {
-        graderingRepository = GraderingRepository(jdbcTemplate)
         TestUtils.slettAllStatistikkFraDatabase(jdbcTemplate)
     }
 
@@ -80,7 +80,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(50),
             BigDecimal(300)
         )
-        val resultat = graderingRepository!!.hentSykefraværMedGradering(UNDERENHET_1_NÆRING_14)
+        val resultat = graderingRepository.hentSykefraværMedGradering(UNDERENHET_1_NÆRING_14)
         Assertions.assertThat(resultat.size).isEqualTo(2)
         Assertions.assertThat(resultat[0])
             .isEqualTo(
@@ -134,7 +134,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(50),
             BigDecimal(300)
         )
-        val resultat = graderingRepository!!.hentSykefraværMedGradering(UNDERENHET_1_NÆRING_14)
+        val resultat = graderingRepository.hentSykefraværMedGradering(UNDERENHET_1_NÆRING_14)
         Assertions.assertThat(resultat.size).isEqualTo(2)
         Assertions.assertThat(resultat[0])
             .isEqualTo(
@@ -188,7 +188,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(50),
             BigDecimal(300)
         )
-        val resultat = graderingRepository!!.hentSykefraværMedGradering(PRODUKSJON_AV_KLÆR)
+        val resultat = graderingRepository.hentSykefraværMedGradering(PRODUKSJON_AV_KLÆR)
         Assertions.assertThat(resultat.size).isEqualTo(2)
         Assertions.assertThat(resultat[0])
             .isEqualTo(
@@ -257,7 +257,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(66),
             BigDecimal(3000)
         )
-        val resultat = graderingRepository!!.hentSykefraværMedGradering(
+        val resultat = graderingRepository.hentSykefraværMedGradering(
             Bransje(Bransjer.SYKEHUS)
         )
         Assertions.assertThat(resultat.size).isEqualTo(2)
@@ -302,7 +302,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(20),
             BigDecimal(100)
         )
-        val resultat = graderingRepository!!.hentSykefraværMedGradering(Bransje(Bransjer.SYKEHUS))
+        val resultat = graderingRepository.hentSykefraværMedGradering(Bransje(Bransjer.SYKEHUS))
         Assertions.assertThat(resultat.size).isEqualTo(1)
         Assertions.assertThat(resultat[0])
             .isEqualTo(
