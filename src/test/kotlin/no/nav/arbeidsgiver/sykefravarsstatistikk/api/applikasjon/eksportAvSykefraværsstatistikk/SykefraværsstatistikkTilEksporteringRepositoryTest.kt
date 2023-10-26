@@ -33,6 +33,7 @@ import java.util.stream.Collectors
 open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     @Autowired
     lateinit var jdbcTemplate: NamedParameterJdbcTemplate
+
     @Autowired
     private lateinit var repository: SykefraværsstatistikkTilEksporteringRepository
 
@@ -329,9 +330,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     fun hentSykefraværprosentAlleVirksomheter__skal_hente_alle_virksomheter_for_ett_eller_flere_kvartaler() {
         opprettStatistikkVirksomhetTestData()
         val resultat_2019_2 = sykefraværsstatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(
-            ÅrstallOgKvartal(
-                2019,
-                2
+            listOf(
+                ÅrstallOgKvartal(2019, 2)
             )
         )
         org.assertj.core.api.Assertions.assertThat(resultat_2019_2.size).isEqualTo(2)
@@ -343,7 +343,10 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
         )
         val resultat_2019_1_TIL_2019_2 =
             sykefraværsstatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(
-                ÅrstallOgKvartal(2019, 1), ÅrstallOgKvartal(2019, 2)
+                ÅrstallOgKvartal(
+                    2019,
+                    2
+                ) inkludertTidligere 1
             )
         org.assertj.core.api.Assertions.assertThat(resultat_2019_1_TIL_2019_2.size).isEqualTo(4)
         assertSykefraværsstatistikkForVirksomhetIsEqual(
@@ -360,7 +363,10 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
         )
         val resultat_2018_3_TIL_2019_2 =
             sykefraværsstatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(
-                ÅrstallOgKvartal(2018, 3), ÅrstallOgKvartal(2019, 2)
+                ÅrstallOgKvartal(
+                    2019,
+                    2
+                ) inkludertTidligere 3
             )
         org.assertj.core.api.Assertions.assertThat(resultat_2018_3_TIL_2019_2.size).isEqualTo(8)
         assertSykefraværsstatistikkForVirksomhetIsEqual(

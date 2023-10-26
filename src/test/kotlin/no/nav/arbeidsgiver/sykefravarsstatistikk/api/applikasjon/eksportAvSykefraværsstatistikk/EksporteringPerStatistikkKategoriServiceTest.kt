@@ -104,9 +104,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
             )
         )
         whenever(
-            sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(
-                __2019_3, __2020_2
-            )
+            sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(__2020_2 inkludertTidligere 3)
         )
             .thenReturn(allData)
 

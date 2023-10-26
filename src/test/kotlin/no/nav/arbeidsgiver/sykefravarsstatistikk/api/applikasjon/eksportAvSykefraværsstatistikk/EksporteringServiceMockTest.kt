@@ -119,9 +119,7 @@ class EksporteringServiceMockTest {
             )
         ).thenReturn(listOf(sykefraværsstatistikkForNæringskode))
         whenever(
-            sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(
-                __2020_2
-            )
+            sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(listOf(__2020_2))
         ).thenReturn(
             listOf(
                 sykefraværsstatistikkVirksomhet(fraÅrstallOgKvartal, "987654321"),
@@ -222,9 +220,7 @@ class EksporteringServiceMockTest {
             )
         )
         whenever(
-            sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(
-                __2020_2
-            )
+            sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(listOf(__2020_2))
         ).thenReturn(
             listOf(
                 sykefraværsstatistikkVirksomhet(fraÅrstallOgKvartal, "987654321"),

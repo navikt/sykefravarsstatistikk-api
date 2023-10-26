@@ -75,12 +75,8 @@ class SykefravarStatistikkVirksomhetRepository(
     }
 
     fun hentSykefraværAlleVirksomheter(
-        fra: ÅrstallOgKvartal, til: ÅrstallOgKvartal = fra
+        kvartaler: List<ÅrstallOgKvartal>
     ): List<SykefraværsstatistikkVirksomhetUtenVarighet> {
-        require(fra <= til)
-
-        val kvartaler = ÅrstallOgKvartal.range(fra, til).map { it.årstall to it.kvartal }
-
         return transaction {
             slice(
                 årstall,
@@ -90,7 +86,7 @@ class SykefravarStatistikkVirksomhetRepository(
                 muligeDagsverk.sum(),
                 antallPersoner.sum(),
             ).select {
-                (årstall to kvartal) inList kvartaler
+                (årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }
             }.groupBy(årstall, kvartal, orgnr)
                 .map {
                     SykefraværsstatistikkVirksomhetUtenVarighet(

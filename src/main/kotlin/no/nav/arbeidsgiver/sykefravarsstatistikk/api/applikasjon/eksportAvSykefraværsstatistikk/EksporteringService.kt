@@ -98,9 +98,7 @@ class EksporteringService(
                 årstallOgKvartal
             )
         val sykefraværsstatistikkVirksomhetUtenVarighet =
-            sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(
-                årstallOgKvartal, årstallOgKvartal
-            )
+            sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(listOf(årstallOgKvartal))
         val umaskertSykefraværForEttKvartal = EksporteringServiceUtils.hentSisteKvartalIBeregningen(
             umaskertSykefraværsstatistikkSistePublisertKvartalLand, årstallOgKvartal
         )

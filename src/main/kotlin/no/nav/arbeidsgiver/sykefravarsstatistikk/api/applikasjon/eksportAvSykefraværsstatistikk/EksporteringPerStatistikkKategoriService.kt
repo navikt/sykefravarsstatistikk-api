@@ -120,9 +120,7 @@ class EksporteringPerStatistikkKategoriService(
     }
 
     private fun eksporterSykefraværsstatistikkVirksomhet(årstallOgKvartal: ÅrstallOgKvartal) {
-        sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(
-            årstallOgKvartal.minusKvartaler(3), årstallOgKvartal
-        )
+        sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(årstallOgKvartal inkludertTidligere 3)
             .groupByVirksomhet().let {
                 eksporterSykefraværsstatistikkPerKategori(
                     årstallOgKvartal = årstallOgKvartal,

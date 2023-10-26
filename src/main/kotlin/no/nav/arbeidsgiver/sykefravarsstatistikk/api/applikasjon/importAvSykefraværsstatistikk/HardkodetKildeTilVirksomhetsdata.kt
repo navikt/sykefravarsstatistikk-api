@@ -16,7 +16,7 @@ class HardkodetKildeTilVirksomhetsdata : KildeTilVirksomhetsdata {
     override fun hentVirksomheter(årstallOgKvartal: ÅrstallOgKvartal): List<Orgenhet> {
         return SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal).map {
             Orgenhet(
-                orgnr = Orgnr(verdi = it.orgnr!!),
+                orgnr = Orgnr(verdi = it.orgnr),
                 navn = "Bedrift ${it.orgnr}",
                 rectype = it.rectype,
                 sektor = Sektor.PRIVAT,
