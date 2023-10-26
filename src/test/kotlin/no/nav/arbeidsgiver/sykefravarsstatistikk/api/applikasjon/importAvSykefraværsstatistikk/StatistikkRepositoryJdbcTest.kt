@@ -5,19 +5,14 @@ import testUtils.AssertUtils.assertBigDecimalIsEqual
 import testUtils.TestData.NÆRINGSKODE_2SIFFER
 import testUtils.TestData.NÆRINGSKODE_5SIFFER
 import testUtils.TestData.ORGNR_VIRKSOMHET_1
-import testUtils.TestUtils.parametreForStatistikk
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori.Companion.fraKode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.UmaskertSykefraværForEttKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Statistikkilde
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkNæringMedVarighet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.StatistikkRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.assertj.core.api.Assertions
 import org.jetbrains.exposed.sql.selectAll
@@ -43,36 +38,57 @@ import java.sql.ResultSet
 open class StatistikkRepositoryJdbcTest {
     @Autowired
     private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
+
     @Autowired
     private lateinit var statistikkRepository: StatistikkRepository
 
     @Autowired
     private lateinit var sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
 
+    @Autowired
+    private lateinit var sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository
+
     @BeforeEach
     fun setUp() {
-        slettAllStatistikkFraDatabase(jdbcTemplate, sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository)
+        slettAllStatistikkFraDatabase(
+            jdbcTemplate,
+            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
+            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
+        )
     }
 
     @AfterEach
     fun tearDown() {
-        slettAllStatistikkFraDatabase(jdbcTemplate, sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository)
+        slettAllStatistikkFraDatabase(
+            jdbcTemplate,
+            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
+            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository
+        )
     }
 
     @Test
     fun hentSisteÅrstallOgKvartalForSykefraværsstatistikk__skal_returnere_siste_ÅrstallOgKvartal_for_import() {
-        jdbcTemplate!!.update(
-            "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametreForStatistikk(2019, 2, 10, 4, 100)
+
+        sykefraværStatistikkLandRepository.settInn(
+            listOf(
+                SykefraværsstatistikkLand(
+                    årstall = 2019,
+                    kvartal = 2,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(4),
+                    muligeDagsverk = BigDecimal(100),
+                ),
+                SykefraværsstatistikkLand(
+                    årstall = 2019,
+                    kvartal = 1,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(5),
+                    muligeDagsverk = BigDecimal(100)
+                )
+            )
         )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_land (arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametreForStatistikk(2019, 1, 10, 5, 100)
-        )
-        val årstallOgKvartal =
-            statistikkRepository!!.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(Statistikkilde.LAND)
+
+        val årstallOgKvartal = sykefraværStatistikkLandRepository.hentNyesteKvartal()
         Assertions.assertThat(årstallOgKvartal).isEqualTo(ÅrstallOgKvartal(2019, 2))
     }
 
@@ -83,8 +99,8 @@ open class StatistikkRepositoryJdbcTest {
             2019, 1, "03123", "A", 14, BigDecimal("55.123"), BigDecimal("856.891")
         )
         list.add(statistikkMedVarighet)
-        statistikkRepository!!.batchOpprettSykefraværsstatistikkNæringMedVarighet(
-            list, statistikkRepository!!.INSERT_BATCH_STØRRELSE
+        statistikkRepository.batchOpprettSykefraværsstatistikkNæringMedVarighet(
+            list, statistikkRepository.INSERT_BATCH_STØRRELSE
         )
         val resultList = hentSykefraværprosentNæringMedVarighet()
         Assertions.assertThat(resultList.size).isEqualTo(1)
@@ -118,8 +134,8 @@ open class StatistikkRepositoryJdbcTest {
             BigDecimal(100).setScale(6)
         )
         list.add(gradertSykemelding)
-        statistikkRepository!!.batchOpprettSykefraværsstatistikkVirksomhetMedGradering(
-            list, statistikkRepository!!.INSERT_BATCH_STØRRELSE
+        statistikkRepository.batchOpprettSykefraværsstatistikkVirksomhetMedGradering(
+            list, statistikkRepository.INSERT_BATCH_STØRRELSE
         )
         val resultList = hentSykefraværprosentMedGradering()
         Assertions.assertThat(resultList.size).isEqualTo(1)
@@ -174,7 +190,7 @@ open class StatistikkRepositoryJdbcTest {
         lagreSykefraværprosentNæringMedVarighet("02", "A", 2018, 4)
         lagreSykefraværprosentNæringMedVarighet("01", "A", 2019, 1)
         lagreSykefraværprosentNæringMedVarighet("02", "A", 2019, 1)
-        val antallSlettet = statistikkRepository!!.slettSykefraværsstatistikkNæringMedVarighet(
+        val antallSlettet = statistikkRepository.slettSykefraværsstatistikkNæringMedVarighet(
             ÅrstallOgKvartal(2019, 1)
         )
         val list = hentSykefraværprosentNæringMedVarighet()
@@ -185,7 +201,7 @@ open class StatistikkRepositoryJdbcTest {
     private fun lagreSykefraværprosentNæringMedVarighet(
         næringkode: String, varighet: String, årstall: Int, kvartal: Int
     ) {
-        jdbcTemplate!!.update(
+        jdbcTemplate.update(
             String.format(
                 "insert into sykefravar_statistikk_naring_med_varighet "
                         + "(arstall, kvartal, naring_kode, varighet, antall_personer, tapte_dagsverk, mulige_dagsverk) "
@@ -197,7 +213,7 @@ open class StatistikkRepositoryJdbcTest {
     }
 
     private fun hentSykefraværprosentNæringMedVarighet(): List<UmaskertSykefraværForEttKvartalMedVarighet> {
-        return jdbcTemplate!!.query(
+        return jdbcTemplate.query(
             "select * from sykefravar_statistikk_naring_med_varighet",
             MapSqlParameterSource()
         ) { rs: ResultSet, rowNum: Int ->
@@ -212,7 +228,7 @@ open class StatistikkRepositoryJdbcTest {
     }
 
     private fun hentSykefraværprosentMedGradering(): List<UmaskertSykefraværForEttKvartal> {
-        return jdbcTemplate!!.query(
+        return jdbcTemplate.query(
             "select * from sykefravar_statistikk_virksomhet_med_gradering",
             MapSqlParameterSource()
         ) { rs: ResultSet, rowNum: Int ->

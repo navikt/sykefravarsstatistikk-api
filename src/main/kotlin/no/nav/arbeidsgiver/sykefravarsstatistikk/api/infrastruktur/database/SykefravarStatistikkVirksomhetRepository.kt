@@ -152,4 +152,15 @@ class SykefravarStatistikkVirksomhetRepository(
             }
         }
     }
+
+    fun hentNyesteKvartal(): ÅrstallOgKvartal {
+        return transaction {
+            selectAll()
+                .orderBy(årstall to SortOrder.DESC)
+                .orderBy(kvartal to SortOrder.DESC)
+                .limit(1)
+                .map { ÅrstallOgKvartal(it[årstall], it[kvartal]) }
+                .first()
+        }
+    }
 }

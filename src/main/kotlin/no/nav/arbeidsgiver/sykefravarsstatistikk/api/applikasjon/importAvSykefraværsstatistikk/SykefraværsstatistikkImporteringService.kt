@@ -26,9 +26,7 @@ class SykefraværsstatistikkImporteringService(
     fun importerHvisDetFinnesNyStatistikk(): ÅrstallOgKvartal {
         log.info("Gjeldende miljø: " + environment.activeProfiles.contentToString())
         val årstallOgKvartalForSykefraværsstatistikk = listOf(
-            statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
-                Statistikkilde.LAND
-            ),
+            sykefraværsstatistikkLandRepository.hentNyesteKvartal(),
             statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
                 Statistikkilde.SEKTOR
             ),
@@ -38,9 +36,7 @@ class SykefraværsstatistikkImporteringService(
             statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
                 Statistikkilde.NÆRING_5_SIFFER
             ),
-            statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
-                Statistikkilde.VIRKSOMHET
-            ),
+            statistikkVirksomhetRepository.hentNyesteKvartal()
         )
         val årstallOgKvartalForDvh = listOf(
             datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
