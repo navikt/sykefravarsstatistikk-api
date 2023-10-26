@@ -16,24 +16,6 @@ import java.util.stream.Collectors
 class SykefraværsstatistikkTilEksporteringRepository(
     @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
 ) {
-    fun hentSykefraværprosentLand(årstallOgKvartal: ÅrstallOgKvartal): SykefraværsstatistikkLand? {
-        return try {
-            val resultat = namedParameterJdbcTemplate.query(
-                "select arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk "
-                        + "from sykefravar_statistikk_land "
-                        + "where arstall = :arstall and kvartal = :kvartal order by arstall, kvartal",
-                MapSqlParameterSource()
-                    .addValue("arstall", årstallOgKvartal.årstall)
-                    .addValue("kvartal", årstallOgKvartal.kvartal)
-            ) { rs: ResultSet, _: Int -> mapTilSykefraværsstatistikkLand(rs) }
-            if (resultat.size != 1) {
-                null
-            } else resultat[0]
-        } catch (e: EmptyResultDataAccessException) {
-            null
-        }
-    }
-
     fun hentSykefraværprosentAlleSektorer(
         årstallOgKvartal: ÅrstallOgKvartal
     ): List<SykefraværsstatistikkSektor> {
@@ -179,17 +161,6 @@ class SykefraværsstatistikkTilEksporteringRepository(
 
     fun hentSykefraværAlleBransjer(kvartaler: List<ÅrstallOgKvartal>): List<SykefraværsstatistikkBransje> {
         return hentSykefraværsstatistikkForBransjer(kvartaler, namedParameterJdbcTemplate)
-    }
-
-    @Throws(SQLException::class)
-    private fun mapTilSykefraværsstatistikkLand(rs: ResultSet): SykefraværsstatistikkLand {
-        return SykefraværsstatistikkLand(
-            rs.getInt("arstall"),
-            rs.getInt("kvartal"),
-            rs.getInt("antall_personer"),
-            rs.getBigDecimal("tapte_dagsverk"),
-            rs.getBigDecimal("mulige_dagsverk")
-        )
     }
 
     @Throws(SQLException::class)

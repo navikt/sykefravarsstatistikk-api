@@ -40,16 +40,6 @@ open class UmaskertSykefraværForEttKvartal(
         )
     }
 
-    fun tilSykefraværsstatistikkLand(): SykefraværsstatistikkLand {
-        return SykefraværsstatistikkLand(
-            årstallOgKvartal.årstall,
-            årstallOgKvartal.kvartal,
-            antallPersoner,
-            dagsverkTeller,
-            dagsverkNevner
-        )
-    }
-
     val kvartal: Int
         get() = årstallOgKvartal.kvartal
     val Årstall: Int

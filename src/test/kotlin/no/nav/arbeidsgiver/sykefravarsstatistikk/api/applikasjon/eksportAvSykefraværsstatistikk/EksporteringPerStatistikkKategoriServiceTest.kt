@@ -9,6 +9,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkLand
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
@@ -40,8 +41,16 @@ class EksporteringPerStatistikkKategoriServiceTest {
     fun eksporterSykefraværsstatistikkLand__sender_riktig_melding_til_kafka() {
         val umaskertSykefraværForEttKvartalListe =
             EksporteringServiceTestUtils.sykefraværsstatistikkLandSiste4Kvartaler(__2020_2)
-        whenever(sykefraværStatistikkLandRepository.hentForKvartaler(any()))
-            .thenReturn(umaskertSykefraværForEttKvartalListe)
+        whenever(sykefraværStatistikkLandRepository.hentSykefraværstatistikkLand(any()))
+            .thenReturn(umaskertSykefraværForEttKvartalListe.map {
+                SykefraværsstatistikkLand(
+                    it.årstallOgKvartal.årstall,
+                    it.årstallOgKvartal.kvartal,
+                    it.antallPersoner,
+                    it.dagsverkTeller,
+                    it.dagsverkNevner
+                )
+            })
 
         service.eksporterPerStatistikkKategori(__2020_2, Statistikkategori.LAND)
 

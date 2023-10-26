@@ -34,6 +34,18 @@ class SykefraværStatistikkLandRepository(override val database: Database) :
         }
     }
 
+    fun hentSykefraværstatistikkLand(kvartaler: List<ÅrstallOgKvartal>): List<SykefraværsstatistikkLand> {
+        return hentForKvartaler(kvartaler).map {
+            SykefraværsstatistikkLand(
+                it.årstallOgKvartal.årstall,
+                it.årstallOgKvartal.kvartal,
+                it.antallPersoner,
+                it.dagsverkTeller,
+                it.dagsverkNevner
+            )
+        }
+    }
+
     fun slettForKvartal(årstallOgKvartal: ÅrstallOgKvartal) = transaction {
         deleteWhere { (årstall eq årstallOgKvartal.årstall) and (kvartal eq årstallOgKvartal.kvartal) }
     }

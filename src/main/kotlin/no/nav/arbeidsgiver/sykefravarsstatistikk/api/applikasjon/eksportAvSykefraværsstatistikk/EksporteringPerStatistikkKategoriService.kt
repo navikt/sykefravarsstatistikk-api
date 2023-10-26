@@ -54,8 +54,7 @@ class EksporteringPerStatistikkKategoriService(
 
     private fun eksporterSykefraværsstatistikkLand(årstallOgKvartal: ÅrstallOgKvartal) {
 
-        sykefraværStatistikkLandRepository.hentForKvartaler(årstallOgKvartal inkludertTidligere 3)
-            .tilSykefraværsstatistikkLand()
+        sykefraværStatistikkLandRepository.hentSykefraværstatistikkLand(årstallOgKvartal inkludertTidligere 3)
             .groupByLand().let {
                 eksporterSykefraværsstatistikkPerKategori(
                     årstallOgKvartal = årstallOgKvartal,
@@ -246,9 +245,6 @@ fun List<Sykefraværsstatistikk>.tilUmaskertSykefraværForEttKvartal() =
             )
         }
     }
-
-fun List<UmaskertSykefraværForEttKvartal>.tilSykefraværsstatistikkLand() =
-    this.map { it.tilSykefraværsstatistikkLand() }
 
 fun List<SykefraværsstatistikkLand>.groupByLand():
         Map<String, List<Sykefraværsstatistikk>> =
