@@ -64,8 +64,6 @@ data class ÅrstallOgKvartal(
     infix fun inkludertTidligere(n: Int) = (0..n).map { this.minusKvartaler(it) }
 
     companion object {
-
-        @Deprecated("Bruk inkludertTidligere i stedet for denne, og fjern deretter")
         fun range(fra: ÅrstallOgKvartal, til: ÅrstallOgKvartal): List<ÅrstallOgKvartal> {
             val årstallOgKvartal: MutableList<ÅrstallOgKvartal> = ArrayList()
             var i = fra

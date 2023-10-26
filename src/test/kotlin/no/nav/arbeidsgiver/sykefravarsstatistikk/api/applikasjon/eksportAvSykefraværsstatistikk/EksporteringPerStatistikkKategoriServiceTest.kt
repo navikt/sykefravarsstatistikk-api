@@ -1,13 +1,14 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk
 
 import net.javacrumbs.jsonunit.assertj.assertThatJson
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.__2019_3
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.__2019_4
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.__2020_1
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.__2020_2
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.sykefraværsstatistikkSektor
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
@@ -22,12 +23,14 @@ import java.math.BigDecimal
 class EksporteringPerStatistikkKategoriServiceTest {
     private val sykefraværsstatistikkTilEksporteringRepository = mock<SykefraværsstatistikkTilEksporteringRepository>()
     private val sykefraværStatistikkLandRepository = mock<SykefraværStatistikkLandRepository>()
+    private val sykefravarStatistikkVirksomhetRepository = mock<SykefravarStatistikkVirksomhetRepository>()
     private val kafkaClient = mock<KafkaClient>()
 
     private val service: EksporteringPerStatistikkKategoriService = EksporteringPerStatistikkKategoriService(
-        sykefraværsstatistikkTilEksporteringRepository,
-        sykefraværStatistikkLandRepository,
-        kafkaClient,
+        tilEksporteringRepository = sykefraværsstatistikkTilEksporteringRepository,
+        sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
+        sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
+        kafkaClient = kafkaClient,
     )
 
     private val statistikkategoriKafkameldingCaptor = argumentCaptor<StatistikkategoriKafkamelding>()
@@ -101,9 +104,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
             )
         )
         whenever(
-            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleVirksomheter(
-                __2019_3, __2020_2
-            )
+            sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(__2020_2 inkludertTidligere 3)
         )
             .thenReturn(allData)
 

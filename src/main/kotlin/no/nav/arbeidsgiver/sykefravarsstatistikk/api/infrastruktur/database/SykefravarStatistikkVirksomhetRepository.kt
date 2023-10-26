@@ -1,11 +1,12 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.less
 import org.springframework.stereotype.Component
-import java.sql.ResultSet
 
 @Component
 class SykefravarStatistikkVirksomhetRepository(
@@ -47,6 +48,59 @@ class SykefravarStatistikkVirksomhetRepository(
         }
     }
 
+    fun hentSykefraværMedVarighet(
+        organisasjonsnummer: Orgnr
+    ): List<UmaskertSykefraværForEttKvartalMedVarighet> {
+        return transaction {
+            select {
+                (orgnr eq organisasjonsnummer.verdi) and
+                        (varighet inList listOf('A', 'B', 'C', 'D', 'E', 'F', 'X'))
+            }.orderBy(
+                årstall to SortOrder.ASC,
+                kvartal to SortOrder.ASC,
+                varighet to SortOrder.ASC
+            ).map {
+                UmaskertSykefraværForEttKvartalMedVarighet(
+                    årstallOgKvartal = ÅrstallOgKvartal(
+                        årstall = it[årstall],
+                        kvartal = it[kvartal]
+                    ),
+                    tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
+                    muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
+                    antallPersoner = it[antallPersoner],
+                    varighet = Varighetskategori.fraKode(it[varighet]?.toString())
+                )
+            }
+        }
+    }
+
+    fun hentSykefraværAlleVirksomheter(
+        kvartaler: List<ÅrstallOgKvartal>
+    ): List<SykefraværsstatistikkVirksomhetUtenVarighet> {
+        return transaction {
+            slice(
+                årstall,
+                kvartal,
+                orgnr,
+                tapteDagsverk.sum(),
+                muligeDagsverk.sum(),
+                antallPersoner.sum(),
+            ).select {
+                (årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }
+            }.groupBy(årstall, kvartal, orgnr)
+                .map {
+                    SykefraværsstatistikkVirksomhetUtenVarighet(
+                        årstall = it[årstall],
+                        kvartal = it[kvartal],
+                        orgnr = it[orgnr],
+                        tapteDagsverk = it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                        muligeDagsverk = it[muligeDagsverk.sum()]!!.toBigDecimal(),
+                        antallPersoner = it[antallPersoner.sum()]!!
+                    )
+                }
+        }
+    }
+
     fun settInn(data: List<SykefraværsstatistikkVirksomhet>): Int {
         return transaction {
             batchInsert(data) {
@@ -57,7 +111,7 @@ class SykefravarStatistikkVirksomhetRepository(
                 this[tapteDagsverk] = it.tapteDagsverk.toFloat()
                 this[muligeDagsverk] = it.muligeDagsverk.toFloat()
                 this[varighet] = it.varighet!!.first()
-                this[virksomhetstype] = it.rectype!!.first()
+                this[virksomhetstype] = it.rectype.first()
             }.count()
         }
     }

@@ -2,13 +2,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykef
 
 import config.AppConfigForJdbcTesterConfig
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
-import testUtils.AssertUtils.assertBigDecimalIsEqual
-import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
-import testUtils.TestUtils.opprettStatistikkForNæringer
-import testUtils.TestUtils.slettAllStatistikkFraDatabase
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sykefraværsstatistikk
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkForNæringskode
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetUtenVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
@@ -25,6 +18,10 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import testUtils.AssertUtils.assertBigDecimalIsEqual
+import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
+import testUtils.TestUtils.opprettStatistikkForNæringer
+import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import java.math.BigDecimal
 import java.util.*
 import java.util.stream.Collectors
@@ -36,11 +33,9 @@ import java.util.stream.Collectors
 open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     @Autowired
     lateinit var jdbcTemplate: NamedParameterJdbcTemplate
-    private val repository: SykefraværsstatistikkTilEksporteringRepository by lazy {
-        SykefraværsstatistikkTilEksporteringRepository(
-            jdbcTemplate
-        )
-    }
+
+    @Autowired
+    private lateinit var repository: SykefraværsstatistikkTilEksporteringRepository
 
     @Autowired
     lateinit var sykefraværsstatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
@@ -334,7 +329,11 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     @Test
     fun hentSykefraværprosentAlleVirksomheter__skal_hente_alle_virksomheter_for_ett_eller_flere_kvartaler() {
         opprettStatistikkVirksomhetTestData()
-        val resultat_2019_2 = repository.hentSykefraværAlleVirksomheter(ÅrstallOgKvartal(2019, 2))
+        val resultat_2019_2 = sykefraværsstatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(
+            listOf(
+                ÅrstallOgKvartal(2019, 2)
+            )
+        )
         org.assertj.core.api.Assertions.assertThat(resultat_2019_2.size).isEqualTo(2)
         assertSykefraværsstatistikkForVirksomhetIsEqual(
             resultat_2019_2, 2019, 2, 3, VIRKSOMHET_1, 1, 60
@@ -342,9 +341,13 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
         assertSykefraværsstatistikkForVirksomhetIsEqual(
             resultat_2019_2, 2019, 2, 4, VIRKSOMHET_2, 9, 100
         )
-        val resultat_2019_1_TIL_2019_2 = repository.hentSykefraværAlleVirksomheter(
-            ÅrstallOgKvartal(2019, 1), ÅrstallOgKvartal(2019, 2)
-        )
+        val resultat_2019_1_TIL_2019_2 =
+            sykefraværsstatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(
+                ÅrstallOgKvartal(
+                    2019,
+                    2
+                ) inkludertTidligere 1
+            )
         org.assertj.core.api.Assertions.assertThat(resultat_2019_1_TIL_2019_2.size).isEqualTo(4)
         assertSykefraværsstatistikkForVirksomhetIsEqual(
             resultat_2019_1_TIL_2019_2, 2019, 1, 40, VIRKSOMHET_1, 20, 115
@@ -358,9 +361,13 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
         assertSykefraværsstatistikkForVirksomhetIsEqual(
             resultat_2019_1_TIL_2019_2, 2019, 2, 4, VIRKSOMHET_2, 9, 100
         )
-        val resultat_2018_3_TIL_2019_2 = repository.hentSykefraværAlleVirksomheter(
-            ÅrstallOgKvartal(2018, 3), ÅrstallOgKvartal(2019, 2)
-        )
+        val resultat_2018_3_TIL_2019_2 =
+            sykefraværsstatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(
+                ÅrstallOgKvartal(
+                    2019,
+                    2
+                ) inkludertTidligere 3
+            )
         org.assertj.core.api.Assertions.assertThat(resultat_2018_3_TIL_2019_2.size).isEqualTo(8)
         assertSykefraværsstatistikkForVirksomhetIsEqual(
             resultat_2018_3_TIL_2019_2, 2018, 4, 40, VIRKSOMHET_1, 20, 115
@@ -748,13 +755,6 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
         val parametre = MapSqlParameterSource()
             .addValue("naring_kode", sykefraværsstatistikkForNæringskode.næringkode5siffer)
         return leggTilParametreForSykefraværsstatistikk(parametre, sykefraværsstatistikkForNæringskode)
-    }
-
-    private fun parametre(
-        sykefraværsstatistikkVirksomhet: SykefraværsstatistikkVirksomhetUtenVarighet
-    ): MapSqlParameterSource {
-        val parametre = MapSqlParameterSource().addValue("orgnr", sykefraværsstatistikkVirksomhet.orgnr)
-        return leggTilParametreForSykefraværsstatistikk(parametre, sykefraværsstatistikkVirksomhet)
     }
 
     private fun leggTilParametreForSykefraværsstatistikk(

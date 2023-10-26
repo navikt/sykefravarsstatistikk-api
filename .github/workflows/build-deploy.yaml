@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - idiomatisk_kotlin
+      - virksomhetrepository
     paths-ignore:
       - '**.md'
       - '**/**.md'

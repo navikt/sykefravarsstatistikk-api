@@ -1,14 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkBransje
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkForNæringskode
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetUtenVarighet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkForNæring
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkLand
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkSektor
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal.Companion.range
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -21,7 +14,7 @@ import java.util.stream.Collectors
 
 @Component
 class SykefraværsstatistikkTilEksporteringRepository(
-    @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate
+    @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
 ) {
     fun hentSykefraværprosentLand(årstallOgKvartal: ÅrstallOgKvartal): SykefraværsstatistikkLand? {
         return try {
@@ -136,26 +129,6 @@ class SykefraværsstatistikkTilEksporteringRepository(
         }
     }
 
-    @JvmOverloads
-    fun hentSykefraværAlleVirksomheter(
-        fraÅrstallOgKvartal: ÅrstallOgKvartal?, tilÅrstallOgKvartal: ÅrstallOgKvartal? = fraÅrstallOgKvartal
-    ): List<SykefraværsstatistikkVirksomhetUtenVarighet> {
-        return try {
-            namedParameterJdbcTemplate.query(
-                "select arstall, kvartal, orgnr, "
-                        + "sum(tapte_dagsverk) as tapte_dagsverk, "
-                        + "sum(mulige_dagsverk) as mulige_dagsverk, "
-                        + "sum(antall_personer) as antall_personer "
-                        + "from sykefravar_statistikk_virksomhet "
-                        + " where "
-                        + getWhereClause(fraÅrstallOgKvartal, tilÅrstallOgKvartal)
-                        + " group by arstall, kvartal, orgnr"
-            ) { rs: ResultSet, _: Int -> mapTilSykefraværsstatistikkVirksomhet(rs) }
-        } catch (e: EmptyResultDataAccessException) {
-            emptyList()
-        }
-    }
-
     fun hentSykefraværAlleVirksomheterGradert(
         fraÅrstallOgKvartal: ÅrstallOgKvartal,
         tilÅrstallOgKvartal: ÅrstallOgKvartal,
@@ -240,22 +213,6 @@ class SykefraværsstatistikkTilEksporteringRepository(
             rs.getInt("antall_personer"),
             rs.getBigDecimal("tapte_dagsverk"),
             rs.getBigDecimal("mulige_dagsverk")
-        )
-    }
-
-    @Throws(SQLException::class)
-    private fun mapTilSykefraværsstatistikkVirksomhet(
-        rs: ResultSet
-    ): SykefraværsstatistikkVirksomhetUtenVarighet {
-        return SykefraværsstatistikkVirksomhetUtenVarighet(
-            rs.getInt("arstall"),
-            rs.getInt("kvartal"),
-            rs.getString("orgnr"),
-            rs.getInt("antall_personer"),
-            rs.getBigDecimal("tapte_dagsverk"),
-            rs.getBigDecimal("mulige_dagsverk")
-
-
         )
     }
 
