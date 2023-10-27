@@ -18,38 +18,18 @@ class GraderingRepository(
     @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
     private val sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
 ) {
-    fun hentSykefraværMedGradering(virksomhet: Virksomhet): List<UmaskertSykefraværForEttKvartal> {
-        return try {
-            namedParameterJdbcTemplate.query(
-                "select arstall, kvartal,"
-                        + " sum(tapte_dagsverk_gradert_sykemelding) as "
-                        + "sum_tapte_dagsverk_gradert_sykemelding, "
-                        + " sum(tapte_dagsverk) as sum_tapte_dagsverk, "
-                        + " sum(antall_personer) as sum_antall_personer "
-                        + " from sykefravar_statistikk_virksomhet_med_gradering "
-                        + " where "
-                        + " orgnr = :orgnr "
-                        + " and rectype = :rectype "
-                        + " group by arstall, kvartal"
-                        + " order by arstall, kvartal",
-                MapSqlParameterSource()
-                    .addValue("orgnr", virksomhet.orgnr.verdi)
-                    .addValue("rectype", DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET)
-            ) { rs: ResultSet, _: Int -> mapTilUmaskertSykefraværForEttKvartal(rs) }
-        } catch (e: EmptyResultDataAccessException) {
-            emptyList()
-        }
-    }
-
     fun hentGradertSykefraværAlleKategorier(virksomhet: Virksomhet): Sykefraværsdata {
         val næring = virksomhet.næringskode.næring
         val maybeBransje = finnBransje(virksomhet.næringskode)
-        val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> = EnumMap(Statistikkategori::class.java)
-        data[Statistikkategori.VIRKSOMHET] = hentSykefraværMedGradering(virksomhet)
+        val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> =
+            EnumMap(Statistikkategori::class.java)
+        data[Statistikkategori.VIRKSOMHET] =
+            sykefravarStatistikkVirksomhetGraderingRepository.hentForOrgnr(virksomhet.orgnr)
         if (maybeBransje.isEmpty) {
             data[Statistikkategori.NÆRING] = hentSykefraværMedGradering(næring)
-        }  else {
-            data[Statistikkategori.BRANSJE] = sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(maybeBransje.get())
+        } else {
+            data[Statistikkategori.BRANSJE] =
+                sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(maybeBransje.get())
         }
         return Sykefraværsdata(data)
     }

@@ -86,7 +86,9 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(50),
             BigDecimal(300)
         )
-        val resultat = graderingRepository.hentSykefraværMedGradering(UNDERENHET_1_NÆRING_14)
+        val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForOrgnr(
+            UNDERENHET_1_NÆRING_14.orgnr
+        )
         Assertions.assertThat(resultat.size).isEqualTo(2)
         Assertions.assertThat(resultat[0])
             .isEqualTo(
@@ -137,7 +139,9 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(50),
             BigDecimal(300)
         )
-        val resultat = graderingRepository.hentSykefraværMedGradering(UNDERENHET_1_NÆRING_14)
+        val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForOrgnr(
+            UNDERENHET_1_NÆRING_14.orgnr
+        )
         Assertions.assertThat(resultat.size).isEqualTo(2)
         Assertions.assertThat(resultat[0])
             .isEqualTo(

@@ -86,6 +86,30 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
         }
     }
 
+    fun hentForOrgnr(inputOrgnr: Orgnr): List<UmaskertSykefraværForEttKvartal> {
+        return transaction {
+            slice(
+                årstall,
+                kvartal,
+                tapteDagsverkGradertSykemelding.sum(),
+                tapteDagsverk.sum(),
+                antallPersoner.sum(),
+            ).select {
+                (orgnr eq inputOrgnr.verdi) and
+                        (rectype eq DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET)
+            }.groupBy(årstall, kvartal)
+                .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
+                .map {
+                    UmaskertSykefraværForEttKvartal(
+                        ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                        it[tapteDagsverkGradertSykemelding.sum()]!!.toBigDecimal(),
+                        it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                        it[antallPersoner.sum()]!!
+                    )
+                }
+        }
+    }
+
     fun hentForBransje(bransje: Bransje): List<UmaskertSykefraværForEttKvartal> {
         val bransjeidentifikator = if (bransje.erDefinertPåFemsiffernivå()) {
             næringskode
