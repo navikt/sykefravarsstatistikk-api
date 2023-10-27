@@ -30,9 +30,6 @@ open class GraderingRepositoryJdbcTest {
     private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     @Autowired
-    private lateinit var graderingRepository: GraderingRepository
-
-    @Autowired
     private lateinit var sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository
 
     @BeforeEach
@@ -192,7 +189,8 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(50),
             BigDecimal(300)
         )
-        val resultat = graderingRepository.hentSykefraværMedGradering(PRODUKSJON_AV_KLÆR)
+        val resultat =
+            sykefravarStatistikkVirksomhetGraderingRepository.hentForNæring(PRODUKSJON_AV_KLÆR)
         Assertions.assertThat(resultat.size).isEqualTo(2)
         Assertions.assertThat(resultat[0])
             .isEqualTo(
