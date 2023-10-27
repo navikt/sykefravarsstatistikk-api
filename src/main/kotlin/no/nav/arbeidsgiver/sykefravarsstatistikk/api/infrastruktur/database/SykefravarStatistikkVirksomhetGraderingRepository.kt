@@ -86,60 +86,27 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
         }
     }
 
-    fun hentForNæring(inputNæring: Næring): List<UmaskertSykefraværForEttKvartal> {
-        return transaction {
-            slice(
-                årstall,
-                kvartal,
-                tapteDagsverkGradertSykemelding.sum(),
-                tapteDagsverk.sum(),
-                antallPersoner.sum(),
-            ).select {
-                (næring eq inputNæring.tosifferIdentifikator) and
-                        (rectype eq DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET)
-            }.groupBy(årstall, kvartal)
-                .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
-                .map {
-                    UmaskertSykefraværForEttKvartal(
-                        ÅrstallOgKvartal(it[årstall], it[kvartal]),
-                        it[tapteDagsverkGradertSykemelding.sum()]!!.toBigDecimal(),
-                        it[tapteDagsverk.sum()]!!.toBigDecimal(),
-                        it[antallPersoner.sum()]!!
-                    )
-                }
-        }
+    fun hentForNæring(inputNæring: Næring): List<UmaskertSykefraværForEttKvartal> = hent {
+        (næring eq inputNæring.tosifferIdentifikator) and
+                (rectype eq DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET)
     }
 
-    fun hentForOrgnr(inputOrgnr: Orgnr): List<UmaskertSykefraværForEttKvartal> {
-        return transaction {
-            slice(
-                årstall,
-                kvartal,
-                tapteDagsverkGradertSykemelding.sum(),
-                tapteDagsverk.sum(),
-                antallPersoner.sum(),
-            ).select {
-                (orgnr eq inputOrgnr.verdi) and
-                        (rectype eq DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET)
-            }.groupBy(årstall, kvartal)
-                .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
-                .map {
-                    UmaskertSykefraværForEttKvartal(
-                        ÅrstallOgKvartal(it[årstall], it[kvartal]),
-                        it[tapteDagsverkGradertSykemelding.sum()]!!.toBigDecimal(),
-                        it[tapteDagsverk.sum()]!!.toBigDecimal(),
-                        it[antallPersoner.sum()]!!
-                    )
-                }
-        }
+    fun hentForOrgnr(inputOrgnr: Orgnr): List<UmaskertSykefraværForEttKvartal> = hent {
+        (orgnr eq inputOrgnr.verdi) and
+                (rectype eq DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET)
     }
 
-    fun hentForBransje(bransje: Bransje): List<UmaskertSykefraværForEttKvartal> {
+    fun hentForBransje(bransje: Bransje): List<UmaskertSykefraværForEttKvartal> = hent {
         val bransjeidentifikator = if (bransje.erDefinertPåFemsiffernivå()) {
             næringskode
         } else {
             næring
         }
+        (bransjeidentifikator inList bransje.identifikatorer) and
+                (rectype eq DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET)
+    }
+
+    private fun hent(where: SqlExpressionBuilder.() -> Op<Boolean>): List<UmaskertSykefraværForEttKvartal> {
         return transaction {
             slice(
                 årstall,
@@ -147,10 +114,8 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
                 tapteDagsverkGradertSykemelding.sum(),
                 tapteDagsverk.sum(),
                 antallPersoner.sum(),
-            ).select {
-                (bransjeidentifikator inList bransje.identifikatorer) and
-                        (rectype eq DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET)
-            }.groupBy(årstall, kvartal)
+            ).select(where)
+                .groupBy(årstall, kvartal)
                 .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
                 .map {
                     UmaskertSykefraværForEttKvartal(
