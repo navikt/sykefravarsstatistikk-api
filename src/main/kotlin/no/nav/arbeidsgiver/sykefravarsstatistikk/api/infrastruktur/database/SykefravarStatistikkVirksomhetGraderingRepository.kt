@@ -86,6 +86,45 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
         }
     }
 
+    fun hentSykefraværAlleVirksomheterGradert(
+        kvartaler: List<ÅrstallOgKvartal>
+    ): List<SykefraværsstatistikkVirksomhetMedGradering> {
+        return transaction {
+            slice(
+                årstall,
+                kvartal,
+                orgnr,
+                næring,
+                næringskode,
+                rectype,
+                antallGraderteSykemeldinger.sum(),
+                tapteDagsverkGradertSykemelding.sum(),
+                antallPersoner.sum(),
+                antallSykemeldinger.sum(),
+                tapteDagsverk.sum(),
+                muligeDagsverk.sum(),
+            ).select {
+                (årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }
+            }.groupBy(årstall, kvartal, orgnr, næring, næringskode, rectype)
+                .map {
+                    SykefraværsstatistikkVirksomhetMedGradering(
+                        årstall = it[årstall],
+                        kvartal = it[kvartal],
+                        orgnr = it[orgnr],
+                        næring = it[næring],
+                        næringkode = it[næringskode],
+                        rectype = it[rectype],
+                        antallGraderteSykemeldinger = it[antallGraderteSykemeldinger.sum()]!!,
+                        tapteDagsverkGradertSykemelding = it[tapteDagsverkGradertSykemelding.sum()]!!.toBigDecimal(),
+                        antallSykemeldinger = it[antallSykemeldinger.sum()]!!,
+                        antallPersoner = it[antallPersoner.sum()]!!,
+                        tapteDagsverk = it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                        muligeDagsverk = it[muligeDagsverk.sum()]!!.toBigDecimal(),
+                    )
+                }
+        }
+    }
+
     fun hentForNæring(inputNæring: Næring): List<UmaskertSykefraværForEttKvartal> = hent {
         (næring eq inputNæring.tosifferIdentifikator) and
                 (rectype eq DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET)

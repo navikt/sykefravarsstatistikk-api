@@ -5,6 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic.Companion.from
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
@@ -19,6 +20,7 @@ class EksporteringPerStatistikkKategoriService(
     private val tilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository,
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
     private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
+    private val sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
     private val kafkaClient: KafkaClient,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -131,17 +133,16 @@ class EksporteringPerStatistikkKategoriService(
     }
 
     private fun eksporterSykefraværsstatistikkVirksomhetGradert(årstallOgKvartal: ÅrstallOgKvartal) {
-        tilEksporteringRepository.hentSykefraværAlleVirksomheterGradert(
-            årstallOgKvartal.minusKvartaler(3), årstallOgKvartal
-        )
-            .groupByVirksomhetGradert().let {
-                eksporterSykefraværsstatistikkPerKategori(
-                    årstallOgKvartal = årstallOgKvartal,
-                    sykefraværGruppertEtterKode = it,
-                    statistikkategori = Statistikkategori.VIRKSOMHET_GRADERT,
-                    kafkaTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_GRADERT_V1
-                )
-            }
+        sykefravarStatistikkVirksomhetGraderingRepository.hentSykefraværAlleVirksomheterGradert(
+            årstallOgKvartal inkludertTidligere 3
+        ).groupByVirksomhetGradert().let {
+            eksporterSykefraværsstatistikkPerKategori(
+                årstallOgKvartal = årstallOgKvartal,
+                sykefraværGruppertEtterKode = it,
+                statistikkategori = Statistikkategori.VIRKSOMHET_GRADERT,
+                kafkaTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_GRADERT_V1
+            )
+        }
     }
 
 
