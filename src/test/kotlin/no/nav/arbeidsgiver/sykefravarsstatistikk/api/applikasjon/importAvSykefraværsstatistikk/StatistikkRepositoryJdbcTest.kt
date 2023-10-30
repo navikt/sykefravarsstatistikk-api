@@ -1,16 +1,12 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk
 
 import config.AppConfigForJdbcTesterConfig
-import testUtils.AssertUtils.assertBigDecimalIsEqual
-import testUtils.TestData.NÆRINGSKODE_2SIFFER
-import testUtils.TestData.NÆRINGSKODE_5SIFFER
-import testUtils.TestData.ORGNR_VIRKSOMHET_1
-import testUtils.TestUtils.slettAllStatistikkFraDatabase
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori.Companion.fraKode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori.Companion.fraKode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.StatistikkRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
@@ -28,6 +24,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import testUtils.AssertUtils.assertBigDecimalIsEqual
+import testUtils.TestData.NÆRINGSKODE_2SIFFER
+import testUtils.TestData.NÆRINGSKODE_5SIFFER
+import testUtils.TestData.ORGNR_VIRKSOMHET_1
+import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import java.math.BigDecimal
 import java.sql.ResultSet
 
@@ -44,6 +45,9 @@ open class StatistikkRepositoryJdbcTest {
 
     @Autowired
     private lateinit var sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
+
+    @Autowired
+    private lateinit var sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository
 
     @Autowired
     private lateinit var sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository
@@ -134,10 +138,8 @@ open class StatistikkRepositoryJdbcTest {
             BigDecimal(100).setScale(6)
         )
         list.add(gradertSykemelding)
-        statistikkRepository.batchOpprettSykefraværsstatistikkVirksomhetMedGradering(
-            list, statistikkRepository.INSERT_BATCH_STØRRELSE
-        )
-        val resultList = hentSykefraværprosentMedGradering()
+        sykefravarStatistikkVirksomhetGraderingRepository.opprettSykefraværsstatistikkVirksomhetMedGradering(list)
+        val resultList = sykefravarStatistikkVirksomhetGraderingRepository.hentSykefraværprosentMedGradering()
         Assertions.assertThat(resultList.size).isEqualTo(1)
         Assertions.assertThat(resultList[0])
             .isEqualTo(
@@ -227,17 +229,17 @@ open class StatistikkRepositoryJdbcTest {
         }
     }
 
-    private fun hentSykefraværprosentMedGradering(): List<UmaskertSykefraværForEttKvartal> {
-        return jdbcTemplate.query(
-            "select * from sykefravar_statistikk_virksomhet_med_gradering",
-            MapSqlParameterSource()
-        ) { rs: ResultSet, rowNum: Int ->
-            UmaskertSykefraværForEttKvartal(
-                ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
-                rs.getBigDecimal("tapte_dagsverk_gradert_sykemelding"),
-                rs.getBigDecimal("mulige_dagsverk"),
-                rs.getInt("antall_personer")
-            )
+    private fun SykefravarStatistikkVirksomhetGraderingRepository.hentSykefraværprosentMedGradering(): List<UmaskertSykefraværForEttKvartal> {
+        return transaction {
+            selectAll()
+                .map {
+                    UmaskertSykefraværForEttKvartal(
+                        årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                        dagsverkTeller = it[tapteDagsverkGradertSykemelding].toBigDecimal(),
+                        dagsverkNevner = it[muligeDagsverk].toBigDecimal(),
+                        antallPersoner = it[antallPersoner]
+                    )
+                }
         }
     }
 

@@ -52,7 +52,7 @@ class SykefraværStatistikkLandRepository(override val database: Database) :
 
     fun settInn(data: List<SykefraværsstatistikkLand>): Int {
         return transaction {
-            batchInsert(data) {
+            batchInsert(data, shouldReturnGeneratedValues = false) {
                 this[årstall] = it.årstall
                 this[kvartal] = it.kvartal
                 this[antallPersoner] = it.antallPersoner

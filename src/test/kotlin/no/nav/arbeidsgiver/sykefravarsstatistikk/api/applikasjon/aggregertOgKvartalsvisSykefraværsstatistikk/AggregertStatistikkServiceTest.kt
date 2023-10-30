@@ -1,24 +1,21 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk
 
 import arrow.core.right
-import testUtils.TestUtils
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.TilgangskontrollService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Sykefraværsdata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.TilgangskontrollService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import testUtils.TestUtils
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.stream.Collectors
@@ -26,52 +23,28 @@ import java.util.stream.Collectors
 @ExtendWith(MockitoExtension::class)
 internal class AggregertStatistikkServiceTest {
 
-    private lateinit var serviceUnderTest: AggregertStatistikkService
 
-    @Mock
-    private lateinit var mockSykefraværRepository: SykefraværRepository
+    private val mockSykefraværRepository: SykefraværRepository = mock()
 
-    @Mock
-    private lateinit var mockGraderingRepository: GraderingRepository
+    private val mockImporttidspunktRepository: ImporttidspunktRepository = mock(defaultAnswer = {
+        ImporttidspunktDto(LocalDate.of(2022, 2, 2), TestUtils.SISTE_PUBLISERTE_KVARTAL)
+    })
 
-    @Mock
-    private lateinit var mockImporttidspunktRepository: ImporttidspunktRepository
+    private val mockTilgangskontrollService: TilgangskontrollService = mock()
 
-    @Mock
-    private lateinit var mockTilgangskontrollService: TilgangskontrollService
+    private val mockEnhetsregisteretClient: EnhetsregisteretClient = mock()
 
-    @Mock
-    private lateinit var mockEnhetsregisteretClient: EnhetsregisteretClient
+    private val mockVarighetRepository: VarighetRepository = mock()
 
-    @Mock
-    private lateinit var mockVarighetRepository: VarighetRepository
-
-    @BeforeEach
-    fun setUp() {
-        whenever(
-            mockImporttidspunktRepository.hentNyesteImporterteKvartal()
-        ).thenReturn(ImporttidspunktDto(LocalDate.of(2022, 2, 2), TestUtils.SISTE_PUBLISERTE_KVARTAL))
-
-        serviceUnderTest = AggregertStatistikkService(
-            mockSykefraværRepository,
-            mockGraderingRepository,
-            mockVarighetRepository,
-            mockTilgangskontrollService,
-            mockEnhetsregisteretClient,
-            mockImporttidspunktRepository
-        )
-    }
-
-    @AfterEach
-    fun tearDown() {
-        Mockito.reset(
-            mockSykefraværRepository,
-            mockGraderingRepository,
-            mockVarighetRepository,
-            mockEnhetsregisteretClient,
-            mockTilgangskontrollService
-        )
-    }
+    val sykefravarStatistikkVirksomhetGraderingRepository = mock<SykefravarStatistikkVirksomhetGraderingRepository>()
+    private val serviceUnderTest: AggregertStatistikkService = AggregertStatistikkService(
+        mockSykefraværRepository,
+        mockVarighetRepository,
+        mockTilgangskontrollService,
+        mockEnhetsregisteretClient,
+        mockImporttidspunktRepository,
+        sykefravarStatistikkVirksomhetGraderingRepository,
+    )
 
     @Test
     fun hentAggregertHistorikk_kræsjerIkkeVedManglendeData() {
@@ -85,11 +58,6 @@ internal class AggregertStatistikkServiceTest {
                 any(), any()
             )
         ).thenReturn(Sykefraværsdata(mutableMapOf()))
-        whenever(mockGraderingRepository.hentGradertSykefraværAlleKategorier(any())).thenReturn(
-            Sykefraværsdata(
-                mutableMapOf()
-            )
-        )
         assertThat(serviceUnderTest.hentAggregertStatistikk(etOrgnr).getOrNull()).isEqualTo(AggregertStatistikkJson())
 
         // Resultat med statistikkategori og tomme lister skal heller ikke kræsje
@@ -102,15 +70,6 @@ internal class AggregertStatistikkServiceTest {
                 mutableMapOf(
                     Statistikkategori.VIRKSOMHET to listOf(),
                     Statistikkategori.LAND to listOf(),
-                    Statistikkategori.NÆRING to listOf(),
-                    Statistikkategori.BRANSJE to listOf()
-                )
-            )
-        )
-        whenever(mockGraderingRepository.hentGradertSykefraværAlleKategorier(any())).thenReturn(
-            Sykefraværsdata(
-                mutableMapOf(
-                    Statistikkategori.VIRKSOMHET to listOf(),
                     Statistikkategori.NÆRING to listOf(),
                     Statistikkategori.BRANSJE to listOf()
                 )
@@ -136,15 +95,12 @@ internal class AggregertStatistikkServiceTest {
                 )
             )
         )
-        whenever(mockGraderingRepository.hentGradertSykefraværAlleKategorier(any())).thenReturn(
-            Sykefraværsdata(
-                mutableMapOf(
-                    Statistikkategori.VIRKSOMHET to genererTestSykefravær(50),
-                    Statistikkategori.NÆRING to genererTestSykefravær(60),
-                    Statistikkategori.BRANSJE to genererTestSykefravær(70)
-                )
-            )
-        )
+        whenever(sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(any()))
+            .thenReturn(genererTestSykefravær(70))
+        whenever(sykefravarStatistikkVirksomhetGraderingRepository.hentForNæring(any()))
+            .thenReturn(genererTestSykefravær(60))
+        whenever(sykefravarStatistikkVirksomhetGraderingRepository.hentForOrgnr(any()))
+            .thenReturn(genererTestSykefravær(50))
         val forventedeProsenttyper =
             listOf(Statistikkategori.VIRKSOMHET, Statistikkategori.BRANSJE, Statistikkategori.LAND)
         val forventedeGraderingstyper = listOf(Statistikkategori.VIRKSOMHET, Statistikkategori.BRANSJE)
@@ -171,11 +127,6 @@ internal class AggregertStatistikkServiceTest {
                 any(), any()
             )
         ).thenReturn(Sykefraværsdata(mutableMapOf(Statistikkategori.VIRKSOMHET to genererTestSykefravær(1))))
-        whenever(mockGraderingRepository.hentGradertSykefraværAlleKategorier(any())).thenReturn(
-            Sykefraværsdata(
-                mutableMapOf(Statistikkategori.VIRKSOMHET to genererTestSykefravær(50))
-            )
-        )
         whenever(
             mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any())
         ).thenReturn(
@@ -223,11 +174,6 @@ internal class AggregertStatistikkServiceTest {
                 any(), any()
             )
         ).thenReturn(Sykefraværsdata(mutableMapOf(Statistikkategori.VIRKSOMHET to genererTestSykefravær(1))))
-        whenever(mockGraderingRepository.hentGradertSykefraværAlleKategorier(any())).thenReturn(
-            Sykefraværsdata(
-                mutableMapOf(Statistikkategori.VIRKSOMHET to genererTestSykefravær(50))
-            )
-        )
         whenever(
             mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any())
         ).thenReturn(
@@ -280,15 +226,6 @@ internal class AggregertStatistikkServiceTest {
                 )
             )
         )
-        whenever(mockGraderingRepository.hentGradertSykefraværAlleKategorier(any())).thenReturn(
-            Sykefraværsdata(
-                mutableMapOf(
-                    Statistikkategori.VIRKSOMHET to genererTestSykefravær(50),
-                    Statistikkategori.NÆRING to genererTestSykefravær(60),
-                    Statistikkategori.BRANSJE to genererTestSykefravær(70)
-                )
-            )
-        )
         whenever(
             mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any())
         ).thenReturn(
@@ -330,11 +267,6 @@ internal class AggregertStatistikkServiceTest {
                 any(), any()
             )
         ).thenReturn(Sykefraværsdata(mutableMapOf(Statistikkategori.VIRKSOMHET to genererTestSykefravær(1))))
-        whenever(mockGraderingRepository.hentGradertSykefraværAlleKategorier(any())).thenReturn(
-            Sykefraværsdata(
-                mutableMapOf()
-            )
-        )
         whenever(
             mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any())
         ).thenReturn(mapOf())
@@ -350,11 +282,6 @@ internal class AggregertStatistikkServiceTest {
         whenever(mockTilgangskontrollService.brukerRepresentererVirksomheten(any())).thenReturn(true)
         whenever(mockTilgangskontrollService.brukerHarIaRettigheterIVirksomheten(any())).thenReturn(true)
         whenever(mockEnhetsregisteretClient.hentUnderenhet(any())).thenReturn(virksomhetUtenforBransjeprogrammet.right())
-        whenever(mockGraderingRepository.hentGradertSykefraværAlleKategorier(any())).thenReturn(
-            Sykefraværsdata(
-                mutableMapOf()
-            )
-        )
 
         val årstallOgKvartal = ÅrstallOgKvartal(2022, 1)
         whenever(mockSykefraværRepository.hentTotaltSykefraværAlleKategorier(any(), any())).thenReturn(
@@ -435,7 +362,11 @@ internal class AggregertStatistikkServiceTest {
         assertThat(result?.prosentSiste4KvartalerTotalt).isEqualTo(
             listOf(
                 StatistikkJson(
-                    Statistikkategori.NÆRING, "Offentlig administrasjon og forsvar, og trygdeordninger underlagt offentlig forvaltning", "6.8", 20, listOf(
+                    Statistikkategori.NÆRING,
+                    "Offentlig administrasjon og forsvar, og trygdeordninger underlagt offentlig forvaltning",
+                    "6.8",
+                    20,
+                    listOf(
                         årstallOgKvartal
                     )
                 )
@@ -444,7 +375,11 @@ internal class AggregertStatistikkServiceTest {
         assertThat(result?.prosentSiste4KvartalerKorttid).isEqualTo(
             listOf(
                 StatistikkJson(
-                    Statistikkategori.NÆRING, "Offentlig administrasjon og forsvar, og trygdeordninger underlagt offentlig forvaltning", "0.7", 20, listOf(
+                    Statistikkategori.NÆRING,
+                    "Offentlig administrasjon og forsvar, og trygdeordninger underlagt offentlig forvaltning",
+                    "0.7",
+                    20,
+                    listOf(
                         årstallOgKvartal
                     )
                 )
@@ -453,7 +388,11 @@ internal class AggregertStatistikkServiceTest {
         assertThat(result?.prosentSiste4KvartalerLangtid).isEqualTo(
             listOf(
                 StatistikkJson(
-                    Statistikkategori.NÆRING, "Offentlig administrasjon og forsvar, og trygdeordninger underlagt offentlig forvaltning", "6.1", 20, listOf(
+                    Statistikkategori.NÆRING,
+                    "Offentlig administrasjon og forsvar, og trygdeordninger underlagt offentlig forvaltning",
+                    "6.1",
+                    20,
+                    listOf(
                         årstallOgKvartal
                     )
                 )

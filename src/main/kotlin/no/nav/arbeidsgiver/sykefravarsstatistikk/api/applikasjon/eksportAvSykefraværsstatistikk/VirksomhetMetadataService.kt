@@ -10,7 +10,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Å
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Orgenhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.fjernDupliserteOrgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.GraderingRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkRepository
 import org.slf4j.LoggerFactory
@@ -21,9 +21,9 @@ import java.util.stream.Collectors
 class VirksomhetMetadataService(
     private val datavarehusRepository: KildeTilVirksomhetsdata,
     private val virksomhetMetadataRepository: VirksomhetMetadataRepository,
-    private val graderingRepository: GraderingRepository,
     private val eksporteringRepository: EksporteringRepository,
     private val kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository,
+    private val sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -142,7 +142,9 @@ class VirksomhetMetadataService(
 
     private fun importVirksomhetNæringskode(årstallOgKvartal: ÅrstallOgKvartal): Int {
         val virksomhetMetadataNæringskode5siffer =
-            graderingRepository.hentVirksomhetMetadataNæringskode5siffer(årstallOgKvartal)
+            sykefravarStatistikkVirksomhetGraderingRepository.hentVirksomhetMetadataNæringskode5Siffer(
+                årstallOgKvartal
+            )
         if (virksomhetMetadataNæringskode5siffer.isEmpty()) {
             log.warn(
                 "Ingen virksomhetMetadataNæringskode5siffer funnet i vår statistikktabell. Stopper import. "

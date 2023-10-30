@@ -103,7 +103,7 @@ class SykefravarStatistikkVirksomhetRepository(
 
     fun settInn(data: List<SykefraværsstatistikkVirksomhet>): Int {
         return transaction {
-            batchInsert(data) {
+            batchInsert(data, shouldReturnGeneratedValues = false) {
                 this[orgnr] = it.orgnr!!
                 this[årstall] = it.årstall
                 this[kvartal] = it.kvartal

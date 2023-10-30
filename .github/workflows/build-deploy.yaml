@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - virksomhetrepository
+      - expose-gradert
     paths-ignore:
       - '**.md'
       - '**/**.md'

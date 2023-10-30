@@ -3,11 +3,10 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.StatistikkRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.SlettOgOpprettResultat
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Statistikkilde
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.StatistikkildeDvh
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.slf4j.LoggerFactory
 import org.springframework.core.env.Environment
@@ -20,7 +19,8 @@ class SykefraværsstatistikkImporteringService(
     private val datavarehusRepository: DatavarehusRepository,
     private val importtidspunktRepository: ImporttidspunktRepository,
     private val sykefraværsstatistikkLandRepository: SykefraværStatistikkLandRepository,
-    private val environment: Environment
+    private val environment: Environment,
+    private val sykefraværStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
     fun importerHvisDetFinnesNyStatistikk(): ÅrstallOgKvartal {
@@ -197,9 +197,11 @@ class SykefraværsstatistikkImporteringService(
         } else {
             SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal)
         }
-        val resultat = statistikkRepository.importSykefraværsstatistikkVirksomhetMedGradering(
-            statistikk, årstallOgKvartal
+        val antallSlettet = sykefraværStatistikkVirksomhetGraderingRepository.slettDataFor(årstallOgKvartal)
+        val antallOprettet = sykefraværStatistikkVirksomhetGraderingRepository.opprettSykefraværsstatistikkVirksomhetMedGradering(
+            statistikk
         )
+        val resultat = SlettOgOpprettResultat(antallSlettet, antallOprettet)
         loggResultat(årstallOgKvartal, resultat, "virksomhet gradert sykemelding")
     }
 

@@ -7,22 +7,23 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvar
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.TilgangskontrollService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.GraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VarighetRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class AggregertStatistikkService(
     private val sykefraværprosentRepository: SykefraværRepository,
-    private val graderingRepository: GraderingRepository,
     private val varighetRepository: VarighetRepository,
     private val tilgangskontrollService: TilgangskontrollService,
     private val enhetsregisteretClient: EnhetsregisteretClient,
     private val importtidspunktRepository: ImporttidspunktRepository,
+    private val sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -55,7 +56,7 @@ class AggregertStatistikkService(
             }
         )
         val totalSykefravær = hentTotalfraværSisteFemKvartaler(virksomhet)
-        val gradertSykefravær = hentGradertSykefravær(virksomhet)
+        val gradertSykefravær = hentGradertSykefraværAlleKategorier(virksomhet)
         val korttidSykefravær = hentKorttidsfravær(virksomhet)
         val langtidsfravær = hentLangtidsfravær(virksomhet)
 
@@ -69,6 +70,22 @@ class AggregertStatistikkService(
             virksomhet, totalSykefravær, gradertSykefravær, korttidSykefravær, langtidsfravær
         ).right()
 
+    }
+
+    private fun hentGradertSykefraværAlleKategorier(virksomhet: Virksomhet): Sykefraværsdata {
+        val næring = virksomhet.næringskode.næring
+        val maybeBransje = Bransjeprogram.finnBransje(virksomhet.næringskode)
+        val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> =
+            EnumMap(Statistikkategori::class.java)
+        data[Statistikkategori.VIRKSOMHET] =
+            sykefravarStatistikkVirksomhetGraderingRepository.hentForOrgnr(virksomhet.orgnr)
+        if (maybeBransje.isEmpty) {
+            data[Statistikkategori.NÆRING] = sykefravarStatistikkVirksomhetGraderingRepository.hentForNæring(næring)
+        } else {
+            data[Statistikkategori.BRANSJE] =
+                sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(maybeBransje.get())
+        }
+        return Sykefraværsdata(data)
     }
 
     private fun aggregerData(
@@ -131,10 +148,6 @@ class AggregertStatistikkService(
         return sykefraværprosentRepository.hentTotaltSykefraværAlleKategorier(
             forBedrift, (gjeldendePeriode inkludertTidligere 4)
         )
-    }
-
-    private fun hentGradertSykefravær(virksomhet: Virksomhet): Sykefraværsdata {
-        return graderingRepository.hentGradertSykefraværAlleKategorier(virksomhet)
     }
 
     private fun hentKorttidsfravær(virksomhet: Virksomhet): Sykefraværsdata {

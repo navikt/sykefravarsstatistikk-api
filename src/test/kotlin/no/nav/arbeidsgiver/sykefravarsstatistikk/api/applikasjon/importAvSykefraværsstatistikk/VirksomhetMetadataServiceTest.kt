@@ -1,7 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk
 
-import testUtils.TestData.ORGNR_VIRKSOMHET_1
-import testUtils.TestData.ORGNR_VIRKSOMHET_2
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.VirksomhetMetadataService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetMetadata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetMetadataMedNæringskode
@@ -11,7 +9,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Se
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Orgenhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.GraderingRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkRepository
@@ -21,23 +19,24 @@ import org.mockito.ArgumentMatchers
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import testUtils.TestData.ORGNR_VIRKSOMHET_1
+import testUtils.TestData.ORGNR_VIRKSOMHET_2
 
 internal class VirksomhetMetadataServiceTest {
     private val datavarehusRepository: DatavarehusRepository = mock()
 
     private val virksomhetMetadataRepository: VirksomhetMetadataRepository = mock()
 
-    private val graderingRepository: GraderingRepository = mock()
-
     private val eksporteringRepository: EksporteringRepository = mock()
 
     private val kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository = mock()
+    private val sykefravarStatistikkVirksomhetGraderingRepository = mock<SykefravarStatistikkVirksomhetGraderingRepository>()
     private var service: VirksomhetMetadataService = VirksomhetMetadataService(
         datavarehusRepository,
         virksomhetMetadataRepository,
-        graderingRepository,
         eksporteringRepository,
-        kafkaUtsendingHistorikkRepository
+        kafkaUtsendingHistorikkRepository,
+        sykefravarStatistikkVirksomhetGraderingRepository,
     )
     private val __2020_4 = ÅrstallOgKvartal(2020, 4)
 
@@ -75,7 +74,11 @@ internal class VirksomhetMetadataServiceTest {
     private fun mockImportVirksomhetNæringskode5sifferMapping(
         virksomhetMetadataMedNæringskodeListe: List<VirksomhetMetadataMedNæringskode>
     ) {
-        whenever(graderingRepository.hentVirksomhetMetadataNæringskode5siffer(any()))
+        whenever(
+            sykefravarStatistikkVirksomhetGraderingRepository.hentVirksomhetMetadataNæringskode5Siffer(
+                any<ÅrstallOgKvartal>()
+            )
+        )
             .thenReturn(virksomhetMetadataMedNæringskodeListe)
         whenever(virksomhetMetadataRepository.opprettVirksomhetMetadataNæringskode5siffer(any()))
             .thenReturn(virksomhetMetadataMedNæringskodeListe.size)
