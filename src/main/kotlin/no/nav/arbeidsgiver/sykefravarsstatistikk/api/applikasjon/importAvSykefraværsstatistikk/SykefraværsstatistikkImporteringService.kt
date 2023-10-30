@@ -19,17 +19,18 @@ class SykefraværsstatistikkImporteringService(
     private val datavarehusRepository: DatavarehusRepository,
     private val importtidspunktRepository: ImporttidspunktRepository,
     private val sykefraværsstatistikkLandRepository: SykefraværStatistikkLandRepository,
-    private val environment: Environment,
     private val sykefraværStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
+    private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
+
+    private val environment: Environment,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
     fun importerHvisDetFinnesNyStatistikk(): ÅrstallOgKvartal {
         log.info("Gjeldende miljø: " + environment.activeProfiles.contentToString())
         val årstallOgKvartalForSykefraværsstatistikk = listOf(
             sykefraværsstatistikkLandRepository.hentNyesteKvartal(),
-            statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
-                Statistikkilde.SEKTOR
-            ),
+            sykefraværStatistikkSektorRepository.hentNyesteKvartal(),
+
             statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
                 Statistikkilde.NÆRING
             ),
@@ -133,7 +134,7 @@ class SykefraværsstatistikkImporteringService(
         årstallOgKvartal: ÅrstallOgKvartal
     ): SlettOgOpprettResultat {
 
-        val statistikk =  datavarehusRepository.hentSykefraværsstatistikkLand(årstallOgKvartal)
+        val statistikk = datavarehusRepository.hentSykefraværsstatistikkLand(årstallOgKvartal)
 
         val antallSlettet = sykefraværsstatistikkLandRepository.slettForKvartal(årstallOgKvartal)
         val antallOpprettet = sykefraværsstatistikkLandRepository.settInn(statistikk)
@@ -147,12 +148,14 @@ class SykefraværsstatistikkImporteringService(
     private fun importSykefraværsstatistikkSektor(
         årstallOgKvartal: ÅrstallOgKvartal
     ): SlettOgOpprettResultat {
-        val sykefraværsstatistikkSektor = datavarehusRepository.hentSykefraværsstatistikkSektor(årstallOgKvartal)
-        val resultat = statistikkRepository.importSykefraværsstatistikkSektor(
-            sykefraværsstatistikkSektor, årstallOgKvartal
-        )
-        loggResultat(årstallOgKvartal, resultat, "sektor")
-        return resultat
+        val sykefraværsstatistikkSektor =
+            datavarehusRepository.hentSykefraværsstatistikkSektor(årstallOgKvartal)
+
+        val slettet = sykefraværStatistikkSektorRepository.slettDataFor(årstallOgKvartal)
+        val opprettet = sykefraværStatistikkSektorRepository.settInn(sykefraværsstatistikkSektor)
+        return SlettOgOpprettResultat(slettet, opprettet).also {
+            loggResultat(årstallOgKvartal, it, "sektor")
+        }
     }
 
     private fun importSykefraværsstatistikkNæring(
@@ -198,9 +201,10 @@ class SykefraværsstatistikkImporteringService(
             SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal)
         }
         val antallSlettet = sykefraværStatistikkVirksomhetGraderingRepository.slettDataFor(årstallOgKvartal)
-        val antallOprettet = sykefraværStatistikkVirksomhetGraderingRepository.opprettSykefraværsstatistikkVirksomhetMedGradering(
-            statistikk
-        )
+        val antallOprettet =
+            sykefraværStatistikkVirksomhetGraderingRepository.opprettSykefraværsstatistikkVirksomhetMedGradering(
+                statistikk
+            )
         val resultat = SlettOgOpprettResultat(antallSlettet, antallOprettet)
         loggResultat(årstallOgKvartal, resultat, "virksomhet gradert sykemelding")
     }

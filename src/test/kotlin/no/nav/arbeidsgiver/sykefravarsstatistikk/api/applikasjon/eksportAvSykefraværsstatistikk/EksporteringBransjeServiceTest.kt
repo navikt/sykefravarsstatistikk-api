@@ -28,6 +28,7 @@ internal class EksporteringBransjeServiceTest {
         EksporteringPerStatistikkKategoriService(
             tilEksporteringRepository = repositoryMock,
             sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepositoryMock,
+            sykefraværStatistikkSektorRepository = mock(),
             sykefravarStatistikkVirksomhetRepository = mock(),
             sykefravarStatistikkVirksomhetGraderingRepository = mock(),
             kafkaClient = kafkaClientMock,

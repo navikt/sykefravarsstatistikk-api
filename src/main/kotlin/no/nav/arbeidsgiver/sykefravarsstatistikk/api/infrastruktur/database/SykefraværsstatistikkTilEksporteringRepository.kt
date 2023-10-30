@@ -16,42 +16,6 @@ import java.util.stream.Collectors
 class SykefraværsstatistikkTilEksporteringRepository(
     @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
 ) {
-    fun hentSykefraværprosentAlleSektorer(
-        årstallOgKvartal: ÅrstallOgKvartal
-    ): List<SykefraværsstatistikkSektor> {
-        return try {
-            namedParameterJdbcTemplate.query(
-                "select sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk "
-                        + "from sykefravar_statistikk_sektor "
-                        + "where arstall = :arstall and kvartal = :kvartal "
-                        + "order by arstall, kvartal, sektor_kode",
-                MapSqlParameterSource()
-                    .addValue("arstall", årstallOgKvartal.årstall)
-                    .addValue("kvartal", årstallOgKvartal.kvartal)
-            ) { rs: ResultSet, _: Int -> mapTilSykefraværsstatistikkSektor(rs) }
-        } catch (e: EmptyResultDataAccessException) {
-            emptyList()
-        }
-    }
-
-    fun hentSykefraværAlleSektorerFraOgMed(
-        årstallOgKvartal: ÅrstallOgKvartal
-    ): List<SykefraværsstatistikkSektor> {
-        return try {
-            namedParameterJdbcTemplate.query(
-                "select sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk "
-                        + "from sykefravar_statistikk_sektor "
-                        + "where (arstall = :arstall and kvartal >= :kvartal) "
-                        + "or (arstall > :arstall) "
-                        + "order by arstall, kvartal, sektor_kode",
-                MapSqlParameterSource()
-                    .addValue("arstall", årstallOgKvartal.årstall)
-                    .addValue("kvartal", årstallOgKvartal.kvartal)
-            ) { rs: ResultSet, _: Int -> mapTilSykefraværsstatistikkSektor(rs) }
-        } catch (e: EmptyResultDataAccessException) {
-            emptyList()
-        }
-    }
 
     /* Sykefraværsprosent Næring */
     fun hentSykefraværprosentAlleNæringer(
@@ -132,18 +96,6 @@ class SykefraværsstatistikkTilEksporteringRepository(
 
     fun hentSykefraværAlleBransjer(kvartaler: List<ÅrstallOgKvartal>): List<SykefraværsstatistikkBransje> {
         return hentSykefraværsstatistikkForBransjer(kvartaler, namedParameterJdbcTemplate)
-    }
-
-    @Throws(SQLException::class)
-    private fun mapTilSykefraværsstatistikkSektor(rs: ResultSet): SykefraværsstatistikkSektor {
-        return SykefraværsstatistikkSektor(
-            rs.getInt("arstall"),
-            rs.getInt("kvartal"),
-            rs.getString("sektor_kode"),
-            rs.getInt("antall_personer"),
-            rs.getBigDecimal("tapte_dagsverk"),
-            rs.getBigDecimal("mulige_dagsverk")
-        )
     }
 
     @Throws(SQLException::class)

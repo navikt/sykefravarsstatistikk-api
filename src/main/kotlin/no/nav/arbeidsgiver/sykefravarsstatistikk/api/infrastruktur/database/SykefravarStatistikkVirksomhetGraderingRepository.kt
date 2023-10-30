@@ -103,9 +103,11 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
                 antallSykemeldinger.sum(),
                 tapteDagsverk.sum(),
                 muligeDagsverk.sum(),
-            ).select {
+            )
+                .select {
                 (årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }
-            }.groupBy(årstall, kvartal, orgnr, næring, næringskode, rectype)
+            }
+                .groupBy(årstall, kvartal, orgnr, næring, næringskode, rectype)
                 .map {
                     SykefraværsstatistikkVirksomhetMedGradering(
                         årstall = it[årstall],

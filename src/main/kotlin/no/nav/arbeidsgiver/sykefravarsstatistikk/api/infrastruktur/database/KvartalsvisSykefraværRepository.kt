@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.dao.EmptyResultDataAccessException
@@ -12,22 +11,8 @@ import java.sql.SQLException
 
 @Component
 class KvartalsvisSykefraværRepository(
-    @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate
+    @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
 ) {
-    fun hentKvartalsvisSykefraværprosentSektor(sektor: Sektor): List<SykefraværForEttKvartal> {
-        return try {
-            namedParameterJdbcTemplate.query(
-                "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal "
-                        + "FROM sykefravar_statistikk_sektor "
-                        + "where sektor_kode = :sektorKode "
-                        + "ORDER BY arstall, kvartal ",
-                MapSqlParameterSource().addValue("sektorKode", sektor.sektorkode)
-            ) { rs: ResultSet, _: Int -> mapTilKvartalsvisSykefraværprosent(rs) }
-        } catch (e: EmptyResultDataAccessException) {
-            emptyList()
-        }
-    }
-
     fun hentKvartalsvisSykefraværprosentNæring(næring: Næring): List<SykefraværForEttKvartal> {
         return try {
             namedParameterJdbcTemplate.query(

@@ -6,10 +6,13 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.net.HttpHeaders
 import config.SpringIntegrationTestbase
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkSektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkSektorRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.assertj.core.api.Assertions
@@ -25,10 +28,10 @@ import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import testUtils.TestUtils.opprettStatistikkForLand
 import testUtils.TestUtils.opprettStatistikkForLandExposed
 import testUtils.TestUtils.opprettStatistikkForNæring
-import testUtils.TestUtils.opprettStatistikkForSektor
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import testUtils.TestUtils.slettAlleImporttidspunkt
 import java.io.IOException
+import java.math.BigDecimal
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -55,6 +58,9 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
     lateinit var sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository
 
     @Autowired
+    lateinit var sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository
+
+    @Autowired
     lateinit var importtidspunktRepository: ImporttidspunktRepository
 
     @LocalServerPort
@@ -63,7 +69,11 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
 
     @BeforeEach
     fun setUp() {
-        slettAllStatistikkFraDatabase(jdbcTemplate, sykefravarStatistikkVirksomhetRepository)
+        slettAllStatistikkFraDatabase(
+            jdbcTemplate = jdbcTemplate,
+            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
+            sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository,
+        )
         importtidspunktRepository.slettAlleImporttidspunkt()
         importtidspunktRepository.settInnImporttidspunkt(SISTE_PUBLISERTE_KVARTAL, LocalDate.parse("2022-06-02"))
     }
@@ -79,16 +89,26 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
     @Test
     fun `kvartalsvis skal returnere riktig JSON`() {
         val jwtToken = createToken(
-            mockOAuth2Server,
-            "15008462396",
-            TOKENX_ISSUER_ID,
-            "https://oidc.difi.no/idporten-oidc-provider/"
+            oAuth2Server = mockOAuth2Server,
+            pid = "15008462396",
+            issuerId = TOKENX_ISSUER_ID,
+            idp = "https://oidc.difi.no/idporten-oidc-provider/"
         )
         opprettStatistikkForLand(sykefraværStatistikkLandRepository)
-
         opprettStatistikkForLandExposed(sykefraværStatistikkLandRepository)
 
-        opprettStatistikkForSektor(jdbcTemplate)
+        sykefraværStatistikkSektorRepository.settInn(
+            listOf(
+                SykefraværsstatistikkSektor(
+                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
+                    sektorkode = Sektor.STATLIG.sektorkode,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal("657853.346702"),
+                    muligeDagsverk = BigDecimal("13558710.866603")
+                )
+            )
+        )
         opprettStatistikkForNæring(
             jdbcTemplate, PRODUKSJON_NYTELSESMIDLER, SISTE_ÅRSTALL, SISTE_KVARTAL, 5, 100, 10
         )
