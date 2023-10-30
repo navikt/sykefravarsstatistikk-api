@@ -1,9 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene
 
 import ia.felles.definisjoner.bransjer.Bransjer
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næring
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Bransje
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.BransjeEllerNæring
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test

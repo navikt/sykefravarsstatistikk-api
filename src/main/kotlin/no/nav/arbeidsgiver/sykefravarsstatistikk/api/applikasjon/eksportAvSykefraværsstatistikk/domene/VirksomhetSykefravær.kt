@@ -49,8 +49,7 @@ class VirksomhetSykefravær : SykefraværForEttKvartal {
         if (this === other) return true
         if (other !is VirksomhetSykefravær) return false
         if (!super.equals(other)) return false
-        val that = other
-        return super.equals(that) && antallPersoner == that.antallPersoner && kategori == that.kategori && orgnr == that.orgnr && navn == that.navn
+        return super.equals(other) && antallPersoner == other.antallPersoner && kategori == other.kategori && orgnr == other.orgnr && navn == other.navn
     }
 
     override fun hashCode(): Int {

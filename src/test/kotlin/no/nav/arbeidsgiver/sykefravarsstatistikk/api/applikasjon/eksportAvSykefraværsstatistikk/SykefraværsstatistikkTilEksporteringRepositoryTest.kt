@@ -196,7 +196,7 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     @Test
     fun hentSykefraværprosentAlleNæringer_siste4Kvartaler_kan_likevel_hente_bare_siste_publiserte_kvartal() {
         opprettStatistikkForNæringer(jdbcTemplate)
-        val forventet = java.util.List.of<SykefraværsstatistikkForNæring>(
+        val forventet = listOf(
             SykefraværsstatistikkForNæring(
                 SISTE_PUBLISERTE_KVARTAL.årstall,
                 SISTE_PUBLISERTE_KVARTAL.kvartal,
