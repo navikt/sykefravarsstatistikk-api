@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.net.HttpHeaders
 import config.SpringIntegrationTestbase
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkSektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
@@ -97,7 +98,7 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
                 SykefraværsstatistikkSektor(
                     årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
                     kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
-                    sektorkode = "1",
+                    sektorkode = Sektor.STATLIG.sektorkode,
                     antallPersoner = 10,
                     tapteDagsverk = BigDecimal("657853.346702"),
                     muligeDagsverk = BigDecimal("13558710.866603")

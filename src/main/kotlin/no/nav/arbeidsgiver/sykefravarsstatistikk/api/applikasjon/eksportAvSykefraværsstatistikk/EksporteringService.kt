@@ -23,6 +23,7 @@ class EksporteringService(
     private val virksomhetMetadataRepository: VirksomhetMetadataRepository,
     private val sykefraværsstatistikkTilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository,
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
+    private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
     private val kafkaClient: KafkaClient,
     private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
 ) {
@@ -86,9 +87,7 @@ class EksporteringService(
         val umaskertSykefraværsstatistikkSistePublisertKvartalLand =
             sykefraværStatistikkLandRepository.hentForKvartaler(listOf(årstallOgKvartal))
         val sykefraværsstatistikkSektor =
-            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(
-                årstallOgKvartal
-            )
+            sykefraværStatistikkSektorRepository.hentForKvartaler(listOf(årstallOgKvartal))
         val sykefraværsstatistikkForNæringer =
             sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(
                 årstallOgKvartal

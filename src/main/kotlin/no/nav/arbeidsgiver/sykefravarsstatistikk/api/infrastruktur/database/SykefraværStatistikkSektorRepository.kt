@@ -32,6 +32,26 @@ class SykefraværStatistikkSektorRepository(
         }
     }
 
+    fun hentForKvartaler(kvartaler: List<ÅrstallOgKvartal>): List<SykefraværsstatistikkSektor> {
+        return transaction {
+            select {
+                (årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }
+            }
+                .orderBy(årstall to SortOrder.ASC)
+                .orderBy(kvartal to SortOrder.ASC)
+                .map {
+                    SykefraværsstatistikkSektor(
+                        årstall = it[årstall],
+                        kvartal = it[kvartal],
+                        sektorkode = it[sektorKode],
+                        antallPersoner = it[antallPersoner],
+                        tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
+                        muligeDagsverk = it[muligeDagsverk].toBigDecimal()
+                    )
+                }
+        }
+    }
+
     fun slettDataFor(årstallOgKvartal: ÅrstallOgKvartal): Int {
         return transaction {
             deleteWhere {
@@ -46,7 +66,8 @@ class SykefraværStatistikkSektorRepository(
                 sektorKode eq sektor.sektorkode
             }
                 .groupBy(årstall, kvartal)
-                .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
+                .orderBy(årstall to SortOrder.ASC)
+                .orderBy(kvartal to SortOrder.ASC)
                 .map {
                     SykefraværForEttKvartal(
                         årstallOgKvartal = ÅrstallOgKvartal(

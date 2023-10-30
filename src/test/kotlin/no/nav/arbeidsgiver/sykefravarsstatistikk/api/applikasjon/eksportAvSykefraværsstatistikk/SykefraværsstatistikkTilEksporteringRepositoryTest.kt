@@ -6,6 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvar
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkSektorRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -44,6 +45,9 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     @Autowired
     lateinit var sykefraværsstatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
 
+    @Autowired
+    lateinit var sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository
+
     private val produksjonAvKlær = Næringskode("14190")
     private val undervisning = Næringskode("86907")
     private val utdanning = Næring("86")
@@ -53,12 +57,18 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
     @BeforeEach
     fun setUp() {
-        slettAllStatistikkFraDatabase(jdbcTemplate)
+        slettAllStatistikkFraDatabase(
+            jdbcTemplate,
+            sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository
+        )
     }
 
     @AfterEach
     fun tearDown() {
-        slettAllStatistikkFraDatabase(jdbcTemplate)
+        slettAllStatistikkFraDatabase(
+            jdbcTemplate,
+            sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository
+        )
     }
 
     @Test
@@ -100,12 +110,12 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     fun hentSykefraværprosentAlleSektorer__skal_hente_alle_sektorer_for_ett_kvartal() {
         opprettStatistikkSektorTestData()
         val resultat =
-            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(ÅrstallOgKvartal(2019, 2))
+            sykefraværStatistikkSektorRepository.hentForKvartaler(listOf(ÅrstallOgKvartal(2019, 2)))
         org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(2)
         assertSykefraværsstatistikkForSektorIsEqual(resultat, 2019, 2, 3, Sektor.KOMMUNAL, 1, 60)
         assertSykefraværsstatistikkForSektorIsEqual(resultat, 2019, 2, 4, Sektor.PRIVAT, 9, 100)
         val resultat_2019_1 =
-            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleSektorer(ÅrstallOgKvartal(2019, 1))
+            sykefraværStatistikkSektorRepository.hentForKvartaler(listOf(ÅrstallOgKvartal(2019, 1)))
         org.assertj.core.api.Assertions.assertThat(resultat_2019_1.size).isEqualTo(2)
         assertSykefraværsstatistikkForSektorIsEqual(
             resultat_2019_1, 2019, 1, 40, Sektor.KOMMUNAL, 20, 115
@@ -581,10 +591,42 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     }
 
     private fun opprettStatistikkSektorTestData() {
-        createStatistikkSektor(Sektor.KOMMUNAL, 2019, 2, 3, 1, 60)
-        createStatistikkSektor(Sektor.KOMMUNAL, 2019, 1, 40, 20, 115)
-        createStatistikkSektor(Sektor.PRIVAT, 2019, 2, 4, 9, 100)
-        createStatistikkSektor(Sektor.PRIVAT, 2019, 1, 7, 12, 100)
+        sykefraværStatistikkSektorRepository.settInn(
+            listOf(
+                SykefraværsstatistikkSektor(
+                    sektorkode = Sektor.KOMMUNAL.sektorkode,
+                    årstall = 2019,
+                    kvartal = 2,
+                    antallPersoner = 3,
+                    tapteDagsverk = 1.toBigDecimal(),
+                    muligeDagsverk = 60.toBigDecimal()
+                ),
+                SykefraværsstatistikkSektor(
+                    sektorkode = Sektor.KOMMUNAL.sektorkode,
+                    årstall = 2019,
+                    kvartal = 1,
+                    antallPersoner = 40,
+                    tapteDagsverk = 20.toBigDecimal(),
+                    muligeDagsverk = 115.toBigDecimal()
+                ),
+                SykefraværsstatistikkSektor(
+                    sektorkode = Sektor.PRIVAT.sektorkode,
+                    årstall = 2019,
+                    kvartal = 2,
+                    antallPersoner = 4,
+                    tapteDagsverk = 9.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                ),
+                SykefraværsstatistikkSektor(
+                    sektorkode = Sektor.PRIVAT.sektorkode,
+                    årstall = 2019,
+                    kvartal = 1,
+                    antallPersoner = 7,
+                    tapteDagsverk = 12.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                ),
+            )
+        )
     }
 
     private fun opprettStatistikkVirksomhetTestData() {
@@ -715,31 +757,6 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
             }
     }
 
-    private fun createStatistikkSektor(
-        sektor: Sektor,
-        årstall: Int,
-        kvartal: Int,
-        antallPersoner: Int,
-        tapteDagsverk: Int,
-        muligeDagsverk: Int
-    ) {
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_sektor "
-                    + "(sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "values (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(
-                SykefraværsstatistikkSektor(
-                    årstall,
-                    kvartal,
-                    sektor.sektorkode,
-                    antallPersoner,
-                    BigDecimal(tapteDagsverk),
-                    BigDecimal(muligeDagsverk)
-                )
-            )
-        )
-    }
-
     private fun createStatistikkNæring(
         næring: Næring,
         årstall: Int,
@@ -787,12 +804,6 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 )
             )
         )
-    }
-
-    private fun parametre(sykefraværsstatistikkSektor: SykefraværsstatistikkSektor): MapSqlParameterSource {
-        val parametre = MapSqlParameterSource()
-            .addValue("sektor_kode", sykefraværsstatistikkSektor.sektorkode)
-        return leggTilParametreForSykefraværsstatistikk(parametre, sykefraværsstatistikkSektor)
     }
 
     private fun parametre(sykefraværsstatistikkForNæring: SykefraværsstatistikkForNæring): MapSqlParameterSource {

@@ -4,10 +4,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.N�
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkLand
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkData
 import org.jetbrains.exposed.sql.deleteAll
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -44,13 +41,17 @@ object TestUtils {
         transaction { deleteAll() }
     }
 
+    private fun SykefraværStatistikkSektorRepository.slettAlt() {
+        transaction { deleteAll() }
+    }
+
     fun slettAllStatistikkFraDatabase(
         jdbcTemplate: NamedParameterJdbcTemplate,
         sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository? = null,
         sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository? = null,
+        sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository? = null,
         sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository? = null
     ) {
-
         sykefravarStatistikkVirksomhetRepository?.slettAlt()
 
         jdbcTemplate.update("delete from sykefravar_statistikk_naring", MapSqlParameterSource())
@@ -61,8 +62,8 @@ object TestUtils {
         jdbcTemplate.update(
             "delete from sykefravar_statistikk_naring5siffer", MapSqlParameterSource()
         )
-        jdbcTemplate.update("delete from sykefravar_statistikk_sektor", MapSqlParameterSource())
         sykefraværStatistikkLandRepository?.slettAlt()
+        sykefraværStatistikkSektorRepository?.slettAlt()
     }
 
 

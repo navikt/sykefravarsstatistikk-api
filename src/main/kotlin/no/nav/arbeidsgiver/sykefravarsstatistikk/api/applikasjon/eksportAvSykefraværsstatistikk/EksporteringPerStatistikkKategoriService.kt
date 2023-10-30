@@ -5,10 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic.Companion.from
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.GradertStatistikkategoriKafkamelding
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.StatistikkategoriKafkamelding
@@ -19,6 +16,7 @@ import org.springframework.stereotype.Component
 class EksporteringPerStatistikkKategoriService(
     private val tilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository,
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
+    private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
     private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
     private val sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
     private val kafkaClient: KafkaClient,
@@ -68,16 +66,16 @@ class EksporteringPerStatistikkKategoriService(
     }
 
     private fun eksporterSykefraværsstatistikkSektor(årstallOgKvartal: ÅrstallOgKvartal) {
-        tilEksporteringRepository.hentSykefraværAlleSektorerFraOgMed(
-            årstallOgKvartal.minusKvartaler(3)
-        ).groupBySektor().let {
-            eksporterSykefraværsstatistikkPerKategori(
-                årstallOgKvartal = årstallOgKvartal,
-                sykefraværGruppertEtterKode = it,
-                statistikkategori = Statistikkategori.SEKTOR,
-                kafkaTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_SEKTOR_V1
-            )
-        }
+        sykefraværStatistikkSektorRepository.hentForKvartaler(årstallOgKvartal inkludertTidligere 3)
+            .groupBySektor()
+            .let {
+                eksporterSykefraværsstatistikkPerKategori(
+                    årstallOgKvartal = årstallOgKvartal,
+                    sykefraværGruppertEtterKode = it,
+                    statistikkategori = Statistikkategori.SEKTOR,
+                    kafkaTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_SEKTOR_V1
+                )
+            }
     }
 
     private fun eksporterSykefraværsstatistikkNæring(årstallOgKvartal: ÅrstallOgKvartal) {
