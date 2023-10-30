@@ -5,7 +5,7 @@ import io.mockk.mockk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KvartalsvisSykefraværRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværSektorRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkSektorRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -18,20 +18,20 @@ class KvartalsvisSykefraværshistorikkServiceTest {
     private val kvartalsvisSykefraværprosentRepository: KvartalsvisSykefraværRepository = mockk()
     private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository = mockk()
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository = mockk()
-    val sykefraværSektorRepository = mockk<SykefraværSektorRepository>()
+    val sykefraværStatistikkSektorRepository = mockk<SykefraværStatistikkSektorRepository>()
     private val kvartalsvisSykefraværshistorikkService: KvartalsvisSykefraværshistorikkService =
         KvartalsvisSykefraværshistorikkService(
             kvartalsvisSykefraværprosentRepository,
             sykefravarStatistikkVirksomhetRepository,
             sykefraværStatistikkLandRepository,
-            sykefraværSektorRepository,
+            sykefraværStatistikkSektorRepository,
         )
 
 
     @BeforeEach
     fun setUp() {
         every { sykefraværStatistikkLandRepository.hentAlt() } returns listOf(sykefraværprosent())
-        every { sykefraværSektorRepository.hentKvartalsvisSykefraværprosent(any<Sektor>()) } returns listOf(
+        every { sykefraværStatistikkSektorRepository.hentKvartalsvisSykefraværprosent(any<Sektor>()) } returns listOf(
             sykefraværprosent()
         )
         every { sykefravarStatistikkVirksomhetRepository.hentAlt(any()) } returns listOf(sykefraværprosent())

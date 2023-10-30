@@ -21,16 +21,15 @@ class SykefraværsstatistikkImporteringService(
     private val sykefraværsstatistikkLandRepository: SykefraværStatistikkLandRepository,
     private val environment: Environment,
     private val sykefraværStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
-    private val sykefraværSektorRepository: SykefraværSektorRepository,
+    private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
     fun importerHvisDetFinnesNyStatistikk(): ÅrstallOgKvartal {
         log.info("Gjeldende miljø: " + environment.activeProfiles.contentToString())
         val årstallOgKvartalForSykefraværsstatistikk = listOf(
             sykefraværsstatistikkLandRepository.hentNyesteKvartal(),
-            statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
-                Statistikkilde.SEKTOR
-            ),
+            sykefraværStatistikkSektorRepository.hentNyesteKvartal(),
+
             statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
                 Statistikkilde.NÆRING
             ),
@@ -151,8 +150,8 @@ class SykefraværsstatistikkImporteringService(
         val sykefraværsstatistikkSektor =
             datavarehusRepository.hentSykefraværsstatistikkSektor(årstallOgKvartal)
 
-        val slettet = sykefraværSektorRepository.slettDataFor(årstallOgKvartal)
-        val opprettet = sykefraværSektorRepository.settInn(sykefraværsstatistikkSektor)
+        val slettet = sykefraværStatistikkSektorRepository.slettDataFor(årstallOgKvartal)
+        val opprettet = sykefraværStatistikkSektorRepository.settInn(sykefraværsstatistikkSektor)
         return SlettOgOpprettResultat(slettet, opprettet).also {
             loggResultat(årstallOgKvartal, it, "sektor")
         }

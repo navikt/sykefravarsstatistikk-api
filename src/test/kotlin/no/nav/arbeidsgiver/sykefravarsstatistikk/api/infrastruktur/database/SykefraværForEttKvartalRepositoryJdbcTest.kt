@@ -40,7 +40,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
     private lateinit var sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository
 
     @Autowired
-    private lateinit var sykefraværSektorRepository: SykefraværSektorRepository
+    private lateinit var sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository
 
 
     @BeforeEach
@@ -80,7 +80,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
     @Test
     fun hentSykefraværprosentSektor__skal_returnere_riktig_sykefravær() {
 
-        sykefraværSektorRepository.settInn(
+        sykefraværStatistikkSektorRepository.settInn(
             listOf(
                 SykefraværsstatistikkSektor(
                     årstall = 2019,
@@ -119,7 +119,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
         )
 
         val resultat =
-            sykefraværSektorRepository.hentKvartalsvisSykefraværprosent(
+            sykefraværStatistikkSektorRepository.hentKvartalsvisSykefraværprosent(
                 Sektor.STATLIG
             )
         AssertionsForClassTypes.assertThat(resultat.size).isEqualTo(3)

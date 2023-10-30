@@ -11,7 +11,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sy
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværSektorRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkSektorRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.assertj.core.api.Assertions
@@ -57,7 +57,7 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
     lateinit var sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository
 
     @Autowired
-    lateinit var sykefraværSektorRepository: SykefraværSektorRepository
+    lateinit var sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository
 
     @Autowired
     lateinit var importtidspunktRepository: ImporttidspunktRepository
@@ -92,7 +92,7 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
         opprettStatistikkForLand(sykefraværStatistikkLandRepository)
         opprettStatistikkForLandExposed(sykefraværStatistikkLandRepository)
 
-        sykefraværSektorRepository.settInn(
+        sykefraværStatistikkSektorRepository.settInn(
             listOf(
                 SykefraværsstatistikkSektor(
                     årstall = SISTE_PUBLISERTE_KVARTAL.årstall,

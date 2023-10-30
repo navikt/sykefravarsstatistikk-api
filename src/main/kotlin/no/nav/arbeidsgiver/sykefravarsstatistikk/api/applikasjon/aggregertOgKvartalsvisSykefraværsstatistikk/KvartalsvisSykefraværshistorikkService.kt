@@ -4,7 +4,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Bransjeprogram.finnBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KvartalsvisSykefraværRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværSektorRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkSektorRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -19,7 +19,7 @@ class KvartalsvisSykefraværshistorikkService(
     private val kvartalsvisSykefraværprosentRepository: KvartalsvisSykefraværRepository,
     private val sykefraværStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
-    private val sykefraværSektorRepository: SykefraværSektorRepository,
+    private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -91,7 +91,7 @@ class KvartalsvisSykefraværshistorikkService(
         return KvartalsvisSykefraværshistorikkJson(
             Statistikkategori.SEKTOR,
             ssbSektor!!.displaystring,
-            sykefraværSektorRepository.hentKvartalsvisSykefraværprosent(ssbSektor)
+            sykefraværStatistikkSektorRepository.hentKvartalsvisSykefraværprosent(ssbSektor)
         )
     }
 

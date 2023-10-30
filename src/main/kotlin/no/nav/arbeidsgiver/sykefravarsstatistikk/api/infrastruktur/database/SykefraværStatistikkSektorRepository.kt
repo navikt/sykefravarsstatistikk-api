@@ -9,7 +9,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.springframework.stereotype.Component
 
 @Component
-class SykefraværSektorRepository(
+class SykefraværStatistikkSektorRepository(
     override val database: Database
 ) : UsingExposed, Table("sykefravar_statistikk_sektor") {
     val årstall = integer("arstall")
@@ -61,4 +61,14 @@ class SykefraværSektorRepository(
         }
     }
 
+    fun hentNyesteKvartal(): ÅrstallOgKvartal {
+        return transaction {
+            selectAll()
+                .orderBy(årstall to SortOrder.DESC)
+                .orderBy(kvartal to SortOrder.DESC)
+                .limit(1)
+                .map { ÅrstallOgKvartal(it[årstall], it[kvartal]) }
+                .first()
+        }
+    }
 }
