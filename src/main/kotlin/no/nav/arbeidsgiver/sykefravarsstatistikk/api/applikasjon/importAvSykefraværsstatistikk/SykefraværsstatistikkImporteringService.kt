@@ -19,9 +19,10 @@ class SykefraværsstatistikkImporteringService(
     private val datavarehusRepository: DatavarehusRepository,
     private val importtidspunktRepository: ImporttidspunktRepository,
     private val sykefraværsstatistikkLandRepository: SykefraværStatistikkLandRepository,
-    private val environment: Environment,
     private val sykefraværStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
     private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
+
+    private val environment: Environment,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
     fun importerHvisDetFinnesNyStatistikk(): ÅrstallOgKvartal {
