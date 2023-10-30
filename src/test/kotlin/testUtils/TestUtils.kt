@@ -44,17 +44,20 @@ object TestUtils {
     private fun SykefraværStatistikkSektorRepository.slettAlt() {
         transaction { deleteAll() }
     }
+    private fun SykefraværStatistikkNæringRepository.slettAlt() {
+        transaction { deleteAll() }
+    }
 
     fun slettAllStatistikkFraDatabase(
         jdbcTemplate: NamedParameterJdbcTemplate,
         sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository? = null,
         sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository? = null,
         sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository? = null,
-        sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository? = null
+        sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository? = null,
+        sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository? = null,
     ) {
         sykefravarStatistikkVirksomhetRepository?.slettAlt()
-
-        jdbcTemplate.update("delete from sykefravar_statistikk_naring", MapSqlParameterSource())
+        sykefraværStatistikkNæringRepository?.slettAlt()
         jdbcTemplate.update(
             "delete from sykefravar_statistikk_naring_med_varighet", MapSqlParameterSource()
         )

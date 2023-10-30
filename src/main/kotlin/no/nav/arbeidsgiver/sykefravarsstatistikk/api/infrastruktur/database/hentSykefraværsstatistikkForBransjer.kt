@@ -1,10 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkBransje
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkForNæring
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Bransje
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Bransjeprogram
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -14,19 +10,25 @@ import java.sql.ResultSet
 
 fun hentSykefraværsstatistikkForBransjer(
     kvartaler: List<ÅrstallOgKvartal>,
-    namedParameterJdbcTemplate: NamedParameterJdbcTemplate
+    namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
+    sykefraværsstatistikkNæringRepository: SykefraværStatistikkNæringRepository,
 ): List<SykefraværsstatistikkBransje> {
     val (næringer, næringskoder) = getNæringerAndNæringskoderSomUtgjørBransjene()
 
     return try {
+        val statistikkForNæring = sykefraværsstatistikkNæringRepository.hentForAngitteNæringer(
+            kvartaler,
+            næringer
+        )
+
+        val statistikkForNæringskoder = kvartaler.associateWith { kvartal ->
+            hentSykefraværsstatistikkForAngitteNæringskoder(
+                namedParameterJdbcTemplate, kvartal, næringskoder.map { it.femsifferIdentifikator }
+            )
+        }
         summerSykefraværsstatistikkPerBransje(
-            kvartaler.associateWith {
-                hentSykefraværsstatistikkForAngitteNæringer(
-                    namedParameterJdbcTemplate, it, næringer
-                ) + hentSykefraværsstatistikkForAngitteNæringskoder(
-                    namedParameterJdbcTemplate, it, næringskoder
-                )
-            })
+            statistikkForNæringskoder + statistikkForNæring
+        )
     } catch (e: EmptyResultDataAccessException) {
         emptyList()
     }
@@ -63,33 +65,14 @@ private fun hentSykefraværsstatistikkForAngitteNæringskoder(
     )
 }
 
-private fun hentSykefraværsstatistikkForAngitteNæringer(
-    namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
-    kvartal: ÅrstallOgKvartal,
-    næringer: List<String>
-): List<SykefraværsstatistikkForNæring> =
-    namedParameterJdbcTemplate.query(
-        """
-            select arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk
-            from sykefravar_statistikk_naring
-            where (arstall = :arstall and kvartal = :kvartal)
-            and naring_kode in (:naringer)
-            """.trimMargin(),
-        MapSqlParameterSource()
-            .addValue("arstall", kvartal.årstall)
-            .addValue("kvartal", kvartal.kvartal)
-            .addValue("naringer", næringer),
-        sykefraværsstatistikkNæringRowMapper(),
-    )
-
 private fun sykefraværsstatistikkNæringRowMapper() = RowMapper { resultSet: ResultSet, _: Int ->
     SykefraværsstatistikkTilEksporteringRepository.mapTilSykefraværsstatistikkNæring(resultSet)
 }
 
-private fun getNæringerAndNæringskoderSomUtgjørBransjene(): Pair<List<String>, List<String>> {
+private fun getNæringerAndNæringskoderSomUtgjørBransjene(): Pair<List<Næring>, List<Næringskode>> {
     val bransjer = Bransjeprogram.alleBransjer.map { it.identifikatorer }.flatten()
-    val næringer = bransjer.filter { it.length == 2 }
-    val næringskoder = bransjer.filter { it.length == 5 }
+    val næringer = bransjer.filter { it.length == 2 }.map { Næring(it) }
+    val næringskoder = bransjer.filter { it.length == 5 }.map { Næringskode(it) }
     return Pair(næringer, næringskoder)
 }
 

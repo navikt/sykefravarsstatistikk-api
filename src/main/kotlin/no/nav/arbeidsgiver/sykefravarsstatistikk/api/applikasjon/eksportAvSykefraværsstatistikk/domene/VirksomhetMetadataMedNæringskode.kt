@@ -10,12 +10,18 @@ class VirksomhetMetadataMedNæringskode(
     private val næringskode: Næringskode
 ) {
 
+    fun getOrgnr(): String {
+        return orgnr.verdi
+    }
+
     val Årstall: Int
         get() = årstallOgKvartal.årstall
     val kvartal: Int
         get() = årstallOgKvartal.kvartal
     val næring: String
         get() = næringskode.næring.tosifferIdentifikator
+    val næringskode5siffer: String
+        get() = næringskode.femsifferIdentifikator
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

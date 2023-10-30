@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkForNæring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import org.jetbrains.exposed.sql.*
@@ -46,6 +47,28 @@ class SykefraværStatistikkNæringRepository(
                 .limit(1)
                 .map { ÅrstallOgKvartal(it[årstall], it[kvartal]) }
                 .first()
+        }
+    }
+
+    fun hentForAngitteNæringer(
+        kvartaler: List<ÅrstallOgKvartal>,
+        næringer: List<Næring>
+    ): Map<ÅrstallOgKvartal, List<SykefraværsstatistikkForNæring>> {
+        return transaction {
+            select {
+                ((årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }) and
+                        (næring inList næringer.map { it.tosifferIdentifikator })
+            }.map {
+                SykefraværsstatistikkForNæring(
+                    årstall = it[årstall],
+                    kvartal = it[kvartal],
+                    næringkode = it[næring],
+                    antallPersoner = it[antallPersoner],
+                    tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
+                    muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
+                )
+            }.groupBy { ÅrstallOgKvartal(it.årstall, it.kvartal) }
+
         }
     }
 }

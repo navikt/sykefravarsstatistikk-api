@@ -15,6 +15,7 @@ import java.util.stream.Collectors
 @Component
 class SykefraværsstatistikkTilEksporteringRepository(
     @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
+    private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository,
 ) {
 
     /* Sykefraværsprosent Næring */
@@ -95,7 +96,11 @@ class SykefraværsstatistikkTilEksporteringRepository(
     }
 
     fun hentSykefraværAlleBransjer(kvartaler: List<ÅrstallOgKvartal>): List<SykefraværsstatistikkBransje> {
-        return hentSykefraværsstatistikkForBransjer(kvartaler, namedParameterJdbcTemplate)
+        return hentSykefraværsstatistikkForBransjer(
+            kvartaler,
+            namedParameterJdbcTemplate,
+            sykefraværStatistikkNæringRepository
+        )
     }
 
     @Throws(SQLException::class)

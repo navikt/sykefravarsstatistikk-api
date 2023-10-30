@@ -1,17 +1,12 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk
 
 import config.AppConfigForJdbcTesterConfig
-import testUtils.TestData.NÆRINGSKODE_2SIFFER
-import testUtils.TestData.NÆRINGSKODE_5SIFFER
-import testUtils.TestData.ORGNR_VIRKSOMHET_1
-import testUtils.TestData.ORGNR_VIRKSOMHET_2
-import testUtils.TestData.ORGNR_VIRKSOMHET_3
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetMetadata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetMetadataMedNæringskode
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor.Companion.fraSektorkode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor.Companion.fraSektorkode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
@@ -28,6 +23,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import testUtils.TestData.NÆRINGSKODE_2SIFFER
+import testUtils.TestData.NÆRINGSKODE_5SIFFER
+import testUtils.TestData.ORGNR_VIRKSOMHET_1
+import testUtils.TestData.ORGNR_VIRKSOMHET_2
+import testUtils.TestData.ORGNR_VIRKSOMHET_3
 import java.sql.ResultSet
 import java.util.*
 
@@ -37,11 +37,12 @@ import java.util.*
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 open class VirksomhetMetadataRepositoryJdbcTest {
     @Autowired
-    private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate? = null
-    private var repository: VirksomhetMetadataRepository? = null
+    private lateinit var namedParameterJdbcTemplate: NamedParameterJdbcTemplate
+
+    @Autowired
+    private lateinit var repository: VirksomhetMetadataRepository
     @BeforeEach
     fun setUp() {
-        repository = VirksomhetMetadataRepository(namedParameterJdbcTemplate!!)
         cleanUpTestDb(namedParameterJdbcTemplate)
     }
 
@@ -53,14 +54,14 @@ open class VirksomhetMetadataRepositoryJdbcTest {
     @Test
     fun slettNæringOgNæringskode5siffer__sletter_VirksomhetMetaData() {
         opprettTestVirksomhetMetaData(2020, 3)
-        val antallSlettet = repository!!.slettNæringOgNæringskode5siffer()
+        val antallSlettet = repository.slettNæringOgNæringskode5siffer()
         Assertions.assertThat(antallSlettet).isEqualTo(2)
     }
 
     @Test
     fun slettVirksomhetMetadata__sletter_VirksomhetMetaData() {
         opprettTestVirksomhetMetaData(2020, 3)
-        val antallSlettet = repository!!.slettVirksomhetMetadata()
+        val antallSlettet = repository.slettVirksomhetMetadata()
         Assertions.assertThat(antallSlettet).isEqualTo(3)
     }
 
@@ -76,8 +77,8 @@ open class VirksomhetMetadataRepositoryJdbcTest {
             ÅrstallOgKvartal(2020, 3),
             Næringskode("10002")
         )
-        repository!!.opprettVirksomhetMetadataNæringskode5siffer(
-            Arrays.asList(
+        repository.opprettVirksomhetMetadataNæringskode5siffer(
+            listOf(
                 virksomhetMetadataMedNæringskode1, virksomhetMetadataMedNæringskode2
             )
         )
@@ -106,7 +107,7 @@ open class VirksomhetMetadataRepositoryJdbcTest {
             NÆRINGSKODE_5SIFFER,
             ÅrstallOgKvartal(2020, 3)
         )
-        repository!!.opprettVirksomhetMetadata(
+        repository.opprettVirksomhetMetadata(
             Arrays.asList(virksomhetMetadataVirksomhet1, virksomhetMetadataVirksomhet2)
         )
         val results = hentAlleVirksomhetMetadata(namedParameterJdbcTemplate)
@@ -117,14 +118,14 @@ open class VirksomhetMetadataRepositoryJdbcTest {
     @Test
     fun hentVirksomhetMetadata_returnerer_riktige_metdata_for_en_gitt_årstall_og_kvartal() {
         opprettTestVirksomhetMetaData(2020, 2)
-        val results = repository!!.hentVirksomhetMetadataMedNæringskoder(ÅrstallOgKvartal(2019, 2))
+        val results = repository.hentVirksomhetMetadataMedNæringskoder(ÅrstallOgKvartal(2019, 2))
         Assertions.assertThat(results.size).isEqualTo(0)
     }
 
     @Test
     fun hentVirksomhetMetadata_returnerer_riktige_metdata() {
         opprettTestVirksomhetMetaData(2020, 3)
-        val results = repository!!.hentVirksomhetMetadataMedNæringskoder(ÅrstallOgKvartal(2020, 3))
+        val results = repository.hentVirksomhetMetadataMedNæringskoder(ÅrstallOgKvartal(2020, 3))
         Assertions.assertThat(results.size).isEqualTo(3)
         val virksomhetMetadataVirksomhet1 =
             results.stream().filter { r: VirksomhetMetadata -> ORGNR_VIRKSOMHET_1 == r.orgnr }
@@ -171,7 +172,7 @@ open class VirksomhetMetadataRepositoryJdbcTest {
     }
 
     private fun opprettTestVirksomhetMetaData(årstall: Int, kvartal: Int): Int {
-        namedParameterJdbcTemplate!!.update(
+        namedParameterJdbcTemplate.update(
             "insert into virksomhet_metadata (orgnr, navn, rectype, sektor, primarnaring, primarnaringskode, arstall, kvartal) "
                     + "VALUES (:orgnr, :navn, :rectype, :sektor, :primarnaring, :primarnaringskode, :årstall, :kvartal)",
             parametreViksomhetMetadata(

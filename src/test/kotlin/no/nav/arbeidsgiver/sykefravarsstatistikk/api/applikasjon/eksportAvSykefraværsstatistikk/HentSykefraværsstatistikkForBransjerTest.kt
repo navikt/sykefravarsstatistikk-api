@@ -1,12 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk
 
-import ia.felles.definisjoner.bransjer.Bransjer
 import config.AppConfigForJdbcTesterConfig
-import testUtils.TestUtils
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næring
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkBransje
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import ia.felles.definisjoner.bransjer.Bransjer
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkNæringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.hentSykefraværsstatistikkForBransjer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -19,6 +16,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import testUtils.TestUtils
 import java.math.BigDecimal
 
 @ActiveProfiles("db-test")
@@ -29,32 +27,45 @@ open class HentSykefraværsstatistikkForBransjerTest {
     @Autowired
     private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
+    @Autowired
+    private lateinit var sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
+
     @BeforeEach
     fun beforeEach() {
-        TestUtils.slettAllStatistikkFraDatabase(jdbcTemplate)
+        TestUtils.slettAllStatistikkFraDatabase(
+            jdbcTemplate = jdbcTemplate,
+            sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository
+        )
     }
 
     @Test
     fun `hentSykefraværsstatistikkForBransjer skal returnere tom liste når det ikke finnes noen sykefraværsstatistikk`() {
-        val result = hentSykefraværsstatistikkForBransjer(listOf(ÅrstallOgKvartal(2023, 1)), jdbcTemplate)
+        val result = hentSykefraværsstatistikkForBransjer(
+            listOf(ÅrstallOgKvartal(2023, 1)),
+            jdbcTemplate,
+            sykefraværStatistikkNæringRepository
+        )
 
         assertThat(result).isEmpty()
     }
 
     @Test
     fun `henSykefraværsstatistikkForBransjer skal returnere ett kvartal med statistikk`() {
-        fireKvartalerAnleggsbransje.forEach {
-            TestUtils.opprettStatistikkForNæring(
-                jdbcTemplate,
-                Næring("42"),
+        sykefraværStatistikkNæringRepository.settInn(fireKvartalerAnleggsbransje.map {
+            SykefraværsstatistikkForNæring(
                 it.årstall,
                 it.kvartal,
-                it.tapteDagsverk.toInt(),
-                it.muligeDagsverk.toInt(),
-                it.antallPersoner
+                Næring("42").tosifferIdentifikator,
+                it.antallPersoner,
+                it.tapteDagsverk,
+                it.muligeDagsverk
             )
-        }
-        val result = hentSykefraværsstatistikkForBransjer(listOf(ÅrstallOgKvartal(2023, 1)), jdbcTemplate)
+        })
+        val result = hentSykefraværsstatistikkForBransjer(
+            listOf(ÅrstallOgKvartal(2023, 1)),
+            jdbcTemplate,
+            sykefraværStatistikkNæringRepository
+        )
 
         assertThat(result).contains(fireKvartalerAnleggsbransje.first())
     }
@@ -72,7 +83,11 @@ open class HentSykefraværsstatistikkForBransjerTest {
                 1
             )
         }
-        val result = hentSykefraværsstatistikkForBransjer(listOf(ÅrstallOgKvartal(2023, 1)), jdbcTemplate)
+        val result = hentSykefraværsstatistikkForBransjer(
+            listOf(ÅrstallOgKvartal(2023, 1)),
+            jdbcTemplate,
+            sykefraværStatistikkNæringRepository
+        )
 
         assertThat(result).contains(
             SykefraværsstatistikkBransje(
@@ -102,31 +117,31 @@ val fireKvartalerAnleggsbransje = arrayOf(
         1,
         Bransjer.ANLEGG,
         1,
-        BigDecimal.ONE,
-        BigDecimal.ONE
+        BigDecimal("1.0"),
+        BigDecimal("1.0")
     ),
     SykefraværsstatistikkBransje(
         2023,
         2,
         Bransjer.ANLEGG,
         1,
-        BigDecimal.ONE,
-        BigDecimal.ONE
+        BigDecimal("1.0"),
+        BigDecimal("1.0")
     ),
     SykefraværsstatistikkBransje(
         2023,
         3,
         Bransjer.ANLEGG,
         1,
-        BigDecimal.ONE,
-        BigDecimal.ONE
+        BigDecimal("1.0"),
+        BigDecimal("1.0")
     ),
     SykefraværsstatistikkBransje(
         2023,
         4,
         Bransjer.ANLEGG,
         1,
-        BigDecimal.ONE,
-        BigDecimal.ONE
+        BigDecimal("1.0"),
+        BigDecimal("1.0")
     ),
 )
