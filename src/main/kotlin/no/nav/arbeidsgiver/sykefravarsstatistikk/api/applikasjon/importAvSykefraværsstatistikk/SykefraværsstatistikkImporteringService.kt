@@ -21,6 +21,7 @@ class SykefraværsstatistikkImporteringService(
     private val sykefraværsstatistikkLandRepository: SykefraværStatistikkLandRepository,
     private val sykefraværStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
     private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
+    private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository,
 
     private val environment: Environment,
 ) {
@@ -30,10 +31,7 @@ class SykefraværsstatistikkImporteringService(
         val årstallOgKvartalForSykefraværsstatistikk = listOf(
             sykefraværsstatistikkLandRepository.hentNyesteKvartal(),
             sykefraværStatistikkSektorRepository.hentNyesteKvartal(),
-
-            statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
-                Statistikkilde.NÆRING
-            ),
+            sykefraværStatistikkNæringRepository.hentNyesteKvartal(),
             statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
                 Statistikkilde.NÆRING_5_SIFFER
             ),
@@ -162,9 +160,9 @@ class SykefraværsstatistikkImporteringService(
         årstallOgKvartal: ÅrstallOgKvartal
     ): SlettOgOpprettResultat {
         val sykefraværsstatistikkNæring = datavarehusRepository.hentSykefraværsstatistikkNæring(årstallOgKvartal)
-        val resultat = statistikkRepository.importSykefraværsstatistikkNæring(
-            sykefraværsstatistikkNæring, årstallOgKvartal
-        )
+        val slettet = sykefraværStatistikkNæringRepository.slettFor(årstallOgKvartal)
+        val opprettet = sykefraværStatistikkNæringRepository.settInn(sykefraværsstatistikkNæring)
+        val resultat = SlettOgOpprettResultat(slettet, opprettet)
         loggResultat(årstallOgKvartal, resultat, "næring")
         return resultat
     }
