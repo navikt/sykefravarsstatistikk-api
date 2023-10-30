@@ -99,18 +99,6 @@ class SykefraværsstatistikkTilEksporteringRepository(
     }
 
     @Throws(SQLException::class)
-    private fun mapTilSykefraværsstatistikkSektor(rs: ResultSet): SykefraværsstatistikkSektor {
-        return SykefraværsstatistikkSektor(
-            rs.getInt("arstall"),
-            rs.getInt("kvartal"),
-            rs.getString("sektor_kode"),
-            rs.getInt("antall_personer"),
-            rs.getBigDecimal("tapte_dagsverk"),
-            rs.getBigDecimal("mulige_dagsverk")
-        )
-    }
-
-    @Throws(SQLException::class)
     private fun mapTilSykefraværsstatistikkNæring5Siffer(rs: ResultSet): SykefraværsstatistikkForNæringskode {
         return SykefraværsstatistikkForNæringskode(
             rs.getInt("arstall"),
