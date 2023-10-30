@@ -2,37 +2,36 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKva
 
 import io.mockk.every
 import io.mockk.mockk
-import testUtils.TestData.enNæringskode
-import testUtils.TestData.etOrgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværForEttKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.UnderenhetLegacy
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KvartalsvisSykefraværRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværSektorRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import testUtils.TestData.enNæringskode
+import testUtils.TestData.etOrgnr
 import java.math.BigDecimal
 
 class KvartalsvisSykefraværshistorikkServiceTest {
     private val kvartalsvisSykefraværprosentRepository: KvartalsvisSykefraværRepository = mockk()
     private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository = mockk()
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository = mockk()
+    val sykefraværSektorRepository = mockk<SykefraværSektorRepository>()
     private val kvartalsvisSykefraværshistorikkService: KvartalsvisSykefraværshistorikkService =
         KvartalsvisSykefraværshistorikkService(
             kvartalsvisSykefraværprosentRepository,
             sykefravarStatistikkVirksomhetRepository,
             sykefraværStatistikkLandRepository,
+            sykefraværSektorRepository,
         )
 
 
     @BeforeEach
     fun setUp() {
         every { sykefraværStatistikkLandRepository.hentAlt() } returns listOf(sykefraværprosent())
-        every { kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(any()) } returns listOf(
+        every { sykefraværSektorRepository.hentKvartalsvisSykefraværprosent(any<Sektor>()) } returns listOf(
             sykefraværprosent()
         )
         every { sykefravarStatistikkVirksomhetRepository.hentAlt(any()) } returns listOf(sykefraværprosent())

@@ -1,7 +1,13 @@
 package testUtils
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næring
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkLand
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkData
 import org.jetbrains.exposed.sql.deleteAll
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -11,10 +17,8 @@ import java.math.BigDecimal
 import java.sql.ResultSet
 
 object TestUtils {
-    @JvmField
     val PRODUKSJON_NYTELSESMIDLER = Næring("10")
 
-    @JvmField
     val SISTE_PUBLISERTE_KVARTAL = ÅrstallOgKvartal(2022, 1)
     fun sisteKvartalMinus(n: Int): ÅrstallOgKvartal {
         return SISTE_PUBLISERTE_KVARTAL.minusKvartaler(n)
@@ -154,25 +158,6 @@ object TestUtils {
             )
         )
     }
-
-
-    fun opprettStatistikkForSektor(jdbcTemplate: NamedParameterJdbcTemplate?) {
-        SykefraværsstatistikkSektorUtils(jdbcTemplate)
-            .getBatchCreateFunction(
-                listOf(
-                    SykefraværsstatistikkSektor(
-                        SISTE_PUBLISERTE_KVARTAL.årstall,
-                        SISTE_PUBLISERTE_KVARTAL.kvartal,
-                        "1",
-                        10,
-                        BigDecimal("657853.346702"),
-                        BigDecimal("13558710.866603")
-                    )
-                )
-            )
-            .apply()
-    }
-
 
     fun opprettStatistikkForNæringskode(
         jdbcTemplate: NamedParameterJdbcTemplate,
@@ -321,6 +306,7 @@ object TestUtils {
             parametre
         )
     }
+
     private fun SykefravarStatistikkVirksomhetGraderingRepository.slettAlt() {
         transaction { deleteAll() }
     }

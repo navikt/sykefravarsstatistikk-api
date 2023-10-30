@@ -1,12 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import ia.felles.definisjoner.bransjer.Bransjer
 import config.AppConfigForJdbcTesterConfig
-import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
-import testUtils.TestUtils.opprettStatistikkForLand
-import testUtils.TestUtils.slettAllStatistikkFraDatabase
+import ia.felles.definisjoner.bransjer.Bransjer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.assertj.core.api.AssertionsForClassTypes
 import org.junit.jupiter.api.AfterEach
@@ -21,6 +17,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
+import testUtils.TestUtils.opprettStatistikkForLand
+import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import java.math.BigDecimal
 
 @ActiveProfiles("db-test")
@@ -39,6 +38,9 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
 
     @Autowired
     private lateinit var sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository
+
+    @Autowired
+    private lateinit var sykefraværSektorRepository: SykefraværSektorRepository
 
 
     @BeforeEach
@@ -77,29 +79,49 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværprosentSektor__skal_returnere_riktig_sykefravær() {
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(Sektor.STATLIG, 2019, 2, 10, 2, 100)
+
+        sykefraværSektorRepository.settInn(
+            listOf(
+                SykefraværsstatistikkSektor(
+                    årstall = 2019,
+                    kvartal = 2,
+                    sektorkode = Sektor.STATLIG.sektorkode,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(2),
+                    muligeDagsverk = BigDecimal(100)
+                ),
+                SykefraværsstatistikkSektor(
+                    årstall = 2019,
+                    kvartal = 1,
+                    sektorkode = Sektor.STATLIG.sektorkode,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(2),
+                    muligeDagsverk = BigDecimal(100)
+                ),
+                SykefraværsstatistikkSektor(
+                    årstall = 2018,
+                    kvartal = 4,
+                    sektorkode = Sektor.STATLIG.sektorkode,
+                    antallPersoner = 10,
+                    tapteDagsverk = 4.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                ),
+                SykefraværsstatistikkSektor(
+                    årstall = 2018,
+                    kvartal = 4,
+                    sektorkode = Sektor.KOMMUNAL.sektorkode,
+                    antallPersoner = 10,
+                    tapteDagsverk = 5.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                ),
+
+                )
         )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(Sektor.STATLIG, 2019, 1, 10, 3, 100)
-        )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(Sektor.STATLIG, 2018, 4, 10, 4, 100)
-        )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_sektor (sektor_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:sektor_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(Sektor.KOMMUNAL, 2018, 4, 10, 5, 100)
-        )
-        val resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentSektor(
-            Sektor.STATLIG
-        )
+
+        val resultat =
+            sykefraværSektorRepository.hentKvartalsvisSykefraværprosent(
+                Sektor.STATLIG
+            )
         AssertionsForClassTypes.assertThat(resultat.size).isEqualTo(3)
         AssertionsForClassTypes.assertThat(resultat[0])
             .isEqualTo(
@@ -288,18 +310,6 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
             .addValue("antall_personer", antallPersoner)
             .addValue("tapte_dagsverk", tapteDagsverk)
             .addValue("mulige_dagsverk", muligeDagsverk)
-    }
-
-    private fun parametre(
-        sektor: Sektor,
-        årstall: Int,
-        kvartal: Int,
-        antallPersoner: Int,
-        tapteDagsverk: Int,
-        muligeDagsverk: Int
-    ): MapSqlParameterSource {
-        return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
-            .addValue("sektor_kode", sektor.sektorkode)
     }
 
     private fun parametre(

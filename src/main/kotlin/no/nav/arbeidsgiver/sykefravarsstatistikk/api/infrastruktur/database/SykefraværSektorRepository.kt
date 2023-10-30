@@ -1,5 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkSektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import org.jetbrains.exposed.sql.*
@@ -14,8 +16,8 @@ class SykefraværSektorRepository(
     val kvartal = integer("kvartal")
     val sektorKode = text("sektor_kode")
     val antallPersoner = integer("antall_personer")
-    val tapteDagsverk = float("tapte_dagsverk")
-    val muligeDagsverk = float("mulige_dagsverk")
+    val tapteDagsverk = double("tapte_dagsverk")
+    val muligeDagsverk = double("mulige_dagsverk")
 
     fun settInn(statistikk: List<SykefraværsstatistikkSektor>): Int {
         return transaction {
@@ -24,8 +26,8 @@ class SykefraværSektorRepository(
                 this[kvartal] = it.kvartal
                 this[sektorKode] = it.sektorkode
                 this[antallPersoner] = it.antallPersoner
-                this[tapteDagsverk] = it.tapteDagsverk?.toFloat()!!
-                this[muligeDagsverk] = it.muligeDagsverk?.toFloat()!!
+                this[tapteDagsverk] = it.tapteDagsverk?.toDouble()!!
+                this[muligeDagsverk] = it.muligeDagsverk?.toDouble()!!
             }.count()
         }
     }
@@ -35,6 +37,27 @@ class SykefraværSektorRepository(
             deleteWhere {
                 (årstall eq årstallOgKvartal.årstall) and (kvartal eq årstallOgKvartal.kvartal)
             }
+        }
+    }
+
+    fun hentKvartalsvisSykefraværprosent(sektor: Sektor): List<SykefraværForEttKvartal> {
+        return transaction {
+            select {
+                sektorKode eq sektor.sektorkode
+            }
+                .groupBy(årstall, kvartal)
+                .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
+                .map {
+                    SykefraværForEttKvartal(
+                        årstallOgKvartal = ÅrstallOgKvartal(
+                            årstall = it[årstall],
+                            kvartal = it[kvartal]
+                        ),
+                        tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
+                        muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
+                        antallPersoner = it[antallPersoner]
+                    )
+                }
         }
     }
 
