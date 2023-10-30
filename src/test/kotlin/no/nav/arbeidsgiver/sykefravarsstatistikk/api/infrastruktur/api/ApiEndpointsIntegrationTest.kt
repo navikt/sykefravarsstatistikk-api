@@ -69,7 +69,11 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
 
     @BeforeEach
     fun setUp() {
-        slettAllStatistikkFraDatabase(jdbcTemplate, sykefravarStatistikkVirksomhetRepository)
+        slettAllStatistikkFraDatabase(
+            jdbcTemplate = jdbcTemplate,
+            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
+            sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository,
+        )
         importtidspunktRepository.slettAlleImporttidspunkt()
         importtidspunktRepository.settInnImporttidspunkt(SISTE_PUBLISERTE_KVARTAL, LocalDate.parse("2022-06-02"))
     }
