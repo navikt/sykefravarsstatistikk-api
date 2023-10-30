@@ -1,7 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import com.google.common.collect.Lists
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sykefraværsstatistikk
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkForNæring
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkNæringMedVarighet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.SlettOgOpprettResultat
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.SlettOgOpprettResultat.Companion.tomtResultat
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Statistikkilde
@@ -52,18 +55,6 @@ class StatistikkRepository(
                 resultSet.getInt("kvartal")
             )
         }
-    }
-
-    fun importSykefraværsstatistikkSektor(
-        sykefraværsstatistikkSektor: List<SykefraværsstatistikkSektor>,
-        årstallOgKvartal: ÅrstallOgKvartal
-    ): SlettOgOpprettResultat {
-        val sykefraværsstatistikkSektorUtils = SykefraværsstatistikkSektorUtils(
-            namedParameterJdbcTemplate
-        )
-        return importStatistikk(
-            "sektor", sykefraværsstatistikkSektor, årstallOgKvartal, sykefraværsstatistikkSektorUtils
-        )
     }
 
     fun importSykefraværsstatistikkNæring(
