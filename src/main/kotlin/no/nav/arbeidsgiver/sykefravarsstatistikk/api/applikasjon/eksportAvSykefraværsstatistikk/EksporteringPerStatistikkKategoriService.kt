@@ -5,7 +5,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic.Companion.from
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.GradertStatistikkategoriKafkamelding
@@ -20,6 +19,7 @@ class EksporteringPerStatistikkKategoriService(
     private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
     private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
     private val sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
+    private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository,
     private val kafkaClient: KafkaClient,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -80,8 +80,8 @@ class EksporteringPerStatistikkKategoriService(
     }
 
     private fun eksporterSykefraværsstatistikkNæring(årstallOgKvartal: ÅrstallOgKvartal) {
-        tilEksporteringRepository.hentSykefraværAlleNæringerFraOgMed(
-            årstallOgKvartal.minusKvartaler(3)
+        sykefraværStatistikkNæringRepository.hentForAlleNæringer(
+            årstallOgKvartal inkludertTidligere 3
         ).groupByNæring().let {
             eksporterSykefraværsstatistikkPerKategori(
                 årstallOgKvartal = årstallOgKvartal,

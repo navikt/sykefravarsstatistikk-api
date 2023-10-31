@@ -7,8 +7,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.__2020_2
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.sykefraværsstatistikkSektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkLand
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.GradertStatistikkategoriKafkamelding
@@ -24,15 +24,18 @@ class EksporteringPerStatistikkKategoriServiceTest {
     private val sykefraværStatistikkLandRepository = mock<SykefraværStatistikkLandRepository>()
     private val sykefravarStatistikkVirksomhetRepository = mock<SykefravarStatistikkVirksomhetRepository>()
     private val sykefraværStatistikkSektorRepository = mock<SykefraværStatistikkSektorRepository>()
-    private val sykefravarStatistikkVirksomhetGraderingRepository = mock<SykefravarStatistikkVirksomhetGraderingRepository>()
+    private val sykefravarStatistikkVirksomhetGraderingRepository =
+        mock<SykefravarStatistikkVirksomhetGraderingRepository>()
     private val kafkaClient = mock<KafkaClient>()
 
+    private val sykefraværStatistikkNæringRepository = mock<SykefraværStatistikkNæringRepository>()
     private val service: EksporteringPerStatistikkKategoriService = EksporteringPerStatistikkKategoriService(
         tilEksporteringRepository = sykefraværsstatistikkTilEksporteringRepository,
         sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
         sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository,
         sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
         sykefravarStatistikkVirksomhetGraderingRepository = sykefravarStatistikkVirksomhetGraderingRepository,
+        sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository,
         kafkaClient = kafkaClient,
     )
 
@@ -200,7 +203,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
         )
 
         whenever(
-            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleNæringerFraOgMed(__2019_3)
+            sykefraværStatistikkNæringRepository.hentForAlleNæringer(__2020_2 inkludertTidligere 3)
         )
             .thenReturn(allData)
 

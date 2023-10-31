@@ -43,25 +43,6 @@ class SykefraværsstatistikkTilEksporteringRepository(
         }
     }
 
-    fun hentSykefraværAlleNæringerFraOgMed(
-        fraÅrstallOgKvartal: ÅrstallOgKvartal
-    ): List<SykefraværsstatistikkForNæring> {
-        return try {
-            namedParameterJdbcTemplate.query(
-                "select arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk "
-                        + "from sykefravar_statistikk_naring "
-                        + "where (arstall = :arstall and kvartal >= :kvartal) "
-                        + "or (arstall > :arstall) "
-                        + "group by arstall, kvartal, id order by arstall, kvartal, naring_kode",
-                MapSqlParameterSource()
-                    .addValue("arstall", fraÅrstallOgKvartal.årstall)
-                    .addValue("kvartal", fraÅrstallOgKvartal.kvartal)
-            ) { rs: ResultSet, _: Int -> mapTilSykefraværsstatistikkNæring(rs) }
-        } catch (e: EmptyResultDataAccessException) {
-            emptyList()
-        }
-    }
-
     fun hentSykefraværAlleBransjer(kvartaler: List<ÅrstallOgKvartal>): List<SykefraværsstatistikkBransje> {
         return hentSykefraværsstatistikkForBransjer(
             kvartaler,

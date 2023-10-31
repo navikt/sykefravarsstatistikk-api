@@ -278,8 +278,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 BigDecimal("1000000.0")
             )
         )
-        val resultat = sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleNæringerFraOgMed(
-            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)
+        val resultat = sykefraværStatistikkNæringRepository.hentForAlleNæringer(
+            SISTE_PUBLISERTE_KVARTAL inkludertTidligere 3
         )
         org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(5)
         org.assertj.core.api.Assertions.assertThat(resultat).containsExactlyInAnyOrderElementsOf(forventet)
@@ -306,8 +306,10 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 BigDecimal("1000000.0")
             )
         )
-        val resultat = sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleNæringerFraOgMed(
-            SISTE_PUBLISERTE_KVARTAL
+        val resultat = sykefraværStatistikkNæringRepository.hentForAlleNæringer(
+            listOf(
+                SISTE_PUBLISERTE_KVARTAL
+            )
         )
         org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(2)
         org.assertj.core.api.Assertions.assertThat(resultat).containsExactlyInAnyOrderElementsOf(forventet)
@@ -315,8 +317,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
     @Test
     fun hentSykefraværAlleNæringer_siste4Kvartaler_skalIkkeKrasjeVedManglendeData() {
-        val resultat = sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleNæringerFraOgMed(
-            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)
+        val resultat = sykefraværStatistikkNæringRepository.hentForAlleNæringer(
+            SISTE_PUBLISERTE_KVARTAL inkludertTidligere 3
         )
         org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(0)
         org.assertj.core.api.Assertions.assertThat(resultat).containsExactlyInAnyOrderElementsOf(listOf())
