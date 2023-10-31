@@ -1,9 +1,6 @@
 package testUtils
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næring
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkLand
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkData
 import org.jetbrains.exposed.sql.deleteAll
@@ -44,6 +41,7 @@ object TestUtils {
     private fun SykefraværStatistikkSektorRepository.slettAlt() {
         transaction { deleteAll() }
     }
+
     private fun SykefraværStatistikkNæringRepository.slettAlt() {
         transaction { deleteAll() }
     }
@@ -114,22 +112,22 @@ object TestUtils {
                 SISTE_PUBLISERTE_KVARTAL.årstall,
                 SISTE_PUBLISERTE_KVARTAL.kvartal,
                 10,
-                BigDecimal(4),
-                BigDecimal(100)
+                BigDecimal("4.0"),
+                BigDecimal("100.0")
             ),
             SykefraværsstatistikkLand(
                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).årstall,
                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).kvartal,
                 10,
-                BigDecimal(5),
-                BigDecimal(100)
+                BigDecimal("5.0"),
+                BigDecimal("100.0")
             ),
             SykefraværsstatistikkLand(
                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).årstall,
                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).kvartal,
                 10,
-                BigDecimal(6),
-                BigDecimal(100)
+                BigDecimal("6.0"),
+                BigDecimal("100.0")
             ),
         )
         sykefraværStatistikkLandRepository.settInn(statistikk)
@@ -142,22 +140,22 @@ object TestUtils {
                     årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
                     kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
                     antallPersoner = 10,
-                    tapteDagsverk = BigDecimal(4),
-                    muligeDagsverk = BigDecimal(100)
+                    tapteDagsverk = BigDecimal("4.0"),
+                    muligeDagsverk = BigDecimal("100.0")
                 ),
                 SykefraværsstatistikkLand(
                     årstall = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).årstall,
                     kvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).kvartal,
                     antallPersoner = 10,
-                    tapteDagsverk = BigDecimal(5),
-                    muligeDagsverk = BigDecimal(100)
+                    tapteDagsverk = BigDecimal("5.0"),
+                    muligeDagsverk = BigDecimal("100.0")
                 ),
                 SykefraværsstatistikkLand(
                     årstall = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).årstall,
                     kvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).kvartal,
                     antallPersoner = 10,
-                    tapteDagsverk = BigDecimal(6),
-                    muligeDagsverk = BigDecimal(100)
+                    tapteDagsverk = BigDecimal("6.0"),
+                    muligeDagsverk = BigDecimal("100.0")
                 ),
             )
         )
@@ -185,94 +183,70 @@ object TestUtils {
     }
 
 
-    fun opprettStatistikkForNæringer(jdbcTemplate: NamedParameterJdbcTemplate) {
-        opprettStatistikkForNæring(
-            jdbcTemplate,
-            Næring("10"),
-            SISTE_PUBLISERTE_KVARTAL.årstall,
-            SISTE_PUBLISERTE_KVARTAL.kvartal,
-            20000,
-            1000000,
-            50
-        )
-        opprettStatistikkForNæring(
-            jdbcTemplate,
-            Næring("10"),
-            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).årstall,
-            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).kvartal,
-            30000,
-            1000000,
-            50
-        )
-        opprettStatistikkForNæring(
-            jdbcTemplate,
-            Næring("10"),
-            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).årstall,
-            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).kvartal,
-            40000,
-            1000000,
-            50
-        )
-        opprettStatistikkForNæring(
-            jdbcTemplate,
-            Næring("10"),
-            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).årstall,
-            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).kvartal,
-            50000,
-            1000000,
-            50
-        )
-        opprettStatistikkForNæring(
-            jdbcTemplate,
-            Næring("10"),
-            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4).årstall,
-            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4).kvartal,
-            60000,
-            1000000,
-            50
-        )
-        opprettStatistikkForNæring(
-            jdbcTemplate,
-            Næring("88"),
-            SISTE_PUBLISERTE_KVARTAL.årstall,
-            SISTE_PUBLISERTE_KVARTAL.kvartal,
-            25000,
-            1000000,
-            50
-        )
-        opprettStatistikkForNæring(
-            jdbcTemplate,
-            Næring("88"),
-            SISTE_PUBLISERTE_KVARTAL.minusEttÅr().årstall,
-            SISTE_PUBLISERTE_KVARTAL.minusEttÅr().kvartal,
-            30000,
-            1000000,
-            50
-        )
-    }
-
-
-    fun opprettStatistikkForNæring(
-        jdbcTemplate: NamedParameterJdbcTemplate,
-        næring: Næring,
-        årstall: Int,
-        kvartal: Int,
-        tapteDagsverk: Int,
-        muligeDagsverk: Int,
-        antallPersoner: Int
+    fun opprettStatistikkForNæringer(
+        sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
     ) {
-        val parametre = parametreForStatistikk(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
-        parametre.addValue("naring_kode", næring.tosifferIdentifikator)
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring "
-                    + "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, "
-                    + "mulige_dagsverk) "
-                    + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, "
-                    + ":tapte_dagsverk, :mulige_dagsverk)",
-            parametre
+        sykefraværStatistikkNæringRepository.settInn(
+            listOf(
+                SykefraværsstatistikkForNæring(
+                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
+                    næringkode = "10",
+                    antallPersoner = 50,
+                    tapteDagsverk = BigDecimal("20000.0"),
+                    muligeDagsverk = BigDecimal("1000000.0")
+                ),
+                SykefraværsstatistikkForNæring(
+                    årstall = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).kvartal,
+                    næringkode = "10",
+                    antallPersoner = 50,
+                    tapteDagsverk = BigDecimal("30000.0"),
+                    muligeDagsverk = BigDecimal("1000000.0")
+                ),
+                SykefraværsstatistikkForNæring(
+                    årstall = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).kvartal,
+                    næringkode = "10",
+                    antallPersoner = 50,
+                    tapteDagsverk = BigDecimal("40000.0"),
+                    muligeDagsverk = BigDecimal("1000000.0")
+                ),
+                SykefraværsstatistikkForNæring(
+                    årstall = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).kvartal,
+                    næringkode = "10",
+                    antallPersoner = 50,
+                    tapteDagsverk = BigDecimal("50000.0"),
+                    muligeDagsverk = BigDecimal("1000000.0")
+                ),
+                SykefraværsstatistikkForNæring(
+                    årstall = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4).årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4).kvartal,
+                    næringkode = "10",
+                    antallPersoner = 50,
+                    tapteDagsverk = BigDecimal("60000.0"),
+                    muligeDagsverk = BigDecimal("1000000.0")
+                ),
+                SykefraværsstatistikkForNæring(
+                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
+                    næringkode = "88",
+                    antallPersoner = 50,
+                    tapteDagsverk = BigDecimal("25000.0"),
+                    muligeDagsverk = BigDecimal("1000000.0")
+                ),
+                SykefraværsstatistikkForNæring(
+                    årstall = SISTE_PUBLISERTE_KVARTAL.minusEttÅr().årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.minusEttÅr().kvartal,
+                    næringkode = "88",
+                    antallPersoner = 50,
+                    tapteDagsverk = BigDecimal("30000.0"),
+                    muligeDagsverk = BigDecimal("1000000.0")
+                ),
+            )
         )
     }
-
 
     fun ImporttidspunktRepository.slettAlleImporttidspunkt() {
         transaction { deleteAll() }

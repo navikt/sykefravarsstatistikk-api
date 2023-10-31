@@ -4,10 +4,7 @@ import config.AppConfigForJdbcTesterConfig
 import io.kotest.matchers.shouldBe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkSektorRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværsstatistikkTilEksporteringRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -48,6 +45,9 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     @Autowired
     lateinit var sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository
 
+    @Autowired
+    lateinit var sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
+
     private val produksjonAvKlær = Næringskode("14190")
     private val undervisning = Næringskode("86907")
     private val utdanning = Næring("86")
@@ -59,7 +59,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     fun setUp() {
         slettAllStatistikkFraDatabase(
             jdbcTemplate,
-            sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository
+            sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository,
+            sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository,
         )
     }
 
@@ -67,7 +68,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     fun tearDown() {
         slettAllStatistikkFraDatabase(
             jdbcTemplate,
-            sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository
+            sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository,
+            sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository,
         )
     }
 
@@ -128,13 +130,15 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     @Test
     fun hentSykefraværprosentAlleNæringer__skal_hente_alle_næringer_for_ett_kvartal() {
         opprettStatistikkNæringTestData(ÅrstallOgKvartal(2019, 1), ÅrstallOgKvartal(2019, 2))
+        val årstallOgKvartal = ÅrstallOgKvartal(2019, 2)
         val resultat =
-            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(ÅrstallOgKvartal(2019, 2))
+            sykefraværStatistikkNæringRepository.hentForAlleNæringer(listOf(årstallOgKvartal))
         org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(2)
         assertSykefraværsstatistikkForNæringIsEqual(resultat, 2019, 2, 10, produksjon, 2, 100)
         assertSykefraværsstatistikkForNæringIsEqual(resultat, 2019, 2, 8, utdanning, 5, 100)
+        val årstallOgKvartal1 = ÅrstallOgKvartal(2019, 1)
         val resultat_2019_1 =
-            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(ÅrstallOgKvartal(2019, 1))
+            sykefraværStatistikkNæringRepository.hentForAlleNæringer(listOf(årstallOgKvartal1))
         org.assertj.core.api.Assertions.assertThat(resultat_2019_1.size).isEqualTo(2)
         assertSykefraværsstatistikkForNæringIsEqual(resultat_2019_1, 2019, 1, 10, produksjon, 2, 100)
         assertSykefraværsstatistikkForNæringIsEqual(resultat_2019_1, 2019, 1, 8, utdanning, 5, 100)
@@ -142,90 +146,88 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
     @Test
     fun hentSykefraværprosentAlleNæringer_siste4Kvartaler_skal_hente_riktig_data() {
-        opprettStatistikkForNæringer(jdbcTemplate)
-        val forventet = java.util.List.of<SykefraværsstatistikkForNæring>(
-            SykefraværsstatistikkForNæring(
-                SISTE_PUBLISERTE_KVARTAL.årstall,
-                SISTE_PUBLISERTE_KVARTAL.kvartal,
-                "10",
-                50,
-                BigDecimal(20000),
-                BigDecimal(1000000)
-            ),
-            SykefraværsstatistikkForNæring(
-                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).årstall,
-                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).kvartal,
-                "10",
-                50,
-                BigDecimal(30000),
-                BigDecimal(1000000)
-            ),
-            SykefraværsstatistikkForNæring(
-                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).årstall,
-                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).kvartal,
-                "10",
-                50,
-                BigDecimal(40000),
-                BigDecimal(1000000)
-            ),
-            SykefraværsstatistikkForNæring(
-                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).årstall,
-                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).kvartal,
-                "10",
-                50,
-                BigDecimal(50000),
-                BigDecimal(1000000)
-            ),
-            SykefraværsstatistikkForNæring(
-                SISTE_PUBLISERTE_KVARTAL.årstall,
-                SISTE_PUBLISERTE_KVARTAL.kvartal,
-                "88",
-                50,
-                BigDecimal(25000),
-                BigDecimal(1000000)
-            )
-        )
-        val resultat: List<SykefraværsstatistikkForNæring> =
-            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(
-                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3), SISTE_PUBLISERTE_KVARTAL
-            ).toList()
-        org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(5)
-        org.assertj.core.api.Assertions.assertThat(resultat).containsExactlyInAnyOrderElementsOf(forventet)
-    }
-
-    @Test
-    fun hentSykefraværprosentAlleNæringer_siste4Kvartaler_kan_likevel_hente_bare_siste_publiserte_kvartal() {
-        opprettStatistikkForNæringer(jdbcTemplate)
+        opprettStatistikkForNæringer(sykefraværStatistikkNæringRepository)
         val forventet = listOf(
             SykefraværsstatistikkForNæring(
                 SISTE_PUBLISERTE_KVARTAL.årstall,
                 SISTE_PUBLISERTE_KVARTAL.kvartal,
                 "10",
                 50,
-                BigDecimal(20000),
-                BigDecimal(1000000)
+                BigDecimal("20000.0"),
+                BigDecimal("1000000.0")
+            ),
+            SykefraværsstatistikkForNæring(
+                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).årstall,
+                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).kvartal,
+                "10",
+                50,
+                BigDecimal("30000.0"),
+                BigDecimal("1000000.0")
+            ),
+            SykefraværsstatistikkForNæring(
+                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).årstall,
+                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).kvartal,
+                "10",
+                50,
+                BigDecimal("40000.0"),
+                BigDecimal("1000000.0")
+            ),
+            SykefraværsstatistikkForNæring(
+                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).årstall,
+                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).kvartal,
+                "10",
+                50,
+                BigDecimal("50000.0"),
+                BigDecimal("1000000.0")
             ),
             SykefraværsstatistikkForNæring(
                 SISTE_PUBLISERTE_KVARTAL.årstall,
                 SISTE_PUBLISERTE_KVARTAL.kvartal,
                 "88",
                 50,
-                BigDecimal(25000),
-                BigDecimal(1000000)
+                BigDecimal("25000.0"),
+                BigDecimal("1000000.0")
             )
         )
-        val resultat = sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(
-            SISTE_PUBLISERTE_KVARTAL,
-            1
+        val resultat: List<SykefraværsstatistikkForNæring> =
+            sykefraværStatistikkNæringRepository.hentForAlleNæringer(SISTE_PUBLISERTE_KVARTAL inkludertTidligere 3)
+        org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(5)
+        org.assertj.core.api.Assertions.assertThat(resultat).containsExactlyInAnyOrderElementsOf(forventet)
+    }
+
+    @Test
+    fun hentSykefraværprosentAlleNæringer_siste4Kvartaler_kan_likevel_hente_bare_siste_publiserte_kvartal() {
+        opprettStatistikkForNæringer(sykefraværStatistikkNæringRepository)
+        val forventet = listOf(
+            SykefraværsstatistikkForNæring(
+                SISTE_PUBLISERTE_KVARTAL.årstall,
+                SISTE_PUBLISERTE_KVARTAL.kvartal,
+                "10",
+                50,
+                BigDecimal("20000.0"),
+                BigDecimal("1000000.0")
+            ),
+            SykefraværsstatistikkForNæring(
+                SISTE_PUBLISERTE_KVARTAL.årstall,
+                SISTE_PUBLISERTE_KVARTAL.kvartal,
+                "88",
+                50,
+                BigDecimal("25000.0"),
+                BigDecimal("1000000.0")
+            )
         )
+        val resultat = sykefraværStatistikkNæringRepository.hentForAlleNæringer(listOf(SISTE_PUBLISERTE_KVARTAL))
         org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(2)
         org.assertj.core.api.Assertions.assertThat(resultat).containsExactlyInAnyOrderElementsOf(forventet)
     }
 
     @Test
     fun hentSykefraværprosentAlleNæringer_siste4Kvartaler_skalIkkeKrasjeVedManglendeData() {
-        val resultat = sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(
-            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)
+        val årstallOgKvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3)
+        val resultat = sykefraværStatistikkNæringRepository.hentForAlleNæringer(
+            listOf(
+                årstallOgKvartal
+            )
         )
         org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(0)
         org.assertj.core.api.Assertions.assertThat(resultat).containsExactlyInAnyOrderElementsOf(listOf())
@@ -233,47 +235,47 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
     @Test
     fun hentSykefraværAlleNæringer_siste4Kvartaler_skal_hente_riktig_data() {
-        opprettStatistikkForNæringer(jdbcTemplate)
+        opprettStatistikkForNæringer(sykefraværStatistikkNæringRepository)
         val forventet = java.util.List.of<SykefraværsstatistikkForNæring>(
             SykefraværsstatistikkForNæring(
                 SISTE_PUBLISERTE_KVARTAL.årstall,
                 SISTE_PUBLISERTE_KVARTAL.kvartal,
                 "10",
                 50,
-                BigDecimal(20000),
-                BigDecimal(1000000)
+                BigDecimal("20000.0"),
+                BigDecimal("1000000.0")
             ),
             SykefraværsstatistikkForNæring(
                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).årstall,
                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).kvartal,
                 "10",
                 50,
-                BigDecimal(30000),
-                BigDecimal(1000000)
+                BigDecimal("30000.0"),
+                BigDecimal("1000000.0")
             ),
             SykefraværsstatistikkForNæring(
                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).årstall,
                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).kvartal,
                 "10",
                 50,
-                BigDecimal(40000),
-                BigDecimal(1000000)
+                BigDecimal("40000.0"),
+                BigDecimal("1000000.0")
             ),
             SykefraværsstatistikkForNæring(
                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).årstall,
                 SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).kvartal,
                 "10",
                 50,
-                BigDecimal(50000),
-                BigDecimal(1000000)
+                BigDecimal("50000.0"),
+                BigDecimal("1000000.0")
             ),
             SykefraværsstatistikkForNæring(
                 SISTE_PUBLISERTE_KVARTAL.årstall,
                 SISTE_PUBLISERTE_KVARTAL.kvartal,
                 "88",
                 50,
-                BigDecimal(25000),
-                BigDecimal(1000000)
+                BigDecimal("25000.0"),
+                BigDecimal("1000000.0")
             )
         )
         val resultat = sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleNæringerFraOgMed(
@@ -285,23 +287,23 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
     @Test
     fun hentSykefraværAlleNæringer_siste4Kvartaler_kan_likevel_hente_bare_siste_publiserte_kvartal() {
-        opprettStatistikkForNæringer(jdbcTemplate)
+        opprettStatistikkForNæringer(sykefraværStatistikkNæringRepository)
         val forventet = java.util.List.of<SykefraværsstatistikkForNæring>(
             SykefraværsstatistikkForNæring(
                 SISTE_PUBLISERTE_KVARTAL.årstall,
                 SISTE_PUBLISERTE_KVARTAL.kvartal,
                 "10",
                 50,
-                BigDecimal(20000),
-                BigDecimal(1000000)
+                BigDecimal("20000.0"),
+                BigDecimal("1000000.0")
             ),
             SykefraværsstatistikkForNæring(
                 SISTE_PUBLISERTE_KVARTAL.årstall,
                 SISTE_PUBLISERTE_KVARTAL.kvartal,
                 "88",
                 50,
-                BigDecimal(25000),
-                BigDecimal(1000000)
+                BigDecimal("25000.0"),
+                BigDecimal("1000000.0")
             )
         )
         val resultat = sykefraværsstatistikkTilEksporteringRepository.hentSykefraværAlleNæringerFraOgMed(
@@ -572,8 +574,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                     årstall = 2019,
                     kvartal = 2,
                     antallPersoner = 2500000,
-                    tapteDagsverk = BigDecimal(256800),
-                    muligeDagsverk = BigDecimal(60000000)
+                    tapteDagsverk = BigDecimal("256800.0"),
+                    muligeDagsverk = BigDecimal("60000000.0")
                 )
             )
         )
@@ -583,8 +585,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                     årstall = 2019,
                     kvartal = 1,
                     antallPersoner = 2750000,
-                    tapteDagsverk = BigDecimal(350000),
-                    muligeDagsverk = BigDecimal(71000000)
+                    tapteDagsverk = BigDecimal("350000.0"),
+                    muligeDagsverk = BigDecimal("71000000.0")
                 )
             )
         )
@@ -638,8 +640,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                     årstall = 2018,
                     kvartal = 2,
                     antallPersoner = 3,
-                    tapteDagsverk = BigDecimal(1),
-                    muligeDagsverk = BigDecimal(60),
+                    tapteDagsverk = BigDecimal("1.0"),
+                    muligeDagsverk = BigDecimal("60.0"),
                     rectype = "2",
                     varighet = Varighetskategori.TOTAL.kode
                 ),
@@ -648,8 +650,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                     årstall = 2018,
                     kvartal = 2,
                     antallPersoner = 4,
-                    tapteDagsverk = BigDecimal(9),
-                    muligeDagsverk = BigDecimal(100),
+                    tapteDagsverk = BigDecimal("9.0"),
+                    muligeDagsverk = BigDecimal("100.0"),
                     rectype = "2",
                     varighet = Varighetskategori.TOTAL.kode
                 ),
@@ -658,8 +660,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                     årstall = 2018,
                     kvartal = 3,
                     antallPersoner = 3,
-                    tapteDagsverk = BigDecimal(1),
-                    muligeDagsverk = BigDecimal(60),
+                    tapteDagsverk = BigDecimal("1.0"),
+                    muligeDagsverk = BigDecimal("60.0"),
                     rectype = "2",
                     varighet = Varighetskategori.TOTAL.kode
                 ),
@@ -668,8 +670,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                     årstall = 2018,
                     kvartal = 4,
                     antallPersoner = 40,
-                    tapteDagsverk = BigDecimal(20),
-                    muligeDagsverk = BigDecimal(115),
+                    tapteDagsverk = BigDecimal("20.0"),
+                    muligeDagsverk = BigDecimal("115.0"),
                     rectype = "2",
                     varighet = Varighetskategori.TOTAL.kode
                 ),
@@ -678,8 +680,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                     årstall = 2018,
                     kvartal = 3,
                     antallPersoner = 4,
-                    tapteDagsverk = BigDecimal(9),
-                    muligeDagsverk = BigDecimal(100),
+                    tapteDagsverk = BigDecimal("9.0"),
+                    muligeDagsverk = BigDecimal("100.0"),
                     rectype = "2",
                     varighet = Varighetskategori.TOTAL.kode
                 ),
@@ -688,8 +690,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                     årstall = 2018,
                     kvartal = 4,
                     antallPersoner = 7,
-                    tapteDagsverk = BigDecimal(12),
-                    muligeDagsverk = BigDecimal(100),
+                    tapteDagsverk = BigDecimal("12.0"),
+                    muligeDagsverk = BigDecimal("100.0"),
                     rectype = "2",
                     varighet = Varighetskategori.TOTAL.kode
                 ),
@@ -698,8 +700,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                     årstall = 2019,
                     kvartal = 2,
                     antallPersoner = 3,
-                    tapteDagsverk = BigDecimal(1),
-                    muligeDagsverk = BigDecimal(60),
+                    tapteDagsverk = BigDecimal("1.0"),
+                    muligeDagsverk = BigDecimal("60.0"),
                     rectype = "2",
                     varighet = Varighetskategori.TOTAL.kode
                 ),
@@ -708,8 +710,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                     årstall = 2019,
                     kvartal = 1,
                     antallPersoner = 40,
-                    tapteDagsverk = BigDecimal(20),
-                    muligeDagsverk = BigDecimal(115),
+                    tapteDagsverk = BigDecimal("20.0"),
+                    muligeDagsverk = BigDecimal("115.0"),
                     rectype = "2",
                     varighet = Varighetskategori.TOTAL.kode
                 ),
@@ -718,8 +720,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                     årstall = 2019,
                     kvartal = 2,
                     antallPersoner = 4,
-                    tapteDagsverk = BigDecimal(9),
-                    muligeDagsverk = BigDecimal(100),
+                    tapteDagsverk = BigDecimal("9.0"),
+                    muligeDagsverk = BigDecimal("100.0"),
                     rectype = "2",
                     varighet = Varighetskategori.TOTAL.kode
                 ),
@@ -728,8 +730,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                     årstall = 2019,
                     kvartal = 1,
                     antallPersoner = 7,
-                    tapteDagsverk = BigDecimal(12),
-                    muligeDagsverk = BigDecimal(100),
+                    tapteDagsverk = BigDecimal("12.0"),
+                    muligeDagsverk = BigDecimal("100.0"),
                     rectype = "2",
                     varighet = Varighetskategori.TOTAL.kode
                 ),
@@ -738,11 +740,26 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     }
 
     private fun opprettStatistikkNæringTestData(vararg årstallOgKvartal: ÅrstallOgKvartal) {
-        Arrays.stream(årstallOgKvartal)
-            .forEach { (årstall, kvartal): ÅrstallOgKvartal ->
-                createStatistikkNæring(produksjon, årstall, kvartal, 10, 2, 100)
-                createStatistikkNæring(utdanning, årstall, kvartal, 8, 5, 100)
-            }
+        årstallOgKvartal.forEach {
+            sykefraværStatistikkNæringRepository.settInn(listOf(
+                SykefraværsstatistikkForNæring(
+                    årstall = it.årstall,
+                    kvartal = it.kvartal,
+                    næringkode = produksjon.tosifferIdentifikator,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal("2.0"),
+                    muligeDagsverk = BigDecimal("100.0")
+                ),
+                SykefraværsstatistikkForNæring(
+                    årstall = it.årstall,
+                    kvartal = it.kvartal,
+                    næringkode = utdanning.tosifferIdentifikator,
+                    antallPersoner = 8,
+                    tapteDagsverk = BigDecimal("5.0"),
+                    muligeDagsverk = BigDecimal("100.0")
+                )
+            ))
+        }
     }
 
     private fun opprettStatistikkNæring5SifferTestData(vararg årstallOgKvartals: ÅrstallOgKvartal) {
@@ -755,30 +772,6 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                     undervisning, årstall, kvartal, 10, 5, 100
                 )
             }
-    }
-
-    private fun createStatistikkNæring(
-        næring: Næring,
-        årstall: Int,
-        kvartal: Int,
-        antallPersoner: Int,
-        tapteDagsverk: Int,
-        muligeDagsverk: Int
-    ) {
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring (naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "values (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(
-                SykefraværsstatistikkForNæring(
-                    årstall,
-                    kvartal,
-                    næring.tosifferIdentifikator,
-                    antallPersoner,
-                    BigDecimal(tapteDagsverk),
-                    BigDecimal(muligeDagsverk)
-                )
-            )
-        )
     }
 
     private fun createStatistikkNæring5Siffer(
@@ -804,12 +797,6 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 )
             )
         )
-    }
-
-    private fun parametre(sykefraværsstatistikkForNæring: SykefraværsstatistikkForNæring): MapSqlParameterSource {
-        val parametre = MapSqlParameterSource()
-            .addValue("naring_kode", sykefraværsstatistikkForNæring.næringkode)
-        return leggTilParametreForSykefraværsstatistikk(parametre, sykefraværsstatistikkForNæring)
     }
 
     private fun parametre(

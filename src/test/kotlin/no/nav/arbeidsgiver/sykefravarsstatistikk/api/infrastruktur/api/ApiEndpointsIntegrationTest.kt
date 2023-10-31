@@ -6,10 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.net.HttpHeaders
 import config.SpringIntegrationTestbase
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkSektor
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.assertj.core.api.Assertions
@@ -24,7 +21,6 @@ import testUtils.TestUtils.PRODUKSJON_NYTELSESMIDLER
 import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import testUtils.TestUtils.opprettStatistikkForLand
 import testUtils.TestUtils.opprettStatistikkForLandExposed
-import testUtils.TestUtils.opprettStatistikkForNæring
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import testUtils.TestUtils.slettAlleImporttidspunkt
 import java.io.IOException
@@ -110,8 +106,17 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
                 )
             )
         )
-        opprettStatistikkForNæring(
-            jdbcTemplate, PRODUKSJON_NYTELSESMIDLER, SISTE_ÅRSTALL, SISTE_KVARTAL, 5, 100, 10
+        sykefraværStatistikkNæringRepository.settInn(
+            listOf(
+                SykefraværsstatistikkForNæring(
+                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
+                    næringkode = PRODUKSJON_NYTELSESMIDLER.tosifferIdentifikator,
+                    antallPersoner = 10,
+                    tapteDagsverk = 5.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal(),
+                )
+            )
         )
         sykefravarStatistikkVirksomhetRepository.settInn(
             listOf(

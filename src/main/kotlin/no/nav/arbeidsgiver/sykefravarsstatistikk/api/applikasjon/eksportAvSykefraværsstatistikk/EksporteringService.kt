@@ -26,6 +26,7 @@ class EksporteringService(
     private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
     private val kafkaClient: KafkaClient,
     private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
+    private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -89,8 +90,8 @@ class EksporteringService(
         val sykefraværsstatistikkSektor =
             sykefraværStatistikkSektorRepository.hentForKvartaler(listOf(årstallOgKvartal))
         val sykefraværsstatistikkForNæringer =
-            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(
-                årstallOgKvartal
+            sykefraværStatistikkNæringRepository.hentForAlleNæringer(
+                listOf(årstallOgKvartal)
             )
         val sykefraværsstatistikkForNæringskoder =
             sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentForAlleNæringskoder(

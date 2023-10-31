@@ -18,39 +18,6 @@ class SykefraværsstatistikkTilEksporteringRepository(
     private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository,
 ) {
 
-    /* Sykefraværsprosent Næring */
-    fun hentSykefraværprosentAlleNæringer(
-        sisteÅrstallOgKvartal: ÅrstallOgKvartal, antallKvartaler: Int
-    ): List<SykefraværsstatistikkForNæring> {
-        return if (antallKvartaler == 2) {
-            hentSykefraværprosentAlleNæringer(sisteÅrstallOgKvartal)
-        } else hentSykefraværprosentAlleNæringer(
-            sisteÅrstallOgKvartal, sisteÅrstallOgKvartal.minusKvartaler(antallKvartaler - 1)
-        )
-    }
-
-    fun hentSykefraværprosentAlleNæringer(
-        årstallOgKvartal: ÅrstallOgKvartal?
-    ): List<SykefraværsstatistikkForNæring> {
-        return hentSykefraværprosentAlleNæringer(årstallOgKvartal, årstallOgKvartal)
-    }
-
-    fun hentSykefraværprosentAlleNæringer(
-        fraÅrstallOgKvartal: ÅrstallOgKvartal?, tilÅrstallOgKvartal: ÅrstallOgKvartal?
-    ): List<SykefraværsstatistikkForNæring> {
-        return try {
-            namedParameterJdbcTemplate.query(
-                "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk "
-                        + "from sykefravar_statistikk_naring "
-                        + " where "
-                        + getWhereClause(fraÅrstallOgKvartal, tilÅrstallOgKvartal)
-                        + "order by (arstall, kvartal) desc, naring_kode"
-            ) { rs: ResultSet, _: Int -> mapTilSykefraværsstatistikkNæring(rs) }
-        } catch (e: EmptyResultDataAccessException) {
-            emptyList()
-        }
-    }
-
     fun hentSykefraværprosentForAlleNæringskoder(
         årstallOgKvartal: ÅrstallOgKvartal
     ): List<SykefraværsstatistikkForNæringskode> {

@@ -66,7 +66,29 @@ class SykefraværStatistikkNæringRepository(
                     muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
                 )
             }.groupBy { ÅrstallOgKvartal(it.årstall, it.kvartal) }
+        }
+    }
 
+    fun hentForAlleNæringer(
+        kvartaler: List<ÅrstallOgKvartal>
+    ): List<SykefraværsstatistikkForNæring> {
+        return transaction {
+            select {
+                (årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }
+            }.orderBy(
+                årstall to SortOrder.DESC,
+                kvartal to SortOrder.DESC,
+                næring to SortOrder.ASC,
+            ).map {
+                    SykefraværsstatistikkForNæring(
+                        årstall = it[årstall],
+                        kvartal = it[kvartal],
+                        næringkode = it[næring],
+                        antallPersoner = it[antallPersoner],
+                        tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
+                        muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
+                    )
+                }
         }
     }
 
