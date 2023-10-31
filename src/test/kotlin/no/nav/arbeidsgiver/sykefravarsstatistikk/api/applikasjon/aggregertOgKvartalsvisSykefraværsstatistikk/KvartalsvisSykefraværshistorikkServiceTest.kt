@@ -3,10 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKva
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KvartalsvisSykefraværRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkSektorRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -19,12 +16,14 @@ class KvartalsvisSykefraværshistorikkServiceTest {
     private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository = mockk()
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository = mockk()
     val sykefraværStatistikkSektorRepository = mockk<SykefraværStatistikkSektorRepository>()
+    private val sykefraværStatistikkNæringRepository = mockk<SykefraværStatistikkNæringRepository>()
     private val kvartalsvisSykefraværshistorikkService: KvartalsvisSykefraværshistorikkService =
         KvartalsvisSykefraværshistorikkService(
-            kvartalsvisSykefraværprosentRepository,
-            sykefravarStatistikkVirksomhetRepository,
-            sykefraværStatistikkLandRepository,
-            sykefraværStatistikkSektorRepository,
+            kvartalsvisSykefraværprosentRepository = kvartalsvisSykefraværprosentRepository,
+            sykefraværStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
+            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
+            sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository,
+            sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository,
         )
 
 

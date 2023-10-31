@@ -3,6 +3,7 @@ package infrastruktur
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.net.HttpHeaders
 import config.SpringIntegrationTestbase
+import io.kotest.matchers.shouldBe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
@@ -53,6 +54,9 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     lateinit var sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository
 
     @Autowired
+    lateinit var sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
+
+    @Autowired
     lateinit var importtidspunktRepository: ImporttidspunktRepository
 
     @BeforeEach
@@ -62,6 +66,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
             sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
             sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
             sykefravarStatistikkVirksomhetGraderingRepository = sykefravarStatistikkVirksomhetGraderingRepository,
+            sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository
         )
         importtidspunktRepository.slettAlleImporttidspunkt()
         importtidspunktRepository.settInnImporttidspunkt(SISTE_PUBLISERTE_KVARTAL, LocalDate.parse("2022-06-02"))
@@ -302,8 +307,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun hentAgreggertStatistikk_kræsjerIkkeDersomMuligeDagsverkErZero() {
+    fun `hentAgreggertStatistikk kræsjer ikke dersom mulige dagsverk er 0`() {
         sykefravarStatistikkVirksomhetRepository.settInn(
             listOf(
                 SykefraværsstatistikkVirksomhet(
@@ -320,10 +324,8 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
         )
         val response = utførAutorisertKall(ORGNR_UNDERENHET)
         val responseBody = objectMapper.readTree(response.body())
-        Assertions.assertThat(
-            responseBody["prosentSiste4KvartalerTotalt"].findValuesAsText("statistikkategori")
-        )
-            .isEmpty()
+
+        responseBody["prosentSiste4KvartalerTotalt"].findValuesAsText("statistikkategori") shouldBe emptyList()
     }
 
     @Test
@@ -336,7 +338,6 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
         Assertions.assertThat(barnehageJson["label"].toString()).isEqualTo("\"Barnehager\"")
     }
 
-    @Throws(IOException::class, InterruptedException::class)
     private fun utførAutorisertKall(orgnr: String): HttpResponse<String> {
         val jwtToken = createMockIdportenTokenXToken(mockOAuth2Server)
         return HttpClient.newBuilder()

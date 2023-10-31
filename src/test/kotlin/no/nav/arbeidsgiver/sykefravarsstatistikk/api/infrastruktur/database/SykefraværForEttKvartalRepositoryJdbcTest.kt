@@ -42,6 +42,9 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
     @Autowired
     private lateinit var sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository
 
+    @Autowired
+    private lateinit var sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
+
 
     @BeforeEach
     fun setUp() {
@@ -134,24 +137,35 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
     @Test
     fun hentSykefraværprosentNæring__skal_returnere_riktig_sykefravær() {
         val produksjonAvKlær = Næring("14")
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring (naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(produksjonAvKlær, 2019, 2, 10, 2, 100)
+        sykefraværStatistikkNæringRepository.settInn(
+            listOf(
+                SykefraværsstatistikkForNæring(
+                    næringkode = produksjonAvKlær.tosifferIdentifikator,
+                    årstall = 2019,
+                    kvartal = 2,
+                    antallPersoner = 10,
+                    tapteDagsverk = 2.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                ),
+                SykefraværsstatistikkForNæring(
+                    næringkode = produksjonAvKlær.tosifferIdentifikator,
+                    årstall = 2019,
+                    kvartal = 1,
+                    antallPersoner = 10,
+                    tapteDagsverk = 3.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                ),
+                SykefraværsstatistikkForNæring(
+                    næringkode = Næring("85").tosifferIdentifikator,
+                    årstall = 2018,
+                    kvartal = 4,
+                    antallPersoner = 10,
+                    tapteDagsverk = 5.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                ),
+            )
         )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring (naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(produksjonAvKlær, 2019, 1, 10, 3, 100)
-        )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring (naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(Næring("85"), 2018, 4, 10, 5, 100)
-        )
-        val resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentNæring(
-            produksjonAvKlær
-        )
+        val resultat = sykefraværStatistikkNæringRepository.hentKvartalsvisSykefraværprosent(produksjonAvKlær)
         AssertionsForClassTypes.assertThat(resultat.size).isEqualTo(2)
         AssertionsForClassTypes.assertThat(resultat[0])
             .isEqualTo(

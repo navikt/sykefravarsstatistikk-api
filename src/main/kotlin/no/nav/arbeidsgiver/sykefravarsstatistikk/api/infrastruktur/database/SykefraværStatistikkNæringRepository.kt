@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næring
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkForNæring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import org.jetbrains.exposed.sql.*
@@ -71,4 +72,20 @@ class SykefraværStatistikkNæringRepository(
 
         }
     }
+
+    fun hentKvartalsvisSykefraværprosent(næringa: Næring): List<SykefraværForEttKvartal> {
+        return transaction {
+            select {
+                næring eq næringa.tosifferIdentifikator
+            }.orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC).map {
+                SykefraværForEttKvartal(
+                    årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                    tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
+                    muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
+                    antallPersoner = it[antallPersoner]
+                )
+            }
+        }
+    }
+
 }
