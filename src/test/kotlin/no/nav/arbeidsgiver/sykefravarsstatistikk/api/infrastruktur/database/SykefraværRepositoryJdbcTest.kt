@@ -37,6 +37,9 @@ open class SykefraværRepositoryJdbcTest {
     private lateinit var sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository
 
     @Autowired
+    private lateinit var sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
+
+    @Autowired
     private lateinit var sykefraværRepository: SykefraværRepository
 
 
@@ -114,7 +117,10 @@ open class SykefraværRepositoryJdbcTest {
     @Test
     fun hentUmaskertSykefraværForEttKvartalListe_skal_hente_riktig_data() {
         persisterDatasetIDb(Næring("10"))
-        val resultat = sykefraværRepository.hentUmaskertSykefravær(Næring("10"), ÅrstallOgKvartal(2019, 1))
+        val resultat = sykefraværStatistikkNæringRepository.hentUmaskertSykefravær(
+            Næring("10"),
+            ÅrstallOgKvartal(2019, 2) inkludertTidligere 1
+        )
         Assertions.assertThat(resultat.size).isEqualTo(2)
         Assertions.assertThat(resultat[0]).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 1, 3))
         Assertions.assertThat(resultat[1]).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2))
@@ -190,50 +196,49 @@ open class SykefraværRepositoryJdbcTest {
     }
 
     private fun persisterDatasetIDb(næring: Næring) {
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring "
-                    + "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, "
-                    + "mulige_dagsverk)"
-                    + "values "
-                    + "(:arstall, :kvartal, :næring, :antall_personer, :tapte_dagsverk, "
-                    + ":mulige_dagsverk)",
-            parametre(2019, 2, næring, 10, 2, 100)
-        )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring "
-                    + "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, "
-                    + "mulige_dagsverk)"
-                    + "values "
-                    + "(:arstall, :kvartal, :næring, :antall_personer, :tapte_dagsverk, "
-                    + ":mulige_dagsverk)",
-            parametre(2019, 1, Næring("94"), 10, 3, 100)
-        )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring "
-                    + "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, "
-                    + "mulige_dagsverk)"
-                    + "values "
-                    + "(:arstall, :kvartal, :næring, :antall_personer, :tapte_dagsverk, "
-                    + ":mulige_dagsverk)",
-            parametre(2019, 1, næring, 10, 3, 100)
-        )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring "
-                    + "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, "
-                    + "mulige_dagsverk)"
-                    + "values "
-                    + "(:arstall, :kvartal, :næring, :antall_personer, :tapte_dagsverk, "
-                    + ":mulige_dagsverk)",
-            parametre(2018, 4, næring, 10, 5, 100)
-        )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring "
-                    + "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, "
-                    + "mulige_dagsverk)"
-                    + "values "
-                    + "(:arstall, :kvartal, :næring, :antall_personer, :tapte_dagsverk, "
-                    + ":mulige_dagsverk)",
-            parametre(2018, 3, næring, 10, 6, 100)
+        sykefraværStatistikkNæringRepository.settInn(
+            listOf(
+                SykefraværsstatistikkForNæring(
+                    næringkode = næring.tosifferIdentifikator,
+                    årstall = 2019,
+                    kvartal = 2,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(2),
+                    muligeDagsverk = BigDecimal(100)
+                ),
+                SykefraværsstatistikkForNæring(
+                    næringkode = "94",
+                    årstall = 2019,
+                    kvartal = 1,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(3),
+                    muligeDagsverk = BigDecimal(100)
+                ),
+                SykefraværsstatistikkForNæring(
+                    næringkode = næring.tosifferIdentifikator,
+                    årstall = 2019,
+                    kvartal = 1,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(3),
+                    muligeDagsverk = BigDecimal(100)
+                ),
+                SykefraværsstatistikkForNæring(
+                    næringkode = næring.tosifferIdentifikator,
+                    årstall = 2018,
+                    kvartal = 4,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(5),
+                    muligeDagsverk = BigDecimal(100)
+                ),
+                SykefraværsstatistikkForNæring(
+                    næringkode = næring.tosifferIdentifikator,
+                    årstall = 2018,
+                    kvartal = 3,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal(6),
+                    muligeDagsverk = BigDecimal(100)
+                ),
+            )
         )
     }
 
@@ -322,18 +327,6 @@ open class SykefraværRepositoryJdbcTest {
             .addValue("antall_personer", antallPersoner)
             .addValue("tapte_dagsverk", tapteDagsverk)
             .addValue("mulige_dagsverk", muligeDagsverk)
-    }
-
-    private fun parametre(
-        årstall: Int,
-        kvartal: Int,
-        næring: Næring,
-        antallPersoner: Int,
-        tapteDagsverk: Int,
-        muligeDagsverk: Int
-    ): MapSqlParameterSource {
-        return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
-            .addValue("næring", næring.tosifferIdentifikator)
     }
 
     private fun parametre(

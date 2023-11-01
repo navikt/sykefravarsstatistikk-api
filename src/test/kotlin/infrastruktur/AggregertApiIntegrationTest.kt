@@ -3,11 +3,9 @@ package infrastruktur
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.net.HttpHeaders
 import config.SpringIntegrationTestbase
+import io.kotest.matchers.shouldBe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import no.nav.security.mock.oauth2.MockOAuth2Server
@@ -22,12 +20,10 @@ import testUtils.TestTokenUtil.createMockIdportenTokenXToken
 import testUtils.TestUtils.PRODUKSJON_NYTELSESMIDLER
 import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import testUtils.TestUtils.opprettStatistikkForLand
-import testUtils.TestUtils.opprettStatistikkForNæring
 import testUtils.TestUtils.opprettStatistikkForNæringskode
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import testUtils.TestUtils.slettAlleImporttidspunkt
 import testUtils.insertData
-import java.io.IOException
 import java.math.BigDecimal
 import java.net.URI
 import java.net.http.HttpClient
@@ -53,6 +49,9 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     lateinit var sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository
 
     @Autowired
+    lateinit var sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
+
+    @Autowired
     lateinit var importtidspunktRepository: ImporttidspunktRepository
 
     @BeforeEach
@@ -62,6 +61,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
             sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
             sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
             sykefravarStatistikkVirksomhetGraderingRepository = sykefravarStatistikkVirksomhetGraderingRepository,
+            sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository
         )
         importtidspunktRepository.slettAlleImporttidspunkt()
         importtidspunktRepository.settInnImporttidspunkt(SISTE_PUBLISERTE_KVARTAL, LocalDate.parse("2022-06-02"))
@@ -109,23 +109,25 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     fun hentAgreggertStatistikk_returnererForventedeTyperForBedriftSomHarAlleTyperData() {
         val (årstall, kvartal) = SISTE_PUBLISERTE_KVARTAL.minusEttÅr()
         opprettStatistikkForLand(sykefraværStatistikkLandRepository)
-        opprettStatistikkForNæring(
-            jdbcTemplate,
-            PRODUKSJON_NYTELSESMIDLER,
-            SISTE_PUBLISERTE_KVARTAL.årstall,
-            SISTE_PUBLISERTE_KVARTAL.kvartal,
-            5,
-            100,
-            10
-        )
-        opprettStatistikkForNæring(
-            jdbcTemplate,
-            PRODUKSJON_NYTELSESMIDLER,
-            årstall,
-            kvartal,
-            20,
-            100,
-            10
+        sykefraværStatistikkNæringRepository.settInn(
+            listOf(
+                SykefraværsstatistikkForNæring(
+                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
+                    næringkode = PRODUKSJON_NYTELSESMIDLER.tosifferIdentifikator,
+                    antallPersoner = 10,
+                    tapteDagsverk = 5.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                ),
+                SykefraværsstatistikkForNæring(
+                    årstall = årstall,
+                    kvartal = kvartal,
+                    næringkode = PRODUKSJON_NYTELSESMIDLER.tosifferIdentifikator,
+                    antallPersoner = 10,
+                    tapteDagsverk = 20.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                )
+            )
         )
         sykefravarStatistikkVirksomhetRepository.settInn(
             listOf(
@@ -302,8 +304,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun hentAgreggertStatistikk_kræsjerIkkeDersomMuligeDagsverkErZero() {
+    fun `hentAgreggertStatistikk kræsjer ikke dersom mulige dagsverk er 0`() {
         sykefravarStatistikkVirksomhetRepository.settInn(
             listOf(
                 SykefraværsstatistikkVirksomhet(
@@ -320,10 +321,8 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
         )
         val response = utførAutorisertKall(ORGNR_UNDERENHET)
         val responseBody = objectMapper.readTree(response.body())
-        Assertions.assertThat(
-            responseBody["prosentSiste4KvartalerTotalt"].findValuesAsText("statistikkategori")
-        )
-            .isEmpty()
+
+        responseBody["prosentSiste4KvartalerTotalt"].findValuesAsText("statistikkategori") shouldBe emptyList()
     }
 
     @Test
@@ -336,7 +335,6 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
         Assertions.assertThat(barnehageJson["label"].toString()).isEqualTo("\"Barnehager\"")
     }
 
-    @Throws(IOException::class, InterruptedException::class)
     private fun utførAutorisertKall(orgnr: String): HttpResponse<String> {
         val jwtToken = createMockIdportenTokenXToken(mockOAuth2Server)
         return HttpClient.newBuilder()

@@ -15,40 +15,8 @@ import java.util.stream.Collectors
 @Component
 class SykefraværsstatistikkTilEksporteringRepository(
     @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
+    private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository,
 ) {
-
-    /* Sykefraværsprosent Næring */
-    fun hentSykefraværprosentAlleNæringer(
-        sisteÅrstallOgKvartal: ÅrstallOgKvartal, antallKvartaler: Int
-    ): List<SykefraværsstatistikkForNæring> {
-        return if (antallKvartaler == 2) {
-            hentSykefraværprosentAlleNæringer(sisteÅrstallOgKvartal)
-        } else hentSykefraværprosentAlleNæringer(
-            sisteÅrstallOgKvartal, sisteÅrstallOgKvartal.minusKvartaler(antallKvartaler - 1)
-        )
-    }
-
-    fun hentSykefraværprosentAlleNæringer(
-        årstallOgKvartal: ÅrstallOgKvartal?
-    ): List<SykefraværsstatistikkForNæring> {
-        return hentSykefraværprosentAlleNæringer(årstallOgKvartal, årstallOgKvartal)
-    }
-
-    fun hentSykefraværprosentAlleNæringer(
-        fraÅrstallOgKvartal: ÅrstallOgKvartal?, tilÅrstallOgKvartal: ÅrstallOgKvartal?
-    ): List<SykefraværsstatistikkForNæring> {
-        return try {
-            namedParameterJdbcTemplate.query(
-                "select naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk "
-                        + "from sykefravar_statistikk_naring "
-                        + " where "
-                        + getWhereClause(fraÅrstallOgKvartal, tilÅrstallOgKvartal)
-                        + "order by (arstall, kvartal) desc, naring_kode"
-            ) { rs: ResultSet, _: Int -> mapTilSykefraværsstatistikkNæring(rs) }
-        } catch (e: EmptyResultDataAccessException) {
-            emptyList()
-        }
-    }
 
     fun hentSykefraværprosentForAlleNæringskoder(
         årstallOgKvartal: ÅrstallOgKvartal
@@ -75,27 +43,12 @@ class SykefraværsstatistikkTilEksporteringRepository(
         }
     }
 
-    fun hentSykefraværAlleNæringerFraOgMed(
-        fraÅrstallOgKvartal: ÅrstallOgKvartal
-    ): List<SykefraværsstatistikkForNæring> {
-        return try {
-            namedParameterJdbcTemplate.query(
-                "select arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, mulige_dagsverk "
-                        + "from sykefravar_statistikk_naring "
-                        + "where (arstall = :arstall and kvartal >= :kvartal) "
-                        + "or (arstall > :arstall) "
-                        + "group by arstall, kvartal, id order by arstall, kvartal, naring_kode",
-                MapSqlParameterSource()
-                    .addValue("arstall", fraÅrstallOgKvartal.årstall)
-                    .addValue("kvartal", fraÅrstallOgKvartal.kvartal)
-            ) { rs: ResultSet, _: Int -> mapTilSykefraværsstatistikkNæring(rs) }
-        } catch (e: EmptyResultDataAccessException) {
-            emptyList()
-        }
-    }
-
     fun hentSykefraværAlleBransjer(kvartaler: List<ÅrstallOgKvartal>): List<SykefraværsstatistikkBransje> {
-        return hentSykefraværsstatistikkForBransjer(kvartaler, namedParameterJdbcTemplate)
+        return hentSykefraværsstatistikkForBransjer(
+            kvartaler,
+            namedParameterJdbcTemplate,
+            sykefraværStatistikkNæringRepository
+        )
     }
 
     @Throws(SQLException::class)

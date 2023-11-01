@@ -49,6 +49,7 @@ class EksporteringServiceMockTest {
     private val sykefraværStatistikkSektorRepository = mock<SykefraværStatistikkSektorRepository>()
 
     private val sykefravarStatistikkVirksomhetRepository = mock<SykefravarStatistikkVirksomhetRepository>()
+    private val sykefraværStatistikkNæringRepository = mock<SykefraværStatistikkNæringRepository>()
     private val service: EksporteringService = EksporteringService(
         eksporteringRepository,
         virksomhetMetadataRepository,
@@ -57,6 +58,7 @@ class EksporteringServiceMockTest {
         sykefraværStatistikkSektorRepository,
         kafkaClient,
         sykefravarStatistikkVirksomhetRepository,
+        sykefraværStatistikkNæringRepository,
     )
 
     val årstallOgKvartalArgumentCaptor: KArgumentCaptor<ÅrstallOgKvartal> = argumentCaptor<ÅrstallOgKvartal>()
@@ -106,7 +108,7 @@ class EksporteringServiceMockTest {
             sykefraværStatistikkSektorRepository.hentForKvartaler(any())
         ).thenReturn(listOf(sykefraværsstatistikkSektor))
         whenever(
-            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(__2020_2)
+            sykefraværStatistikkNæringRepository.hentForAlleNæringer(any())
         ).thenReturn(
             listOf(
                 sykefraværsstatistikkNæring(fraÅrstallOgKvartal),
@@ -182,7 +184,7 @@ class EksporteringServiceMockTest {
             sykefraværStatistikkSektorRepository.hentForKvartaler(any())
         ).thenReturn(listOf(sykefraværsstatistikkSektor))
         whenever(
-            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentAlleNæringer(__2020_2)
+            sykefraværStatistikkNæringRepository.hentForAlleNæringer(any())
         ).thenReturn(
             listOf(
                 sykefraværsstatistikkNæring(fraÅrstallOgKvartal),

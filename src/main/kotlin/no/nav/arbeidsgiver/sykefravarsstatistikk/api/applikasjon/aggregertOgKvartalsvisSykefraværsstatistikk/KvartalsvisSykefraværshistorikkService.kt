@@ -2,10 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKva
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Bransjeprogram.finnBransje
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.KvartalsvisSykefraværRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkSektorRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.util.concurrent.CompletableFuture
@@ -20,6 +17,7 @@ class KvartalsvisSykefraværshistorikkService(
     private val sykefraværStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
     private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
+    private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -99,7 +97,7 @@ class KvartalsvisSykefraværshistorikkService(
         return KvartalsvisSykefraværshistorikkJson(
             Statistikkategori.NÆRING,
             næring.navn,
-            kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentNæring(næring)
+            sykefraværStatistikkNæringRepository.hentKvartalsvisSykefraværprosent(næring)
         )
     }
 
@@ -121,7 +119,7 @@ class KvartalsvisSykefraværshistorikkService(
         )
     }
 
-    protected fun uthentingAvSykefraværshistorikkNæring(underenhet: Virksomhet): CompletableFuture<KvartalsvisSykefraværshistorikkJson> {
+    private fun uthentingAvSykefraværshistorikkNæring(underenhet: Virksomhet): CompletableFuture<KvartalsvisSykefraværshistorikkJson> {
         return CompletableFuture.supplyAsync<Næring> { underenhet.næringskode.næring }
             .orTimeout(TIMEOUT_UTHENTING_FRA_DB_I_SEKUNDER.toLong(), TimeUnit.SECONDS)
             .thenCompose { næring: Næring ->

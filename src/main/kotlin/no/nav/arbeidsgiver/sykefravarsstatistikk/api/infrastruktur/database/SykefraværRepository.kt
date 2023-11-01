@@ -17,6 +17,7 @@ class SykefraværRepository(
     @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
     private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
+    private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository,
 ) {
     fun hentUmaskertSykefravær(
         bransje: Bransje, fraÅrstallOgKvartal: ÅrstallOgKvartal
@@ -46,30 +47,6 @@ class SykefraværRepository(
         }
     }
 
-    fun hentUmaskertSykefravær(
-        næring: Næring, fraÅrstallOgKvartal: ÅrstallOgKvartal
-    ): List<UmaskertSykefraværForEttKvartal> {
-        return try {
-            namedParameterJdbcTemplate.query(
-                "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal "
-                        + "FROM sykefravar_statistikk_naring "
-                        + "where naring_kode = :naringKode "
-                        + "and ("
-                        + "  (arstall = :arstall and kvartal >= :kvartal) "
-                        + "  or "
-                        + "  (arstall > :arstall)"
-                        + ") "
-                        + "ORDER BY arstall, kvartal ",
-                MapSqlParameterSource()
-                    .addValue("naringKode", næring.tosifferIdentifikator)
-                    .addValue("arstall", fraÅrstallOgKvartal.årstall)
-                    .addValue("kvartal", fraÅrstallOgKvartal.kvartal)
-            ) { rs: ResultSet, _: Int -> mapTilUmaskertSykefraværForEttKvartal(rs) }.sorted()
-        } catch (e: EmptyResultDataAccessException) {
-            emptyList()
-        }
-    }
-
 
     fun hentTotaltSykefraværAlleKategorier(
         virksomhet: Virksomhet, kvartaler: List<ÅrstallOgKvartal>
@@ -81,16 +58,19 @@ class SykefraværRepository(
             EnumMap(Statistikkategori::class.java)
         val fraÅrstallOgKvartal = kvartaler.minOf { it }
 
-        data[Statistikkategori.VIRKSOMHET] = sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(virksomhet,
+        data[Statistikkategori.VIRKSOMHET] = sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(
+            virksomhet,
             fraÅrstallOgKvartal
         )
         data[Statistikkategori.LAND] = sykefraværStatistikkLandRepository.hentForKvartaler(kvartaler)
         if (maybeBransje.isEmpty) {
-            data[Statistikkategori.NÆRING] = hentUmaskertSykefravær(næring, fraÅrstallOgKvartal)
+            data[Statistikkategori.NÆRING] =
+                sykefraværStatistikkNæringRepository.hentUmaskertSykefravær(næring, kvartaler)
         } else if (maybeBransje.get().erDefinertPåFemsiffernivå()) {
             data[Statistikkategori.BRANSJE] = hentUmaskertSykefravær(maybeBransje.get(), fraÅrstallOgKvartal)
         } else {
-            data[Statistikkategori.BRANSJE] = hentUmaskertSykefravær(næring, fraÅrstallOgKvartal)
+            data[Statistikkategori.BRANSJE] =
+                sykefraværStatistikkNæringRepository.hentUmaskertSykefravær(næring, kvartaler)
         }
         return Sykefraværsdata(data)
     }

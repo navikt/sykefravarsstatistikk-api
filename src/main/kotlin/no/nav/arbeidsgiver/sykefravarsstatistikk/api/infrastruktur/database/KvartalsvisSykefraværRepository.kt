@@ -13,21 +13,8 @@ import java.sql.SQLException
 class KvartalsvisSykefraværRepository(
     @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
 ) {
-    fun hentKvartalsvisSykefraværprosentNæring(næring: Næring): List<SykefraværForEttKvartal> {
-        return try {
-            namedParameterJdbcTemplate.query(
-                "SELECT tapte_dagsverk, mulige_dagsverk, antall_personer, arstall, kvartal "
-                        + "FROM sykefravar_statistikk_naring "
-                        + "where naring_kode = :naring "
-                        + "ORDER BY arstall, kvartal ",
-                MapSqlParameterSource().addValue("naring", næring.tosifferIdentifikator)
-            ) { rs: ResultSet, _: Int -> mapTilKvartalsvisSykefraværprosent(rs) }
-        } catch (e: EmptyResultDataAccessException) {
-            emptyList()
-        }
-    }
-
     fun hentKvartalsvisSykefraværprosentBransje(bransje: Bransje): List<SykefraværForEttKvartal> {
+        // TODO how can this even work
         return try {
             namedParameterJdbcTemplate.query(
                 "SELECT sum(tapte_dagsverk) as tapte_dagsverk, sum(mulige_dagsverk) as mulige_dagsverk, sum(antall_personer) as antall_personer, arstall, kvartal "
@@ -36,7 +23,7 @@ class KvartalsvisSykefraværRepository(
                         + "group by arstall, kvartal "
                         + "ORDER BY arstall, kvartal ",
                 MapSqlParameterSource()
-                    .addValue("naringKoder", bransje.identifikatorer)
+                        .addValue("naringKoder", bransje.identifikatorer)
             ) { rs: ResultSet, _: Int -> mapTilKvartalsvisSykefraværprosent(rs) }
         } catch (e: EmptyResultDataAccessException) {
             emptyList()

@@ -31,6 +31,7 @@ internal class EksporteringBransjeServiceTest {
             sykefraværStatistikkSektorRepository = mock(),
             sykefravarStatistikkVirksomhetRepository = mock(),
             sykefravarStatistikkVirksomhetGraderingRepository = mock(),
+            sykefraværStatistikkNæringRepository = mock(),
             kafkaClient = kafkaClientMock,
         )
 

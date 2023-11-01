@@ -57,18 +57,6 @@ class StatistikkRepository(
         }
     }
 
-    fun importSykefraværsstatistikkNæring(
-        sykefraværsstatistikkForNæring: List<SykefraværsstatistikkForNæring>,
-        årstallOgKvartal: ÅrstallOgKvartal
-    ): SlettOgOpprettResultat {
-        val sykefraværsstatistikkNæringUtils = SykefraværsstatistikkNæringUtils(
-            namedParameterJdbcTemplate
-        )
-        return importStatistikk(
-            "næring", sykefraværsstatistikkForNæring, årstallOgKvartal, sykefraværsstatistikkNæringUtils
-        )
-    }
-
     fun importSykefraværsstatistikkNæring5siffer(
         sykefraværsstatistikkForNæring: List<SykefraværsstatistikkForNæring>,
         årstallOgKvartal: ÅrstallOgKvartal

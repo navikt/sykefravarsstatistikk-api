@@ -9,6 +9,7 @@ class VirksomhetMetadataMedNæringskode(
     private val årstallOgKvartal: ÅrstallOgKvartal,
     private val næringskode: Næringskode
 ) {
+
     fun getOrgnr(): String {
         return orgnr.verdi
     }
