@@ -6,6 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.N�
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import org.jetbrains.exposed.sql.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.jdbc.core.RowMapper
@@ -18,33 +19,32 @@ import java.sql.ResultSet
 @Component
 open class VirksomhetMetadataRepository(
     @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
-) {
+    override val database: Database,
+) : UsingExposed, Table("virksomhet_metadata") {
+    private val orgnr = text("orgnr")
+    private val navn = text("navn")
+    private val rectype = varchar("rectype", 1)
+    private val sektor = text("sektor")
+    private val primærnæring = varchar("primarnaring", 2)
+    private val primærnæringskode = varchar("primarnaringskode", 5)
+    private val arstall = integer("arstall")
+    private val kvartal = integer("kvartal")
+
     private val log = LoggerFactory.getLogger(this::class.java)
 
     open fun opprettVirksomhetMetadata(virksomhetMetadata: List<VirksomhetMetadata>): Int {
-        val m = virksomhetMetadata.map {
-            mapOf(
-                "orgnr" to it.orgnr,
-                "navn" to it.navn,
-                "rectype" to it.rectype,
-                "sektor" to it.sektor.sektorkode,
-                "primærnæring" to it.primærnæring,
-                "primærnæringskode" to it.primærnæringskode,
-                "årstall" to it.årstall,
-                "kvartal" to it.kvartal,
-            )
+        return transaction {
+            batchInsert(virksomhetMetadata, shouldReturnGeneratedValues = false) {
+                this[orgnr] = it.orgnr
+                this[navn] = it.navn
+                this[rectype] = it.rectype
+                this[sektor] = it.sektor.sektorkode
+                this[primærnæring] = it.primærnæring
+                this[primærnæringskode] = it.primærnæringskode
+                this[arstall] = it.årstall
+                this[kvartal] = it.kvartal
+            }.count()
         }
-        val batch = SqlParameterSourceUtils.createBatch(m)
-        val results = namedParameterJdbcTemplate.batchUpdate(
-            """
-                |insert into virksomhet_metadata
-                |    (orgnr, navn, rectype, sektor, primarnaring, primarnaringskode, arstall, kvartal)
-                |values
-                |    (:orgnr, :navn, :rectype, :sektor, :primærnæring, :primærnæringskode, :årstall, :kvartal)
-            """.trimMargin(),
-            batch,
-        )
-        return results.sum()
     }
 
     @Deprecated("Brukes kun av legacy Kafka-strøm, som skal fases ut.")
@@ -85,26 +85,29 @@ open class VirksomhetMetadataRepository(
         return assemble(virksomhetMetadata, næringOgNæringskode5siffer)
     }
 
-     open fun hentVirksomhetMetadata(årstallOgKvartal: ÅrstallOgKvartal): MutableList<VirksomhetMetadata> {
-        val paramSource = MapSqlParameterSource()
-            .addValue("årstall", årstallOgKvartal.årstall)
-            .addValue("kvartal", årstallOgKvartal.kvartal)
-        log.info("Henter data fra 'virksomhet_metadata' for $årstallOgKvartal ...")
-        val virksomhetMetadata = namedParameterJdbcTemplate.query(
-            """
-                |select orgnr, navn, rectype, sektor, primarnaring, primarnaringskode, arstall, kvartal
-                |from virksomhet_metadata
-                |where arstall = :årstall and kvartal = :kvartal
-                """.trimMargin(),
-            paramSource,
-            virksomhetMetadataRowMapper(),
-        )
-        log.info("Datauthenting fra 'virksomhet_metadata' ferdig.")
-        return virksomhetMetadata
+    open fun hentVirksomhetMetadata(årstallOgKvartal: ÅrstallOgKvartal): List<VirksomhetMetadata> {
+        return transaction {
+            select {
+                (arstall eq årstallOgKvartal.årstall) and (kvartal eq årstallOgKvartal.kvartal)
+            }.map {
+                VirksomhetMetadata(
+                    Orgnr(it[orgnr]),
+                    it[navn],
+                    it[rectype],
+                    Sektor.fraSektorkode(it[sektor])!!,
+                    it[primærnæring],
+                    it[primærnæringskode],
+                    ÅrstallOgKvartal(
+                        it[arstall], it[kvartal]
+                    )
+                )
+            }
+        }
     }
 
-    open fun slettVirksomhetMetadata(): Int =
-        namedParameterJdbcTemplate.update("delete from virksomhet_metadata", MapSqlParameterSource())
+    open fun slettVirksomhetMetadata(): Int = transaction {
+        deleteAll()
+    }
 
     @Deprecated("Brukes kun av legacy Kafka-strøm, som skal fases ut.")
     open fun slettNæringOgNæringskode5siffer(): Int =
@@ -131,20 +134,6 @@ open class VirksomhetMetadataRepository(
         Pair(
             Orgnr(resultSet.getString("orgnr")),
             Næringskode(resultSet.getString("naring_kode_5siffer"))
-        )
-    }
-
-    private fun virksomhetMetadataRowMapper() = RowMapper { resultSet: ResultSet, _: Int ->
-        VirksomhetMetadata(
-            Orgnr(resultSet.getString("orgnr")),
-            resultSet.getString("navn"),
-            resultSet.getString("rectype"),
-            Sektor.fraSektorkode(resultSet.getString("sektor"))!!,
-            resultSet.getString("primarnaring"),
-            resultSet.getString("primarnaringskode"),
-            ÅrstallOgKvartal(
-                resultSet.getInt("arstall"), resultSet.getInt("kvartal")
-            )
         )
     }
 }

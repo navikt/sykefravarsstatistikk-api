@@ -69,7 +69,6 @@ object TestUtils {
 
 
     fun slettAllEksportDataFraDatabase(jdbcTemplate: NamedParameterJdbcTemplate) {
-        jdbcTemplate.update("delete from virksomhet_metadata", MapSqlParameterSource())
         jdbcTemplate.update("delete from eksport_per_kvartal", MapSqlParameterSource())
         jdbcTemplate.update("delete from kafka_utsending_historikk", MapSqlParameterSource())
         jdbcTemplate.update(
