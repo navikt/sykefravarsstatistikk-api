@@ -10,6 +10,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Å
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Orgenhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.fjernDupliserteOrgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.LegacyEksporteringRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.LegacyVirksomhetMetadataRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkRepository
@@ -24,6 +25,7 @@ class VirksomhetMetadataService(
     private val legacyEksporteringRepository: LegacyEksporteringRepository,
     private val kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository,
     private val sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
+    private val legacyVirksomhetMetadataRepository: LegacyVirksomhetMetadataRepository,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -57,7 +59,10 @@ class VirksomhetMetadataService(
     object ForrigeEksportIkkeFerdig
 
     @Deprecated("Brukes bare av legacy Kafka-strøm, som skal fases ut.")
-    fun forberedNesteEksport(årstallOgKvartal: ÅrstallOgKvartal, slettHistorikk: Boolean): Either<ForrigeEksportIkkeFerdig, Int> {
+    fun forberedNesteEksport(
+        årstallOgKvartal: ÅrstallOgKvartal,
+        slettHistorikk: Boolean
+    ): Either<ForrigeEksportIkkeFerdig, Int> {
         log.info("Forberede neste eksport: prosessen starter.")
         if (slettHistorikk) {
             val slettUtsendingHistorikkStart = System.currentTimeMillis()
@@ -92,7 +97,10 @@ class VirksomhetMetadataService(
             "Slettet '{}' rader fra forrige eksportering.",
             antallSlettetEksportertPerKvartal
         )
-        val virksomhetMetadata = virksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(årstallOgKvartal)
+        val virksomhetMetadata =
+            legacyVirksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(
+                årstallOgKvartal
+            )
         val virksomhetEksportPerKvartalListe = mapToVirksomhetEksportPerKvartal(virksomhetMetadata)
         log.info(
             "Skal gjøre klar '{}' virksomheter til neste eksportering. ",
@@ -151,11 +159,11 @@ class VirksomhetMetadataService(
             )
             return 0
         }
-        val antallSlettetNæringskode5Siffer = virksomhetMetadataRepository.slettNæringOgNæringskode5siffer()
+        val antallSlettetNæringskode5Siffer = legacyVirksomhetMetadataRepository.slettNæringOgNæringskode5siffer()
         log.info(
             "Slettet '{}' eksisterende NæringOgNæringskode5siffer. ", antallSlettetNæringskode5Siffer
         )
-        val antallOpprettet = virksomhetMetadataRepository.opprettVirksomhetMetadataNæringskode5siffer(
+        val antallOpprettet = legacyVirksomhetMetadataRepository.opprettVirksomhetMetadataNæringskode5siffer(
             virksomhetMetadataNæringskode5siffer
         )
         log.info(

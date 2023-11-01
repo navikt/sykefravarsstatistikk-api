@@ -20,13 +20,13 @@ import java.util.function.Consumer
 @Deprecated("Brukes bare av legacy Kafka-strøm, som skal fases ut.")
 class EksporteringService(
     private val legacyEksporteringRepository: LegacyEksporteringRepository,
-    private val virksomhetMetadataRepository: VirksomhetMetadataRepository,
     private val sykefraværsstatistikkTilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository,
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
     private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
     private val kafkaClient: KafkaClient,
     private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
     private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository,
+    private val legacyVirksomhetMetadataRepository: LegacyVirksomhetMetadataRepository,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -76,7 +76,7 @@ class EksporteringService(
 
     @Throws(KafkaUtsendingException::class)
     @Deprecated("Brukes bare av legacy Kafka-strøm, som skal fases ut.")
-    protected fun legacyEksporter(
+    private fun legacyEksporter(
         virksomheterTilEksport: List<VirksomhetEksportPerKvartal>, årstallOgKvartal: ÅrstallOgKvartal
     ): Int {
         val startEksportering = System.currentTimeMillis()
@@ -84,7 +84,9 @@ class EksporteringService(
             virksomheterTilEksport.size, KafkaTopic.SYKEFRAVARSSTATISTIKK_V1
         )
         val virksomhetMetadataListe =
-            virksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(årstallOgKvartal)
+            legacyVirksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(
+                årstallOgKvartal
+            )
         val umaskertSykefraværsstatistikkSistePublisertKvartalLand =
             sykefraværStatistikkLandRepository.hentForKvartaler(listOf(årstallOgKvartal))
         val sykefraværsstatistikkSektor =

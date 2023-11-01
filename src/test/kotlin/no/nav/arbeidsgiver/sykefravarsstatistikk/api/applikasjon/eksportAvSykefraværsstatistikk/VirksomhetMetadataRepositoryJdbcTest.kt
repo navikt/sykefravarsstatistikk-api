@@ -7,6 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.N�
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.LegacyVirksomhetMetadataRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.assertj.core.api.Assertions
@@ -38,6 +39,10 @@ open class VirksomhetMetadataRepositoryJdbcTest {
 
     @Autowired
     private lateinit var repository: VirksomhetMetadataRepository
+
+    @Autowired
+    private lateinit var legacyVirksomhetMetadataRepository: LegacyVirksomhetMetadataRepository
+
     @BeforeEach
     fun setUp() {
         repository.slettVirksomhetMetadata()
@@ -46,7 +51,7 @@ open class VirksomhetMetadataRepositoryJdbcTest {
     @Test
     fun slettNæringOgNæringskode5siffer__sletter_VirksomhetMetaData() {
         opprettTestVirksomhetMetaData(2020, 3)
-        val antallSlettet = repository.slettNæringOgNæringskode5siffer()
+        val antallSlettet = legacyVirksomhetMetadataRepository.slettNæringOgNæringskode5siffer()
         Assertions.assertThat(antallSlettet).isEqualTo(2)
     }
 
@@ -69,7 +74,7 @@ open class VirksomhetMetadataRepositoryJdbcTest {
             ÅrstallOgKvartal(2020, 3),
             Næringskode("10002")
         )
-        repository.opprettVirksomhetMetadataNæringskode5siffer(
+        legacyVirksomhetMetadataRepository.opprettVirksomhetMetadataNæringskode5siffer(
             listOf(
                 virksomhetMetadataMedNæringskode1, virksomhetMetadataMedNæringskode2
             )
@@ -110,14 +115,24 @@ open class VirksomhetMetadataRepositoryJdbcTest {
     @Test
     fun hentVirksomhetMetadata_returnerer_riktige_metdata_for_en_gitt_årstall_og_kvartal() {
         opprettTestVirksomhetMetaData(2020, 2)
-        val results = repository.hentVirksomhetMetadataMedNæringskoder(ÅrstallOgKvartal(2019, 2))
+        val results = legacyVirksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(
+            ÅrstallOgKvartal(
+                2019,
+                2
+            )
+        )
         Assertions.assertThat(results.size).isEqualTo(0)
     }
 
     @Test
     fun hentVirksomhetMetadata_returnerer_riktige_metdata() {
         opprettTestVirksomhetMetaData(2020, 3)
-        val results = repository.hentVirksomhetMetadataMedNæringskoder(ÅrstallOgKvartal(2020, 3))
+        val results = legacyVirksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(
+            ÅrstallOgKvartal(
+                2020,
+                3
+            )
+        )
         Assertions.assertThat(results.size).isEqualTo(3)
         val virksomhetMetadataVirksomhet1 =
             results.stream().filter { r: VirksomhetMetadata -> ORGNR_VIRKSOMHET_1 == r.orgnr }
@@ -145,35 +160,37 @@ open class VirksomhetMetadataRepositoryJdbcTest {
     }
 
     private fun opprettTestVirksomhetMetaData(årstall: Int, kvartal: Int) {
-        repository.opprettVirksomhetMetadata(listOf(
-            VirksomhetMetadata(
-                Orgnr(ORGNR_VIRKSOMHET_1),
-                "Virksomhet 1",
-                "2",
-                Sektor.PRIVAT,
-                "71",
-                "71000",
-                ÅrstallOgKvartal(årstall, kvartal)
-            ),
-            VirksomhetMetadata(
-                Orgnr(ORGNR_VIRKSOMHET_2),
-                "Virksomhet 2",
-                "2",
-                Sektor.PRIVAT,
-                "10",
-                "10000",
-                ÅrstallOgKvartal(årstall, kvartal)
-            ),
-            VirksomhetMetadata(
-                Orgnr(ORGNR_VIRKSOMHET_3),
-                "Virksomhet 3",
-                "2",
-                Sektor.PRIVAT,
-                "10",
-                "10000",
-                ÅrstallOgKvartal(årstall, kvartal)
+        repository.opprettVirksomhetMetadata(
+            listOf(
+                VirksomhetMetadata(
+                    Orgnr(ORGNR_VIRKSOMHET_1),
+                    "Virksomhet 1",
+                    "2",
+                    Sektor.PRIVAT,
+                    "71",
+                    "71000",
+                    ÅrstallOgKvartal(årstall, kvartal)
+                ),
+                VirksomhetMetadata(
+                    Orgnr(ORGNR_VIRKSOMHET_2),
+                    "Virksomhet 2",
+                    "2",
+                    Sektor.PRIVAT,
+                    "10",
+                    "10000",
+                    ÅrstallOgKvartal(årstall, kvartal)
+                ),
+                VirksomhetMetadata(
+                    Orgnr(ORGNR_VIRKSOMHET_3),
+                    "Virksomhet 3",
+                    "2",
+                    Sektor.PRIVAT,
+                    "10",
+                    "10000",
+                    ÅrstallOgKvartal(årstall, kvartal)
+                )
             )
-        ))
+        )
         namedParameterJdbcTemplate.update(
             "insert into virksomhet_metadata_naring_kode_5siffer (orgnr, naring_kode, naring_kode_5siffer, arstall, kvartal) "
                     + "VALUES (:orgnr, :naring_kode, :naring_kode_5siffer, :årstall, :kvartal)",

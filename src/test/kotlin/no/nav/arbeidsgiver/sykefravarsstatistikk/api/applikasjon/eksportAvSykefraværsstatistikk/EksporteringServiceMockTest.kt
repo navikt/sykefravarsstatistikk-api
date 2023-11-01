@@ -40,8 +40,6 @@ import org.mockito.kotlin.whenever
 class EksporteringServiceMockTest {
     private val legacyEksporteringRepository: LegacyEksporteringRepository = mock()
 
-    private val virksomhetMetadataRepository: VirksomhetMetadataRepository = mock()
-
     private val sykefraværsstatistikkTilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository = mock()
 
     private val kafkaClient: KafkaClient = mock()
@@ -50,15 +48,16 @@ class EksporteringServiceMockTest {
 
     private val sykefravarStatistikkVirksomhetRepository = mock<SykefravarStatistikkVirksomhetRepository>()
     private val sykefraværStatistikkNæringRepository = mock<SykefraværStatistikkNæringRepository>()
+    private val legacyVirksomhetMetadataRepository = mock<LegacyVirksomhetMetadataRepository>()
     private val service: EksporteringService = EksporteringService(
         legacyEksporteringRepository,
-        virksomhetMetadataRepository,
         sykefraværsstatistikkTilEksporteringRepository,
         sykefraværStatistikkLandRepository,
         sykefraværStatistikkSektorRepository,
         kafkaClient,
         sykefravarStatistikkVirksomhetRepository,
         sykefraværStatistikkNæringRepository,
+        legacyVirksomhetMetadataRepository
     )
 
     val årstallOgKvartalArgumentCaptor: KArgumentCaptor<ÅrstallOgKvartal> = argumentCaptor<ÅrstallOgKvartal>()
@@ -100,7 +99,7 @@ class EksporteringServiceMockTest {
         )
         val fraÅrstallOgKvartal: ÅrstallOgKvartal = __2020_2.minusKvartaler(3)
         whenever(
-            virksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(
+            legacyVirksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(
                 __2020_2
             )
         ).thenReturn(listOf(virksomhetMetadata))
@@ -175,7 +174,11 @@ class EksporteringServiceMockTest {
                 __2020_2
             )
         ).thenReturn(listOf(virksomhetEksportPerKvartal))
-        whenever(virksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(årstallOgKvartal)).thenReturn(
+        whenever(
+            legacyVirksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(
+                årstallOgKvartal
+            )
+        ).thenReturn(
             listOf(
                 virksomhet1_TilHørerBransjeMetadata
             )

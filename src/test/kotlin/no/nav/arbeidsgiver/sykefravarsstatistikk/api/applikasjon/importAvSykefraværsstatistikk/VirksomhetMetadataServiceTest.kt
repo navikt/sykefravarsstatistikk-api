@@ -9,6 +9,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Se
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Orgenhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.LegacyEksporteringRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.LegacyVirksomhetMetadataRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
@@ -30,13 +31,16 @@ internal class VirksomhetMetadataServiceTest {
     private val legacyEksporteringRepository: LegacyEksporteringRepository = mock()
 
     private val kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository = mock()
-    private val sykefravarStatistikkVirksomhetGraderingRepository = mock<SykefravarStatistikkVirksomhetGraderingRepository>()
+    private val sykefravarStatistikkVirksomhetGraderingRepository =
+        mock<SykefravarStatistikkVirksomhetGraderingRepository>()
+    val legacyVirksomhetMetadataRepository = mock<LegacyVirksomhetMetadataRepository>()
     private var service: VirksomhetMetadataService = VirksomhetMetadataService(
         datavarehusRepository,
         virksomhetMetadataRepository,
         legacyEksporteringRepository,
         kafkaUtsendingHistorikkRepository,
         sykefravarStatistikkVirksomhetGraderingRepository,
+        legacyVirksomhetMetadataRepository,
     )
     private val __2020_4 = ÅrstallOgKvartal(2020, 4)
 
@@ -56,7 +60,11 @@ internal class VirksomhetMetadataServiceTest {
     private fun mockForberedNesteEksport(
         årstallOgKvartal: ÅrstallOgKvartal, virksomhetMetadataListe: List<VirksomhetMetadata>
     ) {
-        whenever(virksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(årstallOgKvartal))
+        whenever(
+            legacyVirksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(
+                årstallOgKvartal
+            )
+        )
             .thenReturn(virksomhetMetadataListe)
         whenever(legacyEksporteringRepository.opprettEksport(ArgumentMatchers.any()))
             .thenReturn(virksomhetMetadataListe.size)
@@ -80,7 +88,8 @@ internal class VirksomhetMetadataServiceTest {
             )
         )
             .thenReturn(virksomhetMetadataMedNæringskodeListe)
-        whenever(virksomhetMetadataRepository.opprettVirksomhetMetadataNæringskode5siffer(any()))
+
+        whenever(legacyVirksomhetMetadataRepository.opprettVirksomhetMetadataNæringskode5siffer(any()))
             .thenReturn(virksomhetMetadataMedNæringskodeListe.size)
     }
 
