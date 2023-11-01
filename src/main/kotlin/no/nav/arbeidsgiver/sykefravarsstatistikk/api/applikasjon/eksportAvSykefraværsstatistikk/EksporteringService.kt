@@ -19,7 +19,7 @@ import java.util.function.Consumer
 @Component
 @Deprecated("Brukes bare av legacy Kafka-strøm, som skal fases ut.")
 class EksporteringService(
-    private val eksporteringRepository: EksporteringRepository,
+    private val legacyEksporteringRepository: LegacyEksporteringRepository,
     private val virksomhetMetadataRepository: VirksomhetMetadataRepository,
     private val sykefraværsstatistikkTilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository,
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
@@ -34,8 +34,8 @@ class EksporteringService(
     fun legacyEksporter(
         årstallOgKvartal: ÅrstallOgKvartal,
     ): Either<LegacyEksportFeil, Int> {
-        val virksomheterTilEksport = EksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal(
-            årstallOgKvartal, eksporteringRepository
+        val virksomheterTilEksport = LegacyEksporteringServiceUtils.getListeAvVirksomhetEksportPerKvartal(
+            årstallOgKvartal, legacyEksporteringRepository
         )
         val antallStatistikkSomSkalEksporteres =
             if (virksomheterTilEksport.isEmpty()) 0 else virksomheterTilEksport.size
@@ -99,21 +99,21 @@ class EksporteringService(
             )
         val sykefraværsstatistikkVirksomhetUtenVarighet =
             sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(listOf(årstallOgKvartal))
-        val umaskertSykefraværForEttKvartal = EksporteringServiceUtils.hentSisteKvartalIBeregningen(
+        val umaskertSykefraværForEttKvartal = LegacyEksporteringServiceUtils.hentSisteKvartalIBeregningen(
             umaskertSykefraværsstatistikkSistePublisertKvartalLand, årstallOgKvartal
         )
-        val landSykefravær = EksporteringServiceUtils.getSykefraværMedKategoriForLand(
+        val landSykefravær = LegacyEksporteringServiceUtils.getSykefraværMedKategoriForLand(
             årstallOgKvartal,
-            EksporteringServiceUtils.mapToSykefraværsstatistikkLand(
+            LegacyEksporteringServiceUtils.mapToSykefraværsstatistikkLand(
                 umaskertSykefraværForEttKvartal!!
             )
         )
-        val virksomhetMetadataMap = EksporteringServiceUtils.getVirksomhetMetadataHashMap(virksomhetMetadataListe)
-        val subsets = Lists.partition(virksomheterTilEksport, EksporteringServiceUtils.EKSPORT_BATCH_STØRRELSE)
+        val virksomhetMetadataMap = LegacyEksporteringServiceUtils.getVirksomhetMetadataHashMap(virksomhetMetadataListe)
+        val subsets = Lists.partition(virksomheterTilEksport, LegacyEksporteringServiceUtils.EKSPORT_BATCH_STØRRELSE)
         val antallEksportert = AtomicInteger()
         subsets.forEach { subset: List<VirksomhetEksportPerKvartal> ->
             val virksomheterMetadataIDenneSubset =
-                EksporteringServiceUtils.getVirksomheterMetadataFraSubset(virksomhetMetadataMap, subset)
+                LegacyEksporteringServiceUtils.getVirksomheterMetadataFraSubset(virksomhetMetadataMap, subset)
             log.info(
                 "Starter utsending av '{}' statistikk meldinger (fra '{}' virksomheter)",
                 virksomheterMetadataIDenneSubset.size,
@@ -161,8 +161,8 @@ class EksporteringService(
         val antallSentTilEksport = AtomicInteger()
         val antallVirksomheterLagretSomEksportertIDb = AtomicInteger()
         val eksporterteVirksomheterListe: MutableList<String> = ArrayList()
-        val sykefraværsstatistikkVirksomhetForEttKvartalUtenVarighetMap = EksporteringServiceUtils.toMap(
-            EksporteringServiceUtils.filterByKvartal(
+        val sykefraværsstatistikkVirksomhetForEttKvartalUtenVarighetMap = LegacyEksporteringServiceUtils.toMap(
+            LegacyEksporteringServiceUtils.filterByKvartal(
                 årstallOgKvartal,
                 sykefraværsstatistikkVirksomhetUtenVarighet
             )
@@ -173,17 +173,17 @@ class EksporteringService(
                 if (virksomhetMetadata != null) {
                     kafkaClient.send(
                         årstallOgKvartal,
-                        EksporteringServiceUtils.getVirksomhetSykefravær(
+                        LegacyEksporteringServiceUtils.getVirksomhetSykefravær(
                             virksomhetMetadata,
                             sykefraværsstatistikkVirksomhetForEttKvartalUtenVarighetMap
                         ),
-                        EksporteringServiceUtils.getSykefraværMedKategoriForNæring5Siffer(
+                        LegacyEksporteringServiceUtils.getSykefraværMedKategoriForNæring5Siffer(
                             virksomhetMetadata, sykefraværsstatistikkForNæringskode
                         ),
-                        EksporteringServiceUtils.getSykefraværMedKategoriNæringForVirksomhet(
+                        LegacyEksporteringServiceUtils.getSykefraværMedKategoriNæringForVirksomhet(
                             virksomhetMetadata, sykefraværsstatistikkForNæring
                         ),
-                        EksporteringServiceUtils.getSykefraværMedKategoriForSektor(
+                        LegacyEksporteringServiceUtils.getSykefraværMedKategoriForSektor(
                             virksomhetMetadata,
                             sykefraværsstatistikkSektor
                         ),
@@ -195,11 +195,11 @@ class EksporteringService(
                         startUtsendingProcess, stopUtsendingProcess
                     )
                     val antallVirksomhetertLagretSomEksportert =
-                        EksporteringServiceUtils.leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
+                        LegacyEksporteringServiceUtils.leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
                             virksomhetMetadata.orgnr,
                             årstallOgKvartal,
                             eksporterteVirksomheterListe,
-                            eksporteringRepository,
+                            legacyEksporteringRepository,
                             kafkaClient
                         )
                     antallVirksomheterLagretSomEksportertIDb.addAndGet(
@@ -207,12 +207,12 @@ class EksporteringService(
                     )
                 }
             })
-        val antallRestendeOppdatert = EksporteringServiceUtils.lagreEksporterteVirksomheterOgNullstillLista(
-            årstallOgKvartal, eksporterteVirksomheterListe, eksporteringRepository, kafkaClient
+        val antallRestendeOppdatert = LegacyEksporteringServiceUtils.lagreEksporterteVirksomheterOgNullstillLista(
+            årstallOgKvartal, eksporterteVirksomheterListe, legacyEksporteringRepository, kafkaClient
         )
         antallVirksomheterLagretSomEksportertIDb.addAndGet(antallRestendeOppdatert)
         val eksportertHittilNå = antallEksportert.addAndGet(antallSentTilEksport.get())
-        EksporteringServiceUtils.cleanUpEtterBatch(eksporteringRepository)
+        LegacyEksporteringServiceUtils.cleanUpEtterBatch(legacyEksporteringRepository)
         log.info(
             String.format(
                 "Eksportert '%d' rader av '%d' totalt ('%d' oppdatert i DB)",

@@ -8,7 +8,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Or
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Orgenhet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.LegacyEksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
@@ -27,14 +27,14 @@ internal class VirksomhetMetadataServiceTest {
 
     private val virksomhetMetadataRepository: VirksomhetMetadataRepository = mock()
 
-    private val eksporteringRepository: EksporteringRepository = mock()
+    private val legacyEksporteringRepository: LegacyEksporteringRepository = mock()
 
     private val kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository = mock()
     private val sykefravarStatistikkVirksomhetGraderingRepository = mock<SykefravarStatistikkVirksomhetGraderingRepository>()
     private var service: VirksomhetMetadataService = VirksomhetMetadataService(
         datavarehusRepository,
         virksomhetMetadataRepository,
-        eksporteringRepository,
+        legacyEksporteringRepository,
         kafkaUtsendingHistorikkRepository,
         sykefravarStatistikkVirksomhetGraderingRepository,
     )
@@ -58,7 +58,7 @@ internal class VirksomhetMetadataServiceTest {
     ) {
         whenever(virksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(årstallOgKvartal))
             .thenReturn(virksomhetMetadataListe)
-        whenever(eksporteringRepository.opprettEksport(ArgumentMatchers.any()))
+        whenever(legacyEksporteringRepository.opprettEksport(ArgumentMatchers.any()))
             .thenReturn(virksomhetMetadataListe.size)
     }
 

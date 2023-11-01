@@ -17,7 +17,7 @@ import java.sql.ResultSet
 
 @Component
 open class VirksomhetMetadataRepository(
-    @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate
+    @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -47,6 +47,7 @@ open class VirksomhetMetadataRepository(
         return results.sum()
     }
 
+    @Deprecated("Brukes kun av legacy Kafka-strøm, som skal fases ut.")
     open fun opprettVirksomhetMetadataNæringskode5siffer(
         virksomhetMetadataMedNæringskode: List<VirksomhetMetadataMedNæringskode>
     ): Int {
@@ -63,6 +64,7 @@ open class VirksomhetMetadataRepository(
         return results.sum()
     }
 
+    @Deprecated("Brukes kun av legacy Kafka-strøm, som skal fases ut.")
     open fun hentVirksomhetMetadataMedNæringskoder(årstallOgKvartal: ÅrstallOgKvartal): List<VirksomhetMetadata> {
         val virksomhetMetadata = hentVirksomhetMetadata(årstallOgKvartal)
 
@@ -104,6 +106,7 @@ open class VirksomhetMetadataRepository(
     open fun slettVirksomhetMetadata(): Int =
         namedParameterJdbcTemplate.update("delete from virksomhet_metadata", MapSqlParameterSource())
 
+    @Deprecated("Brukes kun av legacy Kafka-strøm, som skal fases ut.")
     open fun slettNæringOgNæringskode5siffer(): Int =
         namedParameterJdbcTemplate.update(
             "delete from virksomhet_metadata_naring_kode_5siffer", MapSqlParameterSource()

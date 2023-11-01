@@ -38,7 +38,7 @@ import org.mockito.kotlin.whenever
 
 @ExtendWith(MockitoExtension::class)
 class EksporteringServiceMockTest {
-    private val eksporteringRepository: EksporteringRepository = mock()
+    private val legacyEksporteringRepository: LegacyEksporteringRepository = mock()
 
     private val virksomhetMetadataRepository: VirksomhetMetadataRepository = mock()
 
@@ -51,7 +51,7 @@ class EksporteringServiceMockTest {
     private val sykefravarStatistikkVirksomhetRepository = mock<SykefravarStatistikkVirksomhetRepository>()
     private val sykefraværStatistikkNæringRepository = mock<SykefraværStatistikkNæringRepository>()
     private val service: EksporteringService = EksporteringService(
-        eksporteringRepository,
+        legacyEksporteringRepository,
         virksomhetMetadataRepository,
         sykefraværsstatistikkTilEksporteringRepository,
         sykefraværStatistikkLandRepository,
@@ -78,7 +78,7 @@ class EksporteringServiceMockTest {
     @Test
     fun eksporter_returnerer_feil_når_det_ikke_finnes_statistikk() {
         whenever(
-            eksporteringRepository.hentVirksomhetEksportPerKvartal(
+            legacyEksporteringRepository.hentVirksomhetEksportPerKvartal(
                 __2020_2
             )
         ).thenReturn(emptyList())
@@ -89,7 +89,7 @@ class EksporteringServiceMockTest {
     @Test
     fun eksporter_sender_riktig_melding_til_kafka_og_returnerer_antall_meldinger_sendt() {
         whenever(
-            eksporteringRepository.hentVirksomhetEksportPerKvartal(
+            legacyEksporteringRepository.hentVirksomhetEksportPerKvartal(
                 __2020_2
             )
         ).thenReturn(listOf(virksomhetEksportPerKvartal))
@@ -171,7 +171,7 @@ class EksporteringServiceMockTest {
             )
         )
         whenever(
-            eksporteringRepository.hentVirksomhetEksportPerKvartal(
+            legacyEksporteringRepository.hentVirksomhetEksportPerKvartal(
                 __2020_2
             )
         ).thenReturn(listOf(virksomhetEksportPerKvartal))
