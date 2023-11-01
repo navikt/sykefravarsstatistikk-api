@@ -63,7 +63,7 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
         }
     }
 
-    fun hentVirksomhetMetadataNæringskode5Siffer(
+    fun hentVirksomhetMetadataMedNæringskode(
         årstallOgKvartal: ÅrstallOgKvartal
     ): List<VirksomhetMetadataMedNæringskode> {
         return transaction {

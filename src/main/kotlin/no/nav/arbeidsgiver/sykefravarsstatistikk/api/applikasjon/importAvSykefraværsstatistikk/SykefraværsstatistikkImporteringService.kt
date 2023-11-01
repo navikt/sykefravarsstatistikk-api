@@ -1,10 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkNæringskodeRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.SlettOgOpprettResultat
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Statistikkilde
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.StatistikkildeDvh
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
@@ -15,13 +15,14 @@ import org.springframework.stereotype.Component
 @Component
 class SykefraværsstatistikkImporteringService(
     private val statistikkRepository: StatistikkRepository,
-    private val statistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
+    private val sykefraværStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
     private val datavarehusRepository: DatavarehusRepository,
     private val importtidspunktRepository: ImporttidspunktRepository,
     private val sykefraværsstatistikkLandRepository: SykefraværStatistikkLandRepository,
     private val sykefraværStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
     private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
     private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository,
+    private val sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository,
 
     private val environment: Environment,
 ) {
@@ -32,10 +33,8 @@ class SykefraværsstatistikkImporteringService(
             sykefraværsstatistikkLandRepository.hentNyesteKvartal(),
             sykefraværStatistikkSektorRepository.hentNyesteKvartal(),
             sykefraværStatistikkNæringRepository.hentNyesteKvartal(),
-            statistikkRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
-                Statistikkilde.NÆRING_5_SIFFER
-            ),
-            statistikkVirksomhetRepository.hentNyesteKvartal()
+            sykefraværStatistikkNæringskodeRepository.hentNyesteKvartal(),
+            sykefraværStatistikkVirksomhetRepository.hentNyesteKvartal()
         )
         val årstallOgKvartalForDvh = listOf(
             datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
@@ -170,10 +169,14 @@ class SykefraværsstatistikkImporteringService(
     private fun importSykefraværsstatistikkNæring5siffer(
         årstallOgKvartal: ÅrstallOgKvartal
     ): SlettOgOpprettResultat {
-        val sykefraværsstatistikkNæring = datavarehusRepository.hentSykefraværsstatistikkNæring5siffer(årstallOgKvartal)
-        val resultat = statistikkRepository.importSykefraværsstatistikkNæring5siffer(
-            sykefraværsstatistikkNæring, årstallOgKvartal
-        )
+        val sykefraværsstatistikkNæringskode =
+            datavarehusRepository.hentSykefraværsstatistikkNæring5siffer(årstallOgKvartal)
+
+        val antallSlettet = sykefraværStatistikkNæringskodeRepository.slettKvartal(årstallOgKvartal)
+        val antallOpprettet = sykefraværStatistikkNæringskodeRepository.settInn(sykefraværsstatistikkNæringskode)
+
+        val resultat = SlettOgOpprettResultat(antallSlettet, antallOpprettet)
+
         loggResultat(årstallOgKvartal, resultat, "næring5siffer")
         return resultat
     }
@@ -184,8 +187,8 @@ class SykefraværsstatistikkImporteringService(
         } else {
             SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhet(årstallOgKvartal)
         }
-        val antallSlettet = statistikkVirksomhetRepository.slettForKvartal(årstallOgKvartal)
-        val antallSattInn = statistikkVirksomhetRepository.settInn(statistikk)
+        val antallSlettet = sykefraværStatistikkVirksomhetRepository.slettForKvartal(årstallOgKvartal)
+        val antallSattInn = sykefraværStatistikkVirksomhetRepository.settInn(statistikk)
 
         loggResultat(årstallOgKvartal, SlettOgOpprettResultat(antallSlettet, antallSattInn), "virksomhet")
     }

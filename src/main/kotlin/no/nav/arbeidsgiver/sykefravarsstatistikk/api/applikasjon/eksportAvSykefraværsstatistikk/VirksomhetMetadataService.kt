@@ -150,7 +150,7 @@ class VirksomhetMetadataService(
 
     private fun importVirksomhetNæringskode(årstallOgKvartal: ÅrstallOgKvartal): Int {
         val virksomhetMetadataNæringskode5siffer =
-            sykefravarStatistikkVirksomhetGraderingRepository.hentVirksomhetMetadataNæringskode5Siffer(
+            sykefravarStatistikkVirksomhetGraderingRepository.hentVirksomhetMetadataMedNæringskode(
                 årstallOgKvartal
             )
         if (virksomhetMetadataNæringskode5siffer.isEmpty()) {

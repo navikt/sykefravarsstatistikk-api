@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
 import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
@@ -31,9 +30,6 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
     private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     @Autowired
-    private lateinit var kvartalsvisSykefraværprosentRepository: KvartalsvisSykefraværRepository
-
-    @Autowired
     private lateinit var sykefraværStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
 
     @Autowired
@@ -44,6 +40,9 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
 
     @Autowired
     private lateinit var sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
+
+    @Autowired
+    private lateinit var sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository
 
 
     @BeforeEach
@@ -176,33 +175,48 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
     }
 
     @Test
-    fun hentSykefraværprosentBransje__skal_returnere_riktig_sykefravær() {
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring5siffer "
-                    + "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(Næringskode("87101"), 2019, 2, 10, 5, 100)
+    fun `hentKvartalsvisSykefraværprosent skal returnere riktig sykefravær`() {
+        sykefraværStatistikkNæringskodeRepository.settInn(
+            listOf(
+                SykefraværsstatistikkForNæringskode(
+                    næringkode5siffer = Næringskode("87101").femsifferIdentifikator,
+                    årstall = 2019,
+                    kvartal = 2,
+                    antallPersoner = 10,
+                    tapteDagsverk = 5.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                ),
+                SykefraværsstatistikkForNæringskode(
+                    næringkode5siffer = Næringskode("87101").femsifferIdentifikator,
+                    årstall = 2019,
+                    kvartal = 1,
+                    antallPersoner = 10,
+                    tapteDagsverk = 1.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                ),
+                SykefraværsstatistikkForNæringskode(
+                    næringkode5siffer = Næringskode("87102").femsifferIdentifikator,
+                    årstall = 2019,
+                    kvartal = 1,
+                    antallPersoner = 10,
+                    tapteDagsverk = 7.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                ),
+                SykefraværsstatistikkForNæringskode(
+                    næringkode5siffer = Næringskode("87301").femsifferIdentifikator,
+                    årstall = 2018,
+                    kvartal = 4,
+                    antallPersoner = 10,
+                    tapteDagsverk = 6.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                ),
+            )
         )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring5siffer "
-                    + "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(Næringskode("87101"), 2019, 1, 10, 1, 100)
-        )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring5siffer "
-                    + "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(Næringskode("87102"), 2019, 1, 10, 7, 100)
-        )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring5siffer "
-                    + "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(Næringskode("87301"), 2018, 4, 10, 6, 100)
-        )
-        val sykehjem = Bransje(Bransjer.SYKEHJEM)
-        val resultat = kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentBransje(sykehjem)
+
+        val resultat =
+            sykefraværStatistikkNæringskodeRepository.hentKvartalsvisSykefraværprosent(
+                Bransje(Bransjer.SYKEHJEM).identifikatorer
+            )
         AssertionsForClassTypes.assertThat(resultat.size).isEqualTo(2)
         AssertionsForClassTypes.assertThat(resultat[0])
             .isEqualTo(
@@ -315,38 +329,4 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
             )
     }
 
-    private fun parametre(
-        årstall: Int, kvartal: Int, antallPersoner: Int, tapteDagsverk: Int, muligeDagsverk: Int
-    ): MapSqlParameterSource {
-        return MapSqlParameterSource()
-            .addValue("arstall", årstall)
-            .addValue("kvartal", kvartal)
-            .addValue("antall_personer", antallPersoner)
-            .addValue("tapte_dagsverk", tapteDagsverk)
-            .addValue("mulige_dagsverk", muligeDagsverk)
-    }
-
-    private fun parametre(
-        næringskode: Næringskode,
-        årstall: Int,
-        kvartal: Int,
-        antallPersoner: Int,
-        tapteDagsverk: Int,
-        muligeDagsverk: Int
-    ): MapSqlParameterSource {
-        return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
-            .addValue("naring_kode", næringskode.femsifferIdentifikator)
-    }
-
-    private fun parametre(
-        næring: Næring,
-        årstall: Int,
-        kvartal: Int,
-        antallPersoner: Int,
-        tapteDagsverk: Int,
-        muligeDagsverk: Int
-    ): MapSqlParameterSource {
-        return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
-            .addValue("naring_kode", næring.tosifferIdentifikator)
-    }
 }

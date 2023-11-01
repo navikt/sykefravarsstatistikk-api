@@ -83,7 +83,7 @@ internal class VirksomhetMetadataServiceTest {
         virksomhetMetadataMedNæringskodeListe: List<VirksomhetMetadataMedNæringskode>
     ) {
         whenever(
-            sykefravarStatistikkVirksomhetGraderingRepository.hentVirksomhetMetadataNæringskode5Siffer(
+            sykefravarStatistikkVirksomhetGraderingRepository.hentVirksomhetMetadataMedNæringskode(
                 any<ÅrstallOgKvartal>()
             )
         )

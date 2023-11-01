@@ -39,10 +39,10 @@ class SykefravarStatistikkVirksomhetRepository(
                 .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
                 .map {
                     UmaskertSykefraværForEttKvartal(
-                        ÅrstallOgKvartal(it[årstall], it[kvartal]),
-                        it[tapteDagsverk.sum()]!!.toBigDecimal(),
-                        it[muligeDagsverk.sum()]!!.toBigDecimal(),
-                        it[antallPersoner.sum()]!!
+                        årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                        dagsverkTeller = it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                        dagsverkNevner = it[muligeDagsverk.sum()]!!.toBigDecimal(),
+                        antallPersoner = it[antallPersoner.sum()]!!
                     )
                 }.sorted()
         }

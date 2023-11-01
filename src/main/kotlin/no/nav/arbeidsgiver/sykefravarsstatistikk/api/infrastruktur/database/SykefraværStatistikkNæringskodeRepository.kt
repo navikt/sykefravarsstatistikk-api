@@ -1,0 +1,77 @@
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
+
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværForEttKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkForNæringskode
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.springframework.stereotype.Component
+
+
+@Component
+class SykefraværStatistikkNæringskodeRepository(
+    override val database: Database
+) : UsingExposed, Table("sykefravar_statistikk_naring5siffer") {
+
+    val næringskode = varchar("naring_kode", 5)
+    val årstall = integer("arstall")
+    val kvartal = integer("kvartal")
+    val antallPersoner = integer("antall_personer")
+    val tapteDagsverk = double("tapte_dagsverk")
+    val muligeDagsverk = double("mulige_dagsverk")
+    fun settInn(data: List<SykefraværsstatistikkForNæringskode>): Int {
+        return transaction {
+            batchInsert(data) {
+                this[årstall] = it.årstall
+                this[kvartal] = it.kvartal
+                this[næringskode] = it.næringkode5siffer
+                this[antallPersoner] = it.antallPersoner
+                this[tapteDagsverk] = it.tapteDagsverk.toDouble()
+                this[muligeDagsverk] = it.muligeDagsverk.toDouble()
+            }
+        }.count()
+    }
+
+    fun hentKvartalsvisSykefraværprosent(næringskoder: List<String>): List<SykefraværForEttKvartal> {
+        return transaction {
+            slice(
+                årstall,
+                kvartal,
+                antallPersoner.sum(),
+                tapteDagsverk.sum(),
+                muligeDagsverk.sum()
+            )
+                .select { næringskode inList næringskoder }
+                .groupBy(årstall, kvartal)
+                .orderBy(årstall to SortOrder.ASC)
+                .orderBy(kvartal to SortOrder.ASC)
+                .map {
+                    SykefraværForEttKvartal(
+                        årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                        antallPersoner = it[antallPersoner.sum()]!!,
+                        tapteDagsverk = it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                        muligeDagsverk = it[muligeDagsverk.sum()]!!.toBigDecimal()
+
+                    )
+                }
+        }
+    }
+
+
+    fun hentNyesteKvartal(): ÅrstallOgKvartal {
+        return transaction {
+            selectAll()
+                .orderBy(årstall to SortOrder.DESC)
+                .orderBy(kvartal to SortOrder.DESC)
+                .limit(1)
+                .map { ÅrstallOgKvartal(it[årstall], it[kvartal]) }
+                .first()
+        }
+    }
+
+    fun slettKvartal(årstallOgKvartal: ÅrstallOgKvartal): Int {
+        return transaction {
+            deleteWhere { (årstall eq årstallOgKvartal.årstall) and (kvartal eq årstallOgKvartal.kvartal) }
+        }
+    }
+}

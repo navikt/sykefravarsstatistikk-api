@@ -13,11 +13,11 @@ import java.util.stream.Stream
 
 @Component
 class KvartalsvisSykefraværshistorikkService(
-    private val kvartalsvisSykefraværprosentRepository: KvartalsvisSykefraværRepository,
     private val sykefraværStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
     private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
-    private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
+    private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository,
+    private val sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -41,7 +41,7 @@ class KvartalsvisSykefraværshistorikkService(
                 sektor!!.displaystring
             ),
             if (skalHenteDataPåNæring) uthentingAvSykefraværshistorikkNæring(underenhet) else uthentingMedFeilhåndteringOgTimeout(
-                { hentSykefraværshistorikkBransje(bransje.get()) },
+                { hentSykefraværshistorikkNæringskoder(bransje.get()) },
                 Statistikkategori.BRANSJE,
                 bransje.get().navn
             ),
@@ -101,11 +101,13 @@ class KvartalsvisSykefraværshistorikkService(
         )
     }
 
-    private fun hentSykefraværshistorikkBransje(bransje: Bransje): KvartalsvisSykefraværshistorikkJson {
+    private fun hentSykefraværshistorikkNæringskoder(bransje: Bransje): KvartalsvisSykefraværshistorikkJson {
         return KvartalsvisSykefraværshistorikkJson(
             Statistikkategori.BRANSJE,
             bransje.navn,
-            kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentBransje(bransje)
+            sykefraværStatistikkNæringskodeRepository.hentKvartalsvisSykefraværprosent(
+                bransje.identifikatorer
+            )
         )
     }
 

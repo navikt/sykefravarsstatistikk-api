@@ -126,7 +126,7 @@ class DatavarehusRepository(
 
     fun hentSykefraværsstatistikkNæring5siffer(
         årstallOgKvartal: ÅrstallOgKvartal
-    ): List<SykefraværsstatistikkForNæring> {
+    ): List<SykefraværsstatistikkForNæringskode> {
         val namedParameters: SqlParameterSource = MapSqlParameterSource()
             .addValue(ARSTALL, årstallOgKvartal.årstall)
             .addValue(KVARTAL, årstallOgKvartal.kvartal)
@@ -140,7 +140,7 @@ class DatavarehusRepository(
                     + " group by arstall, kvartal, naering_kode",
             namedParameters
         ) { resultSet: ResultSet, _: Int ->
-            SykefraværsstatistikkForNæring(
+            SykefraværsstatistikkForNæringskode(
                 resultSet.getInt(ARSTALL),
                 resultSet.getInt(KVARTAL),
                 resultSet.getString(NARING_5SIFFER),
