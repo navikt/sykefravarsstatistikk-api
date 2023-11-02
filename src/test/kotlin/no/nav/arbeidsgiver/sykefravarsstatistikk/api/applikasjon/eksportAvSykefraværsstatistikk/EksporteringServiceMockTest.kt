@@ -48,15 +48,17 @@ class EksporteringServiceMockTest {
 
     private val sykefravarStatistikkVirksomhetRepository = mock<SykefravarStatistikkVirksomhetRepository>()
     private val sykefraværStatistikkNæringRepository = mock<SykefraværStatistikkNæringRepository>()
+    private val sykefraværStatistikkNæringskodeRepository = mock<SykefraværStatistikkNæringskodeRepository>()
     private val legacyVirksomhetMetadataRepository = mock<LegacyVirksomhetMetadataRepository>()
-    private val service: EksporteringService = EksporteringService(
+
+    private val service = EksporteringService(
         legacyEksporteringRepository,
-        sykefraværsstatistikkTilEksporteringRepository,
         sykefraværStatistikkLandRepository,
         sykefraværStatistikkSektorRepository,
         kafkaClient,
         sykefravarStatistikkVirksomhetRepository,
         sykefraværStatistikkNæringRepository,
+        sykefraværStatistikkNæringskodeRepository,
         legacyVirksomhetMetadataRepository
     )
 

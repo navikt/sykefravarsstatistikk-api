@@ -46,6 +46,12 @@ object TestUtils {
         transaction { deleteAll() }
     }
 
+    private fun SykefraværStatistikkNæringskodeRepository.slettAlt() {
+        transaction {
+            deleteAll()
+        }
+    }
+
     fun slettAllStatistikkFraDatabase(
         jdbcTemplate: NamedParameterJdbcTemplate,
         sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository? = null,
@@ -53,6 +59,7 @@ object TestUtils {
         sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository? = null,
         sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository? = null,
         sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository? = null,
+        sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository? = null
     ) {
         sykefravarStatistikkVirksomhetRepository?.slettAlt()
         sykefraværStatistikkNæringRepository?.slettAlt()
@@ -60,9 +67,7 @@ object TestUtils {
             "delete from sykefravar_statistikk_naring_med_varighet", MapSqlParameterSource()
         )
         sykefravarStatistikkVirksomhetGraderingRepository?.slettAlt()
-        jdbcTemplate.update(
-            "delete from sykefravar_statistikk_naring5siffer", MapSqlParameterSource()
-        )
+        sykefraværStatistikkNæringskodeRepository?.slettAlt()
         sykefraværStatistikkLandRepository?.slettAlt()
         sykefraværStatistikkSektorRepository?.slettAlt()
     }

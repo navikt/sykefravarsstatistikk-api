@@ -1,8 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværForEttKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkForNæringskode
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.springframework.stereotype.Component
@@ -19,6 +17,7 @@ class SykefraværStatistikkNæringskodeRepository(
     val antallPersoner = integer("antall_personer")
     val tapteDagsverk = double("tapte_dagsverk")
     val muligeDagsverk = double("mulige_dagsverk")
+
     fun settInn(data: List<SykefraværsstatistikkForNæringskode>): Int {
         return transaction {
             batchInsert(data) {
@@ -54,6 +53,57 @@ class SykefraværStatistikkNæringskodeRepository(
 
                     )
                 }
+        }
+    }
+
+    fun hentAltForKvartaler(kvartaler: List<ÅrstallOgKvartal>): List<SykefraværsstatistikkForNæringskode> {
+        return transaction {
+            select {
+                (årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }
+            }
+                .orderBy(årstall to SortOrder.DESC)
+                .orderBy(kvartal to SortOrder.DESC)
+                .map {
+                    SykefraværsstatistikkForNæringskode(
+                        årstall = it[årstall],
+                        kvartal = it[kvartal],
+                        næringkode5siffer = it[næringskode],
+                        antallPersoner = it[antallPersoner],
+                        tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
+                        muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
+                    )
+                }
+        }
+    }
+
+    fun hentForKvartaler(
+        næringskoder: List<Næringskode>,
+        kvartaler: List<ÅrstallOgKvartal>
+    ): List<UmaskertSykefraværForEttKvartal> {
+        return transaction {
+            slice(
+                årstall,
+                kvartal,
+                antallPersoner.sum(),
+                tapteDagsverk.sum(),
+                muligeDagsverk.sum(),
+            )
+                .select {
+                    (næringskode inList næringskoder.map { it.femsifferIdentifikator }) and
+                            ((årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal })
+                }
+                .groupBy(årstall, kvartal)
+                .orderBy(årstall to SortOrder.ASC)
+                .orderBy(kvartal to SortOrder.ASC)
+                .map {
+                    UmaskertSykefraværForEttKvartal(
+                        årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                        dagsverkTeller = it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                        dagsverkNevner = it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                        antallPersoner = it[antallPersoner.sum()]!!
+                    )
+                }
+
         }
     }
 

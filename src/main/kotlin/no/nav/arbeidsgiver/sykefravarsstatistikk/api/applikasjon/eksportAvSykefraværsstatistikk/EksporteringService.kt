@@ -20,12 +20,12 @@ import java.util.function.Consumer
 @Deprecated("Brukes bare av legacy Kafka-strøm, som skal fases ut.")
 class EksporteringService(
     private val legacyEksporteringRepository: LegacyEksporteringRepository,
-    private val sykefraværsstatistikkTilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository,
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
     private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
     private val kafkaClient: KafkaClient,
     private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
     private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository,
+    private val sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository,
     private val legacyVirksomhetMetadataRepository: LegacyVirksomhetMetadataRepository,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -96,11 +96,10 @@ class EksporteringService(
                 listOf(årstallOgKvartal)
             )
         val sykefraværsstatistikkForNæringskoder =
-            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentForAlleNæringskoder(
-                årstallOgKvartal
-            )
+            sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(listOf(årstallOgKvartal))
         val sykefraværsstatistikkVirksomhetUtenVarighet =
             sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(listOf(årstallOgKvartal))
+
         val umaskertSykefraværForEttKvartal = LegacyEksporteringServiceUtils.hentSisteKvartalIBeregningen(
             umaskertSykefraværsstatistikkSistePublisertKvartalLand, årstallOgKvartal
         )

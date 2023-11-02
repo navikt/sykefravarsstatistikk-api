@@ -1,6 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk
 
 import arrow.core.right
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Sykefraværsdata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
@@ -9,98 +11,98 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import testUtils.TestUtils
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.stream.Collectors
 
-@ExtendWith(MockitoExtension::class)
 internal class AggregertStatistikkServiceTest {
 
+    private val mockImporttidspunktRepository = mockk<ImporttidspunktRepository>()
 
-    private val mockSykefraværRepository: SykefraværRepository = mock()
+    private val mockTilgangskontrollService = mockk<TilgangskontrollService>()
 
-    private val mockImporttidspunktRepository: ImporttidspunktRepository = mock(defaultAnswer = {
-        ImporttidspunktDto(LocalDate.of(2022, 2, 2), TestUtils.SISTE_PUBLISERTE_KVARTAL)
-    })
+    private val mockEnhetsregisteretClient = mockk<EnhetsregisteretClient>()
 
-    private val mockTilgangskontrollService: TilgangskontrollService = mock()
+    private val mockVarighetRepository = mockk<VarighetRepository>()
 
-    private val mockEnhetsregisteretClient: EnhetsregisteretClient = mock()
+    private val sykefravarStatistikkVirksomhetGraderingRepository =
+        mockk<SykefravarStatistikkVirksomhetGraderingRepository>()
 
-    private val mockVarighetRepository: VarighetRepository = mock()
-
-    val sykefravarStatistikkVirksomhetGraderingRepository = mock<SykefravarStatistikkVirksomhetGraderingRepository>()
     private val serviceUnderTest: AggregertStatistikkService = AggregertStatistikkService(
-        mockSykefraværRepository,
         mockVarighetRepository,
         mockTilgangskontrollService,
         mockEnhetsregisteretClient,
         mockImporttidspunktRepository,
         sykefravarStatistikkVirksomhetGraderingRepository,
+        mockk(),
+        mockk(),
+        mockk(),
+        mockk(),
     )
+
+    @BeforeEach
+    fun setUp() {
+        every { mockImporttidspunktRepository.hentNyesteImporterteKvartal() } returns ImporttidspunktDto(
+            LocalDate.of(
+                2022,
+                2,
+                2
+            ), TestUtils.SISTE_PUBLISERTE_KVARTAL
+        )
+    }
 
     @Test
     fun hentAggregertHistorikk_kræsjerIkkeVedManglendeData() {
-        whenever(mockTilgangskontrollService.brukerRepresentererVirksomheten(any())).thenReturn(true)
-        whenever(mockEnhetsregisteretClient.hentUnderenhet(any())).thenReturn(enBarnehage.right())
-        whenever(mockTilgangskontrollService.brukerHarIaRettigheterIVirksomheten(any())).thenReturn(true)
+
+
+        every { mockTilgangskontrollService.brukerRepresentererVirksomheten(any()) } returns true
+        every { mockEnhetsregisteretClient.hentUnderenhet(any()) } returns enBarnehage.right()
+        every { mockTilgangskontrollService.brukerHarIaRettigheterIVirksomheten(any()) } returns true
 
         // Helt tomt resultat skal ikke kræsje
-        whenever(
-            mockSykefraværRepository.hentTotaltSykefraværAlleKategorier(
-                any(), any()
-            )
-        ).thenReturn(Sykefraværsdata(mutableMapOf()))
+        every { serviceUnderTest.hentTotaltSykefraværAlleKategorier(any(), any()) } returns
+                Sykefraværsdata(
+                    mutableMapOf()
+                )
+
         assertThat(serviceUnderTest.hentAggregertStatistikk(etOrgnr).getOrNull()).isEqualTo(AggregertStatistikkJson())
 
         // Resultat med statistikkategori og tomme lister skal heller ikke kræsje
-        whenever(
-            mockSykefraværRepository.hentTotaltSykefraværAlleKategorier(
-                any(), any()
-            )
-        ).thenReturn(
-            Sykefraværsdata(
-                mutableMapOf(
-                    Statistikkategori.VIRKSOMHET to listOf(),
-                    Statistikkategori.LAND to listOf(),
-                    Statistikkategori.NÆRING to listOf(),
-                    Statistikkategori.BRANSJE to listOf()
+        every { serviceUnderTest.hentTotaltSykefraværAlleKategorier(any(), any()) } returns
+                Sykefraværsdata(
+                    mutableMapOf(
+                        Statistikkategori.VIRKSOMHET to listOf(),
+                        Statistikkategori.LAND to listOf(),
+                        Statistikkategori.NÆRING to listOf(),
+                        Statistikkategori.BRANSJE to listOf()
+                    )
                 )
-            )
-        )
+
         assertThat(serviceUnderTest.hentAggregertStatistikk(etOrgnr).getOrNull()).isEqualTo(AggregertStatistikkJson())
     }
 
     @Test
     fun hentAggregertHistorikk_henterAltSykefraværDersomBrukerHarIaRettigheter() {
         mockAvhengigheterForBarnehageMedIaRettigheter()
-        whenever(
-            mockSykefraværRepository.hentTotaltSykefraværAlleKategorier(
-                any(), any()
+        every { serviceUnderTest.hentTotaltSykefraværAlleKategorier(any(), any()) } returns Sykefraværsdata(
+            mutableMapOf(
+                Statistikkategori.VIRKSOMHET to genererTestSykefravær(1),
+                Statistikkategori.LAND to genererTestSykefravær(10),
+                Statistikkategori.NÆRING to genererTestSykefravær(20),
+                Statistikkategori.BRANSJE to genererTestSykefravær(30)
             )
-        ).thenReturn(
-            Sykefraværsdata(
-                mutableMapOf(
-                    Statistikkategori.VIRKSOMHET to genererTestSykefravær(1),
-                    Statistikkategori.LAND to genererTestSykefravær(10),
-                    Statistikkategori.NÆRING to genererTestSykefravær(20),
-                    Statistikkategori.BRANSJE to genererTestSykefravær(30)
-                )
-            )
+
         )
-        whenever(sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(any()))
-            .thenReturn(genererTestSykefravær(70))
-        whenever(sykefravarStatistikkVirksomhetGraderingRepository.hentForNæring(any()))
-            .thenReturn(genererTestSykefravær(60))
-        whenever(sykefravarStatistikkVirksomhetGraderingRepository.hentForOrgnr(any()))
-            .thenReturn(genererTestSykefravær(50))
+        every { sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(any()) } returns genererTestSykefravær(
+            70
+        )
+        every { sykefravarStatistikkVirksomhetGraderingRepository.hentForNæring(any()) } returns genererTestSykefravær(
+            60
+        )
+        every { sykefravarStatistikkVirksomhetGraderingRepository.hentForOrgnr(any()) } returns genererTestSykefravær(50)
         val forventedeProsenttyper =
             listOf(Statistikkategori.VIRKSOMHET, Statistikkategori.BRANSJE, Statistikkategori.LAND)
         val forventedeGraderingstyper = listOf(Statistikkategori.VIRKSOMHET, Statistikkategori.BRANSJE)
@@ -122,38 +124,36 @@ internal class AggregertStatistikkServiceTest {
     fun hentAggregertStatistikk_regnerUtLangtidsfravær_dersomAntallPersonerErOverEllerLikFem() {
         mockAvhengigheterForBarnehageMedIaRettigheter()
 
-        whenever(
-            mockSykefraværRepository.hentTotaltSykefraværAlleKategorier(
-                any(), any()
-            )
-        ).thenReturn(Sykefraværsdata(mutableMapOf(Statistikkategori.VIRKSOMHET to genererTestSykefravær(1))))
-        whenever(
-            mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any())
-        ).thenReturn(
-            mapOf(
-                Statistikkategori.VIRKSOMHET to listOf(
-                    fraværMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL, 10, 0, 0, Varighetskategori._20_UKER_TIL_39_UKER
-                    ), fraværMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL, 40, 0, 0, Varighetskategori._17_DAGER_TIL_8_UKER
-                    ), fraværMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL, 20, 0, 0, Varighetskategori._8_UKER_TIL_20_UKER
-                    ), fraværMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL, 5, 0, 0, Varighetskategori._8_DAGER_TIL_16_DAGER
-                    ), fraværMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL, 0, 100, 200, Varighetskategori.TOTAL
-                    ), fraværMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
-                        10,
-                        0,
-                        0,
-                        Varighetskategori._20_UKER_TIL_39_UKER
-                    ), fraværMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 0, 100, 5, Varighetskategori.TOTAL
+        every { serviceUnderTest.hentTotaltSykefraværAlleKategorier(any(), any()) } returns
+                Sykefraværsdata(
+                    mutableMapOf(Statistikkategori.VIRKSOMHET to genererTestSykefravær(1))
+                )
+
+        every { mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any()) } returns
+                mapOf(
+                    Statistikkategori.VIRKSOMHET to listOf(
+                        fraværMedVarighet(
+                            TestUtils.SISTE_PUBLISERTE_KVARTAL, 10, 0, 0, Varighetskategori._20_UKER_TIL_39_UKER
+                        ), fraværMedVarighet(
+                            TestUtils.SISTE_PUBLISERTE_KVARTAL, 40, 0, 0, Varighetskategori._17_DAGER_TIL_8_UKER
+                        ), fraværMedVarighet(
+                            TestUtils.SISTE_PUBLISERTE_KVARTAL, 20, 0, 0, Varighetskategori._8_UKER_TIL_20_UKER
+                        ), fraværMedVarighet(
+                            TestUtils.SISTE_PUBLISERTE_KVARTAL, 5, 0, 0, Varighetskategori._8_DAGER_TIL_16_DAGER
+                        ), fraværMedVarighet(
+                            TestUtils.SISTE_PUBLISERTE_KVARTAL, 0, 100, 200, Varighetskategori.TOTAL
+                        ), fraværMedVarighet(
+                            TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                            10,
+                            0,
+                            0,
+                            Varighetskategori._20_UKER_TIL_39_UKER
+                        ), fraværMedVarighet(
+                            TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 0, 100, 5, Varighetskategori.TOTAL
+                        )
                     )
                 )
-            )
-        )
+
         val forventet = StatistikkJson(
             Statistikkategori.VIRKSOMHET,
             "En Barnehage",
@@ -169,34 +169,30 @@ internal class AggregertStatistikkServiceTest {
     @Test
     fun hentAggregertStatistikk_returnererKorttidsfravær_dersomAntallPersonerErOverEllerLikFem() {
         mockAvhengigheterForBarnehageMedIaRettigheter()
-        whenever(
-            mockSykefraværRepository.hentTotaltSykefraværAlleKategorier(
-                any(), any()
-            )
-        ).thenReturn(Sykefraværsdata(mutableMapOf(Statistikkategori.VIRKSOMHET to genererTestSykefravær(1))))
-        whenever(
-            mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any())
-        ).thenReturn(
-            mapOf(
-                Statistikkategori.VIRKSOMHET to listOf(
-                    fraværMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL, 40, 0, 0, Varighetskategori._1_DAG_TIL_7_DAGER
-                    ), fraværMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL, 5, 0, 0, Varighetskategori._8_DAGER_TIL_16_DAGER
-                    ), fraværMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL, 0, 100, 100, Varighetskategori.TOTAL
-                    ), fraværMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
-                        10,
-                        0,
-                        0,
-                        Varighetskategori._8_DAGER_TIL_16_DAGER
-                    ), fraværMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 0, 100, 0, Varighetskategori.TOTAL
+        every { serviceUnderTest.hentTotaltSykefraværAlleKategorier(any(), any()) } returns
+                Sykefraværsdata(mutableMapOf(Statistikkategori.VIRKSOMHET to genererTestSykefravær(1)))
+
+        every { mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any()) } returns
+                mapOf(
+                    Statistikkategori.VIRKSOMHET to listOf(
+                        fraværMedVarighet(
+                            TestUtils.SISTE_PUBLISERTE_KVARTAL, 40, 0, 0, Varighetskategori._1_DAG_TIL_7_DAGER
+                        ), fraværMedVarighet(
+                            TestUtils.SISTE_PUBLISERTE_KVARTAL, 5, 0, 0, Varighetskategori._8_DAGER_TIL_16_DAGER
+                        ), fraværMedVarighet(
+                            TestUtils.SISTE_PUBLISERTE_KVARTAL, 0, 100, 100, Varighetskategori.TOTAL
+                        ), fraværMedVarighet(
+                            TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                            10,
+                            0,
+                            0,
+                            Varighetskategori._8_DAGER_TIL_16_DAGER
+                        ), fraværMedVarighet(
+                            TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 0, 100, 0, Varighetskategori.TOTAL
+                        )
                     )
                 )
-            )
-        )
+
         val forventet = StatistikkJson(
             Statistikkategori.VIRKSOMHET,
             "En Barnehage",
@@ -212,45 +208,38 @@ internal class AggregertStatistikkServiceTest {
     @Test
     fun hentAggregertStatistikk_maskererKorttidOgLangtid_dersomAntallTilfellerErUnderFemIAlleKvartaler() {
         mockAvhengigheterForBarnehageMedIaRettigheter()
-        whenever(
-            mockSykefraværRepository.hentTotaltSykefraværAlleKategorier(
-                any(), any()
-            )
-        ).thenReturn(
-            Sykefraværsdata(
-                mutableMapOf(
-                    Statistikkategori.VIRKSOMHET to genererTestSykefravær(1),
-                    Statistikkategori.LAND to genererTestSykefravær(10),
-                    Statistikkategori.NÆRING to genererTestSykefravær(20),
-                    Statistikkategori.BRANSJE to genererTestSykefravær(30)
-                )
-            )
-        )
-        whenever(
-            mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any())
-        ).thenReturn(
-            mapOf(
-                Statistikkategori.VIRKSOMHET to listOf(
-                    fraværMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL, 10, 0, 0, Varighetskategori._20_UKER_TIL_39_UKER
-                    ), fraværMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL, 20, 0, 0, Varighetskategori._8_UKER_TIL_20_UKER
-                    ), fraværMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL, 5, 0, 0, Varighetskategori._8_DAGER_TIL_16_DAGER
-                    ), fraværMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL, 0, 100, 3, Varighetskategori.TOTAL
-                    ), fraværMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
-                        10,
-                        0,
-                        0,
-                        Varighetskategori._20_UKER_TIL_39_UKER
-                    ), fraværMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 0, 100, 4, Varighetskategori.TOTAL
+        every { serviceUnderTest.hentTotaltSykefraværAlleKategorier(any(), any()) } returns
+                Sykefraværsdata(
+                    mutableMapOf(
+                        Statistikkategori.VIRKSOMHET to genererTestSykefravær(1),
+                        Statistikkategori.LAND to genererTestSykefravær(10),
+                        Statistikkategori.NÆRING to genererTestSykefravær(20),
+                        Statistikkategori.BRANSJE to genererTestSykefravær(30)
                     )
                 )
-            )
-        )
+        every { mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any()) } returns
+                mapOf(
+                    Statistikkategori.VIRKSOMHET to listOf(
+                        fraværMedVarighet(
+                            TestUtils.SISTE_PUBLISERTE_KVARTAL, 10, 0, 0, Varighetskategori._20_UKER_TIL_39_UKER
+                        ), fraværMedVarighet(
+                            TestUtils.SISTE_PUBLISERTE_KVARTAL, 20, 0, 0, Varighetskategori._8_UKER_TIL_20_UKER
+                        ), fraværMedVarighet(
+                            TestUtils.SISTE_PUBLISERTE_KVARTAL, 5, 0, 0, Varighetskategori._8_DAGER_TIL_16_DAGER
+                        ), fraværMedVarighet(
+                            TestUtils.SISTE_PUBLISERTE_KVARTAL, 0, 100, 3, Varighetskategori.TOTAL
+                        ), fraværMedVarighet(
+                            TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                            10,
+                            0,
+                            0,
+                            Varighetskategori._20_UKER_TIL_39_UKER
+                        ), fraværMedVarighet(
+                            TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), 0, 100, 4, Varighetskategori.TOTAL
+                        )
+
+                    )
+                )
         assertThat(
             serviceUnderTest.hentAggregertStatistikk(etOrgnr).getOrNull()?.prosentSiste4KvartalerKorttid
         ).isEqualTo(listOf<Any>())
@@ -262,14 +251,12 @@ internal class AggregertStatistikkServiceTest {
     @Test
     fun hentAggregertStatistikk_returnererTapteOgMuligeDagsverk() {
         mockAvhengigheterForBarnehageMedIaRettigheter()
-        whenever(
-            mockSykefraværRepository.hentTotaltSykefraværAlleKategorier(
-                any(), any()
-            )
-        ).thenReturn(Sykefraværsdata(mutableMapOf(Statistikkategori.VIRKSOMHET to genererTestSykefravær(1))))
-        whenever(
-            mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any())
-        ).thenReturn(mapOf())
+        every { serviceUnderTest.hentTotaltSykefraværAlleKategorier(any(), any()) } returns
+                Sykefraværsdata(
+                    mutableMapOf(Statistikkategori.VIRKSOMHET to genererTestSykefravær(1))
+                )
+
+        every { mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any()) } returns mapOf()
         val respons = serviceUnderTest.hentAggregertStatistikk(etOrgnr).getOrNull()
         val antallMuligeDagsverk = respons?.muligeDagsverkTotalt?.get(0)?.verdi
         val antallTapteDagsverk = respons?.tapteDagsverkTotalt?.get(0)?.verdi
@@ -279,29 +266,26 @@ internal class AggregertStatistikkServiceTest {
 
     @Test
     fun `Summen av langtid og kortidsfravær skal være lik totalfraværet`() {
-        whenever(mockTilgangskontrollService.brukerRepresentererVirksomheten(any())).thenReturn(true)
-        whenever(mockTilgangskontrollService.brukerHarIaRettigheterIVirksomheten(any())).thenReturn(true)
-        whenever(mockEnhetsregisteretClient.hentUnderenhet(any())).thenReturn(virksomhetUtenforBransjeprogrammet.right())
+        every { mockTilgangskontrollService.brukerRepresentererVirksomheten(any()) } returns true
+        every { mockTilgangskontrollService.brukerHarIaRettigheterIVirksomheten(any()) } returns true
+        every { mockEnhetsregisteretClient.hentUnderenhet(any()) } returns virksomhetUtenforBransjeprogrammet.right()
 
         val årstallOgKvartal = ÅrstallOgKvartal(2022, 1)
-        whenever(mockSykefraværRepository.hentTotaltSykefraværAlleKategorier(any(), any())).thenReturn(
-            Sykefraværsdata(
-                mutableMapOf(
-                    Statistikkategori.NÆRING to listOf(
-                        UmaskertSykefraværForEttKvartal(
-                            årstallOgKvartal,
-                            BigDecimal(68),
-                            BigDecimal(1000),
-                            20,
+        every { serviceUnderTest.hentTotaltSykefraværAlleKategorier(any(), any()) } returns
+                Sykefraværsdata(
+                    mutableMapOf(
+                        Statistikkategori.NÆRING to listOf(
+                            UmaskertSykefraværForEttKvartal(
+                                årstallOgKvartal,
+                                BigDecimal(68),
+                                BigDecimal(1000),
+                                20,
+                            )
                         )
                     )
                 )
-            )
-        )
 
-        whenever(mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any()))
-            // Korttidsfravær 0.7%
-            .thenReturn(
+        every { mockVarighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(any()) } returns
                 mutableMapOf(
                     Statistikkategori.NÆRING to listOf(
                         UmaskertSykefraværForEttKvartalMedVarighet(
@@ -333,10 +317,7 @@ internal class AggregertStatistikkServiceTest {
                             Varighetskategori.TOTAL,
                         ),
                     )
-                )
-            )
-            // Langtidsfravær 6.1%
-            .thenReturn(
+                ) andThen
                 mutableMapOf(
                     Statistikkategori.NÆRING to listOf(
                         UmaskertSykefraværForEttKvartalMedVarighet(
@@ -355,7 +336,7 @@ internal class AggregertStatistikkServiceTest {
                         ),
                     )
                 )
-            )
+
 
         val result = serviceUnderTest.hentAggregertStatistikk(etOrgnr).getOrNull()
 
@@ -403,9 +384,9 @@ internal class AggregertStatistikkServiceTest {
     }
 
     private fun mockAvhengigheterForBarnehageMedIaRettigheter() {
-        whenever(mockTilgangskontrollService.brukerRepresentererVirksomheten(any())).thenReturn(true)
-        whenever(mockEnhetsregisteretClient.hentUnderenhet(any())).thenReturn(enBarnehage.right())
-        whenever(mockTilgangskontrollService.brukerHarIaRettigheterIVirksomheten(any())).thenReturn(true)
+        every { mockTilgangskontrollService.brukerRepresentererVirksomheten(any()) } returns true
+        every { mockEnhetsregisteretClient.hentUnderenhet(any()) } returns enBarnehage.right()
+        every { mockTilgangskontrollService.brukerHarIaRettigheterIVirksomheten(any()) } returns true
     }
 
     private fun genererTestSykefravær(offset: Int): List<UmaskertSykefraværForEttKvartal> {

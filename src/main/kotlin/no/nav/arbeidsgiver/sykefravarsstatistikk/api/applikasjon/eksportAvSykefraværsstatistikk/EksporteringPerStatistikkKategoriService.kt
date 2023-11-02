@@ -20,6 +20,7 @@ class EksporteringPerStatistikkKategoriService(
     private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
     private val sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
     private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository,
+    private val sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository,
     private val kafkaClient: KafkaClient,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -93,17 +94,15 @@ class EksporteringPerStatistikkKategoriService(
     }
 
     private fun eksporterSykefraværsstatistikkNæringskode(årstallOgKvartal: ÅrstallOgKvartal) {
-        tilEksporteringRepository.hentSykefraværprosentForAlleNæringskoder(
-            årstallOgKvartal.minusKvartaler(3),
-            årstallOgKvartal
-        ).groupByNæringskode().let {
-            eksporterSykefraværsstatistikkPerKategori(
-                årstallOgKvartal = årstallOgKvartal,
-                sykefraværGruppertEtterKode = it,
-                statistikkategori = Statistikkategori.NÆRINGSKODE,
-                kafkaTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_NARINGSKODE_V1
-            )
-        }
+        sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(årstallOgKvartal inkludertTidligere 3)
+            .groupByNæringskode().let {
+                eksporterSykefraværsstatistikkPerKategori(
+                    årstallOgKvartal = årstallOgKvartal,
+                    sykefraværGruppertEtterKode = it,
+                    statistikkategori = Statistikkategori.NÆRINGSKODE,
+                    kafkaTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_NARINGSKODE_V1
+                )
+            }
     }
 
     private fun eksporterSykefraværsstatistikkBransje(kvartal: ÅrstallOgKvartal) {
@@ -121,7 +120,7 @@ class EksporteringPerStatistikkKategoriService(
 
     private fun eksporterSykefraværsstatistikkVirksomhet(årstallOgKvartal: ÅrstallOgKvartal) {
         sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(årstallOgKvartal inkludertTidligere 3)
-            .groupByVirksomhet().let {
+            .groupByOrgnr().let {
                 eksporterSykefraværsstatistikkPerKategori(
                     årstallOgKvartal = årstallOgKvartal,
                     sykefraværGruppertEtterKode = it,
@@ -134,7 +133,7 @@ class EksporteringPerStatistikkKategoriService(
     private fun eksporterSykefraværsstatistikkVirksomhetGradert(årstallOgKvartal: ÅrstallOgKvartal) {
         sykefravarStatistikkVirksomhetGraderingRepository.hentSykefraværAlleVirksomheterGradert(
             årstallOgKvartal inkludertTidligere 3
-        ).groupByVirksomhetGradert().let {
+        ).groupByVirksomhet().let {
             eksporterSykefraværsstatistikkPerKategori(
                 årstallOgKvartal = årstallOgKvartal,
                 sykefraværGruppertEtterKode = it,
@@ -266,11 +265,11 @@ fun List<SykefraværsstatistikkBransje>.groupByBransje():
         Map<String, List<Sykefraværsstatistikk>> =
     this.groupBy({ it.bransje.name }, { it })
 
-fun List<SykefraværsstatistikkVirksomhetUtenVarighet>.groupByVirksomhet():
+fun List<SykefraværsstatistikkVirksomhetUtenVarighet>.groupByOrgnr():
         Map<String, List<Sykefraværsstatistikk>> =
     this.groupBy({ it.orgnr }, { it })
 
-fun List<SykefraværsstatistikkVirksomhetMedGradering>.groupByVirksomhetGradert():
+fun List<SykefraværsstatistikkVirksomhetMedGradering>.groupByVirksomhet():
         Map<String, List<Sykefraværsstatistikk>> =
     this.groupBy({ it.orgnr }, { it })
 

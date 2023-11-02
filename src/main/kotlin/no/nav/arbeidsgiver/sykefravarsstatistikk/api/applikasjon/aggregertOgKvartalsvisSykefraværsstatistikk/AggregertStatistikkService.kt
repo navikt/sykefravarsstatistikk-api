@@ -7,10 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvar
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.TilgangskontrollService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VarighetRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -18,12 +15,15 @@ import java.util.*
 
 @Service
 class AggregertStatistikkService(
-    private val sykefraværprosentRepository: SykefraværRepository,
     private val varighetRepository: VarighetRepository,
     private val tilgangskontrollService: TilgangskontrollService,
     private val enhetsregisteretClient: EnhetsregisteretClient,
     private val importtidspunktRepository: ImporttidspunktRepository,
     private val sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
+    private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
+    private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
+    private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository,
+    private val sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -145,9 +145,7 @@ class AggregertStatistikkService(
         val gjeldendePeriode = importtidspunktRepository.hentNyesteImporterteKvartal()?.gjeldendePeriode
             ?: throw IllegalStateException("Fant ikke siste publiserte kvartal")
 
-        return sykefraværprosentRepository.hentTotaltSykefraværAlleKategorier(
-            forBedrift, (gjeldendePeriode inkludertTidligere 4)
-        )
+        return hentTotaltSykefraværAlleKategorier(forBedrift, (gjeldendePeriode inkludertTidligere 4))
     }
 
     private fun hentKorttidsfravær(virksomhet: Virksomhet): Sykefraværsdata {
@@ -193,5 +191,35 @@ class AggregertStatistikkService(
                 BransjeEllerNæring(Næring(kode))
             }
     }
+
+    fun hentTotaltSykefraværAlleKategorier(
+        virksomhet: Virksomhet, kvartaler: List<ÅrstallOgKvartal>
+    ): Sykefraværsdata {
+
+        val næring = virksomhet.næringskode.næring
+        val maybeBransje = Bransjeprogram.finnBransje(virksomhet.næringskode)
+        val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> =
+            EnumMap(Statistikkategori::class.java)
+        val fraÅrstallOgKvartal = kvartaler.minOf { it }
+
+        data[Statistikkategori.VIRKSOMHET] = sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(
+            virksomhet,
+            fraÅrstallOgKvartal
+        )
+        data[Statistikkategori.LAND] = sykefraværStatistikkLandRepository.hentForKvartaler(kvartaler)
+        if (maybeBransje.isEmpty) {
+            data[Statistikkategori.NÆRING] =
+                sykefraværStatistikkNæringRepository.hentUmaskertSykefravær(næring, kvartaler)
+        } else if (maybeBransje.get().erDefinertPåFemsiffernivå()) {
+            val næringskoder = maybeBransje.get().identifikatorer.map { Næringskode(it) }
+            data[Statistikkategori.BRANSJE] =
+                sykefraværStatistikkNæringskodeRepository.hentForKvartaler(næringskoder, kvartaler)
+        } else {
+            data[Statistikkategori.BRANSJE] =
+                sykefraværStatistikkNæringRepository.hentUmaskertSykefravær(næring, kvartaler)
+        }
+        return Sykefraværsdata(data)
+    }
+
 }
 

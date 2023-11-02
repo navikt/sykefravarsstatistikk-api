@@ -26,9 +26,11 @@ class EksporteringPerStatistikkKategoriServiceTest {
     private val sykefraværStatistikkSektorRepository = mock<SykefraværStatistikkSektorRepository>()
     private val sykefravarStatistikkVirksomhetGraderingRepository =
         mock<SykefravarStatistikkVirksomhetGraderingRepository>()
+    private val sykefraværStatistikkNæringRepository = mock<SykefraværStatistikkNæringRepository>()
+    private val sykefraværStatistikkNæringskodeRepository = mock<SykefraværStatistikkNæringskodeRepository>()
+
     private val kafkaClient = mock<KafkaClient>()
 
-    private val sykefraværStatistikkNæringRepository = mock<SykefraværStatistikkNæringRepository>()
     private val service: EksporteringPerStatistikkKategoriService = EksporteringPerStatistikkKategoriService(
         tilEksporteringRepository = sykefraværsstatistikkTilEksporteringRepository,
         sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
@@ -36,6 +38,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
         sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
         sykefravarStatistikkVirksomhetGraderingRepository = sykefravarStatistikkVirksomhetGraderingRepository,
         sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository,
+        sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository,
         kafkaClient = kafkaClient,
     )
 
