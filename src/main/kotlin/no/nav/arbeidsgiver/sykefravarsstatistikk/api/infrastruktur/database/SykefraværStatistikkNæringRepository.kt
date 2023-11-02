@@ -107,7 +107,7 @@ class SykefraværStatistikkNæringRepository(
         }
     }
 
-    fun hentUmaskertSykefravær(
+    fun hentForKvartaler(
         næringa: Næring,
         kvartaler: List<ÅrstallOgKvartal>
     ): List<UmaskertSykefraværForEttKvartal> {

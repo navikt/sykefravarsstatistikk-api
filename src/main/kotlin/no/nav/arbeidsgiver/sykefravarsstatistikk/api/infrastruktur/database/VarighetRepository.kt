@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Bransjeprogram.finnBransje
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -16,9 +15,8 @@ import java.util.*
 @Component
 class VarighetRepository(
     @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
-    private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
 ) {
-    fun hentSykefraværMedVarighet(
+    fun hentSykefraværMedVarighetNæring(
         næring: Næring
     ): List<UmaskertSykefraværForEttKvartalMedVarighet> {
         return try {
@@ -36,7 +34,7 @@ class VarighetRepository(
         }
     }
 
-    fun hentSykefraværMedVarighet(
+    fun hentSykefraværMedVarighetBransje(
         bransje: Bransje
     ): List<UmaskertSykefraværForEttKvartalMedVarighet> {
         return try {
@@ -55,23 +53,6 @@ class VarighetRepository(
         }
     }
 
-    fun hentUmaskertSykefraværMedVarighetAlleKategorier(virksomhet: Virksomhet): Map<Statistikkategori, List<UmaskertSykefraværForEttKvartalMedVarighet>> {
-        val næring = virksomhet.næringskode.næring
-        val maybeBransje = finnBransje(virksomhet.næringskode)
-        val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartalMedVarighet>> = EnumMap(
-            Statistikkategori::class.java
-        )
-        data[Statistikkategori.VIRKSOMHET] =
-            sykefravarStatistikkVirksomhetRepository.hentSykefraværMedVarighet(virksomhet.orgnr)
-        if (maybeBransje.isEmpty) {
-            data[Statistikkategori.NÆRING] = hentSykefraværMedVarighet(næring)
-        } else if (maybeBransje.get().erDefinertPåFemsiffernivå()) {
-            data[Statistikkategori.BRANSJE] = hentSykefraværMedVarighet(maybeBransje.get())
-        } else {
-            data[Statistikkategori.BRANSJE] = hentSykefraværMedVarighet(næring)
-        }
-        return data
-    }
 
     @Throws(SQLException::class)
     private fun mapTilKvartalsvisSykefraværMedVarighet(

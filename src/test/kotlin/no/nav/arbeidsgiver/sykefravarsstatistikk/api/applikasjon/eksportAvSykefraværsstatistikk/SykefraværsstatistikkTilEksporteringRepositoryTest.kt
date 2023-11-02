@@ -89,7 +89,6 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 )
             )
         ) shouldBe emptyList()
-
     }
 
     @Test

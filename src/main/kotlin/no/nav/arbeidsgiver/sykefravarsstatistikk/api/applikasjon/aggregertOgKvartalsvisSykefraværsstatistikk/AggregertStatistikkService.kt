@@ -164,7 +164,7 @@ class AggregertStatistikkService(
     private fun hentLangtidsEllerKorttidsfravær(
         virksomhet: Virksomhet, entenLangtidEllerKorttid: (UmaskertSykefraværForEttKvartalMedVarighet) -> Boolean
     ) = Sykefraværsdata(
-        varighetRepository.hentUmaskertSykefraværMedVarighetAlleKategorier(virksomhet)
+        hentUmaskertSykefraværMedVarighetAlleKategorier(virksomhet)
             .mapValues { (_, statistikk) ->
                 statistikk.filter(entenLangtidEllerKorttid).let(::grupperOgSummerHvertKvartal)
             }.toMutableMap()
@@ -209,17 +209,34 @@ class AggregertStatistikkService(
         data[Statistikkategori.LAND] = sykefraværStatistikkLandRepository.hentForKvartaler(kvartaler)
         if (maybeBransje.isEmpty) {
             data[Statistikkategori.NÆRING] =
-                sykefraværStatistikkNæringRepository.hentUmaskertSykefravær(næring, kvartaler)
+                sykefraværStatistikkNæringRepository.hentForKvartaler(næring, kvartaler)
         } else if (maybeBransje.get().erDefinertPåFemsiffernivå()) {
             val næringskoder = maybeBransje.get().identifikatorer.map { Næringskode(it) }
             data[Statistikkategori.BRANSJE] =
                 sykefraværStatistikkNæringskodeRepository.hentForKvartaler(næringskoder, kvartaler)
         } else {
             data[Statistikkategori.BRANSJE] =
-                sykefraværStatistikkNæringRepository.hentUmaskertSykefravær(næring, kvartaler)
+                sykefraværStatistikkNæringRepository.hentForKvartaler(næring, kvartaler)
         }
         return Sykefraværsdata(data)
     }
 
+    private fun hentUmaskertSykefraværMedVarighetAlleKategorier(virksomhet: Virksomhet): Map<Statistikkategori, List<UmaskertSykefraværForEttKvartalMedVarighet>> {
+        val næring = virksomhet.næringskode.næring
+        val maybeBransje = Bransjeprogram.finnBransje(virksomhet.næringskode)
+        val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartalMedVarighet>> = EnumMap(
+            Statistikkategori::class.java
+        )
+        data[Statistikkategori.VIRKSOMHET] =
+            sykefravarStatistikkVirksomhetRepository.hentSykefraværMedVarighet(virksomhet.orgnr)
+        if (maybeBransje.isEmpty) {
+            data[Statistikkategori.NÆRING] = varighetRepository.hentSykefraværMedVarighetNæring(næring)
+        } else if (maybeBransje.get().erDefinertPåFemsiffernivå()) {
+            data[Statistikkategori.BRANSJE] = varighetRepository.hentSykefraværMedVarighetBransje(maybeBransje.get())
+        } else {
+            data[Statistikkategori.BRANSJE] = varighetRepository.hentSykefraværMedVarighetNæring(næring)
+        }
+        return data
+    }
 }
 
