@@ -19,17 +19,6 @@ object TestUtils {
     }
 
 
-    fun parametreForStatistikk(
-        årstall: Int, kvartal: Int, antallPersoner: Int, tapteDagsverk: Int, muligeDagsverk: Int
-    ): MapSqlParameterSource {
-        return MapSqlParameterSource()
-            .addValue("arstall", årstall)
-            .addValue("kvartal", kvartal)
-            .addValue("antall_personer", antallPersoner)
-            .addValue("tapte_dagsverk", tapteDagsverk)
-            .addValue("mulige_dagsverk", muligeDagsverk)
-    }
-
     private fun SykefravarStatistikkVirksomhetRepository.slettAlt() {
         transaction { deleteAll() }
     }
@@ -111,30 +100,31 @@ object TestUtils {
     }
 
     fun opprettStatistikkForLand(sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository) {
-        val statistikk = listOf(
-            SykefraværsstatistikkLand(
-                SISTE_PUBLISERTE_KVARTAL.årstall,
-                SISTE_PUBLISERTE_KVARTAL.kvartal,
-                10,
-                BigDecimal("4.0"),
-                BigDecimal("100.0")
-            ),
-            SykefraværsstatistikkLand(
-                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).årstall,
-                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).kvartal,
-                10,
-                BigDecimal("5.0"),
-                BigDecimal("100.0")
-            ),
-            SykefraværsstatistikkLand(
-                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).årstall,
-                SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).kvartal,
-                10,
-                BigDecimal("6.0"),
-                BigDecimal("100.0")
-            ),
+        sykefraværStatistikkLandRepository.settInn(
+            listOf(
+                SykefraværsstatistikkLand(
+                    SISTE_PUBLISERTE_KVARTAL.årstall,
+                    SISTE_PUBLISERTE_KVARTAL.kvartal,
+                    10,
+                    BigDecimal("4.0"),
+                    BigDecimal("100.0")
+                ),
+                SykefraværsstatistikkLand(
+                    SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).årstall,
+                    SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).kvartal,
+                    10,
+                    BigDecimal("5.0"),
+                    BigDecimal("100.0")
+                ),
+                SykefraværsstatistikkLand(
+                    SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).årstall,
+                    SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).kvartal,
+                    10,
+                    BigDecimal("6.0"),
+                    BigDecimal("100.0")
+                ),
+            )
         )
-        sykefraværStatistikkLandRepository.settInn(statistikk)
     }
 
     fun opprettStatistikkForLandExposed(repository: SykefraværStatistikkLandRepository) {
@@ -164,28 +154,6 @@ object TestUtils {
             )
         )
     }
-
-    fun opprettStatistikkForNæringskode(
-        jdbcTemplate: NamedParameterJdbcTemplate,
-        næringskode5Siffer: Næringskode,
-        årstall: Int,
-        kvartal: Int,
-        tapteDagsverk: Int,
-        muligeDagsverk: Int,
-        antallPersoner: Int
-    ) {
-        val parametre = parametreForStatistikk(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
-        parametre.addValue("naring_kode", næringskode5Siffer.femsifferIdentifikator)
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring5siffer "
-                    + "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, "
-                    + "mulige_dagsverk) "
-                    + "VALUES (:naring_kode, :arstall, :kvartal, :antall_personer, "
-                    + ":tapte_dagsverk, :mulige_dagsverk)",
-            parametre
-        )
-    }
-
 
     fun opprettStatistikkForNæringer(
         sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class EksporteringPerStatistikkKategoriService(
-    private val tilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository,
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
     private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
     private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
@@ -107,7 +106,11 @@ class EksporteringPerStatistikkKategoriService(
 
     private fun eksporterSykefraværsstatistikkBransje(kvartal: ÅrstallOgKvartal) {
 
-        tilEksporteringRepository.hentSykefraværAlleBransjer(kvartal inkludertTidligere 3)
+        hentSykefraværsstatistikkForBransjer(
+            kvartaler = kvartal inkludertTidligere 3,
+            sykefraværsstatistikkNæringRepository = sykefraværStatistikkNæringRepository,
+            sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository
+        )
             .groupByBransje().let {
                 eksporterSykefraværsstatistikkPerKategori(
                     årstallOgKvartal = kvartal,
@@ -152,9 +155,10 @@ class EksporteringPerStatistikkKategoriService(
     ) {
 
         var antallStatistikkEksportert = 0
-        sykefraværGruppertEtterKode.forEach { (kode: String, statistikk: List<Sykefraværsstatistikk>) ->
-            val umaskertSykefraværsstatistikkSiste4Kvartaler: List<UmaskertSykefraværForEttKvartal> =
+        sykefraværGruppertEtterKode.forEach { (kode, statistikk) ->
+            val umaskertSykefraværsstatistikkSiste4Kvartaler =
                 statistikk.tilUmaskertSykefraværForEttKvartal()
+
             val sykefraværMedKategoriSisteKvartal =
                 umaskertSykefraværsstatistikkSiste4Kvartaler
                     .tilSykefraværMedKategoriSisteKvartal(statistikkategori, kode)

@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import config.AppConfigForJdbcTesterConfig
-import ia.felles.definisjoner.bransjer.Bransjer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.assertj.core.api.Assertions
@@ -164,8 +163,8 @@ open class SykefraværRepositoryJdbcTest {
             listOf( Næringskode("12345")), listOf(ÅrstallOgKvartal(2019, 1), ÅrstallOgKvartal(2018, 4))
         )
         Assertions.assertThat(resultat.size).isEqualTo(2)
-        Assertions.assertThat(resultat[0].dagsverkTeller).isEqualTo(BigDecimal("4.0"))
-        Assertions.assertThat(resultat[1].dagsverkTeller).isEqualTo(BigDecimal("2.0"))
+        Assertions.assertThat(resultat[0].tapteDagsverk).isEqualTo(BigDecimal("4.0"))
+        Assertions.assertThat(resultat[1].muligeDagsverk).isEqualTo(BigDecimal("2.0"))
     }
 
     private fun persisterDatasetIDb(barnehage: Underenhet.Næringsdrivende) {
@@ -281,7 +280,7 @@ open class SykefraværRepositoryJdbcTest {
             Næringskode("88911"),
             10
         )
-        val BARNEHAGEBRANSJEN = Bransje(Bransjer.BARNEHAGER)
+
         private fun sykefraværForEtÅrstallOgKvartal(
             årstall: Int, kvartal: Int, totalTapteDagsverk: Int
         ): UmaskertSykefraværForEttKvartal {

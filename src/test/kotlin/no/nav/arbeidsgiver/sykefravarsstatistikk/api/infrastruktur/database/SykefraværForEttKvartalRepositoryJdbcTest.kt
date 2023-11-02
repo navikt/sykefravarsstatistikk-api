@@ -215,7 +215,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
 
         val resultat =
             sykefraværStatistikkNæringskodeRepository.hentKvartalsvisSykefraværprosent(
-                Bransje(Bransjer.SYKEHJEM).identifikatorer
+                Bransje(Bransjer.SYKEHJEM)
             )
         AssertionsForClassTypes.assertThat(resultat.size).isEqualTo(2)
         AssertionsForClassTypes.assertThat(resultat[0])

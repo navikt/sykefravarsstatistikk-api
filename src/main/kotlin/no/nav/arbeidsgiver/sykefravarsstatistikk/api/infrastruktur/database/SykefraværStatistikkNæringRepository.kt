@@ -48,27 +48,6 @@ class SykefraværStatistikkNæringRepository(
         }
     }
 
-    fun hentForAngitteNæringer(
-        kvartaler: List<ÅrstallOgKvartal>,
-        næringer: List<Næring>
-    ): Map<ÅrstallOgKvartal, List<SykefraværsstatistikkForNæring>> {
-        return transaction {
-            select {
-                ((årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }) and
-                        (næring inList næringer.map { it.tosifferIdentifikator })
-            }.map {
-                SykefraværsstatistikkForNæring(
-                    årstall = it[årstall],
-                    kvartal = it[kvartal],
-                    næringkode = it[næring],
-                    antallPersoner = it[antallPersoner],
-                    tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
-                    muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
-                )
-            }.groupBy { ÅrstallOgKvartal(it.årstall, it.kvartal) }
-        }
-    }
-
     fun hentForAlleNæringer(
         kvartaler: List<ÅrstallOgKvartal>
     ): List<SykefraværsstatistikkForNæring> {

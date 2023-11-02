@@ -40,8 +40,6 @@ import org.mockito.kotlin.whenever
 class EksporteringServiceMockTest {
     private val legacyEksporteringRepository: LegacyEksporteringRepository = mock()
 
-    private val sykefraværsstatistikkTilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository = mock()
-
     private val kafkaClient: KafkaClient = mock()
     private val sykefraværStatistikkLandRepository = mock<SykefraværStatistikkLandRepository>()
     private val sykefraværStatistikkSektorRepository = mock<SykefraværStatistikkSektorRepository>()
@@ -119,9 +117,7 @@ class EksporteringServiceMockTest {
             )
         )
         whenever(
-            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentForAlleNæringskoder(
-                __2020_2
-            )
+            sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(any())
         ).thenReturn(listOf(sykefraværsstatistikkForNæringskode))
         whenever(
             sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(listOf(__2020_2))
@@ -199,9 +195,7 @@ class EksporteringServiceMockTest {
             )
         )
         whenever(
-            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentForAlleNæringskoder(
-                __2020_2
-            )
+            sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(any())
         ).thenReturn(
             listOf(
                 sykefraværsstatistikkNæring5SifferBransjeprogram("86101", årstallOgKvartal),

@@ -20,7 +20,6 @@ import testUtils.TestTokenUtil.createMockIdportenTokenXToken
 import testUtils.TestUtils.PRODUKSJON_NYTELSESMIDLER
 import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import testUtils.TestUtils.opprettStatistikkForLand
-import testUtils.TestUtils.opprettStatistikkForNæringskode
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import testUtils.TestUtils.slettAlleImporttidspunkt
 import testUtils.insertData
@@ -50,6 +49,9 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
 
     @Autowired
     lateinit var sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
+
+    @Autowired
+    lateinit var sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository
 
     @Autowired
     lateinit var importtidspunktRepository: ImporttidspunktRepository
@@ -275,19 +277,28 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     @Throws(Exception::class)
     fun hentAgreggertStatistikk_returnererIkkeVirksomhetstatistikkTilBrukerSomManglerIaRettigheter() {
         val (årstall, kvartal) = SISTE_PUBLISERTE_KVARTAL.minusEttÅr()
-        opprettStatistikkForNæringskode(
-            jdbcTemplate,
-            BARNEHAGER,
-            SISTE_PUBLISERTE_KVARTAL.årstall,
-            SISTE_PUBLISERTE_KVARTAL.kvartal,
-            5,
-            100,
-            10
-        )
-        opprettStatistikkForNæringskode(
-            jdbcTemplate, BARNEHAGER, årstall, kvartal, 1, 100, 10
+        sykefraværStatistikkNæringskodeRepository.settInn(
+            listOf(
+                SykefraværsstatistikkForNæringskode(
+                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
+                    næringkode5siffer = BARNEHAGER.femsifferIdentifikator,
+                    antallPersoner = 10,
+                    tapteDagsverk = 5.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                ),
+                SykefraværsstatistikkForNæringskode(
+                    årstall = årstall,
+                    kvartal = kvartal,
+                    næringkode5siffer = BARNEHAGER.femsifferIdentifikator,
+                    antallPersoner = 10,
+                    tapteDagsverk = 1.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal(),
+                )
+            )
         )
         opprettStatistikkForLand(sykefraværStatistikkLandRepository)
+
         val response = utførAutorisertKall(ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER)
         val responseBody = objectMapper.readTree(response.body())
         Assertions.assertThat(
@@ -328,7 +339,18 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     @Test
     @Throws(Exception::class)
     fun hentAgreggertStatistikk_viserNavnetTilBransjenEllerNæringenSomLabel() {
-        opprettStatistikkForNæringskode(jdbcTemplate, BARNEHAGER, 2022, 1, 5, 100, 10)
+        sykefraværStatistikkNæringskodeRepository.settInn(
+            listOf(
+                SykefraværsstatistikkForNæringskode(
+                    årstall = 2022,
+                    kvartal = 1,
+                    næringkode5siffer = BARNEHAGER.femsifferIdentifikator,
+                    antallPersoner = 10,
+                    tapteDagsverk = 5.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                )
+            )
+        )
         val response = utførAutorisertKall(ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER)
         val responseBody = objectMapper.readTree(response.body())
         val barnehageJson = responseBody["prosentSiste4KvartalerTotalt"][0]

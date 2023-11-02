@@ -94,7 +94,16 @@ internal class AggregertStatistikkServiceTest {
 
         every {
             mockSykefraværStatistikkNæringskodeRepository.hentForKvartaler(any(), any())
-        } returns genererTestSykefravær(30)
+        } returns genererTestSykefravær(30).map {
+            SykefraværsstatistikkForNæringskode(
+                årstall = it.årstallOgKvartal.årstall,
+                kvartal = it.årstallOgKvartal.kvartal,
+                næringkode5siffer = "88911",
+                antallPersoner = it.antallPersoner,
+                tapteDagsverk = it.dagsverkTeller,
+                muligeDagsverk = it.dagsverkNevner
+            )
+        }
 
         every {
             mockSykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(any())
@@ -264,7 +273,16 @@ internal class AggregertStatistikkServiceTest {
 
         every {
             mockSykefraværStatistikkNæringskodeRepository.hentForKvartaler(any(), any())
-        } returns genererTestSykefravær(30)
+        } returns genererTestSykefravær(30).map {
+            SykefraværsstatistikkForNæringskode(
+                årstall = it.årstallOgKvartal.årstall,
+                kvartal = it.årstallOgKvartal.kvartal,
+                næringkode5siffer = "88911",
+                antallPersoner = it.antallPersoner,
+                tapteDagsverk = it.dagsverkTeller,
+                muligeDagsverk = it.dagsverkNevner
+            )
+        }
 
         every { mockSykefravarStatistikkVirksomhetRepository.hentSykefraværMedVarighet(any()) } returns
                 listOf(
@@ -463,29 +481,28 @@ internal class AggregertStatistikkServiceTest {
     companion object {
         private fun umaskertSykefravær(
             årstallOgKvartal: ÅrstallOgKvartal, tapteDagsverk: Double, antallPersoner: Int
-        ): UmaskertSykefraværForEttKvartal {
-            return UmaskertSykefraværForEttKvartal(
-                årstallOgKvartal, BigDecimal(tapteDagsverk), BigDecimal(100), antallPersoner
-            )
-        }
+        ) = UmaskertSykefraværForEttKvartal(
+            årstallOgKvartal, BigDecimal(tapteDagsverk), BigDecimal(100), antallPersoner
+        )
+
+
+        private val etOrgnr = Orgnr("999999999")
+        private val etAnnetOrgnr = Orgnr("1111111111")
+
+        private val enBarnehage = Underenhet.Næringsdrivende(
+            orgnr = etOrgnr,
+            navn = "En Barnehage",
+            næringskode = Næringskode("88911"),
+            antallAnsatte = 10,
+            overordnetEnhetOrgnr = etAnnetOrgnr
+        )
+
+        private val virksomhetUtenforBransjeprogrammet = Underenhet.Næringsdrivende(
+            orgnr = etOrgnr,
+            overordnetEnhetOrgnr = etAnnetOrgnr,
+            navn = "Virksomhet utenfor bransjeprogrammet",
+            antallAnsatte = 20,
+            næringskode = Næringskode("84300")
+        )
     }
-
-    private val etOrgnr = Orgnr("999999999")
-    private val etAnnetOrgnr = Orgnr("1111111111")
-
-    private val enBarnehage = Underenhet.Næringsdrivende(
-        orgnr = etOrgnr,
-        navn = "En Barnehage",
-        næringskode = Næringskode("88911"),
-        antallAnsatte = 10,
-        overordnetEnhetOrgnr = etAnnetOrgnr
-    )
-
-    private val virksomhetUtenforBransjeprogrammet = Underenhet.Næringsdrivende(
-        orgnr = etOrgnr,
-        overordnetEnhetOrgnr = etAnnetOrgnr,
-        navn = "Virksomhet utenfor bransjeprogrammet",
-        antallAnsatte = 20,
-        næringskode = Næringskode("84300")
-    )
 }

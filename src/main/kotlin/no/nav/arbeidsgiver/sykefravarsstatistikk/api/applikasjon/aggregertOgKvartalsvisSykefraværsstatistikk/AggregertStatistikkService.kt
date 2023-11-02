@@ -214,6 +214,7 @@ class AggregertStatistikkService(
             val næringskoder = maybeBransje.get().identifikatorer.map { Næringskode(it) }
             data[Statistikkategori.BRANSJE] =
                 sykefraværStatistikkNæringskodeRepository.hentForKvartaler(næringskoder, kvartaler)
+                    .map { UmaskertSykefraværForEttKvartal(it) }
         } else {
             data[Statistikkategori.BRANSJE] =
                 sykefraværStatistikkNæringRepository.hentForKvartaler(næring, kvartaler)

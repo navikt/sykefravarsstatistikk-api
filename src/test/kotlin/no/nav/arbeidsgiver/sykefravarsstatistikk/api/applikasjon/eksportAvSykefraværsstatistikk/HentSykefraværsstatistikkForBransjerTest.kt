@@ -4,6 +4,7 @@ import config.AppConfigForJdbcTesterConfig
 import ia.felles.definisjoner.bransjer.Bransjer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkNæringRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkNæringskodeRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.hentSykefraværsstatistikkForBransjer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -30,20 +31,24 @@ open class HentSykefraværsstatistikkForBransjerTest {
     @Autowired
     private lateinit var sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
 
+    @Autowired
+    private lateinit var sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository
+
     @BeforeEach
     fun beforeEach() {
         TestUtils.slettAllStatistikkFraDatabase(
             jdbcTemplate = jdbcTemplate,
-            sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository
+            sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository,
+            sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository
         )
     }
 
     @Test
     fun `hentSykefraværsstatistikkForBransjer skal returnere tom liste når det ikke finnes noen sykefraværsstatistikk`() {
         val result = hentSykefraværsstatistikkForBransjer(
-            listOf(ÅrstallOgKvartal(2023, 1)),
-            jdbcTemplate,
-            sykefraværStatistikkNæringRepository
+            kvartaler = listOf(ÅrstallOgKvartal(2023, 1)),
+            sykefraværsstatistikkNæringRepository = sykefraværStatistikkNæringRepository,
+            sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository
         )
 
         assertThat(result).isEmpty()
@@ -53,18 +58,18 @@ open class HentSykefraværsstatistikkForBransjerTest {
     fun `henSykefraværsstatistikkForBransjer skal returnere ett kvartal med statistikk`() {
         sykefraværStatistikkNæringRepository.settInn(fireKvartalerAnleggsbransje.map {
             SykefraværsstatistikkForNæring(
-                it.årstall,
-                it.kvartal,
-                Næring("42").tosifferIdentifikator,
-                it.antallPersoner,
-                it.tapteDagsverk,
-                it.muligeDagsverk
+                årstall = it.årstall,
+                kvartal = it.kvartal,
+                næringkode = Næring("42").tosifferIdentifikator,
+                antallPersoner = it.antallPersoner,
+                tapteDagsverk = it.tapteDagsverk,
+                muligeDagsverk = it.muligeDagsverk
             )
         })
         val result = hentSykefraværsstatistikkForBransjer(
-            listOf(ÅrstallOgKvartal(2023, 1)),
-            jdbcTemplate,
-            sykefraværStatistikkNæringRepository
+            kvartaler = listOf(ÅrstallOgKvartal(2023, 1)),
+            sykefraværsstatistikkNæringRepository = sykefraværStatistikkNæringRepository,
+            sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository
         )
 
         assertThat(result).contains(fireKvartalerAnleggsbransje.first())
@@ -72,39 +77,40 @@ open class HentSykefraværsstatistikkForBransjerTest {
 
     @Test
     fun `henSykefraværsstatistikkForBransjer skal for hver bransje summere opp riktig statistikk`() {
-        listOf("87101", "87102", "86102").forEach {
-            TestUtils.opprettStatistikkForNæringskode(
-                jdbcTemplate,
-                Næringskode(it),
-                2023,
-                1,
-                1,
-                1,
-                1
-            )
-        }
+        sykefraværStatistikkNæringskodeRepository.settInn(
+            listOf("87101", "87102", "86102").map {
+                SykefraværsstatistikkForNæringskode(
+                    årstall = 2023,
+                    kvartal = 1,
+                    næringkode5siffer = it,
+                    antallPersoner = 1,
+                    tapteDagsverk = 1.toBigDecimal(),
+                    muligeDagsverk = 1.toBigDecimal(),
+                )
+            }
+        )
         val result = hentSykefraværsstatistikkForBransjer(
-            listOf(ÅrstallOgKvartal(2023, 1)),
-            jdbcTemplate,
-            sykefraværStatistikkNæringRepository
+            kvartaler = listOf(ÅrstallOgKvartal(2023, 1)),
+            sykefraværsstatistikkNæringRepository = sykefraværStatistikkNæringRepository,
+            sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository
         )
 
         assertThat(result).contains(
             SykefraværsstatistikkBransje(
-                2023,
-                1,
-                Bransjer.SYKEHJEM,
-                2,
-                BigDecimal.valueOf(2),
-                BigDecimal.valueOf(2)
+                årstall = 2023,
+                kvartal = 1,
+                bransje = Bransjer.SYKEHJEM,
+                antallPersoner = 2,
+                tapteDagsverk = BigDecimal("2.0"),
+                muligeDagsverk = BigDecimal("2.0")
             ),
             SykefraværsstatistikkBransje(
-                2023,
-                1,
-                Bransjer.SYKEHUS,
-                1,
-                BigDecimal.valueOf(1),
-                BigDecimal.valueOf(1)
+                årstall = 2023,
+                kvartal = 1,
+                bransje = Bransjer.SYKEHUS,
+                antallPersoner = 1,
+                tapteDagsverk = BigDecimal("1.0"),
+                muligeDagsverk = BigDecimal("1.0")
             )
         )
     }

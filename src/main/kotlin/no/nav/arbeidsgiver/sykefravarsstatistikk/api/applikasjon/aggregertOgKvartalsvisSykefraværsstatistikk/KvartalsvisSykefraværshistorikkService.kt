@@ -121,9 +121,7 @@ class KvartalsvisSykefraværshistorikkService(
         return KvartalsvisSykefraværshistorikkJson(
             Statistikkategori.BRANSJE,
             bransje.navn,
-            sykefraværStatistikkNæringskodeRepository.hentKvartalsvisSykefraværprosent(
-                bransje.identifikatorer
-            )
+            sykefraværStatistikkNæringskodeRepository.hentKvartalsvisSykefraværprosent(bransje)
         )
     }
 

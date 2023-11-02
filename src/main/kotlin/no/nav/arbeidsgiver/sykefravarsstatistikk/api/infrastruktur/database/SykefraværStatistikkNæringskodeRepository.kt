@@ -4,6 +4,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.springframework.stereotype.Component
+import java.lang.RuntimeException
 
 
 @Component
@@ -31,7 +32,10 @@ class SykefraværStatistikkNæringskodeRepository(
         }.count()
     }
 
-    fun hentKvartalsvisSykefraværprosent(næringskoder: List<String>): List<SykefraværForEttKvartal> {
+
+    // TODO: Gjør så dette repoet ikke trenger forholde seg til konseptet bransje
+    fun hentKvartalsvisSykefraværprosent(bransje: Bransje): List<SykefraværForEttKvartal> {
+        if (bransje.erDefinertPåTosiffernivå()) { throw RuntimeException("Denne metoden fungerer bare på femsifferdefinerte bransjer")}
         return transaction {
             slice(
                 årstall,
@@ -40,7 +44,7 @@ class SykefraværStatistikkNæringskodeRepository(
                 tapteDagsverk.sum(),
                 muligeDagsverk.sum()
             )
-                .select { næringskode inList næringskoder }
+                .select { næringskode inList bransje.identifikatorer }
                 .groupBy(årstall, kvartal)
                 .orderBy(årstall to SortOrder.ASC)
                 .orderBy(kvartal to SortOrder.ASC)
@@ -79,11 +83,12 @@ class SykefraværStatistikkNæringskodeRepository(
     fun hentForKvartaler(
         næringskoder: List<Næringskode>,
         kvartaler: List<ÅrstallOgKvartal>
-    ): List<UmaskertSykefraværForEttKvartal> {
+    ): List<SykefraværsstatistikkForNæringskode> {
         return transaction {
             slice(
                 årstall,
                 kvartal,
+                næringskode,
                 antallPersoner.sum(),
                 tapteDagsverk.sum(),
                 muligeDagsverk.sum(),
@@ -96,10 +101,12 @@ class SykefraværStatistikkNæringskodeRepository(
                 .orderBy(årstall to SortOrder.ASC)
                 .orderBy(kvartal to SortOrder.ASC)
                 .map {
-                    UmaskertSykefraværForEttKvartal(
-                        årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
-                        dagsverkTeller = it[tapteDagsverk.sum()]!!.toBigDecimal(),
-                        dagsverkNevner = it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                    SykefraværsstatistikkForNæringskode(
+                        årstall = it[årstall],
+                        kvartal = it[kvartal],
+                        næringkode5siffer = it[næringskode],
+                        tapteDagsverk = it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                        muligeDagsverk = it[tapteDagsverk.sum()]!!.toBigDecimal(),
                         antallPersoner = it[antallPersoner.sum()]!!
                     )
                 }
