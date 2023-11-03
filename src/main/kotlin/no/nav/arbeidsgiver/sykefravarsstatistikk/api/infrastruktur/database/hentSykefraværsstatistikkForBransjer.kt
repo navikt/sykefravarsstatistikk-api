@@ -9,27 +9,18 @@ fun hentSykefraværsstatistikkForBransjer(
     sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository
 ): List<SykefraværsstatistikkBransje> {
     val statistikkForNæring = sykefraværsstatistikkNæringRepository.hentForAlleNæringer(kvartaler)
+        .groupBy { ÅrstallOgKvartal(it.årstall, it.kvartal) }
 
     val statistikkForNæringskoder = sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(kvartaler)
+        .groupBy { ÅrstallOgKvartal(it.årstall, it.kvartal) }
 
-    val summert = mutableListOf<SykefraværsstatistikkBransje>()
-
-    for (kvarttal in kvartaler) {
-        summert += summerSykefraværsstatistikkPerBransjeNæringskoder(statistikkForNæringskoder.filter {
-            ÅrstallOgKvartal(
-                it.årstall,
-                it.kvartal
-            ) == kvarttal
-        }) +
-                summerSykefraværsstatistikkPerBransjeNæringer(statistikkForNæring.filter {
-                    ÅrstallOgKvartal(
-                        it.årstall,
-                        it.kvartal
-                    ) == kvarttal
-                })
-    }
-
-    return summert
+    return statistikkForNæring
+        .flatMap { summerSykefraværsstatistikkPerBransjeNæringer(it.value) } +
+            statistikkForNæringskoder.flatMap {
+                summerSykefraværsstatistikkPerBransjeNæringskoder(
+                    it.value
+                )
+            }
 }
 
 

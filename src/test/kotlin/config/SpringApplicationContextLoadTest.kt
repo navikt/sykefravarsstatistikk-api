@@ -1,6 +1,5 @@
 package config
 
-import config.SpringIntegrationTestbase
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.SykefraværshistorikkController
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test

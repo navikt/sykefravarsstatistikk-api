@@ -236,7 +236,7 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     @Test
     fun hentSykefraværAlleNæringer_siste4Kvartaler_skal_hente_riktig_data() {
         opprettStatistikkForNæringer(sykefraværStatistikkNæringRepository)
-        val forventet = java.util.List.of<SykefraværsstatistikkForNæring>(
+        val forventet = listOf(
             SykefraværsstatistikkForNæring(
                 SISTE_PUBLISERTE_KVARTAL.årstall,
                 SISTE_PUBLISERTE_KVARTAL.kvartal,
@@ -288,7 +288,7 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     @Test
     fun hentSykefraværAlleNæringer_siste4Kvartaler_kan_likevel_hente_bare_siste_publiserte_kvartal() {
         opprettStatistikkForNæringer(sykefraværStatistikkNæringRepository)
-        val forventet = java.util.List.of<SykefraværsstatistikkForNæring>(
+        val forventet = listOf(
             SykefraværsstatistikkForNæring(
                 SISTE_PUBLISERTE_KVARTAL.årstall,
                 SISTE_PUBLISERTE_KVARTAL.kvartal,

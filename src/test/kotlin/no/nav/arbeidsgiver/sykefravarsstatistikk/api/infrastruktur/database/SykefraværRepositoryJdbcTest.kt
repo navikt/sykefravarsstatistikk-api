@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import config.AppConfigForJdbcTesterConfig
+import ia.felles.definisjoner.bransjer.Bransjer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.assertj.core.api.Assertions
@@ -132,14 +133,14 @@ open class SykefraværRepositoryJdbcTest {
                 SykefraværsstatistikkForNæringskode(
                     årstall = 2019,
                     kvartal = 2,
-                    næringkode5siffer = Næringskode("12345").femsifferIdentifikator,
+                    næringkode5siffer = Næringskode("88911").femsifferIdentifikator,
                     tapteDagsverk = 1.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal()
                 ),
                 SykefraværsstatistikkForNæringskode(
                     årstall = 2019,
                     kvartal = 1,
-                    næringkode5siffer = Næringskode("12345").femsifferIdentifikator,
+                    næringkode5siffer = Næringskode("88911").femsifferIdentifikator,
                     tapteDagsverk = 2.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal()
                 ),
@@ -153,14 +154,18 @@ open class SykefraværRepositoryJdbcTest {
                 SykefraværsstatistikkForNæringskode(
                     årstall = 2018,
                     kvartal = 4,
-                    næringkode5siffer = Næringskode("12345").femsifferIdentifikator,
+                    næringkode5siffer = Næringskode("88911").femsifferIdentifikator,
                     tapteDagsverk = 4.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal()
                 ),
             )
         )
-        val resultat = sykefraværStatistikkNæringskodeRepository.hentForKvartaler(
-            listOf( Næringskode("12345")), listOf(ÅrstallOgKvartal(2019, 1), ÅrstallOgKvartal(2018, 4))
+        val resultat = sykefraværStatistikkNæringskodeRepository.hentForBransje(
+            Bransje(Bransjer.BARNEHAGER),
+            listOf(
+                ÅrstallOgKvartal(2019, 1),
+                ÅrstallOgKvartal(2018, 4)
+            )
         )
         Assertions.assertThat(resultat.size).isEqualTo(2)
         Assertions.assertThat(resultat[0].tapteDagsverk).isEqualTo(BigDecimal("4.0"))

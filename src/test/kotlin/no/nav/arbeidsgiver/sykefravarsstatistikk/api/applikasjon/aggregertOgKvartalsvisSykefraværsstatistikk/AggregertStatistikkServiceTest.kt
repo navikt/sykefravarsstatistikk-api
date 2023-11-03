@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk
 
 import arrow.core.right
+import ia.felles.definisjoner.bransjer.Bransjer
 import io.kotest.matchers.equals.shouldBeEqual
 import io.mockk.every
 import io.mockk.mockk
@@ -58,7 +59,7 @@ internal class AggregertStatistikkServiceTest {
         every { mockSykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(any(), any()) } returns listOf()
         every { mockSykefravarStatistikkVirksomhetRepository.hentSykefraværMedVarighet(any()) } returns listOf()
         every { mockSykefraværStatistikkNæringRepository.hentForKvartaler(any(), any()) } returns listOf()
-        every { mockSykefraværStatistikkNæringskodeRepository.hentForKvartaler(any(), any()) } returns listOf()
+        every { mockSykefraværStatistikkNæringskodeRepository.hentForBransje(any(), any()) } returns listOf()
         every { mockSykefraværStatistikkLandRepository.hentForKvartaler(any()) } returns listOf()
 
         every { mockSykefravarStatistikkVirksomhetGraderingRepository.hentForOrgnr(any()) } returns listOf()
@@ -93,12 +94,12 @@ internal class AggregertStatistikkServiceTest {
         } returns genererTestSykefravær(10)
 
         every {
-            mockSykefraværStatistikkNæringskodeRepository.hentForKvartaler(any(), any())
+            mockSykefraværStatistikkNæringskodeRepository.hentForBransje(any(), any())
         } returns genererTestSykefravær(30).map {
-            SykefraværsstatistikkForNæringskode(
+            SykefraværsstatistikkBransje(
                 årstall = it.årstallOgKvartal.årstall,
                 kvartal = it.årstallOgKvartal.kvartal,
-                næringkode5siffer = "88911",
+                bransje = Bransjer.BARNEHAGER,
                 antallPersoner = it.antallPersoner,
                 tapteDagsverk = it.dagsverkTeller,
                 muligeDagsverk = it.dagsverkNevner
@@ -272,12 +273,12 @@ internal class AggregertStatistikkServiceTest {
         } returns genererTestSykefravær(10)
 
         every {
-            mockSykefraværStatistikkNæringskodeRepository.hentForKvartaler(any(), any())
+            mockSykefraværStatistikkNæringskodeRepository.hentForBransje(any(), any())
         } returns genererTestSykefravær(30).map {
-            SykefraværsstatistikkForNæringskode(
+            SykefraværsstatistikkBransje(
                 årstall = it.årstallOgKvartal.årstall,
                 kvartal = it.årstallOgKvartal.kvartal,
-                næringkode5siffer = "88911",
+                bransje = Bransjer.BARNEHAGER,
                 antallPersoner = it.antallPersoner,
                 tapteDagsverk = it.dagsverkTeller,
                 muligeDagsverk = it.dagsverkNevner

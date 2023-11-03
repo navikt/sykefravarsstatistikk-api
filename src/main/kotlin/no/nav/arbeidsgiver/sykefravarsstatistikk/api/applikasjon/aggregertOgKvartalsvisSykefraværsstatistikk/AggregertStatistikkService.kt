@@ -211,9 +211,8 @@ class AggregertStatistikkService(
             data[Statistikkategori.NÆRING] =
                 sykefraværStatistikkNæringRepository.hentForKvartaler(næring, kvartaler)
         } else if (maybeBransje.get().erDefinertPåFemsiffernivå()) {
-            val næringskoder = maybeBransje.get().identifikatorer.map { Næringskode(it) }
             data[Statistikkategori.BRANSJE] =
-                sykefraværStatistikkNæringskodeRepository.hentForKvartaler(næringskoder, kvartaler)
+                sykefraværStatistikkNæringskodeRepository.hentForBransje(maybeBransje.get(), kvartaler)
                     .map { UmaskertSykefraværForEttKvartal(it) }
         } else {
             data[Statistikkategori.BRANSJE] =

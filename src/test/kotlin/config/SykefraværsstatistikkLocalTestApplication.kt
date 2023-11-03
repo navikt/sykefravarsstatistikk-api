@@ -1,6 +1,5 @@
 package config
 
-import config.AppConfigForJdbcTesterConfig
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties

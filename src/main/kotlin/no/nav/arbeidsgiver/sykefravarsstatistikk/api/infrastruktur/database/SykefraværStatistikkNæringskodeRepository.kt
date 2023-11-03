@@ -79,31 +79,30 @@ class SykefraværStatistikkNæringskodeRepository(
         }
     }
 
-    fun hentForKvartaler(
-        næringskoder: List<Næringskode>,
+    fun hentForBransje(
+        bransje: Bransje,
         kvartaler: List<ÅrstallOgKvartal>
-    ): List<SykefraværsstatistikkForNæringskode> {
+    ): List<SykefraværsstatistikkBransje> {
         return transaction {
             slice(
                 årstall,
                 kvartal,
-                næringskode,
                 antallPersoner.sum(),
                 tapteDagsverk.sum(),
                 muligeDagsverk.sum(),
             )
                 .select {
-                    (næringskode inList næringskoder.map { it.femsifferIdentifikator }) and
+                    (næringskode inList bransje.identifikatorer) and
                             ((årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal })
                 }
                 .groupBy(årstall, kvartal, næringskode)
                 .orderBy(årstall to SortOrder.ASC)
                 .orderBy(kvartal to SortOrder.ASC)
                 .map {
-                    SykefraværsstatistikkForNæringskode(
+                    SykefraværsstatistikkBransje(
                         årstall = it[årstall],
                         kvartal = it[kvartal],
-                        næringkode5siffer = it[næringskode],
+                        bransje = bransje.type,
                         tapteDagsverk = it[tapteDagsverk.sum()]!!.toBigDecimal(),
                         muligeDagsverk = it[tapteDagsverk.sum()]!!.toBigDecimal(),
                         antallPersoner = it[antallPersoner.sum()]!!
