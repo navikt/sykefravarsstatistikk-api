@@ -200,11 +200,10 @@ class AggregertStatistikkService(
         val maybeBransje = Bransjeprogram.finnBransje(virksomhet.næringskode)
         val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> =
             EnumMap(Statistikkategori::class.java)
-        val fraÅrstallOgKvartal = kvartaler.minOf { it }
 
         data[Statistikkategori.VIRKSOMHET] = sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(
             virksomhet,
-            fraÅrstallOgKvartal
+            kvartaler
         )
         data[Statistikkategori.LAND] = sykefraværStatistikkLandRepository.hentForKvartaler(kvartaler)
         if (maybeBransje.isEmpty) {

@@ -90,7 +90,10 @@ open class SykefraværRepositoryJdbcTest {
     fun hentSykefraværprosentVirksomhet__skal_returnerer_empty_list_dersom_ingen_data_funnet_for_årstall_og_kvartal() {
         persisterDatasetIDb(BARNEHAGE)
         val resultat =
-            sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(BARNEHAGE, ÅrstallOgKvartal(2021, 4))
+            sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(
+                BARNEHAGE,
+                listOf(ÅrstallOgKvartal(2021, 4))
+            )
         Assertions.assertThat(resultat.size).isEqualTo(0)
     }
 
@@ -98,7 +101,10 @@ open class SykefraværRepositoryJdbcTest {
     fun hentSykefraværprosentVirksomhet__skal_returnere_riktig_sykefravær() {
         persisterDatasetIDb(BARNEHAGE)
         val resultat =
-            sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(BARNEHAGE, ÅrstallOgKvartal(2018, 3))
+            sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(
+                virksomhet = BARNEHAGE,
+                kvartaler = ÅrstallOgKvartal(2019, 2) inkludertTidligere 3
+            )
         Assertions.assertThat(resultat.size).isEqualTo(4)
         Assertions.assertThat(resultat[0]).isEqualTo(sykefraværForEtÅrstallOgKvartal(2018, 3, 6))
         Assertions.assertThat(resultat[3]).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2))
@@ -108,7 +114,10 @@ open class SykefraværRepositoryJdbcTest {
     fun hentSykefraværprosentVirksomhet__skal_returnere_riktig_sykefravær_for_ønskede_kvartaler() {
         persisterDatasetIDb(BARNEHAGE)
         val resultat =
-            sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(BARNEHAGE, ÅrstallOgKvartal(2019, 1))
+            sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(
+                BARNEHAGE,
+                ÅrstallOgKvartal(2019, 2) inkludertTidligere 1
+            )
         Assertions.assertThat(resultat.size).isEqualTo(2)
         Assertions.assertThat(resultat[0]).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 1, 3))
         Assertions.assertThat(resultat[1]).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2))
