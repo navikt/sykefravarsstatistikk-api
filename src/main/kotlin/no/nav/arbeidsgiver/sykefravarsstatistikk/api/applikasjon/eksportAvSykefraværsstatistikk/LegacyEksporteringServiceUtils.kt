@@ -5,7 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetMetadata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetSykefravær
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.EksporteringRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.LegacyEksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
 import org.springframework.stereotype.Component
 import java.util.function.Consumer
@@ -14,7 +14,7 @@ import java.util.stream.Collectors
 
 @Component
 @Deprecated("Slettes når Salesforce-teamet har gått over til eksport per kategori")
-object EksporteringServiceUtils {
+object LegacyEksporteringServiceUtils {
     const val OPPDATER_VIRKSOMHETER_SOM_ER_EKSPORTERT_BATCH_STØRRELSE = 1000
     const val EKSPORT_BATCH_STØRRELSE = 10000
     fun filterByKvartal(
@@ -208,16 +208,16 @@ object EksporteringServiceUtils {
             .collect(Collectors.toList())
     }
 
-    fun cleanUpEtterBatch(eksporteringRepository: EksporteringRepository) {
-        eksporteringRepository.oppdaterAlleVirksomheterIEksportTabellSomErBekrreftetEksportert()
-        eksporteringRepository.slettVirksomheterBekreftetEksportert()
+    fun cleanUpEtterBatch(legacyEksporteringRepository: LegacyEksporteringRepository) {
+        legacyEksporteringRepository.oppdaterAlleVirksomheterIEksportTabellSomErBekrreftetEksportert()
+        legacyEksporteringRepository.slettVirksomheterBekreftetEksportert()
     }
 
     fun leggTilOrgnrIEksporterteVirksomheterListaOglagreIDbNårListaErFull(
         orgnr: String,
         årstallOgKvartal: ÅrstallOgKvartal,
         virksomheterSomSkalFlaggesSomEksportert: MutableList<String>,
-        eksporteringRepository: EksporteringRepository,
+        legacyEksporteringRepository: LegacyEksporteringRepository,
         kafkaClient: KafkaClient
     ): Int {
         virksomheterSomSkalFlaggesSomEksportert.add(orgnr)
@@ -227,7 +227,7 @@ object EksporteringServiceUtils {
             lagreEksporterteVirksomheterOgNullstillLista(
                 årstallOgKvartal,
                 virksomheterSomSkalFlaggesSomEksportert,
-                eksporteringRepository,
+                legacyEksporteringRepository,
                 kafkaClient
             )
         } else {
@@ -238,12 +238,12 @@ object EksporteringServiceUtils {
     fun lagreEksporterteVirksomheterOgNullstillLista(
         årstallOgKvartal: ÅrstallOgKvartal,
         virksomheterSomSkalFlaggesSomEksportert: MutableList<String>,
-        eksporteringRepository: EksporteringRepository,
+        legacyEksporteringRepository: LegacyEksporteringRepository,
         kafkaClient: KafkaClient
     ): Int {
         val antallSomSkalOppdateres = virksomheterSomSkalFlaggesSomEksportert.size
         val startWriteToDB = System.nanoTime()
-        eksporteringRepository.batchOpprettVirksomheterBekreftetEksportert(
+        legacyEksporteringRepository.batchOpprettVirksomheterBekreftetEksportert(
             virksomheterSomSkalFlaggesSomEksportert, årstallOgKvartal
         )
         virksomheterSomSkalFlaggesSomEksportert.clear()
@@ -254,9 +254,9 @@ object EksporteringServiceUtils {
 
     fun getListeAvVirksomhetEksportPerKvartal(
         årstallOgKvartal: ÅrstallOgKvartal?,
-        eksporteringRepository: EksporteringRepository
+        legacyEksporteringRepository: LegacyEksporteringRepository
     ): List<VirksomhetEksportPerKvartal> {
-        val virksomhetEksportPerKvartal = eksporteringRepository.hentVirksomhetEksportPerKvartal(
+        val virksomhetEksportPerKvartal = legacyEksporteringRepository.hentVirksomhetEksportPerKvartal(
             årstallOgKvartal!!
         )
         val virksomhetEksportPerKvartalStream =

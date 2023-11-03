@@ -13,11 +13,11 @@ import java.util.stream.Stream
 
 @Component
 class KvartalsvisSykefraværshistorikkService(
-    private val kvartalsvisSykefraværprosentRepository: KvartalsvisSykefraværRepository,
     private val sykefraværStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
     private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
-    private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
+    private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository,
+    private val sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -28,7 +28,6 @@ class KvartalsvisSykefraværshistorikkService(
         underenhet: Virksomhet, sektor: Sektor?
     ): MutableList<KvartalsvisSykefraværshistorikkJson> {
         val bransje = finnBransje(underenhet)
-        val skalHenteDataPåNæring = bransje.isEmpty || bransje.get().erDefinertPåTosiffernivå()
         return Stream.of(
             uthentingMedFeilhåndteringOgTimeout(
                 { hentSykefraværshistorikkLand() },
@@ -40,11 +39,7 @@ class KvartalsvisSykefraværshistorikkService(
                 Statistikkategori.SEKTOR,
                 sektor!!.displaystring
             ),
-            if (skalHenteDataPåNæring) uthentingAvSykefraværshistorikkNæring(underenhet) else uthentingMedFeilhåndteringOgTimeout(
-                { hentSykefraværshistorikkBransje(bransje.get()) },
-                Statistikkategori.BRANSJE,
-                bransje.get().navn
-            ),
+            uthentingForBransjeEllerNæring(underenhet.næringskode.næring, bransje.orElse(null)),
             uthentingMedFeilhåndteringOgTimeout(
                 {
                     hentSykefraværshistorikkVirksomhet(
@@ -57,6 +52,27 @@ class KvartalsvisSykefraværshistorikkService(
         )
             .map { obj: CompletableFuture<KvartalsvisSykefraværshistorikkJson> -> obj.join() }
             .collect(Collectors.toList())
+    }
+
+    private fun uthentingForBransjeEllerNæring(
+        næring: Næring,
+        bransje: Bransje?
+    ): CompletableFuture<KvartalsvisSykefraværshistorikkJson> {
+        val skalHenteDataPåNæring = bransje == null || bransje.erDefinertPåTosiffernivå()
+
+        return if (skalHenteDataPåNæring) {
+            uthentingMedFeilhåndteringOgTimeout(
+                { hentSykefraværshistorikkNæring(næring) },
+                Statistikkategori.NÆRING,
+                næring.navn
+            )
+        } else {
+            uthentingMedFeilhåndteringOgTimeout(
+                { hentSykefraværshistorikkNæringskoder(bransje!!) },
+                Statistikkategori.BRANSJE,
+                bransje!!.navn
+            )
+        }
     }
 
     fun hentSykefraværshistorikk(
@@ -77,7 +93,7 @@ class KvartalsvisSykefraværshistorikkService(
         return kvartalsvisSykefraværshistorikkListe
     }
 
-    protected fun hentSykefraværshistorikkLand(): KvartalsvisSykefraværshistorikkJson {
+    private fun hentSykefraværshistorikkLand(): KvartalsvisSykefraværshistorikkJson {
         return KvartalsvisSykefraværshistorikkJson(
             Statistikkategori.LAND,
             SYKEFRAVÆRPROSENT_LAND_LABEL,
@@ -101,11 +117,11 @@ class KvartalsvisSykefraværshistorikkService(
         )
     }
 
-    private fun hentSykefraværshistorikkBransje(bransje: Bransje): KvartalsvisSykefraværshistorikkJson {
+    private fun hentSykefraværshistorikkNæringskoder(bransje: Bransje): KvartalsvisSykefraværshistorikkJson {
         return KvartalsvisSykefraværshistorikkJson(
             Statistikkategori.BRANSJE,
             bransje.navn,
-            kvartalsvisSykefraværprosentRepository.hentKvartalsvisSykefraværprosentBransje(bransje)
+            sykefraværStatistikkNæringskodeRepository.hentKvartalsvisSykefraværprosent(bransje)
         )
     }
 
@@ -117,34 +133,6 @@ class KvartalsvisSykefraværshistorikkService(
             virksomhet.navn,
             sykefraværStatistikkVirksomhetRepository.hentAlt(virksomhet.orgnr)
         )
-    }
-
-    private fun uthentingAvSykefraværshistorikkNæring(underenhet: Virksomhet): CompletableFuture<KvartalsvisSykefraværshistorikkJson> {
-        return CompletableFuture.supplyAsync<Næring> { underenhet.næringskode.næring }
-            .orTimeout(TIMEOUT_UTHENTING_FRA_DB_I_SEKUNDER.toLong(), TimeUnit.SECONDS)
-            .thenCompose { næring: Næring ->
-                uthentingMedFeilhåndteringOgTimeout(
-                    { hentSykefraværshistorikkNæring(næring) },
-                    Statistikkategori.NÆRING,
-                    næring.navn
-                )
-            }
-            .handle { result: KvartalsvisSykefraværshistorikkJson?, throwable: Throwable? ->
-                if (throwable == null) {
-                    return@handle result
-                } else {
-                    log.warn(
-                        String.format(
-                            "Fikk '%s' ved uthenting av næring '%s'. " + "Returnerer en tom liste",
-                            throwable.message, underenhet.næringskode.næring.tosifferIdentifikator
-                        ),
-                        throwable
-                    )
-                    return@handle KvartalsvisSykefraværshistorikkJson(
-                        Statistikkategori.NÆRING, null, listOf<SykefraværForEttKvartal>()
-                    )
-                }
-            }
     }
 
     private fun uthentingMedFeilhåndteringOgTimeout(

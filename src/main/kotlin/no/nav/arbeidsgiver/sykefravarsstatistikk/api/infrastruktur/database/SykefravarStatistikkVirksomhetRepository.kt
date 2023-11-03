@@ -23,7 +23,7 @@ class SykefravarStatistikkVirksomhetRepository(
     val virksomhetstype = char("rectype")
 
     fun hentUmaskertSykefravær(
-        virksomhet: Virksomhet, fraÅrstallOgKvartal: ÅrstallOgKvartal
+        virksomhet: Virksomhet, kvartaler: List<ÅrstallOgKvartal>
     ): List<UmaskertSykefraværForEttKvartal> {
         return transaction {
             slice(
@@ -33,16 +33,16 @@ class SykefravarStatistikkVirksomhetRepository(
                 årstall,
                 kvartal
             ).select {
-                orgnr eq virksomhet.orgnr.verdi and ((årstall eq fraÅrstallOgKvartal.årstall) and (kvartal greaterEq fraÅrstallOgKvartal.kvartal)) or (årstall greater fraÅrstallOgKvartal.årstall)
+                orgnr eq virksomhet.orgnr.verdi and (årstall to kvartal inList kvartaler.map { it.årstall to it.kvartal })
             }
                 .groupBy(årstall, kvartal)
                 .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
                 .map {
                     UmaskertSykefraværForEttKvartal(
-                        ÅrstallOgKvartal(it[årstall], it[kvartal]),
-                        it[tapteDagsverk.sum()]!!.toBigDecimal(),
-                        it[muligeDagsverk.sum()]!!.toBigDecimal(),
-                        it[antallPersoner.sum()]!!
+                        årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                        dagsverkTeller = it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                        dagsverkNevner = it[muligeDagsverk.sum()]!!.toBigDecimal(),
+                        antallPersoner = it[antallPersoner.sum()]!!
                     )
                 }.sorted()
         }

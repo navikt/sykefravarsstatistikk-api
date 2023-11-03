@@ -12,18 +12,19 @@ import testUtils.TestData.etOrgnr
 import java.math.BigDecimal
 
 class KvartalsvisSykefraværshistorikkServiceTest {
-    private val kvartalsvisSykefraværprosentRepository: KvartalsvisSykefraværRepository = mockk()
     private val sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository = mockk()
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository = mockk()
-    val sykefraværStatistikkSektorRepository = mockk<SykefraværStatistikkSektorRepository>()
+    private val sykefraværStatistikkSektorRepository = mockk<SykefraværStatistikkSektorRepository>()
     private val sykefraværStatistikkNæringRepository = mockk<SykefraværStatistikkNæringRepository>()
+    private val sykefraværStatistikkNæringskodeRepository = mockk<SykefraværStatistikkNæringskodeRepository>()
+
     private val kvartalsvisSykefraværshistorikkService: KvartalsvisSykefraværshistorikkService =
         KvartalsvisSykefraværshistorikkService(
-            kvartalsvisSykefraværprosentRepository = kvartalsvisSykefraværprosentRepository,
             sykefraværStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
             sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
             sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository,
             sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository,
+            sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository
         )
 
 

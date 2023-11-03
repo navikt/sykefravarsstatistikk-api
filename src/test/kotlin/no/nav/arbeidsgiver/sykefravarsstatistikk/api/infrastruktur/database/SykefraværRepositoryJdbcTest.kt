@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
 import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
@@ -40,7 +39,7 @@ open class SykefraværRepositoryJdbcTest {
     private lateinit var sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
 
     @Autowired
-    private lateinit var sykefraværRepository: SykefraværRepository
+    private lateinit var sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository
 
 
     @BeforeEach
@@ -49,6 +48,7 @@ open class SykefraværRepositoryJdbcTest {
             jdbcTemplate = jdbcTemplate,
             sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
             sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository
+
         )
     }
 
@@ -90,7 +90,10 @@ open class SykefraværRepositoryJdbcTest {
     fun hentSykefraværprosentVirksomhet__skal_returnerer_empty_list_dersom_ingen_data_funnet_for_årstall_og_kvartal() {
         persisterDatasetIDb(BARNEHAGE)
         val resultat =
-            sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(BARNEHAGE, ÅrstallOgKvartal(2021, 4))
+            sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(
+                BARNEHAGE,
+                listOf(ÅrstallOgKvartal(2021, 4))
+            )
         Assertions.assertThat(resultat.size).isEqualTo(0)
     }
 
@@ -98,7 +101,10 @@ open class SykefraværRepositoryJdbcTest {
     fun hentSykefraværprosentVirksomhet__skal_returnere_riktig_sykefravær() {
         persisterDatasetIDb(BARNEHAGE)
         val resultat =
-            sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(BARNEHAGE, ÅrstallOgKvartal(2018, 3))
+            sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(
+                virksomhet = BARNEHAGE,
+                kvartaler = ÅrstallOgKvartal(2019, 2) inkludertTidligere 3
+            )
         Assertions.assertThat(resultat.size).isEqualTo(4)
         Assertions.assertThat(resultat[0]).isEqualTo(sykefraværForEtÅrstallOgKvartal(2018, 3, 6))
         Assertions.assertThat(resultat[3]).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2))
@@ -108,7 +114,10 @@ open class SykefraværRepositoryJdbcTest {
     fun hentSykefraværprosentVirksomhet__skal_returnere_riktig_sykefravær_for_ønskede_kvartaler() {
         persisterDatasetIDb(BARNEHAGE)
         val resultat =
-            sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(BARNEHAGE, ÅrstallOgKvartal(2019, 1))
+            sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(
+                BARNEHAGE,
+                ÅrstallOgKvartal(2019, 2) inkludertTidligere 1
+            )
         Assertions.assertThat(resultat.size).isEqualTo(2)
         Assertions.assertThat(resultat[0]).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 1, 3))
         Assertions.assertThat(resultat[1]).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2))
@@ -117,7 +126,7 @@ open class SykefraværRepositoryJdbcTest {
     @Test
     fun hentUmaskertSykefraværForEttKvartalListe_skal_hente_riktig_data() {
         persisterDatasetIDb(Næring("10"))
-        val resultat = sykefraværStatistikkNæringRepository.hentUmaskertSykefravær(
+        val resultat = sykefraværStatistikkNæringRepository.hentForKvartaler(
             Næring("10"),
             ÅrstallOgKvartal(2019, 2) inkludertTidligere 1
         )
@@ -127,14 +136,49 @@ open class SykefraværRepositoryJdbcTest {
     }
 
     @Test
-    fun hentUmaskertSykefravær_skal_hente_riktig_data_for_5sifferBransje() {
-        persisterDatasetIDbForBransjeMed5SifferKode(BARNEHAGEBRANSJEN)
-        val resultat = sykefraværRepository.hentUmaskertSykefravær(
-            BARNEHAGEBRANSJEN, ÅrstallOgKvartal(2019, 1)
+    fun `skal hente riktig data for næringskode`() {
+        sykefraværStatistikkNæringskodeRepository.settInn(
+            listOf(
+                SykefraværsstatistikkForNæringskode(
+                    årstall = 2019,
+                    kvartal = 2,
+                    næringkode5siffer = Næringskode("88911").femsifferIdentifikator,
+                    tapteDagsverk = 1.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                ),
+                SykefraværsstatistikkForNæringskode(
+                    årstall = 2019,
+                    kvartal = 1,
+                    næringkode5siffer = Næringskode("88911").femsifferIdentifikator,
+                    tapteDagsverk = 2.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                ),
+                SykefraværsstatistikkForNæringskode(
+                    årstall = 2019,
+                    kvartal = 1,
+                    næringkode5siffer = Næringskode("99999").femsifferIdentifikator,
+                    tapteDagsverk = 3.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                ),
+                SykefraværsstatistikkForNæringskode(
+                    årstall = 2018,
+                    kvartal = 4,
+                    næringkode5siffer = Næringskode("88911").femsifferIdentifikator,
+                    tapteDagsverk = 4.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                ),
+            )
+        )
+        val resultat = sykefraværStatistikkNæringskodeRepository.hentForBransje(
+            Bransje(Bransjer.BARNEHAGER),
+            listOf(
+                ÅrstallOgKvartal(2019, 1),
+                ÅrstallOgKvartal(2018, 4)
+            )
         )
         Assertions.assertThat(resultat.size).isEqualTo(2)
-        Assertions.assertThat(resultat[0]).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 1, 3))
-        Assertions.assertThat(resultat[1]).isEqualTo(sykefraværForEtÅrstallOgKvartal(2019, 2, 2))
+        Assertions.assertThat(resultat[0].tapteDagsverk).isEqualTo(BigDecimal("4.0"))
+        Assertions.assertThat(resultat[1].muligeDagsverk).isEqualTo(BigDecimal("100.0"))
     }
 
     private fun persisterDatasetIDb(barnehage: Underenhet.Næringsdrivende) {
@@ -242,105 +286,6 @@ open class SykefraværRepositoryJdbcTest {
         )
     }
 
-    private fun persisterDatasetIDbForBransjeMed5SifferKode(bransje: Bransje) {
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring5siffer "
-                    + "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, "
-                    + "mulige_dagsverk)"
-                    + "values "
-                    + "(:arstall, :kvartal, :næringskode, :antall_personer, :tapte_dagsverk, "
-                    + ":mulige_dagsverk)",
-            parametre(
-                2019,
-                2,
-                Næringskode(bransje.identifikatorer[0]),
-                10,
-                2,
-                100
-            )
-        )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring5siffer "
-                    + "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, "
-                    + "mulige_dagsverk)"
-                    + "values "
-                    + "(:arstall, :kvartal, :næringskode, :antall_personer, :tapte_dagsverk, "
-                    + ":mulige_dagsverk)",
-            parametre(2019, 1, Næringskode("94444"), 10, 3, 100)
-        )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring5siffer "
-                    + "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, "
-                    + "mulige_dagsverk)"
-                    + "values "
-                    + "(:arstall, :kvartal, :næringskode, :antall_personer, :tapte_dagsverk, "
-                    + ":mulige_dagsverk)",
-            parametre(
-                2019,
-                1,
-                Næringskode(bransje.identifikatorer[0]),
-                10,
-                3,
-                100
-            )
-        )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring5siffer "
-                    + "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, "
-                    + "mulige_dagsverk)"
-                    + "values "
-                    + "(:arstall, :kvartal, :næringskode, :antall_personer, :tapte_dagsverk, "
-                    + ":mulige_dagsverk)",
-            parametre(
-                2018,
-                4,
-                Næringskode(bransje.identifikatorer[0]),
-                10,
-                5,
-                100
-            )
-        )
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring5siffer "
-                    + "(arstall, kvartal, naring_kode, antall_personer, tapte_dagsverk, "
-                    + "mulige_dagsverk)"
-                    + "values "
-                    + "(:arstall, :kvartal, :næringskode, :antall_personer, :tapte_dagsverk, "
-                    + ":mulige_dagsverk)",
-            parametre(
-                2018,
-                3,
-                Næringskode(bransje.identifikatorer[0]),
-                10,
-                6,
-                100
-            )
-        )
-    }
-
-    private fun parametre(
-        årstall: Int, kvartal: Int, antallPersoner: Int, tapteDagsverk: Int, muligeDagsverk: Int
-    ): MapSqlParameterSource {
-        return MapSqlParameterSource()
-            .addValue("arstall", årstall)
-            .addValue("kvartal", kvartal)
-            .addValue("antall_personer", antallPersoner)
-            .addValue("tapte_dagsverk", tapteDagsverk)
-            .addValue("mulige_dagsverk", muligeDagsverk)
-    }
-
-    private fun parametre(
-        årstall: Int,
-        kvartal: Int,
-        næringskode: Næringskode,
-        antallPersoner: Int,
-        tapteDagsverk: Int,
-        muligeDagsverk: Int
-    ): MapSqlParameterSource {
-        return parametre(årstall, kvartal, antallPersoner, tapteDagsverk, muligeDagsverk)
-            .addValue("næringskode", næringskode.femsifferIdentifikator)
-    }
-
     companion object {
         val BARNEHAGE = Underenhet.Næringsdrivende(
             Orgnr("999999999"),
@@ -349,25 +294,15 @@ open class SykefraværRepositoryJdbcTest {
             Næringskode("88911"),
             10
         )
-        val BARNEHAGEBRANSJEN = Bransje(Bransjer.BARNEHAGER)
-        private fun sykefraværForEtÅrstallOgKvartal(
-            årstall: Int, kvartal: Int, totalTapteDagsverk: Int
-        ): UmaskertSykefraværForEttKvartal {
-            return sykefraværForEtÅrstallOgKvartal(årstall, kvartal, totalTapteDagsverk, 100, 10)
-        }
 
         private fun sykefraværForEtÅrstallOgKvartal(
-            årstall: Int,
-            kvartal: Int,
-            totalTapteDagsverk: Int,
-            totalMuligeDagsverk: Int,
-            totalAntallPersoner: Int
+            årstall: Int, kvartal: Int, totalTapteDagsverk: Int
         ): UmaskertSykefraværForEttKvartal {
             return UmaskertSykefraværForEttKvartal(
                 ÅrstallOgKvartal(årstall, kvartal),
                 BigDecimal(totalTapteDagsverk),
-                BigDecimal(totalMuligeDagsverk),
-                totalAntallPersoner
+                BigDecimal(100),
+                10
             )
         }
     }

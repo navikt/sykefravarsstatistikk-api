@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk
+package infrastruktur.database
 
 import config.AppConfigForJdbcTesterConfig
 import io.kotest.matchers.shouldBe
@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
 import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
@@ -34,9 +33,6 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     @Autowired
-    private lateinit var sykefraværsstatistikkTilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository
-
-    @Autowired
     private lateinit var sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository
 
     @Autowired
@@ -47,6 +43,9 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
     @Autowired
     lateinit var sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
+
+    @Autowired
+    lateinit var sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository
 
     private val produksjonAvKlær = Næringskode("14190")
     private val undervisning = Næringskode("86907")
@@ -61,6 +60,7 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
             jdbcTemplate,
             sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository,
             sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository,
+            sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository,
         )
     }
 
@@ -70,6 +70,7 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
             jdbcTemplate,
             sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository,
             sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository,
+            sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository,
         )
     }
 
@@ -85,7 +86,6 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
                 )
             )
         ) shouldBe emptyList()
-
     }
 
     @Test
@@ -236,7 +236,7 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     @Test
     fun hentSykefraværAlleNæringer_siste4Kvartaler_skal_hente_riktig_data() {
         opprettStatistikkForNæringer(sykefraværStatistikkNæringRepository)
-        val forventet = java.util.List.of<SykefraværsstatistikkForNæring>(
+        val forventet = listOf(
             SykefraværsstatistikkForNæring(
                 SISTE_PUBLISERTE_KVARTAL.årstall,
                 SISTE_PUBLISERTE_KVARTAL.kvartal,
@@ -288,7 +288,7 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     @Test
     fun hentSykefraværAlleNæringer_siste4Kvartaler_kan_likevel_hente_bare_siste_publiserte_kvartal() {
         opprettStatistikkForNæringer(sykefraværStatistikkNæringRepository)
-        val forventet = java.util.List.of<SykefraværsstatistikkForNæring>(
+        val forventet = listOf(
             SykefraværsstatistikkForNæring(
                 SISTE_PUBLISERTE_KVARTAL.årstall,
                 SISTE_PUBLISERTE_KVARTAL.kvartal,
@@ -329,11 +329,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
         opprettStatistikkNæring5SifferTestData(
             ÅrstallOgKvartal(2019, 2), ÅrstallOgKvartal(2019, 1)
         )
-        val resultat = sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentForAlleNæringskoder(
-            ÅrstallOgKvartal(
-                2019,
-                2
-            )
+        val resultat = sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(
+            listOf(ÅrstallOgKvartal(2019, 2))
         )
         assertSykefraværsstatistikkForBedreNæringskodeContains(
             resultat, 2019, 2, 10, produksjonAvKlær, 3, 100
@@ -341,11 +338,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
         assertSykefraværsstatistikkForBedreNæringskodeContains(
             resultat, 2019, 2, 10, undervisning, 5, 100
         )
-        val resultat_2019_1 = sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentForAlleNæringskoder(
-            ÅrstallOgKvartal(
-                2019,
-                1
-            )
+        val resultat_2019_1 = sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(
+            listOf(ÅrstallOgKvartal(2019, 1))
         )
         org.assertj.core.api.Assertions.assertThat(resultat_2019_1.size).isEqualTo(2)
         assertSykefraværsstatistikkForBedreNæringskodeContains(
@@ -361,11 +355,8 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
         opprettStatistikkNæring5SifferTestData(
             ÅrstallOgKvartal(2019, 2), ÅrstallOgKvartal(2019, 1)
         )
-        val resultat = sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentForAlleNæringskoder(
-            ÅrstallOgKvartal(
-                2019,
-                2
-            )
+        val resultat = sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(
+            listOf(ÅrstallOgKvartal(2019, 2))
         )
         assertSykefraværsstatistikkForBedreNæringskodeContains(
             resultat, 2019, 2, 10, produksjonAvKlær, 3, 100
@@ -373,10 +364,9 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
         assertSykefraværsstatistikkForBedreNæringskodeContains(
             resultat, 2019, 2, 10, undervisning, 5, 100
         )
-        val resultat_2019_1_til_2019_2 =
-            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentForAlleNæringskoder(
-                ÅrstallOgKvartal(2019, 1), ÅrstallOgKvartal(2019, 2)
-            )
+        val resultat_2019_1_til_2019_2 = sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(
+            ÅrstallOgKvartal(2019, 2) inkludertTidligere 1
+        )
         org.assertj.core.api.Assertions.assertThat(resultat.size).isEqualTo(2)
         org.assertj.core.api.Assertions.assertThat(resultat_2019_1_til_2019_2.size).isEqualTo(4)
         assertSykefraværsstatistikkForBedreNæringskodeContains(
@@ -743,80 +733,61 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
 
     private fun opprettStatistikkNæringTestData(vararg årstallOgKvartal: ÅrstallOgKvartal) {
         årstallOgKvartal.forEach {
-            sykefraværStatistikkNæringRepository.settInn(listOf(
-                SykefraværsstatistikkForNæring(
-                    årstall = it.årstall,
-                    kvartal = it.kvartal,
-                    næringkode = produksjon.tosifferIdentifikator,
-                    antallPersoner = 10,
-                    tapteDagsverk = BigDecimal("2.0"),
-                    muligeDagsverk = BigDecimal("100.0")
-                ),
-                SykefraværsstatistikkForNæring(
-                    årstall = it.årstall,
-                    kvartal = it.kvartal,
-                    næringkode = utdanning.tosifferIdentifikator,
-                    antallPersoner = 8,
-                    tapteDagsverk = BigDecimal("5.0"),
-                    muligeDagsverk = BigDecimal("100.0")
+            sykefraværStatistikkNæringRepository.settInn(
+                listOf(
+                    SykefraværsstatistikkForNæring(
+                        årstall = it.årstall,
+                        kvartal = it.kvartal,
+                        næringkode = produksjon.tosifferIdentifikator,
+                        antallPersoner = 10,
+                        tapteDagsverk = BigDecimal("2.0"),
+                        muligeDagsverk = BigDecimal("100.0")
+                    ),
+                    SykefraværsstatistikkForNæring(
+                        årstall = it.årstall,
+                        kvartal = it.kvartal,
+                        næringkode = utdanning.tosifferIdentifikator,
+                        antallPersoner = 8,
+                        tapteDagsverk = BigDecimal("5.0"),
+                        muligeDagsverk = BigDecimal("100.0")
+                    )
                 )
-            ))
+            )
         }
     }
 
     private fun opprettStatistikkNæring5SifferTestData(vararg årstallOgKvartals: ÅrstallOgKvartal) {
         Arrays.stream(årstallOgKvartals)
             .forEach { (årstall, kvartal): ÅrstallOgKvartal ->
-                createStatistikkNæring5Siffer(
-                    produksjonAvKlær, årstall, kvartal, 10, 3, 100
+                sykefraværStatistikkNæringskodeRepository.settInn(
+                    listOf(
+                        SykefraværsstatistikkForNæringskode(
+                            årstall,
+                            kvartal,
+                            produksjonAvKlær.femsifferIdentifikator,
+                            10,
+                            BigDecimal(3),
+                            BigDecimal(
+                                100
+                            )
+                        )
+                    )
                 )
-                createStatistikkNæring5Siffer(
-                    undervisning, årstall, kvartal, 10, 5, 100
+                sykefraværStatistikkNæringskodeRepository.settInn(
+                    listOf(
+                        SykefraværsstatistikkForNæringskode(
+                            årstall,
+                            kvartal,
+                            undervisning.femsifferIdentifikator,
+                            10,
+                            BigDecimal(5),
+                            BigDecimal(
+                                100
+                            )
+                        )
+                    )
                 )
             }
     }
 
-    private fun createStatistikkNæring5Siffer(
-        næringskode: Næringskode,
-        årstall: Int,
-        kvartal: Int,
-        antallPersoner: Int,
-        tapteDagsverk: Int,
-        muligeDagsverk: Int
-    ) {
-        jdbcTemplate.update(
-            "insert into sykefravar_statistikk_naring5siffer "
-                    + "(naring_kode, arstall, kvartal, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                    + "values (:naring_kode, :arstall, :kvartal, :antall_personer, :tapte_dagsverk, :mulige_dagsverk)",
-            parametre(
-                SykefraværsstatistikkForNæringskode(
-                    årstall,
-                    kvartal,
-                    næringskode.femsifferIdentifikator,
-                    antallPersoner,
-                    BigDecimal(tapteDagsverk),
-                    BigDecimal(muligeDagsverk)
-                )
-            )
-        )
-    }
-
-    private fun parametre(
-        sykefraværsstatistikkForNæringskode: SykefraværsstatistikkForNæringskode
-    ): MapSqlParameterSource {
-        val parametre = MapSqlParameterSource()
-            .addValue("naring_kode", sykefraværsstatistikkForNæringskode.næringkode5siffer)
-        return leggTilParametreForSykefraværsstatistikk(parametre, sykefraværsstatistikkForNæringskode)
-    }
-
-    private fun leggTilParametreForSykefraværsstatistikk(
-        parametre: MapSqlParameterSource, sykefraværsstatistikk: Sykefraværsstatistikk
-    ): MapSqlParameterSource {
-        return parametre
-            .addValue("arstall", sykefraværsstatistikk.årstall)
-            .addValue("kvartal", sykefraværsstatistikk.kvartal)
-            .addValue("antall_personer", sykefraværsstatistikk.antallPersoner)
-            .addValue("tapte_dagsverk", sykefraværsstatistikk.tapteDagsverk)
-            .addValue("mulige_dagsverk", sykefraværsstatistikk.muligeDagsverk)
-    }
 }

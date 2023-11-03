@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 class SykefraværStatistikkNæringRepository(
     override val database: Database
 ) : UsingExposed, Table("sykefravar_statistikk_naring") {
-    val næring = text("naring_kode")
+    val næring = varchar("naring_kode", 2)
     val årstall = integer("arstall")
     val kvartal = integer("kvartal")
     val antallPersoner = integer("antall_personer")
@@ -23,8 +23,8 @@ class SykefraværStatistikkNæringRepository(
                 this[årstall] = it.årstall
                 this[kvartal] = it.kvartal
                 this[antallPersoner] = it.antallPersoner
-                this[tapteDagsverk] = it.tapteDagsverk?.toDouble()!!
-                this[muligeDagsverk] = it.muligeDagsverk?.toDouble()!!
+                this[tapteDagsverk] = it.tapteDagsverk!!.toDouble()
+                this[muligeDagsverk] = it.muligeDagsverk!!.toDouble()
             }.count()
         }
     }
@@ -45,27 +45,6 @@ class SykefraværStatistikkNæringRepository(
                 .limit(1)
                 .map { ÅrstallOgKvartal(it[årstall], it[kvartal]) }
                 .first()
-        }
-    }
-
-    fun hentForAngitteNæringer(
-        kvartaler: List<ÅrstallOgKvartal>,
-        næringer: List<Næring>
-    ): Map<ÅrstallOgKvartal, List<SykefraværsstatistikkForNæring>> {
-        return transaction {
-            select {
-                ((årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }) and
-                        (næring inList næringer.map { it.tosifferIdentifikator })
-            }.map {
-                SykefraværsstatistikkForNæring(
-                    årstall = it[årstall],
-                    kvartal = it[kvartal],
-                    næringkode = it[næring],
-                    antallPersoner = it[antallPersoner],
-                    tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
-                    muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
-                )
-            }.groupBy { ÅrstallOgKvartal(it.årstall, it.kvartal) }
         }
     }
 
@@ -107,7 +86,7 @@ class SykefraværStatistikkNæringRepository(
         }
     }
 
-    fun hentUmaskertSykefravær(
+    fun hentForKvartaler(
         næringa: Næring,
         kvartaler: List<ÅrstallOgKvartal>
     ): List<UmaskertSykefraværForEttKvartal> {

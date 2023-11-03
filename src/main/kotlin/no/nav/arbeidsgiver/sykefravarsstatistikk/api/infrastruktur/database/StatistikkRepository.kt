@@ -1,13 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import com.google.common.collect.Lists
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sykefraværsstatistikk
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkForNæring
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkNæringMedVarighet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.SlettOgOpprettResultat
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.SlettOgOpprettResultat.Companion.tomtResultat
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Statistikkilde
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -15,7 +11,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.core.namedparam.SqlParameterSource
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils
 import org.springframework.stereotype.Component
-import java.sql.ResultSet
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -26,51 +21,6 @@ class StatistikkRepository(
     val INSERT_BATCH_STØRRELSE = 10000
 
     private val log = LoggerFactory.getLogger(this::class.java)
-
-    fun hentSisteÅrstallOgKvartalForSykefraværsstatistikk(type: Statistikkilde): ÅrstallOgKvartal {
-        val alleÅrstallOgKvartal = hentAlleÅrstallOgKvartalForSykefraværsstatistikk(type)
-        log.info("Henter statistikk for type {}", type.tabell)
-        return try {
-            alleÅrstallOgKvartal[0]
-        } catch (e: IndexOutOfBoundsException) {
-            log.error("Error ved uthenting av statistikk for type {}", type.tabell)
-            throw e
-        }
-    }
-
-    fun hentAlleÅrstallOgKvartalForSykefraværsstatistikk(
-        type: Statistikkilde
-    ): List<ÅrstallOgKvartal> {
-        return namedParameterJdbcTemplate.query(
-            String.format(
-                "select distinct arstall, kvartal "
-                        + "from %s "
-                        + "order by arstall desc, kvartal desc",
-                type.tabell
-            ),
-            MapSqlParameterSource()
-        ) { resultSet: ResultSet, _: Int ->
-            ÅrstallOgKvartal(
-                resultSet.getInt("arstall"),
-                resultSet.getInt("kvartal")
-            )
-        }
-    }
-
-    fun importSykefraværsstatistikkNæring5siffer(
-        sykefraværsstatistikkForNæring: List<SykefraværsstatistikkForNæring>,
-        årstallOgKvartal: ÅrstallOgKvartal
-    ): SlettOgOpprettResultat {
-        val sykefraværsstatistikkNæring5sifferUtils = SykefraværsstatistikkNæring5sifferUtils(
-            namedParameterJdbcTemplate
-        )
-        return importStatistikk(
-            "næring5siffer",
-            sykefraværsstatistikkForNæring,
-            årstallOgKvartal,
-            sykefraværsstatistikkNæring5sifferUtils
-        )
-    }
 
     fun importSykefraværsstatistikkNæringMedVarighet(
         sykefraværsstatistikkNæringMedVarighet: List<SykefraværsstatistikkNæringMedVarighet>,

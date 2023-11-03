@@ -20,22 +20,23 @@ import java.math.BigDecimal
 
 
 class EksporteringPerStatistikkKategoriServiceTest {
-    private val sykefraværsstatistikkTilEksporteringRepository = mock<SykefraværsstatistikkTilEksporteringRepository>()
     private val sykefraværStatistikkLandRepository = mock<SykefraværStatistikkLandRepository>()
     private val sykefravarStatistikkVirksomhetRepository = mock<SykefravarStatistikkVirksomhetRepository>()
     private val sykefraværStatistikkSektorRepository = mock<SykefraværStatistikkSektorRepository>()
     private val sykefravarStatistikkVirksomhetGraderingRepository =
         mock<SykefravarStatistikkVirksomhetGraderingRepository>()
+    private val sykefraværStatistikkNæringRepository = mock<SykefraværStatistikkNæringRepository>()
+    private val sykefraværStatistikkNæringskodeRepository = mock<SykefraværStatistikkNæringskodeRepository>()
+
     private val kafkaClient = mock<KafkaClient>()
 
-    private val sykefraværStatistikkNæringRepository = mock<SykefraværStatistikkNæringRepository>()
     private val service: EksporteringPerStatistikkKategoriService = EksporteringPerStatistikkKategoriService(
-        tilEksporteringRepository = sykefraværsstatistikkTilEksporteringRepository,
         sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
         sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository,
         sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
         sykefravarStatistikkVirksomhetGraderingRepository = sykefravarStatistikkVirksomhetGraderingRepository,
         sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository,
+        sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository,
         kafkaClient = kafkaClient,
     )
 
@@ -272,8 +273,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
         )
 
         whenever(
-            sykefraværsstatistikkTilEksporteringRepository
-                .hentSykefraværprosentForAlleNæringskoder(__2019_3, __2020_2)
+            sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(any())
         ).thenReturn(allData)
 
         // 2- Kall tjenesten
@@ -363,10 +363,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
             ),
         )
 
-        whenever(
-            sykefraværsstatistikkTilEksporteringRepository
-                .hentSykefraværprosentForAlleNæringskoder(__2019_3, __2020_2)
-        ).thenReturn(allData)
+        whenever(sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(any())).thenReturn(allData)
 
         service.eksporterPerStatistikkKategori(__2020_2, Statistikkategori.NÆRINGSKODE)
 

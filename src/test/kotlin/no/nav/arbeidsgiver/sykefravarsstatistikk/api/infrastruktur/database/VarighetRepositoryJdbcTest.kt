@@ -124,7 +124,7 @@ open class VarighetRepositoryJdbcTest {
             Varighetskategori._1_DAG_TIL_7_DAGER,
             4
         )
-        val resultat = varighetRepository.hentSykefraværMedVarighet(barnehager.næring)
+        val resultat = varighetRepository.hentSykefraværMedVarighetNæring(barnehager.næring)
         assertThat(resultat.size).isEqualTo(2)
         assertThat(resultat[0])
             .isEqualTo(
@@ -172,7 +172,7 @@ open class VarighetRepositoryJdbcTest {
             Varighetskategori._1_DAG_TIL_7_DAGER,
             8
         )
-        val resultat = varighetRepository.hentSykefraværMedVarighet(Bransje(Bransjer.SYKEHUS))
+        val resultat = varighetRepository.hentSykefraværMedVarighetBransje(Bransje(Bransjer.SYKEHUS))
         assertThat(resultat.size).isEqualTo(2)
         assertThat(resultat[0])
             .isEqualTo(
@@ -206,7 +206,7 @@ open class VarighetRepositoryJdbcTest {
         leggTilStatisitkkNæringMedVarighet(jdbcTemplate, næringskode2, 2023, 1, "E", 20, 400, 1000)
 
         // Kjør hentSykefraværMedVarighet() med et Næring-objekt som er opprettet fra en av nærignskodene
-        val resultat = varighetRepository.hentSykefraværMedVarighet(næringskode1.næring)
+        val resultat = varighetRepository.hentSykefraværMedVarighetNæring(næringskode1.næring)
 
         // Resultatet skal bli statistikk for BEGGE de to næringskodene
         assertThat(resultat.size).isEqualTo(2)

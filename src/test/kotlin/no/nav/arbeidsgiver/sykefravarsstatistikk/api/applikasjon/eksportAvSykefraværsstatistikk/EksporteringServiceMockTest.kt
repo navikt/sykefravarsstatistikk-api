@@ -38,11 +38,7 @@ import org.mockito.kotlin.whenever
 
 @ExtendWith(MockitoExtension::class)
 class EksporteringServiceMockTest {
-    private val eksporteringRepository: EksporteringRepository = mock()
-
-    private val virksomhetMetadataRepository: VirksomhetMetadataRepository = mock()
-
-    private val sykefraværsstatistikkTilEksporteringRepository: SykefraværsstatistikkTilEksporteringRepository = mock()
+    private val legacyEksporteringRepository: LegacyEksporteringRepository = mock()
 
     private val kafkaClient: KafkaClient = mock()
     private val sykefraværStatistikkLandRepository = mock<SykefraværStatistikkLandRepository>()
@@ -50,15 +46,18 @@ class EksporteringServiceMockTest {
 
     private val sykefravarStatistikkVirksomhetRepository = mock<SykefravarStatistikkVirksomhetRepository>()
     private val sykefraværStatistikkNæringRepository = mock<SykefraværStatistikkNæringRepository>()
-    private val service: EksporteringService = EksporteringService(
-        eksporteringRepository,
-        virksomhetMetadataRepository,
-        sykefraværsstatistikkTilEksporteringRepository,
+    private val sykefraværStatistikkNæringskodeRepository = mock<SykefraværStatistikkNæringskodeRepository>()
+    private val legacyVirksomhetMetadataRepository = mock<LegacyVirksomhetMetadataRepository>()
+
+    private val service = EksporteringService(
+        legacyEksporteringRepository,
         sykefraværStatistikkLandRepository,
         sykefraværStatistikkSektorRepository,
         kafkaClient,
         sykefravarStatistikkVirksomhetRepository,
         sykefraværStatistikkNæringRepository,
+        sykefraværStatistikkNæringskodeRepository,
+        legacyVirksomhetMetadataRepository
     )
 
     val årstallOgKvartalArgumentCaptor: KArgumentCaptor<ÅrstallOgKvartal> = argumentCaptor<ÅrstallOgKvartal>()
@@ -78,7 +77,7 @@ class EksporteringServiceMockTest {
     @Test
     fun eksporter_returnerer_feil_når_det_ikke_finnes_statistikk() {
         whenever(
-            eksporteringRepository.hentVirksomhetEksportPerKvartal(
+            legacyEksporteringRepository.hentVirksomhetEksportPerKvartal(
                 __2020_2
             )
         ).thenReturn(emptyList())
@@ -89,7 +88,7 @@ class EksporteringServiceMockTest {
     @Test
     fun eksporter_sender_riktig_melding_til_kafka_og_returnerer_antall_meldinger_sendt() {
         whenever(
-            eksporteringRepository.hentVirksomhetEksportPerKvartal(
+            legacyEksporteringRepository.hentVirksomhetEksportPerKvartal(
                 __2020_2
             )
         ).thenReturn(listOf(virksomhetEksportPerKvartal))
@@ -100,7 +99,7 @@ class EksporteringServiceMockTest {
         )
         val fraÅrstallOgKvartal: ÅrstallOgKvartal = __2020_2.minusKvartaler(3)
         whenever(
-            virksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(
+            legacyVirksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(
                 __2020_2
             )
         ).thenReturn(listOf(virksomhetMetadata))
@@ -118,9 +117,7 @@ class EksporteringServiceMockTest {
             )
         )
         whenever(
-            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentForAlleNæringskoder(
-                __2020_2
-            )
+            sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(any())
         ).thenReturn(listOf(sykefraværsstatistikkForNæringskode))
         whenever(
             sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(listOf(__2020_2))
@@ -171,11 +168,15 @@ class EksporteringServiceMockTest {
             )
         )
         whenever(
-            eksporteringRepository.hentVirksomhetEksportPerKvartal(
+            legacyEksporteringRepository.hentVirksomhetEksportPerKvartal(
                 __2020_2
             )
         ).thenReturn(listOf(virksomhetEksportPerKvartal))
-        whenever(virksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(årstallOgKvartal)).thenReturn(
+        whenever(
+            legacyVirksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(
+                årstallOgKvartal
+            )
+        ).thenReturn(
             listOf(
                 virksomhet1_TilHørerBransjeMetadata
             )
@@ -194,9 +195,7 @@ class EksporteringServiceMockTest {
             )
         )
         whenever(
-            sykefraværsstatistikkTilEksporteringRepository.hentSykefraværprosentForAlleNæringskoder(
-                __2020_2
-            )
+            sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(any())
         ).thenReturn(
             listOf(
                 sykefraværsstatistikkNæring5SifferBransjeprogram("86101", årstallOgKvartal),

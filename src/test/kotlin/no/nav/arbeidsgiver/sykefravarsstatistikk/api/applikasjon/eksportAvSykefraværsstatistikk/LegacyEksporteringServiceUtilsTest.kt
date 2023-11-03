@@ -25,10 +25,10 @@ import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import kotlin.collections.set
 
-class EksporteringServiceUtilsTest {
+class LegacyEksporteringServiceUtilsTest {
     @Test
     fun virksomhetMetadataHashMap__returnerer_en_map_med_orgnr_som_key() {
-        val virksomhetMetadataHashMap = EksporteringServiceUtils.getVirksomhetMetadataHashMap(
+        val virksomhetMetadataHashMap = LegacyEksporteringServiceUtils.getVirksomhetMetadataHashMap(
             listOf(virksomhet1Metadata_2020_4, virksomhet2Metadata_2020_4)
         )
         Assertions.assertEquals(2, virksomhetMetadataHashMap.size)
@@ -48,7 +48,7 @@ class EksporteringServiceUtilsTest {
         virksomhetMetadataHashMap[virksomhet1Metadata_2020_4.orgnr] = virksomhet1Metadata_2020_4
         virksomhetMetadataHashMap[virksomhet2Metadata_2020_4.orgnr] = virksomhet2Metadata_2020_4
         virksomhetMetadataHashMap[virksomhet3Metadata_2020_4.orgnr] = virksomhet3Metadata_2020_4
-        val virksomhetMetadataList = EksporteringServiceUtils.getVirksomheterMetadataFraSubset(
+        val virksomhetMetadataList = LegacyEksporteringServiceUtils.getVirksomheterMetadataFraSubset(
             virksomhetMetadataHashMap,
             listOf(
                 VirksomhetEksportPerKvartal(ORGNR_VIRKSOMHET_1, __2020_4, false),
@@ -62,7 +62,7 @@ class EksporteringServiceUtilsTest {
 
     @Test
     fun virksomhetSykefravær__returnerer_VirksomhetSykefravær_uten_statistikk__dersom_ingen_entry_matcher_Virksomhet() {
-        val actualVirksomhetSykefravær = EksporteringServiceUtils.getVirksomhetSykefravær(
+        val actualVirksomhetSykefravær = LegacyEksporteringServiceUtils.getVirksomhetSykefravær(
             virksomhet1Metadata_2020_4, buildMapAvSykefraværsstatistikkPerVirksomhet(10)
         )
         val expectedVirksomhetSykefravær = VirksomhetSykefravær(
@@ -91,7 +91,7 @@ class EksporteringServiceUtilsTest {
         val bigMap = buildMapAvSykefraværsstatistikkPerVirksomhet(500000)
         val startWithMap = System.nanoTime()
         val actualVirksomhetSykefravær =
-            EksporteringServiceUtils.getVirksomhetSykefravær(virksomhetToBeFound, bigMap)
+            LegacyEksporteringServiceUtils.getVirksomhetSykefravær(virksomhetToBeFound, bigMap)
         val stopWithMap = System.nanoTime()
         val expectedVirksomhetSykefravær = VirksomhetSykefravær(
             virksomhetToBeFound.orgnr,
@@ -108,7 +108,7 @@ class EksporteringServiceUtilsTest {
 
     @Test
     fun sykefraværMedKategoriForSektor__returnerer_SykefraværMedKategori__med_sykefraværsstatistikk_for_sektor() {
-        val resultat = EksporteringServiceUtils.getSykefraværMedKategoriForSektor(
+        val resultat = LegacyEksporteringServiceUtils.getSykefraværMedKategoriForSektor(
             virksomhet1Metadata_2020_4,
             listOf(
                 byggSykefraværStatistikkSektor(virksomhet1Metadata_2020_4, 10, 156, 22233),
@@ -125,7 +125,7 @@ class EksporteringServiceUtilsTest {
 
     @Test
     fun sykefraværMedKategoriForNæring__returnerer_SykefraværMedKategori__med_sykefraværsstatistikk_for_næring() {
-        val resultat = EksporteringServiceUtils.getSykefraværMedKategoriNæringForVirksomhet(
+        val resultat = LegacyEksporteringServiceUtils.getSykefraværMedKategoriNæringForVirksomhet(
             virksomhet1Metadata_2020_4,
             listOf(
                 byggSykefraværStatistikkNæring(virksomhet1Metadata_2020_4, 10, 156, 22233),
@@ -148,7 +148,7 @@ class EksporteringServiceUtilsTest {
                 Næringskode("11000")
             )
         )
-        val resultat = EksporteringServiceUtils.getSykefraværMedKategoriForNæring5Siffer(
+        val resultat = LegacyEksporteringServiceUtils.getSykefraværMedKategoriForNæring5Siffer(
             virksomhet1Metadata_2020_4,
             listOf(
                 byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "11000"),
@@ -186,7 +186,7 @@ class EksporteringServiceUtilsTest {
             byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "45210"),
             byggSykefraværStatistikkNæring5Siffer(virksomhet1Metadata_2020_4, "85000")
         )
-        val resultat = EksporteringServiceUtils.getSykefraværsstatistikkNæring5Siffers(
+        val resultat = LegacyEksporteringServiceUtils.getSykefraværsstatistikkNæring5Siffers(
             virksomhetMetadata_2020_4_med_næring5siffer, sykefraværsstatistikkForNæringskodeList
         )
         assertThat(resultat.size).isEqualTo(2)
@@ -210,7 +210,7 @@ class EksporteringServiceUtilsTest {
     @Test
     fun filterByKvartal_skalIkkeFeile() {
         assertThat(
-            EksporteringServiceUtils.filterByKvartal(
+            LegacyEksporteringServiceUtils.filterByKvartal(
                 SISTE_PUBLISERTE_KVARTAL,
                 listOf(
                     byggSykefraværsstatistikkVirksomhet(
@@ -227,7 +227,7 @@ class EksporteringServiceUtilsTest {
         val ønskedeResultat__2021_2 = listOf(
             byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2021_2)
         )
-        val actual__2021_2 = EksporteringServiceUtils.filterByKvartal(
+        val actual__2021_2 = LegacyEksporteringServiceUtils.filterByKvartal(
             __2021_2,
             listOf(
                 byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2020_4),
@@ -246,7 +246,7 @@ class EksporteringServiceUtilsTest {
             byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2020_4),
             byggSykefraværsstatistikkVirksomhet(virksomhet2Metadata_2020_4)
         )
-        val actual__2020_4 = EksporteringServiceUtils.filterByKvartal(
+        val actual__2020_4 = LegacyEksporteringServiceUtils.filterByKvartal(
             __2020_4,
             listOf(
                 byggSykefraværsstatistikkVirksomhet(virksomhet1Metadata_2020_4),

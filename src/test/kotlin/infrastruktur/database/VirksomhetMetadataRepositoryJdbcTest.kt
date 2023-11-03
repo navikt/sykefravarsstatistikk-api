@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk
+package infrastruktur.database
 
 import config.AppConfigForJdbcTesterConfig
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetMetadata
@@ -6,12 +6,11 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor.Companion.fraSektorkode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.LegacyVirksomhetMetadataRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.assertj.core.api.Assertions
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -29,7 +28,6 @@ import testUtils.TestData.ORGNR_VIRKSOMHET_1
 import testUtils.TestData.ORGNR_VIRKSOMHET_2
 import testUtils.TestData.ORGNR_VIRKSOMHET_3
 import java.sql.ResultSet
-import java.util.*
 
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension::class)
@@ -41,20 +39,19 @@ open class VirksomhetMetadataRepositoryJdbcTest {
 
     @Autowired
     private lateinit var repository: VirksomhetMetadataRepository
+
+    @Autowired
+    private lateinit var legacyVirksomhetMetadataRepository: LegacyVirksomhetMetadataRepository
+
     @BeforeEach
     fun setUp() {
-        cleanUpTestDb(namedParameterJdbcTemplate)
-    }
-
-    @AfterEach
-    fun tearDown() {
-        cleanUpTestDb(namedParameterJdbcTemplate)
+        repository.slettVirksomhetMetadata()
     }
 
     @Test
     fun slettNæringOgNæringskode5siffer__sletter_VirksomhetMetaData() {
         opprettTestVirksomhetMetaData(2020, 3)
-        val antallSlettet = repository.slettNæringOgNæringskode5siffer()
+        val antallSlettet = legacyVirksomhetMetadataRepository.slettNæringOgNæringskode5siffer()
         Assertions.assertThat(antallSlettet).isEqualTo(2)
     }
 
@@ -77,7 +74,7 @@ open class VirksomhetMetadataRepositoryJdbcTest {
             ÅrstallOgKvartal(2020, 3),
             Næringskode("10002")
         )
-        repository.opprettVirksomhetMetadataNæringskode5siffer(
+        legacyVirksomhetMetadataRepository.opprettVirksomhetMetadataNæringskode5siffer(
             listOf(
                 virksomhetMetadataMedNæringskode1, virksomhetMetadataMedNæringskode2
             )
@@ -108,9 +105,9 @@ open class VirksomhetMetadataRepositoryJdbcTest {
             ÅrstallOgKvartal(2020, 3)
         )
         repository.opprettVirksomhetMetadata(
-            Arrays.asList(virksomhetMetadataVirksomhet1, virksomhetMetadataVirksomhet2)
+            listOf(virksomhetMetadataVirksomhet1, virksomhetMetadataVirksomhet2)
         )
-        val results = hentAlleVirksomhetMetadata(namedParameterJdbcTemplate)
+        val results = repository.hentVirksomhetMetadata(ÅrstallOgKvartal(2020, 3))
         Assertions.assertThat(results[0]).isEqualTo(virksomhetMetadataVirksomhet1)
         Assertions.assertThat(results[1]).isEqualTo(virksomhetMetadataVirksomhet2)
     }
@@ -118,14 +115,24 @@ open class VirksomhetMetadataRepositoryJdbcTest {
     @Test
     fun hentVirksomhetMetadata_returnerer_riktige_metdata_for_en_gitt_årstall_og_kvartal() {
         opprettTestVirksomhetMetaData(2020, 2)
-        val results = repository.hentVirksomhetMetadataMedNæringskoder(ÅrstallOgKvartal(2019, 2))
+        val results = legacyVirksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(
+            ÅrstallOgKvartal(
+                2019,
+                2
+            )
+        )
         Assertions.assertThat(results.size).isEqualTo(0)
     }
 
     @Test
     fun hentVirksomhetMetadata_returnerer_riktige_metdata() {
         opprettTestVirksomhetMetaData(2020, 3)
-        val results = repository.hentVirksomhetMetadataMedNæringskoder(ÅrstallOgKvartal(2020, 3))
+        val results = legacyVirksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(
+            ÅrstallOgKvartal(
+                2020,
+                3
+            )
+        )
         Assertions.assertThat(results.size).isEqualTo(3)
         val virksomhetMetadataVirksomhet1 =
             results.stream().filter { r: VirksomhetMetadata -> ORGNR_VIRKSOMHET_1 == r.orgnr }
@@ -135,25 +142,6 @@ open class VirksomhetMetadataRepositoryJdbcTest {
             .isTrue()
         Assertions.assertThat(næringskoder.contains(Næringskode("71002")))
             .isTrue()
-    }
-
-    private fun hentAlleVirksomhetMetadata(
-        jdbcTemplate: NamedParameterJdbcTemplate?
-    ): List<VirksomhetMetadata> {
-        return jdbcTemplate!!.query(
-            "select * from virksomhet_metadata",
-            MapSqlParameterSource()
-        ) { rs: ResultSet, rowNum: Int ->
-            VirksomhetMetadata(
-                Orgnr(rs.getString("orgnr")),
-                rs.getString("navn"),
-                rs.getString("rectype"),
-                fraSektorkode(rs.getString("sektor"))!!,
-                rs.getString("primarnaring"),
-                rs.getString("primarnaringskode"),
-                ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal"))
-            )
-        }
     }
 
     private fun hentAlleVirksomhetMetadataNæringskode5siffer(
@@ -171,12 +159,36 @@ open class VirksomhetMetadataRepositoryJdbcTest {
         }
     }
 
-    private fun opprettTestVirksomhetMetaData(årstall: Int, kvartal: Int): Int {
-        namedParameterJdbcTemplate.update(
-            "insert into virksomhet_metadata (orgnr, navn, rectype, sektor, primarnaring, primarnaringskode, arstall, kvartal) "
-                    + "VALUES (:orgnr, :navn, :rectype, :sektor, :primarnaring, :primarnaringskode, :årstall, :kvartal)",
-            parametreViksomhetMetadata(
-                ORGNR_VIRKSOMHET_1, "Virksomhet 1", "2", "3", "71", "71000", årstall, kvartal
+    private fun opprettTestVirksomhetMetaData(årstall: Int, kvartal: Int) {
+        repository.opprettVirksomhetMetadata(
+            listOf(
+                VirksomhetMetadata(
+                    Orgnr(ORGNR_VIRKSOMHET_1),
+                    "Virksomhet 1",
+                    "2",
+                    Sektor.PRIVAT,
+                    "71",
+                    "71000",
+                    ÅrstallOgKvartal(årstall, kvartal)
+                ),
+                VirksomhetMetadata(
+                    Orgnr(ORGNR_VIRKSOMHET_2),
+                    "Virksomhet 2",
+                    "2",
+                    Sektor.PRIVAT,
+                    "10",
+                    "10000",
+                    ÅrstallOgKvartal(årstall, kvartal)
+                ),
+                VirksomhetMetadata(
+                    Orgnr(ORGNR_VIRKSOMHET_3),
+                    "Virksomhet 3",
+                    "2",
+                    Sektor.PRIVAT,
+                    "10",
+                    "10000",
+                    ÅrstallOgKvartal(årstall, kvartal)
+                )
             )
         )
         namedParameterJdbcTemplate.update(
@@ -193,42 +205,6 @@ open class VirksomhetMetadataRepositoryJdbcTest {
                 ORGNR_VIRKSOMHET_1, "71", "71002", årstall, kvartal
             )
         )
-        namedParameterJdbcTemplate.update(
-            "insert into virksomhet_metadata (orgnr, navn, rectype, sektor, primarnaring, primarnaringskode, arstall, kvartal) "
-                    + "VALUES (:orgnr, :navn, :rectype, :sektor, :primarnaring, :primarnaringskode, :årstall, :kvartal)",
-            parametreViksomhetMetadata(
-                ORGNR_VIRKSOMHET_2, "Virksomhet 2", "2", "3", "10", "10000", årstall, kvartal
-            )
-        )
-        namedParameterJdbcTemplate.update(
-            "insert into virksomhet_metadata (orgnr, navn, rectype, sektor, primarnaring, primarnaringskode, arstall, kvartal) "
-                    + "VALUES (:orgnr, :navn, :rectype, :sektor, :primarnaring, :primarnaringskode, :årstall, :kvartal)",
-            parametreViksomhetMetadata(
-                ORGNR_VIRKSOMHET_3, "Virksomhet 3", "2", "3", "10", "10000", årstall, kvartal
-            )
-        )
-        return 0
-    }
-
-    private fun parametreViksomhetMetadata(
-        orgnr: String,
-        navn: String,
-        rectype: String,
-        sektor: String,
-        primarnaring: String,
-        primarnaringskode: String,
-        årstall: Int,
-        kvartal: Int
-    ): MapSqlParameterSource {
-        return MapSqlParameterSource()
-            .addValue("orgnr", orgnr)
-            .addValue("navn", navn)
-            .addValue("rectype", rectype)
-            .addValue("sektor", sektor)
-            .addValue("primarnaring", primarnaring)
-            .addValue("primarnaringskode", primarnaringskode)
-            .addValue("årstall", årstall)
-            .addValue("kvartal", kvartal)
     }
 
     private fun parametreViksomhetMetadataNæring5Siffer(
@@ -244,11 +220,5 @@ open class VirksomhetMetadataRepositoryJdbcTest {
             .addValue("naring_kode_5siffer", næringskode5Siffer)
             .addValue("årstall", årstall)
             .addValue("kvartal", kvartal)
-    }
-
-    companion object {
-        private fun cleanUpTestDb(jdbcTemplate: NamedParameterJdbcTemplate?) {
-            jdbcTemplate!!.update("delete from virksomhet_metadata", MapSqlParameterSource())
-        }
     }
 }
