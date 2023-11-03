@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - expose-sektor
+      - expose-da-rest
     paths-ignore:
       - '**.md'
       - '**/**.md'
