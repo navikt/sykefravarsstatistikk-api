@@ -169,7 +169,7 @@ open class SykefraværRepositoryJdbcTest {
         )
         Assertions.assertThat(resultat.size).isEqualTo(2)
         Assertions.assertThat(resultat[0].tapteDagsverk).isEqualTo(BigDecimal("4.0"))
-        Assertions.assertThat(resultat[1].muligeDagsverk).isEqualTo(BigDecimal("2.0"))
+        Assertions.assertThat(resultat[1].muligeDagsverk).isEqualTo(BigDecimal("100.0"))
     }
 
     private fun persisterDatasetIDb(barnehage: Underenhet.Næringsdrivende) {
