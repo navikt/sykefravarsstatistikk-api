@@ -4,7 +4,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.springframework.stereotype.Component
-import java.lang.RuntimeException
 
 
 @Component
@@ -97,7 +96,7 @@ class SykefraværStatistikkNæringskodeRepository(
                     (næringskode inList næringskoder.map { it.femsifferIdentifikator }) and
                             ((årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal })
                 }
-                .groupBy(årstall, kvartal)
+                .groupBy(årstall, kvartal, næringskode)
                 .orderBy(årstall to SortOrder.ASC)
                 .orderBy(kvartal to SortOrder.ASC)
                 .map {
