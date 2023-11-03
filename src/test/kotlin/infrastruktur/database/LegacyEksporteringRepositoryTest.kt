@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk
+package infrastruktur.database
 
 import config.AppConfigForJdbcTesterConfig
 import testUtils.TestData.ORGNR_VIRKSOMHET_1

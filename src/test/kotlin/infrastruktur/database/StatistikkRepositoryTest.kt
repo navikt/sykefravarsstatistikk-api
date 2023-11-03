@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk
+package infrastruktur.database
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sykefraværsstatistikk
@@ -12,14 +12,11 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.Syke
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.assertj.core.api.AssertionsForClassTypes
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.mock
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.math.BigDecimal
 import java.util.stream.IntStream
 
-@ExtendWith(MockitoExtension::class)
 class StatistikkRepositoryTest {
     private val jdbcTemplate: NamedParameterJdbcTemplate = mock()
     private val statistikkRepository: StatistikkRepository = StatistikkRepository(jdbcTemplate)

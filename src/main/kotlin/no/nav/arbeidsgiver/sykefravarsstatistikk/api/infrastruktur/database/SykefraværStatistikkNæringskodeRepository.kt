@@ -95,7 +95,7 @@ class SykefraværStatistikkNæringskodeRepository(
                     (næringskode inList bransje.identifikatorer) and
                             ((årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal })
                 }
-                .groupBy(årstall, kvartal, næringskode)
+                .groupBy(årstall, kvartal)
                 .orderBy(årstall to SortOrder.ASC)
                 .orderBy(kvartal to SortOrder.ASC)
                 .map {
@@ -104,7 +104,7 @@ class SykefraværStatistikkNæringskodeRepository(
                         kvartal = it[kvartal],
                         bransje = bransje.type,
                         tapteDagsverk = it[tapteDagsverk.sum()]!!.toBigDecimal(),
-                        muligeDagsverk = it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                        muligeDagsverk = it[muligeDagsverk.sum()]!!.toBigDecimal(),
                         antallPersoner = it[antallPersoner.sum()]!!
                     )
                 }
