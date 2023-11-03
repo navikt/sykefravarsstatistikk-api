@@ -19,7 +19,7 @@ import java.math.BigDecimal
 
 internal class EksporteringBransjeServiceTest {
 
-    private val kafkaClientMock = mockk<KafkaClient>()
+    private val kafkaClientMock = mockk<KafkaClient>(relaxed = true)
     private val sykefraværStatistikkLandRepositoryMock = mockk<SykefraværStatistikkLandRepository>()
 
     private val sykefraværStatistikkNæringRepository = mockk<SykefraværStatistikkNæringRepository>()
@@ -52,7 +52,7 @@ internal class EksporteringBransjeServiceTest {
     @Test
     fun `eksporterPerStatistikkKategori skal putte riktige kvartaler på topic`() {
         every { sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(any()) } returns emptyList()
-        every { sykefraværStatistikkNæringRepository.hentForAlleNæringer(any())} returns listOf(
+        every { sykefraværStatistikkNæringRepository.hentForAlleNæringer(any()) } returns listOf(
             SykefraværsstatistikkForNæring(
                 årstall = 1990,
                 kvartal = 1,
@@ -80,8 +80,8 @@ internal class EksporteringBransjeServiceTest {
     }
 
     @Test
-    fun `eksporterPerStatistikkKategori skal kaste feil når forespurt kvartal ikke finnes i databasen`() {
-
+    fun `eksporterPerStatistikkKategori skal ikke sende melding når forespurt kvartal ikke finnes i databasen`() {
+        every { sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(any()) } returns emptyList()
         every { sykefraværStatistikkNæringRepository.hentForAlleNæringer(any()) } returns listOf(
             SykefraværsstatistikkForNæring(
                 årstall = 1990,
@@ -93,36 +93,23 @@ internal class EksporteringBransjeServiceTest {
             )
         )
 
-
-        val exception = assertThrows<RuntimeException> {
-            service.eksporterPerStatistikkKategori(
-                ÅrstallOgKvartal(2023, 2),
-                Statistikkategori.BRANSJE,
-            )
-        }
-        assertThat(exception.message).isEqualTo("Stopper eksport av kategori BRANSJE pga: 'Siste kvartal i dataene '1990-1' er ikke lik forespurt kvartal '2023-2'. Kategori er 'BRANSJE' og kode er 'ANLEGG''")
+        verify(exactly = 0) { kafkaClientMock.sendMelding(any(), any()) }
     }
 
 
     @Test
     fun `eksporterPerStatistikkKategori skal putte bransjetall på topic`() {
-        val bransjestatistikk = SykefraværsstatistikkBransje(
-            årstall = 2023,
-            kvartal = 2,
-            bransje = Bransjer.ANLEGG,
-            antallPersoner = 5,
-            tapteDagsverk = BigDecimal.ONE,
-            muligeDagsverk = BigDecimal.ONE
-        )
-        val sykefraværsstatistikk = listOf(bransjestatistikk)
-
-        every {
-            hentSykefraværsstatistikkForBransjer(
-                kvartaler = any(),
-                sykefraværsstatistikkNæringRepository = sykefraværStatistikkNæringRepository,
-                sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository
+        every { sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(any()) } returns emptyList()
+        every { sykefraværStatistikkNæringRepository.hentForAlleNæringer(any()) } returns listOf(
+            SykefraværsstatistikkForNæring(
+                årstall = 2023,
+                kvartal = 2,
+                næringkode = Bransjer.ANLEGG.næringskoder.first(),
+                antallPersoner = 5,
+                tapteDagsverk = BigDecimal.ONE,
+                muligeDagsverk = BigDecimal.ONE
             )
-        } returns sykefraværsstatistikk
+        )
 
         service.eksporterPerStatistikkKategori(
             ÅrstallOgKvartal(2023, 2),
@@ -142,7 +129,14 @@ internal class EksporteringBransjeServiceTest {
             SykefraværFlereKvartalerForEksport(
                 listOf(
                     UmaskertSykefraværForEttKvartal(
-                        bransjestatistikk
+                        SykefraværsstatistikkBransje(
+                            årstall = 2023,
+                            kvartal = 2,
+                            bransje = Bransjer.ANLEGG,
+                            antallPersoner = 5,
+                            tapteDagsverk = BigDecimal.ONE,
+                            muligeDagsverk = BigDecimal.ONE
+                        )
                     )
                 )
             )

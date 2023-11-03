@@ -153,7 +153,6 @@ class EksporteringPerStatistikkKategoriService(
         statistikkategori: Statistikkategori,
         kafkaTopic: KafkaTopic
     ) {
-
         var antallStatistikkEksportert = 0
         sykefraværGruppertEtterKode.forEach { (kode, statistikk) ->
             val umaskertSykefraværsstatistikkSiste4Kvartaler =
@@ -163,34 +162,29 @@ class EksporteringPerStatistikkKategoriService(
                 umaskertSykefraværsstatistikkSiste4Kvartaler
                     .tilSykefraværMedKategoriSisteKvartal(statistikkategori, kode)
 
-            val erValidertStatistikk = assertForespurteKvartalFinnesIStatistikken(
-                årstallOgKvartal,
-                sykefraværMedKategoriSisteKvartal,
-                statistikkategori,
-                kode
-            )
-
-            if (erValidertStatistikk) {
-                val melding = when (statistikkategori) {
-                    Statistikkategori.LAND,
-                    Statistikkategori.SEKTOR,
-                    Statistikkategori.NÆRING,
-                    Statistikkategori.BRANSJE,
-                    Statistikkategori.OVERORDNET_ENHET,
-                    Statistikkategori.VIRKSOMHET,
-                    Statistikkategori.NÆRINGSKODE -> StatistikkategoriKafkamelding(
-                        sykefraværMedKategoriSisteKvartal,
-                        SykefraværFlereKvartalerForEksport(umaskertSykefraværsstatistikkSiste4Kvartaler)
-                    )
-
-                    Statistikkategori.VIRKSOMHET_GRADERT -> GradertStatistikkategoriKafkamelding(
-                        sykefraværMedKategoriSisteKvartal,
-                        SykefraværFlereKvartalerForEksport(umaskertSykefraværsstatistikkSiste4Kvartaler)
-                    )
-                }
-                kafkaClient.sendMelding(melding, kafkaTopic)
-                antallStatistikkEksportert++
+            if (årstallOgKvartal != sykefraværMedKategoriSisteKvartal.årstallOgKvartal) {
+                return
             }
+
+            val melding = when (statistikkategori) {
+                Statistikkategori.LAND,
+                Statistikkategori.SEKTOR,
+                Statistikkategori.NÆRING,
+                Statistikkategori.BRANSJE,
+                Statistikkategori.OVERORDNET_ENHET,
+                Statistikkategori.VIRKSOMHET,
+                Statistikkategori.NÆRINGSKODE -> StatistikkategoriKafkamelding(
+                    sykefraværMedKategoriSisteKvartal,
+                    SykefraværFlereKvartalerForEksport(umaskertSykefraværsstatistikkSiste4Kvartaler)
+                )
+
+                Statistikkategori.VIRKSOMHET_GRADERT -> GradertStatistikkategoriKafkamelding(
+                    sykefraværMedKategoriSisteKvartal,
+                    SykefraværFlereKvartalerForEksport(umaskertSykefraværsstatistikkSiste4Kvartaler)
+                )
+            }
+            kafkaClient.sendMelding(melding, kafkaTopic)
+            antallStatistikkEksportert++
         }
         log.info(
             "Ferdig med utsending av alle meldinger til Kafka for statistikkategori ${statistikkategori.name}. " +
@@ -199,55 +193,32 @@ class EksporteringPerStatistikkKategoriService(
     }
 
 
-    private fun assertForespurteKvartalFinnesIStatistikken(
-        årstallOgKvartal: ÅrstallOgKvartal,
-        sykefravær: SykefraværMedKategori,
-        statistikkategori: Statistikkategori,
-        kode: String
-    ): Boolean {
-        if (årstallOgKvartal != sykefravær.årstallOgKvartal) {
-            val message =
-                "Siste kvartal i dataene '${sykefravær.årstallOgKvartal?.årstall}-${sykefravær.årstallOgKvartal?.kvartal}' " +
-                        "er ikke lik forespurt kvartal '${årstallOgKvartal.årstall}-${årstallOgKvartal.kvartal}'. " +
-                        "Kategori er '${statistikkategori.name}' og kode er '$kode'"
+    fun List<Sykefraværsstatistikk>.tilUmaskertSykefraværForEttKvartal() =
+        this.map {
+            when (it) {
+                is SykefraværsstatistikkBransje,
+                is SykefraværsstatistikkForNæring,
+                is SykefraværsstatistikkForNæringskode,
+                is SykefraværsstatistikkLand,
+                is SykefraværsstatistikkNæringMedVarighet,
+                is SykefraværsstatistikkSektor,
+                is SykefraværsstatistikkVirksomhetUtenVarighet,
+                is SykefraværsstatistikkVirksomhet -> UmaskertSykefraværForEttKvartal(
+                    ÅrstallOgKvartal(it.årstall, it.kvartal),
+                    it.tapteDagsverk!!,
+                    it.muligeDagsverk!!,
+                    it.antallPersoner
+                )
 
-            return when (statistikkategori) {
-                Statistikkategori.NÆRINGSKODE,
-                Statistikkategori.VIRKSOMHET_GRADERT,
-                Statistikkategori.VIRKSOMHET -> false
-
-                else -> throw RuntimeException("Stopper eksport av kategori ${statistikkategori.name} pga: '$message'")
+                is SykefraværsstatistikkVirksomhetMedGradering -> UmaskertSykefraværForEttKvartal(
+                    ÅrstallOgKvartal(it.årstall, it.kvartal),
+                    it.tapteDagsverkGradertSykemelding,
+                    it.tapteDagsverk,
+                    it.antallPersoner
+                )
             }
         }
-        return true
-    }
 }
-
-fun List<Sykefraværsstatistikk>.tilUmaskertSykefraværForEttKvartal() =
-    this.map {
-        when (it) {
-            is SykefraværsstatistikkBransje,
-            is SykefraværsstatistikkForNæring,
-            is SykefraværsstatistikkForNæringskode,
-            is SykefraværsstatistikkLand,
-            is SykefraværsstatistikkNæringMedVarighet,
-            is SykefraværsstatistikkSektor,
-            is SykefraværsstatistikkVirksomhetUtenVarighet,
-            is SykefraværsstatistikkVirksomhet -> UmaskertSykefraværForEttKvartal(
-                ÅrstallOgKvartal(it.årstall, it.kvartal),
-                it.tapteDagsverk!!,
-                it.muligeDagsverk!!,
-                it.antallPersoner
-            )
-
-            is SykefraværsstatistikkVirksomhetMedGradering -> UmaskertSykefraværForEttKvartal(
-                ÅrstallOgKvartal(it.årstall, it.kvartal),
-                it.tapteDagsverkGradertSykemelding,
-                it.tapteDagsverk,
-                it.antallPersoner
-            )
-        }
-    }
 
 fun List<SykefraværsstatistikkLand>.groupByLand():
         Map<String, List<Sykefraværsstatistikk>> =
@@ -283,4 +254,5 @@ fun List<UmaskertSykefraværForEttKvartal>.tilSykefraværMedKategoriSisteKvartal
 ): SykefraværMedKategori =
     this.maxWith(compareBy({ it.Årstall }, { it.kvartal }))
         .tilSykefraværMedKategori(statistikkategori, kode)
+
 
