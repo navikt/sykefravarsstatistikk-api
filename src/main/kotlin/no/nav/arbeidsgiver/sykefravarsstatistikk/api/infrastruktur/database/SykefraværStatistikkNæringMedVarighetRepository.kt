@@ -7,6 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.N�
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkNæringMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.springframework.stereotype.Component
 
 @Component
@@ -43,7 +44,10 @@ class SykefraværStatistikkNæringMedVarighetRepository(
     ): List<UmaskertSykefraværForEttKvartalMedVarighet> {
         return transaction {
             select {
-                (næringskode like stringLiteral("${næringa.tosifferIdentifikator}%")) and (varighet inList listOf('A', 'B', 'C', 'D', 'E', 'F', 'X'))
+                (næringskode like stringLiteral("${næringa.tosifferIdentifikator}%")) and
+                        (varighet inList listOf(
+                            'A', 'B', 'C', 'D', 'E', 'F', 'X'
+                        ))
             }
                 .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC, varighet to SortOrder.ASC)
                 .map {
@@ -66,7 +70,10 @@ class SykefraværStatistikkNæringMedVarighetRepository(
         } else {
             transaction {
                 select {
-                    (næringskode inList bransje.identifikatorer) and (varighet inList listOf('A', 'B', 'C', 'D', 'E', 'F', 'X'))
+                    (næringskode inList bransje.identifikatorer) and
+                            (varighet inList listOf(
+                                'A', 'B', 'C', 'D', 'E', 'F', 'X'
+                            ))
                 }.orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC, varighet to SortOrder.ASC)
                     .map {
                         UmaskertSykefraværForEttKvartalMedVarighet(
@@ -78,6 +85,12 @@ class SykefraværStatistikkNæringMedVarighetRepository(
                         )
                     }
             }
+        }
+    }
+
+    fun slettKvartal(årstallOgKvartal: ÅrstallOgKvartal): Int {
+        return transaction {
+            deleteWhere { (årstall eq årstallOgKvartal.årstall) and (kvartal eq årstallOgKvartal.kvartal) }
         }
     }
 }

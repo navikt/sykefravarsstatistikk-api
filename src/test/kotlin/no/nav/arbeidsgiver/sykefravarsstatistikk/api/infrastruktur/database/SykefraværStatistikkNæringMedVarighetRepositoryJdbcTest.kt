@@ -101,17 +101,38 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
     @Test
     fun hentSykefraværForEttKvartalMedVarighet_for_næring__skal_returnere_riktig_sykefravær() {
         val barnehager = Næringskode("88911")
-        leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
-            sykefraværStatistikkNæringMedVarighetRepository, barnehager, ÅrstallOgKvartal(2019, 2), 1, 10
+        val årstallOgKvartal = ÅrstallOgKvartal(2019, 2)
+        sykefraværStatistikkNæringMedVarighetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkNæringMedVarighet(
+                    årstall = årstallOgKvartal.årstall,
+                    kvartal = årstallOgKvartal.kvartal,
+                    næringkode = barnehager.femsifferIdentifikator,
+                    varighet = Varighetskategori.TOTAL.kode,
+                    antallPersoner = 1,
+                    tapteDagsverk = 0.toBigDecimal(),
+                    muligeDagsverk = 10
+                        .toBigDecimal()
+                )
+            )
         )
-        leggTilStatisitkkNæringMedVarighet(
-            sykefraværStatistikkNæringMedVarighetRepository,
-            barnehager,
-            ÅrstallOgKvartal(2019, 2),
-            Varighetskategori._1_DAG_TIL_7_DAGER,
-            4
+        sykefraværStatistikkNæringMedVarighetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkNæringMedVarighet(
+                    årstall = årstallOgKvartal.årstall,
+                    kvartal = årstallOgKvartal.kvartal,
+                    næringkode = barnehager.femsifferIdentifikator,
+                    varighet = Varighetskategori._1_DAG_TIL_7_DAGER.kode,
+                    antallPersoner = 0,
+                    tapteDagsverk = 4
+                        .toBigDecimal(),
+                    muligeDagsverk = 0
+                        .toBigDecimal()
+                )
+            )
         )
-        val resultat = sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(barnehager.næring)
+        val resultat =
+            sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(barnehager.næring)
         assertThat(resultat.size).isEqualTo(2)
         assertThat(resultat[0])
             .isEqualTo(
@@ -139,27 +160,67 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
     fun hentSykefraværForEttKvartalMedVarighet_for_bransje__skal_returnere_riktig_sykefravær() {
         val sykehus = Næringskode("86101")
         val legetjeneste = Næringskode("86211")
-        leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
-            sykefraværStatistikkNæringMedVarighetRepository, sykehus, ÅrstallOgKvartal(2019, 2), 1, 10
+        val årstallOgKvartal = ÅrstallOgKvartal(2019, 2)
+        sykefraværStatistikkNæringMedVarighetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkNæringMedVarighet(
+                    årstall = årstallOgKvartal.årstall,
+                    kvartal = årstallOgKvartal.kvartal,
+                    næringkode = sykehus.femsifferIdentifikator,
+                    varighet = Varighetskategori.TOTAL.kode,
+                    antallPersoner = 1,
+                    tapteDagsverk = 0.toBigDecimal(),
+                    muligeDagsverk = 10
+                        .toBigDecimal()
+                )
+            )
         )
-        leggTilStatisitkkNæringMedVarighet(
-            sykefraværStatistikkNæringMedVarighetRepository,
-            sykehus,
-            ÅrstallOgKvartal(2019, 2),
-            Varighetskategori._1_DAG_TIL_7_DAGER,
-            4
+        sykefraværStatistikkNæringMedVarighetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkNæringMedVarighet(
+                    årstall = årstallOgKvartal.årstall,
+                    kvartal = årstallOgKvartal.kvartal,
+                    næringkode = sykehus.femsifferIdentifikator,
+                    varighet = Varighetskategori._1_DAG_TIL_7_DAGER.kode,
+                    antallPersoner = 0,
+                    tapteDagsverk = 4
+                        .toBigDecimal(),
+                    muligeDagsverk = 0
+                        .toBigDecimal()
+                )
+            )
         )
-        leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
-            sykefraværStatistikkNæringMedVarighetRepository, legetjeneste, ÅrstallOgKvartal(2019, 2), 5, 50
+        sykefraværStatistikkNæringMedVarighetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkNæringMedVarighet(
+                    årstall = årstallOgKvartal.årstall,
+                    kvartal = årstallOgKvartal.kvartal,
+                    næringkode = legetjeneste.femsifferIdentifikator,
+                    varighet = Varighetskategori.TOTAL.kode,
+                    antallPersoner = 5,
+                    tapteDagsverk = 0.toBigDecimal(),
+                    muligeDagsverk = 50
+                        .toBigDecimal()
+                )
+            )
         )
-        leggTilStatisitkkNæringMedVarighet(
-            sykefraværStatistikkNæringMedVarighetRepository,
-            legetjeneste,
-            ÅrstallOgKvartal(2019, 2),
-            Varighetskategori._1_DAG_TIL_7_DAGER,
-            8
+        sykefraværStatistikkNæringMedVarighetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkNæringMedVarighet(
+                    årstall = årstallOgKvartal.årstall,
+                    kvartal = årstallOgKvartal.kvartal,
+                    næringkode = legetjeneste.femsifferIdentifikator,
+                    varighet = Varighetskategori._1_DAG_TIL_7_DAGER.kode,
+                    antallPersoner = 0,
+                    tapteDagsverk = 8
+                        .toBigDecimal(),
+                    muligeDagsverk = 0
+                        .toBigDecimal()
+                )
+            )
         )
-        val resultat = sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetBransje(Bransje(Bransjer.SYKEHUS))
+        val resultat =
+            sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetBransje(Bransje(Bransjer.SYKEHUS))
         assertThat(resultat.size).isEqualTo(2)
         assertThat(resultat[0])
             .isEqualTo(
@@ -189,79 +250,38 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
         val næringskode2 = Næringskode("84999")
 
         // Populer databasen med statistikk for to næringskoder, som har felles næring
-        leggTilStatisitkkNæringMedVarighet(sykefraværStatistikkNæringMedVarighetRepository , næringskode1, 2023, 1, "E", 20, 100, 1000)
-        leggTilStatisitkkNæringMedVarighet(sykefraværStatistikkNæringMedVarighetRepository, næringskode2, 2023, 1, "E", 20, 400, 1000)
+        sykefraværStatistikkNæringMedVarighetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkNæringMedVarighet(
+                    årstall = 2023,
+                    kvartal = 1,
+                    næringkode = næringskode1.femsifferIdentifikator,
+                    varighet = "E",
+                    antallPersoner = 20,
+                    tapteDagsverk = 100.toBigDecimal(),
+                    muligeDagsverk = 1000.toBigDecimal()
+                )
+            )
+        )
+        sykefraværStatistikkNæringMedVarighetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkNæringMedVarighet(
+                    årstall = 2023,
+                    kvartal = 1,
+                    næringkode = næringskode2.femsifferIdentifikator,
+                    varighet = "E",
+                    antallPersoner = 20,
+                    tapteDagsverk = 400.toBigDecimal(),
+                    muligeDagsverk = 1000
+                        .toBigDecimal()
+                )
+            )
+        )
 
-        // Kjør hentSykefraværMedVarighet() med et Næring-objekt som er opprettet fra en av nærignskodene
-        val resultat = sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(næringskode1.næring)
+        val resultat =
+            sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(næringskode1.næring)
 
         // Resultatet skal bli statistikk for BEGGE de to næringskodene
         assertThat(resultat.size).isEqualTo(2)
     }
 }
-
-
-fun leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
-    sykefraværStatistikkNæringMedVarighetRepository: SykefraværStatistikkNæringMedVarighetRepository,
-    næringskode: Næringskode,
-    årstallOgKvartal: ÅrstallOgKvartal,
-    antallPersoner: Int,
-    muligeDagsverk: Int
-) {
-    leggTilStatisitkkNæringMedVarighet(
-        sykefraværStatistikkNæringMedVarighetRepository,
-        næringskode,
-        årstallOgKvartal.årstall,
-        årstallOgKvartal.kvartal,
-        Varighetskategori.TOTAL.kode,
-        antallPersoner,
-        0,
-        muligeDagsverk
-    )
-}
-
-
-fun leggTilStatisitkkNæringMedVarighet(
-    sykefraværStatistikkNæringMedVarighetRepository: SykefraværStatistikkNæringMedVarighetRepository,
-    næringskode: Næringskode,
-    årstallOgKvartal: ÅrstallOgKvartal,
-    varighetskategori: Varighetskategori,
-    tapteDagsverk: Int
-) {
-    leggTilStatisitkkNæringMedVarighet(
-        sykefraværStatistikkNæringMedVarighetRepository,
-        næringskode,
-        årstallOgKvartal.årstall,
-        årstallOgKvartal.kvartal,
-        varighetskategori.kode,
-        0,
-        tapteDagsverk,
-        0
-    )
-}
-
-fun leggTilStatisitkkNæringMedVarighet(
-    repo: SykefraværStatistikkNæringMedVarighetRepository,
-    næringskode: Næringskode,
-    årstall: Int,
-    kvartal: Int,
-    varighet: String?,
-    antallPersoner: Int,
-    tapteDagsverk: Int,
-    muligeDagsverk: Int
-) {
-    repo.settInn(
-        listOf(
-            SykefraværsstatistikkNæringMedVarighet(
-                årstall = årstall,
-                kvartal = kvartal,
-                næringkode = næringskode.femsifferIdentifikator,
-                varighet = varighet,
-                antallPersoner = antallPersoner,
-                tapteDagsverk = tapteDagsverk.toBigDecimal(),
-                muligeDagsverk = muligeDagsverk.toBigDecimal()
-            )
-        )
-    )
-}
-

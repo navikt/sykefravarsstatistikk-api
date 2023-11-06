@@ -237,18 +237,30 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
                     tapteDagsverk = BigDecimal(0),
                     muligeDagsverk = BigDecimal(100),
                     antallPersoner = 10
-                )
+                ),
             )
         )
-        leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
-            sykefraværStatistikkNæringMedVarighetRepository, Næringskode("10300"), ÅrstallOgKvartal(2022, 1), 10, 100
-        )
-        leggTilStatisitkkNæringMedVarighet(
-            sykefraværStatistikkNæringMedVarighetRepository,
-            Næringskode("10300"),
-            ÅrstallOgKvartal(2022, 1),
-            Varighetskategori._1_DAG_TIL_7_DAGER,
-            10
+        sykefraværStatistikkNæringMedVarighetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkNæringMedVarighet(
+                    årstall = 2022,
+                    kvartal = 1,
+                    næringkode = Næringskode("10300").femsifferIdentifikator,
+                    varighet = Varighetskategori.TOTAL.kode,
+                    antallPersoner = 10,
+                    tapteDagsverk = 0.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal()
+                ),
+                SykefraværsstatistikkNæringMedVarighet(
+                    årstall = 2022,
+                    kvartal = 1,
+                    næringkode = Næringskode("10300").femsifferIdentifikator,
+                    varighet = Varighetskategori._1_DAG_TIL_7_DAGER.kode,
+                    antallPersoner = 0,
+                    tapteDagsverk = 10.toBigDecimal(),
+                    muligeDagsverk = 0.toBigDecimal()
+                )
+            )
         )
         val response = utførAutorisertKall(ORGNR_UNDERENHET)
         Assertions.assertThat(response.statusCode()).isEqualTo(200)

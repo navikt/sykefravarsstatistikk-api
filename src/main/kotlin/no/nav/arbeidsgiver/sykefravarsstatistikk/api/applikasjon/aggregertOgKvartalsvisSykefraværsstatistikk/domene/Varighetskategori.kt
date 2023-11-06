@@ -7,8 +7,7 @@ enum class Varighetskategori(val kode: String?) {
     _8_UKER_TIL_20_UKER("D"),
     _20_UKER_TIL_39_UKER("E"),
     MER_ENN_39_UKER("F"),
-    TOTAL("X"),
-    UKJENT(null);
+    TOTAL("X");
 
     fun erTotalvarighet(): Boolean {
         return kode == "X"
