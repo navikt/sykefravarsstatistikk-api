@@ -13,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
 import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -25,8 +24,6 @@ import java.math.BigDecimal
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 open class HentSykefraværsstatistikkForBransjerTest {
-    @Autowired
-    private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     @Autowired
     private lateinit var sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
@@ -37,7 +34,6 @@ open class HentSykefraværsstatistikkForBransjerTest {
     @BeforeEach
     fun beforeEach() {
         TestUtils.slettAllStatistikkFraDatabase(
-            jdbcTemplate = jdbcTemplate,
             sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository,
             sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository
         )

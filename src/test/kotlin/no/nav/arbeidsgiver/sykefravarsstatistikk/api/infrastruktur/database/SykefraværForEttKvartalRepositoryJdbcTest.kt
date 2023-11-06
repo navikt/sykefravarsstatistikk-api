@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
 import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -26,8 +25,6 @@ import java.math.BigDecimal
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 open class SykefraværForEttKvartalRepositoryJdbcTest {
-    @Autowired
-    private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     @Autowired
     private lateinit var sykefraværStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
@@ -48,18 +45,16 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
     @BeforeEach
     fun setUp() {
         slettAllStatistikkFraDatabase(
-            jdbcTemplate,
-            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
             sykefravarStatistikkVirksomhetRepository = sykefraværStatistikkVirksomhetRepository,
+            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
         )
     }
 
     @AfterEach
     fun tearDown() {
         slettAllStatistikkFraDatabase(
-            jdbcTemplate,
-            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
             sykefravarStatistikkVirksomhetRepository = sykefraværStatistikkVirksomhetRepository,
+            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
         )
     }
 

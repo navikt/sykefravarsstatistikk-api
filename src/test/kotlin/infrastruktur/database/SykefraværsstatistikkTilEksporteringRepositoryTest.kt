@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
 import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -29,8 +28,6 @@ import java.util.stream.Collectors
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 open class SykefraværsstatistikkTilEksporteringRepositoryTest {
-    @Autowired
-    lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     @Autowired
     private lateinit var sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository
@@ -57,7 +54,6 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     @BeforeEach
     fun setUp() {
         slettAllStatistikkFraDatabase(
-            jdbcTemplate,
             sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository,
             sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository,
             sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository,
@@ -67,7 +63,6 @@ open class SykefraværsstatistikkTilEksporteringRepositoryTest {
     @AfterEach
     fun tearDown() {
         slettAllStatistikkFraDatabase(
-            jdbcTemplate,
             sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository,
             sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository,
             sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository,

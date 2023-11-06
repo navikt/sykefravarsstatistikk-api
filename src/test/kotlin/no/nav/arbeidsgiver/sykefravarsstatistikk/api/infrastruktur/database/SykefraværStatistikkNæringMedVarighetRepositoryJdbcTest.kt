@@ -6,15 +6,12 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvar
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
 import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -26,8 +23,6 @@ import java.math.BigDecimal
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
-    @Autowired
-    private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     @Autowired
     private lateinit var sykefraværStatistikkNæringMedVarighetRepository: SykefraværStatistikkNæringMedVarighetRepository
@@ -38,16 +33,8 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
     @BeforeEach
     fun setUp() {
         TestUtils.slettAllStatistikkFraDatabase(
-            jdbcTemplate = jdbcTemplate,
-            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository
-        )
-    }
-
-    @AfterEach
-    fun tearDown() {
-        TestUtils.slettAllStatistikkFraDatabase(
-            jdbcTemplate = jdbcTemplate,
-            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository
+            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
+            sykefraværStatistikkNæringMedVarighetRepository = sykefraværStatistikkNæringMedVarighetRepository,
         )
     }
 
@@ -115,10 +102,10 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
     fun hentSykefraværForEttKvartalMedVarighet_for_næring__skal_returnere_riktig_sykefravær() {
         val barnehager = Næringskode("88911")
         leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
-            jdbcTemplate, barnehager, ÅrstallOgKvartal(2019, 2), 1, 10
+            sykefraværStatistikkNæringMedVarighetRepository, barnehager, ÅrstallOgKvartal(2019, 2), 1, 10
         )
         leggTilStatisitkkNæringMedVarighet(
-            jdbcTemplate,
+            sykefraværStatistikkNæringMedVarighetRepository,
             barnehager,
             ÅrstallOgKvartal(2019, 2),
             Varighetskategori._1_DAG_TIL_7_DAGER,
@@ -130,8 +117,8 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
             .isEqualTo(
                 UmaskertSykefraværForEttKvartalMedVarighet(
                     ÅrstallOgKvartal(2019, 2),
-                    BigDecimal(4),
-                    BigDecimal(0),
+                    BigDecimal("4.0"),
+                    BigDecimal("0.0"),
                     0,
                     Varighetskategori._1_DAG_TIL_7_DAGER
                 )
@@ -140,8 +127,8 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
             .isEqualTo(
                 UmaskertSykefraværForEttKvartalMedVarighet(
                     ÅrstallOgKvartal(2019, 2),
-                    BigDecimal(0),
-                    BigDecimal(10),
+                    BigDecimal("0.0"),
+                    BigDecimal("10.0"),
                     1,
                     Varighetskategori.TOTAL
                 )
@@ -153,20 +140,20 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
         val sykehus = Næringskode("86101")
         val legetjeneste = Næringskode("86211")
         leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
-            jdbcTemplate, sykehus, ÅrstallOgKvartal(2019, 2), 1, 10
+            sykefraværStatistikkNæringMedVarighetRepository, sykehus, ÅrstallOgKvartal(2019, 2), 1, 10
         )
         leggTilStatisitkkNæringMedVarighet(
-            jdbcTemplate,
+            sykefraværStatistikkNæringMedVarighetRepository,
             sykehus,
             ÅrstallOgKvartal(2019, 2),
             Varighetskategori._1_DAG_TIL_7_DAGER,
             4
         )
         leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
-            jdbcTemplate, legetjeneste, ÅrstallOgKvartal(2019, 2), 5, 50
+            sykefraværStatistikkNæringMedVarighetRepository, legetjeneste, ÅrstallOgKvartal(2019, 2), 5, 50
         )
         leggTilStatisitkkNæringMedVarighet(
-            jdbcTemplate,
+            sykefraværStatistikkNæringMedVarighetRepository,
             legetjeneste,
             ÅrstallOgKvartal(2019, 2),
             Varighetskategori._1_DAG_TIL_7_DAGER,
@@ -178,8 +165,8 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
             .isEqualTo(
                 UmaskertSykefraværForEttKvartalMedVarighet(
                     ÅrstallOgKvartal(2019, 2),
-                    BigDecimal(4),
-                    BigDecimal(0),
+                    BigDecimal("4.0"),
+                    BigDecimal("0.0"),
                     0,
                     Varighetskategori._1_DAG_TIL_7_DAGER
                 )
@@ -188,8 +175,8 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
             .isEqualTo(
                 UmaskertSykefraværForEttKvartalMedVarighet(
                     ÅrstallOgKvartal(2019, 2),
-                    BigDecimal(0),
-                    BigDecimal(10),
+                    BigDecimal("0.0"),
+                    BigDecimal("10.0"),
                     1,
                     Varighetskategori.TOTAL
                 )
@@ -202,8 +189,8 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
         val næringskode2 = Næringskode("84999")
 
         // Populer databasen med statistikk for to næringskoder, som har felles næring
-        leggTilStatisitkkNæringMedVarighet(jdbcTemplate, næringskode1, 2023, 1, "E", 20, 100, 1000)
-        leggTilStatisitkkNæringMedVarighet(jdbcTemplate, næringskode2, 2023, 1, "E", 20, 400, 1000)
+        leggTilStatisitkkNæringMedVarighet(sykefraværStatistikkNæringMedVarighetRepository , næringskode1, 2023, 1, "E", 20, 100, 1000)
+        leggTilStatisitkkNæringMedVarighet(sykefraværStatistikkNæringMedVarighetRepository, næringskode2, 2023, 1, "E", 20, 400, 1000)
 
         // Kjør hentSykefraværMedVarighet() med et Næring-objekt som er opprettet fra en av nærignskodene
         val resultat = sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(næringskode1.næring)
@@ -215,14 +202,14 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
 
 
 fun leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
-    jdbcTemplate: NamedParameterJdbcTemplate,
+    sykefraværStatistikkNæringMedVarighetRepository: SykefraværStatistikkNæringMedVarighetRepository,
     næringskode: Næringskode,
     årstallOgKvartal: ÅrstallOgKvartal,
     antallPersoner: Int,
     muligeDagsverk: Int
 ) {
     leggTilStatisitkkNæringMedVarighet(
-        jdbcTemplate,
+        sykefraværStatistikkNæringMedVarighetRepository,
         næringskode,
         årstallOgKvartal.årstall,
         årstallOgKvartal.kvartal,
@@ -235,14 +222,14 @@ fun leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
 
 
 fun leggTilStatisitkkNæringMedVarighet(
-    jdbcTemplate: NamedParameterJdbcTemplate,
+    sykefraværStatistikkNæringMedVarighetRepository: SykefraværStatistikkNæringMedVarighetRepository,
     næringskode: Næringskode,
     årstallOgKvartal: ÅrstallOgKvartal,
     varighetskategori: Varighetskategori,
     tapteDagsverk: Int
 ) {
     leggTilStatisitkkNæringMedVarighet(
-        jdbcTemplate,
+        sykefraværStatistikkNæringMedVarighetRepository,
         næringskode,
         årstallOgKvartal.årstall,
         årstallOgKvartal.kvartal,
@@ -254,7 +241,7 @@ fun leggTilStatisitkkNæringMedVarighet(
 }
 
 fun leggTilStatisitkkNæringMedVarighet(
-    jdbcTemplate: NamedParameterJdbcTemplate,
+    repo: SykefraværStatistikkNæringMedVarighetRepository,
     næringskode: Næringskode,
     årstall: Int,
     kvartal: Int,
@@ -263,26 +250,18 @@ fun leggTilStatisitkkNæringMedVarighet(
     tapteDagsverk: Int,
     muligeDagsverk: Int
 ) {
-    jdbcTemplate.update(
-        "insert into sykefravar_statistikk_naring_med_varighet "
-                + "(arstall, kvartal, naring_kode, varighet, antall_personer, tapte_dagsverk, "
-                + "mulige_dagsverk) "
-                + "VALUES ("
-                + ":arstall, "
-                + ":kvartal, "
-                + ":naring_kode, "
-                + ":varighet, "
-                + ":antall_personer, "
-                + ":tapte_dagsverk, "
-                + ":mulige_dagsverk)",
-        MapSqlParameterSource()
-            .addValue("arstall", årstall)
-            .addValue("kvartal", kvartal)
-            .addValue("naring_kode", næringskode.femsifferIdentifikator)
-            .addValue("varighet", varighet)
-            .addValue("antall_personer", antallPersoner)
-            .addValue("tapte_dagsverk", tapteDagsverk)
-            .addValue("mulige_dagsverk", muligeDagsverk)
+    repo.settInn(
+        listOf(
+            SykefraværsstatistikkNæringMedVarighet(
+                årstall = årstall,
+                kvartal = kvartal,
+                næringkode = næringskode.femsifferIdentifikator,
+                varighet = varighet,
+                antallPersoner = antallPersoner,
+                tapteDagsverk = tapteDagsverk.toBigDecimal(),
+                muligeDagsverk = muligeDagsverk.toBigDecimal()
+            )
+        )
     )
 }
 

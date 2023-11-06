@@ -15,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import testUtils.TestTokenUtil.createMockIdportenTokenXToken
 import testUtils.TestUtils.PRODUKSJON_NYTELSESMIDLER
 import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
@@ -33,9 +32,6 @@ import java.time.LocalDate
 
 class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     @Autowired
-    private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
-
-    @Autowired
     lateinit var mockOAuth2Server: MockOAuth2Server
 
     @Autowired
@@ -51,6 +47,9 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     lateinit var sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
 
     @Autowired
+    lateinit var sykefraværStatistikkNæringMedVarighetRepository: SykefraværStatistikkNæringMedVarighetRepository
+
+    @Autowired
     lateinit var sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository
 
     @Autowired
@@ -59,11 +58,11 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     @BeforeEach
     fun setUp() {
         slettAllStatistikkFraDatabase(
-            jdbcTemplate = jdbcTemplate,
             sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
             sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
             sykefravarStatistikkVirksomhetGraderingRepository = sykefravarStatistikkVirksomhetGraderingRepository,
-            sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository
+            sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository,
+            sykefraværStatistikkNæringMedVarighetRepository = sykefraværStatistikkNæringMedVarighetRepository,
         )
         importtidspunktRepository.slettAlleImporttidspunkt()
         importtidspunktRepository.settInnImporttidspunkt(SISTE_PUBLISERTE_KVARTAL, LocalDate.parse("2022-06-02"))
@@ -72,7 +71,6 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     @AfterEach
     fun tearDown() {
         slettAllStatistikkFraDatabase(
-            jdbcTemplate = jdbcTemplate,
             sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
             sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
             sykefravarStatistikkVirksomhetGraderingRepository = sykefravarStatistikkVirksomhetGraderingRepository
@@ -243,10 +241,10 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
             )
         )
         leggTilStatisitkkNæringMedVarighetForTotalVarighetskategori(
-            jdbcTemplate, Næringskode("10300"), ÅrstallOgKvartal(2022, 1), 10, 100
+            sykefraværStatistikkNæringMedVarighetRepository, Næringskode("10300"), ÅrstallOgKvartal(2022, 1), 10, 100
         )
         leggTilStatisitkkNæringMedVarighet(
-            jdbcTemplate,
+            sykefraværStatistikkNæringMedVarighetRepository,
             Næringskode("10300"),
             ÅrstallOgKvartal(2022, 1),
             Varighetskategori._1_DAG_TIL_7_DAGER,
