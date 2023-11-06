@@ -3,34 +3,42 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
-import org.springframework.beans.factory.annotation.Qualifier
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.select
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.util.*
 
 @Component
-class VarighetRepository(
-    @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
-) {
+class SykefraværStatistikkNæringMedVarighetRepository(override val database: Database) : UsingExposed,
+    Table("sykefravar_statistikk_naring_med_varighet") {
+
+    val årstall = integer("arstall")
+    val kvartal = integer("kvartal")
+    val næring = varchar("naring_kode", length = 2)
+    val tapteDagsverk = double("tapte_dagsverk")
+    val muligeDagsverk = double("mulige_dagsverk")
+    val antallPersoner = integer("antall_personer")
+    val varighet = char("varighet")
+
     fun hentSykefraværMedVarighetNæring(
-        næring: Næring
+        næringa: Næring
     ): List<UmaskertSykefraværForEttKvartalMedVarighet> {
-        return try {
-            namedParameterJdbcTemplate.query(
-                "select tapte_dagsverk, mulige_dagsverk, antall_personer, varighet, arstall, kvartal "
-                        + " from sykefravar_statistikk_naring_med_varighet "
-                        + " where "
-                        + " naring_kode like :næring "
-                        + " and varighet in ('A', 'B', 'C', 'D', 'E', 'F', 'X')"
-                        + " order by arstall, kvartal, varighet",
-                MapSqlParameterSource().addValue("næring", "${næring.tosifferIdentifikator}%")
-            ) { rs: ResultSet, _: Int -> mapTilKvartalsvisSykefraværMedVarighet(rs) }
-        } catch (e: EmptyResultDataAccessException) {
-            emptyList()
+        return transaction {
+            select { næring eq næringa.tosifferIdentifikator }
+                .map {
+                    UmaskertSykefraværForEttKvartalMedVarighet(
+                        årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                        tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
+                        muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
+                        antallPersoner = it[antallPersoner],
+                        varighet = Varighetskategori.fraKode(it[varighet].toString())
+                    )
+                }
         }
     }
 

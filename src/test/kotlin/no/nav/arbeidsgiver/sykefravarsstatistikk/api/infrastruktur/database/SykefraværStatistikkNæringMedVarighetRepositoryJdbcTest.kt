@@ -25,12 +25,12 @@ import java.math.BigDecimal
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
-open class VarighetRepositoryJdbcTest {
+open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
     @Autowired
     private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     @Autowired
-    private lateinit var varighetRepository: VarighetRepository
+    private lateinit var sykefraværStatistikkNæringMedVarighetRepository: SykefraværStatistikkNæringMedVarighetRepository
 
     @Autowired
     private lateinit var sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
@@ -124,7 +124,7 @@ open class VarighetRepositoryJdbcTest {
             Varighetskategori._1_DAG_TIL_7_DAGER,
             4
         )
-        val resultat = varighetRepository.hentSykefraværMedVarighetNæring(barnehager.næring)
+        val resultat = sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(barnehager.næring)
         assertThat(resultat.size).isEqualTo(2)
         assertThat(resultat[0])
             .isEqualTo(
@@ -172,7 +172,7 @@ open class VarighetRepositoryJdbcTest {
             Varighetskategori._1_DAG_TIL_7_DAGER,
             8
         )
-        val resultat = varighetRepository.hentSykefraværMedVarighetBransje(Bransje(Bransjer.SYKEHUS))
+        val resultat = sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetBransje(Bransje(Bransjer.SYKEHUS))
         assertThat(resultat.size).isEqualTo(2)
         assertThat(resultat[0])
             .isEqualTo(
@@ -206,7 +206,7 @@ open class VarighetRepositoryJdbcTest {
         leggTilStatisitkkNæringMedVarighet(jdbcTemplate, næringskode2, 2023, 1, "E", 20, 400, 1000)
 
         // Kjør hentSykefraværMedVarighet() med et Næring-objekt som er opprettet fra en av nærignskodene
-        val resultat = varighetRepository.hentSykefraværMedVarighetNæring(næringskode1.næring)
+        val resultat = sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(næringskode1.næring)
 
         // Resultatet skal bli statistikk for BEGGE de to næringskodene
         assertThat(resultat.size).isEqualTo(2)

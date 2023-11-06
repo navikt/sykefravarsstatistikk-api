@@ -15,7 +15,7 @@ import java.util.*
 
 @Service
 class AggregertStatistikkService(
-    private val varighetRepository: VarighetRepository,
+    private val sykefraværStatistikkNæringMedVarighetRepository: SykefraværStatistikkNæringMedVarighetRepository,
     private val tilgangskontrollService: TilgangskontrollService,
     private val enhetsregisteretClient: EnhetsregisteretClient,
     private val importtidspunktRepository: ImporttidspunktRepository,
@@ -229,11 +229,11 @@ class AggregertStatistikkService(
         data[Statistikkategori.VIRKSOMHET] =
             sykefravarStatistikkVirksomhetRepository.hentSykefraværMedVarighet(virksomhet.orgnr)
         if (maybeBransje.isEmpty) {
-            data[Statistikkategori.NÆRING] = varighetRepository.hentSykefraværMedVarighetNæring(næring)
+            data[Statistikkategori.NÆRING] = sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(næring)
         } else if (maybeBransje.get().erDefinertPåFemsiffernivå()) {
-            data[Statistikkategori.BRANSJE] = varighetRepository.hentSykefraværMedVarighetBransje(maybeBransje.get())
+            data[Statistikkategori.BRANSJE] = sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetBransje(maybeBransje.get())
         } else {
-            data[Statistikkategori.BRANSJE] = varighetRepository.hentSykefraværMedVarighetNæring(næring)
+            data[Statistikkategori.BRANSJE] = sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(næring)
         }
         return data
     }

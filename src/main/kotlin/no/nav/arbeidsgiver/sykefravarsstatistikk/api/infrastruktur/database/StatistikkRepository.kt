@@ -80,60 +80,6 @@ class StatistikkRepository(
         return Arrays.stream(results).sum()
     }
 
-    fun importStatistikk(
-        statistikktype: String,
-        sykefraværsstatistikk: List<Sykefraværsstatistikk>,
-        årstallOgKvartal: ÅrstallOgKvartal,
-        sykefraværsstatistikkIntegrasjonUtils: SykefraværsstatistikkIntegrasjonUtils
-    ): SlettOgOpprettResultat {
-        if (sykefraværsstatistikk.isEmpty()) {
-            log.info(
-                String.format(
-                    "Ingen sykefraværsstatistikk (%s) til import for årstall '%d' og kvartal '%d'. ",
-                    statistikktype, årstallOgKvartal.årstall, årstallOgKvartal.kvartal
-                )
-            )
-            return tomtResultat()
-        }
-        log.info(
-            String.format(
-                "Starter import av sykefraværsstatistikk (%s) for årstall '%d' og kvartal '%d'. "
-                        + "Skal importere %d rader",
-                statistikktype,
-                årstallOgKvartal.årstall,
-                årstallOgKvartal.kvartal,
-                sykefraværsstatistikk.size
-            )
-        )
-        val antallSlettet = slett(årstallOgKvartal, sykefraværsstatistikkIntegrasjonUtils.getDeleteFunction())
-        val antallOprettet = batchOpprett(
-            sykefraværsstatistikk, sykefraværsstatistikkIntegrasjonUtils, INSERT_BATCH_STØRRELSE
-        )
-        return SlettOgOpprettResultat(antallSlettet, antallOprettet)
-    }
-
-    fun batchOpprett(
-        sykefraværsstatistikk: List<Sykefraværsstatistikk>,
-        utils: SykefraværsstatistikkIntegrasjonUtils,
-        insertBatchStørrelse: Int
-    ): Int {
-        val subsets = sykefraværsstatistikk.chunked(insertBatchStørrelse)
-        val antallOpprettet = AtomicInteger()
-        subsets.forEach { subset: List<Sykefraværsstatistikk> ->
-            val opprettet = utils.getBatchCreateFunction(subset).apply()
-            val opprettetHittilNå = antallOpprettet.addAndGet(opprettet)
-            log.info(String.format("Opprettet %d rader", opprettetHittilNå))
-        }
-        return antallOpprettet.get()
-    }
-
-
-    private fun slett(
-        årstallOgKvartal: ÅrstallOgKvartal, deleteFunction: DeleteSykefraværsstatistikkFunction
-    ): Int {
-        return deleteFunction.apply(årstallOgKvartal)
-    }
-
     private fun loggInfoIngenDataTilImport(
         årstallOgKvartal: ÅrstallOgKvartal, beskrivelse: String
     ) {
