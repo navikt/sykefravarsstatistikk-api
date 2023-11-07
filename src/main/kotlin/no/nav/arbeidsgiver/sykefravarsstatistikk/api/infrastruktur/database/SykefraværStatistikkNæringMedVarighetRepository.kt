@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
+import ia.felles.definisjoner.bransjer.BransjeId
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Bransje
@@ -65,7 +66,7 @@ class SykefraværStatistikkNæringMedVarighetRepository(
     fun hentSykefraværMedVarighetBransje(
         bransje: Bransje
     ): List<UmaskertSykefraværForEttKvartalMedVarighet> {
-        return if (bransje.erDefinertPåTosiffernivå()) {
+        return if (bransje.type.bransjeId is BransjeId.Næring) {
             hentSykefraværMedVarighetNæring(Næring(bransje.identifikatorer.first()))
         } else {
             transaction {
