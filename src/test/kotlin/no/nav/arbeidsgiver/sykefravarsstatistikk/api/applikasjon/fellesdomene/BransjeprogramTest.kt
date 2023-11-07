@@ -1,19 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene
 
-import ia.felles.definisjoner.bransjer.Bransje as Bransjer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import ia.felles.definisjoner.bransjer.Bransje as Bransjer
 
 internal class BransjeprogramTest {
-
-    @Test
-    fun `finnBransje returnerer tom Optional hvis input er null`() {
-        val næringskode: Næringskode? = null
-
-        assertThat(Bransjeprogram.finnBransje(næringskode)).isEmpty
-    }
-
     @Test
     fun `finnBransje returnerer tom Optional hvis næringskoden ikke er i bransjeprogrammet`() {
         val utenforBransjeprogrammet = Næringskode("11111")

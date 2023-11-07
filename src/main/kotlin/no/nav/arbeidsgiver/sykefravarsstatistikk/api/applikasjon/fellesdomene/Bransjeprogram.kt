@@ -7,10 +7,10 @@ object Bransjeprogram {
     val alleBransjer: List<Bransje> = Bransjer.entries.map { Bransje(it) }
 
 
-    fun finnBransje(underenhet: Virksomhet?): Optional<Bransje> = finnBransje(underenhet?.næringskode)
+    fun finnBransje(underenhet: Virksomhet): Optional<Bransje> = finnBransje(underenhet.næringskode)
 
 
-    fun finnBransje(næringskode: Næringskode?): Optional<Bransje> =
+    fun finnBransje(næringskode: Næringskode): Optional<Bransje> =
         Optional.ofNullable(
             alleBransjer.firstOrNull
         {

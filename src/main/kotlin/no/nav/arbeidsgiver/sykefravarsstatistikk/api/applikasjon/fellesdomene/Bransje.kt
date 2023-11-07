@@ -14,19 +14,11 @@ data class Bransje(
         }
     }
 
-    init {
-        require(type.bransjeId is BransjeId.Næring || type.bransjeId is BransjeId.Næringskoder)
-        { "Støtter kun bransjer som er spesifisert av enten 2 eller 5 sifre" }
-    }
-
     fun inkludererVirksomhet(underenhet: Virksomhet): Boolean {
         return inkludererNæringskode(underenhet.næringskode)
     }
 
-    fun inkludererNæringskode(næringskode: Næringskode?): Boolean {
-        if (næringskode == null) {
-            return false
-        }
+    fun inkludererNæringskode(næringskode: Næringskode): Boolean {
         return type.bransjeId.let {
             when (it) {
                 is BransjeId.Næring -> næringskode.næring.tosifferIdentifikator == it.næring
