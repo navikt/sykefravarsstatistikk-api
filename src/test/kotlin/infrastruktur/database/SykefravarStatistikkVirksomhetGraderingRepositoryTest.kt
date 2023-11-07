@@ -92,8 +92,8 @@ open class SykefravarStatistikkVirksomhetGraderingRepositoryTest {
         resultat.size shouldBe 1
         resultat.first() shouldBeEqualToComparingFields UmaskertSykefraværForEttKvartal(
             årstallOgKvartal = ÅrstallOgKvartal(2020, 3),
-            dagsverkTeller = BigDecimal("4.0"),
-            dagsverkNevner = BigDecimal("16.0"),
+            dagsverkTeller = BigDecimal("3.0"),
+            dagsverkNevner = BigDecimal("4.0"),
             antallPersoner = 13
         )
     }

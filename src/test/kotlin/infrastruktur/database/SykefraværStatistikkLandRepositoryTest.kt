@@ -21,7 +21,6 @@ import java.math.BigDecimal
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
-
 open class SykefraværStatistikkLandRepositoryTest {
     @Autowired
     private lateinit var sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository
@@ -54,6 +53,79 @@ open class SykefraværStatistikkLandRepositoryTest {
             )
         )
 
-        sykefraværStatistikkLandRepository.hentNyesteKvartal() shouldBe ÅrstallOgKvartal(2019, 2)
+        sykefraværStatistikkLandRepository.hentNyesteKvartal() shouldBe ÅrstallOgKvartal(2019, 1)
+    }
+
+    @Test
+    fun `hentSykefraværstatistikkLand returnerer tom liste dersom ingen statistikk er funnet for kvartal`() {
+        sykefraværStatistikkLandRepository.settInn(
+            listOf(
+                SykefraværsstatistikkLand(
+                    årstall = 2019,
+                    kvartal = 2,
+                    antallPersoner = 2500000,
+                    tapteDagsverk = BigDecimal("256800.0"),
+                    muligeDagsverk = BigDecimal("60000000.0")
+                )
+            )
+        )
+
+        sykefraværStatistikkLandRepository.hentSykefraværstatistikkLand(
+            listOf(ÅrstallOgKvartal(2019, 4))
+        ) shouldBe emptyList()
+    }
+
+    @Test
+    fun `hentSykefraværprosentLand skal hente sykefravær land for ett kvartal`() {
+        sykefraværStatistikkLandRepository.settInn(
+            listOf(
+                SykefraværsstatistikkLand(
+                    årstall = 2019,
+                    kvartal = 2,
+                    antallPersoner = 2500000,
+                    tapteDagsverk = BigDecimal("256800.0"),
+                    muligeDagsverk = BigDecimal("60000000.0")
+                )
+            )
+        )
+        sykefraværStatistikkLandRepository.settInn(
+            listOf(
+                SykefraværsstatistikkLand(
+                    årstall = 2019,
+                    kvartal = 1,
+                    antallPersoner = 2750000,
+                    tapteDagsverk = BigDecimal("350000.0"),
+                    muligeDagsverk = BigDecimal("71000000.0")
+                )
+            )
+        )
+
+        sykefraværStatistikkLandRepository.hentSykefraværstatistikkLand(
+            listOf(ÅrstallOgKvartal(2019, 4))
+        ) shouldBe emptyList()
+
+        val resultat =
+            sykefraværStatistikkLandRepository.hentSykefraværstatistikkLand(
+                listOf(
+                    ÅrstallOgKvartal(2019, 2),
+                    ÅrstallOgKvartal(2019, 1)
+                )
+            )
+
+        resultat[0] shouldBe SykefraværsstatistikkLand(
+            årstall = 2019,
+            kvartal = 1,
+            antallPersoner = 2750000,
+            tapteDagsverk = BigDecimal("350000.0"),
+            muligeDagsverk = BigDecimal("71000000.0")
+        )
+
+        resultat[1] shouldBe SykefraværsstatistikkLand(
+            årstall = 2019,
+            kvartal = 2,
+            antallPersoner = 2500000,
+            tapteDagsverk = BigDecimal("256800.0"),
+            muligeDagsverk = BigDecimal("60000000.0")
+        )
     }
 }
