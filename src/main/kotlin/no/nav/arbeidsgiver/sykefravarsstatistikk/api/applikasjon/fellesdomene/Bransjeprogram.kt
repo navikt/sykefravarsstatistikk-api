@@ -4,9 +4,9 @@ import ia.felles.definisjoner.bransjer.BransjeId
 import ia.felles.definisjoner.bransjer.Bransje as Bransjer
 
 object Bransjeprogram {
-    val alleBransjer: List<Bransje> = Bransjer.entries.map { Bransje(it) }
+    val alleBransjer: List<LegacyBransje> = Bransjer.entries.map { LegacyBransje(it) }
 
-    fun finnBransje(næringskode: Næringskode): Bransje? = alleBransjer.firstOrNull { bransje ->
+    fun finnBransje(næringskode: Næringskode): LegacyBransje? = alleBransjer.firstOrNull { bransje ->
             bransje.type.bransjeId.let {
                 when (it) {
                     is BransjeId.Næring -> næringskode.næring.tosifferIdentifikator == it.næring

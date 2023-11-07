@@ -57,9 +57,9 @@ class KvartalsvisSykefraværshistorikkService(
 
     private fun uthentingForBransjeEllerNæring(
         næring: Næring,
-        bransje: Bransje?
+        legacyBransje: LegacyBransje?
     ): CompletableFuture<KvartalsvisSykefraværshistorikkJson> {
-        val skalHenteDataPåNæring = bransje == null || bransje.type.bransjeId is BransjeId.Næring
+        val skalHenteDataPåNæring = legacyBransje == null || legacyBransje.type.bransjeId is BransjeId.Næring
 
         return if (skalHenteDataPåNæring) {
             uthentingMedFeilhåndteringOgTimeout(
@@ -69,9 +69,9 @@ class KvartalsvisSykefraværshistorikkService(
             )
         } else {
             uthentingMedFeilhåndteringOgTimeout(
-                { hentSykefraværshistorikkNæringskoder(bransje!!) },
+                { hentSykefraværshistorikkNæringskoder(legacyBransje!!) },
                 Statistikkategori.BRANSJE,
-                bransje!!.navn
+                legacyBransje!!.navn
             )
         }
     }
@@ -118,11 +118,11 @@ class KvartalsvisSykefraværshistorikkService(
         )
     }
 
-    private fun hentSykefraværshistorikkNæringskoder(bransje: Bransje): KvartalsvisSykefraværshistorikkJson {
+    private fun hentSykefraværshistorikkNæringskoder(legacyBransje: LegacyBransje): KvartalsvisSykefraværshistorikkJson {
         return KvartalsvisSykefraværshistorikkJson(
             Statistikkategori.BRANSJE,
-            bransje.navn,
-            sykefraværStatistikkNæringskodeRepository.hentKvartalsvisSykefraværprosent(bransje)
+            legacyBransje.navn,
+            sykefraværStatistikkNæringskodeRepository.hentKvartalsvisSykefraværprosent(legacyBransje)
         )
     }
 

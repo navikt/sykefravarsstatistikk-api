@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test
 internal class BransjeEllerNæringTest {
     @Test
     fun BransjeEllerNæring_kan_opprettes_for_en_bransje_og_returnerer_en_bransje() {
-        val bransje = Bransje(Bransjer.BARNEHAGER)
-        val bransjeEllerNæring = BransjeEllerNæring(bransje)
+        val legacyBransje = LegacyBransje(Bransjer.BARNEHAGER)
+        val bransjeEllerNæring = BransjeEllerNæring(legacyBransje)
         assertThat(bransjeEllerNæring.isBransje).isEqualTo(true)
-        assertThat(bransjeEllerNæring.getBransje()).isEqualTo(bransje)
+        assertThat(bransjeEllerNæring.getBransje()).isEqualTo(legacyBransje)
         assertThrows(NoSuchElementException::class.java) { bransjeEllerNæring.næring }
     }
 

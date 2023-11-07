@@ -220,7 +220,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
             )
         )
         val resultat =
-            sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetBransje(Bransje(Bransjer.SYKEHUS))
+            sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetBransje(LegacyBransje(Bransjer.SYKEHUS))
         assertThat(resultat.size).isEqualTo(2)
         assertThat(resultat[0])
             .isEqualTo(

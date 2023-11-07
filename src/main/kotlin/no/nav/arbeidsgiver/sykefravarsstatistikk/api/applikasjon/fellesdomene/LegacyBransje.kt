@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene
 import ia.felles.definisjoner.bransjer.BransjeId
 import ia.felles.definisjoner.bransjer.Bransje as Bransjer
 
-data class Bransje(
+data class LegacyBransje(
     val type: Bransjer,
 ) {
     val navn = type.navn

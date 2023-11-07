@@ -165,7 +165,7 @@ open class SykefraværRepositoryJdbcTest {
             )
         )
         val resultat = sykefraværStatistikkNæringskodeRepository.hentForBransje(
-            Bransje(Bransjer.BARNEHAGER),
+            LegacyBransje(Bransjer.BARNEHAGER),
             listOf(
                 ÅrstallOgKvartal(2019, 1),
                 ÅrstallOgKvartal(2018, 4)

@@ -251,7 +251,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(3000)
         )
         val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(
-            Bransje(Bransjer.SYKEHUS)
+            LegacyBransje(Bransjer.SYKEHUS)
         )
         Assertions.assertThat(resultat.size).isEqualTo(2)
         Assertions.assertThat(resultat[0])
@@ -293,7 +293,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(20),
             BigDecimal(100)
         )
-        val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(Bransje(Bransjer.SYKEHUS))
+        val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(LegacyBransje(Bransjer.SYKEHUS))
         Assertions.assertThat(resultat.size).isEqualTo(1)
         Assertions.assertThat(resultat[0])
             .isEqualTo(

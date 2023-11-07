@@ -124,7 +124,7 @@ open class SykefraværStatistikkNæringskodeRepositoryTest {
         )
 
         val resultat = sykefraværStatistikkNæringskodeRepository.hentForBransje(
-            Bransje(Bransjer.SYKEHJEM), listOf(
+            LegacyBransje(Bransjer.SYKEHJEM), listOf(
                 ÅrstallOgKvartal(2023, 3)
             )
         )

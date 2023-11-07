@@ -6,7 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.N�
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Sykefraværsdata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.UmaskertSykefraværForEttKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Bransje
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.LegacyBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.BransjeEllerNæring
 import org.assertj.core.api.AssertionsForClassTypes
 import org.junit.jupiter.api.Test
@@ -29,8 +29,8 @@ internal class AggregeringskalkulatorTest {
             Sykefraværsdata(mutableMapOf(Statistikkategori.BRANSJE to   synkendeSykefravær)),
             TestUtils.SISTE_PUBLISERTE_KVARTAL
         )
-        val bransje = BransjeEllerNæring(Bransje(Bransjer.BARNEHAGER))
-        AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentBransjeEllerNæring(bransje).getOrNull()?.verdi)
+        val legacyBransje = BransjeEllerNæring(LegacyBransje(Bransjer.BARNEHAGER))
+        AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentBransjeEllerNæring(legacyBransje).getOrNull()?.verdi)
             .isEqualTo("5.0")
     }
 

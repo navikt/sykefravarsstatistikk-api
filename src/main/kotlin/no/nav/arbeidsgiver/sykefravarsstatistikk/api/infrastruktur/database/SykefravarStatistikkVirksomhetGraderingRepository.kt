@@ -136,13 +136,13 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
                 (rectype eq DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET)
     }
 
-    fun hentForBransje(bransje: Bransje): List<UmaskertSykefraværForEttKvartal> = hent {
-        val bransjeidentifikator = if (bransje.type.bransjeId is BransjeId.Næringskoder) {
+    fun hentForBransje(legacyBransje: LegacyBransje): List<UmaskertSykefraværForEttKvartal> = hent {
+        val bransjeidentifikator = if (legacyBransje.type.bransjeId is BransjeId.Næringskoder) {
             næringskode
         } else {
             næring
         }
-        (bransjeidentifikator inList bransje.identifikatorer) and
+        (bransjeidentifikator inList legacyBransje.identifikatorer) and
                 (rectype eq DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET)
     }
 

@@ -3,10 +3,10 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene
 import io.vavr.control.Either
 
 class BransjeEllerNæring {
-    val verdi: Either<Bransje, Næring>
+    val verdi: Either<LegacyBransje, Næring>
 
-    constructor(bransje: Bransje) {
-        verdi = Either.left(bransje)
+    constructor(legacyBransje: LegacyBransje) {
+        verdi = Either.left(legacyBransje)
     }
 
     constructor(næring: Næring) {
@@ -22,7 +22,7 @@ class BransjeEllerNæring {
     val isBransje: Boolean
         get() = verdi.isLeft
 
-    fun getBransje(): Bransje {
+    fun getBransje(): LegacyBransje {
         return verdi.left
     }
 
