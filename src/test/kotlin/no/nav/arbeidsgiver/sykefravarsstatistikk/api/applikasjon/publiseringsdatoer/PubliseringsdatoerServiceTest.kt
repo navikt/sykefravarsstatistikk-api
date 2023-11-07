@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktDto
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Importtidspunkt
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.PubliseringsdatoerRepository
@@ -65,7 +65,7 @@ internal class PubliseringsdatoerServiceTest {
 
     @Test
     fun hentPubliseringsdatoer_nårPubliseringHarSkjeddSomPlanlagt_publiseringsdatoerErRiktige() {
-        val sisteImporttidspunkt = ImporttidspunktDto(
+        val sisteImporttidspunkt = Importtidspunkt(
             LocalDate.of(2022, 9, 8),
             ÅrstallOgKvartal(2022, 2)
         )
@@ -85,7 +85,7 @@ internal class PubliseringsdatoerServiceTest {
 
     @Test
     fun hentPubliseringsdatoer_nårPubliseringSkjerEnDagForSent_returnererKorrektDatoForForrigePubliseringIstedenforPlanlagtDato() {
-        val enDagEtterPlanlagtImport = ImporttidspunktDto(
+        val enDagEtterPlanlagtImport = Importtidspunkt(
             LocalDate.of(2022, 6, 3),
             ÅrstallOgKvartal(2022, 1)
         )

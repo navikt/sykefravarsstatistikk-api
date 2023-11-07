@@ -203,7 +203,7 @@ class SykefraværsstatistikkImporteringService(
         }
         val antallSlettet = sykefraværStatistikkVirksomhetGraderingRepository.slettDataFor(årstallOgKvartal)
         val antallOprettet =
-            sykefraværStatistikkVirksomhetGraderingRepository.opprettSykefraværsstatistikkVirksomhetMedGradering(
+            sykefraværStatistikkVirksomhetGraderingRepository.settInn(
                 statistikk
             )
         val resultat = SlettOgOpprettResultat(antallSlettet, antallOprettet)

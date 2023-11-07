@@ -48,7 +48,7 @@ internal class AggregertStatistikkServiceTest {
 
     @BeforeEach
     fun setUp() {
-        every { mockImporttidspunktRepository.hentNyesteImporterteKvartal() } returns ImporttidspunktDto(
+        every { mockImporttidspunktRepository.hentNyesteImporterteKvartal() } returns Importtidspunkt(
             LocalDate.of(
                 2022,
                 2,

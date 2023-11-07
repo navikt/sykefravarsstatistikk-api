@@ -2,12 +2,11 @@ package infrastruktur.database
 
 import config.AppConfigForJdbcTesterConfig
 import ia.felles.definisjoner.bransjer.Bransjer
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Bransje
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkBransje
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkForNæringskode
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkNæringskodeRepository
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfigur
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import testUtils.TestUtils
 import java.math.BigDecimal
 
 
@@ -26,6 +26,71 @@ import java.math.BigDecimal
 open class SykefraværStatistikkNæringskodeRepositoryTest {
     @Autowired
     lateinit var sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository
+
+    private val produksjonAvKlær = Næringskode("14190")
+    private val undervisning = Næringskode("86907")
+
+    @AfterEach
+    fun tearDown() {
+        TestUtils.slettAllStatistikkFraDatabase(
+            sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository,
+        )
+    }
+
+    @Test
+    fun `hentAltForKvartaler skal returnere riktig data til alle næringer`() {
+        listOf(
+            ÅrstallOgKvartal(2019, 2), ÅrstallOgKvartal(2019, 1)
+        ).forEach { (årstall, kvartal) ->
+            sykefraværStatistikkNæringskodeRepository.settInn(
+                listOf(
+                    SykefraværsstatistikkForNæringskode(
+                        årstall = årstall,
+                        kvartal = kvartal,
+                        næringkode5siffer = produksjonAvKlær.femsifferIdentifikator,
+                        antallPersoner = 10,
+                        tapteDagsverk = BigDecimal(3),
+                        muligeDagsverk = BigDecimal(100)
+                    )
+                )
+            )
+            sykefraværStatistikkNæringskodeRepository.settInn(
+                listOf(
+                    SykefraværsstatistikkForNæringskode(
+                        årstall = årstall,
+                        kvartal = kvartal,
+                        næringkode5siffer = undervisning.femsifferIdentifikator,
+                        antallPersoner = 10,
+                        tapteDagsverk = BigDecimal(5),
+                        muligeDagsverk = BigDecimal(100)
+                    )
+                )
+            )
+        }
+
+        val resultat = sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(
+            listOf(ÅrstallOgKvartal(2019, 2))
+        )
+
+        resultat shouldContain SykefraværsstatistikkForNæringskode(
+            årstall = 2019,
+            kvartal = 2,
+            næringkode5siffer = produksjonAvKlær.femsifferIdentifikator,
+            antallPersoner = 10,
+            tapteDagsverk = BigDecimal("3.0"),
+            muligeDagsverk = BigDecimal("100.0")
+        )
+
+        resultat shouldContain SykefraværsstatistikkForNæringskode(
+            årstall = 2019,
+            kvartal = 2,
+            næringkode5siffer = undervisning.femsifferIdentifikator,
+            antallPersoner = 10,
+            tapteDagsverk = BigDecimal("5.0"),
+            muligeDagsverk = BigDecimal("100.0")
+        )
+    }
+
 
     @Test
     fun `bransje skal regens ut riktig`() {

@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Importtidspunkt
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.javatime.date
@@ -35,14 +36,14 @@ class ImporttidspunktRepository(
     }
 
 
-    fun hentNyesteImporterteKvartal(): ImporttidspunktDto? {
+    fun hentNyesteImporterteKvartal(): Importtidspunkt? {
         return transaction {
             selectAll()
                 .orderBy(årstall to SortOrder.DESC)
                 .orderBy(kvartal to SortOrder.DESC)
                 .limit(1)
                 .map {
-                    ImporttidspunktDto(
+                    Importtidspunkt(
                         sistImportertTidspunkt = it[importert],
                         gjeldendePeriode = ÅrstallOgKvartal(it[årstall].toInt(), it[kvartal].toInt())
                     )

@@ -1,4 +1,4 @@
-package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.config
 
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletException
