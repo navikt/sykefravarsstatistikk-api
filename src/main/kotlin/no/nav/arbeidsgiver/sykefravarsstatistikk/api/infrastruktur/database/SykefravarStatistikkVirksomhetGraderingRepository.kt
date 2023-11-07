@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
+import ia.felles.definisjoner.bransjer.BransjeId
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetMetadataMedNæringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
@@ -136,7 +137,7 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
     }
 
     fun hentForBransje(bransje: Bransje): List<UmaskertSykefraværForEttKvartal> = hent {
-        val bransjeidentifikator = if (bransje.erDefinertPåFemsiffernivå()) {
+        val bransjeidentifikator = if (bransje.type.bransjeId is BransjeId.Næringskoder) {
             næringskode
         } else {
             næring

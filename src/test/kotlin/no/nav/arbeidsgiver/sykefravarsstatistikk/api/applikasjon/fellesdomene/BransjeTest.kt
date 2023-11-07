@@ -80,7 +80,7 @@ class BransjeTest {
     fun lengdePåNæringskoder__skal_returnere_riktig_lengde() {
         org.junit.jupiter.api.Assertions.assertTrue(
             Bransje(Bransjer.SYKEHUS)
-                .erDefinertPåFemsiffernivå()
+                .type.bransjeId is BransjeId.Næringskoder
         )
         org.junit.jupiter.api.Assertions.assertTrue(
             Bransje(Bransjer.BYGG)

@@ -15,11 +15,9 @@ data class Bransje(
     }
 
     init {
-        require(type.bransjeId is BransjeId.Næring || erDefinertPåFemsiffernivå())
+        require(type.bransjeId is BransjeId.Næring || type.bransjeId is BransjeId.Næringskoder)
         { "Støtter kun bransjer som er spesifisert av enten 2 eller 5 sifre" }
     }
-
-    fun erDefinertPåFemsiffernivå() = type.bransjeId is BransjeId.Næringskoder
 
     fun inkludererVirksomhet(underenhet: Virksomhet): Boolean {
         return inkludererNæringskode(underenhet.næringskode)

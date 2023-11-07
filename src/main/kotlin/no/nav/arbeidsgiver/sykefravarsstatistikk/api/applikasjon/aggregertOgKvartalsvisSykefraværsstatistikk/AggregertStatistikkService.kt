@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKva
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import ia.felles.definisjoner.bransjer.BransjeId
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Sykefraværsdata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
@@ -209,7 +210,7 @@ class AggregertStatistikkService(
         if (maybeBransje.isEmpty) {
             data[Statistikkategori.NÆRING] =
                 sykefraværStatistikkNæringRepository.hentForKvartaler(næring, kvartaler)
-        } else if (maybeBransje.get().erDefinertPåFemsiffernivå()) {
+        } else if (maybeBransje.get().type.bransjeId is BransjeId.Næringskoder) {
             data[Statistikkategori.BRANSJE] =
                 sykefraværStatistikkNæringskodeRepository.hentForBransje(maybeBransje.get(), kvartaler)
                     .map { UmaskertSykefraværForEttKvartal(it) }
@@ -230,7 +231,7 @@ class AggregertStatistikkService(
             sykefravarStatistikkVirksomhetRepository.hentSykefraværMedVarighet(virksomhet.orgnr)
         if (maybeBransje.isEmpty) {
             data[Statistikkategori.NÆRING] = sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(næring)
-        } else if (maybeBransje.get().erDefinertPåFemsiffernivå()) {
+        } else if (maybeBransje.get().type.bransjeId is BransjeId.Næringskoder) {
             data[Statistikkategori.BRANSJE] = sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetBransje(maybeBransje.get())
         } else {
             data[Statistikkategori.BRANSJE] = sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(næring)
