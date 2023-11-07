@@ -42,9 +42,7 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
         }
     }
 
-    fun opprettSykefraværsstatistikkVirksomhetMedGradering(
-        sykefraværsstatistikk: List<SykefraværsstatistikkVirksomhetMedGradering>
-    ): Int {
+    fun settInn(sykefraværsstatistikk: List<SykefraværsstatistikkVirksomhetMedGradering>): Int {
         return transaction {
             batchInsert(sykefraværsstatistikk, shouldReturnGeneratedValues = false) {
                 this[orgnr] = it.orgnr
@@ -105,8 +103,8 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
                 muligeDagsverk.sum(),
             )
                 .select {
-                (årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }
-            }
+                    (årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }
+                }
                 .groupBy(årstall, kvartal, orgnr, næring, næringskode, rectype)
                 .map {
                     SykefraværsstatistikkVirksomhetMedGradering(
