@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk
 
+import ia.felles.definisjoner.bransjer.BransjeId
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Bransjeprogram.finnBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
@@ -58,7 +59,7 @@ class KvartalsvisSykefraværshistorikkService(
         næring: Næring,
         bransje: Bransje?
     ): CompletableFuture<KvartalsvisSykefraværshistorikkJson> {
-        val skalHenteDataPåNæring = bransje == null || bransje.erDefinertPåTosiffernivå()
+        val skalHenteDataPåNæring = bransje == null || bransje.type.bransjeId is BransjeId.Næring
 
         return if (skalHenteDataPåNæring) {
             uthentingMedFeilhåndteringOgTimeout(

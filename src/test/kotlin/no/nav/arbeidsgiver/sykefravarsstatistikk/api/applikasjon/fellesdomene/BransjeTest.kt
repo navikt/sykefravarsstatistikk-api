@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene
 
+import ia.felles.definisjoner.bransjer.BransjeId
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Bransjeprogram.finnBransje
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
@@ -83,7 +84,7 @@ class BransjeTest {
         )
         org.junit.jupiter.api.Assertions.assertTrue(
             Bransje(Bransjer.BYGG)
-                .erDefinertPåTosiffernivå()
+                .type.bransjeId is BransjeId.Næring
         )
     }
 

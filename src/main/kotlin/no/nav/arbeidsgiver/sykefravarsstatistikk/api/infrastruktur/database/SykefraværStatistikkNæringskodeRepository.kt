@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
+import ia.felles.definisjoner.bransjer.BransjeId
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -34,7 +35,9 @@ class SykefraværStatistikkNæringskodeRepository(
 
     // TODO: Gjør så dette repoet ikke trenger forholde seg til konseptet bransje
     fun hentKvartalsvisSykefraværprosent(bransje: Bransje): List<SykefraværForEttKvartal> {
-        if (bransje.erDefinertPåTosiffernivå()) { throw RuntimeException("Denne metoden fungerer bare på femsifferdefinerte bransjer")}
+        if (bransje.type.bransjeId is BransjeId.Næring) {
+            throw RuntimeException("Denne metoden fungerer bare på femsifferdefinerte bransjer")
+        }
         return transaction {
             slice(
                 årstall,
