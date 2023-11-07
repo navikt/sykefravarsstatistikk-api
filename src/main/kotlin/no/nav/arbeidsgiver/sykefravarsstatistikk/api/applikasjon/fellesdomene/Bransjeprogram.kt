@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene
 
-import ia.felles.definisjoner.bransjer.Bransjer
 import java.util.*
+import ia.felles.definisjoner.bransjer.Bransje as Bransjer
 
 object Bransjeprogram {
     val alleBransjer: List<Bransje> = Bransjer.entries.map { Bransje(it) }

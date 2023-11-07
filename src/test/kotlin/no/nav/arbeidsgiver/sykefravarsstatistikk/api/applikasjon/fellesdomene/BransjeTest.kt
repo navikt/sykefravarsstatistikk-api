@@ -1,11 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene
 
-import ia.felles.definisjoner.bransjer.Bransjer
-import testUtils.TestData.enNæringskode
-import testUtils.TestData.etOrgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Bransjeprogram.finnBransje
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
+import testUtils.TestData.enNæringskode
+import testUtils.TestData.etOrgnr
+import ia.felles.definisjoner.bransjer.Bransje as Bransjer
 
 class BransjeTest {
     @Test

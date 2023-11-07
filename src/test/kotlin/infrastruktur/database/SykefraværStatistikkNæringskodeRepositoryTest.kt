@@ -1,7 +1,7 @@
 package infrastruktur.database
 
 import config.AppConfigForJdbcTesterConfig
-import ia.felles.definisjoner.bransjer.Bransjer
+import ia.felles.definisjoner.bransjer.Bransje as Bransjer
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
