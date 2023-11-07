@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import testUtils.TestTokenUtil.TOKENX_ISSUER_ID
 import testUtils.TestTokenUtil.createToken
 import testUtils.TestUtils.PRODUKSJON_NYTELSESMIDLER
@@ -42,9 +41,6 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
     lateinit var mockOAuth2Server: MockOAuth2Server
 
     @Autowired
-    lateinit var jdbcTemplate: NamedParameterJdbcTemplate
-
-    @Autowired
     lateinit var sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
 
     @Autowired
@@ -66,7 +62,6 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
     @BeforeEach
     fun setUp() {
         slettAllStatistikkFraDatabase(
-            jdbcTemplate = jdbcTemplate,
             sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
             sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository,
             sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository,

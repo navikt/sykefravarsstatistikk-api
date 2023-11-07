@@ -1,14 +1,12 @@
 package infrastruktur.database
 
 import config.AppConfigForJdbcTesterConfig
+import io.kotest.matchers.equals.shouldBeEqual
+import io.kotest.matchers.shouldBe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori.Companion.fraKode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.StatistikkRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.assertj.core.api.Assertions
 import org.jetbrains.exposed.sql.selectAll
@@ -19,8 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
 import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -30,18 +26,12 @@ import testUtils.TestData.NÆRINGSKODE_5SIFFER
 import testUtils.TestData.ORGNR_VIRKSOMHET_1
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import java.math.BigDecimal
-import java.sql.ResultSet
 
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 open class StatistikkRepositoryJdbcTest {
-    @Autowired
-    private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
-
-    @Autowired
-    private lateinit var statistikkRepository: StatistikkRepository
 
     @Autowired
     private lateinit var sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
@@ -52,19 +42,21 @@ open class StatistikkRepositoryJdbcTest {
     @Autowired
     private lateinit var sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository
 
+    @Autowired
+    private lateinit var sykefraværStatistikkNæringMedVarighetRepository: SykefraværStatistikkNæringMedVarighetRepository
+
     @BeforeEach
     fun setUp() {
         slettAllStatistikkFraDatabase(
-            jdbcTemplate,
             sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
             sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
+            sykefraværStatistikkNæringMedVarighetRepository = sykefraværStatistikkNæringMedVarighetRepository
         )
     }
 
     @AfterEach
     fun tearDown() {
         slettAllStatistikkFraDatabase(
-            jdbcTemplate,
             sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
             sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository
         )
@@ -98,18 +90,24 @@ open class StatistikkRepositoryJdbcTest {
 
     @Test
     fun batchOpprettSykefraværsstatistikkNæringMedVarighet__skal_lagre_data_i_tabellen() {
-        val list: MutableList<SykefraværsstatistikkNæringMedVarighet> = ArrayList()
-        val statistikkMedVarighet = SykefraværsstatistikkNæringMedVarighet(
-            2019, 1, "03123", "A", 14, BigDecimal("55.123"), BigDecimal("856.891")
+
+        sykefraværStatistikkNæringMedVarighetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkNæringMedVarighet(
+                    årstall = 2019,
+                    kvartal = 1,
+                    næringkode = "03123",
+                    varighet = "A",
+                    antallPersoner = 14,
+                    tapteDagsverk = BigDecimal("55.123"),
+                    muligeDagsverk = BigDecimal("856.891")
+                )
+            )
         )
-        list.add(statistikkMedVarighet)
-        statistikkRepository.batchOpprettSykefraværsstatistikkNæringMedVarighet(
-            list, statistikkRepository.INSERT_BATCH_STØRRELSE
-        )
-        val resultList = hentSykefraværprosentNæringMedVarighet()
-        Assertions.assertThat(resultList.size).isEqualTo(1)
-        Assertions.assertThat(resultList[0])
-            .isEqualTo(
+        val resultat = sykefraværStatistikkNæringMedVarighetRepository.hentAlt()
+
+        resultat.size shouldBe 1
+        resultat[0] shouldBeEqual
                 UmaskertSykefraværForEttKvartalMedVarighet(
                     ÅrstallOgKvartal(2019, 1),
                     BigDecimal("55.123"),
@@ -117,25 +115,24 @@ open class StatistikkRepositoryJdbcTest {
                     14,
                     Varighetskategori._1_DAG_TIL_7_DAGER
                 )
-            )
     }
 
     @Test
     fun batchOpprettSykefraværsstatistikkVirksomhetMedGradering__skal_lagre_data_i_tabellen() {
         val list: MutableList<SykefraværsstatistikkVirksomhetMedGradering> = ArrayList()
         val gradertSykemelding = SykefraværsstatistikkVirksomhetMedGradering(
-            2020,
-            3,
-            ORGNR_VIRKSOMHET_1,
-            NÆRINGSKODE_2SIFFER,
-            NÆRINGSKODE_5SIFFER,
-            DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
-            1,
-            BigDecimal(3).setScale(6),
-            3,
-            13,
-            BigDecimal(16).setScale(6),
-            BigDecimal(100).setScale(6)
+            årstall = 2020,
+            kvartal = 3,
+            orgnr = ORGNR_VIRKSOMHET_1,
+            næring = NÆRINGSKODE_2SIFFER,
+            næringkode = NÆRINGSKODE_5SIFFER,
+            rectype = DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
+            antallGraderteSykemeldinger = 1,
+            tapteDagsverkGradertSykemelding = BigDecimal(3).setScale(6),
+            antallSykemeldinger = 3,
+            antallPersoner = 13,
+            tapteDagsverk = BigDecimal(16).setScale(6),
+            muligeDagsverk = BigDecimal(100).setScale(6)
         )
         list.add(gradertSykemelding)
         sykefravarStatistikkVirksomhetGraderingRepository.opprettSykefraværsstatistikkVirksomhetMedGradering(list)
@@ -186,46 +183,84 @@ open class StatistikkRepositoryJdbcTest {
 
     @Test
     fun slettSykefraværsstatistikkNæringMedVarighet__skal_slette_data_i_tabellen() {
-        lagreSykefraværprosentNæringMedVarighet("01", "A", 2018, 3)
-        lagreSykefraværprosentNæringMedVarighet("02", "A", 2018, 3)
-        lagreSykefraværprosentNæringMedVarighet("01", "A", 2018, 4)
-        lagreSykefraværprosentNæringMedVarighet("02", "A", 2018, 4)
-        lagreSykefraværprosentNæringMedVarighet("01", "A", 2019, 1)
-        lagreSykefraværprosentNæringMedVarighet("02", "A", 2019, 1)
-        val antallSlettet = statistikkRepository.slettSykefraværsstatistikkNæringMedVarighet(
-            ÅrstallOgKvartal(2019, 1)
-        )
-        val list = hentSykefraværprosentNæringMedVarighet()
-        Assertions.assertThat(list.size).isEqualTo(4)
-        Assertions.assertThat(antallSlettet).isEqualTo(2)
-    }
-
-    private fun lagreSykefraværprosentNæringMedVarighet(
-        næringkode: String, varighet: String, årstall: Int, kvartal: Int
-    ) {
-        jdbcTemplate.update(
-            String.format(
-                "insert into sykefravar_statistikk_naring_med_varighet "
-                        + "(arstall, kvartal, naring_kode, varighet, antall_personer, tapte_dagsverk, mulige_dagsverk) "
-                        + "values (%d, %d, '%s', '%s', 15, 30, 300)",
-                årstall, kvartal, næringkode, varighet
-            ),
-            MapSqlParameterSource()
-        )
-    }
-
-    private fun hentSykefraværprosentNæringMedVarighet(): List<UmaskertSykefraværForEttKvartalMedVarighet> {
-        return jdbcTemplate.query(
-            "select * from sykefravar_statistikk_naring_med_varighet",
-            MapSqlParameterSource()
-        ) { rs: ResultSet, rowNum: Int ->
-            UmaskertSykefraværForEttKvartalMedVarighet(
-                ÅrstallOgKvartal(rs.getInt("arstall"), rs.getInt("kvartal")),
-                rs.getBigDecimal("tapte_dagsverk"),
-                rs.getBigDecimal("mulige_dagsverk"),
-                rs.getInt("antall_personer"),
-                fraKode(rs.getString("varighet"))
+        sykefraværStatistikkNæringMedVarighetRepository.settInn(
+            listOf(
+                SykefraværsstatistikkNæringMedVarighet(
+                    årstall = 2018,
+                    kvartal = 3,
+                    tapteDagsverk = 30.toBigDecimal(),
+                    muligeDagsverk = 300.toBigDecimal(),
+                    antallPersoner = 15,
+                    varighet = "A",
+                    næringkode = "01000"
+                ),
+                SykefraværsstatistikkNæringMedVarighet(
+                    årstall = 2018,
+                    kvartal = 3,
+                    tapteDagsverk = 30.toBigDecimal(),
+                    muligeDagsverk = 300.toBigDecimal(),
+                    antallPersoner = 15,
+                    varighet = "A",
+                    næringkode = "02000"
+                ),
+                SykefraværsstatistikkNæringMedVarighet(
+                    årstall = 2018,
+                    kvartal = 4,
+                    tapteDagsverk = 30.toBigDecimal(),
+                    muligeDagsverk = 300.toBigDecimal(),
+                    antallPersoner = 15,
+                    varighet = "A",
+                    næringkode = "01000"
+                ),
+                SykefraværsstatistikkNæringMedVarighet(
+                    årstall = 2018,
+                    kvartal = 4,
+                    tapteDagsverk = 30.toBigDecimal(),
+                    muligeDagsverk = 300.toBigDecimal(),
+                    antallPersoner = 15,
+                    varighet = "A",
+                    næringkode = "02000"
+                ),
+                SykefraværsstatistikkNæringMedVarighet(
+                    årstall = 2019,
+                    kvartal = 1,
+                    tapteDagsverk = 30.toBigDecimal(),
+                    muligeDagsverk = 300.toBigDecimal(),
+                    antallPersoner = 15,
+                    varighet = "A",
+                    næringkode = "01000"
+                ),
+                SykefraværsstatistikkNæringMedVarighet(
+                    årstall = 2019,
+                    kvartal = 1,
+                    tapteDagsverk = 30.toBigDecimal(),
+                    muligeDagsverk = 300.toBigDecimal(),
+                    antallPersoner = 15,
+                    varighet = "A",
+                    næringkode = "02000"
+                )
             )
+        )
+
+        val antallSlettet = sykefraværStatistikkNæringMedVarighetRepository.slettKvartal(ÅrstallOgKvartal(2019, 1))
+
+        val list = sykefraværStatistikkNæringMedVarighetRepository.hentAlt()
+
+        list.size shouldBe 4
+        antallSlettet shouldBe 2
+    }
+
+    private fun SykefraværStatistikkNæringMedVarighetRepository.hentAlt(): List<UmaskertSykefraværForEttKvartalMedVarighet> {
+        return transaction {
+            selectAll().map {
+                UmaskertSykefraværForEttKvartalMedVarighet(
+                    årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                    tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
+                    muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
+                    antallPersoner = it[antallPersoner],
+                    varighet = Varighetskategori.fraKode(it[varighet].toString())
+                )
+            }
         }
     }
 

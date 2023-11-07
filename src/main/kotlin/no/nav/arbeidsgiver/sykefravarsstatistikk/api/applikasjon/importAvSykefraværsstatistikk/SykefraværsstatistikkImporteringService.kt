@@ -14,12 +14,12 @@ import org.springframework.stereotype.Component
 
 @Component
 class SykefraværsstatistikkImporteringService(
-    private val statistikkRepository: StatistikkRepository,
     private val sykefraværStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
     private val datavarehusRepository: DatavarehusRepository,
     private val importtidspunktRepository: ImporttidspunktRepository,
     private val sykefraværsstatistikkLandRepository: SykefraværStatistikkLandRepository,
     private val sykefraværStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
+    private val sykefraværStatistikkNæringMedVarighetRepository: SykefraværStatistikkNæringMedVarighetRepository,
     private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
     private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository,
     private val sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository,
@@ -213,11 +213,13 @@ class SykefraværsstatistikkImporteringService(
     private fun importSykefraværsstatistikkNæringMedVarighet(
         årstallOgKvartal: ÅrstallOgKvartal
     ): SlettOgOpprettResultat {
-        val sykefraværsstatistikkNæringMedVarighet =
-            datavarehusRepository.hentSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal)
-        val resultat = statistikkRepository.importSykefraværsstatistikkNæringMedVarighet(
-            sykefraværsstatistikkNæringMedVarighet, årstallOgKvartal
-        )
+        val data = datavarehusRepository.hentSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal)
+
+        val antallSlettet = sykefraværStatistikkNæringMedVarighetRepository.slettKvartal(årstallOgKvartal)
+        val antallOpprettet = sykefraværStatistikkNæringMedVarighetRepository.settInn(data)
+
+        val resultat = SlettOgOpprettResultat(antallSlettet, antallOpprettet)
+
         loggResultat(årstallOgKvartal, resultat, "næring med varighet")
         return resultat
     }

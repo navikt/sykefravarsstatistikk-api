@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - expose-da-rest
+      - the-last-expose
     paths-ignore:
       - '**.md'
       - '**/**.md'

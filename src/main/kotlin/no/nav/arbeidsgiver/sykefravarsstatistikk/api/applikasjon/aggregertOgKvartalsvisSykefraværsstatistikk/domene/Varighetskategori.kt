@@ -7,8 +7,7 @@ enum class Varighetskategori(val kode: String?) {
     _8_UKER_TIL_20_UKER("D"),
     _20_UKER_TIL_39_UKER("E"),
     MER_ENN_39_UKER("F"),
-    TOTAL("X"),
-    UKJENT(null);
+    TOTAL("X");
 
     fun erTotalvarighet(): Boolean {
         return kode == "X"
@@ -33,7 +32,7 @@ enum class Varighetskategori(val kode: String?) {
     }
 
     companion object {
-        fun fraKode(kode: String?): Varighetskategori =
+        fun fraKode(kode: String): Varighetskategori =
             Varighetskategori.entries.find { it.kode == kode }
                 ?: throw IllegalArgumentException("Det finnes ingen sykefraværsvarighet med kode $kode")
     }

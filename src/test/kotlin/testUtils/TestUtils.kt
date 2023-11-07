@@ -1,6 +1,9 @@
 package testUtils
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næring
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkForNæring
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkLand
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkData
 import org.jetbrains.exposed.sql.deleteAll
@@ -41,20 +44,24 @@ object TestUtils {
         }
     }
 
+    private fun SykefraværStatistikkNæringMedVarighetRepository.slettAlt() {
+        transaction {
+            deleteAll()
+        }
+    }
+
     fun slettAllStatistikkFraDatabase(
-        jdbcTemplate: NamedParameterJdbcTemplate,
         sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository? = null,
         sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository? = null,
         sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository? = null,
         sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository? = null,
         sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository? = null,
-        sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository? = null
+        sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository? = null,
+        sykefraværStatistikkNæringMedVarighetRepository: SykefraværStatistikkNæringMedVarighetRepository? = null,
     ) {
         sykefravarStatistikkVirksomhetRepository?.slettAlt()
         sykefraværStatistikkNæringRepository?.slettAlt()
-        jdbcTemplate.update(
-            "delete from sykefravar_statistikk_naring_med_varighet", MapSqlParameterSource()
-        )
+        sykefraværStatistikkNæringMedVarighetRepository?.slettAlt()
         sykefravarStatistikkVirksomhetGraderingRepository?.slettAlt()
         sykefraværStatistikkNæringskodeRepository?.slettAlt()
         sykefraværStatistikkLandRepository?.slettAlt()

@@ -26,7 +26,7 @@ internal class AggregertStatistikkServiceTest {
 
     private val mockEnhetsregisteretClient = mockk<EnhetsregisteretClient>()
 
-    private val mockVarighetRepository = mockk<VarighetRepository>()
+    private val mockSykefraværStatistikkNæringMedVarighetRepository = mockk<SykefraværStatistikkNæringMedVarighetRepository>()
     private val mockSykefravarStatistikkVirksomhetGraderingRepository =
         mockk<SykefravarStatistikkVirksomhetGraderingRepository>()
     val mockSykefravarStatistikkVirksomhetRepository = mockk<SykefravarStatistikkVirksomhetRepository>()
@@ -35,7 +35,7 @@ internal class AggregertStatistikkServiceTest {
     val mockSykefraværStatistikkNæringskodeRepository = mockk<SykefraværStatistikkNæringskodeRepository>()
 
     private val serviceUnderTest: AggregertStatistikkService = AggregertStatistikkService(
-        mockVarighetRepository,
+        mockSykefraværStatistikkNæringMedVarighetRepository,
         mockTilgangskontrollService,
         mockEnhetsregisteretClient,
         mockImporttidspunktRepository,
@@ -66,8 +66,8 @@ internal class AggregertStatistikkServiceTest {
         every { mockSykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(any()) } returns listOf()
         every { mockSykefravarStatistikkVirksomhetGraderingRepository.hentForNæring(any()) } returns listOf()
 
-        every { mockVarighetRepository.hentSykefraværMedVarighetNæring(any()) } returns listOf()
-        every { mockVarighetRepository.hentSykefraværMedVarighetBransje(any()) } returns listOf()
+        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(any()) } returns listOf()
+        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetBransje(any()) } returns listOf()
     }
 
     @Test
@@ -138,7 +138,7 @@ internal class AggregertStatistikkServiceTest {
             mockSykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(any(), any())
         } returns genererTestSykefravær(1)
 
-        every { mockVarighetRepository.hentSykefraværMedVarighetNæring(any()) }
+        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(any()) }
 
         every {
             mockSykefravarStatistikkVirksomhetRepository.hentSykefraværMedVarighet(any())
@@ -371,7 +371,7 @@ internal class AggregertStatistikkServiceTest {
                 )
 
 
-        every { mockVarighetRepository.hentSykefraværMedVarighetNæring(any()) } returns
+        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(any()) } returns
                 listOf(
                     UmaskertSykefraværForEttKvartalMedVarighet(
                         årstallOgKvartal,

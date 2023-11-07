@@ -68,7 +68,7 @@ class SykefravarStatistikkVirksomhetRepository(
                     tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
                     muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
                     antallPersoner = it[antallPersoner],
-                    varighet = Varighetskategori.fraKode(it[varighet]?.toString())
+                    varighet = Varighetskategori.fraKode(it[varighet].toString())
                 )
             }
         }
