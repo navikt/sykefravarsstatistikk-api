@@ -24,49 +24,49 @@ class BransjeTest {
     @Test
     fun finnBransje__mapperBarnehageTilBarnehagebransjen() {
         val enBarnehage = Næringskode("88911")
-        val navn = finnBransje(enBarnehage).orElseThrow().navn
+        val navn = finnBransje(enBarnehage)?.navn
         Assertions.assertThat(navn).isEqualTo("Barnehager")
     }
 
     @Test
     fun finnBransje__mapperBoligbyggelagTilByggebransjen() {
         val etBoligbyggerlag = Næringskode("41101")
-        val navn = finnBransje(etBoligbyggerlag).orElseThrow().navn
+        val navn = finnBransje(etBoligbyggerlag)?.navn
         Assertions.assertThat(navn).isEqualTo("Bygg")
     }
 
     @Test
     fun finnBransje__mapperBroOgTunellbyggerTilAnleggsbransjen() {
         val enByggerAvBroOgTunnel = Næringskode("42130")
-        val navn = finnBransje(enByggerAvBroOgTunnel).orElseThrow().navn
+        val navn = finnBransje(enByggerAvBroOgTunnel)?.navn
         Assertions.assertThat(navn).isEqualTo("Anlegg")
     }
 
     @Test
     fun finnBransje__mapperProdusentAvIskremTilNæringsmiddelindustrien() {
         val enProdusentAvIskrem = Næringskode("10520")
-        val navn = finnBransje(enProdusentAvIskrem).orElseThrow().navn
+        val navn = finnBransje(enProdusentAvIskrem)?.navn
         Assertions.assertThat(navn).isEqualTo("Næringsmiddelindustri")
     }
 
     @Test
     fun finnBransje__mapperSomatiskeSpesialsykehusTilSykehusbransjen() {
         val etSomatiskSpesialsykehus = Næringskode("86102")
-        val navn = finnBransje(etSomatiskSpesialsykehus).orElseThrow().navn
+        val navn = finnBransje(etSomatiskSpesialsykehus)?.navn
         Assertions.assertThat(navn).isEqualTo("Sykehus")
     }
 
     @Test
     fun finnBransje__mapperSykehjemTilSykehjemsbransjen() {
         val etSomatiskSykehjem = Næringskode("87102")
-        val navn = finnBransje(etSomatiskSykehjem).orElseThrow().navn
+        val navn = finnBransje(etSomatiskSykehjem)?.navn
         Assertions.assertThat(navn).isEqualTo("Sykehjem")
     }
 
     @Test
     fun finnBransje__mapperTurbiltransportTilTransportbransjen() {
         val enturbiltransportør = Næringskode("49392")
-        val navn = finnBransje(enturbiltransportør).orElseThrow().navn
+        val navn = finnBransje(enturbiltransportør)?.navn
         Assertions.assertThat(navn).isEqualTo("Transport")
     }
 

@@ -7,6 +7,7 @@ import ia.felles.definisjoner.bransjer.BransjeId
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Sykefraværsdata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Bransjeprogram.finnBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.TilgangskontrollService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
@@ -80,11 +81,11 @@ class AggregertStatistikkService(
             EnumMap(Statistikkategori::class.java)
         data[Statistikkategori.VIRKSOMHET] =
             sykefravarStatistikkVirksomhetGraderingRepository.hentForOrgnr(virksomhet.orgnr)
-        if (maybeBransje.isEmpty) {
+        if (maybeBransje == null) {
             data[Statistikkategori.NÆRING] = sykefravarStatistikkVirksomhetGraderingRepository.hentForNæring(næring)
         } else {
             data[Statistikkategori.BRANSJE] =
-                sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(maybeBransje.get())
+                sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(maybeBransje)
         }
         return Sykefraværsdata(data)
     }
@@ -183,15 +184,10 @@ class AggregertStatistikkService(
     private fun <L, R> filterRights(vararg leftsAndRights: Either<L, R>): List<R> = leftsAndRights
         .mapNotNull { it.getOrNull() }
 
-    fun finnBransjeEllerNæring(virksomhet: Virksomhet): BransjeEllerNæring {
-        val maybeBransje = Bransjeprogram.finnBransje(virksomhet)
-        return maybeBransje
-            .map { BransjeEllerNæring(it) }
-            .orElseGet {
-                val kode = virksomhet.næringskode.næring.tosifferIdentifikator
-                BransjeEllerNæring(Næring(kode))
-            }
-    }
+    fun finnBransjeEllerNæring(virksomhet: Virksomhet): BransjeEllerNæring =
+        finnBransje(virksomhet.næringskode)?.let {
+            BransjeEllerNæring(it)
+        } ?: BransjeEllerNæring(virksomhet.næringskode.næring)
 
     fun hentTotaltSykefraværAlleKategorier(
         virksomhet: Virksomhet, kvartaler: List<ÅrstallOgKvartal>
@@ -207,12 +203,12 @@ class AggregertStatistikkService(
             kvartaler
         )
         data[Statistikkategori.LAND] = sykefraværStatistikkLandRepository.hentForKvartaler(kvartaler)
-        if (maybeBransje.isEmpty) {
+        if (maybeBransje == null) {
             data[Statistikkategori.NÆRING] =
                 sykefraværStatistikkNæringRepository.hentForKvartaler(næring, kvartaler)
-        } else if (maybeBransje.get().type.bransjeId is BransjeId.Næringskoder) {
+        } else if (maybeBransje.type.bransjeId is BransjeId.Næringskoder) {
             data[Statistikkategori.BRANSJE] =
-                sykefraværStatistikkNæringskodeRepository.hentForBransje(maybeBransje.get(), kvartaler)
+                sykefraværStatistikkNæringskodeRepository.hentForBransje(maybeBransje, kvartaler)
                     .map { UmaskertSykefraværForEttKvartal(it) }
         } else {
             data[Statistikkategori.BRANSJE] =
@@ -229,12 +225,15 @@ class AggregertStatistikkService(
         )
         data[Statistikkategori.VIRKSOMHET] =
             sykefravarStatistikkVirksomhetRepository.hentSykefraværMedVarighet(virksomhet.orgnr)
-        if (maybeBransje.isEmpty) {
-            data[Statistikkategori.NÆRING] = sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(næring)
-        } else if (maybeBransje.get().type.bransjeId is BransjeId.Næringskoder) {
-            data[Statistikkategori.BRANSJE] = sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetBransje(maybeBransje.get())
+        if (maybeBransje == null) {
+            data[Statistikkategori.NÆRING] =
+                sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(næring)
+        } else if (maybeBransje.type.bransjeId is BransjeId.Næringskoder) {
+            data[Statistikkategori.BRANSJE] =
+                sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetBransje(maybeBransje)
         } else {
-            data[Statistikkategori.BRANSJE] = sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(næring)
+            data[Statistikkategori.BRANSJE] =
+                sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(næring)
         }
         return data
     }

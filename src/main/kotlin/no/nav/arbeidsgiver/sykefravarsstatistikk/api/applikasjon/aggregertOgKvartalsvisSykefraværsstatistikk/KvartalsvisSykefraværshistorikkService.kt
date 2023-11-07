@@ -28,7 +28,7 @@ class KvartalsvisSykefraværshistorikkService(
     fun hentSykefraværshistorikk(
         underenhet: Virksomhet, sektor: Sektor?
     ): MutableList<KvartalsvisSykefraværshistorikkJson> {
-        val bransje = finnBransje(underenhet)
+        val bransje = finnBransje(underenhet.næringskode)
         return Stream.of(
             uthentingMedFeilhåndteringOgTimeout(
                 { hentSykefraværshistorikkLand() },
@@ -40,7 +40,7 @@ class KvartalsvisSykefraværshistorikkService(
                 Statistikkategori.SEKTOR,
                 sektor!!.displaystring
             ),
-            uthentingForBransjeEllerNæring(underenhet.næringskode.næring, bransje.orElse(null)),
+            uthentingForBransjeEllerNæring(underenhet.næringskode.næring, bransje),
             uthentingMedFeilhåndteringOgTimeout(
                 {
                     hentSykefraværshistorikkVirksomhet(

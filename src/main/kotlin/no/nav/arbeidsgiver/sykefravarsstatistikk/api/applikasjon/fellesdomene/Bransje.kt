@@ -15,15 +15,12 @@ data class Bransje(
     }
 
     fun inkludererVirksomhet(underenhet: Virksomhet): Boolean {
-        return inkludererNæringskode(underenhet.næringskode)
-    }
-
-    fun inkludererNæringskode(næringskode: Næringskode): Boolean {
         return type.bransjeId.let {
             when (it) {
-                is BransjeId.Næring -> næringskode.næring.tosifferIdentifikator == it.næring
-                is BransjeId.Næringskoder -> it.næringskoder.contains(næringskode.femsifferIdentifikator)
+                is BransjeId.Næring -> underenhet.næringskode.næring.tosifferIdentifikator == it.næring
+                is BransjeId.Næringskoder -> it.næringskoder.contains(underenhet.næringskode.femsifferIdentifikator)
             }
         }
     }
+
 }
