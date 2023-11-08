@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
+import ia.felles.definisjoner.bransjer.Bransje
 import ia.felles.definisjoner.bransjer.BransjeId
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.jetbrains.exposed.sql.*
@@ -32,12 +33,7 @@ class SykefraværStatistikkNæringskodeRepository(
         }.count()
     }
 
-
-    // TODO: Gjør så dette repoet ikke trenger forholde seg til konseptet bransje
-    fun hentKvartalsvisSykefraværprosent(legacyBransje: LegacyBransje): List<SykefraværForEttKvartal> {
-        if (legacyBransje.type.bransjeId is BransjeId.Næring) {
-            throw RuntimeException("Denne metoden fungerer bare på femsifferdefinerte bransjer")
-        }
+    fun hentKvartalsvisSykefraværprosent(næringskoder: List<Næringskode>): List<SykefraværForEttKvartal> {
         return transaction {
             slice(
                 årstall,
@@ -46,7 +42,7 @@ class SykefraværStatistikkNæringskodeRepository(
                 tapteDagsverk.sum(),
                 muligeDagsverk.sum()
             )
-                .select { næringskode inList legacyBransje.identifikatorer }
+                .select { næringskode inList næringskoder.map { it.femsifferIdentifikator } }
                 .groupBy(årstall, kvartal)
                 .orderBy(årstall to SortOrder.ASC)
                 .orderBy(kvartal to SortOrder.ASC)
@@ -83,7 +79,7 @@ class SykefraværStatistikkNæringskodeRepository(
     }
 
     fun hentForBransje(
-        legacyBransje: LegacyBransje,
+        bransje: Bransje,
         kvartaler: List<ÅrstallOgKvartal>
     ): List<SykefraværsstatistikkBransje> {
         return transaction {
@@ -95,7 +91,7 @@ class SykefraværStatistikkNæringskodeRepository(
                 muligeDagsverk.sum(),
             )
                 .select {
-                    (næringskode inList legacyBransje.identifikatorer) and
+                    (næringskode inList (bransje.bransjeId as BransjeId.Næringskoder).næringskoder) and
                             ((årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal })
                 }
                 .groupBy(årstall, kvartal)
@@ -105,7 +101,7 @@ class SykefraværStatistikkNæringskodeRepository(
                     SykefraværsstatistikkBransje(
                         årstall = it[årstall],
                         kvartal = it[kvartal],
-                        bransje = legacyBransje.type,
+                        bransje = bransje,
                         tapteDagsverk = it[tapteDagsverk.sum()]!!.toBigDecimal(),
                         muligeDagsverk = it[muligeDagsverk.sum()]!!.toBigDecimal(),
                         antallPersoner = it[antallPersoner.sum()]!!

@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
+import ia.felles.definisjoner.bransjer.Bransje
 import ia.felles.definisjoner.bransjer.BransjeId
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetMetadataMedNæringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
@@ -136,13 +137,19 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
                 (rectype eq DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET)
     }
 
-    fun hentForBransje(legacyBransje: LegacyBransje): List<UmaskertSykefraværForEttKvartal> = hent {
-        val bransjeidentifikator = if (legacyBransje.type.bransjeId is BransjeId.Næringskoder) {
+    fun hentForBransje(bransje: Bransje): List<UmaskertSykefraværForEttKvartal> = hent {
+        val identifikatorer = bransje.bransjeId.let {
+            when (it) {
+                is BransjeId.Næring -> listOf(it.næring)
+                is BransjeId.Næringskoder -> it.næringskoder
+            }
+        }
+        val bransjeidentifikator = if (bransje.bransjeId is BransjeId.Næringskoder) {
             næringskode
         } else {
             næring
         }
-        (bransjeidentifikator inList legacyBransje.identifikatorer) and
+        (bransjeidentifikator inList identifikatorer) and
                 (rectype eq DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET)
     }
 

@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import config.AppConfigForJdbcTesterConfig
-import ia.felles.definisjoner.bransjer.Bransje as Bransjer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.LocalOgUnitTestOidcConfiguration
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
@@ -19,6 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import testUtils.TestUtils
 import testUtils.insertData
 import java.math.BigDecimal
+import ia.felles.definisjoner.bransjer.Bransje as Bransjer
 
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension::class)
@@ -251,7 +251,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(3000)
         )
         val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(
-            LegacyBransje(Bransjer.SYKEHUS)
+            Bransjer.SYKEHUS
         )
         Assertions.assertThat(resultat.size).isEqualTo(2)
         Assertions.assertThat(resultat[0])
@@ -293,7 +293,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(20),
             BigDecimal(100)
         )
-        val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(LegacyBransje(Bransjer.SYKEHUS))
+        val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(Bransjer.SYKEHUS)
         Assertions.assertThat(resultat.size).isEqualTo(1)
         Assertions.assertThat(resultat[0])
             .isEqualTo(

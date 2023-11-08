@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 import ia.felles.definisjoner.bransjer.BransjeId
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.LegacyBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkNæringMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
@@ -64,14 +63,13 @@ class SykefraværStatistikkNæringMedVarighetRepository(
     }
 
     fun hentSykefraværMedVarighetBransje(
-        legacyBransje: LegacyBransje
-    ): List<UmaskertSykefraværForEttKvartalMedVarighet> {
-        return if (legacyBransje.type.bransjeId is BransjeId.Næring) {
-            hentSykefraværMedVarighetNæring(Næring(legacyBransje.identifikatorer.first()))
-        } else {
+        bransjeId: BransjeId
+    ): List<UmaskertSykefraværForEttKvartalMedVarighet> = when (bransjeId) {
+        is BransjeId.Næring -> hentSykefraværMedVarighetNæring(Næring(bransjeId.næring))
+        is BransjeId.Næringskoder -> {
             transaction {
                 select {
-                    (næringskode inList legacyBransje.identifikatorer) and
+                    (næringskode inList bransjeId.næringskoder) and
                             (varighet inList listOf(
                                 'A', 'B', 'C', 'D', 'E', 'F', 'X'
                             ))

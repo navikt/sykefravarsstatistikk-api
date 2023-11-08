@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene
 
+import ia.felles.definisjoner.bransjer.BransjeId
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import ia.felles.definisjoner.bransjer.Bransje as Bransjer
@@ -17,7 +18,7 @@ internal class BransjeprogramTest {
     fun `finnBransje returnerer BARNEHAGE for næringskode 88911`() {
         val næringskodenTilBarnehager = Næringskode("88911")
 
-        Bransjeprogram.finnBransje(næringskodenTilBarnehager)?.type shouldBe Bransjer.BARNEHAGER
+        Bransjeprogram.finnBransje(næringskodenTilBarnehager) shouldBe Bransjer.BARNEHAGER
     }
 
     @Test
@@ -29,7 +30,7 @@ internal class BransjeprogramTest {
     fun `finnBransje returnerer NÆRINGSMIDDELINDUSTRI for næringskode 10320`() {
         val juicepressing = Næringskode("10320")
 
-        Bransjeprogram.finnBransje(juicepressing)?.type shouldBe Bransjer.NÆRINGSMIDDELINDUSTRI
+        Bransjeprogram.finnBransje(juicepressing) shouldBe Bransjer.NÆRINGSMIDDELINDUSTRI
     }
 
     @Test
@@ -40,6 +41,6 @@ internal class BransjeprogramTest {
 
         val actual = Bransjeprogram.finnBransje(næringINæringsmiddelindustriBransjen)
 
-        actual?.identifikatorer shouldBe listOf("10")
+        (actual!!.bransjeId as BransjeId.Næring).næring shouldBe "10"
     }
 }

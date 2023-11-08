@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk
 
+import ia.felles.definisjoner.bransjer.Bransje
 import ia.felles.definisjoner.bransjer.BransjeId
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Bransjeprogram.finnBransje
@@ -57,9 +58,9 @@ class KvartalsvisSykefraværshistorikkService(
 
     private fun uthentingForBransjeEllerNæring(
         næring: Næring,
-        legacyBransje: LegacyBransje?
+        bransje: Bransje?
     ): CompletableFuture<KvartalsvisSykefraværshistorikkJson> {
-        val skalHenteDataPåNæring = legacyBransje == null || legacyBransje.type.bransjeId is BransjeId.Næring
+        val skalHenteDataPåNæring = bransje == null || bransje.bransjeId is BransjeId.Næring
 
         return if (skalHenteDataPåNæring) {
             uthentingMedFeilhåndteringOgTimeout(
@@ -69,9 +70,9 @@ class KvartalsvisSykefraværshistorikkService(
             )
         } else {
             uthentingMedFeilhåndteringOgTimeout(
-                { hentSykefraværshistorikkNæringskoder(legacyBransje!!) },
+                { hentSykefraværshistorikkNæringskoder(bransje!!) },
                 Statistikkategori.BRANSJE,
-                legacyBransje!!.navn
+                bransje!!.navn
             )
         }
     }
@@ -118,12 +119,19 @@ class KvartalsvisSykefraværshistorikkService(
         )
     }
 
-    private fun hentSykefraværshistorikkNæringskoder(legacyBransje: LegacyBransje): KvartalsvisSykefraværshistorikkJson {
-        return KvartalsvisSykefraværshistorikkJson(
-            Statistikkategori.BRANSJE,
-            legacyBransje.navn,
-            sykefraværStatistikkNæringskodeRepository.hentKvartalsvisSykefraværprosent(legacyBransje)
-        )
+    private fun hentSykefraværshistorikkNæringskoder(bransje: Bransje): KvartalsvisSykefraværshistorikkJson {
+        return when (bransje.bransjeId) {
+            is BransjeId.Næring -> TODO()
+            is BransjeId.Næringskoder -> KvartalsvisSykefraværshistorikkJson(
+                Statistikkategori.BRANSJE,
+                bransje.navn,
+                sykefraværStatistikkNæringskodeRepository.hentKvartalsvisSykefraværprosent((bransje.bransjeId as BransjeId.Næringskoder).næringskoder.map {
+                    Næringskode(
+                        it
+                    )
+                })
+            )
+        }
     }
 
     private fun hentSykefraværshistorikkVirksomhet(

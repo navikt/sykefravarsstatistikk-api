@@ -76,7 +76,7 @@ class AggregertStatistikkService(
 
     private fun hentGradertSykefraværAlleKategorier(virksomhet: Virksomhet): Sykefraværsdata {
         val næring = virksomhet.næringskode.næring
-        val maybeBransje = Bransjeprogram.finnBransje(virksomhet.næringskode)
+        val maybeBransje = finnBransje(virksomhet.næringskode)
         val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> =
             EnumMap(Statistikkategori::class.java)
         data[Statistikkategori.VIRKSOMHET] =
@@ -194,7 +194,7 @@ class AggregertStatistikkService(
     ): Sykefraværsdata {
 
         val næring = virksomhet.næringskode.næring
-        val maybeBransje = Bransjeprogram.finnBransje(virksomhet.næringskode)
+        val maybeBransje = finnBransje(virksomhet.næringskode)
         val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> =
             EnumMap(Statistikkategori::class.java)
 
@@ -206,7 +206,7 @@ class AggregertStatistikkService(
         if (maybeBransje == null) {
             data[Statistikkategori.NÆRING] =
                 sykefraværStatistikkNæringRepository.hentForKvartaler(næring, kvartaler)
-        } else if (maybeBransje.type.bransjeId is BransjeId.Næringskoder) {
+        } else if (maybeBransje.bransjeId is BransjeId.Næringskoder) {
             data[Statistikkategori.BRANSJE] =
                 sykefraværStatistikkNæringskodeRepository.hentForBransje(maybeBransje, kvartaler)
                     .map { UmaskertSykefraværForEttKvartal(it) }
@@ -219,7 +219,7 @@ class AggregertStatistikkService(
 
     private fun hentUmaskertSykefraværMedVarighetAlleKategorier(virksomhet: Virksomhet): Map<Statistikkategori, List<UmaskertSykefraværForEttKvartalMedVarighet>> {
         val næring = virksomhet.næringskode.næring
-        val maybeBransje = Bransjeprogram.finnBransje(virksomhet.næringskode)
+        val maybeBransje = finnBransje(virksomhet.næringskode)
         val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartalMedVarighet>> = EnumMap(
             Statistikkategori::class.java
         )
@@ -228,9 +228,9 @@ class AggregertStatistikkService(
         if (maybeBransje == null) {
             data[Statistikkategori.NÆRING] =
                 sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(næring)
-        } else if (maybeBransje.type.bransjeId is BransjeId.Næringskoder) {
+        } else if (maybeBransje.bransjeId is BransjeId.Næringskoder) {
             data[Statistikkategori.BRANSJE] =
-                sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetBransje(maybeBransje)
+                sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetBransje(maybeBransje.bransjeId)
         } else {
             data[Statistikkategori.BRANSJE] =
                 sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(næring)
