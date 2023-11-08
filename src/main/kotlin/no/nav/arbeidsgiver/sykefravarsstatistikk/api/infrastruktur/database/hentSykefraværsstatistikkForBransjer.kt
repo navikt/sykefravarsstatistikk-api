@@ -4,7 +4,7 @@ import ia.felles.definisjoner.bransjer.BransjeId
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import java.math.BigDecimal.ZERO
 
-fun hentSykefraværsstatistikkForBransjer(
+fun hentSykefraværsstatistikkForBransje(
     kvartaler: List<ÅrstallOgKvartal>,
     sykefraværsstatistikkNæringRepository: SykefraværStatistikkNæringRepository,
     sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository
@@ -29,7 +29,7 @@ fun summerSykefraværsstatistikkPerBransjeNæringer(
     statistikk: List<SykefraværsstatistikkForNæring>
 ): List<SykefraværsstatistikkBransje> {
 
-    val bransjer = Bransjeprogram.alleBransjer
+    val bransjer = Bransjeprogram.alleBransje
         .map { bransje ->
             bransje to statistikk.filter {
                 bransje.bransjeId.let { bransjeId ->
@@ -66,7 +66,7 @@ fun summerSykefraværsstatistikkPerBransjeNæringskoder(
     statistikk: List<SykefraværsstatistikkForNæringskode>
 ): List<SykefraværsstatistikkBransje> {
 
-    val bransjer = Bransjeprogram.alleBransjer
+    val bransjer = Bransjeprogram.alleBransje
         .map { bransje ->
             bransje to statistikk.filter {
                 bransje.bransjeId.let { bransjeId ->

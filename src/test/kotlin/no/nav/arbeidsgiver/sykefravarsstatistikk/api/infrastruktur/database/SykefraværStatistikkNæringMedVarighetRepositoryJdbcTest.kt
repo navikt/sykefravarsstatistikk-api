@@ -16,8 +16,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import testUtils.TestUtils
 import java.math.BigDecimal
-import ia.felles.definisjoner.bransjer.Bransje as Bransjer
-
+import ia.felles.definisjoner.bransjer.Bransje
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
@@ -220,7 +219,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
             )
         )
         val resultat =
-            sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetBransje(Bransjer.SYKEHUS.bransjeId)
+            sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetBransje(Bransje.SYKEHUS.bransjeId)
         assertThat(resultat.size).isEqualTo(2)
         assertThat(resultat[0])
             .isEqualTo(

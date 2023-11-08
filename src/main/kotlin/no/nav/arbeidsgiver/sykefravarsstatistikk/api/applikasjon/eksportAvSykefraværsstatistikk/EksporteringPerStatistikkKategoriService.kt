@@ -106,7 +106,7 @@ class EksporteringPerStatistikkKategoriService(
 
     private fun eksporterSykefraværsstatistikkBransje(kvartal: ÅrstallOgKvartal) {
 
-        hentSykefraværsstatistikkForBransjer(
+        hentSykefraværsstatistikkForBransje(
             kvartaler = kvartal inkludertTidligere 3,
             sykefraværsstatistikkNæringRepository = sykefraværStatistikkNæringRepository,
             sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository

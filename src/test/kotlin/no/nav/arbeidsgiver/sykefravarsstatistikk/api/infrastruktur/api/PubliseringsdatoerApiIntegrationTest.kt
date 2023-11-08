@@ -1,8 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api
 
 import config.SpringIntegrationTestbase
-import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
-import testUtils.TestUtils.slettAlleImporttidspunkt
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
 import org.assertj.core.api.AssertionsForClassTypes
 import org.junit.jupiter.api.AfterEach
@@ -10,7 +8,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
+import testUtils.TestUtils.slettAlleImporttidspunkt
 import java.io.IOException
 import java.net.URI
 import java.net.http.HttpClient
@@ -24,9 +23,6 @@ class PubliseringsdatoerApiIntegrationTest : SpringIntegrationTestbase() {
 
     @Autowired
     private lateinit var importtidspunktRepository: ImporttidspunktRepository
-
-    @Autowired
-    var jdbcTemplate: NamedParameterJdbcTemplate? = null
 
     @BeforeEach
     fun setUp() {

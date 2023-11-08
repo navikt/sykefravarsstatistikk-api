@@ -1,11 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk
 
 import config.AppConfigForJdbcTesterConfig
-import ia.felles.definisjoner.bransjer.Bransje as Bransjer
+import ia.felles.definisjoner.bransjer.Bransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkNæringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkNæringskodeRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.hentSykefraværsstatistikkForBransjer
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.hentSykefraværsstatistikkForBransje
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,7 +23,7 @@ import java.math.BigDecimal
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
-open class HentSykefraværsstatistikkForBransjerTest {
+open class HentSykefraværsstatistikkForBransjeTest {
 
     @Autowired
     private lateinit var sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
@@ -40,8 +40,8 @@ open class HentSykefraværsstatistikkForBransjerTest {
     }
 
     @Test
-    fun `hentSykefraværsstatistikkForBransjer skal returnere tom liste når det ikke finnes noen sykefraværsstatistikk`() {
-        val result = hentSykefraværsstatistikkForBransjer(
+    fun `hentSykefraværsstatistikkForBransje skal returnere tom liste når det ikke finnes noen sykefraværsstatistikk`() {
+        val result = hentSykefraværsstatistikkForBransje(
             kvartaler = listOf(ÅrstallOgKvartal(2023, 1)),
             sykefraværsstatistikkNæringRepository = sykefraværStatistikkNæringRepository,
             sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository
@@ -51,7 +51,7 @@ open class HentSykefraværsstatistikkForBransjerTest {
     }
 
     @Test
-    fun `henSykefraværsstatistikkForBransjer skal returnere ett kvartal med statistikk`() {
+    fun `henSykefraværsstatistikkForBransje skal returnere ett kvartal med statistikk`() {
         sykefraværStatistikkNæringRepository.settInn(fireKvartalerAnleggsbransje.map {
             SykefraværsstatistikkForNæring(
                 årstall = it.årstall,
@@ -62,7 +62,7 @@ open class HentSykefraværsstatistikkForBransjerTest {
                 muligeDagsverk = it.muligeDagsverk
             )
         })
-        val result = hentSykefraværsstatistikkForBransjer(
+        val result = hentSykefraværsstatistikkForBransje(
             kvartaler = listOf(ÅrstallOgKvartal(2023, 1)),
             sykefraværsstatistikkNæringRepository = sykefraværStatistikkNæringRepository,
             sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository
@@ -72,7 +72,7 @@ open class HentSykefraværsstatistikkForBransjerTest {
     }
 
     @Test
-    fun `henSykefraværsstatistikkForBransjer skal for hver bransje summere opp riktig statistikk`() {
+    fun `henSykefraværsstatistikkForBransje skal for hver bransje summere opp riktig statistikk`() {
         sykefraværStatistikkNæringskodeRepository.settInn(
             listOf("87101", "87102", "86102").map {
                 SykefraværsstatistikkForNæringskode(
@@ -85,7 +85,7 @@ open class HentSykefraværsstatistikkForBransjerTest {
                 )
             }
         )
-        val result = hentSykefraværsstatistikkForBransjer(
+        val result = hentSykefraværsstatistikkForBransje(
             kvartaler = listOf(ÅrstallOgKvartal(2023, 1)),
             sykefraværsstatistikkNæringRepository = sykefraværStatistikkNæringRepository,
             sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository
@@ -95,7 +95,7 @@ open class HentSykefraværsstatistikkForBransjerTest {
             SykefraværsstatistikkBransje(
                 årstall = 2023,
                 kvartal = 1,
-                bransje = Bransjer.SYKEHJEM,
+                bransje = Bransje.SYKEHJEM,
                 antallPersoner = 2,
                 tapteDagsverk = BigDecimal("2.0"),
                 muligeDagsverk = BigDecimal("2.0")
@@ -103,7 +103,7 @@ open class HentSykefraværsstatistikkForBransjerTest {
             SykefraværsstatistikkBransje(
                 årstall = 2023,
                 kvartal = 1,
-                bransje = Bransjer.SYKEHUS,
+                bransje = Bransje.SYKEHUS,
                 antallPersoner = 1,
                 tapteDagsverk = BigDecimal("1.0"),
                 muligeDagsverk = BigDecimal("1.0")
@@ -117,7 +117,7 @@ val fireKvartalerAnleggsbransje = arrayOf(
     SykefraværsstatistikkBransje(
         2023,
         1,
-        Bransjer.ANLEGG,
+        Bransje.ANLEGG,
         1,
         BigDecimal("1.0"),
         BigDecimal("1.0")
@@ -125,7 +125,7 @@ val fireKvartalerAnleggsbransje = arrayOf(
     SykefraværsstatistikkBransje(
         2023,
         2,
-        Bransjer.ANLEGG,
+        Bransje.ANLEGG,
         1,
         BigDecimal("1.0"),
         BigDecimal("1.0")
@@ -133,7 +133,7 @@ val fireKvartalerAnleggsbransje = arrayOf(
     SykefraværsstatistikkBransje(
         2023,
         3,
-        Bransjer.ANLEGG,
+        Bransje.ANLEGG,
         1,
         BigDecimal("1.0"),
         BigDecimal("1.0")
@@ -141,7 +141,7 @@ val fireKvartalerAnleggsbransje = arrayOf(
     SykefraværsstatistikkBransje(
         2023,
         4,
-        Bransjer.ANLEGG,
+        Bransje.ANLEGG,
         1,
         BigDecimal("1.0"),
         BigDecimal("1.0")

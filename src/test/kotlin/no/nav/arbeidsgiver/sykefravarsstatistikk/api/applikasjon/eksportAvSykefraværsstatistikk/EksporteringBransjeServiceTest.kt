@@ -13,8 +13,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaCl
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.StatistikkategoriKafkamelding
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
-import ia.felles.definisjoner.bransjer.Bransje as Bransjer
-
+import ia.felles.definisjoner.bransjer.Bransje
 internal class EksporteringBransjeServiceTest {
 
     private val kafkaClientMock = mockk<KafkaClient>(relaxed = true)
@@ -117,7 +116,7 @@ internal class EksporteringBransjeServiceTest {
         val melding = StatistikkategoriKafkamelding(
             SykefraværMedKategori(
                 Statistikkategori.BRANSJE,
-                Bransjer.ANLEGG.name,
+                Bransje.ANLEGG.name,
                 2023,
                 2,
                 BigDecimal.ONE,
@@ -130,7 +129,7 @@ internal class EksporteringBransjeServiceTest {
                         SykefraværsstatistikkBransje(
                             årstall = 2023,
                             kvartal = 2,
-                            bransje = Bransjer.ANLEGG,
+                            bransje = Bransje.ANLEGG,
                             antallPersoner = 5,
                             tapteDagsverk = BigDecimal.ONE,
                             muligeDagsverk = BigDecimal.ONE

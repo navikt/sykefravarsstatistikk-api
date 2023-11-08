@@ -19,8 +19,7 @@ import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import testUtils.TestUtils.opprettStatistikkForLand
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import java.math.BigDecimal
-import ia.felles.definisjoner.bransjer.Bransje as Bransjer
-
+import ia.felles.definisjoner.bransjer.Bransje
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
@@ -211,7 +210,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
 
         val resultat =
             sykefraværStatistikkNæringskodeRepository.hentKvartalsvisSykefraværprosent(
-                (Bransjer.SYKEHJEM.bransjeId as BransjeId.Næringskoder).næringskoder.map { Næringskode(it) },
+                (Bransje.SYKEHJEM.bransjeId as BransjeId.Næringskoder).næringskoder.map { Næringskode(it) },
             )
         AssertionsForClassTypes.assertThat(resultat.size).isEqualTo(2)
         AssertionsForClassTypes.assertThat(resultat[0])

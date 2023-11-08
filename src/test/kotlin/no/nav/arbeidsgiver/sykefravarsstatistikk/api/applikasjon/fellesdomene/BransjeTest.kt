@@ -7,10 +7,9 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import testUtils.TestData.enNæringskode
 import testUtils.TestData.etOrgnr
-import ia.felles.definisjoner.bransjer.Bransje as Bransjer
-
+import ia.felles.definisjoner.bransjer.Bransje
 class BransjeTest {
-    private fun Bransjer.inkludererVirksomhet(virksomhet: Virksomhet): Boolean {
+    private fun Bransje.inkludererVirksomhet(virksomhet: Virksomhet): Boolean {
         return bransjeId.let {
             when (it) {
                 is BransjeId.Næring -> it.næring == virksomhet.næringskode.næring.tosifferIdentifikator
@@ -21,12 +20,12 @@ class BransjeTest {
 
     @Test
     fun virksomhetTilhørerBransjeprogram__skal_gi_true_hvis_næringskode_starter_med_de_definerte_sifrene() {
-        Assertions.assertThat(Bransjer.BYGG.inkludererVirksomhet(underenhetMedNæringskode("41999"))).isTrue()
+        Assertions.assertThat(Bransje.BYGG.inkludererVirksomhet(underenhetMedNæringskode("41999"))).isTrue()
     }
 
     @Test
     fun virksomhetTilhørerBransjeprogram__skal_gi_false_hvis_næringskode_ikke_starter_med_de_definerte_sifrene() {
-        Assertions.assertThat(Bransjer.SYKEHUS.inkludererVirksomhet(underenhetMedNæringskode("46512"))).isFalse()
+        Assertions.assertThat(Bransje.SYKEHUS.inkludererVirksomhet(underenhetMedNæringskode("46512"))).isFalse()
     }
 
     @Test
@@ -81,22 +80,22 @@ class BransjeTest {
     @Test
     fun lengdePåNæringskoder__skal_returnere_riktig_lengde() {
         assertTrue(
-            Bransjer.SYKEHUS.bransjeId is BransjeId.Næringskoder
+            Bransje.SYKEHUS.bransjeId is BransjeId.Næringskoder
         )
         assertTrue(
-            Bransjer.BYGG.bransjeId is BransjeId.Næring
+            Bransje.BYGG.bransjeId is BransjeId.Næring
         )
     }
 
     @Test
     fun inkludererVirksomhet__skal_returnere_hvorvidt_virksomhetens_næring_er_i_bransjen() {
-        val bransje = Bransjer.SYKEHUS
+        val bransje = Bransje.SYKEHUS
         Assertions.assertThat(bransje.inkludererVirksomhet(underenhetMedNæringskode("86101"))).isTrue()
         Assertions.assertThat(bransje.inkludererVirksomhet(underenhetMedNæringskode("00000"))).isFalse()
     }
 
-    private fun underenhetMedNæringskode(næringskode: String): UnderenhetLegacy {
-        return UnderenhetLegacy(
+    private fun underenhetMedNæringskode(næringskode: String): Underenhet.Næringsdrivende {
+        return Underenhet.Næringsdrivende(
             etOrgnr(), Orgnr("053497180"), "Underenhet AS", enNæringskode(næringskode), 40
         )
     }

@@ -18,8 +18,7 @@ import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import testUtils.TestUtils.opprettStatistikkForLandExposed
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import java.math.BigDecimal
-import ia.felles.definisjoner.bransjer.Bransje as Bransjer
-
+import ia.felles.definisjoner.bransjer.Bransje
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
@@ -165,7 +164,7 @@ open class SykefraværRepositoryJdbcTest {
             )
         )
         val resultat = sykefraværStatistikkNæringskodeRepository.hentForBransje(
-            Bransjer.BARNEHAGER,
+            Bransje.BARNEHAGER,
             listOf(
                 ÅrstallOgKvartal(2019, 1),
                 ÅrstallOgKvartal(2018, 4)

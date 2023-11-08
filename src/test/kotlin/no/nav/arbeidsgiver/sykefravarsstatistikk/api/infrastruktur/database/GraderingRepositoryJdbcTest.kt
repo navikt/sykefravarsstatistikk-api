@@ -18,8 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import testUtils.TestUtils
 import testUtils.insertData
 import java.math.BigDecimal
-import ia.felles.definisjoner.bransjer.Bransje as Bransjer
-
+import ia.felles.definisjoner.bransjer.Bransje
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
@@ -251,7 +250,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(3000)
         )
         val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(
-            Bransjer.SYKEHUS
+            Bransje.SYKEHUS
         )
         Assertions.assertThat(resultat.size).isEqualTo(2)
         Assertions.assertThat(resultat[0])
@@ -293,7 +292,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(20),
             BigDecimal(100)
         )
-        val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(Bransjer.SYKEHUS)
+        val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(Bransje.SYKEHUS)
         Assertions.assertThat(resultat.size).isEqualTo(1)
         Assertions.assertThat(resultat[0])
             .isEqualTo(
@@ -315,21 +314,21 @@ open class GraderingRepositoryJdbcTest {
             sektor = Sektor.PRIVAT,
         )
 
-        private val UNDERENHET_1_NÆRING_14 = UnderenhetLegacy(
+        private val UNDERENHET_1_NÆRING_14 = Underenhet.Næringsdrivende(
             Orgnr("999999999"),
             null,
             null.toString(),
             Næringskode("14120"),
             null
         )
-        private val UNDERENHET_2_NÆRING_15 = UnderenhetLegacy(
+        private val UNDERENHET_2_NÆRING_15 = Underenhet.Næringsdrivende(
             Orgnr("888888888"),
             null,
             null.toString(),
             Næringskode("15100"),
             null
         )
-        private val UNDERENHET_3_NÆRING_14 = UnderenhetLegacy(
+        private val UNDERENHET_3_NÆRING_14 = Underenhet.Næringsdrivende(
             Orgnr("777777777"),
             null,
             null.toString(),

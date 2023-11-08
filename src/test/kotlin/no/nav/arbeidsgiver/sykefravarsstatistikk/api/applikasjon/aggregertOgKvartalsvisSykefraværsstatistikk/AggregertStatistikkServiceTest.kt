@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk
 
 import arrow.core.right
-import ia.felles.definisjoner.bransjer.Bransje as Bransjer
+import ia.felles.definisjoner.bransjer.Bransje
 import io.kotest.matchers.equals.shouldBeEqual
 import io.mockk.every
 import io.mockk.mockk
@@ -99,7 +99,7 @@ internal class AggregertStatistikkServiceTest {
             SykefraværsstatistikkBransje(
                 årstall = it.årstallOgKvartal.årstall,
                 kvartal = it.årstallOgKvartal.kvartal,
-                bransje = Bransjer.BARNEHAGER,
+                bransje = Bransje.BARNEHAGER,
                 antallPersoner = it.antallPersoner,
                 tapteDagsverk = it.dagsverkTeller,
                 muligeDagsverk = it.dagsverkNevner
@@ -278,7 +278,7 @@ internal class AggregertStatistikkServiceTest {
             SykefraværsstatistikkBransje(
                 årstall = it.årstallOgKvartal.årstall,
                 kvartal = it.årstallOgKvartal.kvartal,
-                bransje = Bransjer.BARNEHAGER,
+                bransje = Bransje.BARNEHAGER,
                 antallPersoner = it.antallPersoner,
                 tapteDagsverk = it.dagsverkTeller,
                 muligeDagsverk = it.dagsverkNevner
