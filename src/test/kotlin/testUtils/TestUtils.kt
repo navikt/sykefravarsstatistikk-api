@@ -1,7 +1,6 @@
 package testUtils
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næring
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkForNæring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkLand
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
@@ -157,71 +156,6 @@ object TestUtils {
                     antallPersoner = 10,
                     tapteDagsverk = BigDecimal("6.0"),
                     muligeDagsverk = BigDecimal("100.0")
-                ),
-            )
-        )
-    }
-
-    fun opprettStatistikkForNæringer(
-        sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
-    ) {
-        sykefraværStatistikkNæringRepository.settInn(
-            listOf(
-                SykefraværsstatistikkForNæring(
-                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
-                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
-                    næringkode = "10",
-                    antallPersoner = 50,
-                    tapteDagsverk = BigDecimal("20000.0"),
-                    muligeDagsverk = BigDecimal("1000000.0")
-                ),
-                SykefraværsstatistikkForNæring(
-                    årstall = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).årstall,
-                    kvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).kvartal,
-                    næringkode = "10",
-                    antallPersoner = 50,
-                    tapteDagsverk = BigDecimal("30000.0"),
-                    muligeDagsverk = BigDecimal("1000000.0")
-                ),
-                SykefraværsstatistikkForNæring(
-                    årstall = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).årstall,
-                    kvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).kvartal,
-                    næringkode = "10",
-                    antallPersoner = 50,
-                    tapteDagsverk = BigDecimal("40000.0"),
-                    muligeDagsverk = BigDecimal("1000000.0")
-                ),
-                SykefraværsstatistikkForNæring(
-                    årstall = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).årstall,
-                    kvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(3).kvartal,
-                    næringkode = "10",
-                    antallPersoner = 50,
-                    tapteDagsverk = BigDecimal("50000.0"),
-                    muligeDagsverk = BigDecimal("1000000.0")
-                ),
-                SykefraværsstatistikkForNæring(
-                    årstall = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4).årstall,
-                    kvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(4).kvartal,
-                    næringkode = "10",
-                    antallPersoner = 50,
-                    tapteDagsverk = BigDecimal("60000.0"),
-                    muligeDagsverk = BigDecimal("1000000.0")
-                ),
-                SykefraværsstatistikkForNæring(
-                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
-                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
-                    næringkode = "88",
-                    antallPersoner = 50,
-                    tapteDagsverk = BigDecimal("25000.0"),
-                    muligeDagsverk = BigDecimal("1000000.0")
-                ),
-                SykefraværsstatistikkForNæring(
-                    årstall = SISTE_PUBLISERTE_KVARTAL.minusEttÅr().årstall,
-                    kvartal = SISTE_PUBLISERTE_KVARTAL.minusEttÅr().kvartal,
-                    næringkode = "88",
-                    antallPersoner = 50,
-                    tapteDagsverk = BigDecimal("30000.0"),
-                    muligeDagsverk = BigDecimal("1000000.0")
                 ),
             )
         )

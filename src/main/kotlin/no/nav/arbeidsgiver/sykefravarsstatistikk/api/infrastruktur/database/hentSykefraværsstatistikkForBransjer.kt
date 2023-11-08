@@ -1,9 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
+import ia.felles.definisjoner.bransjer.BransjeId
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import java.math.BigDecimal.ZERO
 
-fun hentSykefraværsstatistikkForBransjer(
+fun hentSykefraværsstatistikkForBransje(
     kvartaler: List<ÅrstallOgKvartal>,
     sykefraværsstatistikkNæringRepository: SykefraværStatistikkNæringRepository,
     sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository
@@ -28,10 +29,15 @@ fun summerSykefraværsstatistikkPerBransjeNæringer(
     statistikk: List<SykefraværsstatistikkForNæring>
 ): List<SykefraværsstatistikkBransje> {
 
-    val bransjer = Bransjeprogram.alleBransjer
+    val bransjer = Bransjeprogram.alleBransje
         .map { bransje ->
             bransje to statistikk.filter {
-                bransje.identifikatorer.contains(it.næringkode)
+                bransje.bransjeId.let { bransjeId ->
+                    when (bransjeId) {
+                        is BransjeId.Næring -> bransjeId.næring == it.næringkode
+                        is BransjeId.Næringskoder -> false
+                    }
+                }
             }
         }.filter { it.second.isNotEmpty() }
 
@@ -43,7 +49,7 @@ fun summerSykefraværsstatistikkPerBransjeNæringer(
 
         sumPerBransje +=
             SykefraværsstatistikkBransje(
-                bransje = bransje.type,
+                bransje = bransje,
                 årstall = årstall,
                 kvartal = kvartal,
                 antallPersoner = bransjedata.sumOf { it.antallPersoner },
@@ -60,10 +66,16 @@ fun summerSykefraværsstatistikkPerBransjeNæringskoder(
     statistikk: List<SykefraværsstatistikkForNæringskode>
 ): List<SykefraværsstatistikkBransje> {
 
-    val bransjer = Bransjeprogram.alleBransjer
+    val bransjer = Bransjeprogram.alleBransje
         .map { bransje ->
             bransje to statistikk.filter {
-                bransje.identifikatorer.contains(it.næringkode5siffer)
+                bransje.bransjeId.let { bransjeId ->
+                    when (bransjeId) {
+                        is BransjeId.Næring -> false
+                        is BransjeId.Næringskoder -> bransjeId.næringskoder.contains(it.næringkode5siffer)
+                    }
+                }
+
             }
         }.filter { it.second.isNotEmpty() }
 
@@ -75,7 +87,7 @@ fun summerSykefraværsstatistikkPerBransjeNæringskoder(
 
         sumPerBransje +=
             SykefraværsstatistikkBransje(
-                bransje = bransje.type,
+                bransje = bransje,
                 årstall = årstall,
                 kvartal = kvartal,
                 antallPersoner = bransjedata.sumOf { it.antallPersoner },

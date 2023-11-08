@@ -1,17 +1,15 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk
 
-import ia.felles.definisjoner.bransjer.Bransjer
-import testUtils.TestUtils
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Sykefraværsdata
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.BransjeEllerNæring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Sykefraværsdata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.UmaskertSykefraværForEttKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Bransje
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.BransjeEllerNæring
 import org.assertj.core.api.AssertionsForClassTypes
 import org.junit.jupiter.api.Test
+import testUtils.TestUtils
 import java.math.BigDecimal
-
+import ia.felles.definisjoner.bransjer.Bransje
 internal class AggregeringskalkulatorTest {
     @Test
     fun fraværsprosentLand_regnerUtRiktigFraværsprosent() {
@@ -29,8 +27,8 @@ internal class AggregeringskalkulatorTest {
             Sykefraværsdata(mutableMapOf(Statistikkategori.BRANSJE to   synkendeSykefravær)),
             TestUtils.SISTE_PUBLISERTE_KVARTAL
         )
-        val bransje = BransjeEllerNæring(Bransje(Bransjer.BARNEHAGER))
-        AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentBransjeEllerNæring(bransje).getOrNull()?.verdi)
+        val bransjeEllerNæring = BransjeEllerNæring(Bransje.BARNEHAGER)
+        AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentBransjeEllerNæring(bransjeEllerNæring).getOrNull()?.verdi)
             .isEqualTo("5.0")
     }
 

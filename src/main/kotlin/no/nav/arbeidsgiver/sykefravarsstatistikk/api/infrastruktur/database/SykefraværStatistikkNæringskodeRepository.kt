@@ -1,5 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
+import ia.felles.definisjoner.bransjer.Bransje
+import ia.felles.definisjoner.bransjer.BransjeId
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -31,10 +33,7 @@ class SykefraværStatistikkNæringskodeRepository(
         }.count()
     }
 
-
-    // TODO: Gjør så dette repoet ikke trenger forholde seg til konseptet bransje
-    fun hentKvartalsvisSykefraværprosent(bransje: Bransje): List<SykefraværForEttKvartal> {
-        if (bransje.erDefinertPåTosiffernivå()) { throw RuntimeException("Denne metoden fungerer bare på femsifferdefinerte bransjer")}
+    fun hentKvartalsvisSykefraværprosent(næringskoder: List<Næringskode>): List<SykefraværForEttKvartal> {
         return transaction {
             slice(
                 årstall,
@@ -43,7 +42,7 @@ class SykefraværStatistikkNæringskodeRepository(
                 tapteDagsverk.sum(),
                 muligeDagsverk.sum()
             )
-                .select { næringskode inList bransje.identifikatorer }
+                .select { næringskode inList næringskoder.map { it.femsifferIdentifikator } }
                 .groupBy(årstall, kvartal)
                 .orderBy(årstall to SortOrder.ASC)
                 .orderBy(kvartal to SortOrder.ASC)
@@ -92,7 +91,7 @@ class SykefraværStatistikkNæringskodeRepository(
                 muligeDagsverk.sum(),
             )
                 .select {
-                    (næringskode inList bransje.identifikatorer) and
+                    (næringskode inList (bransje.bransjeId as BransjeId.Næringskoder).næringskoder) and
                             ((årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal })
                 }
                 .groupBy(årstall, kvartal)
@@ -102,7 +101,7 @@ class SykefraværStatistikkNæringskodeRepository(
                     SykefraværsstatistikkBransje(
                         årstall = it[årstall],
                         kvartal = it[kvartal],
-                        bransje = bransje.type,
+                        bransje = bransje,
                         tapteDagsverk = it[tapteDagsverk.sum()]!!.toBigDecimal(),
                         muligeDagsverk = it[muligeDagsverk.sum()]!!.toBigDecimal(),
                         antallPersoner = it[antallPersoner.sum()]!!

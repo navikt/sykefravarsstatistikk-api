@@ -1,10 +1,12 @@
 package infrastruktur.database
 
 import config.AppConfigForJdbcTesterConfig
-import ia.felles.definisjoner.bransjer.Bransjer
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkBransje
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkForNæringskode
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkNæringskodeRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -17,7 +19,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import testUtils.TestUtils
 import java.math.BigDecimal
-
+import ia.felles.definisjoner.bransjer.Bransje
 
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension::class)
@@ -124,7 +126,7 @@ open class SykefraværStatistikkNæringskodeRepositoryTest {
         )
 
         val resultat = sykefraværStatistikkNæringskodeRepository.hentForBransje(
-            Bransje(Bransjer.SYKEHJEM), listOf(
+            Bransje.SYKEHJEM, listOf(
                 ÅrstallOgKvartal(2023, 3)
             )
         )
@@ -133,7 +135,7 @@ open class SykefraværStatistikkNæringskodeRepositoryTest {
             SykefraværsstatistikkBransje(
                 årstall = 2023,
                 kvartal = 3,
-                bransje = Bransjer.SYKEHJEM,
+                bransje = Bransje.SYKEHJEM,
                 tapteDagsverk = BigDecimal("10.0"),
                 muligeDagsverk = BigDecimal("20.0"),
                 antallPersoner = 20,

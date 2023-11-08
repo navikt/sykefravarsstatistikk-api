@@ -1,24 +1,15 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene
 
-import ia.felles.definisjoner.bransjer.Bransjer
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.assertEquals
+import ia.felles.definisjoner.bransjer.BransjeId
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-
+import ia.felles.definisjoner.bransjer.Bransje
 internal class BransjeprogramTest {
-
     @Test
-    fun `finnBransje returnerer tom Optional hvis input er null`() {
-        val næringskode: Næringskode? = null
-
-        assertThat(Bransjeprogram.finnBransje(næringskode)).isEmpty
-    }
-
-    @Test
-    fun `finnBransje returnerer tom Optional hvis næringskoden ikke er i bransjeprogrammet`() {
+    fun `finnBransje returnerer null hvis næringskoden ikke er i bransjeprogrammet`() {
         val utenforBransjeprogrammet = Næringskode("11111")
 
-        assertThat(Bransjeprogram.finnBransje(utenforBransjeprogrammet)).isEmpty
+        Bransjeprogram.finnBransje(utenforBransjeprogrammet) shouldBe null
     }
 
 
@@ -26,23 +17,21 @@ internal class BransjeprogramTest {
     fun `finnBransje returnerer BARNEHAGE for næringskode 88911`() {
         val næringskodenTilBarnehager = Næringskode("88911")
 
-        val barnehagebransjen = Bransjeprogram.finnBransje(næringskodenTilBarnehager).get().type
-        assertEquals(Bransjer.BARNEHAGER, barnehagebransjen)
+        Bransjeprogram.finnBransje(næringskodenTilBarnehager) shouldBe Bransje.BARNEHAGER
     }
 
     @Test
-    fun `finnBransje returnerer empty for næringskode 84300`() {
-        val bransje = Bransjeprogram.finnBransje(Næringskode("84300"))
-        assertThat(bransje).isEmpty
+    fun `finnBransje returnerer null for næringskode 84300`() {
+        Bransjeprogram.finnBransje(Næringskode("84300")) shouldBe null
     }
 
     @Test
     fun `finnBransje returnerer NÆRINGSMIDDELINDUSTRI for næringskode 10320`() {
         val juicepressing = Næringskode("10320")
 
-        val næringsmiddelbransjen = Bransjeprogram.finnBransje(juicepressing).get().type
-        assertEquals(Bransjer.NÆRINGSMIDDELINDUSTRI, næringsmiddelbransjen)
+        Bransjeprogram.finnBransje(juicepressing) shouldBe Bransje.NÆRINGSMIDDELINDUSTRI
     }
+
     @Test
     fun `bransje i næringsmiddelindustrien er definert på tosiffernivå`() {
         // En bedrift i næringsmiddelindustrien er i bransjeprogrammet, men data hentes likevel på
@@ -51,7 +40,6 @@ internal class BransjeprogramTest {
 
         val actual = Bransjeprogram.finnBransje(næringINæringsmiddelindustriBransjen)
 
-        assertThat(actual).isNotEmpty()
-        assertThat(actual.get().identifikatorer).isEqualTo(listOf("10"))
+        (actual!!.bransjeId as BransjeId.Næring).næring shouldBe "10"
     }
 }

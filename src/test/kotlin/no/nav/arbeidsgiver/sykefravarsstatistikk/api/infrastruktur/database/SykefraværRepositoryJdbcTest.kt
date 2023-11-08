@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import config.AppConfigForJdbcTesterConfig
-import ia.felles.definisjoner.bransjer.Bransjer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.assertj.core.api.Assertions
@@ -19,7 +18,7 @@ import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import testUtils.TestUtils.opprettStatistikkForLandExposed
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import java.math.BigDecimal
-
+import ia.felles.definisjoner.bransjer.Bransje
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
@@ -165,7 +164,7 @@ open class SykefraværRepositoryJdbcTest {
             )
         )
         val resultat = sykefraværStatistikkNæringskodeRepository.hentForBransje(
-            Bransje(Bransjer.BARNEHAGER),
+            Bransje.BARNEHAGER,
             listOf(
                 ÅrstallOgKvartal(2019, 1),
                 ÅrstallOgKvartal(2018, 4)

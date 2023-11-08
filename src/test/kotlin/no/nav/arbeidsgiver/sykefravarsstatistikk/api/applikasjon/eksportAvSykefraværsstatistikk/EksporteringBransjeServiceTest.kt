@@ -1,10 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk
 
-import ia.felles.definisjoner.bransjer.Bransjer
-import io.mockk.confirmVerified
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.kotest.matchers.equals.shouldBeEqual
+import io.mockk.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.SykefraværFlereKvartalerForEksport
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.SykefraværMedKategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
@@ -16,7 +13,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaCl
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.StatistikkategoriKafkamelding
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
-
+import ia.felles.definisjoner.bransjer.Bransje
 internal class EksporteringBransjeServiceTest {
 
     private val kafkaClientMock = mockk<KafkaClient>(relaxed = true)
@@ -56,7 +53,7 @@ internal class EksporteringBransjeServiceTest {
             SykefraværsstatistikkForNæring(
                 årstall = 1990,
                 kvartal = 1,
-                næringkode = Bransjer.ANLEGG.næringskoder.first(),
+                næringkode = "42",
                 antallPersoner = 1,
                 tapteDagsverk = BigDecimal.ONE,
                 muligeDagsverk = BigDecimal.ONE
@@ -64,7 +61,7 @@ internal class EksporteringBransjeServiceTest {
             SykefraværsstatistikkForNæring(
                 årstall = 2023,
                 kvartal = 1,
-                næringkode = Bransjer.ANLEGG.næringskoder.first(),
+                næringkode = "42",
                 antallPersoner = 1,
                 tapteDagsverk = BigDecimal.ONE,
                 muligeDagsverk = BigDecimal.ONE
@@ -86,7 +83,7 @@ internal class EksporteringBransjeServiceTest {
             SykefraværsstatistikkForNæring(
                 årstall = 1990,
                 kvartal = 1,
-                næringkode = Bransjer.ANLEGG.næringskoder.first(),
+                næringkode = "42",
                 antallPersoner = 1,
                 tapteDagsverk = BigDecimal.ONE,
                 muligeDagsverk = BigDecimal.ONE
@@ -104,7 +101,7 @@ internal class EksporteringBransjeServiceTest {
             SykefraværsstatistikkForNæring(
                 årstall = 2023,
                 kvartal = 2,
-                næringkode = Bransjer.ANLEGG.næringskoder.first(),
+                næringkode = "42",
                 antallPersoner = 5,
                 tapteDagsverk = BigDecimal.ONE,
                 muligeDagsverk = BigDecimal.ONE
@@ -119,7 +116,7 @@ internal class EksporteringBransjeServiceTest {
         val melding = StatistikkategoriKafkamelding(
             SykefraværMedKategori(
                 Statistikkategori.BRANSJE,
-                Bransjer.ANLEGG.name,
+                Bransje.ANLEGG.name,
                 2023,
                 2,
                 BigDecimal.ONE,
@@ -132,7 +129,7 @@ internal class EksporteringBransjeServiceTest {
                         SykefraværsstatistikkBransje(
                             årstall = 2023,
                             kvartal = 2,
-                            bransje = Bransjer.ANLEGG,
+                            bransje = Bransje.ANLEGG,
                             antallPersoner = 5,
                             tapteDagsverk = BigDecimal.ONE,
                             muligeDagsverk = BigDecimal.ONE
@@ -142,7 +139,11 @@ internal class EksporteringBransjeServiceTest {
             )
         )
 
-        verify { kafkaClientMock.sendMelding(melding, KafkaTopic.SYKEFRAVARSSTATISTIKK_BRANSJE_V1) }
+        val fangetMelding = slot<StatistikkategoriKafkamelding>()
+
+        verify { kafkaClientMock.sendMelding(capture(fangetMelding), KafkaTopic.SYKEFRAVARSSTATISTIKK_BRANSJE_V1) }
+
+        fangetMelding.captured shouldBeEqual melding
         confirmVerified(kafkaClientMock)
     }
 }

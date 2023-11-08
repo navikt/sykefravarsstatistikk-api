@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene
 
+import ia.felles.definisjoner.bransjer.Bransje
 import io.vavr.control.Either
 
 class BransjeEllerNæring {

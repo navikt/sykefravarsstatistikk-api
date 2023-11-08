@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import config.AppConfigForJdbcTesterConfig
-import ia.felles.definisjoner.bransjer.Bransjer
+import ia.felles.definisjoner.bransjer.Bransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.LocalOgUnitTestOidcConfiguration
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
@@ -251,7 +251,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(3000)
         )
         val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(
-            Bransje(Bransjer.SYKEHUS)
+            Bransje.SYKEHUS
         )
         Assertions.assertThat(resultat.size).isEqualTo(2)
         Assertions.assertThat(resultat[0])
@@ -293,7 +293,7 @@ open class GraderingRepositoryJdbcTest {
             BigDecimal(20),
             BigDecimal(100)
         )
-        val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(Bransje(Bransjer.SYKEHUS))
+        val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(Bransje.SYKEHUS)
         Assertions.assertThat(resultat.size).isEqualTo(1)
         Assertions.assertThat(resultat[0])
             .isEqualTo(

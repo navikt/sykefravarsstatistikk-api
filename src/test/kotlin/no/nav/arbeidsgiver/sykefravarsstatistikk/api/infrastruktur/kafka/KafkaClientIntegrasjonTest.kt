@@ -1,11 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka
 
-import ia.felles.definisjoner.bransjer.Bransjer
-import net.javacrumbs.jsonunit.assertj.assertThatJson
 import config.SykefraværsstatistikkLocalTestApplication
+import ia.felles.definisjoner.bransjer.Bransje
+import net.javacrumbs.jsonunit.assertj.assertThatJson
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.MetadataVirksomhetKafkamelding
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.SektorKafkaDto
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
@@ -89,7 +89,7 @@ class KafkaClientIntegrasjonTest {
                 "999999999",
                 ÅrstallOgKvartal(2023, 2),
                 "86101",
-                Bransjer.SYKEHUS,
+                Bransje.SYKEHUS,
                 SektorKafkaDto.STATLIG
             ),
             KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1,
@@ -105,7 +105,7 @@ class KafkaClientIntegrasjonTest {
                 "999999999",
                 ÅrstallOgKvartal(2023, 2),
                 "86",
-                Bransjer.SYKEHUS,
+                Bransje.SYKEHUS,
                 SektorKafkaDto.STATLIG
             ),
             KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1,
