@@ -65,7 +65,6 @@ class SykefraværStatistikkSektorRepository(
             select {
                 sektorKode eq sektor.sektorkode
             }
-                .groupBy(årstall, kvartal)
                 .orderBy(årstall to SortOrder.ASC)
                 .orderBy(kvartal to SortOrder.ASC)
                 .map {
