@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import config.AppConfigForJdbcTesterConfig
+import ia.felles.definisjoner.bransjer.Bransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.LocalOgUnitTestOidcConfiguration
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
@@ -18,7 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import testUtils.TestUtils
 import testUtils.insertData
 import java.math.BigDecimal
-import ia.felles.definisjoner.bransjer.Bransje
+
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
@@ -314,21 +315,21 @@ open class GraderingRepositoryJdbcTest {
             sektor = Sektor.PRIVAT,
         )
 
-        private val UNDERENHET_1_NÆRING_14 = Underenhet.Næringsdrivende(
+        private val UNDERENHET_1_NÆRING_14 = UnderenhetLegacy(
             Orgnr("999999999"),
             null,
             null.toString(),
             Næringskode("14120"),
             null
         )
-        private val UNDERENHET_2_NÆRING_15 = Underenhet.Næringsdrivende(
+        private val UNDERENHET_2_NÆRING_15 = UnderenhetLegacy(
             Orgnr("888888888"),
             null,
             null.toString(),
             Næringskode("15100"),
             null
         )
-        private val UNDERENHET_3_NÆRING_14 = Underenhet.Næringsdrivende(
+        private val UNDERENHET_3_NÆRING_14 = UnderenhetLegacy(
             Orgnr("777777777"),
             null,
             null.toString(),
