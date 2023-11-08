@@ -5,7 +5,7 @@ import ia.felles.definisjoner.bransjer.BransjeId
 import ia.felles.definisjoner.bransjer.Bransje as Bransjer
 
 object Bransjeprogram {
-    val alleBransjer: List<LegacyBransje> = Bransjer.entries.map { LegacyBransje(it) }
+    val alleBransjer: List<Bransje> = Bransjer.entries
 
     fun finnBransje(næringskode: Næringskode): Bransje? = Bransjer.entries.firstOrNull { bransje ->
             bransje.bransjeId.let {
