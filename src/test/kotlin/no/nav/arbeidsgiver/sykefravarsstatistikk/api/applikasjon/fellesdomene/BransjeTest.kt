@@ -3,22 +3,30 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene
 import ia.felles.definisjoner.bransjer.BransjeId
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Bransjeprogram.finnBransje
 import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import testUtils.TestData.enNæringskode
 import testUtils.TestData.etOrgnr
 import ia.felles.definisjoner.bransjer.Bransje as Bransjer
 
 class BransjeTest {
+    private fun Bransjer.inkludererVirksomhet(virksomhet: Virksomhet): Boolean {
+        return bransjeId.let {
+            when (it) {
+                is BransjeId.Næring -> it.næring == virksomhet.næringskode.næring.tosifferIdentifikator
+                is BransjeId.Næringskoder -> it.næringskoder.contains(virksomhet.næringskode.femsifferIdentifikator)
+            }
+        }
+    }
+
     @Test
     fun virksomhetTilhørerBransjeprogram__skal_gi_true_hvis_næringskode_starter_med_de_definerte_sifrene() {
-        val legacyBransje = LegacyBransje(Bransjer.BYGG)
-        Assertions.assertThat(legacyBransje.inkludererVirksomhet(underenhetMedNæringskode("41999"))).isTrue()
+        Assertions.assertThat(Bransjer.BYGG.inkludererVirksomhet(underenhetMedNæringskode("41999"))).isTrue()
     }
 
     @Test
     fun virksomhetTilhørerBransjeprogram__skal_gi_false_hvis_næringskode_ikke_starter_med_de_definerte_sifrene() {
-        val legacyBransje = LegacyBransje(Bransjer.SYKEHUS)
-        Assertions.assertThat(legacyBransje.inkludererVirksomhet(underenhetMedNæringskode("46512"))).isFalse()
+        Assertions.assertThat(Bransjer.SYKEHUS.inkludererVirksomhet(underenhetMedNæringskode("46512"))).isFalse()
     }
 
     @Test
@@ -71,28 +79,20 @@ class BransjeTest {
     }
 
     @Test
-    fun bransje__skal_godta_koder_med_lengde_2_eller_5() {
-        LegacyBransje(Bransjer.SYKEHUS)
-        LegacyBransje(Bransjer.SYKEHUS)
-    }
-
-    @Test
     fun lengdePåNæringskoder__skal_returnere_riktig_lengde() {
-        org.junit.jupiter.api.Assertions.assertTrue(
-            LegacyBransje(Bransjer.SYKEHUS)
-                .type.bransjeId is BransjeId.Næringskoder
+        assertTrue(
+            Bransjer.SYKEHUS.bransjeId is BransjeId.Næringskoder
         )
-        org.junit.jupiter.api.Assertions.assertTrue(
-            LegacyBransje(Bransjer.BYGG)
-                .type.bransjeId is BransjeId.Næring
+        assertTrue(
+            Bransjer.BYGG.bransjeId is BransjeId.Næring
         )
     }
 
     @Test
     fun inkludererVirksomhet__skal_returnere_hvorvidt_virksomhetens_næring_er_i_bransjen() {
-        val legacyBransje = LegacyBransje(Bransjer.SYKEHUS)
-        Assertions.assertThat(legacyBransje.inkludererVirksomhet(underenhetMedNæringskode("86101"))).isTrue()
-        Assertions.assertThat(legacyBransje.inkludererVirksomhet(underenhetMedNæringskode("00000"))).isFalse()
+        val bransje = Bransjer.SYKEHUS
+        Assertions.assertThat(bransje.inkludererVirksomhet(underenhetMedNæringskode("86101"))).isTrue()
+        Assertions.assertThat(bransje.inkludererVirksomhet(underenhetMedNæringskode("00000"))).isFalse()
     }
 
     private fun underenhetMedNæringskode(næringskode: String): UnderenhetLegacy {
