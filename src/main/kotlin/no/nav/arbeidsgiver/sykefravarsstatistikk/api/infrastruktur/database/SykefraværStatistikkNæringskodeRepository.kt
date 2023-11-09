@@ -5,12 +5,13 @@ import ia.felles.definisjoner.bransjer.BransjeId
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 
 
 @Component
 class SykefraværStatistikkNæringskodeRepository(
-    override val database: Database
+    @param:Qualifier("sykefravarsstatistikkDatabase") override val database: Database
 ) : UsingExposed, Table("sykefravar_statistikk_naring5siffer") {
 
     val næringskode = varchar("naring_kode", 5)

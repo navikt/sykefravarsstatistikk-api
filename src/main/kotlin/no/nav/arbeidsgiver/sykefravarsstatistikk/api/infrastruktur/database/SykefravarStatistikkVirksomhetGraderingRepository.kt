@@ -8,11 +8,12 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.D
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.less
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 
 @Component
 class SykefravarStatistikkVirksomhetGraderingRepository(
-    override val database: Database
+    @param:Qualifier("sykefravarsstatistikkDatabase") override val database: Database
 ) : UsingExposed, Table("sykefravar_statistikk_virksomhet_med_gradering") {
 
     val orgnr = varchar("orgnr", 20)

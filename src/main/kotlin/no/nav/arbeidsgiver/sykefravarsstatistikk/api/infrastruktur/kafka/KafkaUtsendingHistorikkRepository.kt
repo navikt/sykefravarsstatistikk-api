@@ -6,12 +6,13 @@ import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.datetime
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
 @Component
 open class KafkaUtsendingHistorikkRepository(
-    override val database: Database,
+    @param:Qualifier("sykefravarsstatistikkDatabase") override val database: Database,
 ): UsingExposed, Table("kafka_utsending_historikk") {
     val orgnr = text("orgnr")
     val key = text("key_json")

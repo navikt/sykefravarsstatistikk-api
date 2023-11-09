@@ -1,14 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import config.AppConfigForJdbcTesterConfig
-import testUtils.TestData.NÆRINGSKODE_2SIFFER
-import testUtils.TestData.NÆRINGSKODE_5SIFFER
-import testUtils.TestData.ORGNR_VIRKSOMHET_1
-import testUtils.TestData.ORGNR_VIRKSOMHET_2
-import testUtils.TestData.ORGNR_VIRKSOMHET_3
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Orgenhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.StatistikkildeDvh
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.cleanUpTestDb
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.insertOrgenhetInDvhTabell
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkLandInDvhTabell
@@ -18,19 +14,24 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.Data
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkVirksomhetInDvhTabell
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.assertj.core.api.AssertionsForClassTypes
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
 import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import testUtils.TestData.NÆRINGSKODE_2SIFFER
+import testUtils.TestData.NÆRINGSKODE_5SIFFER
+import testUtils.TestData.ORGNR_VIRKSOMHET_1
+import testUtils.TestData.ORGNR_VIRKSOMHET_2
+import testUtils.TestData.ORGNR_VIRKSOMHET_3
 import java.math.BigDecimal
 
 @ActiveProfiles("db-test")
@@ -38,17 +39,15 @@ import java.math.BigDecimal
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 open class DatavarehusRepositoryJdbcTest {
+    @Qualifier("datavarehusJdbcTemplate")
     @Autowired
     lateinit var namedParameterJdbcTemplate: NamedParameterJdbcTemplate
-    private val repository: DatavarehusRepository by lazy { DatavarehusRepository(namedParameterJdbcTemplate) }
+
+    @Autowired
+    private lateinit var repository: DatavarehusRepository
 
     @BeforeEach
     fun setUp() {
-        cleanUpTestDb(namedParameterJdbcTemplate)
-    }
-
-    @AfterEach
-    fun tearDown() {
         cleanUpTestDb(namedParameterJdbcTemplate)
     }
 

@@ -4,11 +4,12 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdat
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.javatime.date
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 
 @Component
 class PubliseringsdatoerRepository(
-    override val database: Database
+    @param:Qualifier("sykefravarsstatistikkDatabase") override val database: Database
 ) : UsingExposed, Table("publiseringsdatoer") {
 
     val rapportPeriode = integer("rapport_periode")

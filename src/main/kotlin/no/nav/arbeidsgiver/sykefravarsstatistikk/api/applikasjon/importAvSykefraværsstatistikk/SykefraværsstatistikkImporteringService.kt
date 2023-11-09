@@ -177,7 +177,7 @@ class SykefraværsstatistikkImporteringService(
     }
 
     private fun importSykefraværsstatistikkVirksomhet(årstallOgKvartal: ÅrstallOgKvartal) {
-        val statistikk: List<SykefraværsstatistikkVirksomhet> = if (currentEnvironmentIsProd()) {
+        val statistikk: List<SykefraværsstatistikkVirksomhet> = if (environment.activeProfiles.contains("prod")) {
             datavarehusRepository.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal)
         } else {
             SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhet(årstallOgKvartal)
@@ -191,11 +191,14 @@ class SykefraværsstatistikkImporteringService(
     private fun importSykefraværsstatistikkVirksomhetMedGradering(
         årstallOgKvartal: ÅrstallOgKvartal
     ) {
-        val statistikk: List<SykefraværsstatistikkVirksomhetMedGradering> = if (currentEnvironmentIsProd()) {
-            datavarehusRepository.hentSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal)
-        } else {
-            SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal)
-        }
+        val statistikk: List<SykefraværsstatistikkVirksomhetMedGradering> =
+            if (environment.activeProfiles.contains("prod")) {
+                datavarehusRepository.hentSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal)
+            } else {
+                SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhetMedGradering(
+                    årstallOgKvartal
+                )
+            }
         val antallSlettet = sykefraværStatistikkVirksomhetGraderingRepository.slettDataFor(årstallOgKvartal)
         val antallOprettet =
             sykefraværStatistikkVirksomhetGraderingRepository.settInn(
@@ -243,11 +246,7 @@ class SykefraværsstatistikkImporteringService(
     }
 
     private fun alleErLike(årstallOgKvartal: List<ÅrstallOgKvartal>): Boolean {
-        val førsteÅrstallOgKvartal = årstallOgKvartal[0]
-        return årstallOgKvartal.stream().allMatch { p: ÅrstallOgKvartal -> p == førsteÅrstallOgKvartal }
-    }
-
-    private fun currentEnvironmentIsProd(): Boolean {
-        return environment.activeProfiles.contains("prod")
+        val første = årstallOgKvartal.firstOrNull() ?: return true
+        return årstallOgKvartal.all { it == første }
     }
 }

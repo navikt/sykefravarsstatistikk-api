@@ -3,11 +3,12 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 
 @Component
 class SykefraværStatistikkNæringRepository(
-    override val database: Database
+    @param:Qualifier("sykefravarsstatistikkDatabase") override val database: Database
 ) : UsingExposed, Table("sykefravar_statistikk_naring") {
     val næring = varchar("naring_kode", 2)
     val årstall = integer("arstall")
