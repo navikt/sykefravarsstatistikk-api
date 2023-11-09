@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.KildeTilVirksomhetsdata
+import org.jetbrains.exposed.sql.Database
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor.Companion.fraSektorkode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Orgenhet
@@ -16,7 +17,9 @@ import java.sql.ResultSet
 
 @Component
 class DatavarehusRepository(
+    //public static final String RECTYPE_FOR_ORGANISASJONSLEDD = "3";
     @param:Qualifier("datavarehusJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
+    @param:Qualifier("datavarehusDatabase") private val database: Database
 ) : KildeTilVirksomhetsdata {
     /*
    Statistikk
