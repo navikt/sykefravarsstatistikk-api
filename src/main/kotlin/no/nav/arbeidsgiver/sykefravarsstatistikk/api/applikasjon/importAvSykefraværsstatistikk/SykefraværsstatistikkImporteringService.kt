@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkNæringskodeRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
@@ -53,7 +52,13 @@ class SykefraværsstatistikkImporteringService(
         val gjeldendeÅrstallOgKvartal = årstallOgKvartalForDvh[0]
         return if (kanImportStartes(årstallOgKvartalForSykefraværsstatistikk, årstallOgKvartalForDvh)) {
             log.info("Importerer ny statistikk")
-            importerNyStatistikk(gjeldendeÅrstallOgKvartal)
+            importSykefraværsstatistikkLand(gjeldendeÅrstallOgKvartal)
+            importSykefraværsstatistikkSektor(gjeldendeÅrstallOgKvartal)
+            importSykefraværsstatistikkNæring(gjeldendeÅrstallOgKvartal)
+            importSykefraværsstatistikkNæring5siffer(gjeldendeÅrstallOgKvartal)
+            importSykefraværsstatistikkNæringMedVarighet(gjeldendeÅrstallOgKvartal)
+            importSykefraværsstatistikkVirksomhet(gjeldendeÅrstallOgKvartal)
+            importSykefraværsstatistikkVirksomhetMedGradering(gjeldendeÅrstallOgKvartal)
             oppdaterPubliseringsstatus(gjeldendeÅrstallOgKvartal)
             gjeldendeÅrstallOgKvartal
         } else {
@@ -115,16 +120,6 @@ class SykefraværsstatistikkImporteringService(
             )
             false
         }
-    }
-
-    private fun importerNyStatistikk(årstallOgKvartal: ÅrstallOgKvartal) {
-        importSykefraværsstatistikkLand(årstallOgKvartal)
-        importSykefraværsstatistikkSektor(årstallOgKvartal)
-        importSykefraværsstatistikkNæring(årstallOgKvartal)
-        importSykefraværsstatistikkNæring5siffer(årstallOgKvartal)
-        importSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal)
-        importSykefraværsstatistikkVirksomhet(årstallOgKvartal)
-        importSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal)
     }
 
     private fun importSykefraværsstatistikkLand(

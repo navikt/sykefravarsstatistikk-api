@@ -4,13 +4,12 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.N�
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkLand
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkData
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkRepository
 import org.jetbrains.exposed.sql.deleteAll
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.core.namedparam.SqlParameterSource
 import java.math.BigDecimal
-import java.sql.ResultSet
 
 object TestUtils {
     val PRODUKSJON_NYTELSESMIDLER = Næring("10")
@@ -68,10 +67,13 @@ object TestUtils {
     }
 
 
-    fun slettAllEksportDataFraDatabase(jdbcTemplate: NamedParameterJdbcTemplate) {
-        jdbcTemplate.update("delete from eksport_per_kvartal", MapSqlParameterSource())
-        jdbcTemplate.update("delete from kafka_utsending_historikk", MapSqlParameterSource())
-        jdbcTemplate.update(
+    fun slettAllEksportDataFraDatabase(
+        jdbcTemplate: NamedParameterJdbcTemplate? = null,
+        kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository
+    ) {
+        jdbcTemplate?.update("delete from eksport_per_kvartal", MapSqlParameterSource())
+        kafkaUtsendingHistorikkRepository.slettHistorikk()
+        jdbcTemplate?.update(
             "delete from virksomheter_bekreftet_eksportert", MapSqlParameterSource()
         )
     }
@@ -165,38 +167,6 @@ object TestUtils {
         transaction { deleteAll() }
     }
 
-
-    fun hentAlleKafkaUtsendingHistorikkData(
-        jdbcTemplate: NamedParameterJdbcTemplate
-    ): List<KafkaUtsendingHistorikkData> {
-        return jdbcTemplate.query(
-            "select orgnr, key_json, value_json, opprettet " + "from kafka_utsending_historikk ",
-            MapSqlParameterSource()
-        ) { resultSet: ResultSet, rowNum: Int ->
-            KafkaUtsendingHistorikkData(
-                resultSet.getString("orgnr"),
-                resultSet.getString("key_json"),
-                resultSet.getString("value_json"),
-                resultSet.getTimestamp("opprettet").toLocalDateTime()
-            )
-        }
-    }
-
-
-    fun opprettUtsendingHistorikk(
-        jdbcTemplate: NamedParameterJdbcTemplate,
-        kafkaUtsendingHistorikkData: KafkaUtsendingHistorikkData
-    ) {
-        val parametre = MapSqlParameterSource()
-        parametre.addValue("orgnr", kafkaUtsendingHistorikkData.orgnr)
-        parametre.addValue("key", kafkaUtsendingHistorikkData.key)
-        parametre.addValue("value", kafkaUtsendingHistorikkData.value)
-        jdbcTemplate.update(
-            "insert into kafka_utsending_historikk (orgnr, key_json, value_json) "
-                    + "VALUES (:orgnr, :key, :value)",
-            parametre
-        )
-    }
 
     private fun SykefravarStatistikkVirksomhetGraderingRepository.slettAlt() {
         transaction { deleteAll() }

@@ -1,30 +1,36 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka
 
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.scheduling.annotation.Async
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.UsingExposed
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.deleteAll
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.javatime.datetime
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 
 @Component
 open class KafkaUtsendingHistorikkRepository(
-    @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate
-) {
-    @Async
-    open fun opprettHistorikk(orgnr: String?, key: String?, value: String?) {
-        val parametre: MutableMap<String, String?> = HashMap()
-        parametre["orgnr"] = orgnr
-        parametre["key"] = key
-        parametre["value"] = value
-        namedParameterJdbcTemplate.update(
-            "insert into kafka_utsending_historikk (orgnr, key_json, value_json) "
-                    + "values (:orgnr, :key, :value) ",
-            parametre
-        )
+    override val database: Database,
+): UsingExposed, Table("kafka_utsending_historikk") {
+    val orgnr = text("orgnr")
+    val key = text("key_json")
+    val value = text("value_json")
+    val opprettet = datetime("opprettet").default(LocalDateTime.now())
+
+    fun opprettHistorikk(inOrgnr: String, inKey: String, inValue: String) {
+        transaction {
+            insert {
+                it[orgnr] = inOrgnr
+                it[key] = inKey
+                it[value] = inValue
+            }
+        }
     }
 
     fun slettHistorikk(): Int {
-        return namedParameterJdbcTemplate.update(
-            "delete from kafka_utsending_historikk ", HashMap<String, Any?>()
-        )
+        return transaction {
+            deleteAll()
+        }
     }
 }

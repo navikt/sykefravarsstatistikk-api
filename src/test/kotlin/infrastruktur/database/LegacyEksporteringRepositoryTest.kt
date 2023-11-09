@@ -1,17 +1,12 @@
 package infrastruktur.database
 
 import config.AppConfigForJdbcTesterConfig
-import testUtils.TestData.ORGNR_VIRKSOMHET_1
-import testUtils.TestData.ORGNR_VIRKSOMHET_2
-import testUtils.TestData.ORGNR_VIRKSOMHET_3
-import testUtils.TestUtils.opprettTestVirksomhetMetaData
-import testUtils.TestUtils.slettAllEksportDataFraDatabase
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetEksportPerKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.LocalOgUnitTestOidcConfiguration
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.LegacyEksporteringRepository
-import org.junit.jupiter.api.AfterEach
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkRepository
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,6 +19,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import testUtils.TestData.ORGNR_VIRKSOMHET_1
+import testUtils.TestData.ORGNR_VIRKSOMHET_2
+import testUtils.TestData.ORGNR_VIRKSOMHET_3
+import testUtils.TestUtils.opprettTestVirksomhetMetaData
+import testUtils.TestUtils.slettAllEksportDataFraDatabase
 import java.sql.ResultSet
 import java.time.LocalDateTime
 
@@ -33,17 +33,17 @@ import java.time.LocalDateTime
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class, LocalOgUnitTestOidcConfiguration::class])
 open class LegacyEksporteringRepositoryTest {
     @Autowired
-    private val jdbcTemplate: NamedParameterJdbcTemplate? = null
-    private var legacyEksporteringRepository: LegacyEksporteringRepository? = null
+    private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
+
+    @Autowired
+    private lateinit var legacyEksporteringRepository: LegacyEksporteringRepository
+
+    @Autowired
+    private lateinit var kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository
+
     @BeforeEach
     fun setUp() {
-        legacyEksporteringRepository = LegacyEksporteringRepository(jdbcTemplate!!)
-        slettAllEksportDataFraDatabase(jdbcTemplate)
-    }
-
-    @AfterEach
-    fun tearDown() {
-        slettAllEksportDataFraDatabase(jdbcTemplate!!)
+        slettAllEksportDataFraDatabase(jdbcTemplate, kafkaUtsendingHistorikkRepository)
     }
 
     @Test
@@ -72,7 +72,7 @@ open class LegacyEksporteringRepositoryTest {
                 LocalDateTime.now()
             )
         )
-        val resultat = legacyEksporteringRepository!!.hentVirksomhetEksportPerKvartal(ÅrstallOgKvartal(2019, 2))
+        val resultat = legacyEksporteringRepository.hentVirksomhetEksportPerKvartal(ÅrstallOgKvartal(2019, 2))
         Assertions.assertEquals(2, resultat.size)
         Assertions.assertTrue(
             resultat.stream()
@@ -84,16 +84,16 @@ open class LegacyEksporteringRepositoryTest {
 
     @Test
     fun oppdaterOgSetErEksportertTilTrue__skal_returnere_0_hvis_data_ikke_finnes() {
-        var oppdaterteRader = legacyEksporteringRepository!!.opprettEksport(null)
+        var oppdaterteRader = legacyEksporteringRepository.opprettEksport(null)
         Assertions.assertEquals(0, oppdaterteRader)
-        oppdaterteRader = legacyEksporteringRepository!!.opprettEksport(emptyList<VirksomhetEksportPerKvartal>())
+        oppdaterteRader = legacyEksporteringRepository.opprettEksport(emptyList<VirksomhetEksportPerKvartal>())
         Assertions.assertEquals(0, oppdaterteRader)
     }
 
     @Test
     fun batchOpprettVirksomheterBekreftetEksportert__oppretter_ingenting_hvis_lista_er_tom() {
         val virksomheterBekreftetEksportert: List<String?> = ArrayList()
-        legacyEksporteringRepository!!.batchOpprettVirksomheterBekreftetEksportert(
+        legacyEksporteringRepository.batchOpprettVirksomheterBekreftetEksportert(
             virksomheterBekreftetEksportert, ÅrstallOgKvartal(2020, 2)
         )
         val results = hentAlleVirksomhetBekreftetEksportert()
@@ -106,7 +106,7 @@ open class LegacyEksporteringRepositoryTest {
         virksomheterBekreftetEksportert.add(ORGNR_VIRKSOMHET_1)
         virksomheterBekreftetEksportert.add(ORGNR_VIRKSOMHET_2)
         virksomheterBekreftetEksportert.add(ORGNR_VIRKSOMHET_3)
-        legacyEksporteringRepository!!.batchOpprettVirksomheterBekreftetEksportert(
+        legacyEksporteringRepository.batchOpprettVirksomheterBekreftetEksportert(
             virksomheterBekreftetEksportert, ÅrstallOgKvartal(2020, 2)
         )
         val results = hentAlleVirksomhetBekreftetEksportert()
@@ -136,7 +136,8 @@ open class LegacyEksporteringRepositoryTest {
         createVirksomhetEksportPerKvartal(
             VirksomhetEksportPerKvartalMedDatoer(ORGNR_3, _2021_1, false, null)
         )
-        val antallOppdatert = legacyEksporteringRepository!!.oppdaterAlleVirksomheterIEksportTabellSomErBekrreftetEksportert()
+        val antallOppdatert =
+            legacyEksporteringRepository.oppdaterAlleVirksomheterIEksportTabellSomErBekrreftetEksportert()
         Assertions.assertEquals(1, antallOppdatert)
         val results = hentAlleVirksomhetEksportPerKvartal()
         assertVirksomhetEksportPerKvartal(results, ORGNR_1.verdi, true, testStartDato)
@@ -156,26 +157,26 @@ open class LegacyEksporteringRepositoryTest {
                 Orgnr(ORGNR_VIRKSOMHET_2), ÅrstallOgKvartal(2020, 1), LocalDateTime.now()
             )
         )
-        val antallSlettet = legacyEksporteringRepository!!.slettVirksomheterBekreftetEksportert()
+        val antallSlettet = legacyEksporteringRepository.slettVirksomheterBekreftetEksportert()
         Assertions.assertEquals(2, antallSlettet)
         Assertions.assertEquals(0, hentAlleVirksomhetBekreftetEksportert().size)
     }
 
     @Test
     fun hentAntallIkkeEksportertRader__skal_retunere_riktig_tall() {
-        opprettTestVirksomhetMetaData(jdbcTemplate!!, 2020, 2, ORGNR_VIRKSOMHET_1)
+        opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_1)
         opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_2)
         opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_3, true)
-        val antallIkkeFerdigEksportert = legacyEksporteringRepository!!.hentAntallIkkeFerdigEksportert()
+        val antallIkkeFerdigEksportert = legacyEksporteringRepository.hentAntallIkkeFerdigEksportert()
         Assertions.assertEquals(2, antallIkkeFerdigEksportert)
     }
 
     @Test
     fun slettEksportertPerKvartal__skal_slette_alt() {
-        opprettTestVirksomhetMetaData(jdbcTemplate!!, 2020, 2, ORGNR_VIRKSOMHET_1)
+        opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_1)
         opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_2)
         opprettTestVirksomhetMetaData(jdbcTemplate, 2020, 2, ORGNR_VIRKSOMHET_3, true)
-        val antallSlettet = legacyEksporteringRepository!!.slettEksportertPerKvartal()
+        val antallSlettet = legacyEksporteringRepository.slettEksportertPerKvartal()
         Assertions.assertEquals(3, antallSlettet)
         val results = hentAlleVirksomhetEksportPerKvartal()
         Assertions.assertEquals(0, results.size)
@@ -215,7 +216,7 @@ open class LegacyEksporteringRepositoryTest {
             .addValue("kvartal", virksomhet.årstallOgKvartal.kvartal)
             .addValue("eksportert", virksomhet.eksportert)
             .addValue("oppdatert", virksomhet.oppdatert)
-        return jdbcTemplate!!.update(
+        return jdbcTemplate.update(
             "insert into eksport_per_kvartal (orgnr, arstall, kvartal, eksportert, oppdatert) "
                     + "values (:orgnr, :årstall, :kvartal, :eksportert, :oppdatert)",
             parametre
@@ -228,7 +229,7 @@ open class LegacyEksporteringRepositoryTest {
             .addValue("årstall", virksomhet.årstallOgKvartal.årstall)
             .addValue("kvartal", virksomhet.årstallOgKvartal.kvartal)
             .addValue("opprettet", virksomhet.opprettet)
-        return jdbcTemplate!!.update(
+        return jdbcTemplate.update(
             "insert into virksomheter_bekreftet_eksportert (orgnr, arstall, kvartal, opprettet) "
                     + "values (:orgnr, :årstall, :kvartal, :opprettet)",
             parametre
@@ -236,7 +237,7 @@ open class LegacyEksporteringRepositoryTest {
     }
 
     private fun hentAlleVirksomhetEksportPerKvartal(): List<VirksomhetEksportPerKvartalMedDatoer> {
-        return jdbcTemplate!!.query(
+        return jdbcTemplate.query(
             "select orgnr, arstall, kvartal, eksportert, opprettet, oppdatert "
                     + "from eksport_per_kvartal ",
             MapSqlParameterSource()
@@ -252,7 +253,7 @@ open class LegacyEksporteringRepositoryTest {
     }
 
     private fun hentAlleVirksomhetBekreftetEksportert(): List<VirksomhetBekreftetEksportert> {
-        return jdbcTemplate!!.query(
+        return jdbcTemplate.query(
             "select orgnr, arstall, kvartal, opprettet " + "from virksomheter_bekreftet_eksportert ",
             MapSqlParameterSource()
         ) { resultSet: ResultSet, _: Int ->
