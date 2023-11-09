@@ -1,17 +1,25 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusLandRespository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
+import org.jetbrains.exposed.sql.deleteAll
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 object DatavarehusRepositoryJdbcTestUtils {
 
-    fun cleanUpTestDb(jdbcTemplate: NamedParameterJdbcTemplate) {
-        delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_land_v")
+    fun cleanUpTestDb(jdbcTemplate: NamedParameterJdbcTemplate, datavarehusLandRespository: DatavarehusLandRespository? = null) {
+        datavarehusLandRespository?.slettAlt()
         delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_v_2")
         delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_v")
+    }
+
+    private fun DatavarehusLandRespository.slettAlt() {
+        transaction {
+            deleteAll()
+        }
     }
 
     fun delete(jdbcTemplate: NamedParameterJdbcTemplate, tabell: String?): Int {

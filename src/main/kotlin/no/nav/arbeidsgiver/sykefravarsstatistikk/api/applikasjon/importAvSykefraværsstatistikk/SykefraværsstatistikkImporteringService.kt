@@ -6,6 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Å
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.SlettOgOpprettResultat
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.StatistikkildeDvh
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusLandRespository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.slf4j.LoggerFactory
 import org.springframework.core.env.Environment
@@ -22,6 +23,7 @@ class SykefraværsstatistikkImporteringService(
     private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
     private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository,
     private val sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository,
+    private val datavarehusLandRespository: DatavarehusLandRespository,
 
     private val environment: Environment,
 ) {
@@ -126,7 +128,7 @@ class SykefraværsstatistikkImporteringService(
         årstallOgKvartal: ÅrstallOgKvartal
     ): SlettOgOpprettResultat {
 
-        val statistikk = datavarehusRepository.hentSykefraværsstatistikkLand(årstallOgKvartal)
+        val statistikk = datavarehusLandRespository.hentFor(årstallOgKvartal)
 
         val antallSlettet = sykefraværsstatistikkLandRepository.slettForKvartal(årstallOgKvartal)
         val antallOpprettet = sykefraværsstatistikkLandRepository.settInn(statistikk)

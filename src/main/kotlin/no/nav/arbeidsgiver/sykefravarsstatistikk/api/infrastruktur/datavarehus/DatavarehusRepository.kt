@@ -6,7 +6,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Se
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Orgenhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.StatistikkildeDvh
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer.Publiseringsdato
-import org.jetbrains.exposed.sql.Database
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -17,9 +16,7 @@ import java.sql.ResultSet
 
 @Component
 class DatavarehusRepository(
-    //public static final String RECTYPE_FOR_ORGANISASJONSLEDD = "3";
     @param:Qualifier("datavarehusJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
-    @param:Qualifier("datavarehusDatabase") private val database: Database
 ) : KildeTilVirksomhetsdata {
     /*
    Statistikk
@@ -42,33 +39,6 @@ class DatavarehusRepository(
             )
         }
         return alleÅrstallOgKvartal[0]
-    }
-
-    fun hentSykefraværsstatistikkLand(
-        årstallOgKvartal: ÅrstallOgKvartal
-    ): List<SykefraværsstatistikkLand> {
-        val namedParameters: SqlParameterSource = MapSqlParameterSource()
-            .addValue(ARSTALL, årstallOgKvartal.årstall)
-            .addValue(KVARTAL, årstallOgKvartal.kvartal)
-        return namedParameterJdbcTemplate.query(
-            "select arstall, kvartal, "
-                    + "sum(antpers) as sum_antall_personer, "
-                    + "sum(taptedv) as sum_tapte_dagsverk, "
-                    + "sum(muligedv) as sum_mulige_dagsverk "
-                    + "from dt_p.agg_ia_sykefravar_land_v "
-                    + "where kjonn != 'X' and naring != 'X' "
-                    + "and arstall = :arstall and kvartal = :kvartal "
-                    + "group by arstall, kvartal",
-            namedParameters
-        ) { resultSet: ResultSet, _: Int ->
-            SykefraværsstatistikkLand(
-                resultSet.getInt(ARSTALL),
-                resultSet.getInt(KVARTAL),
-                resultSet.getInt(SUM_ANTALL_PERSONER),
-                resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
-                resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)
-            )
-        }
     }
 
     fun hentSykefraværsstatistikkSektor(

@@ -12,6 +12,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.Data
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkNæringInDvhTabell
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkVirksomhetInDvhTabell
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusLandRespository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.assertj.core.api.AssertionsForClassTypes
 import org.junit.jupiter.api.Assertions
@@ -44,11 +45,14 @@ open class DatavarehusRepositoryJdbcTest {
     lateinit var namedParameterJdbcTemplate: NamedParameterJdbcTemplate
 
     @Autowired
+    lateinit var datavarehusLandRespository: DatavarehusLandRespository
+
+    @Autowired
     private lateinit var repository: DatavarehusRepository
 
     @BeforeEach
     fun setUp() {
-        cleanUpTestDb(namedParameterJdbcTemplate)
+        cleanUpTestDb(namedParameterJdbcTemplate, datavarehusLandRespository)
     }
 
     @Test
@@ -139,11 +143,11 @@ open class DatavarehusRepositoryJdbcTest {
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, 5, 100)
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, 10, 100)
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10)
-        val sykefraværsstatistikkLand = repository.hentSykefraværsstatistikkLand(ÅrstallOgKvartal(2018, 4))
+        val sykefraværsstatistikkLand = datavarehusLandRespository.hentFor(ÅrstallOgKvartal(2018, 4))
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkLand.size).isEqualTo(1)
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkLand[0])
             .isEqualTo(
-                SykefraværsstatistikkLand(2018, 4, 10, BigDecimal(15), BigDecimal(200))
+                SykefraværsstatistikkLand(2018, 4, 10, BigDecimal("15.0"), BigDecimal("200.0"))
             )
     }
 
@@ -414,7 +418,7 @@ open class DatavarehusRepositoryJdbcTest {
     @Test
     fun hentSykefraværsstatistikkLand__returnerer_en_tom_liste_dersom_ingen_data_finnes_i_DVH() {
         insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10)
-        val sykefraværsstatistikkLand = repository.hentSykefraværsstatistikkLand(ÅrstallOgKvartal(2018, 4))
+        val sykefraværsstatistikkLand = datavarehusLandRespository.hentFor(ÅrstallOgKvartal(2018, 4))
         Assertions.assertTrue(sykefraværsstatistikkLand.isEmpty())
     }
 
