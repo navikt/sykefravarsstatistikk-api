@@ -65,15 +65,9 @@ class Aggregeringskalkulator(
         statistikk: List<UmaskertSykefraværForEttKvartal>
     ): SumAvSykefraværOverFlereKvartaler {
         return ekstraherSisteFireKvartaler(statistikk).stream()
-            .map { umaskertSykefravær: UmaskertSykefraværForEttKvartal? ->
-                SumAvSykefraværOverFlereKvartaler(
-                    umaskertSykefravær!!
-                )
-            }
+            .map { SumAvSykefraværOverFlereKvartaler(it) }
             .reduce(SumAvSykefraværOverFlereKvartaler.NULLPUNKT) { obj: SumAvSykefraværOverFlereKvartaler, other: SumAvSykefraværOverFlereKvartaler? ->
-                obj.leggSammen(
-                    other!!
-                )
+                obj.leggSammen(other!!)
             }
     }
 
