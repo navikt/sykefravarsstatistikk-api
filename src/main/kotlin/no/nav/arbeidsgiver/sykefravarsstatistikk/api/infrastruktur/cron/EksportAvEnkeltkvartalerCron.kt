@@ -5,11 +5,11 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import net.javacrumbs.shedlock.core.LockConfiguration
 import net.javacrumbs.shedlock.core.LockingTaskExecutor
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringMetadataVirksomhetService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringPerStatistikkKategoriService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.VirksomhetMetadataService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringMetadataVirksomhetService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringPerStatistikkKategoriService
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -35,8 +35,8 @@ class EksportAvEnkeltkvartalerCron(
 
     @Scheduled(cron = "-")
     fun scheduledEksportAvEnkeltkvartaler() {
-        val kategorier = listOf(Statistikkategori.BRANSJE)
-        val sisteFireÅr = ÅrstallOgKvartal(2023, 2) inkludertTidligere 4 * 4 - 1
+        val kategorier = listOf(Statistikkategori.VIRKSOMHET, Statistikkategori.VIRKSOMHET_GRADERT)
+        val sisteFireÅr = ÅrstallOgKvartal(2023, 3) inkludertTidligere 4 * 4 - 1
 
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
