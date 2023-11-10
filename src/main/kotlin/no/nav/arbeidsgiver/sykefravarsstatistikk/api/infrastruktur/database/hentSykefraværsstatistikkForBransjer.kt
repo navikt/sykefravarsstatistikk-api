@@ -34,7 +34,7 @@ fun summerSykefraværsstatistikkPerBransjeNæringer(
             bransje to statistikk.filter {
                 bransje.bransjeId.let { bransjeId ->
                     when (bransjeId) {
-                        is BransjeId.Næring -> bransjeId.næring == it.næringkode
+                        is BransjeId.Næring -> bransjeId.næring == it.næring
                         is BransjeId.Næringskoder -> false
                     }
                 }

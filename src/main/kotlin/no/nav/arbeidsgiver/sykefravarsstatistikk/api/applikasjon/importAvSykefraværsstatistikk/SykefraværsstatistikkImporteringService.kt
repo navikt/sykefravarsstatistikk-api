@@ -7,6 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefra
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.StatistikkildeDvh
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusLandRespository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusNæringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.slf4j.LoggerFactory
 import org.springframework.core.env.Environment
@@ -24,6 +25,7 @@ class SykefraværsstatistikkImporteringService(
     private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository,
     private val sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository,
     private val datavarehusLandRespository: DatavarehusLandRespository,
+    private val datavarehusNæringRepository: DatavarehusNæringRepository,
 
     private val environment: Environment,
 ) {
@@ -39,9 +41,7 @@ class SykefraværsstatistikkImporteringService(
         )
         val årstallOgKvartalForDvh = listOf(
             datavarehusLandRespository.hentSisteKvartal(),
-            datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
-                StatistikkildeDvh.NÆRING
-            ),
+            datavarehusNæringRepository.hentSisteKvartal(),
             datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
                 StatistikkildeDvh.NÆRING_5_SIFFER
             ),
@@ -155,7 +155,7 @@ class SykefraværsstatistikkImporteringService(
     private fun importSykefraværsstatistikkNæring(
         årstallOgKvartal: ÅrstallOgKvartal
     ): SlettOgOpprettResultat {
-        val sykefraværsstatistikkNæring = datavarehusRepository.hentSykefraværsstatistikkNæring(årstallOgKvartal)
+        val sykefraværsstatistikkNæring = datavarehusNæringRepository.hentFor(årstallOgKvartal)
         val slettet = sykefraværStatistikkNæringRepository.slettFor(årstallOgKvartal)
         val opprettet = sykefraværStatistikkNæringRepository.settInn(sykefraværsstatistikkNæring)
         val resultat = SlettOgOpprettResultat(slettet, opprettet)

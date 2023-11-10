@@ -238,7 +238,7 @@ open class SykefraværRepositoryJdbcTest {
         sykefraværStatistikkNæringRepository.settInn(
             listOf(
                 SykefraværsstatistikkForNæring(
-                    næringkode = næring.tosifferIdentifikator,
+                    næring = næring.tosifferIdentifikator,
                     årstall = 2019,
                     kvartal = 2,
                     antallPersoner = 10,
@@ -246,7 +246,7 @@ open class SykefraværRepositoryJdbcTest {
                     muligeDagsverk = BigDecimal(100)
                 ),
                 SykefraværsstatistikkForNæring(
-                    næringkode = "94",
+                    næring = "94",
                     årstall = 2019,
                     kvartal = 1,
                     antallPersoner = 10,
@@ -254,7 +254,7 @@ open class SykefraværRepositoryJdbcTest {
                     muligeDagsverk = BigDecimal(100)
                 ),
                 SykefraværsstatistikkForNæring(
-                    næringkode = næring.tosifferIdentifikator,
+                    næring = næring.tosifferIdentifikator,
                     årstall = 2019,
                     kvartal = 1,
                     antallPersoner = 10,
@@ -262,7 +262,7 @@ open class SykefraværRepositoryJdbcTest {
                     muligeDagsverk = BigDecimal(100)
                 ),
                 SykefraværsstatistikkForNæring(
-                    næringkode = næring.tosifferIdentifikator,
+                    næring = næring.tosifferIdentifikator,
                     årstall = 2018,
                     kvartal = 4,
                     antallPersoner = 10,
@@ -270,7 +270,7 @@ open class SykefraværRepositoryJdbcTest {
                     muligeDagsverk = BigDecimal(100)
                 ),
                 SykefraværsstatistikkForNæring(
-                    næringkode = næring.tosifferIdentifikator,
+                    næring = næring.tosifferIdentifikator,
                     årstall = 2018,
                     kvartal = 3,
                     antallPersoner = 10,

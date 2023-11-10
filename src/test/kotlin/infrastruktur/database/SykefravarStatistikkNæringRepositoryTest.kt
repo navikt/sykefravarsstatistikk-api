@@ -56,7 +56,7 @@ open class SykefravarStatistikkNæringRepositoryTest {
                     SykefraværsstatistikkForNæring(
                         årstall = it.årstall,
                         kvartal = it.kvartal,
-                        næringkode = produksjon.tosifferIdentifikator,
+                        næring = produksjon.tosifferIdentifikator,
                         antallPersoner = 10,
                         tapteDagsverk = BigDecimal("2.0"),
                         muligeDagsverk = BigDecimal("100.0")
@@ -64,7 +64,7 @@ open class SykefravarStatistikkNæringRepositoryTest {
                     SykefraværsstatistikkForNæring(
                         årstall = it.årstall,
                         kvartal = it.kvartal,
-                        næringkode = utdanning.tosifferIdentifikator,
+                        næring = utdanning.tosifferIdentifikator,
                         antallPersoner = 8,
                         tapteDagsverk = BigDecimal("5.0"),
                         muligeDagsverk = BigDecimal("100.0")
@@ -80,7 +80,7 @@ open class SykefravarStatistikkNæringRepositoryTest {
         resultat[0] shouldBeEqual SykefraværsstatistikkForNæring(
             årstall = 2019,
             kvartal = 2,
-            næringkode = produksjon.tosifferIdentifikator,
+            næring = produksjon.tosifferIdentifikator,
             antallPersoner = 10,
             tapteDagsverk = BigDecimal("2.0"),
             muligeDagsverk = BigDecimal("100.0"),
@@ -88,7 +88,7 @@ open class SykefravarStatistikkNæringRepositoryTest {
         resultat[1] shouldBeEqual SykefraværsstatistikkForNæring(
             årstall = 2019,
             kvartal = 2,
-            næringkode = utdanning.tosifferIdentifikator,
+            næring = utdanning.tosifferIdentifikator,
             antallPersoner = 8,
             tapteDagsverk = BigDecimal("5.0"),
             muligeDagsverk = BigDecimal("100.0"),
@@ -104,7 +104,7 @@ open class SykefravarStatistikkNæringRepositoryTest {
                 SykefraværsstatistikkForNæring(
                     årstall = _2020_1.årstall,
                     kvartal = _2020_1.kvartal,
-                    næringkode = "10",
+                    næring = "10",
                     antallPersoner = 50,
                     tapteDagsverk = BigDecimal("20000.0"),
                     muligeDagsverk = BigDecimal("1000000.0")
@@ -112,7 +112,7 @@ open class SykefravarStatistikkNæringRepositoryTest {
                 SykefraværsstatistikkForNæring(
                     årstall = _2020_1.minusKvartaler(1).årstall,
                     kvartal = _2020_1.minusKvartaler(1).kvartal,
-                    næringkode = "10",
+                    næring = "10",
                     antallPersoner = 50,
                     tapteDagsverk = BigDecimal("30000.0"),
                     muligeDagsverk = BigDecimal("1000000.0")
@@ -120,7 +120,7 @@ open class SykefravarStatistikkNæringRepositoryTest {
                 SykefraværsstatistikkForNæring(
                     årstall = _2020_1.minusKvartaler(2).årstall,
                     kvartal = _2020_1.minusKvartaler(2).kvartal,
-                    næringkode = "10",
+                    næring = "10",
                     antallPersoner = 50,
                     tapteDagsverk = BigDecimal("40000.0"),
                     muligeDagsverk = BigDecimal("1000000.0")
@@ -128,7 +128,7 @@ open class SykefravarStatistikkNæringRepositoryTest {
                 SykefraværsstatistikkForNæring(
                     årstall = _2020_1.årstall,
                     kvartal = _2020_1.kvartal,
-                    næringkode = "88",
+                    næring = "88",
                     antallPersoner = 50,
                     tapteDagsverk = BigDecimal("25000.0"),
                     muligeDagsverk = BigDecimal("1000000.0")
@@ -139,7 +139,7 @@ open class SykefravarStatistikkNæringRepositoryTest {
             SykefraværsstatistikkForNæring(
                 årstall = _2020_1.årstall,
                 kvartal = _2020_1.kvartal,
-                næringkode = "10",
+                næring = "10",
                 antallPersoner = 50,
                 tapteDagsverk = BigDecimal("20000.0"),
                 muligeDagsverk = BigDecimal("1000000.0")
@@ -147,7 +147,7 @@ open class SykefravarStatistikkNæringRepositoryTest {
             SykefraværsstatistikkForNæring(
                 årstall = _2020_1.årstall,
                 kvartal = _2020_1.kvartal,
-                næringkode = "88",
+                næring = "88",
                 antallPersoner = 50,
                 tapteDagsverk = BigDecimal("25000.0"),
                 muligeDagsverk = BigDecimal("1000000.0")
@@ -155,7 +155,7 @@ open class SykefravarStatistikkNæringRepositoryTest {
             SykefraværsstatistikkForNæring(
                 årstall = _2020_1.minusKvartaler(1).årstall,
                 kvartal = _2020_1.minusKvartaler(1).kvartal,
-                næringkode = "10",
+                næring = "10",
                 antallPersoner = 50,
                 tapteDagsverk = BigDecimal("30000.0"),
                 muligeDagsverk = BigDecimal("1000000.0")

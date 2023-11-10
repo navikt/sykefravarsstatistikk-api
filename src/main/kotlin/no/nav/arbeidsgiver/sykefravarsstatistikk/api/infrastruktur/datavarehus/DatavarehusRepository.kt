@@ -41,34 +41,6 @@ class DatavarehusRepository(
         return alleÅrstallOgKvartal[0]
     }
 
-    fun hentSykefraværsstatistikkNæring(
-        årstallOgKvartal: ÅrstallOgKvartal
-    ): List<SykefraværsstatistikkForNæring> {
-        val namedParameters: SqlParameterSource = MapSqlParameterSource()
-            .addValue(ARSTALL, årstallOgKvartal.årstall)
-            .addValue(KVARTAL, årstallOgKvartal.kvartal)
-        return namedParameterJdbcTemplate.query(
-            "select arstall, kvartal, naring, "
-                    + "sum(antpers) as sum_antall_personer, "
-                    + "sum(taptedv) as sum_tapte_dagsverk, "
-                    + "sum(muligedv) as sum_mulige_dagsverk "
-                    + "from dt_p.v_agg_ia_sykefravar_naring "
-                    + "where kjonn != 'X' and naring != 'X' "
-                    + "and arstall = :arstall and kvartal = :kvartal "
-                    + "group by arstall, kvartal, naring",
-            namedParameters
-        ) { resultSet: ResultSet, _: Int ->
-            SykefraværsstatistikkForNæring(
-                resultSet.getInt(ARSTALL),
-                resultSet.getInt(KVARTAL),
-                resultSet.getString(NARING),
-                resultSet.getInt(SUM_ANTALL_PERSONER),
-                resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
-                resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)
-            )
-        }
-    }
-
     fun hentSykefraværsstatistikkNæring5siffer(
         årstallOgKvartal: ÅrstallOgKvartal
     ): List<SykefraværsstatistikkForNæringskode> {

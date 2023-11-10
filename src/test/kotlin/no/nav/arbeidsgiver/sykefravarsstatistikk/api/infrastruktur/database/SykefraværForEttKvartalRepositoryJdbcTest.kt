@@ -134,7 +134,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
         sykefraværStatistikkNæringRepository.settInn(
             listOf(
                 SykefraværsstatistikkForNæring(
-                    næringkode = produksjonAvKlær.tosifferIdentifikator,
+                    næring = produksjonAvKlær.tosifferIdentifikator,
                     årstall = 2019,
                     kvartal = 2,
                     antallPersoner = 10,
@@ -142,7 +142,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
                     muligeDagsverk = 100.toBigDecimal()
                 ),
                 SykefraværsstatistikkForNæring(
-                    næringkode = produksjonAvKlær.tosifferIdentifikator,
+                    næring = produksjonAvKlær.tosifferIdentifikator,
                     årstall = 2019,
                     kvartal = 1,
                     antallPersoner = 10,
@@ -150,7 +150,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
                     muligeDagsverk = 100.toBigDecimal()
                 ),
                 SykefraværsstatistikkForNæring(
-                    næringkode = Næring("85").tosifferIdentifikator,
+                    næring = Næring("85").tosifferIdentifikator,
                     årstall = 2018,
                     kvartal = 4,
                     antallPersoner = 10,

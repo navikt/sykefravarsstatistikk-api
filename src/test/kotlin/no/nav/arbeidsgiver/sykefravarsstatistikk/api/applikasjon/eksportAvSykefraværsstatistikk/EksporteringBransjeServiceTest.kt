@@ -53,7 +53,7 @@ internal class EksporteringBransjeServiceTest {
             SykefraværsstatistikkForNæring(
                 årstall = 1990,
                 kvartal = 1,
-                næringkode = "42",
+                næring = "42",
                 antallPersoner = 1,
                 tapteDagsverk = BigDecimal.ONE,
                 muligeDagsverk = BigDecimal.ONE
@@ -61,7 +61,7 @@ internal class EksporteringBransjeServiceTest {
             SykefraværsstatistikkForNæring(
                 årstall = 2023,
                 kvartal = 1,
-                næringkode = "42",
+                næring = "42",
                 antallPersoner = 1,
                 tapteDagsverk = BigDecimal.ONE,
                 muligeDagsverk = BigDecimal.ONE
@@ -83,7 +83,7 @@ internal class EksporteringBransjeServiceTest {
             SykefraværsstatistikkForNæring(
                 årstall = 1990,
                 kvartal = 1,
-                næringkode = "42",
+                næring = "42",
                 antallPersoner = 1,
                 tapteDagsverk = BigDecimal.ONE,
                 muligeDagsverk = BigDecimal.ONE
@@ -101,7 +101,7 @@ internal class EksporteringBransjeServiceTest {
             SykefraværsstatistikkForNæring(
                 årstall = 2023,
                 kvartal = 2,
-                næringkode = "42",
+                næring = "42",
                 antallPersoner = 5,
                 tapteDagsverk = BigDecimal.ONE,
                 muligeDagsverk = BigDecimal.ONE

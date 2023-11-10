@@ -20,7 +20,7 @@ class SykefraværStatistikkNæringRepository(
     fun settInn(statistikk: List<SykefraværsstatistikkForNæring>): Int {
         return transaction {
             batchInsert(statistikk, shouldReturnGeneratedValues = false) {
-                this[næring] = it.næringkode
+                this[næring] = it.næring
                 this[årstall] = it.årstall
                 this[kvartal] = it.kvartal
                 this[antallPersoner] = it.antallPersoner
@@ -63,7 +63,7 @@ class SykefraværStatistikkNæringRepository(
                     SykefraværsstatistikkForNæring(
                         årstall = it[årstall],
                         kvartal = it[kvartal],
-                        næringkode = it[næring],
+                        næring = it[næring],
                         antallPersoner = it[antallPersoner],
                         tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
                         muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
