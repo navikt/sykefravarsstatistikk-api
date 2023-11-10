@@ -41,37 +41,16 @@ class SykefraværStatistikkNæringMedVarighetRepository(
 
     fun hentLangtidsfravær(
         næring: Næring
-    ) = hentSykefraværstatistikk(næring, Varighetskategori.langtidsvarigheter)
+    ) = hentSykefravær(næring, Varighetskategori.langtidsvarigheter)
 
     fun hentKorttidsfravær(
         næring: Næring
-    ) = hentSykefraværstatistikk(næring, Varighetskategori.kortidsvarigheter)
+    ) = hentSykefravær(næring, Varighetskategori.kortidsvarigheter)
 
-
-    private fun hentSykefraværstatistikk(
-        næringa: Næring,
-        varigheter: List<Varighetskategori>
-    ): List<UmaskertSykefraværForEttKvartal> {
-        return transaction {
-            select {
-                (næringskode like stringLiteral("${næringa.tosifferIdentifikator}%")) and
-                        (varighet inList varigheter.map { it.kode!! })
-            }
-                .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC, varighet to SortOrder.ASC)
-                .map {
-                    UmaskertSykefraværForEttKvartal(
-                        årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
-                        dagsverkTeller = it[tapteDagsverk].toBigDecimal(),
-                        dagsverkNevner = it[muligeDagsverk].toBigDecimal(),
-                        antallPersoner = it[antallPersoner],
-                    )
-                }
-        }
-    }
 
     fun hentLangtidsfravær(bransjeId: BransjeId) = when (bransjeId) {
         is BransjeId.Næring -> hentLangtidsfravær(Næring(bransjeId.næring))
-        is BransjeId.Næringskoder -> hentFravær(
+        is BransjeId.Næringskoder -> hentSykefravær(
             næringskoder = bransjeId,
             varigheter = Varighetskategori.langtidsvarigheter
         )
@@ -79,35 +58,78 @@ class SykefraværStatistikkNæringMedVarighetRepository(
 
     fun hentKorttidsfravær(bransjeId: BransjeId) = when (bransjeId) {
         is BransjeId.Næring -> hentKorttidsfravær(Næring(bransjeId.næring))
-        is BransjeId.Næringskoder -> hentFravær(
+        is BransjeId.Næringskoder -> hentSykefravær(
             næringskoder = bransjeId,
             varigheter = Varighetskategori.kortidsvarigheter
         )
     }
 
-    private fun hentFravær(
-        næringskoder: BransjeId.Næringskoder,
+
+    fun slettKvartal(årstallOgKvartal: ÅrstallOgKvartal): Int {
+        return transaction {
+            deleteWhere { (årstall eq årstallOgKvartal.årstall) and (kvartal eq årstallOgKvartal.kvartal) }
+        }
+    }
+
+    private fun hentSykefravær(
+        næringa: Næring,
         varigheter: List<Varighetskategori>
     ): List<UmaskertSykefraværForEttKvartal> {
         return transaction {
-            select {
-                (næringskode inList næringskoder.næringskoder) and
-                        (varighet inList varigheter.map { it.kode!! })
-            }.orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC, varighet to SortOrder.ASC)
+            slice(
+                årstall,
+                kvartal,
+                næringskode,
+                varighet,
+                tapteDagsverk.sum(),
+                muligeDagsverk.sum(),
+                antallPersoner.sum(),
+            )
+                .select {
+                    (næringskode like stringLiteral("${næringa.tosifferIdentifikator}%")) and
+                            (varighet inList varigheter.map { it.kode!! })
+                }
+                .groupBy(årstall, kvartal, næringskode, varighet)
+                .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
                 .map {
                     UmaskertSykefraværForEttKvartal(
                         årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
-                        dagsverkTeller = it[tapteDagsverk].toBigDecimal(),
-                        dagsverkNevner = it[muligeDagsverk].toBigDecimal(),
-                        antallPersoner = it[antallPersoner],
+                        dagsverkTeller = it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                        dagsverkNevner = it[muligeDagsverk.sum()]!!.toBigDecimal(),
+                        antallPersoner = it[antallPersoner.sum()]!!,
                     )
                 }
         }
     }
 
-    fun slettKvartal(årstallOgKvartal: ÅrstallOgKvartal): Int {
+    private fun hentSykefravær(
+        næringskoder: BransjeId.Næringskoder,
+        varigheter: List<Varighetskategori>
+    ): List<UmaskertSykefraværForEttKvartal> {
         return transaction {
-            deleteWhere { (årstall eq årstallOgKvartal.årstall) and (kvartal eq årstallOgKvartal.kvartal) }
+            slice(
+                årstall,
+                kvartal,
+                næringskode,
+                varighet,
+                muligeDagsverk.sum(),
+                tapteDagsverk.sum(),
+                antallPersoner.sum()
+            )
+                .select {
+                    (næringskode inList næringskoder.næringskoder) and
+                            (varighet inList varigheter.map { it.kode!! })
+                }
+                .groupBy(årstall, kvartal, næringskode, varighet)
+                .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC, varighet to SortOrder.ASC)
+                .map {
+                    UmaskertSykefraværForEttKvartal(
+                        årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                        dagsverkTeller = it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                        dagsverkNevner = it[muligeDagsverk.sum()]!!.toBigDecimal(),
+                        antallPersoner = it[antallPersoner.sum()]!!,
+                    )
+                }
         }
     }
 }

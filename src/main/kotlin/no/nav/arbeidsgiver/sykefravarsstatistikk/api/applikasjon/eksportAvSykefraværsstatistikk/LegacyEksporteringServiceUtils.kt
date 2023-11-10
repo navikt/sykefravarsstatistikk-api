@@ -43,11 +43,11 @@ object LegacyEksporteringServiceUtils {
         umaskertSykefraværForEttKvartal: UmaskertSykefraværForEttKvartal
     ): SykefraværsstatistikkLand {
         return SykefraværsstatistikkLand(
-            umaskertSykefraværForEttKvartal.Årstall,
-            umaskertSykefraværForEttKvartal.kvartal,
-            umaskertSykefraværForEttKvartal.antallPersoner,
-            umaskertSykefraværForEttKvartal.dagsverkTeller,
-            umaskertSykefraværForEttKvartal.dagsverkNevner
+            årstall = umaskertSykefraværForEttKvartal.årstallOgKvartal.årstall,
+            kvartal = umaskertSykefraværForEttKvartal.årstallOgKvartal.kvartal,
+            antallPersoner = umaskertSykefraværForEttKvartal.antallPersoner,
+            tapteDagsverk = umaskertSykefraværForEttKvartal.dagsverkTeller,
+            muligeDagsverk = umaskertSykefraværForEttKvartal.dagsverkNevner
         )
     }
 

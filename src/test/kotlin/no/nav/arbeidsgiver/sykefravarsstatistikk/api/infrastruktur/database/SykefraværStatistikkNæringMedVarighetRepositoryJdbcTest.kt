@@ -225,11 +225,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
                     antallPersoner = 20,
                     tapteDagsverk = 100.toBigDecimal(),
                     muligeDagsverk = 1000.toBigDecimal()
-                )
-            )
-        )
-        sykefraværStatistikkNæringMedVarighetRepository.settInn(
-            listOf(
+                ),
                 SykefraværsstatistikkNæringMedVarighet(
                     årstall = 2023,
                     kvartal = 1,

@@ -116,32 +116,39 @@ class AggregertStatistikkService(
         val kalkulatorLangtid = Aggregeringskalkulator(langtidsfravær, sistePubliserteKvartal)
         val bransjeEllerNæring = finnBransjeEllerNæring(virksomhet)
 
-        val prosentSisteFireKvartalerTotalt = filterRights(
+        val prosentSisteFireKvartalerTotalt = arrayOf(
             kalkulatorTotal.fraværsprosentVirksomhet(virksomhet.navn),
             kalkulatorTotal.fraværsprosentBransjeEllerNæring(bransjeEllerNæring),
             kalkulatorTotal.fraværsprosentNorge()
-        )
-        val prosentSisteFireKvartalerGradert = filterRights(
+        ).mapNotNull { it.getOrNull() }
+
+        val prosentSisteFireKvartalerGradert = arrayOf(
             kalkulatorGradert.fraværsprosentVirksomhet(virksomhet.navn),
             kalkulatorGradert.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
-        )
-        val prosentSisteFireKvartalerKorttid = filterRights(
+        ).mapNotNull { it.getOrNull() }
+
+        val prosentSisteFireKvartalerKorttid = arrayOf(
             kalkulatorKorttid.fraværsprosentVirksomhet(virksomhet.navn),
             kalkulatorKorttid.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
-        )
-        val prosentSisteFireKvartalerLangtid = filterRights(
+        ).mapNotNull { it.getOrNull() }
+
+        val prosentSisteFireKvartalerLangtid = arrayOf(
             kalkulatorLangtid.fraværsprosentVirksomhet(virksomhet.navn),
             kalkulatorLangtid.fraværsprosentBransjeEllerNæring(bransjeEllerNæring)
-        )
-        val trendTotalt = filterRights(
+        ).mapNotNull { it.getOrNull() }
+
+        val trendTotalt = arrayOf(
             kalkulatorTotal.trendBransjeEllerNæring(bransjeEllerNæring)
-        )
-        val tapteDagsverkTotalt = filterRights(
+        ).mapNotNull { it.getOrNull() }
+
+        val tapteDagsverkTotalt = arrayOf(
             kalkulatorTotal.tapteDagsverkVirksomhet(virksomhet.navn)
-        )
-        val muligeDagsverkTotalt = filterRights(
+        ).mapNotNull { it.getOrNull() }
+
+        val muligeDagsverkTotalt = arrayOf(
             kalkulatorTotal.muligeDagsverkVirksomhet(virksomhet.navn)
-        )
+        ).mapNotNull { it.getOrNull() }
+
         return AggregertStatistikkJson(
             prosentSisteFireKvartalerTotalt,
             prosentSisteFireKvartalerGradert,
@@ -166,17 +173,6 @@ class AggregertStatistikkService(
             skalInkludereVirksomhetsstatistikk
         )
     }
-
-    private fun grupperOgSummerHvertKvartal(
-        fraværFlereKvartaler: List<UmaskertSykefraværForEttKvartal>
-    ): List<UmaskertSykefraværForEttKvartal> {
-        return fraværFlereKvartaler.groupBy(UmaskertSykefraværForEttKvartal::årstallOgKvartal)
-            .mapValues { (_, fraværFlereKvartaler) -> fraværFlereKvartaler.reduce(UmaskertSykefraværForEttKvartal::add) }
-            .values.toList()
-    }
-
-    private fun <L, R> filterRights(vararg leftsAndRights: Either<L, R>): List<R> = leftsAndRights
-        .mapNotNull { it.getOrNull() }
 
     fun finnBransjeEllerNæring(virksomhet: Virksomhet): BransjeEllerNæring =
         finnBransje(virksomhet.næringskode)?.let {
@@ -235,7 +231,7 @@ class AggregertStatistikkService(
                 sykefraværStatistikkNæringMedVarighetRepository.hentLangtidsfravær(bransje.bransjeId)
         }
 
-        return Sykefraværsdata(data.mapValues { grupperOgSummerHvertKvartal(it.value) })
+        return Sykefraværsdata(data)
     }
 
 
@@ -259,7 +255,7 @@ class AggregertStatistikkService(
                 sykefraværStatistikkNæringMedVarighetRepository.hentKorttidsfravær(bransje.bransjeId)
         }
 
-        return Sykefraværsdata(data.mapValues { grupperOgSummerHvertKvartal(it.value) })
+        return Sykefraværsdata(data)
     }
 }
 

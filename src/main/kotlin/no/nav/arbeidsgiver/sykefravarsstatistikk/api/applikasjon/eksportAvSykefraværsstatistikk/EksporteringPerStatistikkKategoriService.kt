@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.SykefraværFlereKvartalerForEksport
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.SykefraværMedKategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic.Companion.from
@@ -160,7 +159,7 @@ class EksporteringPerStatistikkKategoriService(
 
             val sykefraværMedKategoriSisteKvartal =
                 umaskertSykefraværsstatistikkSiste4Kvartaler
-                    .tilSykefraværMedKategoriSisteKvartal(statistikkategori, kode)
+                    .max().tilSykefraværMedKategori(statistikkategori, kode)
 
             if (årstallOgKvartal != sykefraværMedKategoriSisteKvartal.årstallOgKvartal) {
                 return
@@ -247,12 +246,5 @@ fun List<SykefraværsstatistikkVirksomhetUtenVarighet>.groupByOrgnr():
 fun List<SykefraværsstatistikkVirksomhetMedGradering>.groupByVirksomhet():
         Map<String, List<Sykefraværsstatistikk>> =
     this.groupBy({ it.orgnr }, { it })
-
-fun List<UmaskertSykefraværForEttKvartal>.tilSykefraværMedKategoriSisteKvartal(
-    statistikkategori: Statistikkategori,
-    kode: String
-): SykefraværMedKategori =
-    this.maxWith(compareBy({ it.Årstall }, { it.kvartal }))
-        .tilSykefraværMedKategori(statistikkategori, kode)
 
 

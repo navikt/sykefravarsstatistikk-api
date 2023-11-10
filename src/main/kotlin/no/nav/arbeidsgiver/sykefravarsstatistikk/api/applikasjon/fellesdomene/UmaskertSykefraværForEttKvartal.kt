@@ -40,25 +40,8 @@ open class UmaskertSykefraværForEttKvartal(
         )
     }
 
-    val kvartal: Int
-        get() = årstallOgKvartal.kvartal
-    val Årstall: Int
-        get() = årstallOgKvartal.årstall
-
     fun kalkulerSykefraværsprosent(): Either<Statistikkfeil, BigDecimal> {
         return StatistikkUtils.kalkulerSykefraværsprosent(dagsverkTeller, dagsverkNevner)
-    }
-
-    fun add(other: UmaskertSykefraværForEttKvartal): UmaskertSykefraværForEttKvartal {
-        require(
-            other.årstallOgKvartal == årstallOgKvartal
-        ) { "Kan ikke summere kvartalsvis sykefravær med forskjellige kvartaler" }
-        return UmaskertSykefraværForEttKvartal(
-            årstallOgKvartal,
-            dagsverkTeller.add(other.dagsverkTeller),
-            dagsverkNevner.add(other.dagsverkNevner),
-            antallPersoner + other.antallPersoner
-        )
     }
 
     override fun compareTo(other: UmaskertSykefraværForEttKvartal) =
