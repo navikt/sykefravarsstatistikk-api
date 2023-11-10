@@ -72,7 +72,7 @@ fun summerSykefraværsstatistikkPerBransjeNæringskoder(
                 bransje.bransjeId.let { bransjeId ->
                     when (bransjeId) {
                         is BransjeId.Næring -> false
-                        is BransjeId.Næringskoder -> bransjeId.næringskoder.contains(it.næringkode5siffer)
+                        is BransjeId.Næringskoder -> bransjeId.næringskoder.contains(it.næringskode)
                     }
                 }
 

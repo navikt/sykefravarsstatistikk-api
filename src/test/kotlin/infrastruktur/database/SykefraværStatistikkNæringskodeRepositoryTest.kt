@@ -49,7 +49,7 @@ open class SykefraværStatistikkNæringskodeRepositoryTest {
                     SykefraværsstatistikkForNæringskode(
                         årstall = årstall,
                         kvartal = kvartal,
-                        næringkode5siffer = produksjonAvKlær.femsifferIdentifikator,
+                        næringskode = produksjonAvKlær.femsifferIdentifikator,
                         antallPersoner = 10,
                         tapteDagsverk = BigDecimal(3),
                         muligeDagsverk = BigDecimal(100)
@@ -61,7 +61,7 @@ open class SykefraværStatistikkNæringskodeRepositoryTest {
                     SykefraværsstatistikkForNæringskode(
                         årstall = årstall,
                         kvartal = kvartal,
-                        næringkode5siffer = undervisning.femsifferIdentifikator,
+                        næringskode = undervisning.femsifferIdentifikator,
                         antallPersoner = 10,
                         tapteDagsverk = BigDecimal(5),
                         muligeDagsverk = BigDecimal(100)
@@ -77,7 +77,7 @@ open class SykefraværStatistikkNæringskodeRepositoryTest {
         resultat shouldContain SykefraværsstatistikkForNæringskode(
             årstall = 2019,
             kvartal = 2,
-            næringkode5siffer = produksjonAvKlær.femsifferIdentifikator,
+            næringskode = produksjonAvKlær.femsifferIdentifikator,
             antallPersoner = 10,
             tapteDagsverk = BigDecimal("3.0"),
             muligeDagsverk = BigDecimal("100.0")
@@ -86,7 +86,7 @@ open class SykefraværStatistikkNæringskodeRepositoryTest {
         resultat shouldContain SykefraværsstatistikkForNæringskode(
             årstall = 2019,
             kvartal = 2,
-            næringkode5siffer = undervisning.femsifferIdentifikator,
+            næringskode = undervisning.femsifferIdentifikator,
             antallPersoner = 10,
             tapteDagsverk = BigDecimal("5.0"),
             muligeDagsverk = BigDecimal("100.0")
@@ -101,7 +101,7 @@ open class SykefraværStatistikkNæringskodeRepositoryTest {
                 SykefraværsstatistikkForNæringskode(
                     årstall = 2023,
                     kvartal = 3,
-                    næringkode5siffer = "87101",
+                    næringskode = "87101",
                     tapteDagsverk = 4.toBigDecimal(),
                     muligeDagsverk = 10.toBigDecimal(),
                     antallPersoner = 10
@@ -109,7 +109,7 @@ open class SykefraværStatistikkNæringskodeRepositoryTest {
                 SykefraværsstatistikkForNæringskode(
                     årstall = 2023,
                     kvartal = 3,
-                    næringkode5siffer = "87102",
+                    næringskode = "87102",
                     tapteDagsverk = 6.toBigDecimal(),
                     muligeDagsverk = 10.toBigDecimal(),
                     antallPersoner = 10,
@@ -117,7 +117,7 @@ open class SykefraværStatistikkNæringskodeRepositoryTest {
                 SykefraværsstatistikkForNæringskode(
                     årstall = 2023,
                     kvartal = 3,
-                    næringkode5siffer = "88000",
+                    næringskode = "88000",
                     tapteDagsverk = 8.toBigDecimal(),
                     muligeDagsverk = 10.toBigDecimal(),
                     antallPersoner = 10,

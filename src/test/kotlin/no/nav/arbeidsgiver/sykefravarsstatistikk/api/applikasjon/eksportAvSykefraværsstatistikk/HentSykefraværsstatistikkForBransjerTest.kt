@@ -78,7 +78,7 @@ open class HentSykefraværsstatistikkForBransjeTest {
                 SykefraværsstatistikkForNæringskode(
                     årstall = 2023,
                     kvartal = 1,
-                    næringkode5siffer = it,
+                    næringskode = it,
                     antallPersoner = 1,
                     tapteDagsverk = 1.toBigDecimal(),
                     muligeDagsverk = 1.toBigDecimal(),

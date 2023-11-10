@@ -137,28 +137,28 @@ open class SykefraværRepositoryJdbcTest {
                 SykefraværsstatistikkForNæringskode(
                     årstall = 2019,
                     kvartal = 2,
-                    næringkode5siffer = Næringskode("88911").femsifferIdentifikator,
+                    næringskode = Næringskode("88911").femsifferIdentifikator,
                     tapteDagsverk = 1.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal()
                 ),
                 SykefraværsstatistikkForNæringskode(
                     årstall = 2019,
                     kvartal = 1,
-                    næringkode5siffer = Næringskode("88911").femsifferIdentifikator,
+                    næringskode = Næringskode("88911").femsifferIdentifikator,
                     tapteDagsverk = 2.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal()
                 ),
                 SykefraværsstatistikkForNæringskode(
                     årstall = 2019,
                     kvartal = 1,
-                    næringkode5siffer = Næringskode("99999").femsifferIdentifikator,
+                    næringskode = Næringskode("99999").femsifferIdentifikator,
                     tapteDagsverk = 3.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal()
                 ),
                 SykefraværsstatistikkForNæringskode(
                     årstall = 2018,
                     kvartal = 4,
-                    næringkode5siffer = Næringskode("88911").femsifferIdentifikator,
+                    næringskode = Næringskode("88911").femsifferIdentifikator,
                     tapteDagsverk = 4.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal()
                 ),

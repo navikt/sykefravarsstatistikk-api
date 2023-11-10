@@ -13,6 +13,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.Data
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkVirksomhetInDvhTabell
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusLandRespository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusNæringRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusNæringskodeRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.assertj.core.api.AssertionsForClassTypes
 import org.jetbrains.exposed.sql.insert
@@ -50,6 +51,9 @@ open class DatavarehusRepositoryJdbcTest {
 
     @Autowired
     lateinit var datavarehusNæringRepository: DatavarehusNæringRepository
+
+    @Autowired
+    private lateinit var datavarehusNæringskodeRepository: DatavarehusNæringskodeRepository
 
     @Autowired
     private lateinit var repository: DatavarehusRepository
@@ -106,9 +110,7 @@ open class DatavarehusRepositoryJdbcTest {
         insertSykefraværsstatistikkNærin5SiffergInDvhTabell(
             namedParameterJdbcTemplate, 2020, 1, 2, "01110", "M", 12, 100
         )
-        val sisteÅrstallOgKvartal = repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
-            StatistikkildeDvh.NÆRING_5_SIFFER
-        )
+        val sisteÅrstallOgKvartal = datavarehusNæringskodeRepository.hentSisteKvartal()
         AssertionsForClassTypes.assertThat(sisteÅrstallOgKvartal).isEqualTo(ÅrstallOgKvartal(2022, 3))
     }
 

@@ -174,7 +174,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
         sykefraværStatistikkNæringskodeRepository.settInn(
             listOf(
                 SykefraværsstatistikkForNæringskode(
-                    næringkode5siffer = Næringskode("87101").femsifferIdentifikator,
+                    næringskode = Næringskode("87101").femsifferIdentifikator,
                     årstall = 2019,
                     kvartal = 2,
                     antallPersoner = 10,
@@ -182,7 +182,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
                     muligeDagsverk = 100.toBigDecimal()
                 ),
                 SykefraværsstatistikkForNæringskode(
-                    næringkode5siffer = Næringskode("87101").femsifferIdentifikator,
+                    næringskode = Næringskode("87101").femsifferIdentifikator,
                     årstall = 2019,
                     kvartal = 1,
                     antallPersoner = 10,
@@ -190,7 +190,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
                     muligeDagsverk = 100.toBigDecimal()
                 ),
                 SykefraværsstatistikkForNæringskode(
-                    næringkode5siffer = Næringskode("87102").femsifferIdentifikator,
+                    næringskode = Næringskode("87102").femsifferIdentifikator,
                     årstall = 2019,
                     kvartal = 1,
                     antallPersoner = 10,
@@ -198,7 +198,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
                     muligeDagsverk = 100.toBigDecimal()
                 ),
                 SykefraværsstatistikkForNæringskode(
-                    næringkode5siffer = Næringskode("87301").femsifferIdentifikator,
+                    næringskode = Næringskode("87301").femsifferIdentifikator,
                     årstall = 2018,
                     kvartal = 4,
                     antallPersoner = 10,

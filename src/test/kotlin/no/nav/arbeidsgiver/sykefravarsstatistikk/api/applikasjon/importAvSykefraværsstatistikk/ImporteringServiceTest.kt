@@ -8,18 +8,7 @@ import org.mockito.Mockito.mock
 class ImporteringServiceTest {
     var importeringService =
         SykefraværsstatistikkImporteringService(
-            mock(),
-            mock(),
-            mock(),
-            mock(),
-            mock(),
-            mock(),
-            mock(),
-            mock(),
-            mock(),
-            mock(),
-            mock(),
-            mock(),
+            mock(), mock(), mock(), mock(), mock(), mock(), mock(), mock(), mock(), mock(), mock(), mock(), mock(),
         )
 
     @Test

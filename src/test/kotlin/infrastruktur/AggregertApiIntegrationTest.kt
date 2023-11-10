@@ -292,7 +292,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
                 SykefraværsstatistikkForNæringskode(
                     årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
                     kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
-                    næringkode5siffer = BARNEHAGER.femsifferIdentifikator,
+                    næringskode = BARNEHAGER.femsifferIdentifikator,
                     antallPersoner = 10,
                     tapteDagsverk = 5.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal()
@@ -300,7 +300,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
                 SykefraværsstatistikkForNæringskode(
                     årstall = årstall,
                     kvartal = kvartal,
-                    næringkode5siffer = BARNEHAGER.femsifferIdentifikator,
+                    næringskode = BARNEHAGER.femsifferIdentifikator,
                     antallPersoner = 10,
                     tapteDagsverk = 1.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal(),
@@ -354,7 +354,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
                 SykefraværsstatistikkForNæringskode(
                     årstall = 2022,
                     kvartal = 1,
-                    næringkode5siffer = BARNEHAGER.femsifferIdentifikator,
+                    næringskode = BARNEHAGER.femsifferIdentifikator,
                     antallPersoner = 10,
                     tapteDagsverk = 5.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal()

@@ -26,7 +26,7 @@ class SykefraværStatistikkNæringskodeRepository(
             batchInsert(data) {
                 this[årstall] = it.årstall
                 this[kvartal] = it.kvartal
-                this[næringskode] = it.næringkode5siffer
+                this[næringskode] = it.næringskode
                 this[antallPersoner] = it.antallPersoner
                 this[tapteDagsverk] = it.tapteDagsverk.toDouble()
                 this[muligeDagsverk] = it.muligeDagsverk.toDouble()
@@ -70,7 +70,7 @@ class SykefraværStatistikkNæringskodeRepository(
                     SykefraværsstatistikkForNæringskode(
                         årstall = it[årstall],
                         kvartal = it[kvartal],
-                        næringkode5siffer = it[næringskode],
+                        næringskode = it[næringskode],
                         antallPersoner = it[antallPersoner],
                         tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
                         muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
