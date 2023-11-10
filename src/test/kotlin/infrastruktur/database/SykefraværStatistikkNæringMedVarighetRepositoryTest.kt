@@ -45,7 +45,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryTest{
                     årstall = 2019,
                     kvartal = 1,
                     næringkode = "03123",
-                    varighet = "A",
+                    varighet = 'A',
                     antallPersoner = 14,
                     tapteDagsverk = BigDecimal("55.123"),
                     muligeDagsverk = BigDecimal("856.891")
@@ -75,7 +75,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryTest{
                     tapteDagsverk = 30.toBigDecimal(),
                     muligeDagsverk = 300.toBigDecimal(),
                     antallPersoner = 15,
-                    varighet = "A",
+                    varighet = 'A',
                     næringkode = "02000"
                 ),
                 SykefraværsstatistikkNæringMedVarighet(
@@ -84,7 +84,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryTest{
                     tapteDagsverk = 30.toBigDecimal(),
                     muligeDagsverk = 300.toBigDecimal(),
                     antallPersoner = 15,
-                    varighet = "A",
+                    varighet = 'A',
                     næringkode = "01000"
                 ),
                 SykefraværsstatistikkNæringMedVarighet(
@@ -93,7 +93,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryTest{
                     tapteDagsverk = 30.toBigDecimal(),
                     muligeDagsverk = 300.toBigDecimal(),
                     antallPersoner = 15,
-                    varighet = "A",
+                    varighet = 'A',
                     næringkode = "01000"
                 ),
                 SykefraværsstatistikkNæringMedVarighet(
@@ -102,7 +102,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryTest{
                     tapteDagsverk = 30.toBigDecimal(),
                     muligeDagsverk = 300.toBigDecimal(),
                     antallPersoner = 15,
-                    varighet = "A",
+                    varighet = 'A',
                     næringkode = "02000"
                 )
             )
@@ -125,7 +125,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryTest{
                     tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
                     muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
                     antallPersoner = it[antallPersoner],
-                    varighet = Varighetskategori.fraKode(it[varighet].toString())
+                    varighet = Varighetskategori.fraKode(it[varighet])
                 )
             }
         }

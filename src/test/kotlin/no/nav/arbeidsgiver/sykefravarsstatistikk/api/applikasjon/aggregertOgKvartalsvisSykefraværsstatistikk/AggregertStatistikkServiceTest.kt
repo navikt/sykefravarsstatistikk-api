@@ -2,11 +2,10 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKva
 
 import arrow.core.right
 import ia.felles.definisjoner.bransjer.Bransje
+import ia.felles.definisjoner.bransjer.BransjeId
 import io.kotest.matchers.equals.shouldBeEqual
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.TilgangskontrollService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
@@ -26,7 +25,8 @@ internal class AggregertStatistikkServiceTest {
 
     private val mockEnhetsregisteretClient = mockk<EnhetsregisteretClient>()
 
-    private val mockSykefraværStatistikkNæringMedVarighetRepository = mockk<SykefraværStatistikkNæringMedVarighetRepository>()
+    private val mockSykefraværStatistikkNæringMedVarighetRepository =
+        mockk<SykefraværStatistikkNæringMedVarighetRepository>()
     private val mockSykefravarStatistikkVirksomhetGraderingRepository =
         mockk<SykefravarStatistikkVirksomhetGraderingRepository>()
     val mockSykefravarStatistikkVirksomhetRepository = mockk<SykefravarStatistikkVirksomhetRepository>()
@@ -46,6 +46,19 @@ internal class AggregertStatistikkServiceTest {
         mockSykefraværStatistikkNæringskodeRepository,
     )
 
+    private val etOrgnr = Orgnr("999999999")
+
+    private val etAnnetOrgnr = Orgnr("1111111111")
+
+    private val enBarnehage = Underenhet.Næringsdrivende(
+        orgnr = etOrgnr,
+        navn = "En Barnehage",
+        næringskode = Næringskode("88911"),
+        antallAnsatte = 10,
+        overordnetEnhetOrgnr = etAnnetOrgnr
+    )
+
+
     @BeforeEach
     fun setUp() {
         every { mockImporttidspunktRepository.hentNyesteImporterteKvartal() } returns Importtidspunkt(
@@ -57,7 +70,8 @@ internal class AggregertStatistikkServiceTest {
         )
 
         every { mockSykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(any(), any()) } returns listOf()
-        every { mockSykefravarStatistikkVirksomhetRepository.hentSykefraværMedVarighet(any()) } returns listOf()
+        every { mockSykefravarStatistikkVirksomhetRepository.hentLangtidsfravær(any()) } returns listOf()
+        every { mockSykefravarStatistikkVirksomhetRepository.hentKorttidsfravær(any()) } returns listOf()
         every { mockSykefraværStatistikkNæringRepository.hentForKvartaler(any(), any()) } returns listOf()
         every { mockSykefraværStatistikkNæringskodeRepository.hentForBransje(any(), any()) } returns listOf()
         every { mockSykefraværStatistikkLandRepository.hentForKvartaler(any()) } returns listOf()
@@ -66,8 +80,12 @@ internal class AggregertStatistikkServiceTest {
         every { mockSykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(any()) } returns listOf()
         every { mockSykefravarStatistikkVirksomhetGraderingRepository.hentForNæring(any()) } returns listOf()
 
-        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(any()) } returns listOf()
-        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetBransje(any()) } returns listOf()
+        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentKorttidsfravær(any<Næring>()) } returns listOf()
+        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentKorttidsfravær(any<BransjeId>()) } returns listOf()
+
+        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentLangtidsfravær(any<Næring>()) } returns listOf()
+        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentLangtidsfravær(any<BransjeId>()) } returns listOf()
+
     }
 
     @Test
@@ -138,54 +156,66 @@ internal class AggregertStatistikkServiceTest {
             mockSykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(any(), any())
         } returns genererTestSykefravær(1)
 
-        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(any()) }
+        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentLangtidsfravær(any<BransjeId>()) } returns emptyList()
+        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentKorttidsfravær(any<BransjeId>()) } returns emptyList()
 
         every {
-            mockSykefravarStatistikkVirksomhetRepository.hentSykefraværMedVarighet(any())
+            mockSykefravarStatistikkVirksomhetRepository.hentKorttidsfravær(any())
         } returns
                 listOf(
-                    UmaskertSykefraværForEttKvartalMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
-                        BigDecimal(10),
-                        BigDecimal(0),
-                        0,
-                        Varighetskategori._20_UKER_TIL_39_UKER
-                    ), UmaskertSykefraværForEttKvartalMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
-                        BigDecimal(40),
-                        BigDecimal(0),
-                        0,
-                        Varighetskategori._17_DAGER_TIL_8_UKER
-                    ), UmaskertSykefraværForEttKvartalMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
-                        BigDecimal(20),
-                        BigDecimal(0),
-                        0,
-                        Varighetskategori._8_UKER_TIL_20_UKER
-                    ), UmaskertSykefraværForEttKvartalMedVarighet(
+                    UmaskertSykefraværForEttKvartal(
                         TestUtils.SISTE_PUBLISERTE_KVARTAL,
                         BigDecimal(5),
                         BigDecimal(0),
                         0,
-                        Varighetskategori._8_DAGER_TIL_16_DAGER
-                    ), UmaskertSykefraværForEttKvartalMedVarighet(
+                    ),
+                    UmaskertSykefraværForEttKvartal(
                         TestUtils.SISTE_PUBLISERTE_KVARTAL,
                         BigDecimal(0),
                         BigDecimal(100),
                         200,
-                        Varighetskategori.TOTAL
-                    ), UmaskertSykefraværForEttKvartalMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
-                        BigDecimal(10),
-                        BigDecimal(0),
-                        0,
-                        Varighetskategori._20_UKER_TIL_39_UKER
-                    ), UmaskertSykefraværForEttKvartalMedVarighet(
+                    ), UmaskertSykefraværForEttKvartal(
                         TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
                         BigDecimal(0),
                         BigDecimal(100),
                         5,
-                        Varighetskategori.TOTAL
+                    )
+                )
+
+        every {
+            mockSykefravarStatistikkVirksomhetRepository.hentLangtidsfravær(any())
+        } returns
+                listOf(
+                    UmaskertSykefraværForEttKvartal(
+                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        BigDecimal(10),
+                        BigDecimal(0),
+                        0,
+                    ), UmaskertSykefraværForEttKvartal(
+                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        BigDecimal(40),
+                        BigDecimal(0),
+                        0,
+                    ), UmaskertSykefraværForEttKvartal(
+                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        BigDecimal(20),
+                        BigDecimal(0),
+                        0,
+                    ), UmaskertSykefraværForEttKvartal(
+                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        BigDecimal(0),
+                        BigDecimal(100),
+                        200,
+                    ), UmaskertSykefraværForEttKvartal(
+                        TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                        BigDecimal(10),
+                        BigDecimal(0),
+                        0,
+                    ), UmaskertSykefraværForEttKvartal(
+                        TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                        BigDecimal(0),
+                        BigDecimal(100),
+                        5,
                     )
                 )
 
@@ -210,39 +240,34 @@ internal class AggregertStatistikkServiceTest {
         } returns genererTestSykefravær(1)
 
         every {
-            mockSykefravarStatistikkVirksomhetRepository.hentSykefraværMedVarighet(any())
+            mockSykefravarStatistikkVirksomhetRepository.hentKorttidsfravær(any())
         } returns
                 listOf(
-                    UmaskertSykefraværForEttKvartalMedVarighet(
+                    UmaskertSykefraværForEttKvartal(
                         TestUtils.SISTE_PUBLISERTE_KVARTAL,
                         BigDecimal(40),
                         BigDecimal(0),
                         0,
-                        Varighetskategori._1_DAG_TIL_7_DAGER
-                    ), UmaskertSykefraværForEttKvartalMedVarighet(
+                    ), UmaskertSykefraværForEttKvartal(
                         TestUtils.SISTE_PUBLISERTE_KVARTAL,
                         BigDecimal(5),
                         BigDecimal(0),
                         0,
-                        Varighetskategori._8_DAGER_TIL_16_DAGER
-                    ), UmaskertSykefraværForEttKvartalMedVarighet(
+                    ), UmaskertSykefraværForEttKvartal(
                         TestUtils.SISTE_PUBLISERTE_KVARTAL,
                         BigDecimal(0),
                         BigDecimal(100),
                         100,
-                        Varighetskategori.TOTAL
-                    ), UmaskertSykefraværForEttKvartalMedVarighet(
+                    ), UmaskertSykefraværForEttKvartal(
                         TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
                         BigDecimal(10),
                         BigDecimal(0),
                         0,
-                        Varighetskategori._8_DAGER_TIL_16_DAGER
-                    ), UmaskertSykefraværForEttKvartalMedVarighet(
+                    ), UmaskertSykefraværForEttKvartal(
                         TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
                         BigDecimal(0),
                         BigDecimal(100),
                         0,
-                        Varighetskategori.TOTAL
                     )
                 )
 
@@ -285,44 +310,61 @@ internal class AggregertStatistikkServiceTest {
             )
         }
 
-        every { mockSykefravarStatistikkVirksomhetRepository.hentSykefraværMedVarighet(any()) } returns
+
+        every { mockSykefravarStatistikkVirksomhetRepository.hentLangtidsfravær(any()) } returns
                 listOf(
-                    UmaskertSykefraværForEttKvartalMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
-                        BigDecimal(10),
-                        BigDecimal(0),
-                        0,
-                        Varighetskategori._20_UKER_TIL_39_UKER
-                    ), UmaskertSykefraværForEttKvartalMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
-                        BigDecimal(20),
-                        BigDecimal(0),
-                        0,
-                        Varighetskategori._8_UKER_TIL_20_UKER
-                    ), UmaskertSykefraværForEttKvartalMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
-                        BigDecimal(5),
-                        BigDecimal(0),
-                        0,
-                        Varighetskategori._8_DAGER_TIL_16_DAGER
-                    ), UmaskertSykefraværForEttKvartalMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
-                        BigDecimal(0),
-                        BigDecimal(100),
-                        3,
-                        Varighetskategori.TOTAL
-                    ), UmaskertSykefraværForEttKvartalMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
-                        BigDecimal(10),
-                        BigDecimal(0),
-                        0,
-                        Varighetskategori._20_UKER_TIL_39_UKER
-                    ), UmaskertSykefraværForEttKvartalMedVarighet(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
-                        BigDecimal(0),
-                        BigDecimal(100),
-                        4,
-                        Varighetskategori.TOTAL
+                    UmaskertSykefraværForEttKvartal(
+                        årstallOgKvartal = TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        dagsverkTeller = BigDecimal(10),
+                        dagsverkNevner = BigDecimal(0),
+                        antallPersoner = 0,
+                    ),
+                    UmaskertSykefraværForEttKvartal(
+                        årstallOgKvartal = TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        dagsverkTeller = BigDecimal(20),
+                        dagsverkNevner = BigDecimal(0),
+                        antallPersoner = 0,
+                    ),
+                    UmaskertSykefraværForEttKvartal(
+                        årstallOgKvartal = TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        dagsverkTeller = BigDecimal(0),
+                        dagsverkNevner = BigDecimal(100),
+                        antallPersoner = 3,
+                    ),
+                    UmaskertSykefraværForEttKvartal(
+                        årstallOgKvartal = TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                        dagsverkTeller = BigDecimal(10),
+                        dagsverkNevner = BigDecimal(0),
+                        antallPersoner = 0,
+                    ),
+                    UmaskertSykefraværForEttKvartal(
+                        årstallOgKvartal = TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                        dagsverkTeller = BigDecimal(0),
+                        dagsverkNevner = BigDecimal(100),
+                        antallPersoner = 4,
+                    )
+
+                )
+
+        every { mockSykefravarStatistikkVirksomhetRepository.hentKorttidsfravær(any()) } returns
+                listOf(
+                    UmaskertSykefraværForEttKvartal(
+                        årstallOgKvartal = TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        dagsverkTeller = BigDecimal(5),
+                        dagsverkNevner = BigDecimal(0),
+                        antallPersoner = 0,
+                    ),
+                    UmaskertSykefraværForEttKvartal(
+                        årstallOgKvartal = TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        dagsverkTeller = BigDecimal(0),
+                        dagsverkNevner = BigDecimal(100),
+                        antallPersoner = 3,
+                    ),
+                    UmaskertSykefraværForEttKvartal(
+                        årstallOgKvartal = TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                        dagsverkTeller = BigDecimal(0),
+                        dagsverkNevner = BigDecimal(100),
+                        antallPersoner = 4,
                     )
 
                 )
@@ -354,68 +396,69 @@ internal class AggregertStatistikkServiceTest {
     fun `Summen av langtid og kortidsfravær skal være lik totalfraværet`() {
         every { mockTilgangskontrollService.brukerRepresentererVirksomheten(any()) } returns true
         every { mockTilgangskontrollService.brukerHarIaRettigheterIVirksomheten(any()) } returns true
-        every { mockEnhetsregisteretClient.hentUnderenhet(any()) } returns virksomhetUtenforBransjeprogrammet.right()
+        every { mockEnhetsregisteretClient.hentUnderenhet(any()) } returns Underenhet.Næringsdrivende(
+            orgnr = etOrgnr,
+            overordnetEnhetOrgnr = etAnnetOrgnr,
+            navn = "Virksomhet utenfor bransjeprogrammet",
+            antallAnsatte = 20,
+            næringskode = Næringskode("84300")
+        ).right()
 
-        val årstallOgKvartal = ÅrstallOgKvartal(2022, 1)
+        val årstallOgKvartal = ÅrstallOgKvartal(årstall = 2022, kvartal = 1)
 
         every {
             mockSykefraværStatistikkNæringRepository.hentForKvartaler(any(), any())
         } returns
                 listOf(
                     UmaskertSykefraværForEttKvartal(
-                        årstallOgKvartal,
-                        BigDecimal(68),
-                        BigDecimal(1000),
-                        20,
+                        årstallOgKvartal = årstallOgKvartal,
+                        dagsverkTeller = BigDecimal(68),
+                        dagsverkNevner = BigDecimal(1000),
+                        antallPersoner = 20,
                     )
                 )
 
 
-        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(any()) } returns
+        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentKorttidsfravær(any<Næring>()) } returns
                 listOf(
-                    UmaskertSykefraværForEttKvartalMedVarighet(
+                    UmaskertSykefraværForEttKvartal(
                         årstallOgKvartal,
                         BigDecimal(7),
                         BigDecimal(0),
                         20,
-                        Varighetskategori._1_DAG_TIL_7_DAGER,
                     ),
-                    UmaskertSykefraværForEttKvartalMedVarighet(
+                    UmaskertSykefraværForEttKvartal(
                         årstallOgKvartal,
                         BigDecimal(0),
                         BigDecimal(1000),
                         0,
-                        Varighetskategori.TOTAL,
                     ),
-                    UmaskertSykefraværForEttKvartalMedVarighet(
+                    UmaskertSykefraværForEttKvartal(
                         ÅrstallOgKvartal(1993, 2),
                         BigDecimal(799),
                         BigDecimal(0),
                         20,
-                        Varighetskategori._1_DAG_TIL_7_DAGER,
                     ),
-                    UmaskertSykefraværForEttKvartalMedVarighet(
+                    UmaskertSykefraværForEttKvartal(
                         ÅrstallOgKvartal(1993, 2),
                         BigDecimal(0),
                         BigDecimal(1000),
                         0,
-                        Varighetskategori.TOTAL,
                     ),
-                ) andThen
+                )
+        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentLangtidsfravær(any<Næring>()) } returns
                 listOf(
-                    UmaskertSykefraværForEttKvartalMedVarighet(
-                        årstallOgKvartal,
-                        BigDecimal(61),
-                        BigDecimal(0),
-                        20,
-                        Varighetskategori.MER_ENN_39_UKER
+                    UmaskertSykefraværForEttKvartal(
+                        årstallOgKvartal = årstallOgKvartal,
+                        dagsverkTeller = BigDecimal(61),
+                        dagsverkNevner = BigDecimal(0),
+                        antallPersoner = 20,
                     ),
-                    UmaskertSykefraværForEttKvartalMedVarighet(
-                        årstallOgKvartal,
-                        BigDecimal(0),
-                        BigDecimal(1000),
-                        0,
-                        Varighetskategori.TOTAL,
+                    UmaskertSykefraværForEttKvartal(
+                        årstallOgKvartal = årstallOgKvartal,
+                        dagsverkTeller = BigDecimal(0),
+                        dagsverkNevner = BigDecimal(1000),
+                        antallPersoner = 0,
                     ),
                 )
 
@@ -424,24 +467,22 @@ internal class AggregertStatistikkServiceTest {
         result.prosentSiste4KvartalerTotalt shouldBeEqual
                 listOf(
                     StatistikkJson(
-                        Statistikkategori.NÆRING,
-                        "Offentlig administrasjon og forsvar, og trygdeordninger underlagt offentlig forvaltning",
-                        "6.8",
-                        20,
-                        listOf(
-                            årstallOgKvartal
-                        )
+                        statistikkategori = Statistikkategori.NÆRING,
+                        label = "Offentlig administrasjon og forsvar, og trygdeordninger underlagt offentlig forvaltning",
+                        verdi = "6.8",
+                        antallPersonerIBeregningen = 20,
+                        kvartalerIBeregningen = listOf(årstallOgKvartal)
                     )
                 )
 
         result.prosentSiste4KvartalerKorttid shouldBeEqual
                 listOf(
                     StatistikkJson(
-                        Statistikkategori.NÆRING,
-                        "Offentlig administrasjon og forsvar, og trygdeordninger underlagt offentlig forvaltning",
-                        "0.7",
-                        20,
-                        listOf(
+                        statistikkategori = Statistikkategori.NÆRING,
+                        label = "Offentlig administrasjon og forsvar, og trygdeordninger underlagt offentlig forvaltning",
+                        verdi = "0.7",
+                        antallPersonerIBeregningen = 20,
+                        kvartalerIBeregningen = listOf(
                             årstallOgKvartal
                         )
                     )
@@ -469,41 +510,48 @@ internal class AggregertStatistikkServiceTest {
 
     private fun genererTestSykefravær(offset: Int): List<UmaskertSykefraværForEttKvartal> {
         return listOf(
-            umaskertSykefravær(ÅrstallOgKvartal(2022, 1), 1.1 + offset, 10),
-            umaskertSykefravær(ÅrstallOgKvartal(2021, 4), 2.2 + offset, 10),
-            umaskertSykefravær(ÅrstallOgKvartal(2021, 3), 3.3 + offset, 10),
-            umaskertSykefravær(ÅrstallOgKvartal(2021, 2), 4.4 + offset, 10),
-            umaskertSykefravær(ÅrstallOgKvartal(2021, 1), 5.5 + offset, 10),
-            umaskertSykefravær(ÅrstallOgKvartal(2020, 4), 6.6 + offset, 10),
-            umaskertSykefravær(ÅrstallOgKvartal(2020, 3), 7.7 + offset, 10)
-        )
-    }
-
-    companion object {
-        private fun umaskertSykefravær(
-            årstallOgKvartal: ÅrstallOgKvartal, tapteDagsverk: Double, antallPersoner: Int
-        ) = UmaskertSykefraværForEttKvartal(
-            årstallOgKvartal, BigDecimal(tapteDagsverk), BigDecimal(100), antallPersoner
-        )
-
-
-        private val etOrgnr = Orgnr("999999999")
-        private val etAnnetOrgnr = Orgnr("1111111111")
-
-        private val enBarnehage = Underenhet.Næringsdrivende(
-            orgnr = etOrgnr,
-            navn = "En Barnehage",
-            næringskode = Næringskode("88911"),
-            antallAnsatte = 10,
-            overordnetEnhetOrgnr = etAnnetOrgnr
-        )
-
-        private val virksomhetUtenforBransjeprogrammet = Underenhet.Næringsdrivende(
-            orgnr = etOrgnr,
-            overordnetEnhetOrgnr = etAnnetOrgnr,
-            navn = "Virksomhet utenfor bransjeprogrammet",
-            antallAnsatte = 20,
-            næringskode = Næringskode("84300")
+            UmaskertSykefraværForEttKvartal(
+                årstallOgKvartal = ÅrstallOgKvartal(2022, 1),
+                dagsverkTeller = BigDecimal(1.1 + offset),
+                dagsverkNevner = BigDecimal(100),
+                antallPersoner = 10
+            ),
+            UmaskertSykefraværForEttKvartal(
+                årstallOgKvartal = ÅrstallOgKvartal(2021, 4),
+                dagsverkTeller = BigDecimal(2.2 + offset),
+                dagsverkNevner = BigDecimal(100),
+                antallPersoner = 10
+            ),
+            UmaskertSykefraværForEttKvartal(
+                årstallOgKvartal = ÅrstallOgKvartal(2021, 3),
+                dagsverkTeller = BigDecimal(3.3 + offset),
+                dagsverkNevner = BigDecimal(100),
+                antallPersoner = 10
+            ),
+            UmaskertSykefraværForEttKvartal(
+                årstallOgKvartal = ÅrstallOgKvartal(2021, 2),
+                dagsverkTeller = BigDecimal(4.4 + offset),
+                dagsverkNevner = BigDecimal(100),
+                antallPersoner = 10
+            ),
+            UmaskertSykefraværForEttKvartal(
+                årstallOgKvartal = ÅrstallOgKvartal(2021, 1),
+                dagsverkTeller = BigDecimal(5.5 + offset),
+                dagsverkNevner = BigDecimal(100),
+                antallPersoner = 10
+            ),
+            UmaskertSykefraværForEttKvartal(
+                årstallOgKvartal = ÅrstallOgKvartal(2020, 4),
+                dagsverkTeller = BigDecimal(6.6 + offset),
+                dagsverkNevner = BigDecimal(100),
+                antallPersoner = 10
+            ),
+            UmaskertSykefraværForEttKvartal(
+                årstallOgKvartal = ÅrstallOgKvartal(2020, 3),
+                dagsverkTeller = BigDecimal(7.7 + offset),
+                dagsverkNevner = BigDecimal(100),
+                antallPersoner = 10
+            )
         )
     }
 }

@@ -122,7 +122,7 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
                     tapteDagsverk = 9.toBigDecimal(),
                     muligeDagsverk = 200.toBigDecimal(),
                     antallPersoner = 10,
-                    varighet = "A",
+                    varighet = 'A',
                     rectype = "2",
                 )
             )
@@ -136,7 +136,7 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
                     tapteDagsverk = 7.toBigDecimal(),
                     muligeDagsverk = 200.toBigDecimal(),
                     antallPersoner = 10,
-                    varighet = "A",
+                    varighet = 'A',
                     rectype = "1",
                 )
             )

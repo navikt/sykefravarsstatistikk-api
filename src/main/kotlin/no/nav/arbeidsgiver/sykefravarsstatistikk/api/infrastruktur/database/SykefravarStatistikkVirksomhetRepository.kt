@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.jetbrains.exposed.sql.*
@@ -48,27 +47,36 @@ class SykefravarStatistikkVirksomhetRepository(
         }
     }
 
-    fun hentSykefraværMedVarighet(
+    fun hentLangtidsfravær(
         organisasjonsnummer: Orgnr
-    ): List<UmaskertSykefraværForEttKvartalMedVarighet> {
+    ) = hentSykefraværMedVarighet(organisasjonsnummer, Varighetskategori.langtidsvarigheter)
+
+    fun hentKorttidsfravær(
+        organisasjonsnummer: Orgnr
+    ) = hentSykefraværMedVarighet(organisasjonsnummer, Varighetskategori.kortidsvarigheter)
+
+    private fun hentSykefraværMedVarighet(
+        organisasjonsnummer: Orgnr,
+        varigheter: List<Varighetskategori>
+    ): List<UmaskertSykefraværForEttKvartal> {
         return transaction {
             select {
                 (orgnr eq organisasjonsnummer.verdi) and
-                        (varighet inList listOf('A', 'B', 'C', 'D', 'E', 'F', 'X'))
+                        (varighet inList varigheter.map { it.kode })
             }.orderBy(
                 årstall to SortOrder.ASC,
                 kvartal to SortOrder.ASC,
                 varighet to SortOrder.ASC
             ).map {
-                UmaskertSykefraværForEttKvartalMedVarighet(
-                    årstallOgKvartal = ÅrstallOgKvartal(
+                UmaskertSykefraværForEttKvartal(
+                    SykefraværsstatistikkVirksomhetUtenVarighet(
                         årstall = it[årstall],
-                        kvartal = it[kvartal]
-                    ),
-                    tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
-                    muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
-                    antallPersoner = it[antallPersoner],
-                    varighet = Varighetskategori.fraKode(it[varighet].toString())
+                        kvartal = it[kvartal],
+                        tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
+                        muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
+                        antallPersoner = it[antallPersoner],
+                        orgnr = it[orgnr]
+                    )
                 )
             }
         }
@@ -110,7 +118,7 @@ class SykefravarStatistikkVirksomhetRepository(
                 this[antallPersoner] = it.antallPersoner
                 this[tapteDagsverk] = it.tapteDagsverk.toFloat()
                 this[muligeDagsverk] = it.muligeDagsverk.toFloat()
-                this[varighet] = it.varighet!!.first()
+                this[varighet] = it.varighet
                 this[virksomhetstype] = it.rectype.first()
             }.count()
         }

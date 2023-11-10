@@ -138,7 +138,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
                     tapteDagsverk = 5.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal(),
                     antallPersoner = 10,
-                    varighet = "A",
+                    varighet = 'A',
                     rectype = "2",
                 )
             )
@@ -335,7 +335,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
                     tapteDagsverk = 5.toBigDecimal(),
                     muligeDagsverk = 0.toBigDecimal(),
                     antallPersoner = 10,
-                    varighet = "A",
+                    varighet = 'A',
                     rectype = "2",
                 )
             )

@@ -15,7 +15,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.utils.Statistik
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.Konstanter
 import java.math.BigDecimal
 import java.util.function.Supplier
-import java.util.stream.Collectors
 import kotlin.math.max
 
 
@@ -40,31 +39,31 @@ data class SumAvSykefraværOverFlereKvartaler(
         type: Statistikkategori, label: String
     ): Either<Statistikkfeil, StatistikkJson> {
         return kalkulerFraværsprosentMedMaskering()
-            .map { prosent: BigDecimal -> tilStatistikkDto(type, label, prosent.toString()) }
+            .map { prosent: BigDecimal -> tilStatistikkDto(type = type, label = label, verdi = prosent.toString()) }
     }
 
     fun regnUtProsentOgMapTilSykefraværForFlereKvartaler(): Either<Statistikkfeil, SykefraværOverFlereKvartaler> {
         if (muligeDagsverk.compareTo(BigDecimal.ZERO) == 0) {
             return UtilstrekkeligData(
-                    "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."
-                ).left()
+                "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."
+            ).left()
         }
         StatistikkUtils.kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk)
             .getOrElse { return it.left() }
+
         val sykefraværForFlereKvartaler = SykefraværOverFlereKvartaler(
-            kvartaler,
-            tapteDagsverk,
-            muligeDagsverk,
-            umaskertSykefraværList.stream()
-                .map { sf: UmaskertSykefraværForEttKvartal ->
-                    SykefraværForEttKvartal(
-                        sf.årstallOgKvartal,
-                        sf.dagsverkTeller,
-                        sf.dagsverkNevner,
-                        sf.antallPersoner
-                    )
-                }
-                .collect(Collectors.toList()))
+            kvartaler = kvartaler,
+            tapteDagsverk = tapteDagsverk,
+            muligeDagsverk = muligeDagsverk,
+            sykefraværList = umaskertSykefraværList.map {
+                SykefraværForEttKvartal(
+                    årstallOgKvartal = it.årstallOgKvartal,
+                    tapteDagsverk = it.dagsverkTeller,
+                    muligeDagsverk = it.dagsverkNevner,
+                    antallPersoner = it.antallPersoner
+                )
+            }.toList()
+        )
         return sykefraværForFlereKvartaler.right()
     }
 
@@ -76,9 +75,9 @@ data class SumAvSykefraværOverFlereKvartaler(
             return MaskertDataFeil().left()
         }
         return if (muligeDagsverk.compareTo(BigDecimal.ZERO) == 0) {
-                UtilstrekkeligData(
-                    "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."
-                ).left()
+            UtilstrekkeligData(
+                "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."
+            ).left()
         } else StatistikkUtils.kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk)
     }
 

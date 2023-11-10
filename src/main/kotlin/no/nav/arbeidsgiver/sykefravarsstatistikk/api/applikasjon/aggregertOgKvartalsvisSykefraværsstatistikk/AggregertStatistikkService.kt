@@ -5,9 +5,9 @@ import arrow.core.left
 import arrow.core.right
 import ia.felles.definisjoner.bransjer.BransjeId
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Sykefraværsdata
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Bransjeprogram.finnBransje
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.TilgangskontrollService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
@@ -57,35 +57,43 @@ class AggregertStatistikkService(
                 }
             }
         )
-        val totalSykefravær = hentTotalfraværSisteFemKvartaler(virksomhet)
-        val gradertSykefravær = hentGradertSykefraværAlleKategorier(virksomhet)
-        val korttidSykefravær = hentKorttidsfravær(virksomhet)
-        val langtidsfravær = hentLangtidsfravær(virksomhet)
 
-        if (!tilgangskontrollService.brukerHarIaRettigheterIVirksomheten(orgnr)) {
-            totalSykefravær.filtrerBortVirksomhetsdata()
-            gradertSykefravær.filtrerBortVirksomhetsdata()
-            korttidSykefravær.filtrerBortVirksomhetsdata()
-            langtidsfravær.filtrerBortVirksomhetsdata()
-        }
+        val brukerHarRettigheterTilVirksomhetsdata = tilgangskontrollService.brukerHarIaRettigheterIVirksomheten(orgnr)
+
+        val totalSykefravær = hentTotalfraværSisteFemKvartaler(virksomhet, brukerHarRettigheterTilVirksomhetsdata)
+        val gradertSykefravær = hentGradertSykefraværAlleKategorier(virksomhet, brukerHarRettigheterTilVirksomhetsdata)
+        val korttidSykefravær = hentKortidsfravær(virksomhet, brukerHarRettigheterTilVirksomhetsdata)
+        val langtidsfravær = hentLangtidsfravær(virksomhet, brukerHarRettigheterTilVirksomhetsdata)
+
         return aggregerData(
-            virksomhet, totalSykefravær, gradertSykefravær, korttidSykefravær, langtidsfravær
+            virksomhet,
+            totalSykefravær,
+            gradertSykefravær,
+            korttidSykefravær,
+            langtidsfravær
         ).right()
 
     }
 
-    private fun hentGradertSykefraværAlleKategorier(virksomhet: Virksomhet): Sykefraværsdata {
+    private fun hentGradertSykefraværAlleKategorier(
+        virksomhet: Virksomhet,
+        skalInkludereVirksomhetsdata: Boolean
+    ): Sykefraværsdata {
         val næring = virksomhet.næringskode.næring
-        val maybeBransje = finnBransje(virksomhet.næringskode)
+        val bransje = finnBransje(virksomhet.næringskode)
+
         val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> =
             EnumMap(Statistikkategori::class.java)
-        data[Statistikkategori.VIRKSOMHET] =
-            sykefravarStatistikkVirksomhetGraderingRepository.hentForOrgnr(virksomhet.orgnr)
-        if (maybeBransje == null) {
-            data[Statistikkategori.NÆRING] = sykefravarStatistikkVirksomhetGraderingRepository.hentForNæring(næring)
+
+        if (skalInkludereVirksomhetsdata) {
+            data[VIRKSOMHET] =
+                sykefravarStatistikkVirksomhetGraderingRepository.hentForOrgnr(virksomhet.orgnr)
+        }
+        if (bransje == null) {
+            data[NÆRING] = sykefravarStatistikkVirksomhetGraderingRepository.hentForNæring(næring)
         } else {
-            data[Statistikkategori.BRANSJE] =
-                sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(maybeBransje)
+            data[BRANSJE] =
+                sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(bransje)
         }
         return Sykefraværsdata(data)
     }
@@ -97,9 +105,11 @@ class AggregertStatistikkService(
         korttidsfravær: Sykefraværsdata,
         langtidsfravær: Sykefraværsdata
     ): AggregertStatistikkJson {
+
         val sistePubliserteKvartal =
             importtidspunktRepository.hentNyesteImporterteKvartal()?.gjeldendePeriode
                 ?: throw IllegalStateException("Fant ikke siste publiserte kvartal")
+
         val kalkulatorTotal = Aggregeringskalkulator(totalfravær, sistePubliserteKvartal)
         val kalkulatorGradert = Aggregeringskalkulator(gradertFravær, sistePubliserteKvartal)
         val kalkulatorKorttid = Aggregeringskalkulator(korttidsfravær, sistePubliserteKvartal)
@@ -143,35 +153,19 @@ class AggregertStatistikkService(
         )
     }
 
-    private fun hentTotalfraværSisteFemKvartaler(forBedrift: Virksomhet): Sykefraværsdata {
+    private fun hentTotalfraværSisteFemKvartaler(
+        forBedrift: Virksomhet,
+        skalInkludereVirksomhetsstatistikk: Boolean
+    ): Sykefraværsdata {
         val gjeldendePeriode = importtidspunktRepository.hentNyesteImporterteKvartal()?.gjeldendePeriode
             ?: throw IllegalStateException("Fant ikke siste publiserte kvartal")
 
-        return hentTotaltSykefraværAlleKategorier(forBedrift, (gjeldendePeriode inkludertTidligere 4))
+        return hentTotaltSykefraværAlleKategorier(
+            forBedrift,
+            (gjeldendePeriode inkludertTidligere 4),
+            skalInkludereVirksomhetsstatistikk
+        )
     }
-
-    private fun hentKorttidsfravær(virksomhet: Virksomhet): Sykefraværsdata {
-        return hentLangtidsEllerKorttidsfravær(virksomhet) {
-            it.varighet.erKorttidVarighet() || it.varighet.erTotalvarighet()
-        }
-    }
-
-    private fun hentLangtidsfravær(virksomhet: Virksomhet): Sykefraværsdata {
-        return hentLangtidsEllerKorttidsfravær(virksomhet) {
-            it.varighet.erLangtidVarighet() || it.varighet.erTotalvarighet()
-        }
-    }
-
-
-    private fun hentLangtidsEllerKorttidsfravær(
-        virksomhet: Virksomhet, entenLangtidEllerKorttid: (UmaskertSykefraværForEttKvartalMedVarighet) -> Boolean
-    ) = Sykefraværsdata(
-        hentUmaskertSykefraværMedVarighetAlleKategorier(virksomhet)
-            .mapValues { (_, statistikk) ->
-                statistikk.filter(entenLangtidEllerKorttid).let(::grupperOgSummerHvertKvartal)
-            }.toMutableMap()
-    )
-
 
     private fun grupperOgSummerHvertKvartal(
         fraværFlereKvartaler: List<UmaskertSykefraværForEttKvartal>
@@ -190,52 +184,82 @@ class AggregertStatistikkService(
         } ?: BransjeEllerNæring(virksomhet.næringskode.næring)
 
     fun hentTotaltSykefraværAlleKategorier(
-        virksomhet: Virksomhet, kvartaler: List<ÅrstallOgKvartal>
+        virksomhet: Virksomhet, kvartaler: List<ÅrstallOgKvartal>, skalInkludereVirksomhetsstatistikk: Boolean
     ): Sykefraværsdata {
 
         val næring = virksomhet.næringskode.næring
         val maybeBransje = finnBransje(virksomhet.næringskode)
-        val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> =
-            EnumMap(Statistikkategori::class.java)
 
-        data[Statistikkategori.VIRKSOMHET] = sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(
-            virksomhet,
-            kvartaler
-        )
-        data[Statistikkategori.LAND] = sykefraværStatistikkLandRepository.hentForKvartaler(kvartaler)
+        val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> = mutableMapOf()
+
+        if (skalInkludereVirksomhetsstatistikk) {
+            data[VIRKSOMHET] = sykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(
+                virksomhet,
+                kvartaler
+            )
+        }
+
+        data[LAND] = sykefraværStatistikkLandRepository.hentForKvartaler(kvartaler)
+
         if (maybeBransje == null) {
-            data[Statistikkategori.NÆRING] =
+            data[NÆRING] =
                 sykefraværStatistikkNæringRepository.hentForKvartaler(næring, kvartaler)
         } else if (maybeBransje.bransjeId is BransjeId.Næringskoder) {
-            data[Statistikkategori.BRANSJE] =
+            data[BRANSJE] =
                 sykefraværStatistikkNæringskodeRepository.hentForBransje(maybeBransje, kvartaler)
                     .map { UmaskertSykefraværForEttKvartal(it) }
         } else {
-            data[Statistikkategori.BRANSJE] =
+            data[BRANSJE] =
                 sykefraværStatistikkNæringRepository.hentForKvartaler(næring, kvartaler)
         }
+
         return Sykefraværsdata(data)
     }
 
-    private fun hentUmaskertSykefraværMedVarighetAlleKategorier(virksomhet: Virksomhet): Map<Statistikkategori, List<UmaskertSykefraværForEttKvartalMedVarighet>> {
+    private fun hentLangtidsfravær(
+        virksomhet: Virksomhet,
+        inkluderVirksomhetsstatistikk: Boolean
+    ): Sykefraværsdata {
         val næring = virksomhet.næringskode.næring
-        val maybeBransje = finnBransje(virksomhet.næringskode)
-        val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartalMedVarighet>> = EnumMap(
-            Statistikkategori::class.java
-        )
-        data[Statistikkategori.VIRKSOMHET] =
-            sykefravarStatistikkVirksomhetRepository.hentSykefraværMedVarighet(virksomhet.orgnr)
-        if (maybeBransje == null) {
-            data[Statistikkategori.NÆRING] =
-                sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(næring)
-        } else if (maybeBransje.bransjeId is BransjeId.Næringskoder) {
-            data[Statistikkategori.BRANSJE] =
-                sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetBransje(maybeBransje.bransjeId)
-        } else {
-            data[Statistikkategori.BRANSJE] =
-                sykefraværStatistikkNæringMedVarighetRepository.hentSykefraværMedVarighetNæring(næring)
+        val bransje = finnBransje(virksomhet.næringskode)
+        val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> = mutableMapOf()
+
+        if (inkluderVirksomhetsstatistikk) {
+            data[VIRKSOMHET] = sykefravarStatistikkVirksomhetRepository.hentLangtidsfravær(virksomhet.orgnr)
         }
-        return data
+        if (bransje == null) {
+            data[NÆRING] =
+                sykefraværStatistikkNæringMedVarighetRepository.hentLangtidsfravær(næring)
+        } else {
+            data[BRANSJE] =
+                sykefraværStatistikkNæringMedVarighetRepository.hentLangtidsfravær(bransje.bransjeId)
+        }
+
+        return Sykefraværsdata(data.mapValues { grupperOgSummerHvertKvartal(it.value) })
+    }
+
+
+    private fun hentKortidsfravær(
+        virksomhet: Virksomhet,
+        inkluderVirksomhetsstatistikk: Boolean
+    ): Sykefraværsdata {
+        val næring = virksomhet.næringskode.næring
+        val bransje = finnBransje(virksomhet.næringskode)
+        val data: MutableMap<Statistikkategori, List<UmaskertSykefraværForEttKvartal>> = mutableMapOf()
+
+        if (inkluderVirksomhetsstatistikk) {
+            data[VIRKSOMHET] =
+                sykefravarStatistikkVirksomhetRepository.hentKorttidsfravær(virksomhet.orgnr)
+        }
+        if (bransje == null) {
+            data[NÆRING] =
+                sykefraværStatistikkNæringMedVarighetRepository.hentKorttidsfravær(næring)
+        } else {
+            data[BRANSJE] =
+                sykefraværStatistikkNæringMedVarighetRepository.hentKorttidsfravær(bransje.bransjeId)
+        }
+
+        return Sykefraværsdata(data.mapValues { grupperOgSummerHvertKvartal(it.value) })
     }
 }
 

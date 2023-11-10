@@ -171,7 +171,7 @@ class DatavarehusRepository(
                 resultSet.getInt(ARSTALL),
                 resultSet.getInt(KVARTAL),
                 resultSet.getString(ORGNR),
-                resultSet.getString(VARIGHET),
+                resultSet.getString(VARIGHET).first(),
                 resultSet.getString(RECTYPE),
                 resultSet.getInt(SUM_ANTALL_PERSONER),
                 resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
@@ -202,7 +202,7 @@ class DatavarehusRepository(
                 resultSet.getInt(ARSTALL),
                 resultSet.getInt(KVARTAL),
                 resultSet.getString(NARING_5SIFFER),
-                resultSet.getString(VARIGHET),
+                resultSet.getString(VARIGHET).first(),
                 resultSet.getInt(SUM_ANTALL_PERSONER),
                 resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)
