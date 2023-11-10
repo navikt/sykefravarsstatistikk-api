@@ -7,7 +7,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefra
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.StatistikkildeDvh
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.cleanUpTestDb
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.insertOrgenhetInDvhTabell
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkLandInDvhTabell
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkNærin5SiffergInDvhTabell
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkNæringInDvhTabell
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell
@@ -15,6 +14,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.Data
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusLandRespository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.assertj.core.api.AssertionsForClassTypes
+import org.jetbrains.exposed.sql.insert
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -57,12 +57,28 @@ open class DatavarehusRepositoryJdbcTest {
 
     @Test
     fun hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Land_og_sektor() {
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 4, 4, 5, 100)
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 4, 6, 10, 100)
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2020, 1, 1, 1, 10)
-        val sisteÅrstallOgKvartal = repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
-            StatistikkildeDvh.LAND_OG_SEKTOR
+        datavarehusLandRespository.settInn(
+            2019,
+            4,
+            4,
+            5,
+            100
         )
+        datavarehusLandRespository.settInn(
+            2019,
+            4,
+            6,
+            10,
+            100
+        )
+        datavarehusLandRespository.settInn(
+            2020,
+            1,
+            1,
+            1,
+            10
+        )
+        val sisteÅrstallOgKvartal = datavarehusLandRespository.hentSisteKvartal()
         AssertionsForClassTypes.assertThat(sisteÅrstallOgKvartal).isEqualTo(ÅrstallOgKvartal(2020, 1))
     }
 
@@ -124,10 +140,30 @@ open class DatavarehusRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværsstatistikkSektor__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 1, 5, 100)
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 3, 10, 100)
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10)
-        val sykefraværsstatistikkSektor = repository.hentSykefraværsstatistikkSektor(ÅrstallOgKvartal(2018, 4))
+        datavarehusLandRespository.settInn(
+            2018,
+            4,
+            1,
+            5,
+            100
+        )
+        datavarehusLandRespository.settInn(
+            2018,
+            4,
+            3,
+            10,
+            100
+        )
+        datavarehusLandRespository.settInn(
+            2019,
+            1,
+            1,
+            1,
+            10
+        )
+        val sykefraværsstatistikkSektor = datavarehusLandRespository.hentSykefraværsstatistikkSektor(
+            ÅrstallOgKvartal(2018, 4),
+        )
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkSektor.size).isEqualTo(1)
         val sykefraværsstatistikkSektorExpected =
             SykefraværsstatistikkSektor(2018, 4, "1", 4, BigDecimal(15), BigDecimal(200))
@@ -140,9 +176,27 @@ open class DatavarehusRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværsstatistikkLand__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 4, 5, 100)
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2018, 4, 6, 10, 100)
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10)
+        datavarehusLandRespository.settInn(
+            2018,
+            4,
+            4,
+            5,
+            100
+        )
+        datavarehusLandRespository.settInn(
+            2018,
+            4,
+            6,
+            10,
+            100
+        )
+        datavarehusLandRespository.settInn(
+            2019,
+            1,
+            1,
+            1,
+            10
+        )
         val sykefraværsstatistikkLand = datavarehusLandRespository.hentFor(ÅrstallOgKvartal(2018, 4))
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkLand.size).isEqualTo(1)
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkLand[0])
@@ -417,7 +471,13 @@ open class DatavarehusRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværsstatistikkLand__returnerer_en_tom_liste_dersom_ingen_data_finnes_i_DVH() {
-        insertSykefraværsstatistikkLandInDvhTabell(namedParameterJdbcTemplate, 2019, 1, 1, 1, 10)
+        datavarehusLandRespository.settInn(
+            2019,
+            1,
+            1,
+            1,
+            10
+        )
         val sykefraværsstatistikkLand = datavarehusLandRespository.hentFor(ÅrstallOgKvartal(2018, 4))
         Assertions.assertTrue(sykefraværsstatistikkLand.isEmpty())
     }
@@ -447,5 +507,29 @@ open class DatavarehusRepositoryJdbcTest {
                 )
             )
         )
+    }
+
+    private fun DatavarehusLandRespository.settInn(
+        inÅrstall: Int,
+        inKvartal: Int,
+        inAntallPersoner: Int,
+        inTaptedagsverk: Long,
+        inMuligedagsverk: Long,
+    ) {
+        transaction {
+            insert {
+                it[årstall] = inÅrstall
+                it[kvartal] = inKvartal
+                it[antallPersoner] = inAntallPersoner
+                it[tapteDagsverk] = inTaptedagsverk.toDouble()
+                it[muligeDagsverk] = inMuligedagsverk.toDouble()
+                it[sektor] = "1"
+                it[kjønn] = "M"
+                it[næring] = "41"
+                it[alder] = "D"
+                it[fylke] = "06"
+                it[varighet] = "B"
+            }
+        }
     }
 }

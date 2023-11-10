@@ -38,9 +38,7 @@ class SykefraværsstatistikkImporteringService(
             sykefraværStatistikkVirksomhetRepository.hentNyesteKvartal()
         )
         val årstallOgKvartalForDvh = listOf(
-            datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
-                StatistikkildeDvh.LAND_OG_SEKTOR
-            ),
+            datavarehusLandRespository.hentSisteKvartal(),
             datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
                 StatistikkildeDvh.NÆRING
             ),
@@ -143,7 +141,9 @@ class SykefraværsstatistikkImporteringService(
         årstallOgKvartal: ÅrstallOgKvartal
     ): SlettOgOpprettResultat {
         val sykefraværsstatistikkSektor =
-            datavarehusRepository.hentSykefraværsstatistikkSektor(årstallOgKvartal)
+            datavarehusLandRespository.hentSykefraværsstatistikkSektor(
+                årstallOgKvartal,
+            )
 
         val slettet = sykefraværStatistikkSektorRepository.slettDataFor(årstallOgKvartal)
         val opprettet = sykefraværStatistikkSektorRepository.settInn(sykefraværsstatistikkSektor)

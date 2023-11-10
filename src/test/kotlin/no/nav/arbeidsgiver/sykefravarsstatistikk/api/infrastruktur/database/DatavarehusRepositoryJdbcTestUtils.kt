@@ -51,38 +51,6 @@ object DatavarehusRepositoryJdbcTestUtils {
     }
 
 
-    fun insertSykefraværsstatistikkLandInDvhTabell(
-        jdbcTemplate: NamedParameterJdbcTemplate,
-        årstall: Int,
-        kvartal: Int,
-        antallPersoner: Int,
-        taptedagsverk: Long,
-        muligedagsverk: Long
-    ) {
-        val params = MapSqlParameterSource()
-            .addValue("arstall", årstall)
-            .addValue("kvartal", kvartal)
-            .addValue("antpers", antallPersoner)
-            .addValue("taptedv", taptedagsverk)
-            .addValue("muligedv", muligedagsverk)
-        jdbcTemplate.update(
-            "insert into dt_p.agg_ia_sykefravar_land_v ("
-                    + "arstall, kvartal, "
-                    + "naring, naringnavn, "
-                    + "alder, kjonn, "
-                    + "fylkbo, fylknavn, "
-                    + "varighet, sektor, sektornavn, "
-                    + "taptedv, muligedv, antpers) "
-                    + "values ("
-                    + ":arstall, :kvartal, "
-                    + "'41', 'Bygge- og anleggsvirksomhet', "
-                    + "'D', 'M', "
-                    + "'06', 'Buskerud', "
-                    + "'B', '1', 'Statlig forvaltning', "
-                    + ":taptedv, :muligedv, :antpers)",
-            params
-        )
-    }
 
 
     fun insertSykefraværsstatistikkVirksomhetInDvhTabell(
