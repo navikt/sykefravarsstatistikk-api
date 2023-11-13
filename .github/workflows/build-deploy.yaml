@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - varighet_opprydning
+      - dev-branch
     paths-ignore:
       - '**.md'
       - '**/**.md'
