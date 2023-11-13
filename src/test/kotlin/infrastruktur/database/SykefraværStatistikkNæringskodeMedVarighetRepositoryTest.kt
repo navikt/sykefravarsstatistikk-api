@@ -3,9 +3,8 @@ package infrastruktur.database
 import config.AppConfigForJdbcTesterConfig
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.shouldBe
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.UmaskertSykefraværForEttKvartalMedVarighet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkNæringMedVarighet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.UmaskertSykefraværForEttKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkNæringskodeMedVarighetRepository
 import org.jetbrains.exposed.sql.selectAll
@@ -56,12 +55,11 @@ open class SykefraværStatistikkNæringskodeMedVarighetRepositoryTest{
 
         resultat.size shouldBe 1
         resultat[0] shouldBeEqual
-                UmaskertSykefraværForEttKvartalMedVarighet(
+                UmaskertSykefraværForEttKvartal(
                     årstallOgKvartal = ÅrstallOgKvartal(2019, 1),
-                    tapteDagsverk = BigDecimal("55.123"),
-                    muligeDagsverk = BigDecimal("856.891"),
+                    dagsverkTeller = BigDecimal("55.123"),
+                    dagsverkNevner = BigDecimal("856.891"),
                     antallPersoner = 14,
-                    varighet = Varighetskategori._1_DAG_TIL_7_DAGER
                 )
     }
 
@@ -117,15 +115,14 @@ open class SykefraværStatistikkNæringskodeMedVarighetRepositoryTest{
 
 
 
-    private fun SykefraværStatistikkNæringskodeMedVarighetRepository.hentAlt(): List<UmaskertSykefraværForEttKvartalMedVarighet> {
+    private fun SykefraværStatistikkNæringskodeMedVarighetRepository.hentAlt(): List<UmaskertSykefraværForEttKvartal> {
         return transaction {
             selectAll().map {
-                UmaskertSykefraværForEttKvartalMedVarighet(
+                UmaskertSykefraværForEttKvartal(
                     årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
-                    tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
-                    muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
+                    dagsverkTeller = it[tapteDagsverk].toBigDecimal(),
+                    dagsverkNevner = it[muligeDagsverk].toBigDecimal(),
                     antallPersoner = it[antallPersoner],
-                    varighet = Varighetskategori.fraKode(it[varighet])
                 )
             }
         }
