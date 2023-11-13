@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - ny-fellesbransje
+      - varighet_opprydning
     paths-ignore:
       - '**.md'
       - '**/**.md'

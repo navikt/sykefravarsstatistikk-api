@@ -7,7 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvar
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkNæringMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkNæringMedVarighetRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkNæringskodeMedVarighetRepository
 import org.jetbrains.exposed.sql.selectAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,34 +25,34 @@ import java.math.BigDecimal
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
-open class SykefraværStatistikkNæringMedVarighetRepositoryTest{
+open class SykefraværStatistikkNæringskodeMedVarighetRepositoryTest{
 
     @Autowired
-    private lateinit var sykefraværStatistikkNæringMedVarighetRepository: SykefraværStatistikkNæringMedVarighetRepository
+    private lateinit var sykefraværStatistikkNæringskodeMedVarighetRepository: SykefraværStatistikkNæringskodeMedVarighetRepository
 
     @BeforeEach
     fun setUp() {
         TestUtils.slettAllStatistikkFraDatabase(
-            sykefraværStatistikkNæringMedVarighetRepository = sykefraværStatistikkNæringMedVarighetRepository
+            sykefraværStatistikkNæringskodeMedVarighetRepository = sykefraværStatistikkNæringskodeMedVarighetRepository
         )
     }
 
     @Test
     fun `settInn skal lagre data i tabellen`() {
-        sykefraværStatistikkNæringMedVarighetRepository.settInn(
+        sykefraværStatistikkNæringskodeMedVarighetRepository.settInn(
             listOf(
                 SykefraværsstatistikkNæringMedVarighet(
                     årstall = 2019,
                     kvartal = 1,
                     næringkode = "03123",
-                    varighet = "A",
+                    varighet = 'A',
                     antallPersoner = 14,
                     tapteDagsverk = BigDecimal("55.123"),
                     muligeDagsverk = BigDecimal("856.891")
                 )
             )
         )
-        val resultat = sykefraværStatistikkNæringMedVarighetRepository.hentAlt()
+        val resultat = sykefraværStatistikkNæringskodeMedVarighetRepository.hentAlt()
 
         resultat.size shouldBe 1
         resultat[0] shouldBeEqual
@@ -67,7 +67,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryTest{
 
     @Test
     fun `slettKvartal skal slette data for riktig kvartal`() {
-        sykefraværStatistikkNæringMedVarighetRepository.settInn(
+        sykefraværStatistikkNæringskodeMedVarighetRepository.settInn(
             listOf(
                 SykefraværsstatistikkNæringMedVarighet(
                     årstall = 2018,
@@ -75,7 +75,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryTest{
                     tapteDagsverk = 30.toBigDecimal(),
                     muligeDagsverk = 300.toBigDecimal(),
                     antallPersoner = 15,
-                    varighet = "A",
+                    varighet = 'A',
                     næringkode = "02000"
                 ),
                 SykefraværsstatistikkNæringMedVarighet(
@@ -84,7 +84,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryTest{
                     tapteDagsverk = 30.toBigDecimal(),
                     muligeDagsverk = 300.toBigDecimal(),
                     antallPersoner = 15,
-                    varighet = "A",
+                    varighet = 'A',
                     næringkode = "01000"
                 ),
                 SykefraværsstatistikkNæringMedVarighet(
@@ -93,7 +93,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryTest{
                     tapteDagsverk = 30.toBigDecimal(),
                     muligeDagsverk = 300.toBigDecimal(),
                     antallPersoner = 15,
-                    varighet = "A",
+                    varighet = 'A',
                     næringkode = "01000"
                 ),
                 SykefraværsstatistikkNæringMedVarighet(
@@ -102,14 +102,14 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryTest{
                     tapteDagsverk = 30.toBigDecimal(),
                     muligeDagsverk = 300.toBigDecimal(),
                     antallPersoner = 15,
-                    varighet = "A",
+                    varighet = 'A',
                     næringkode = "02000"
                 )
             )
         )
 
-        val antallSlettet = sykefraværStatistikkNæringMedVarighetRepository.slettKvartal(ÅrstallOgKvartal(2019, 1))
-        val antallGjenværende = sykefraværStatistikkNæringMedVarighetRepository.hentAlt().size
+        val antallSlettet = sykefraværStatistikkNæringskodeMedVarighetRepository.slettKvartal(ÅrstallOgKvartal(2019, 1))
+        val antallGjenværende = sykefraværStatistikkNæringskodeMedVarighetRepository.hentAlt().size
 
         antallSlettet shouldBe 2
         antallGjenværende shouldBe 2
@@ -117,7 +117,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryTest{
 
 
 
-    private fun SykefraværStatistikkNæringMedVarighetRepository.hentAlt(): List<UmaskertSykefraværForEttKvartalMedVarighet> {
+    private fun SykefraværStatistikkNæringskodeMedVarighetRepository.hentAlt(): List<UmaskertSykefraværForEttKvartalMedVarighet> {
         return transaction {
             selectAll().map {
                 UmaskertSykefraværForEttKvartalMedVarighet(
@@ -125,7 +125,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryTest{
                     tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
                     muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
                     antallPersoner = it[antallPersoner],
-                    varighet = Varighetskategori.fraKode(it[varighet].toString())
+                    varighet = Varighetskategori.fraKode(it[varighet])
                 )
             }
         }

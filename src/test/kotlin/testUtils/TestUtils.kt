@@ -43,7 +43,7 @@ object TestUtils {
         }
     }
 
-    private fun SykefraværStatistikkNæringMedVarighetRepository.slettAlt() {
+    private fun SykefraværStatistikkNæringskodeMedVarighetRepository.slettAlt() {
         transaction {
             deleteAll()
         }
@@ -56,11 +56,11 @@ object TestUtils {
         sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository? = null,
         sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository? = null,
         sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository? = null,
-        sykefraværStatistikkNæringMedVarighetRepository: SykefraværStatistikkNæringMedVarighetRepository? = null,
+        sykefraværStatistikkNæringskodeMedVarighetRepository: SykefraværStatistikkNæringskodeMedVarighetRepository? = null,
     ) {
         sykefravarStatistikkVirksomhetRepository?.slettAlt()
         sykefraværStatistikkNæringRepository?.slettAlt()
-        sykefraværStatistikkNæringMedVarighetRepository?.slettAlt()
+        sykefraværStatistikkNæringskodeMedVarighetRepository?.slettAlt()
         sykefravarStatistikkVirksomhetGraderingRepository?.slettAlt()
         sykefraværStatistikkNæringskodeRepository?.slettAlt()
         sykefraværStatistikkLandRepository?.slettAlt()

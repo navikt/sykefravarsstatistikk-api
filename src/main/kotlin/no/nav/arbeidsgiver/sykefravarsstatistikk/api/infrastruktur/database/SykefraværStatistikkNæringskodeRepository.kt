@@ -81,7 +81,7 @@ class SykefraværStatistikkNæringskodeRepository(
     fun hentForBransje(
         bransje: Bransje,
         kvartaler: List<ÅrstallOgKvartal>
-    ): List<SykefraværsstatistikkBransje> {
+    ): List<UmaskertSykefraværForEttKvartal> {
         return transaction {
             slice(
                 årstall,
@@ -98,13 +98,12 @@ class SykefraværStatistikkNæringskodeRepository(
                 .orderBy(årstall to SortOrder.ASC)
                 .orderBy(kvartal to SortOrder.ASC)
                 .map {
-                    SykefraværsstatistikkBransje(
-                        årstall = it[årstall],
-                        kvartal = it[kvartal],
-                        bransje = bransje,
-                        tapteDagsverk = it[tapteDagsverk.sum()]!!.toBigDecimal(),
-                        muligeDagsverk = it[muligeDagsverk.sum()]!!.toBigDecimal(),
-                        antallPersoner = it[antallPersoner.sum()]!!
+                    UmaskertSykefraværForEttKvartal(
+                        årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                        antallPersoner = it[antallPersoner.sum()]!!,
+                        dagsverkTeller = it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                        dagsverkNevner = it[muligeDagsverk.sum()]!!.toBigDecimal(
+                        )
                     )
                 }
 

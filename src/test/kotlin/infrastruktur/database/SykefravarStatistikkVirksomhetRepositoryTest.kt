@@ -68,7 +68,7 @@ open class SykefravarStatistikkVirksomhetRepositoryTest {
                     årstall = it[årstall],
                     kvartal = it[kvartal],
                     orgnr = it[orgnr],
-                    varighet = it[varighet].toString(),
+                    varighet = it[varighet],
                     rectype = it[virksomhetstype].toString(),
                     antallPersoner = it[antallPersoner],
                     tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
