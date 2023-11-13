@@ -1,20 +1,20 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk
 
+import ia.felles.definisjoner.bransjer.Bransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Sykefraværsdata
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.BransjeEllerNæring
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næring
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.UmaskertSykefraværForEttKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.assertj.core.api.AssertionsForClassTypes
 import org.junit.jupiter.api.Test
 import testUtils.TestUtils
 import java.math.BigDecimal
-import ia.felles.definisjoner.bransjer.Bransje
+
 internal class AggregeringskalkulatorTest {
     @Test
     fun fraværsprosentLand_regnerUtRiktigFraværsprosent() {
+        val virksomhet =
+            Underenhet.Næringsdrivende(Orgnr("123456789"), Orgnr("123456789"), "dummynavn", Næringskode("11111"), 5)
         val kalkulator = Aggregeringskalkulator(
-            Sykefraværsdata(mutableMapOf(Statistikkategori.VIRKSOMHET to   synkendeSykefravær)),
+            Sykefraværsdata(mapOf(Aggregeringskategorier.Virksomhet(virksomhet) to synkendeSykefravær)),
             TestUtils.SISTE_PUBLISERTE_KVARTAL
         )
         AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentVirksomhet("dummynavn").getOrNull()?.verdi)
@@ -24,18 +24,20 @@ internal class AggregeringskalkulatorTest {
     @Test
     fun fraværsprosentBransjeEllerNæring_regnerUtRiktigFraværsprosentForBransje() {
         val kalkulator = Aggregeringskalkulator(
-            Sykefraværsdata(mutableMapOf(Statistikkategori.BRANSJE to   synkendeSykefravær)),
+            Sykefraværsdata(mapOf(Aggregeringskategorier.Bransje(Bransje.BARNEHAGER) to synkendeSykefravær)),
             TestUtils.SISTE_PUBLISERTE_KVARTAL
         )
         val bransjeEllerNæring = BransjeEllerNæring(Bransje.BARNEHAGER)
-        AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentBransjeEllerNæring(bransjeEllerNæring).getOrNull()?.verdi)
+        AssertionsForClassTypes.assertThat(
+            kalkulator.fraværsprosentBransjeEllerNæring(bransjeEllerNæring).getOrNull()?.verdi
+        )
             .isEqualTo("5.0")
     }
 
     @Test
     fun fraværsprosentBransjeEllerNæring_regnerUtRiktigFraværsprosentForNæring() {
         val kalkulator = Aggregeringskalkulator(
-            Sykefraværsdata(mutableMapOf(Statistikkategori.NÆRING to synkendeSykefravær)),
+            Sykefraværsdata(mapOf(Aggregeringskategorier.Næring(Næring("00")) to synkendeSykefravær)),
             TestUtils.SISTE_PUBLISERTE_KVARTAL
         )
         val dummynæring = BransjeEllerNæring(Næring("00"))
@@ -46,7 +48,7 @@ internal class AggregeringskalkulatorTest {
     @Test
     fun fraværsprosentNorge_regnerUtRiktigFraværsprosent() {
         val kalkulator = Aggregeringskalkulator(
-            Sykefraværsdata(mutableMapOf(Statistikkategori.LAND to synkendeSykefravær)),
+            Sykefraværsdata(mapOf(Aggregeringskategorier.Land to synkendeSykefravær)),
             TestUtils.SISTE_PUBLISERTE_KVARTAL
         )
         AssertionsForClassTypes.assertThat(kalkulator.fraværsprosentNorge().getOrNull()?.verdi).isEqualTo("5.0")
@@ -55,7 +57,7 @@ internal class AggregeringskalkulatorTest {
     @Test
     fun trendBransjeEllerNæring_regnerUtRiktigTrendForNæring() {
         val kalkulator = Aggregeringskalkulator(
-            Sykefraværsdata(mutableMapOf(Statistikkategori.NÆRING to synkendeSykefravær)),
+            Sykefraværsdata(mapOf(Aggregeringskategorier.Næring(Næring("00")) to synkendeSykefravær)),
             TestUtils.SISTE_PUBLISERTE_KVARTAL
         )
         val dummynæring = BransjeEllerNæring(Næring("00"))

@@ -11,7 +11,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.springframework.stereotype.Component
 
 @Component
-class SykefraværStatistikkNæringMedVarighetRepository(
+class SykefraværStatistikkNæringskodeMedVarighetRepository(
     override val database: Database
 ) : UsingExposed, Table("sykefravar_statistikk_naring_med_varighet") {
 

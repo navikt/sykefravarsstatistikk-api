@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk
 
 import arrow.core.right
-import ia.felles.definisjoner.bransjer.Bransje
 import ia.felles.definisjoner.bransjer.BransjeId
 import io.kotest.matchers.equals.shouldBeEqual
 import io.mockk.every
@@ -25,8 +24,8 @@ internal class AggregertStatistikkServiceTest {
 
     private val mockEnhetsregisteretClient = mockk<EnhetsregisteretClient>()
 
-    private val mockSykefraværStatistikkNæringMedVarighetRepository =
-        mockk<SykefraværStatistikkNæringMedVarighetRepository>()
+    private val mockSykefraværStatistikkNæringskodeMedVarighetRepository =
+        mockk<SykefraværStatistikkNæringskodeMedVarighetRepository>()
     private val mockSykefravarStatistikkVirksomhetGraderingRepository =
         mockk<SykefravarStatistikkVirksomhetGraderingRepository>()
     val mockSykefravarStatistikkVirksomhetRepository = mockk<SykefravarStatistikkVirksomhetRepository>()
@@ -35,7 +34,7 @@ internal class AggregertStatistikkServiceTest {
     val mockSykefraværStatistikkNæringskodeRepository = mockk<SykefraværStatistikkNæringskodeRepository>()
 
     private val serviceUnderTest: AggregertStatistikkService = AggregertStatistikkService(
-        mockSykefraværStatistikkNæringMedVarighetRepository,
+        mockSykefraværStatistikkNæringskodeMedVarighetRepository,
         mockTilgangskontrollService,
         mockEnhetsregisteretClient,
         mockImporttidspunktRepository,
@@ -80,11 +79,11 @@ internal class AggregertStatistikkServiceTest {
         every { mockSykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(any()) } returns listOf()
         every { mockSykefravarStatistikkVirksomhetGraderingRepository.hentForNæring(any()) } returns listOf()
 
-        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentKorttidsfravær(any<Næring>()) } returns listOf()
-        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentKorttidsfravær(any<BransjeId>()) } returns listOf()
+        every { mockSykefraværStatistikkNæringskodeMedVarighetRepository.hentKorttidsfravær(any<Næring>()) } returns listOf()
+        every { mockSykefraværStatistikkNæringskodeMedVarighetRepository.hentKorttidsfravær(any<BransjeId>()) } returns listOf()
 
-        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentLangtidsfravær(any<Næring>()) } returns listOf()
-        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentLangtidsfravær(any<BransjeId>()) } returns listOf()
+        every { mockSykefraværStatistikkNæringskodeMedVarighetRepository.hentLangtidsfravær(any<Næring>()) } returns listOf()
+        every { mockSykefraværStatistikkNæringskodeMedVarighetRepository.hentLangtidsfravær(any<BransjeId>()) } returns listOf()
 
     }
 
@@ -113,16 +112,7 @@ internal class AggregertStatistikkServiceTest {
 
         every {
             mockSykefraværStatistikkNæringskodeRepository.hentForBransje(any(), any())
-        } returns genererTestSykefravær(30).map {
-            SykefraværsstatistikkBransje(
-                årstall = it.årstallOgKvartal.årstall,
-                kvartal = it.årstallOgKvartal.kvartal,
-                bransje = Bransje.BARNEHAGER,
-                antallPersoner = it.antallPersoner,
-                tapteDagsverk = it.dagsverkTeller,
-                muligeDagsverk = it.dagsverkNevner
-            )
-        }
+        } returns genererTestSykefravær(30)
 
         every {
             mockSykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(any())
@@ -156,8 +146,8 @@ internal class AggregertStatistikkServiceTest {
             mockSykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(any(), any())
         } returns genererTestSykefravær(1)
 
-        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentLangtidsfravær(any<BransjeId>()) } returns emptyList()
-        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentKorttidsfravær(any<BransjeId>()) } returns emptyList()
+        every { mockSykefraværStatistikkNæringskodeMedVarighetRepository.hentLangtidsfravær(any<BransjeId>()) } returns emptyList()
+        every { mockSykefraværStatistikkNæringskodeMedVarighetRepository.hentKorttidsfravær(any<BransjeId>()) } returns emptyList()
 
         every {
             mockSykefravarStatistikkVirksomhetRepository.hentKorttidsfravær(any())
@@ -299,17 +289,7 @@ internal class AggregertStatistikkServiceTest {
 
         every {
             mockSykefraværStatistikkNæringskodeRepository.hentForBransje(any(), any())
-        } returns genererTestSykefravær(30).map {
-            SykefraværsstatistikkBransje(
-                årstall = it.årstallOgKvartal.årstall,
-                kvartal = it.årstallOgKvartal.kvartal,
-                bransje = Bransje.BARNEHAGER,
-                antallPersoner = it.antallPersoner,
-                tapteDagsverk = it.dagsverkTeller,
-                muligeDagsverk = it.dagsverkNevner
-            )
-        }
-
+        } returns genererTestSykefravær(30)
 
         every { mockSykefravarStatistikkVirksomhetRepository.hentLangtidsfravær(any()) } returns
                 listOf(
@@ -419,7 +399,7 @@ internal class AggregertStatistikkServiceTest {
                 )
 
 
-        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentKorttidsfravær(any<Næring>()) } returns
+        every { mockSykefraværStatistikkNæringskodeMedVarighetRepository.hentKorttidsfravær(any<Næring>()) } returns
                 listOf(
                     UmaskertSykefraværForEttKvartal(
                         årstallOgKvartal,
@@ -446,7 +426,7 @@ internal class AggregertStatistikkServiceTest {
                         0,
                     ),
                 )
-        every { mockSykefraværStatistikkNæringMedVarighetRepository.hentLangtidsfravær(any<Næring>()) } returns
+        every { mockSykefraværStatistikkNæringskodeMedVarighetRepository.hentLangtidsfravær(any<Næring>()) } returns
                 listOf(
                     UmaskertSykefraværForEttKvartal(
                         årstallOgKvartal = årstallOgKvartal,

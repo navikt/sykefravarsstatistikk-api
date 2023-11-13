@@ -47,7 +47,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     lateinit var sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository
 
     @Autowired
-    lateinit var sykefraværStatistikkNæringMedVarighetRepository: SykefraværStatistikkNæringMedVarighetRepository
+    lateinit var sykefraværStatistikkNæringskodeMedVarighetRepository: SykefraværStatistikkNæringskodeMedVarighetRepository
 
     @Autowired
     lateinit var sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository
@@ -62,7 +62,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
             sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
             sykefravarStatistikkVirksomhetGraderingRepository = sykefravarStatistikkVirksomhetGraderingRepository,
             sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository,
-            sykefraværStatistikkNæringMedVarighetRepository = sykefraværStatistikkNæringMedVarighetRepository,
+            sykefraværStatistikkNæringskodeMedVarighetRepository = sykefraværStatistikkNæringskodeMedVarighetRepository,
         )
         importtidspunktRepository.slettAlleImporttidspunkt()
         importtidspunktRepository.settInnImporttidspunkt(SISTE_PUBLISERTE_KVARTAL, LocalDate.parse("2022-06-02"))
@@ -240,7 +240,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
                 ),
             )
         )
-        sykefraværStatistikkNæringMedVarighetRepository.settInn(
+        sykefraværStatistikkNæringskodeMedVarighetRepository.settInn(
             listOf(
                 SykefraværsstatistikkNæringMedVarighet(
                     årstall = 2022,

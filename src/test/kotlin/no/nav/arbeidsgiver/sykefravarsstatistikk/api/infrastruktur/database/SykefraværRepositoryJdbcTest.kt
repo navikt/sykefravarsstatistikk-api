@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import config.AppConfigForJdbcTesterConfig
+import ia.felles.definisjoner.bransjer.Bransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.assertj.core.api.Assertions
@@ -18,7 +19,7 @@ import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import testUtils.TestUtils.opprettStatistikkForLandExposed
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import java.math.BigDecimal
-import ia.felles.definisjoner.bransjer.Bransje
+
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
@@ -171,8 +172,8 @@ open class SykefraværRepositoryJdbcTest {
             )
         )
         Assertions.assertThat(resultat.size).isEqualTo(2)
-        Assertions.assertThat(resultat[0].tapteDagsverk).isEqualTo(BigDecimal("4.0"))
-        Assertions.assertThat(resultat[1].muligeDagsverk).isEqualTo(BigDecimal("100.0"))
+        Assertions.assertThat(resultat[0].dagsverkTeller).isEqualTo(BigDecimal("4.0"))
+        Assertions.assertThat(resultat[1].dagsverkNevner).isEqualTo(BigDecimal("100.0"))
     }
 
     private fun persisterDatasetIDb(barnehage: Underenhet.Næringsdrivende) {

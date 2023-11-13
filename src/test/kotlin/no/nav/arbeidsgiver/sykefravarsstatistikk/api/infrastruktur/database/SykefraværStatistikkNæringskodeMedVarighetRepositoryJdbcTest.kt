@@ -24,10 +24,10 @@ import java.math.BigDecimal
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
-open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
+open class SykefraværStatistikkNæringskodeMedVarighetRepositoryJdbcTest {
 
     @Autowired
-    private lateinit var sykefraværStatistikkNæringMedVarighetRepository: SykefraværStatistikkNæringMedVarighetRepository
+    private lateinit var sykefraværStatistikkNæringskodeMedVarighetRepository: SykefraværStatistikkNæringskodeMedVarighetRepository
 
     @Autowired
     private lateinit var sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository
@@ -36,7 +36,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
     fun setUp() {
         TestUtils.slettAllStatistikkFraDatabase(
             sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
-            sykefraværStatistikkNæringMedVarighetRepository = sykefraværStatistikkNæringMedVarighetRepository,
+            sykefraværStatistikkNæringskodeMedVarighetRepository = sykefraværStatistikkNæringskodeMedVarighetRepository,
         )
     }
 
@@ -98,7 +98,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
     fun hentSykefraværForEttKvartalMedVarighet_for_næring__skal_returnere_riktig_sykefravær() {
         val barnehager = Næringskode(femsifferIdentifikator = "88911")
         val årstallOgKvartal = ÅrstallOgKvartal(årstall = 2019, kvartal = 2)
-        sykefraværStatistikkNæringMedVarighetRepository.settInn(
+        sykefraværStatistikkNæringskodeMedVarighetRepository.settInn(
             listOf(
                 SykefraværsstatistikkNæringMedVarighet(
                     årstall = årstallOgKvartal.årstall,
@@ -121,7 +121,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
             )
         )
         val resultat =
-            sykefraværStatistikkNæringMedVarighetRepository.hentKorttidsfravær(barnehager.næring)
+            sykefraværStatistikkNæringskodeMedVarighetRepository.hentKorttidsfravær(barnehager.næring)
         resultat.size shouldBe 2
         resultat[0] shouldBeEqualToComparingFields
                 UmaskertSykefraværForEttKvartal(
@@ -146,7 +146,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
         val legetjeneste = Næringskode("86211")
         val årstallOgKvartal = ÅrstallOgKvartal(2019, 2)
 
-        sykefraværStatistikkNæringMedVarighetRepository.settInn(
+        sykefraværStatistikkNæringskodeMedVarighetRepository.settInn(
             listOf(
                 SykefraværsstatistikkNæringMedVarighet(
                     årstall = årstallOgKvartal.årstall,
@@ -187,7 +187,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
             )
         )
         val resultat =
-            sykefraværStatistikkNæringMedVarighetRepository.hentKorttidsfravær(Bransje.SYKEHUS.bransjeId)
+            sykefraværStatistikkNæringskodeMedVarighetRepository.hentKorttidsfravær(Bransje.SYKEHUS.bransjeId)
 
         resultat.size shouldBe 2
 
@@ -215,7 +215,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
         val næringskode2 = Næringskode("84999")
 
         // Populer databasen med statistikk for to næringskoder, som har felles næring
-        sykefraværStatistikkNæringMedVarighetRepository.settInn(
+        sykefraværStatistikkNæringskodeMedVarighetRepository.settInn(
             listOf(
                 SykefraværsstatistikkNæringMedVarighet(
                     årstall = 2023,
@@ -239,7 +239,7 @@ open class SykefraværStatistikkNæringMedVarighetRepositoryJdbcTest {
         )
 
         val resultat =
-            sykefraværStatistikkNæringMedVarighetRepository.hentLangtidsfravær(næringskode1.næring)
+            sykefraværStatistikkNæringskodeMedVarighetRepository.hentLangtidsfravær(næringskode1.næring)
 
         // Resultatet skal bli statistikk for BEGGE de to næringskodene
         assertThat(resultat.size).isEqualTo(2)

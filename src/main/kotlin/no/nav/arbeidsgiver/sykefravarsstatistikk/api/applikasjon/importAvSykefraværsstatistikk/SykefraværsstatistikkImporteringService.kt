@@ -19,7 +19,7 @@ class SykefraværsstatistikkImporteringService(
     private val importtidspunktRepository: ImporttidspunktRepository,
     private val sykefraværsstatistikkLandRepository: SykefraværStatistikkLandRepository,
     private val sykefraværStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
-    private val sykefraværStatistikkNæringMedVarighetRepository: SykefraværStatistikkNæringMedVarighetRepository,
+    private val sykefraværStatistikkNæringskodeMedVarighetRepository: SykefraværStatistikkNæringskodeMedVarighetRepository,
     private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
     private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository,
     private val sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository,
@@ -215,8 +215,8 @@ class SykefraværsstatistikkImporteringService(
     ): SlettOgOpprettResultat {
         val data = datavarehusRepository.hentSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal)
 
-        val antallSlettet = sykefraværStatistikkNæringMedVarighetRepository.slettKvartal(årstallOgKvartal)
-        val antallOpprettet = sykefraværStatistikkNæringMedVarighetRepository.settInn(data)
+        val antallSlettet = sykefraværStatistikkNæringskodeMedVarighetRepository.slettKvartal(årstallOgKvartal)
+        val antallOpprettet = sykefraværStatistikkNæringskodeMedVarighetRepository.settInn(data)
 
         val resultat = SlettOgOpprettResultat(antallSlettet, antallOpprettet)
 
