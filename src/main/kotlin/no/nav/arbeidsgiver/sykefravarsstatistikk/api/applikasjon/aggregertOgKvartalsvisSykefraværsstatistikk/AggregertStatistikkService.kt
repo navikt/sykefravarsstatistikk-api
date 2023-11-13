@@ -66,13 +66,12 @@ class AggregertStatistikkService(
         val langtidsfravær = hentLangtidsfravær(virksomhet, brukerHarRettigheterTilVirksomhetsdata)
 
         return aggregerData(
-            virksomhet,
-            totalSykefravær,
-            gradertSykefravær,
-            korttidSykefravær,
-            langtidsfravær
+            virksomhet = virksomhet,
+            totalfravær = totalSykefravær,
+            gradertFravær = gradertSykefravær,
+            korttidsfravær = korttidSykefravær,
+            langtidsfravær = langtidsfravær
         ).right()
-
     }
 
     private fun hentGradertSykefraværAlleKategorier(

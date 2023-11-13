@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKva
 
 import arrow.core.Either
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.SumAvSykefraværOverFlereKvartaler
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.SumAvSykefraværOverFlereKvartaler.Companion.NULLPUNKT
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Sykefraværsdata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Trend
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.BransjeEllerNæring
@@ -64,11 +65,9 @@ class Aggregeringskalkulator(
     fun summerOppSisteFireKvartaler(
         statistikk: List<UmaskertSykefraværForEttKvartal>
     ): SumAvSykefraværOverFlereKvartaler {
-        return ekstraherSisteFireKvartaler(statistikk).stream()
+        return ekstraherSisteFireKvartaler(statistikk)
             .map { SumAvSykefraværOverFlereKvartaler(it) }
-            .reduce(SumAvSykefraværOverFlereKvartaler.NULLPUNKT) { obj: SumAvSykefraværOverFlereKvartaler, other: SumAvSykefraværOverFlereKvartaler? ->
-                obj.leggSammen(other!!)
-            }
+            .reduceOrNull { it, other -> it.leggSammen(other) } ?: NULLPUNKT
     }
 
     private fun ekstraherSisteFireKvartaler(
