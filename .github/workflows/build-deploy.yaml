@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - dev-branch
+      - test-eksport
     paths-ignore:
       - '**.md'
       - '**/**.md'

@@ -146,6 +146,58 @@ class EksporteringPerStatistikkKategoriServiceTest {
     }
 
     @Test
+    fun eksporterSykefraværsstatistikkVirksomhet__sender_riktig_antall_meldinger_til_kafka() {
+        // 1- Mock det database og repositories returnerer. Samme med KafkaService
+        val allData = listOf(
+            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
+                __2020_2,
+                "987654321"
+            ),
+            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
+                __2020_1,
+                "987654321"
+            ),
+            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
+                __2019_4,
+                "987654321"
+            ),
+            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
+                __2019_3,
+                "987654321"
+            ),EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
+                __2020_2,
+                "123412341"
+            ),
+            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
+                __2020_1,
+                "123412341"
+            ),
+            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
+                __2019_4,
+                "123412341"
+            ),
+            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
+                __2019_3,
+                "123412341"
+            )
+        )
+        whenever(
+            sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(__2020_2 inkludertTidligere 3)
+        )
+            .thenReturn(allData)
+
+        // 2- Kall tjenesten
+        service.eksporterPerStatistikkKategori(
+            __2020_2,
+            Statistikkategori.VIRKSOMHET
+        )
+
+
+        // 3- Sjekk hva Kafka har fått
+        verify(kafkaClient, times(2)).sendMelding(any(), any())
+    }
+
+    @Test
     fun `eksporter statistikk for virksomhet gradert sender riktig melding til kafka`() {
         val allData = listOf(
             EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhetGradert(__2020_2, "11"),

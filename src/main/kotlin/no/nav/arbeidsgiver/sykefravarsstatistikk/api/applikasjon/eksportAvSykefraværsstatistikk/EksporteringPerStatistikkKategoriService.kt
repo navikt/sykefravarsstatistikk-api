@@ -57,7 +57,7 @@ class EksporteringPerStatistikkKategoriService(
         sykefraværStatistikkLandRepository.hentSykefraværstatistikkLand(årstallOgKvartal inkludertTidligere 3)
             .groupByLand().let {
                 eksporterSykefraværsstatistikkPerKategori(
-                    årstallOgKvartal = årstallOgKvartal,
+                    eksportkvartal = årstallOgKvartal,
                     sykefraværGruppertEtterKode = it,
                     statistikkategori = Statistikkategori.LAND,
                     kafkaTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_LAND_V1
@@ -70,7 +70,7 @@ class EksporteringPerStatistikkKategoriService(
             .groupBySektor()
             .let {
                 eksporterSykefraværsstatistikkPerKategori(
-                    årstallOgKvartal = årstallOgKvartal,
+                    eksportkvartal = årstallOgKvartal,
                     sykefraværGruppertEtterKode = it,
                     statistikkategori = Statistikkategori.SEKTOR,
                     kafkaTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_SEKTOR_V1
@@ -83,7 +83,7 @@ class EksporteringPerStatistikkKategoriService(
             årstallOgKvartal inkludertTidligere 3
         ).groupByNæring().let {
             eksporterSykefraværsstatistikkPerKategori(
-                årstallOgKvartal = årstallOgKvartal,
+                eksportkvartal = årstallOgKvartal,
                 sykefraværGruppertEtterKode = it,
                 statistikkategori = Statistikkategori.NÆRING,
                 kafkaTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_NARING_V1
@@ -95,7 +95,7 @@ class EksporteringPerStatistikkKategoriService(
         sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(årstallOgKvartal inkludertTidligere 3)
             .groupByNæringskode().let {
                 eksporterSykefraværsstatistikkPerKategori(
-                    årstallOgKvartal = årstallOgKvartal,
+                    eksportkvartal = årstallOgKvartal,
                     sykefraværGruppertEtterKode = it,
                     statistikkategori = Statistikkategori.NÆRINGSKODE,
                     kafkaTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_NARINGSKODE_V1
@@ -112,7 +112,7 @@ class EksporteringPerStatistikkKategoriService(
         )
             .groupByBransje().let {
                 eksporterSykefraværsstatistikkPerKategori(
-                    årstallOgKvartal = kvartal,
+                    eksportkvartal = kvartal,
                     sykefraværGruppertEtterKode = it,
                     statistikkategori = Statistikkategori.BRANSJE,
                     kafkaTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_BRANSJE_V1
@@ -121,15 +121,16 @@ class EksporteringPerStatistikkKategoriService(
     }
 
     private fun eksporterSykefraværsstatistikkVirksomhet(årstallOgKvartal: ÅrstallOgKvartal) {
-        sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(årstallOgKvartal inkludertTidligere 3)
-            .groupByOrgnr().let {
-                eksporterSykefraværsstatistikkPerKategori(
-                    årstallOgKvartal = årstallOgKvartal,
-                    sykefraværGruppertEtterKode = it,
-                    statistikkategori = Statistikkategori.VIRKSOMHET,
-                    kafkaTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1
-                )
-            }
+        val statistikk =
+            sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(årstallOgKvartal inkludertTidligere 3)
+                .groupByOrgnr()
+
+        eksporterSykefraværsstatistikkPerKategori(
+            eksportkvartal = årstallOgKvartal,
+            sykefraværGruppertEtterKode = statistikk,
+            statistikkategori = Statistikkategori.VIRKSOMHET,
+            kafkaTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1
+        )
     }
 
     private fun eksporterSykefraværsstatistikkVirksomhetGradert(årstallOgKvartal: ÅrstallOgKvartal) {
@@ -137,7 +138,7 @@ class EksporteringPerStatistikkKategoriService(
             årstallOgKvartal inkludertTidligere 3
         ).groupByVirksomhet().let {
             eksporterSykefraværsstatistikkPerKategori(
-                årstallOgKvartal = årstallOgKvartal,
+                eksportkvartal = årstallOgKvartal,
                 sykefraværGruppertEtterKode = it,
                 statistikkategori = Statistikkategori.VIRKSOMHET_GRADERT,
                 kafkaTopic = KafkaTopic.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_GRADERT_V1
@@ -147,21 +148,23 @@ class EksporteringPerStatistikkKategoriService(
 
 
     private fun eksporterSykefraværsstatistikkPerKategori(
-        årstallOgKvartal: ÅrstallOgKvartal,
+        eksportkvartal: ÅrstallOgKvartal,
         sykefraværGruppertEtterKode: Map<String, List<Sykefraværsstatistikk>>,
         statistikkategori: Statistikkategori,
         kafkaTopic: KafkaTopic
     ) {
+        log.info("Starter utsending av alle meldinger til Kafka for statistikkategori ${statistikkategori.name}")
         var antallStatistikkEksportert = 0
         sykefraværGruppertEtterKode.forEach { (kode, statistikk) ->
-            val umaskertSykefraværsstatistikkSiste4Kvartaler =
+            val umaskertSykefraværsstatistikk =
                 statistikk.tilUmaskertSykefraværForEttKvartal()
 
             val sykefraværMedKategoriSisteKvartal =
-                umaskertSykefraværsstatistikkSiste4Kvartaler
+                umaskertSykefraværsstatistikk
                     .max().tilSykefraværMedKategori(statistikkategori, kode)
 
-            if (årstallOgKvartal != sykefraværMedKategoriSisteKvartal.årstallOgKvartal) {
+            if (eksportkvartal != sykefraværMedKategoriSisteKvartal.årstallOgKvartal) {
+                log.info("Eksporterer ikke statistikk for kvartal $eksportkvartal fordi det ikke finnes data for kvartal ${sykefraværMedKategoriSisteKvartal.årstallOgKvartal}")
                 return
             }
 
@@ -174,12 +177,12 @@ class EksporteringPerStatistikkKategoriService(
                 Statistikkategori.VIRKSOMHET,
                 Statistikkategori.NÆRINGSKODE -> StatistikkategoriKafkamelding(
                     sykefraværMedKategoriSisteKvartal,
-                    SykefraværFlereKvartalerForEksport(umaskertSykefraværsstatistikkSiste4Kvartaler)
+                    SykefraværFlereKvartalerForEksport(umaskertSykefraværsstatistikk)
                 )
 
                 Statistikkategori.VIRKSOMHET_GRADERT -> GradertStatistikkategoriKafkamelding(
                     sykefraværMedKategoriSisteKvartal,
-                    SykefraværFlereKvartalerForEksport(umaskertSykefraværsstatistikkSiste4Kvartaler)
+                    SykefraværFlereKvartalerForEksport(umaskertSykefraværsstatistikk)
                 )
             }
             kafkaClient.sendMelding(melding, kafkaTopic)
@@ -202,12 +205,7 @@ class EksporteringPerStatistikkKategoriService(
                 is SykefraværsstatistikkNæringMedVarighet,
                 is SykefraværsstatistikkSektor,
                 is SykefraværsstatistikkVirksomhetUtenVarighet,
-                is SykefraværsstatistikkVirksomhet -> UmaskertSykefraværForEttKvartal(
-                    ÅrstallOgKvartal(it.årstall, it.kvartal),
-                    it.tapteDagsverk!!,
-                    it.muligeDagsverk!!,
-                    it.antallPersoner
-                )
+                is SykefraværsstatistikkVirksomhet -> UmaskertSykefraværForEttKvartal(it)
 
                 is SykefraværsstatistikkVirksomhetMedGradering -> UmaskertSykefraværForEttKvartal(
                     ÅrstallOgKvartal(it.årstall, it.kvartal),
