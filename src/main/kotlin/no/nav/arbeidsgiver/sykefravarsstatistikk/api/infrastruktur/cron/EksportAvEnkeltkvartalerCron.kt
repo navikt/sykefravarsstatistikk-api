@@ -11,7 +11,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import org.slf4j.LoggerFactory
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.time.Duration
 import java.time.Instant
@@ -33,7 +32,7 @@ class EksportAvEnkeltkvartalerCron(
         noeFeiletCounter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
     }
 
-    @Scheduled(cron = "0 40 13 15 11 ?")
+    //@Scheduled(cron = "0 40 13 15 11 ?")
     fun scheduledEksportAvEnkeltkvartaler() {
         val kategorier = listOf(Statistikkategori.VIRKSOMHET, Statistikkategori.VIRKSOMHET_GRADERT)
         val sisteFireÅr = ÅrstallOgKvartal(2023, 2) inkludertTidligere 4 * 4 - 1

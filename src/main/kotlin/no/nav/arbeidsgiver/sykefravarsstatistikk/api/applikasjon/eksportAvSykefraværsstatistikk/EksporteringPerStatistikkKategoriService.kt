@@ -164,7 +164,6 @@ class EksporteringPerStatistikkKategoriService(
                     .max().tilSykefraværMedKategori(statistikkategori, kode)
 
             if (eksportkvartal != sykefraværMedKategoriSisteKvartal.årstallOgKvartal) {
-                log.info("Eksporterer ikke statistikk for kvartal $eksportkvartal fordi det ikke finnes data for kvartal ${sykefraværMedKategoriSisteKvartal.årstallOgKvartal}")
                 return@forEach
             }
 
