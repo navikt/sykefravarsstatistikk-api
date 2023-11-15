@@ -165,7 +165,7 @@ class EksporteringPerStatistikkKategoriService(
 
             if (eksportkvartal != sykefraværMedKategoriSisteKvartal.årstallOgKvartal) {
                 log.info("Eksporterer ikke statistikk for kvartal $eksportkvartal fordi det ikke finnes data for kvartal ${sykefraværMedKategoriSisteKvartal.årstallOgKvartal}")
-                return
+                return@forEach
             }
 
             val melding = when (statistikkategori) {
