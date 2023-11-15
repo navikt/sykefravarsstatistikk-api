@@ -8,7 +8,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sy
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetUtenVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.Rectype
 import org.jetbrains.exposed.sql.selectAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -46,7 +46,7 @@ open class SykefravarStatistikkVirksomhetRepositoryTest {
             kvartal = 3,
             orgnr = "999999999",
             varighet = Varighetskategori._1_DAG_TIL_7_DAGER.kode,
-            rectype = DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
+            rectype = Rectype.VIRKSOMHET.kode,
             antallPersoner = 1,
             tapteDagsverk = BigDecimal("16.0"),
             muligeDagsverk = BigDecimal("100.0"),

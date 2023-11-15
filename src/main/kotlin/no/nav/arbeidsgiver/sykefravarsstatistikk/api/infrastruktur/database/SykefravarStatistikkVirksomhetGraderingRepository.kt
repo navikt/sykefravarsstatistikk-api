@@ -4,7 +4,7 @@ import ia.felles.definisjoner.bransjer.Bransje
 import ia.felles.definisjoner.bransjer.BransjeId
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetMetadataMedNæringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.Rectype
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.less
@@ -130,12 +130,12 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
 
     fun hentForNæring(inputNæring: Næring): List<UmaskertSykefraværForEttKvartal> = hent {
         (næring eq inputNæring.tosifferIdentifikator) and
-                (rectype eq DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET)
+                (rectype eq Rectype.VIRKSOMHET.kode)
     }
 
     fun hentForOrgnr(inputOrgnr: Orgnr): List<UmaskertSykefraværForEttKvartal> = hent {
         (orgnr eq inputOrgnr.verdi) and
-                (rectype eq DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET)
+                (rectype eq Rectype.VIRKSOMHET.kode)
     }
 
     fun hentForBransje(bransje: Bransje): List<UmaskertSykefraværForEttKvartal> = hent {
@@ -151,7 +151,7 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
             næring
         }
         (bransjeidentifikator inList identifikatorer) and
-                (rectype eq DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET)
+                (rectype eq Rectype.VIRKSOMHET.kode)
     }
 
     private fun hent(where: SqlExpressionBuilder.() -> Op<Boolean>): List<UmaskertSykefraværForEttKvartal> {

@@ -9,7 +9,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Se
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.LegacyVirksomhetMetadataRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.Rectype
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -89,7 +89,7 @@ open class VirksomhetMetadataRepositoryJdbcTest {
         val virksomhetMetadataVirksomhet1 = VirksomhetMetadata(
             Orgnr(ORGNR_VIRKSOMHET_1),
             "Virksomhet 1",
-            DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
+            Rectype.VIRKSOMHET.kode,
             Sektor.PRIVAT,
             NÆRINGSKODE_2SIFFER,
             NÆRINGSKODE_5SIFFER,
@@ -98,7 +98,7 @@ open class VirksomhetMetadataRepositoryJdbcTest {
         val virksomhetMetadataVirksomhet2 = VirksomhetMetadata(
             Orgnr(ORGNR_VIRKSOMHET_2),
             "Virksomhet 2",
-            DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
+            Rectype.VIRKSOMHET.kode,
             Sektor.PRIVAT,
             NÆRINGSKODE_2SIFFER,
             NÆRINGSKODE_5SIFFER,

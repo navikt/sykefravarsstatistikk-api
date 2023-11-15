@@ -7,7 +7,7 @@ import io.kotest.matchers.shouldBe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.Rectype
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterEach
@@ -147,7 +147,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
             ORGNR_UNDERENHET,
             "10",
             "10300",
-            DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
+            Rectype.VIRKSOMHET.kode,
             SISTE_PUBLISERTE_KVARTAL,
             7,
             BigDecimal(10),
@@ -158,7 +158,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
             ORGNR_UNDERENHET,
             "10",
             "10300",
-            DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
+            Rectype.VIRKSOMHET.kode,
             SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
             7,
             BigDecimal(12),
@@ -169,7 +169,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
             ORGNR_UNDERENHET,
             "10",
             "10300",
-            DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
+            Rectype.VIRKSOMHET.kode,
             SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2),
             15,
             BigDecimal(25),

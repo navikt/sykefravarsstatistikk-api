@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykef
 import testUtils.AssertUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.Rectype
 import org.assertj.core.api.Assertions
 import java.math.BigDecimal
 
@@ -89,27 +89,27 @@ object EksporteringServiceTestUtils {
 
     @JvmField
     var virksomhet1Metadata_2020_4 = VirksomhetMetadata(
-        ORGNR_VIRKSOMHET_1, "Virksomhet 1", DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET, Sektor.STATLIG, "11", "11111", __2020_4
+        ORGNR_VIRKSOMHET_1, "Virksomhet 1", Rectype.VIRKSOMHET.kode, Sektor.STATLIG, "11", "11111", __2020_4
     )
 
     @JvmField
     val virksomhet2Metadata_2020_4 = VirksomhetMetadata(
-        ORGNR_VIRKSOMHET_2, "Virksomhet 2", DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET, Sektor.KOMMUNAL, "22", "22222", __2020_4
+        ORGNR_VIRKSOMHET_2, "Virksomhet 2", Rectype.VIRKSOMHET.kode, Sektor.KOMMUNAL, "22", "22222", __2020_4
     )
 
     @JvmField
     val virksomhet3Metadata_2020_4 = VirksomhetMetadata(
-        ORGNR_VIRKSOMHET_3, "Virksomhet 3", DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET, Sektor.PRIVAT, "33", "33333", __2020_4
+        ORGNR_VIRKSOMHET_3, "Virksomhet 3", Rectype.VIRKSOMHET.kode, Sektor.PRIVAT, "33", "33333", __2020_4
     )
 
     @JvmField
     val virksomhet1Metadata_2021_1 = VirksomhetMetadata(
-        ORGNR_VIRKSOMHET_1, "Virksomhet 1", DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET, Sektor.STATLIG, "11", "11111", __2021_1
+        ORGNR_VIRKSOMHET_1, "Virksomhet 1", Rectype.VIRKSOMHET.kode, Sektor.STATLIG, "11", "11111", __2021_1
     )
 
     @JvmField
     val virksomhet1Metadata_2021_2 = VirksomhetMetadata(
-        ORGNR_VIRKSOMHET_1, "Virksomhet 1", DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET, Sektor.STATLIG, "11", "11111", __2021_2
+        ORGNR_VIRKSOMHET_1, "Virksomhet 1", Rectype.VIRKSOMHET.kode, Sektor.STATLIG, "11", "11111", __2021_2
     )
 
 
@@ -119,7 +119,7 @@ object EksporteringServiceTestUtils {
         return VirksomhetMetadata(
             ORGNR_VIRKSOMHET_1,
             "Virksomhet 1",
-            DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
+            Rectype.VIRKSOMHET.kode,
             Sektor.STATLIG,
             "86",
             "86000",

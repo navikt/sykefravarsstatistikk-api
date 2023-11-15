@@ -6,15 +6,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Orgenhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.StatistikkildeDvh
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.cleanUpTestDb
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.insertOrgenhetInDvhTabell
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkNærin5SiffergInDvhTabell
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkNæringInDvhTabell
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkVirksomhetInDvhTabell
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusLandRespository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusNæringRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusNæringskodeRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.*
 import org.assertj.core.api.AssertionsForClassTypes
 import org.jetbrains.exposed.sql.insert
 import org.junit.jupiter.api.Assertions
@@ -56,11 +51,18 @@ open class DatavarehusRepositoryJdbcTest {
     private lateinit var datavarehusNæringskodeRepository: DatavarehusNæringskodeRepository
 
     @Autowired
+    private lateinit var datavarehusAggregertRepositoryV2: DatavarehusAggregertRepositoryV2
+
+    @Autowired
     private lateinit var repository: DatavarehusRepository
 
     @BeforeEach
     fun setUp() {
-        cleanUpTestDb(namedParameterJdbcTemplate, datavarehusLandRespository)
+        cleanUpTestDb(
+            jdbcTemplate = namedParameterJdbcTemplate,
+            datavarehusLandRespository = datavarehusLandRespository,
+            datavarehusAggregertRepositoryV2 = datavarehusAggregertRepositoryV2
+        )
     }
 
     @Test
@@ -171,7 +173,7 @@ open class DatavarehusRepositoryJdbcTest {
         )
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkSektor.size).isEqualTo(1)
         val sykefraværsstatistikkSektorExpected =
-            SykefraværsstatistikkSektor(2018, 4, "1", 4, BigDecimal(15), BigDecimal(200))
+            SykefraværsstatistikkSektor(2018, 4, "1", 4, BigDecimal("15.0"), BigDecimal("200.0"))
         val sykefraværsstatistikkSektorActual = sykefraværsstatistikkSektor[0]
         Assertions.assertTrue(
             ReflectionEquals(sykefraværsstatistikkSektorExpected)
@@ -275,7 +277,7 @@ open class DatavarehusRepositoryJdbcTest {
             4,
             ORGNR_VIRKSOMHET_1,
             Varighetskategori._1_DAG_TIL_7_DAGER.kode,
-            DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
+            Rectype.VIRKSOMHET.kode,
             7,
             BigDecimal(13),
             BigDecimal(188)
@@ -306,7 +308,7 @@ open class DatavarehusRepositoryJdbcTest {
             "K",
             1,
             10,
-            DatavarehusRepository.RECTYPE_FOR_FORETAK
+            Rectype.FORETAK.kode
         )
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
             namedParameterJdbcTemplate,
@@ -393,8 +395,7 @@ open class DatavarehusRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværsstatistikkVirksomhetMedGradering__lager_sum_og_returnerer_antall_tapte_dagsverk_i_gradert_sykemelding_og_mulige_dagsverk() {
-        insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
-            namedParameterJdbcTemplate,
+        datavarehusAggregertRepositoryV2.settInn(
             2018,
             4,
             13,
@@ -407,8 +408,7 @@ open class DatavarehusRepositoryJdbcTest {
             16,
             100
         )
-        insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
-            namedParameterJdbcTemplate,
+        datavarehusAggregertRepositoryV2.settInn(
             2018,
             4,
             26,
@@ -421,8 +421,7 @@ open class DatavarehusRepositoryJdbcTest {
             32,
             200
         )
-        insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
-            namedParameterJdbcTemplate,
+        datavarehusAggregertRepositoryV2.settInn(
             2019,
             4,
             13,
@@ -444,13 +443,13 @@ open class DatavarehusRepositoryJdbcTest {
             ORGNR_VIRKSOMHET_1,
             NÆRINGSKODE_2SIFFER,
             NÆRINGSKODE_5SIFFER,
-            DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
+            Rectype.VIRKSOMHET.kode,
             1,
-            BigDecimal(3),
+            BigDecimal("3.0"),
             3,
             13,
-            BigDecimal(16),
-            BigDecimal(100)
+            BigDecimal("16.0"),
+            BigDecimal("100.0")
         )
         val expectedLinje2 = SykefraværsstatistikkVirksomhetMedGradering(
             2018,
@@ -458,13 +457,13 @@ open class DatavarehusRepositoryJdbcTest {
             ORGNR_VIRKSOMHET_2,
             NÆRINGSKODE_2SIFFER,
             NÆRINGSKODE_5SIFFER,
-            DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
+            Rectype.VIRKSOMHET.kode,
             2,
-            BigDecimal(6),
+            BigDecimal("6.0"),
             2,
             26,
-            BigDecimal(32),
-            BigDecimal(200)
+            BigDecimal("32.0"),
+            BigDecimal("200.0")
         )
         AssertionsForClassTypes.assertThat(
             sykefraværsstatistikkVirksomhetMedGradering[0]
@@ -489,9 +488,9 @@ open class DatavarehusRepositoryJdbcTest {
 
     @Test
     fun hentVirksomhetMetadataEksportering__returnerer_virksomhetMetadataEksportering() {
-        insertOrgenhetInDvhTabell(
-            namedParameterJdbcTemplate,
+        datavarehusAggregertRepositoryV2.settInn(
             ORGNR_VIRKSOMHET_1,
+            Rectype.VIRKSOMHET.kode,
             Sektor.PRIVAT.sektorkode,
             NÆRINGSKODE_2SIFFER,
             "10.111",
@@ -504,7 +503,7 @@ open class DatavarehusRepositoryJdbcTest {
                 Orgenhet(
                     Orgnr(ORGNR_VIRKSOMHET_1),
                     "",
-                    DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
+                    Rectype.VIRKSOMHET.kode,
                     Sektor.PRIVAT,
                     NÆRINGSKODE_2SIFFER,
                     "10111",
@@ -512,6 +511,60 @@ open class DatavarehusRepositoryJdbcTest {
                 )
             )
         )
+    }
+
+    private fun DatavarehusAggregertRepositoryV2.settInn(
+        årstall: Int,
+        kvartal: Int,
+        antallPersoner: Int,
+        orgnrVirksomhet1: String,
+        næringskode2siffer: String,
+        næringskode5siffer: String,
+        tapteDagsverkGradertSykemelding: Long,
+        antallGradertSykemeldinger: Int,
+        antallSykemeldinger: Int,
+        tapteDagsverk: Long,
+        muligeDagsverk: Long,
+        rectype: String = Rectype.VIRKSOMHET.kode,
+    ) {
+        transaction {
+            insert {
+                it[this.årstall] = årstall
+                it[this.kvartal] = kvartal
+                it[this.antallPersoner] = antallPersoner
+                it[this.orgnr] = orgnrVirksomhet1
+                it[this.næring] = næringskode2siffer
+                it[this.næringskode] = næringskode5siffer
+                it[this.tapteDagsverkGradert] = tapteDagsverkGradertSykemelding.toDouble()
+                it[this.antallGraderteSykemeldinger] = antallGradertSykemeldinger
+                it[this.antallSykemeldinger] = antallSykemeldinger
+                it[this.tapteDagsverk] = tapteDagsverk.toDouble()
+                it[this.muligeDagsverk] = muligeDagsverk.toDouble()
+                it[this.rectype] = rectype
+            }
+        }
+    }
+
+    private fun DatavarehusAggregertRepositoryV2.settInn(
+        orgnr: String,
+        rectype: String,
+        sektor: String,
+        næring: String,
+        primærnæringskode: String,
+        årstall: Int,
+        kvartal: Int
+    ) {
+        transaction {
+            insert {
+                it[this.orgnr] = orgnr
+                it[this.rectype] = rectype
+                it[this.sektor] = sektor
+                it[this.næring] = næring
+                it[this.primærnæringskode] = primærnæringskode
+                it[this.årstall] = årstall
+                it[this.kvartal] = kvartal
+            }
+        }
     }
 
     private fun DatavarehusLandRespository.settInn(
