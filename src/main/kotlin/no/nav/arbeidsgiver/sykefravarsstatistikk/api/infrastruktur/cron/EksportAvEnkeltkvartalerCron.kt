@@ -33,7 +33,7 @@ class EksportAvEnkeltkvartalerCron(
         noeFeiletCounter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
     }
 
-    @Scheduled(cron = "0 0 11 13 11 ?")
+    @Scheduled(cron = "0 30 12 15 11 ?")
     fun scheduledEksportAvEnkeltkvartaler() {
         val kategorier = listOf(Statistikkategori.VIRKSOMHET, Statistikkategori.VIRKSOMHET_GRADERT)
         val sisteFireÅr = ÅrstallOgKvartal(2023, 2) inkludertTidligere 4 * 4 - 1
@@ -41,7 +41,7 @@ class EksportAvEnkeltkvartalerCron(
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
         taskExecutor.executeWithLock(
-            Runnable { gjennomførJobb(sisteFireÅr, kategorier) },
+            Runnable { gjennomførJobb(sisteFireÅr.sorted(), kategorier) },
             LockConfiguration(Instant.now(), "importering", lockAtMostFor, lockAtLeastFor)
         )
     }
