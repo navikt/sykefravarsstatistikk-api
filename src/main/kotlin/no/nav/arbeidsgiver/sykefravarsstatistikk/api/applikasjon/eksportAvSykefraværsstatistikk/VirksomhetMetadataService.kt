@@ -20,7 +20,7 @@ import java.util.stream.Collectors
 
 @Component
 class VirksomhetMetadataService(
-    private val datavarehusRepository: KildeTilVirksomhetsdata,
+    private val kildeTilVirksomhetsdata: KildeTilVirksomhetsdata,
     private val virksomhetMetadataRepository: VirksomhetMetadataRepository,
     private val legacyEksporteringRepository: LegacyEksporteringRepository,
     private val kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository,
@@ -136,7 +136,7 @@ class VirksomhetMetadataService(
     }
 
     private fun hentVirksomheterFraDvh(årstallOgKvartal: ÅrstallOgKvartal): List<Orgenhet> {
-        val virksomheter = datavarehusRepository.hentVirksomheter(årstallOgKvartal)
+        val virksomheter = kildeTilVirksomhetsdata.hentVirksomheter(årstallOgKvartal)
         if (virksomheter.isEmpty()) {
             log.warn(
                 "Har ikke funnet noen virksomheter for årstall '{}' og kvartal '{}'. ",

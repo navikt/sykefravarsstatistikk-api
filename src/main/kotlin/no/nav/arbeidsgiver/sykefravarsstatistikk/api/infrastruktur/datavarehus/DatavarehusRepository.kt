@@ -1,9 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.KildeTilVirksomhetsdata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkNæringMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Orgenhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.StatistikkildeDvh
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer.Publiseringsdato
 import org.springframework.beans.factory.annotation.Qualifier
@@ -17,8 +15,7 @@ import java.sql.ResultSet
 @Component
 class DatavarehusRepository(
     @param:Qualifier("datavarehusJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
-    private val datavarehusAggregertRepositoryV2: DatavarehusAggregertRepositoryV2,
-) : KildeTilVirksomhetsdata {
+) {
     /*
    Statistikk
   */
@@ -70,10 +67,6 @@ class DatavarehusRepository(
                 resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)
             )
         }
-    }
-
-    override fun hentVirksomheter(årstallOgKvartal: ÅrstallOgKvartal): List<Orgenhet> {
-        return datavarehusAggregertRepositoryV2.hentVirksomheter(årstallOgKvartal)
     }
 
     fun hentPubliseringsdatoerFraDvh(): List<Publiseringsdato> {
