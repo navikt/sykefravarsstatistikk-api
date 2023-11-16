@@ -380,7 +380,12 @@ open class DatavarehusRepositoryJdbcTest {
             99
         )
         val sykefraværsstatistikkNæringMedVarighet =
-            repository.hentSykefraværsstatistikkNæringMedVarighet(ÅrstallOgKvartal(2018, 4))
+            datavarehusAggregertRepositoryV1.hentSykefraværsstatistikkNæringMedVarighet(
+                ÅrstallOgKvartal(
+                    2018,
+                    4
+                )
+            )
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkNæringMedVarighet.size).isEqualTo(3)
         val expected = SykefraværsstatistikkNæringMedVarighet(
             2018,

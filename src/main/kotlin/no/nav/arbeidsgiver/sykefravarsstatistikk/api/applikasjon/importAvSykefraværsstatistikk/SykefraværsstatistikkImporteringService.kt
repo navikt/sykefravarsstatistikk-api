@@ -213,7 +213,9 @@ class SykefraværsstatistikkImporteringService(
     private fun importSykefraværsstatistikkNæringMedVarighet(
         årstallOgKvartal: ÅrstallOgKvartal
     ): SlettOgOpprettResultat {
-        val data = datavarehusRepository.hentSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal)
+        val data = datavarehusAggregertRepositoryV1.hentSykefraværsstatistikkNæringMedVarighet(
+            årstallOgKvartal
+        )
 
         val antallSlettet = sykefraværStatistikkNæringskodeMedVarighetRepository.slettKvartal(årstallOgKvartal)
         val antallOpprettet = sykefraværStatistikkNæringskodeMedVarighetRepository.settInn(data)
