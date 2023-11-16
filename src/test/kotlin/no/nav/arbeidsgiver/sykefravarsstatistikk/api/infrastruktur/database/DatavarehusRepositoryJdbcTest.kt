@@ -279,8 +279,8 @@ open class DatavarehusRepositoryJdbcTest {
             Varighetskategori._1_DAG_TIL_7_DAGER.kode,
             Rectype.VIRKSOMHET.kode,
             7,
-            BigDecimal(13),
-            BigDecimal(188)
+            BigDecimal("13.0"),
+            BigDecimal("188.0")
         )
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkVirksomhet[0]).isEqualTo(expected)
     }

@@ -20,6 +20,7 @@ import java.sql.ResultSet
 class DatavarehusRepository(
     @param:Qualifier("datavarehusJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
     private val datavarehusAggregertRepositoryV2: DatavarehusAggregertRepositoryV2,
+    private val datavarehusAggregertRepositoryV1: DatavarehusAggregertRepositoryV1,
 ) : KildeTilVirksomhetsdata {
     /*
    Statistikk
@@ -47,30 +48,7 @@ class DatavarehusRepository(
     fun hentSykefraværsstatistikkVirksomhet(
         årstallOgKvartal: ÅrstallOgKvartal
     ): List<SykefraværsstatistikkVirksomhet> {
-        val namedParameters: SqlParameterSource = MapSqlParameterSource()
-            .addValue(ARSTALL, årstallOgKvartal.årstall)
-            .addValue(KVARTAL, årstallOgKvartal.kvartal)
-        return namedParameterJdbcTemplate.query(
-            "select arstall, kvartal, orgnr, varighet, rectype, "
-                    + "sum(antpers) as sum_antall_personer, "
-                    + "sum(taptedv) as sum_tapte_dagsverk, "
-                    + "sum(muligedv) as sum_mulige_dagsverk "
-                    + "from dt_p.agg_ia_sykefravar_v "
-                    + "where arstall = :arstall and kvartal = :kvartal "
-                    + "group by arstall, kvartal, orgnr, varighet, rectype",
-            namedParameters
-        ) { resultSet: ResultSet, _: Int ->
-            SykefraværsstatistikkVirksomhet(
-                resultSet.getInt(ARSTALL),
-                resultSet.getInt(KVARTAL),
-                resultSet.getString(ORGNR),
-                resultSet.getString(VARIGHET).first(),
-                resultSet.getString(RECTYPE),
-                resultSet.getInt(SUM_ANTALL_PERSONER),
-                resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
-                resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)
-            )
-        }
+        return datavarehusAggregertRepositoryV1.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal)
     }
 
     fun hentSykefraværsstatistikkNæringMedVarighet(
