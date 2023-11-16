@@ -26,7 +26,7 @@ class SykefraværsstatistikkImporteringService(
     private val datavarehusNæringRepository: DatavarehusNæringRepository,
     private val datavarehusNæringskodeRepository: DatavarehusNæringskodeRepository,
     private val datavarehusAggregertRepositoryV1: DatavarehusAggregertRepositoryV1,
-
+    private val datavarehusAggregertRepositoryV2: DatavarehusAggregertRepositoryV2,
     private val environment: Environment,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -193,7 +193,9 @@ class SykefraværsstatistikkImporteringService(
     ) {
         val statistikk: List<SykefraværsstatistikkVirksomhetMedGradering> =
             if (environment.activeProfiles.contains("prod")) {
-                datavarehusRepository.hentSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal)
+                datavarehusAggregertRepositoryV2.hentSykefraværsstatistikkVirksomhetMedGradering(
+                    årstallOgKvartal
+                )
             } else {
                 SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhetMedGradering(
                     årstallOgKvartal
