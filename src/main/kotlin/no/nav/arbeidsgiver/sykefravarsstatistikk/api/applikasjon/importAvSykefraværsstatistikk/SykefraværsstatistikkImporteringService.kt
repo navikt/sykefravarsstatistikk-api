@@ -4,7 +4,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sy
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.SlettOgOpprettResultat
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.StatistikkildeDvh
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.*
 import org.slf4j.LoggerFactory
@@ -43,9 +42,7 @@ class SykefraværsstatistikkImporteringService(
             datavarehusLandRespository.hentSisteKvartal(),
             datavarehusNæringRepository.hentSisteKvartal(),
             datavarehusNæringskodeRepository.hentSisteKvartal(),
-            datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
-                StatistikkildeDvh.VIRKSOMHET
-            ),
+            datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(),
         )
         val gjeldendeÅrstallOgKvartal = årstallOgKvartalForDvh[0]
         return if (kanImportStartes(årstallOgKvartalForSykefraværsstatistikk, årstallOgKvartalForDvh)) {

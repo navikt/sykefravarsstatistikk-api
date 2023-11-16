@@ -86,4 +86,18 @@ class DatavarehusAggregertRepositoryV1(
                 }
         }
     }
+
+    fun hentSisteKvartal(): ÅrstallOgKvartal {
+        return transaction {
+            slice(årstall, kvartal)
+                .selectAll()
+                .orderBy(årstall to SortOrder.DESC, kvartal to SortOrder.DESC)
+                .limit(1).map {
+                    ÅrstallOgKvartal(
+                        årstall = it[årstall],
+                        kvartal = it[kvartal]
+                    )
+                }.first()
+        }
+    }
 }

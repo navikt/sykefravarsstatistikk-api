@@ -1,11 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.StatistikkildeDvh
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer.Publiseringsdato
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.dao.EmptyResultDataAccessException
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 import java.sql.ResultSet
@@ -18,24 +16,8 @@ class DatavarehusRepository(
     /*
    Statistikk
   */
-    fun hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
-        type: StatistikkildeDvh
-    ): ÅrstallOgKvartal {
-        val alleÅrstallOgKvartal = namedParameterJdbcTemplate.query(
-            String.format(
-                "select distinct arstall, kvartal "
-                        + "from %s "
-                        + "order by arstall desc, kvartal desc",
-                type.tabell
-            ),
-            MapSqlParameterSource()
-        ) { resultSet: ResultSet, _: Int ->
-            ÅrstallOgKvartal(
-                resultSet.getInt(ARSTALL),
-                resultSet.getInt(KVARTAL)
-            )
-        }
-        return alleÅrstallOgKvartal[0]
+    fun hentSisteÅrstallOgKvartalForSykefraværsstatistikk(): ÅrstallOgKvartal {
+        return datavarehusAggregertRepositoryV1.hentSisteKvartal()
     }
 
     fun hentPubliseringsdatoerFraDvh(): List<Publiseringsdato> {
