@@ -18,7 +18,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.virksomhet1Metadata_2021_2
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.virksomhet2Metadata_2020_4
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.virksomhet3Metadata_2020_4
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.Rectype
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -82,7 +82,7 @@ class LegacyEksporteringServiceUtilsTest {
         val virksomhetToBeFound = VirksomhetMetadata(
             Orgnr("399000"),
             "Virksomhet 1",
-            DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET,
+            Rectype.VIRKSOMHET.kode,
             Sektor.STATLIG,
             "11",
             "11111",

@@ -137,28 +137,28 @@ open class SykefraværRepositoryJdbcTest {
                 SykefraværsstatistikkForNæringskode(
                     årstall = 2019,
                     kvartal = 2,
-                    næringkode5siffer = Næringskode("88911").femsifferIdentifikator,
+                    næringskode = Næringskode("88911").femsifferIdentifikator,
                     tapteDagsverk = 1.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal()
                 ),
                 SykefraværsstatistikkForNæringskode(
                     årstall = 2019,
                     kvartal = 1,
-                    næringkode5siffer = Næringskode("88911").femsifferIdentifikator,
+                    næringskode = Næringskode("88911").femsifferIdentifikator,
                     tapteDagsverk = 2.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal()
                 ),
                 SykefraværsstatistikkForNæringskode(
                     årstall = 2019,
                     kvartal = 1,
-                    næringkode5siffer = Næringskode("99999").femsifferIdentifikator,
+                    næringskode = Næringskode("99999").femsifferIdentifikator,
                     tapteDagsverk = 3.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal()
                 ),
                 SykefraværsstatistikkForNæringskode(
                     årstall = 2018,
                     kvartal = 4,
-                    næringkode5siffer = Næringskode("88911").femsifferIdentifikator,
+                    næringskode = Næringskode("88911").femsifferIdentifikator,
                     tapteDagsverk = 4.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal()
                 ),
@@ -238,7 +238,7 @@ open class SykefraværRepositoryJdbcTest {
         sykefraværStatistikkNæringRepository.settInn(
             listOf(
                 SykefraværsstatistikkForNæring(
-                    næringkode = næring.tosifferIdentifikator,
+                    næring = næring.tosifferIdentifikator,
                     årstall = 2019,
                     kvartal = 2,
                     antallPersoner = 10,
@@ -246,7 +246,7 @@ open class SykefraværRepositoryJdbcTest {
                     muligeDagsverk = BigDecimal(100)
                 ),
                 SykefraværsstatistikkForNæring(
-                    næringkode = "94",
+                    næring = "94",
                     årstall = 2019,
                     kvartal = 1,
                     antallPersoner = 10,
@@ -254,7 +254,7 @@ open class SykefraværRepositoryJdbcTest {
                     muligeDagsverk = BigDecimal(100)
                 ),
                 SykefraværsstatistikkForNæring(
-                    næringkode = næring.tosifferIdentifikator,
+                    næring = næring.tosifferIdentifikator,
                     årstall = 2019,
                     kvartal = 1,
                     antallPersoner = 10,
@@ -262,7 +262,7 @@ open class SykefraværRepositoryJdbcTest {
                     muligeDagsverk = BigDecimal(100)
                 ),
                 SykefraværsstatistikkForNæring(
-                    næringkode = næring.tosifferIdentifikator,
+                    næring = næring.tosifferIdentifikator,
                     årstall = 2018,
                     kvartal = 4,
                     antallPersoner = 10,
@@ -270,7 +270,7 @@ open class SykefraværRepositoryJdbcTest {
                     muligeDagsverk = BigDecimal(100)
                 ),
                 SykefraværsstatistikkForNæring(
-                    næringkode = næring.tosifferIdentifikator,
+                    næring = næring.tosifferIdentifikator,
                     årstall = 2018,
                     kvartal = 3,
                     antallPersoner = 10,

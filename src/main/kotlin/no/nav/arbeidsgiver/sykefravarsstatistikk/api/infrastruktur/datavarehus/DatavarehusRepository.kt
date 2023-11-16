@@ -1,10 +1,13 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.KildeTilVirksomhetsdata
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor.Companion.fraSektorkode
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkNæringMedVarighet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Orgenhet
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.StatistikkildeDvh
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer.Publiseringsdato
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.*
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -15,8 +18,8 @@ import java.sql.ResultSet
 
 @Component
 class DatavarehusRepository(
-    //public static final String RECTYPE_FOR_ORGANISASJONSLEDD = "3";
-    @param:Qualifier("datavarehusJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate
+    @param:Qualifier("datavarehusJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
+    private val datavarehusAggregertRepositoryV2: DatavarehusAggregertRepositoryV2,
 ) : KildeTilVirksomhetsdata {
     /*
    Statistikk
@@ -39,116 +42,6 @@ class DatavarehusRepository(
             )
         }
         return alleÅrstallOgKvartal[0]
-    }
-
-    fun hentSykefraværsstatistikkLand(
-        årstallOgKvartal: ÅrstallOgKvartal
-    ): List<SykefraværsstatistikkLand> {
-        val namedParameters: SqlParameterSource = MapSqlParameterSource()
-            .addValue(ARSTALL, årstallOgKvartal.årstall)
-            .addValue(KVARTAL, årstallOgKvartal.kvartal)
-        return namedParameterJdbcTemplate.query(
-            "select arstall, kvartal, "
-                    + "sum(antpers) as sum_antall_personer, "
-                    + "sum(taptedv) as sum_tapte_dagsverk, "
-                    + "sum(muligedv) as sum_mulige_dagsverk "
-                    + "from dt_p.agg_ia_sykefravar_land_v "
-                    + "where kjonn != 'X' and naring != 'X' "
-                    + "and arstall = :arstall and kvartal = :kvartal "
-                    + "group by arstall, kvartal",
-            namedParameters
-        ) { resultSet: ResultSet, _: Int ->
-            SykefraværsstatistikkLand(
-                resultSet.getInt(ARSTALL),
-                resultSet.getInt(KVARTAL),
-                resultSet.getInt(SUM_ANTALL_PERSONER),
-                resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
-                resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)
-            )
-        }
-    }
-
-    fun hentSykefraværsstatistikkSektor(
-        årstallOgKvartal: ÅrstallOgKvartal
-    ): List<SykefraværsstatistikkSektor> {
-        val namedParameters: SqlParameterSource = MapSqlParameterSource()
-            .addValue(ARSTALL, årstallOgKvartal.årstall)
-            .addValue(KVARTAL, årstallOgKvartal.kvartal)
-        return namedParameterJdbcTemplate.query(
-            "select arstall, kvartal, sektor, "
-                    + "sum(antpers) as sum_antall_personer, "
-                    + "sum(taptedv) as sum_tapte_dagsverk, "
-                    + "sum(muligedv) as sum_mulige_dagsverk "
-                    + "from dt_p.agg_ia_sykefravar_land_v "
-                    + "where kjonn != 'X' and naring != 'X' "
-                    + "and arstall = :arstall and kvartal = :kvartal "
-                    + "group by arstall, kvartal, sektor",
-            namedParameters
-        ) { resultSet: ResultSet, _: Int ->
-            SykefraværsstatistikkSektor(
-                resultSet.getInt(ARSTALL),
-                resultSet.getInt(KVARTAL),
-                resultSet.getString(SEKTOR),
-                resultSet.getInt(SUM_ANTALL_PERSONER),
-                resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
-                resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)
-            )
-        }
-    }
-
-    fun hentSykefraværsstatistikkNæring(
-        årstallOgKvartal: ÅrstallOgKvartal
-    ): List<SykefraværsstatistikkForNæring> {
-        val namedParameters: SqlParameterSource = MapSqlParameterSource()
-            .addValue(ARSTALL, årstallOgKvartal.årstall)
-            .addValue(KVARTAL, årstallOgKvartal.kvartal)
-        return namedParameterJdbcTemplate.query(
-            "select arstall, kvartal, naring, "
-                    + "sum(antpers) as sum_antall_personer, "
-                    + "sum(taptedv) as sum_tapte_dagsverk, "
-                    + "sum(muligedv) as sum_mulige_dagsverk "
-                    + "from dt_p.v_agg_ia_sykefravar_naring "
-                    + "where kjonn != 'X' and naring != 'X' "
-                    + "and arstall = :arstall and kvartal = :kvartal "
-                    + "group by arstall, kvartal, naring",
-            namedParameters
-        ) { resultSet: ResultSet, _: Int ->
-            SykefraværsstatistikkForNæring(
-                resultSet.getInt(ARSTALL),
-                resultSet.getInt(KVARTAL),
-                resultSet.getString(NARING),
-                resultSet.getInt(SUM_ANTALL_PERSONER),
-                resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
-                resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)
-            )
-        }
-    }
-
-    fun hentSykefraværsstatistikkNæring5siffer(
-        årstallOgKvartal: ÅrstallOgKvartal
-    ): List<SykefraværsstatistikkForNæringskode> {
-        val namedParameters: SqlParameterSource = MapSqlParameterSource()
-            .addValue(ARSTALL, årstallOgKvartal.årstall)
-            .addValue(KVARTAL, årstallOgKvartal.kvartal)
-        return namedParameterJdbcTemplate.query(
-            "select arstall, kvartal, naering_kode, "
-                    + "sum(antpers) as sum_antall_personer, "
-                    + "sum(taptedv) as sum_tapte_dagsverk, "
-                    + "sum(muligedv) as sum_mulige_dagsverk "
-                    + "from dt_p.agg_ia_sykefravar_naring_kode "
-                    + "where arstall = :arstall and kvartal = :kvartal "
-                    + " group by arstall, kvartal, naering_kode",
-            namedParameters
-        ) { resultSet: ResultSet, _: Int ->
-            SykefraværsstatistikkForNæringskode(
-                resultSet.getInt(ARSTALL),
-                resultSet.getInt(KVARTAL),
-                resultSet.getString(NARING_5SIFFER),
-                resultSet.getInt(SUM_ANTALL_PERSONER),
-                resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
-                resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)
-            )
-        }
     }
 
     fun hentSykefraværsstatistikkVirksomhet(
@@ -186,7 +79,7 @@ class DatavarehusRepository(
         val namedParameters: SqlParameterSource = MapSqlParameterSource()
             .addValue(ARSTALL, årstallOgKvartal.årstall)
             .addValue(KVARTAL, årstallOgKvartal.kvartal)
-            .addValue(RECTYPE, RECTYPE_FOR_VIRKSOMHET)
+            .addValue(RECTYPE, Rectype.VIRKSOMHET.kode)
         return namedParameterJdbcTemplate.query(
             "select arstall, kvartal, naering_kode, varighet, "
                     + "sum(antpers) as sum_antall_personer, "
@@ -211,62 +104,11 @@ class DatavarehusRepository(
     }
 
     fun hentSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal: ÅrstallOgKvartal): List<SykefraværsstatistikkVirksomhetMedGradering> {
-        val namedParameters: SqlParameterSource = MapSqlParameterSource()
-            .addValue(ARSTALL, årstallOgKvartal.årstall)
-            .addValue(KVARTAL, årstallOgKvartal.kvartal)
-        return namedParameterJdbcTemplate.query(
-            "select arstall, kvartal, orgnr, naring, naering_kode, rectype, "
-                    + "sum(taptedv_gs) as sum_tapte_dagsverk_gs, "
-                    + "sum(antall_gs) as sum_antall_graderte_sykemeldinger, "
-                    + "sum(antall) as sum_antall_sykemeldinger, "
-                    + "sum(antpers) as sum_antall_personer, "
-                    + "sum(taptedv) as sum_tapte_dagsverk, "
-                    + "sum(mulige_dv) as sum_mulige_dagsverk "
-                    + "from dt_p.agg_ia_sykefravar_v_2 "
-                    + "where arstall = :arstall and kvartal = :kvartal "
-                    + "group by arstall, kvartal, orgnr, naring, naering_kode, rectype",
-            namedParameters
-        ) { resultSet: ResultSet, _: Int ->
-            SykefraværsstatistikkVirksomhetMedGradering(
-                resultSet.getInt(ARSTALL),
-                resultSet.getInt(KVARTAL),
-                resultSet.getString(ORGNR),
-                resultSet.getString(NARING),
-                resultSet.getString(NARING_5SIFFER),
-                resultSet.getString(RECTYPE),
-                resultSet.getInt(SUM_ANTALL_GRADERTE_SYKEMELDINGER),
-                resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK_GS),
-                resultSet.getInt(SUM_ANTALL_SYKEMELDINGER),
-                resultSet.getInt(SUM_ANTALL_PERSONER),
-                resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
-                resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)
-            )
-        }
+        return datavarehusAggregertRepositoryV2.hentSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal)
     }
 
     override fun hentVirksomheter(årstallOgKvartal: ÅrstallOgKvartal): List<Orgenhet> {
-        val namedParameters = MapSqlParameterSource()
-            .addValue(ARSTALL, årstallOgKvartal.årstall)
-            .addValue(KVARTAL, årstallOgKvartal.kvartal)
-        return namedParameterJdbcTemplate.query(
-            "select distinct orgnr, rectype, sektor, substr(primærnæringskode, 1,2) as naring, primærnæringskode as naringskode, arstall, kvartal "
-                    + "from dt_p.agg_ia_sykefravar_v_2 "
-                    + "where arstall = :arstall and kvartal = :kvartal "
-                    + "and length(trim(orgnr)) = 9 "
-                    + "and primærnæringskode is not null "
-                    + "and primærnæringskode != '00.000'",
-            namedParameters
-        ) { resultSet: ResultSet, _: Int ->
-            Orgenhet(
-                Orgnr(resultSet.getString(ORGNR)),
-                "",  // henter ikke lenger navn for virksomheter, da dette ikke er i bruk
-                resultSet.getString(RECTYPE),
-                fraSektorkode(resultSet.getString(SEKTOR)),
-                resultSet.getString(NARING),
-                resultSet.getString("naringskode").replace(".", ""),
-                ÅrstallOgKvartal(resultSet.getInt(ARSTALL), resultSet.getInt(KVARTAL))
-            )
-        }
+        return datavarehusAggregertRepositoryV2.hentVirksomheter(årstallOgKvartal)
     }
 
     fun hentPubliseringsdatoerFraDvh(): List<Publiseringsdato> {
@@ -295,18 +137,12 @@ class DatavarehusRepository(
         const val ARSTALL = "arstall"
         const val KVARTAL = "kvartal"
         const val SEKTOR = "sektor"
-        const val NARING = "naring"
         const val NARING_5SIFFER = "naering_kode"
         const val ORGNR = "orgnr"
         const val VARIGHET = "varighet"
-        const val SUM_TAPTE_DAGSVERK_GS = "sum_tapte_dagsverk_gs"
         const val SUM_ANTALL_PERSONER = "sum_antall_personer"
         const val SUM_TAPTE_DAGSVERK = "sum_tapte_dagsverk"
         const val SUM_MULIGE_DAGSVERK = "sum_mulige_dagsverk"
-        const val SUM_ANTALL_GRADERTE_SYKEMELDINGER = "sum_antall_graderte_sykemeldinger"
-        const val SUM_ANTALL_SYKEMELDINGER = "sum_antall_sykemeldinger"
         const val RECTYPE = "rectype"
-        const val RECTYPE_FOR_FORETAK = "1"
-        const val RECTYPE_FOR_VIRKSOMHET = "2"
     }
 }

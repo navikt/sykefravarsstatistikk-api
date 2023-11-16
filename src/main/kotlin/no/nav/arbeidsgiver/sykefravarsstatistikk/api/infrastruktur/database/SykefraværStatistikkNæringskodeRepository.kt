@@ -5,12 +5,13 @@ import ia.felles.definisjoner.bransjer.BransjeId
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 
 
 @Component
 class SykefraværStatistikkNæringskodeRepository(
-    override val database: Database
+    @param:Qualifier("sykefravarsstatistikkDatabase") override val database: Database
 ) : UsingExposed, Table("sykefravar_statistikk_naring5siffer") {
 
     val næringskode = varchar("naring_kode", 5)
@@ -25,7 +26,7 @@ class SykefraværStatistikkNæringskodeRepository(
             batchInsert(data) {
                 this[årstall] = it.årstall
                 this[kvartal] = it.kvartal
-                this[næringskode] = it.næringkode5siffer
+                this[næringskode] = it.næringskode
                 this[antallPersoner] = it.antallPersoner
                 this[tapteDagsverk] = it.tapteDagsverk.toDouble()
                 this[muligeDagsverk] = it.muligeDagsverk.toDouble()
@@ -69,7 +70,7 @@ class SykefraværStatistikkNæringskodeRepository(
                     SykefraværsstatistikkForNæringskode(
                         årstall = it[årstall],
                         kvartal = it[kvartal],
-                        næringkode5siffer = it[næringskode],
+                        næringskode = it[næringskode],
                         antallPersoner = it[antallPersoner],
                         tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
                         muligeDagsverk = it[muligeDagsverk].toBigDecimal(),

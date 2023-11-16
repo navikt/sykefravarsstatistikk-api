@@ -106,7 +106,7 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
                 SykefraværsstatistikkForNæring(
                     årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
                     kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
-                    næringkode = PRODUKSJON_NYTELSESMIDLER.tosifferIdentifikator,
+                    næring = PRODUKSJON_NYTELSESMIDLER.tosifferIdentifikator,
                     antallPersoner = 10,
                     tapteDagsverk = 5.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal(),

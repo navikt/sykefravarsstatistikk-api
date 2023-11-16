@@ -6,10 +6,11 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Um
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 
 @Component
-class SykefraværStatistikkLandRepository(override val database: Database) :
+class SykefraværStatistikkLandRepository(@param:Qualifier("sykefravarsstatistikkDatabase") override val database: Database) :
     UsingExposed, Table("sykefravar_statistikk_land") {
 
     val årstall = integer("arstall")

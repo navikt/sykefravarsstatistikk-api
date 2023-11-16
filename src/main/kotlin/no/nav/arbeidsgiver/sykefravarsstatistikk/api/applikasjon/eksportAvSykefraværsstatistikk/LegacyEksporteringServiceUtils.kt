@@ -143,8 +143,8 @@ object LegacyEksporteringServiceUtils {
         virksomhetMetadata: VirksomhetMetadata,
         sykefraværsstatistikkForNæring: List<SykefraværsstatistikkForNæring>
     ): SykefraværMedKategori {
-        val (_, _, næringkode, antallPersoner, tapteDagsverk, muligeDagsverk) = sykefraværsstatistikkForNæring.stream()
-            .filter { (årstall, kvartal, næringkode): SykefraværsstatistikkForNæring -> næringkode == virksomhetMetadata.primærnæring && årstall == virksomhetMetadata.årstall && kvartal == virksomhetMetadata.kvartal }
+        val (_, _, næring, antallPersoner, tapteDagsverk, muligeDagsverk) = sykefraværsstatistikkForNæring.stream()
+            .filter { (årstall, kvartal, næring): SykefraværsstatistikkForNæring -> næring == virksomhetMetadata.primærnæring && årstall == virksomhetMetadata.årstall && kvartal == virksomhetMetadata.kvartal }
             .collect(
                 toSingleton(
                     SykefraværsstatistikkForNæring(
@@ -159,7 +159,7 @@ object LegacyEksporteringServiceUtils {
             )
         return SykefraværMedKategori(
             Statistikkategori.NÆRING,
-            næringkode,
+            næring,
             ÅrstallOgKvartal(virksomhetMetadata.årstall, virksomhetMetadata.kvartal),
             tapteDagsverk,
             muligeDagsverk,

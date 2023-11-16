@@ -1,81 +1,42 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusAggregertRepositoryV2
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusLandRespository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.Rectype
+import org.jetbrains.exposed.sql.deleteAll
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 object DatavarehusRepositoryJdbcTestUtils {
 
-    fun cleanUpTestDb(jdbcTemplate: NamedParameterJdbcTemplate) {
-        delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_land_v")
-        delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_v_2")
+    fun cleanUpTestDb(
+        jdbcTemplate: NamedParameterJdbcTemplate,
+        datavarehusLandRespository: DatavarehusLandRespository,
+        datavarehusAggregertRepositoryV2: DatavarehusAggregertRepositoryV2
+    ) {
+        datavarehusLandRespository.slettAlt()
+        datavarehusAggregertRepositoryV2.slettAlt()
         delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_v")
     }
+
+    private fun DatavarehusAggregertRepositoryV2.slettAlt() {
+        transaction {
+            deleteAll()
+        }
+    }
+
+    private fun DatavarehusLandRespository.slettAlt() {
+        transaction {
+            deleteAll()
+        }
+    }
+
 
     fun delete(jdbcTemplate: NamedParameterJdbcTemplate, tabell: String?): Int {
         return jdbcTemplate.update("delete from $tabell", MapSqlParameterSource())
     }
-
-
-    fun insertOrgenhetInDvhTabell(
-        jdbcTemplate: NamedParameterJdbcTemplate,
-        orgnr: String?,
-        sektor: String?,
-        næring: String?,
-        primærnæringskode: String?,
-        årstall: Int,
-        kvartal: Int
-    ) {
-        val naringParams = MapSqlParameterSource()
-            .addValue("orgnr", orgnr)
-            .addValue("sektor", sektor)
-            .addValue("naring", næring)
-            .addValue("primærnæringskode", primærnæringskode)
-            .addValue("årstall", årstall)
-            .addValue("kvartal", kvartal)
-        jdbcTemplate.update(
-            "insert into dt_p.agg_ia_sykefravar_v_2 (orgnr, rectype, sektor, naring, primærnæringskode, arstall, kvartal) "
-                    + "values (:orgnr, '2', :sektor, :naring, :primærnæringskode, :årstall, :kvartal)",
-            naringParams
-        )
-    }
-
-
-    fun insertSykefraværsstatistikkLandInDvhTabell(
-        jdbcTemplate: NamedParameterJdbcTemplate,
-        årstall: Int,
-        kvartal: Int,
-        antallPersoner: Int,
-        taptedagsverk: Long,
-        muligedagsverk: Long
-    ) {
-        val params = MapSqlParameterSource()
-            .addValue("arstall", årstall)
-            .addValue("kvartal", kvartal)
-            .addValue("antpers", antallPersoner)
-            .addValue("taptedv", taptedagsverk)
-            .addValue("muligedv", muligedagsverk)
-        jdbcTemplate.update(
-            "insert into dt_p.agg_ia_sykefravar_land_v ("
-                    + "arstall, kvartal, "
-                    + "naring, naringnavn, "
-                    + "alder, kjonn, "
-                    + "fylkbo, fylknavn, "
-                    + "varighet, sektor, sektornavn, "
-                    + "taptedv, muligedv, antpers) "
-                    + "values ("
-                    + ":arstall, :kvartal, "
-                    + "'41', 'Bygge- og anleggsvirksomhet', "
-                    + "'D', 'M', "
-                    + "'06', 'Buskerud', "
-                    + "'B', '1', 'Statlig forvaltning', "
-                    + ":taptedv, :muligedv, :antpers)",
-            params
-        )
-    }
-
 
     fun insertSykefraværsstatistikkVirksomhetInDvhTabell(
         jdbcTemplate: NamedParameterJdbcTemplate,
@@ -100,7 +61,7 @@ object DatavarehusRepositoryJdbcTestUtils {
             kjonn,
             taptedagsverk,
             muligedagsverk,
-            DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET
+            Rectype.VIRKSOMHET.kode
         )
     }
 
@@ -146,7 +107,6 @@ object DatavarehusRepositoryJdbcTestUtils {
             params
         )
     }
-
 
     fun insertSykefraværsstatistikkNæringInDvhTabell(
         jdbcTemplate: NamedParameterJdbcTemplate,
@@ -212,99 +172,6 @@ object DatavarehusRepositoryJdbcTestUtils {
                     + "'A', :kjonn, "
                     + ":taptedv, :muligedv, :antpers)",
             params
-        )
-    }
-
-    fun insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
-        jdbcTemplate: NamedParameterJdbcTemplate,
-        årstall: Int,
-        kvartal: Int,
-        antallPersoner: Int,
-        orgnr: String?,
-        næring: String?,
-        næringskode5siffer: String?,
-        alder: String?,
-        kjonn: String?,
-        fylkbo: String?,
-        kommnr: String?,
-        taptedagsverkGradertSykemelding: Long,
-        antallGradertSykemeldinger: Int,
-        antallSykemeldinger: Int,
-        taptedagsverk: Long,
-        muligedagsverk: Long,
-        rectype: String?
-    ) {
-        val params = MapSqlParameterSource()
-            .addValue("arstall", årstall)
-            .addValue("kvartal", kvartal)
-            .addValue("orgnr", orgnr)
-            .addValue("naring", næring)
-            .addValue("naering_kode", næringskode5siffer)
-            .addValue("alder", alder)
-            .addValue("kjonn", kjonn)
-            .addValue("fylkbo", fylkbo)
-            .addValue("kommnr", kommnr)
-            .addValue("rectype", rectype)
-            .addValue("antall_gs", antallGradertSykemeldinger)
-            .addValue("taptedv_gs", taptedagsverkGradertSykemelding)
-            .addValue("antall", antallSykemeldinger)
-            .addValue("taptedv", taptedagsverk)
-            .addValue("mulige_dv", muligedagsverk)
-            .addValue("antpers", antallPersoner)
-        jdbcTemplate.update(
-            "insert into dt_p.agg_ia_sykefravar_v_2 ("
-                    + "arstall, kvartal, "
-                    + "orgnr, naring, naering_kode, "
-                    + "alder, kjonn,  fylkbo, "
-                    + "kommnr, rectype, "
-                    + "antall_gs, taptedv_gs, "
-                    + "antall, "
-                    + "taptedv, mulige_dv, antpers) "
-                    + "values ("
-                    + ":arstall, :kvartal, "
-                    + ":orgnr,:naring, :naering_kode, :alder, "
-                    + ":kjonn, :fylkbo, :kommnr, "
-                    + ":rectype, "
-                    + ":antall_gs, :taptedv_gs, "
-                    + ":antall, "
-                    + ":taptedv, :mulige_dv, :antpers)",
-            params
-        )
-    }
-
-
-    fun insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
-        namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
-        årstall: Int,
-        kvartal: Int,
-        antallPersoner: Int,
-        orgnrVirksomhet1: String?,
-        næringskode2siffer: String?,
-        næringskode5siffer: String?,
-        tapteDagsverkGradertSykemelding: Long,
-        antallGradertSykemeldinger: Int,
-        antallSykemeldinger: Int,
-        tapteDagsverk: Long,
-        muligeDagsverk: Long
-    ) {
-        insertSykefraværsstatistikkVirksomhetGraderingInDvhTabell(
-            namedParameterJdbcTemplate,
-            årstall,
-            kvartal,
-            antallPersoner,
-            orgnrVirksomhet1,
-            næringskode2siffer,
-            næringskode5siffer,
-            "A",
-            "M",
-            "03",
-            "4200",
-            tapteDagsverkGradertSykemelding,
-            antallGradertSykemeldinger,
-            antallSykemeldinger,
-            tapteDagsverk,
-            muligeDagsverk,
-            DatavarehusRepository.RECTYPE_FOR_VIRKSOMHET
         )
     }
 }

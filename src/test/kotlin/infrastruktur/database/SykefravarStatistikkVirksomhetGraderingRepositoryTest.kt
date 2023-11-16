@@ -5,7 +5,7 @@ import io.kotest.matchers.equality.shouldBeEqualToComparingFields
 import io.kotest.matchers.shouldBe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository.Companion.RECTYPE_FOR_VIRKSOMHET
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.Rectype
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -44,7 +44,7 @@ open class SykefravarStatistikkVirksomhetGraderingRepositoryTest {
                     orgnr = "99999999",
                     næring = "10",
                     næringkode = "10100",
-                    rectype = RECTYPE_FOR_VIRKSOMHET,
+                    rectype = Rectype.VIRKSOMHET.kode,
                     antallGraderteSykemeldinger = 1,
                     tapteDagsverkGradertSykemelding = BigDecimal("3.0"),
                     antallSykemeldinger = 3,
@@ -74,7 +74,7 @@ open class SykefravarStatistikkVirksomhetGraderingRepositoryTest {
             orgnr = "99999999",
             næring = "10",
             næringkode = "10100",
-            rectype = RECTYPE_FOR_VIRKSOMHET,
+            rectype = Rectype.VIRKSOMHET.kode,
             antallGraderteSykemeldinger = 1,
             tapteDagsverkGradertSykemelding = BigDecimal("3.0"),
             antallSykemeldinger = 3,

@@ -1,12 +1,14 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkNæringskodeRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.SlettOgOpprettResultat
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.StatistikkildeDvh
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusLandRespository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusNæringRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusNæringskodeRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import org.slf4j.LoggerFactory
 import org.springframework.core.env.Environment
@@ -23,6 +25,9 @@ class SykefraværsstatistikkImporteringService(
     private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
     private val sykefraværStatistikkNæringRepository: SykefraværStatistikkNæringRepository,
     private val sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository,
+    private val datavarehusLandRespository: DatavarehusLandRespository,
+    private val datavarehusNæringRepository: DatavarehusNæringRepository,
+    private val datavarehusNæringskodeRepository: DatavarehusNæringskodeRepository,
 
     private val environment: Environment,
 ) {
@@ -37,15 +42,9 @@ class SykefraværsstatistikkImporteringService(
             sykefraværStatistikkVirksomhetRepository.hentNyesteKvartal()
         )
         val årstallOgKvartalForDvh = listOf(
-            datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
-                StatistikkildeDvh.LAND_OG_SEKTOR
-            ),
-            datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
-                StatistikkildeDvh.NÆRING
-            ),
-            datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
-                StatistikkildeDvh.NÆRING_5_SIFFER
-            ),
+            datavarehusLandRespository.hentSisteKvartal(),
+            datavarehusNæringRepository.hentSisteKvartal(),
+            datavarehusNæringskodeRepository.hentSisteKvartal(),
             datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(
                 StatistikkildeDvh.VIRKSOMHET
             ),
@@ -53,7 +52,13 @@ class SykefraværsstatistikkImporteringService(
         val gjeldendeÅrstallOgKvartal = årstallOgKvartalForDvh[0]
         return if (kanImportStartes(årstallOgKvartalForSykefraværsstatistikk, årstallOgKvartalForDvh)) {
             log.info("Importerer ny statistikk")
-            importerNyStatistikk(gjeldendeÅrstallOgKvartal)
+            importSykefraværsstatistikkLand(gjeldendeÅrstallOgKvartal)
+            importSykefraværsstatistikkSektor(gjeldendeÅrstallOgKvartal)
+            importSykefraværsstatistikkNæring(gjeldendeÅrstallOgKvartal)
+            importSykefraværsstatistikkNæring5siffer(gjeldendeÅrstallOgKvartal)
+            importSykefraværsstatistikkNæringMedVarighet(gjeldendeÅrstallOgKvartal)
+            importSykefraværsstatistikkVirksomhet(gjeldendeÅrstallOgKvartal)
+            importSykefraværsstatistikkVirksomhetMedGradering(gjeldendeÅrstallOgKvartal)
             oppdaterPubliseringsstatus(gjeldendeÅrstallOgKvartal)
             gjeldendeÅrstallOgKvartal
         } else {
@@ -117,21 +122,11 @@ class SykefraværsstatistikkImporteringService(
         }
     }
 
-    private fun importerNyStatistikk(årstallOgKvartal: ÅrstallOgKvartal) {
-        importSykefraværsstatistikkLand(årstallOgKvartal)
-        importSykefraværsstatistikkSektor(årstallOgKvartal)
-        importSykefraværsstatistikkNæring(årstallOgKvartal)
-        importSykefraværsstatistikkNæring5siffer(årstallOgKvartal)
-        importSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal)
-        importSykefraværsstatistikkVirksomhet(årstallOgKvartal)
-        importSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal)
-    }
-
     private fun importSykefraværsstatistikkLand(
         årstallOgKvartal: ÅrstallOgKvartal
     ): SlettOgOpprettResultat {
 
-        val statistikk = datavarehusRepository.hentSykefraværsstatistikkLand(årstallOgKvartal)
+        val statistikk = datavarehusLandRespository.hentFor(årstallOgKvartal)
 
         val antallSlettet = sykefraværsstatistikkLandRepository.slettForKvartal(årstallOgKvartal)
         val antallOpprettet = sykefraværsstatistikkLandRepository.settInn(statistikk)
@@ -146,7 +141,9 @@ class SykefraværsstatistikkImporteringService(
         årstallOgKvartal: ÅrstallOgKvartal
     ): SlettOgOpprettResultat {
         val sykefraværsstatistikkSektor =
-            datavarehusRepository.hentSykefraværsstatistikkSektor(årstallOgKvartal)
+            datavarehusLandRespository.hentSykefraværsstatistikkSektor(
+                årstallOgKvartal,
+            )
 
         val slettet = sykefraværStatistikkSektorRepository.slettDataFor(årstallOgKvartal)
         val opprettet = sykefraværStatistikkSektorRepository.settInn(sykefraværsstatistikkSektor)
@@ -158,7 +155,7 @@ class SykefraværsstatistikkImporteringService(
     private fun importSykefraværsstatistikkNæring(
         årstallOgKvartal: ÅrstallOgKvartal
     ): SlettOgOpprettResultat {
-        val sykefraværsstatistikkNæring = datavarehusRepository.hentSykefraværsstatistikkNæring(årstallOgKvartal)
+        val sykefraværsstatistikkNæring = datavarehusNæringRepository.hentFor(årstallOgKvartal)
         val slettet = sykefraværStatistikkNæringRepository.slettFor(årstallOgKvartal)
         val opprettet = sykefraværStatistikkNæringRepository.settInn(sykefraværsstatistikkNæring)
         val resultat = SlettOgOpprettResultat(slettet, opprettet)
@@ -170,7 +167,7 @@ class SykefraværsstatistikkImporteringService(
         årstallOgKvartal: ÅrstallOgKvartal
     ): SlettOgOpprettResultat {
         val sykefraværsstatistikkNæringskode =
-            datavarehusRepository.hentSykefraværsstatistikkNæring5siffer(årstallOgKvartal)
+            datavarehusNæringskodeRepository.hentFor(årstallOgKvartal)
 
         val antallSlettet = sykefraværStatistikkNæringskodeRepository.slettKvartal(årstallOgKvartal)
         val antallOpprettet = sykefraværStatistikkNæringskodeRepository.settInn(sykefraværsstatistikkNæringskode)
@@ -182,7 +179,7 @@ class SykefraværsstatistikkImporteringService(
     }
 
     private fun importSykefraværsstatistikkVirksomhet(årstallOgKvartal: ÅrstallOgKvartal) {
-        val statistikk: List<SykefraværsstatistikkVirksomhet> = if (currentEnvironmentIsProd()) {
+        val statistikk: List<SykefraværsstatistikkVirksomhet> = if (environment.activeProfiles.contains("prod")) {
             datavarehusRepository.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal)
         } else {
             SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhet(årstallOgKvartal)
@@ -196,11 +193,14 @@ class SykefraværsstatistikkImporteringService(
     private fun importSykefraværsstatistikkVirksomhetMedGradering(
         årstallOgKvartal: ÅrstallOgKvartal
     ) {
-        val statistikk: List<SykefraværsstatistikkVirksomhetMedGradering> = if (currentEnvironmentIsProd()) {
-            datavarehusRepository.hentSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal)
-        } else {
-            SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal)
-        }
+        val statistikk: List<SykefraværsstatistikkVirksomhetMedGradering> =
+            if (environment.activeProfiles.contains("prod")) {
+                datavarehusRepository.hentSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal)
+            } else {
+                SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhetMedGradering(
+                    årstallOgKvartal
+                )
+            }
         val antallSlettet = sykefraværStatistikkVirksomhetGraderingRepository.slettDataFor(årstallOgKvartal)
         val antallOprettet =
             sykefraværStatistikkVirksomhetGraderingRepository.settInn(
@@ -248,11 +248,7 @@ class SykefraværsstatistikkImporteringService(
     }
 
     private fun alleErLike(årstallOgKvartal: List<ÅrstallOgKvartal>): Boolean {
-        val førsteÅrstallOgKvartal = årstallOgKvartal[0]
-        return årstallOgKvartal.stream().allMatch { p: ÅrstallOgKvartal -> p == førsteÅrstallOgKvartal }
-    }
-
-    private fun currentEnvironmentIsProd(): Boolean {
-        return environment.activeProfiles.contains("prod")
+        val første = årstallOgKvartal.firstOrNull() ?: return true
+        return årstallOgKvartal.all { it == første }
     }
 }

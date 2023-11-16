@@ -44,7 +44,7 @@ open class ApplikasjonDBConfig {
         return NamedParameterJdbcTemplate(dataSource)
     }
 
-    @Bean
+    @Bean(name = ["sykefravarsstatistikkDatabase"])
     open fun database(
         @Qualifier("sykefravarsstatistikkDataSource") dataSource: DataSource,
     ): Database {

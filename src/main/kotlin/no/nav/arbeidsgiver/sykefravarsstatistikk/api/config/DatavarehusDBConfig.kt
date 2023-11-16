@@ -2,6 +2,8 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.config
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -42,5 +44,14 @@ open class DatavarehusDBConfig {
         @Qualifier("datavarehusDS") dataSource: DataSource
     ): NamedParameterJdbcTemplate {
         return NamedParameterJdbcTemplate(dataSource)
+    }
+
+    @Bean(name = ["datavarehusDatabase"])
+    open fun datavarehusDatabase(
+        @Qualifier("datavarehusDS") dataSource: DataSource
+    ): Database {
+        val db = Database.connect(dataSource)
+        TransactionManager.defaultDatabase = db
+        return db
     }
 }

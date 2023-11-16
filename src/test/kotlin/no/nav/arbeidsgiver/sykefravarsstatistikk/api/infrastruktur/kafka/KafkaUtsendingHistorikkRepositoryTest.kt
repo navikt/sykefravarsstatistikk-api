@@ -1,21 +1,20 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka
 
 import config.AppConfigForJdbcTesterConfig
-import testUtils.TestUtils.hentAlleKafkaUtsendingHistorikkData
-import testUtils.TestUtils.opprettUtsendingHistorikk
-import testUtils.TestUtils.slettAllEksportDataFraDatabase
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.date.shouldBeBefore
+import io.kotest.matchers.shouldBe
+import org.jetbrains.exposed.sql.selectAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
 import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import testUtils.TestUtils.slettAllEksportDataFraDatabase
 import java.time.LocalDateTime
 
 @ActiveProfiles("db-test")
@@ -24,18 +23,11 @@ import java.time.LocalDateTime
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 open class KafkaUtsendingHistorikkRepositoryTest {
     @Autowired
-    lateinit var jdbcTemplate: NamedParameterJdbcTemplate
-    private val kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository by lazy {
-        KafkaUtsendingHistorikkRepository(jdbcTemplate)
-    }
+    private lateinit var kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository
+
     @BeforeEach
     fun setUp() {
-        slettAllEksportDataFraDatabase(jdbcTemplate)
-    }
-
-    @AfterEach
-    fun tearDown() {
-        slettAllEksportDataFraDatabase(jdbcTemplate)
+        slettAllEksportDataFraDatabase(kafkaUtsendingHistorikkRepository = kafkaUtsendingHistorikkRepository)
     }
 
     @Test
@@ -44,26 +36,40 @@ open class KafkaUtsendingHistorikkRepositoryTest {
         kafkaUtsendingHistorikkRepository.opprettHistorikk(
             "987654321", "{\"orgnr\": \"987654321\"}", "{\"statistikk\": \"....\"}"
         )
-        val results = hentAlleKafkaUtsendingHistorikkData(jdbcTemplate)
+        val results = kafkaUtsendingHistorikkRepository.hentAlt()
         val kafkaUtsendingHistorikkData = results[0]
-        Assertions.assertEquals("987654321", kafkaUtsendingHistorikkData.orgnr)
-        Assertions.assertEquals("{\"orgnr\": \"987654321\"}", kafkaUtsendingHistorikkData.key)
-        Assertions.assertEquals("{\"statistikk\": \"....\"}", kafkaUtsendingHistorikkData.value)
-        Assertions.assertTrue(kafkaUtsendingHistorikkData.opprettet.isAfter(startTime))
+        kafkaUtsendingHistorikkData.orgnr shouldBe "987654321"
+        kafkaUtsendingHistorikkData.key shouldBe "{\"orgnr\": \"987654321\"}"
+        kafkaUtsendingHistorikkData.value shouldBe "{\"statistikk\": \"....\"}"
+        kafkaUtsendingHistorikkData.opprettet shouldBeBefore startTime
     }
 
     @Test
     fun slettHistorikk__sletter_historikk() {
-        opprettUtsendingHistorikk(
-            jdbcTemplate, KafkaUtsendingHistorikkData("988777999", "key", "value", LocalDateTime.now())
+        kafkaUtsendingHistorikkRepository.opprettHistorikk(
+            "987654321", "{\"orgnr\": \"987654321\"}", "{\"statistikk\": \"....\"}"
         )
-        opprettUtsendingHistorikk(
-            jdbcTemplate, KafkaUtsendingHistorikkData("988999777", "key", "value", LocalDateTime.now())
+        kafkaUtsendingHistorikkRepository.opprettHistorikk(
+            "123456789", "{\"orgnr\": \"123456789\"}", "{\"statistikk\": \"....\"}"
         )
-        Assertions.assertEquals(2, hentAlleKafkaUtsendingHistorikkData(jdbcTemplate).size)
+
+        val førSletting = kafkaUtsendingHistorikkRepository.hentAlt()
+        førSletting shouldHaveSize 2
+
         val antallSlettet = kafkaUtsendingHistorikkRepository.slettHistorikk()
-        val results = hentAlleKafkaUtsendingHistorikkData(jdbcTemplate)
-        Assertions.assertEquals(0, results.size)
-        Assertions.assertEquals(2, antallSlettet)
+        antallSlettet shouldBe 2
+
+        val etterSletting = kafkaUtsendingHistorikkRepository.hentAlt()
+        etterSletting shouldHaveSize 0
+    }
+
+    private fun KafkaUtsendingHistorikkRepository.hentAlt(): List<KafkaUtsendingHistorikkData> {
+        return transaction {
+            selectAll().map {
+                KafkaUtsendingHistorikkData(
+                    orgnr = it[orgnr], key = it[key], value = it[value], opprettet = it[opprettet]
+                )
+            }
+        }
     }
 }

@@ -1,16 +1,17 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImportEksportJobb
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImportEksportJobb
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.upsert
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 
 @Component
 open class ImportEksportStatusRepository(
-    override val database: Database,
+    @param:Qualifier("sykefravarsstatistikkDatabase") override val database: Database,
 ) : Table("import_eksport_status"), UsingExposed {
     val årstall = varchar("aarstall", 4)
     val kvartal = varchar("kvartal", 1)

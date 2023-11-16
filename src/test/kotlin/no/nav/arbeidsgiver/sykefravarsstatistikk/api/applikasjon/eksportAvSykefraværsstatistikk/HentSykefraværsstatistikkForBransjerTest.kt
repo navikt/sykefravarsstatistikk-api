@@ -56,7 +56,7 @@ open class HentSykefraværsstatistikkForBransjeTest {
             SykefraværsstatistikkForNæring(
                 årstall = it.årstall,
                 kvartal = it.kvartal,
-                næringkode = Næring("42").tosifferIdentifikator,
+                næring = Næring("42").tosifferIdentifikator,
                 antallPersoner = it.antallPersoner,
                 tapteDagsverk = it.tapteDagsverk,
                 muligeDagsverk = it.muligeDagsverk
@@ -78,7 +78,7 @@ open class HentSykefraværsstatistikkForBransjeTest {
                 SykefraværsstatistikkForNæringskode(
                     årstall = 2023,
                     kvartal = 1,
-                    næringkode5siffer = it,
+                    næringskode = it,
                     antallPersoner = 1,
                     tapteDagsverk = 1.toBigDecimal(),
                     muligeDagsverk = 1.toBigDecimal(),
