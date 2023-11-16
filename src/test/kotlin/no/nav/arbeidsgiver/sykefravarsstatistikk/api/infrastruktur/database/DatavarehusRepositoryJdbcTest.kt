@@ -54,6 +54,9 @@ open class DatavarehusRepositoryJdbcTest {
     private lateinit var datavarehusAggregertRepositoryV2: DatavarehusAggregertRepositoryV2
 
     @Autowired
+    private lateinit var datavarehusAggregertRepositoryV1: DatavarehusAggregertRepositoryV1
+
+    @Autowired
     private lateinit var repository: DatavarehusRepository
 
     @BeforeEach
@@ -270,7 +273,7 @@ open class DatavarehusRepositoryJdbcTest {
             99
         )
         val sykefraværsstatistikkVirksomhet =
-            repository.hentSykefraværsstatistikkVirksomhet(ÅrstallOgKvartal(2018, 4))
+            datavarehusAggregertRepositoryV1.hentSykefraværsstatistikkVirksomhet(ÅrstallOgKvartal(2018, 4))
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkVirksomhet.size).isEqualTo(2)
         val expected = SykefraværsstatistikkVirksomhet(
             2018,

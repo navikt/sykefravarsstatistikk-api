@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.KildeTilVirksomhetsdata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkNæringMedVarighet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Orgenhet
@@ -20,7 +19,6 @@ import java.sql.ResultSet
 class DatavarehusRepository(
     @param:Qualifier("datavarehusJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
     private val datavarehusAggregertRepositoryV2: DatavarehusAggregertRepositoryV2,
-    private val datavarehusAggregertRepositoryV1: DatavarehusAggregertRepositoryV1,
 ) : KildeTilVirksomhetsdata {
     /*
    Statistikk
@@ -43,12 +41,6 @@ class DatavarehusRepository(
             )
         }
         return alleÅrstallOgKvartal[0]
-    }
-
-    fun hentSykefraværsstatistikkVirksomhet(
-        årstallOgKvartal: ÅrstallOgKvartal
-    ): List<SykefraværsstatistikkVirksomhet> {
-        return datavarehusAggregertRepositoryV1.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal)
     }
 
     fun hentSykefraværsstatistikkNæringMedVarighet(
@@ -116,7 +108,6 @@ class DatavarehusRepository(
         const val KVARTAL = "kvartal"
         const val SEKTOR = "sektor"
         const val NARING_5SIFFER = "naering_kode"
-        const val ORGNR = "orgnr"
         const val VARIGHET = "varighet"
         const val SUM_ANTALL_PERSONER = "sum_antall_personer"
         const val SUM_TAPTE_DAGSVERK = "sum_tapte_dagsverk"
