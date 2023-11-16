@@ -55,9 +55,6 @@ open class DatavarehusRepositoryJdbcTest {
     @Autowired
     private lateinit var datavarehusAggregertRepositoryV1: DatavarehusAggregertRepositoryV1
 
-    @Autowired
-    private lateinit var repository: DatavarehusRepository
-
     @BeforeEach
     fun setUp() {
         cleanUpTestDb(
@@ -143,7 +140,7 @@ open class DatavarehusRepositoryJdbcTest {
             101
         )
         val sisteÅrstallOgKvartal =
-            repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk()
+            datavarehusAggregertRepositoryV1.hentSisteKvartal()
         AssertionsForClassTypes.assertThat(sisteÅrstallOgKvartal).isEqualTo(ÅrstallOgKvartal(2019, 1))
     }
 

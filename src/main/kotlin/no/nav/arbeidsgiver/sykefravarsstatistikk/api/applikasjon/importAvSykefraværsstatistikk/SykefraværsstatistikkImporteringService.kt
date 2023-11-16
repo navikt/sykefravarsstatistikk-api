@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component
 @Component
 class SykefraværsstatistikkImporteringService(
     private val sykefraværStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository,
-    private val datavarehusRepository: DatavarehusRepository,
     private val importtidspunktRepository: ImporttidspunktRepository,
     private val sykefraværsstatistikkLandRepository: SykefraværStatistikkLandRepository,
     private val sykefraværStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
@@ -42,7 +41,7 @@ class SykefraværsstatistikkImporteringService(
             datavarehusLandRespository.hentSisteKvartal(),
             datavarehusNæringRepository.hentSisteKvartal(),
             datavarehusNæringskodeRepository.hentSisteKvartal(),
-            datavarehusRepository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(),
+            datavarehusAggregertRepositoryV1.hentSisteKvartal(),
         )
         val gjeldendeÅrstallOgKvartal = årstallOgKvartalForDvh[0]
         return if (kanImportStartes(årstallOgKvartalForSykefraværsstatistikk, årstallOgKvartalForDvh)) {

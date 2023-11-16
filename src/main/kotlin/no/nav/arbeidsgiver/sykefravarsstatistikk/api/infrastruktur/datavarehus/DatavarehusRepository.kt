@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer.Publiseringsdato
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.dao.EmptyResultDataAccessException
@@ -11,14 +10,7 @@ import java.sql.ResultSet
 @Component
 class DatavarehusRepository(
     @param:Qualifier("datavarehusJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
-    private val datavarehusAggregertRepositoryV1: DatavarehusAggregertRepositoryV1,
 ) {
-    /*
-   Statistikk
-  */
-    fun hentSisteÅrstallOgKvartalForSykefraværsstatistikk(): ÅrstallOgKvartal {
-        return datavarehusAggregertRepositoryV1.hentSisteKvartal()
-    }
 
     fun hentPubliseringsdatoerFraDvh(): List<Publiseringsdato> {
         return try {
@@ -43,8 +35,6 @@ class DatavarehusRepository(
     }
 
     companion object {
-        const val ARSTALL = "arstall"
-        const val KVARTAL = "kvartal"
         const val SEKTOR = "sektor"
     }
 }
