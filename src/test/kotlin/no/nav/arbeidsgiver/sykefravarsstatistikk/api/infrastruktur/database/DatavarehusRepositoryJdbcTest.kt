@@ -388,8 +388,8 @@ open class DatavarehusRepositoryJdbcTest {
             NÆRINGSKODE_5SIFFER,
             Varighetskategori._1_DAG_TIL_7_DAGER.kode,
             13,
-            BigDecimal(16),
-            BigDecimal(263)
+            BigDecimal("16.0"),
+            BigDecimal("263.0")
         )
         AssertionsForClassTypes.assertThat(
             sykefraværsstatistikkNæringMedVarighet[0]

@@ -8,13 +8,13 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.jdbc.core.namedparam.SqlParameterSource
 import org.springframework.stereotype.Component
 import java.sql.ResultSet
 
 @Component
 class DatavarehusRepository(
     @param:Qualifier("datavarehusJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
+    private val datavarehusAggregertRepositoryV1: DatavarehusAggregertRepositoryV1,
 ) {
     /*
    Statistikk
@@ -42,31 +42,7 @@ class DatavarehusRepository(
     fun hentSykefraværsstatistikkNæringMedVarighet(
         årstallOgKvartal: ÅrstallOgKvartal
     ): List<SykefraværsstatistikkNæringMedVarighet> {
-        val namedParameters: SqlParameterSource = MapSqlParameterSource()
-            .addValue(ARSTALL, årstallOgKvartal.årstall)
-            .addValue(KVARTAL, årstallOgKvartal.kvartal)
-            .addValue(RECTYPE, Rectype.VIRKSOMHET.kode)
-        return namedParameterJdbcTemplate.query(
-            "select arstall, kvartal, naering_kode, varighet, "
-                    + "sum(antpers) as sum_antall_personer, "
-                    + "sum(taptedv) as sum_tapte_dagsverk, "
-                    + "sum(muligedv) as sum_mulige_dagsverk "
-                    + "from dt_p.agg_ia_sykefravar_v "
-                    + "where arstall = :arstall and kvartal = :kvartal and varighet is not null "
-                    + "and rectype= :rectype "
-                    + "group by arstall, kvartal, naering_kode, varighet",
-            namedParameters
-        ) { resultSet: ResultSet, _: Int ->
-            SykefraværsstatistikkNæringMedVarighet(
-                resultSet.getInt(ARSTALL),
-                resultSet.getInt(KVARTAL),
-                resultSet.getString(NARING_5SIFFER),
-                resultSet.getString(VARIGHET).first(),
-                resultSet.getInt(SUM_ANTALL_PERSONER),
-                resultSet.getBigDecimal(SUM_TAPTE_DAGSVERK),
-                resultSet.getBigDecimal(SUM_MULIGE_DAGSVERK)
-            )
-        }
+        return datavarehusAggregertRepositoryV1.hentSykefraværsstatistikkNæringMedVarighet(årstallOgKvartal)
     }
 
     fun hentPubliseringsdatoerFraDvh(): List<Publiseringsdato> {

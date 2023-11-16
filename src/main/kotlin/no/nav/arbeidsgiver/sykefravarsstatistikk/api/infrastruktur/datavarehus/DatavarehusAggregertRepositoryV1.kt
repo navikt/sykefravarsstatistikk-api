@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkNæringMedVarighet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.UsingExposed
@@ -19,7 +20,7 @@ class DatavarehusAggregertRepositoryV1(
     val kjønn = varchar("kjonn", 1)
     val fylkbo = varchar("fylkbo", 2)
     val sftype = varchar("sftype", 1)
-    val varighet = varchar("varighet", 1)
+    val varighet = varchar("varighet", 1).nullable()
     val sektor = varchar("sektor", 1)
     val størrelse = varchar("storrelse", 1)
     val fylkarb = varchar("fylkarb", 2)
@@ -49,11 +50,38 @@ class DatavarehusAggregertRepositoryV1(
                         årstall = it[årstall],
                         kvartal = it[kvartal],
                         orgnr = it[orgnr],
-                        varighet = it[varighet].first(),
+                        varighet = it[varighet]?.first(),
                         tapteDagsverk = it[tapteDagsverk.sum()]!!.toBigDecimal(),
                         muligeDagsverk = it[muligeDagsverk.sum()]!!.toBigDecimal(),
                         antallPersoner = it[antallPersoner.sum()]!!,
                         rectype = it[rectype],
+                    )
+                }
+        }
+    }
+
+    fun hentSykefraværsstatistikkNæringMedVarighet(
+        årstallOgKvartal: ÅrstallOgKvartal
+    ): List<SykefraværsstatistikkNæringMedVarighet> {
+        return transaction {
+            slice(
+                årstall, kvartal, næringskode, varighet,
+                antallPersoner.sum(), tapteDagsverk.sum(), muligeDagsverk.sum()
+            ).select {
+                (årstall eq årstallOgKvartal.årstall) and
+                        (kvartal eq årstallOgKvartal.kvartal) and
+                        (varighet neq null) and
+                        (rectype eq Rectype.VIRKSOMHET.kode)
+            }.groupBy(årstall, kvartal, næringskode, varighet)
+                .map {
+                    SykefraværsstatistikkNæringMedVarighet(
+                        årstall = it[årstall],
+                        kvartal = it[kvartal],
+                        næringkode = it[næringskode],
+                        varighet = it[varighet]?.first(),
+                        antallPersoner = it[antallPersoner.sum()]!!,
+                        tapteDagsverk = it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                        muligeDagsverk = it[muligeDagsverk.sum()]!!.toBigDecimal(),
                     )
                 }
         }
