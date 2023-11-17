@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusAggregertRepositoryV1
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusAggregertRepositoryV2
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusLandRespository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.Rectype
@@ -12,13 +13,19 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 object DatavarehusRepositoryJdbcTestUtils {
 
     fun cleanUpTestDb(
-        jdbcTemplate: NamedParameterJdbcTemplate,
         datavarehusLandRespository: DatavarehusLandRespository,
-        datavarehusAggregertRepositoryV2: DatavarehusAggregertRepositoryV2
+        datavarehusAggregertRepositoryV2: DatavarehusAggregertRepositoryV2,
+        datavarehusAggregertRepositoryV1: DatavarehusAggregertRepositoryV1,
     ) {
         datavarehusLandRespository.slettAlt()
         datavarehusAggregertRepositoryV2.slettAlt()
-        delete(jdbcTemplate, "dt_p.agg_ia_sykefravar_v")
+        datavarehusAggregertRepositoryV1.slettAlt()
+    }
+
+    private fun DatavarehusAggregertRepositoryV1.slettAlt() {
+        transaction {
+            deleteAll()
+        }
     }
 
     private fun DatavarehusAggregertRepositoryV2.slettAlt() {
@@ -33,10 +40,6 @@ object DatavarehusRepositoryJdbcTestUtils {
         }
     }
 
-
-    fun delete(jdbcTemplate: NamedParameterJdbcTemplate, tabell: String?): Int {
-        return jdbcTemplate.update("delete from $tabell", MapSqlParameterSource())
-    }
 
     fun insertSykefraværsstatistikkVirksomhetInDvhTabell(
         jdbcTemplate: NamedParameterJdbcTemplate,

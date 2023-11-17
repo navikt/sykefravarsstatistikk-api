@@ -58,9 +58,9 @@ open class DatavarehusRepositoryJdbcTest {
     @BeforeEach
     fun setUp() {
         cleanUpTestDb(
-            jdbcTemplate = namedParameterJdbcTemplate,
             datavarehusLandRespository = datavarehusLandRespository,
-            datavarehusAggregertRepositoryV2 = datavarehusAggregertRepositoryV2
+            datavarehusAggregertRepositoryV2 = datavarehusAggregertRepositoryV2,
+            datavarehusAggregertRepositoryV1 = datavarehusAggregertRepositoryV1,
         )
     }
 

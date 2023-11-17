@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.PubliseringsdatoerRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusPubliseringsdatoerRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -19,18 +19,18 @@ internal class PubliseringsdatoerImportServiceTest {
     private val mockPubliseringsdatoerRepository: PubliseringsdatoerRepository? = null
 
     @Mock
-    private val mockDatavarehusRepository: DatavarehusRepository? = null
+    private val mockDatavarehusPubliseringsdatoerRepository: DatavarehusPubliseringsdatoerRepository? = null
 
     @BeforeEach
     fun setUp() {
         serviceUnderTest = PubliseringsdatoerImportService(
-            mockPubliseringsdatoerRepository!!, mockDatavarehusRepository!!
+            mockPubliseringsdatoerRepository!!, mockDatavarehusPubliseringsdatoerRepository!!
         )
     }
 
     @AfterEach
     fun tearDown() {
-        Mockito.reset(mockPubliseringsdatoerRepository, mockDatavarehusRepository)
+        Mockito.reset(mockPubliseringsdatoerRepository, mockDatavarehusPubliseringsdatoerRepository)
     }
 
     @Test
@@ -43,7 +43,7 @@ internal class PubliseringsdatoerImportServiceTest {
                 "sykefravær for en periode"
             )
         )
-        Mockito.`when`(mockDatavarehusRepository!!.hentPubliseringsdatoerFraDvh())
+        Mockito.`when`(mockDatavarehusPubliseringsdatoerRepository!!.hentPubliseringsdatoerFraDvh())
             .thenReturn(publiseringsdatoListe)
         serviceUnderTest!!.importerDatoerFraDatavarehus()
         Mockito.verify(mockPubliseringsdatoerRepository, Mockito.times(1))
