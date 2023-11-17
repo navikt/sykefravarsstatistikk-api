@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.KildeTilVirksomhetsdata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.VirksomhetMetadataService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetMetadata
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetMetadataMedNæringskode
@@ -12,7 +13,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.Lega
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.LegacyVirksomhetMetadataRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.DatavarehusRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkRepository
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -24,7 +24,7 @@ import testUtils.TestData.ORGNR_VIRKSOMHET_1
 import testUtils.TestData.ORGNR_VIRKSOMHET_2
 
 internal class VirksomhetMetadataServiceTest {
-    private val datavarehusRepository: DatavarehusRepository = mock()
+    private val datavarehusRepository: KildeTilVirksomhetsdata = mock()
 
     private val virksomhetMetadataRepository: VirksomhetMetadataRepository = mock()
 
@@ -73,7 +73,7 @@ internal class VirksomhetMetadataServiceTest {
     private fun mockImportVirksomhetMetadata(
         orgenhetSomSkalTilVirksomhetMetadata: List<Orgenhet>
     ) {
-        whenever(datavarehusRepository.hentVirksomheter(any()))
+        whenever(datavarehusRepository.hentVirksomheter(any<ÅrstallOgKvartal>()))
             .thenReturn(orgenhetSomSkalTilVirksomhetMetadata)
         whenever(virksomhetMetadataRepository.opprettVirksomhetMetadata(any()))
             .thenReturn(orgenhetSomSkalTilVirksomhetMetadata.size)

@@ -4,7 +4,6 @@ import config.AppConfigForJdbcTesterConfig
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Orgenhet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.StatistikkildeDvh
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.cleanUpTestDb
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkNærin5SiffergInDvhTabell
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.DatavarehusRepositoryJdbcTestUtils.insertSykefraværsstatistikkNæringInDvhTabell
@@ -54,14 +53,14 @@ open class DatavarehusRepositoryJdbcTest {
     private lateinit var datavarehusAggregertRepositoryV2: DatavarehusAggregertRepositoryV2
 
     @Autowired
-    private lateinit var repository: DatavarehusRepository
+    private lateinit var datavarehusAggregertRepositoryV1: DatavarehusAggregertRepositoryV1
 
     @BeforeEach
     fun setUp() {
         cleanUpTestDb(
-            jdbcTemplate = namedParameterJdbcTemplate,
             datavarehusLandRespository = datavarehusLandRespository,
-            datavarehusAggregertRepositoryV2 = datavarehusAggregertRepositoryV2
+            datavarehusAggregertRepositoryV2 = datavarehusAggregertRepositoryV2,
+            datavarehusAggregertRepositoryV1 = datavarehusAggregertRepositoryV1,
         )
     }
 
@@ -141,7 +140,7 @@ open class DatavarehusRepositoryJdbcTest {
             101
         )
         val sisteÅrstallOgKvartal =
-            repository.hentSisteÅrstallOgKvartalForSykefraværsstatistikk(StatistikkildeDvh.VIRKSOMHET)
+            datavarehusAggregertRepositoryV1.hentSisteKvartal()
         AssertionsForClassTypes.assertThat(sisteÅrstallOgKvartal).isEqualTo(ÅrstallOgKvartal(2019, 1))
     }
 
@@ -270,7 +269,7 @@ open class DatavarehusRepositoryJdbcTest {
             99
         )
         val sykefraværsstatistikkVirksomhet =
-            repository.hentSykefraværsstatistikkVirksomhet(ÅrstallOgKvartal(2018, 4))
+            datavarehusAggregertRepositoryV1.hentSykefraværsstatistikkVirksomhet(ÅrstallOgKvartal(2018, 4))
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkVirksomhet.size).isEqualTo(2)
         val expected = SykefraværsstatistikkVirksomhet(
             2018,
@@ -279,8 +278,8 @@ open class DatavarehusRepositoryJdbcTest {
             Varighetskategori._1_DAG_TIL_7_DAGER.kode,
             Rectype.VIRKSOMHET.kode,
             7,
-            BigDecimal(13),
-            BigDecimal(188)
+            BigDecimal("13.0"),
+            BigDecimal("188.0")
         )
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkVirksomhet[0]).isEqualTo(expected)
     }
@@ -377,7 +376,12 @@ open class DatavarehusRepositoryJdbcTest {
             99
         )
         val sykefraværsstatistikkNæringMedVarighet =
-            repository.hentSykefraværsstatistikkNæringMedVarighet(ÅrstallOgKvartal(2018, 4))
+            datavarehusAggregertRepositoryV1.hentSykefraværsstatistikkNæringMedVarighet(
+                ÅrstallOgKvartal(
+                    2018,
+                    4
+                )
+            )
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkNæringMedVarighet.size).isEqualTo(3)
         val expected = SykefraværsstatistikkNæringMedVarighet(
             2018,
@@ -385,8 +389,8 @@ open class DatavarehusRepositoryJdbcTest {
             NÆRINGSKODE_5SIFFER,
             Varighetskategori._1_DAG_TIL_7_DAGER.kode,
             13,
-            BigDecimal(16),
-            BigDecimal(263)
+            BigDecimal("16.0"),
+            BigDecimal("263.0")
         )
         AssertionsForClassTypes.assertThat(
             sykefraværsstatistikkNæringMedVarighet[0]
@@ -435,7 +439,12 @@ open class DatavarehusRepositoryJdbcTest {
             100
         )
         val sykefraværsstatistikkVirksomhetMedGradering =
-            repository.hentSykefraværsstatistikkVirksomhetMedGradering(ÅrstallOgKvartal(2018, 4))
+            datavarehusAggregertRepositoryV2.hentSykefraværsstatistikkVirksomhetMedGradering(
+                ÅrstallOgKvartal(
+                    2018,
+                    4
+                )
+            )
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkVirksomhetMedGradering.size).isEqualTo(2)
         val expected = SykefraværsstatistikkVirksomhetMedGradering(
             2018,
@@ -497,7 +506,7 @@ open class DatavarehusRepositoryJdbcTest {
             2020,
             3
         )
-        val orgenhetList = repository.hentVirksomheter(ÅrstallOgKvartal(2020, 3))
+        val orgenhetList = datavarehusAggregertRepositoryV2.hentVirksomheter(ÅrstallOgKvartal(2020, 3))
         Assertions.assertTrue(
             orgenhetList.contains(
                 Orgenhet(
