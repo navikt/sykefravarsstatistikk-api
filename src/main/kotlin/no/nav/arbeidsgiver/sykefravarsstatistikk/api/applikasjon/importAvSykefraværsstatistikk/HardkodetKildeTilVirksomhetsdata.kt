@@ -22,6 +22,7 @@ object HardkodetKildeTilVirksomhetsdata : KildeTilVirksomhetsdata {
             .addColumn("primærnæring")
             .setUseHeader(true)
             .build()
+
         val virksomheter = CsvMapper()
             .readerFor(DevVirksomhet::class.java)
             .with(csvSchema)
