@@ -27,7 +27,7 @@ object SykefraværsstatistikkImporteringUtils {
                     varighet = varighet.kode,
                     rectype = it.rectype!!,
                     antallPersoner = if (renTilfeldighet) 0 else (0..500).random(),
-                    tapteDagsverk = if (varighet != TOTAL) tapteDagsverk.toBigDecimal() else ZERO,
+                    tapteDagsverk = if (varighet == TOTAL) ZERO else tapteDagsverk.toBigDecimal(),
                     muligeDagsverk = if (varighet == TOTAL) muligeDagsverk.toBigDecimal() else ZERO,
                 )
             }
