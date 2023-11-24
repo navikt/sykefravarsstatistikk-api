@@ -13,7 +13,7 @@ object SykefraværsstatistikkImporteringUtils {
         gjeldendeKvartal: ÅrstallOgKvartal
     ): List<SykefraværsstatistikkVirksomhet> {
         return HardkodetKildeTilVirksomhetsdata.hentVirksomheter(gjeldendeKvartal).flatMap {
-            val muligeDagsverk = (0..1_000_000).random()
+            val muligeDagsverk = (0..100_00).random()
             val tapteDagsverkØvreGrense = muligeDagsverk / 6
             val renTilfeldighet = it.orgnr.verdi.last() == '9'
 
@@ -26,7 +26,7 @@ object SykefraværsstatistikkImporteringUtils {
                     orgnr = it.orgnr.verdi,
                     varighet = varighet.kode,
                     rectype = it.rectype!!,
-                    antallPersoner = if (renTilfeldighet) 0 else (0..10_000).random(),
+                    antallPersoner = if (renTilfeldighet) 0 else (0..500).random(),
                     tapteDagsverk = if (varighet != TOTAL) tapteDagsverk.toBigDecimal() else ZERO,
                     muligeDagsverk = if (varighet == TOTAL) muligeDagsverk.toBigDecimal() else ZERO,
                 )
