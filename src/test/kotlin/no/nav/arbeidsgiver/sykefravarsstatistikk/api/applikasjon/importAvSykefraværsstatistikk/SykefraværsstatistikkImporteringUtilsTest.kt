@@ -46,4 +46,16 @@ class SykefraværsstatistikkImporteringUtilsTest {
 
         statistikk.filter { it.antallPersoner == 0 }.size shouldBeGreaterThanOrEqual 210
     }
+
+    @Test
+    fun `generer sykefraværsstatistikk virksomhet genererer samme data om man kaller funksjonen flere ganger`() {
+        val statistikk1 = SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhet(
+            ÅrstallOgKvartal(2021, 1)
+        )
+        val statistikk2 = SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhet(
+            ÅrstallOgKvartal(2021, 1)
+        )
+
+        statistikk1 shouldBe statistikk2
+    }
 }

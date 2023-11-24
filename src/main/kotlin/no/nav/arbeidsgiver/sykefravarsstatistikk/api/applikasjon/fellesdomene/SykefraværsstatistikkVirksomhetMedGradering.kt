@@ -11,6 +11,7 @@ data class SykefraværsstatistikkVirksomhetMedGradering(
     val rectype: String,
     val antallGraderteSykemeldinger: Int,
     val tapteDagsverkGradertSykemelding: BigDecimal,
+    // TODO: Fjern antallSykemeldinger da den ikke er i bruk
     val antallSykemeldinger: Int,
     override val antallPersoner: Int,
     override val tapteDagsverk: BigDecimal,
