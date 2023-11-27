@@ -1,7 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Orgenhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Orgenhet
 
 fun fjernDupliserteOrgnr(orgenheter: List<Orgenhet>): List<Orgenhet> {
     // Noen bedrifter er registrert som flere sektorer, typisk dersom de har endret sektor underveis i et kvartal.
@@ -9,4 +9,8 @@ fun fjernDupliserteOrgnr(orgenheter: List<Orgenhet>): List<Orgenhet> {
     val sektorprioritering = listOf(Sektor.STATLIG, Sektor.FYLKESKOMMUNAL, Sektor.KOMMUNAL, Sektor.PRIVAT, Sektor.UKJENT)
 
     return orgenheter.sortedBy { sektorprioritering.indexOf(it.sektor) }.distinctBy {it.orgnr}
+}
+
+fun List<Orgenhet>.fjernDupliserteOrgnr(): List<Orgenhet> {
+    return fjernDupliserteOrgnr(this)
 }

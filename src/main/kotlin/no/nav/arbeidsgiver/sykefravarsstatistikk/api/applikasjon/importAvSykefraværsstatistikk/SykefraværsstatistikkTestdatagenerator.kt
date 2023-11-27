@@ -45,7 +45,7 @@ object SykefraværsstatistikkTestdatagenerator {
             return it
         }
 
-        return HardkodetKildeTilVirksomhetsdata.hentTestvirksomheter(gjeldendeKvartal)
+        return HardkodetKildeTilVirksomhetsdata.hentVirksomheter(gjeldendeKvartal)
             .map {
                 val tiProsentAvBedriftene = it.orgnr.verdi.last() == '9'
                 val antallPersoner = if (tiProsentAvBedriftene) (40..10_000).random() else (0..40).random()

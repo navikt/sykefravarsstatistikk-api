@@ -172,7 +172,7 @@ class SykefraværsstatistikkImporteringService(
         return resultat
     }
 
-    private fun importSykefraværsstatistikkVirksomhet(årstallOgKvartal: ÅrstallOgKvartal) {
+    fun importSykefraværsstatistikkVirksomhet(årstallOgKvartal: ÅrstallOgKvartal) {
         val statistikk: List<SykefraværsstatistikkVirksomhet> = if (environment.activeProfiles.contains("dev")) {
             SykefraværsstatistikkTestdatagenerator.genererSykefraværsstatistikkVirksomhet(årstallOgKvartal)
         } else {
@@ -184,7 +184,7 @@ class SykefraværsstatistikkImporteringService(
         loggResultat(årstallOgKvartal, SlettOgOpprettResultat(antallSlettet, antallSattInn), "virksomhet")
     }
 
-    private fun importSykefraværsstatistikkVirksomhetMedGradering(
+    fun importSykefraværsstatistikkVirksomhetMedGradering(
         årstallOgKvartal: ÅrstallOgKvartal
     ) {
         val statistikk: List<SykefraværsstatistikkVirksomhetMedGradering> =

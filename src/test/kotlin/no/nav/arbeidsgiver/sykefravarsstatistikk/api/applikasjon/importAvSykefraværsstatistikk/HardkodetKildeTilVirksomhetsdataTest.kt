@@ -11,14 +11,14 @@ import org.junit.jupiter.api.Test
 class HardkodetKildeTilVirksomhetsdataTest {
     @Test
     fun `hardkodet kilde til virksomheter burde hente ut virksomheter fra fil`() {
-        val virksomheter = HardkodetKildeTilVirksomhetsdata.hentTestvirksomheter(ÅrstallOgKvartal(2020, 1))
+        val virksomheter = HardkodetKildeTilVirksomhetsdata.hentVirksomheter(ÅrstallOgKvartal(2020, 1))
 
         virksomheter.size shouldBe 330
     }
 
     @Test
     fun `hardkodet kilde til virksomheter burde mappe verdiene til riktige felt`() {
-        val virksomheter = HardkodetKildeTilVirksomhetsdata.hentTestvirksomheter(ÅrstallOgKvartal(2020, 1))
+        val virksomheter = HardkodetKildeTilVirksomhetsdata.hentVirksomheter(ÅrstallOgKvartal(2020, 1))
 
         virksomheter.first() shouldBe Orgenhet(
             orgnr = Orgnr("311991531"),
@@ -43,7 +43,7 @@ class HardkodetKildeTilVirksomhetsdataTest {
 
     @Test
     fun `Har kun unike virksomheter`() {
-        val virksomheter = HardkodetKildeTilVirksomhetsdata.hentTestvirksomheter(ÅrstallOgKvartal(2020, 1))
+        val virksomheter = HardkodetKildeTilVirksomhetsdata.hentVirksomheter(ÅrstallOgKvartal(2020, 1))
 
         virksomheter.map { it.orgnr }.shouldBeUnique()
     }

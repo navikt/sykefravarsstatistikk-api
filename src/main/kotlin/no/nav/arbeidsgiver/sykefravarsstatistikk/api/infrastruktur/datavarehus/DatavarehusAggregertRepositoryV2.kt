@@ -68,7 +68,7 @@ class DatavarehusAggregertRepositoryV2(
 
 
 
-    override fun hentTestvirksomheter(årstallOgKvartal: ÅrstallOgKvartal): List<Orgenhet> {
+    override fun hentVirksomheter(årstallOgKvartal: ÅrstallOgKvartal): List<Orgenhet> {
         return transaction {
             slice(
                 orgnr, rectype, sektor, primærnæringskode, årstall, kvartal
