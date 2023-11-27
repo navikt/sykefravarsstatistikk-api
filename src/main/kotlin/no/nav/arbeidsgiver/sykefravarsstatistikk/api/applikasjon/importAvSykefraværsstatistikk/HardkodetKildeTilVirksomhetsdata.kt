@@ -26,7 +26,7 @@ object HardkodetKildeTilVirksomhetsdata : KildeTilVirksomhetsdata {
         val virksomheter = CsvMapper()
             .readerFor(DevVirksomhet::class.java)
             .with(csvSchema)
-            .readValues<DevVirksomhet>(this::class.java.getResource("/mock/test-virksomheter-FIA.csv"))
+            .readValues<DevVirksomhet>(this::class.java.getResource("/mock/testvirksomheter.csv"))
             .readAll()
             .toList()
 
