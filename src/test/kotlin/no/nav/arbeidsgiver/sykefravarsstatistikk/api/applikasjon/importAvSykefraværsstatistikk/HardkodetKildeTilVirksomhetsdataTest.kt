@@ -13,7 +13,7 @@ class HardkodetKildeTilVirksomhetsdataTest {
     fun `hardkodet kilde til virksomheter burde hente ut virksomheter fra fil`() {
         val virksomheter = HardkodetKildeTilVirksomhetsdata.hentTestvirksomheter(ÅrstallOgKvartal(2020, 1))
 
-        virksomheter.size shouldBe 319
+        virksomheter.size shouldBe 330
     }
 
     @Test
