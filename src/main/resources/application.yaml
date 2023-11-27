@@ -25,8 +25,6 @@ spring:
 spring:
   config.activate.on-profile: dev
 
-wiremock.mock:
-  port: 8081
 
 enhetsregisteret:
   url: "https://arbeidsgiver-mock-enhetsregisteret.intern.dev.nav.no/enhetsregisteret/api"
