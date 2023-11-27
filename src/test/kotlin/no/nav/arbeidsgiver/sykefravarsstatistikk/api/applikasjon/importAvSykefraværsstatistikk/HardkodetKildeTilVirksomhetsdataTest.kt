@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk
 
+import io.kotest.matchers.collections.shouldBeUnique
 import io.kotest.matchers.shouldBe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
@@ -38,5 +39,12 @@ class HardkodetKildeTilVirksomhetsdataTest {
             næringskode = "87203",
             årstallOgKvartal = ÅrstallOgKvartal(2020, 1)
         )
+    }
+
+    @Test
+    fun `Har kun unike virksomheter`() {
+        val virksomheter = HardkodetKildeTilVirksomhetsdata.hentTestvirksomheter(ÅrstallOgKvartal(2020, 1))
+
+        virksomheter.map { it.orgnr }.shouldBeUnique()
     }
 }
