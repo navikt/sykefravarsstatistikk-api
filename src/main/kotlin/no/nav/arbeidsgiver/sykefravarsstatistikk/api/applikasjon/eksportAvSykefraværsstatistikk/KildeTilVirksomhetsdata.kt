@@ -4,5 +4,5 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefra
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 
 interface KildeTilVirksomhetsdata {
-    fun hentVirksomheter(årstallOgKvartal: ÅrstallOgKvartal): List<Orgenhet>
+    fun hentTestvirksomheter(årstallOgKvartal: ÅrstallOgKvartal): List<Orgenhet>
 }

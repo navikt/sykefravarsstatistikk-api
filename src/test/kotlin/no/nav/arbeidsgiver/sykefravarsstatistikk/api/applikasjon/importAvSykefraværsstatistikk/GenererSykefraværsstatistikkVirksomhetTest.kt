@@ -8,7 +8,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Å
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal.ZERO
 
-class SykefraværsstatistikkTestdatageneratorTest {
+class GenererSykefraværsstatistikkVirksomhetTest {
+
     @Test
     fun `generer sykefraværsstatistikk virksomhet genererer riktig mengde data`() {
         val statistikk = SykefraværsstatistikkTestdatagenerator.genererSykefraværsstatistikkVirksomhet(
@@ -17,6 +18,7 @@ class SykefraværsstatistikkTestdatageneratorTest {
 
         statistikk.size shouldBe 2233
     }
+
 
     @Test
     fun `generer sykefraværsstatistikk virksomhet genererer data med riktige verdier`() {

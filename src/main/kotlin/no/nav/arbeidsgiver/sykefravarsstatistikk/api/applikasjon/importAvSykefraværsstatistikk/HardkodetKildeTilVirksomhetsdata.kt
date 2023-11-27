@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component
 @Profile("dev")
 @Primary
 object HardkodetKildeTilVirksomhetsdata : KildeTilVirksomhetsdata {
-    override fun hentVirksomheter(årstallOgKvartal: ÅrstallOgKvartal): List<Orgenhet> {
+    override fun hentTestvirksomheter(årstallOgKvartal: ÅrstallOgKvartal): List<Orgenhet> {
         val csvSchema = CsvSchema.builder()
             .addColumn("orgnr")
             .addColumn("sektor")

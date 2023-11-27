@@ -73,7 +73,7 @@ internal class VirksomhetMetadataServiceTest {
     private fun mockImportVirksomhetMetadata(
         orgenhetSomSkalTilVirksomhetMetadata: List<Orgenhet>
     ) {
-        whenever(datavarehusRepository.hentVirksomheter(any<ÅrstallOgKvartal>()))
+        whenever(datavarehusRepository.hentTestvirksomheter(any<ÅrstallOgKvartal>()))
             .thenReturn(orgenhetSomSkalTilVirksomhetMetadata)
         whenever(virksomhetMetadataRepository.opprettVirksomhetMetadata(any()))
             .thenReturn(orgenhetSomSkalTilVirksomhetMetadata.size)

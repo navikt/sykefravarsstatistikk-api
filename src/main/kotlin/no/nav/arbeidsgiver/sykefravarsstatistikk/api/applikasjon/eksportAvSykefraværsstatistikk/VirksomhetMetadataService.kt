@@ -136,7 +136,7 @@ class VirksomhetMetadataService(
     }
 
     private fun hentVirksomheterFraDvh(årstallOgKvartal: ÅrstallOgKvartal): List<Orgenhet> {
-        val virksomheter = kildeTilVirksomhetsdata.hentVirksomheter(årstallOgKvartal)
+        val virksomheter = kildeTilVirksomhetsdata.hentTestvirksomheter(årstallOgKvartal)
         if (virksomheter.isEmpty()) {
             log.warn(
                 "Har ikke funnet noen virksomheter for årstall '{}' og kvartal '{}'. ",

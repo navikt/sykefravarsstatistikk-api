@@ -45,13 +45,17 @@ object SykefraværsstatistikkTestdatagenerator {
             return it
         }
 
-        return HardkodetKildeTilVirksomhetsdata.hentVirksomheter(gjeldendeKvartal)
+        return HardkodetKildeTilVirksomhetsdata.hentTestvirksomheter(gjeldendeKvartal)
             .map {
-                val muligeDagsverk = (0..100_00).random()
+                val tiProsentAvBedriftene = it.orgnr.verdi.last() == '9'
+                val antallPersoner = if (tiProsentAvBedriftene) (40..10_000).random() else (0..40).random()
+
+                val antallDagsverkIEttKvartal = 230 / 4
+                val muligeDagsverk = antallPersoner * antallDagsverkIEttKvartal
+
                 val tapteDagsverk = (0..muligeDagsverk).random().toBigDecimal()
 
-                val renTilfeldighet = it.orgnr.verdi.last() == '9'
-                val antallPersoner = if (renTilfeldighet) 0 else (0..500).random()
+                val antallSykemeldinger = (0..(antallPersoner * 1.25).toInt()).random()
 
                 val graderingsfaktor = Math.random()
 
@@ -62,9 +66,9 @@ object SykefraværsstatistikkTestdatagenerator {
                     næring = it.næring!!,
                     næringkode = it.næringskode!!,
                     rectype = it.rectype!!,
-                    antallGraderteSykemeldinger = (graderingsfaktor * antallPersoner).toInt(),
+                    antallGraderteSykemeldinger = (graderingsfaktor * antallSykemeldinger).toInt(),
                     tapteDagsverkGradertSykemelding = (graderingsfaktor.toBigDecimal() * tapteDagsverk),
-                    antallSykemeldinger = 0,
+                    antallSykemeldinger = antallSykemeldinger,
                     antallPersoner = antallPersoner,
                     tapteDagsverk = tapteDagsverk,
                     muligeDagsverk = muligeDagsverk.toBigDecimal(),

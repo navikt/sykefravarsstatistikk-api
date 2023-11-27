@@ -10,14 +10,14 @@ import org.junit.jupiter.api.Test
 class HardkodetKildeTilVirksomhetsdataTest {
     @Test
     fun `hardkodet kilde til virksomheter burde hente ut virksomheter fra fil`() {
-        val virksomheter = HardkodetKildeTilVirksomhetsdata.hentVirksomheter(ÅrstallOgKvartal(2020, 1))
+        val virksomheter = HardkodetKildeTilVirksomhetsdata.hentTestvirksomheter(ÅrstallOgKvartal(2020, 1))
 
         virksomheter.size shouldBe 319
     }
 
     @Test
     fun `hardkodet kilde til virksomheter burde mappe verdiene til riktige felt`() {
-        val virksomheter = HardkodetKildeTilVirksomhetsdata.hentVirksomheter(ÅrstallOgKvartal(2020, 1))
+        val virksomheter = HardkodetKildeTilVirksomhetsdata.hentTestvirksomheter(ÅrstallOgKvartal(2020, 1))
 
         virksomheter.first() shouldBe Orgenhet(
             orgnr = Orgnr("311991531"),

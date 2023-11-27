@@ -506,7 +506,7 @@ open class DatavarehusRepositoryJdbcTest {
             2020,
             3
         )
-        val orgenhetList = datavarehusAggregertRepositoryV2.hentVirksomheter(ÅrstallOgKvartal(2020, 3))
+        val orgenhetList = datavarehusAggregertRepositoryV2.hentTestvirksomheter(ÅrstallOgKvartal(2020, 3))
         Assertions.assertTrue(
             orgenhetList.contains(
                 Orgenhet(
