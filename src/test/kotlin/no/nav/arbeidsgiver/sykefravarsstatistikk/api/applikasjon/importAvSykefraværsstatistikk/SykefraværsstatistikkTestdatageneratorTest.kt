@@ -8,10 +8,10 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Å
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal.ZERO
 
-class SykefraværsstatistikkImporteringUtilsTest {
+class SykefraværsstatistikkTestdatageneratorTest {
     @Test
     fun `generer sykefraværsstatistikk virksomhet genererer riktig mengde data`() {
-        val statistikk = SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhet(
+        val statistikk = SykefraværsstatistikkTestdatagenerator.genererSykefraværsstatistikkVirksomhet(
             ÅrstallOgKvartal(2021, 1)
         )
 
@@ -20,7 +20,7 @@ class SykefraværsstatistikkImporteringUtilsTest {
 
     @Test
     fun `generer sykefraværsstatistikk virksomhet genererer data med riktige verdier`() {
-        val statistikk = SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhet(
+        val statistikk = SykefraværsstatistikkTestdatagenerator.genererSykefraværsstatistikkVirksomhet(
             ÅrstallOgKvartal(2021, 1)
         )
 
@@ -49,10 +49,10 @@ class SykefraværsstatistikkImporteringUtilsTest {
 
     @Test
     fun `generer sykefraværsstatistikk virksomhet genererer samme data om man kaller funksjonen flere ganger`() {
-        val statistikk1 = SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhet(
+        val statistikk1 = SykefraværsstatistikkTestdatagenerator.genererSykefraværsstatistikkVirksomhet(
             ÅrstallOgKvartal(2021, 1)
         )
-        val statistikk2 = SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhet(
+        val statistikk2 = SykefraværsstatistikkTestdatagenerator.genererSykefraværsstatistikkVirksomhet(
             ÅrstallOgKvartal(2021, 1)
         )
 

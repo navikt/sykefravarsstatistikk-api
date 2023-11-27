@@ -6,9 +6,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sy
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import java.math.BigDecimal.ZERO
-import kotlin.time.times
 
-object SykefraværsstatistikkImporteringUtils {
+object SykefraværsstatistikkTestdatagenerator {
     private val generertStatistikk = mutableMapOf<ÅrstallOgKvartal, List<SykefraværsstatistikkVirksomhet>>()
     private val generertStatistikkMedGradering =
         mutableMapOf<ÅrstallOgKvartal, List<SykefraværsstatistikkVirksomhetMedGradering>>()
@@ -16,32 +15,29 @@ object SykefraværsstatistikkImporteringUtils {
     fun genererSykefraværsstatistikkVirksomhet(
         gjeldendeKvartal: ÅrstallOgKvartal
     ): List<SykefraværsstatistikkVirksomhet> {
+
         generertStatistikk[gjeldendeKvartal]?.let {
             return it
         }
 
-        generertStatistikk[gjeldendeKvartal] = HardkodetKildeTilVirksomhetsdata.hentVirksomheter(gjeldendeKvartal).flatMap {
-            val muligeDagsverk = (0..100_00).random()
-            val tapteDagsverkØvreGrense = muligeDagsverk / 6
-            val renTilfeldighet = it.orgnr.verdi.last() == '9'
-
+        return genererSykefraværsstatistikkVirksomhetMedGradering(gjeldendeKvartal).flatMap {
             Varighetskategori.entries.map { varighet ->
-                val tapteDagsverk = (0..tapteDagsverkØvreGrense).random()
+
+                val tapteDagsverkØvreGrense = it.tapteDagsverk.toInt() / 6
+                val tapteDagsverk = (0..tapteDagsverkØvreGrense).random().toBigDecimal()
 
                 SykefraværsstatistikkVirksomhet(
                     årstall = gjeldendeKvartal.årstall,
                     kvartal = gjeldendeKvartal.kvartal,
-                    orgnr = it.orgnr.verdi,
+                    orgnr = it.orgnr,
                     varighet = varighet.kode,
-                    rectype = it.rectype!!,
-                    antallPersoner = if (renTilfeldighet) 0 else (0..500).random(),
-                    tapteDagsverk = if (varighet == TOTAL) ZERO else tapteDagsverk.toBigDecimal(),
-                    muligeDagsverk = if (varighet == TOTAL) muligeDagsverk.toBigDecimal() else ZERO,
+                    rectype = it.rectype,
+                    antallPersoner = if (varighet == TOTAL) it.antallPersoner else 0,
+                    tapteDagsverk = if (varighet == TOTAL) ZERO else tapteDagsverk,
+                    muligeDagsverk = if (varighet == TOTAL) it.muligeDagsverk else ZERO,
                 )
             }
-        }
-
-        return generertStatistikk[gjeldendeKvartal]!!
+        }.also { generertStatistikk[gjeldendeKvartal] = it }
     }
 
     fun genererSykefraværsstatistikkVirksomhetMedGradering(gjeldendeKvartal: ÅrstallOgKvartal): List<SykefraværsstatistikkVirksomhetMedGradering> {
@@ -49,28 +45,30 @@ object SykefraværsstatistikkImporteringUtils {
             return it
         }
 
-        generertStatistikkMedGradering[gjeldendeKvartal] = genererSykefraværsstatistikkVirksomhet(gjeldendeKvartal)
-            .groupBy { it.orgnr!! }
-            .map { (orgnr, value) ->
-                val muligeDagsverk = value.sumOf { it.muligeDagsverk }
-                val tapteDagsverk = value.sumOf { it.tapteDagsverk }
-                val antallPersoner = value.sumOf { it.antallPersoner }
+        return HardkodetKildeTilVirksomhetsdata.hentVirksomheter(gjeldendeKvartal)
+            .map {
+                val muligeDagsverk = (0..100_00).random()
+                val tapteDagsverk = (0..muligeDagsverk).random().toBigDecimal()
 
-                val graderingsFaktor = Math.random()
+                val renTilfeldighet = it.orgnr.verdi.last() == '9'
+                val antallPersoner = if (renTilfeldighet) 0 else (0..500).random()
+
+                val graderingsfaktor = Math.random()
+
                 SykefraværsstatistikkVirksomhetMedGradering(
                     årstall = gjeldendeKvartal.årstall,
                     kvartal = gjeldendeKvartal.kvartal,
-                    orgnr = orgnr,
-                    næring = value.first().,
-                    næringkode = "",
-                    rectype = "",
-                    antallGraderteSykemeldinger = (graderingsFaktor * antallPersoner).toInt(),
-                    tapteDagsverkGradertSykemelding = (graderingsFaktor.toBigDecimal() * tapteDagsverk),
+                    orgnr = it.orgnr.verdi,
+                    næring = it.næring!!,
+                    næringkode = it.næringskode!!,
+                    rectype = it.rectype!!,
+                    antallGraderteSykemeldinger = (graderingsfaktor * antallPersoner).toInt(),
+                    tapteDagsverkGradertSykemelding = (graderingsfaktor.toBigDecimal() * tapteDagsverk),
                     antallSykemeldinger = 0,
                     antallPersoner = antallPersoner,
                     tapteDagsverk = tapteDagsverk,
-                    muligeDagsverk = muligeDagsverk,
+                    muligeDagsverk = muligeDagsverk.toBigDecimal(),
                 )
-            }
+            }.also { generertStatistikkMedGradering[gjeldendeKvartal] = it }
     }
 }

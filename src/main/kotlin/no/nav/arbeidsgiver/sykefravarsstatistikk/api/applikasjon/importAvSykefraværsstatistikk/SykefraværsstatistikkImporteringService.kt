@@ -176,7 +176,7 @@ class SykefraværsstatistikkImporteringService(
         val statistikk: List<SykefraværsstatistikkVirksomhet> = if (environment.activeProfiles.contains("prod")) {
             datavarehusAggregertRepositoryV1.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal)
         } else {
-            SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhet(årstallOgKvartal)
+            SykefraværsstatistikkTestdatagenerator.genererSykefraværsstatistikkVirksomhet(årstallOgKvartal)
         }
         val antallSlettet = sykefraværStatistikkVirksomhetRepository.slettForKvartal(årstallOgKvartal)
         val antallSattInn = sykefraværStatistikkVirksomhetRepository.settInn(statistikk)
@@ -193,7 +193,7 @@ class SykefraværsstatistikkImporteringService(
                     årstallOgKvartal
                 )
             } else {
-                SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhetMedGradering(
+                SykefraværsstatistikkTestdatagenerator.genererSykefraværsstatistikkVirksomhetMedGradering(
                     årstallOgKvartal
                 )
             }
