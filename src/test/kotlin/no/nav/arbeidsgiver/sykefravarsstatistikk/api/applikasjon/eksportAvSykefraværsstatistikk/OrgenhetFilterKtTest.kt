@@ -1,9 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Orgenhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Orgenhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.fjernDupliserteOrgnr
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -42,7 +42,7 @@ internal class OrgenhetFilterKtTest {
                 dummyvirksomhet.copy(
                     sektor = Sektor.STATLIG
                 )
-            ), fjernDupliserteOrgnr(orgenheter)
+            ), orgenheter.fjernDupliserteOrgnr()
         )
     }
 
@@ -62,7 +62,7 @@ internal class OrgenhetFilterKtTest {
                 sektor = Sektor.KOMMUNAL
             ),
         )
-        assertThat(fjernDupliserteOrgnr(orgenheter)).containsExactlyInAnyOrderElementsOf(orgenheter)
+        assertThat(orgenheter.fjernDupliserteOrgnr()).containsExactlyInAnyOrderElementsOf(orgenheter)
     }
 
     @Test
@@ -80,7 +80,7 @@ internal class OrgenhetFilterKtTest {
             ),
         )
 
-        assertThat(fjernDupliserteOrgnr(orgenheter)).containsExactlyInAnyOrder(
+        assertThat(orgenheter.fjernDupliserteOrgnr()).containsExactlyInAnyOrder(
             dummyvirksomhet.copy(
                 orgnr = Orgnr("222222222"),
                 sektor = Sektor.PRIVAT
@@ -106,7 +106,7 @@ internal class OrgenhetFilterKtTest {
                 dummyvirksomhet.copy(
                     sektor = Sektor.PRIVAT
                 )
-            ), fjernDupliserteOrgnr(orgenheter)
+            ), orgenheter.fjernDupliserteOrgnr()
         )
     }
 
@@ -117,6 +117,6 @@ internal class OrgenhetFilterKtTest {
                 sektor = Sektor.FYLKESKOMMUNAL
             ),
         )
-        assertEquals(orgenheter, fjernDupliserteOrgnr(orgenheter))
+        assertEquals(orgenheter, orgenheter.fjernDupliserteOrgnr())
     }
 }
