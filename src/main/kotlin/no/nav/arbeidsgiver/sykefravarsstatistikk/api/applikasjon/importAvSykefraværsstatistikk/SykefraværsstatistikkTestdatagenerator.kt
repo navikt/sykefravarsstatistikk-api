@@ -5,6 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvar
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.HardkodetKildeTilVirksomhetsdata.Testvirksomhet.VIRKSOMHETSSTØRRELSE
 import java.math.BigDecimal.ZERO
 
 object SykefraværsstatistikkTestdatagenerator {
@@ -45,10 +46,15 @@ object SykefraværsstatistikkTestdatagenerator {
             return it
         }
 
-        return HardkodetKildeTilVirksomhetsdata.hentVirksomheter(gjeldendeKvartal)
-            .map {
-                val tiProsentAvBedriftene = it.orgnr.verdi.last() == '9'
-                val antallPersoner = if (tiProsentAvBedriftene) (40..10_000).random() else (0..40).random()
+        return HardkodetKildeTilVirksomhetsdata.hentTestvirksomheter(gjeldendeKvartal)
+            .map { (virksomhet, størrelse) ->
+                val antallPersoner = when (størrelse) {
+                    VIRKSOMHETSSTØRRELSE.KNØTT -> (0..6).random()
+                    VIRKSOMHETSSTØRRELSE.LITEN -> (5..10).random()
+                    VIRKSOMHETSSTØRRELSE.MEDIUM -> (20 .. 30).random()
+                    VIRKSOMHETSSTØRRELSE.STOR -> (75..100).random()
+                    VIRKSOMHETSSTØRRELSE.ENORM -> (11_000..12_000).random()
+                }
 
                 val antallDagsverkIEttKvartal = 230 / 4
                 val muligeDagsverk = antallPersoner * antallDagsverkIEttKvartal
@@ -62,10 +68,10 @@ object SykefraværsstatistikkTestdatagenerator {
                 SykefraværsstatistikkVirksomhetMedGradering(
                     årstall = gjeldendeKvartal.årstall,
                     kvartal = gjeldendeKvartal.kvartal,
-                    orgnr = it.orgnr.verdi,
-                    næring = it.næring!!,
-                    næringkode = it.næringskode!!,
-                    rectype = it.rectype!!,
+                    orgnr = virksomhet.orgnr.verdi,
+                    næring = virksomhet.næring!!,
+                    næringkode = virksomhet.næringskode!!,
+                    rectype = virksomhet.rectype!!,
                     antallGraderteSykemeldinger = (graderingsfaktor * antallSykemeldinger).toInt(),
                     tapteDagsverkGradertSykemelding = (graderingsfaktor.toBigDecimal() * tapteDagsverk),
                     antallSykemeldinger = antallSykemeldinger,

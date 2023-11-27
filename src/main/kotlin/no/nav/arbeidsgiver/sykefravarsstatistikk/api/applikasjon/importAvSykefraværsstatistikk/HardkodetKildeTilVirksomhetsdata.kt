@@ -16,17 +16,23 @@ import org.springframework.stereotype.Component
 @Primary
 object HardkodetKildeTilVirksomhetsdata : KildeTilVirksomhetsdata {
     override fun hentVirksomheter(årstallOgKvartal: ÅrstallOgKvartal): List<Orgenhet> {
+        return hentTestvirksomheter(årstallOgKvartal).map { it.first }
+    }
+
+
+    fun hentTestvirksomheter(gjeldendeKVartal: ÅrstallOgKvartal): List<Pair<Orgenhet, Testvirksomhet.VIRKSOMHETSSTØRRELSE>> {
         val csvSchema = CsvSchema.builder()
             .addColumn("orgnr")
             .addColumn("sektor")
             .addColumn("primærnæring")
+            .addColumn("størrelse")
             .setUseHeader(true)
             .build()
 
         val virksomheter = CsvMapper()
-            .readerFor(DevVirksomhet::class.java)
+            .readerFor(Testvirksomhet::class.java)
             .with(csvSchema)
-            .readValues<DevVirksomhet>(this::class.java.getResource("/mock/testvirksomheter.csv"))
+            .readValues<Testvirksomhet>(this::class.java.getResource("/mock/testvirksomheter.csv"))
             .readAll()
             .toList()
 
@@ -39,14 +45,23 @@ object HardkodetKildeTilVirksomhetsdata : KildeTilVirksomhetsdata {
                 sektor = Sektor.fraSektorkode(it.sektor),
                 næring = næringskode.take(2),
                 næringskode = næringskode,
-                årstallOgKvartal = årstallOgKvartal
-            )
+                årstallOgKvartal = gjeldendeKVartal
+            ) to it.størrelse
         }
     }
 
-    data class DevVirksomhet(
+    data class Testvirksomhet(
         val orgnr: String = "",
         val sektor: String = "",
         val primærnæring: String = "",
-    )
+        val størrelse: VIRKSOMHETSSTØRRELSE = VIRKSOMHETSSTØRRELSE.LITEN,
+    ) {
+        enum class VIRKSOMHETSSTØRRELSE {
+            STOR,
+            MEDIUM,
+            LITEN,
+            ENORM,
+            KNØTT,
+        }
+    }
 }

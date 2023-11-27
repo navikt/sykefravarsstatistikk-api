@@ -11,12 +11,12 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Å
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
 
-class EksportAvEnkeltkvartalerCronTest {
+class ImportOgEksportAvEnkeltkvartalerCronTest {
     val eksporteringMetadataVirksomhetService = mock<EksporteringMetadataVirksomhetService>()
     val registry = mock<MeterRegistry>(defaultAnswer = { mock<Counter>()})
     val virksomhetMetadataService = mock<VirksomhetMetadataService>()
     val eksporteringPerStatistikkKategoriService = mock<EksporteringPerStatistikkKategoriService>()
-    val jobb = EksportAvEnkeltkvartalerCron(
+    val jobb = ImportOgEksportAvEnkeltkvartalerCron(
         registry,
         mock(),
         eksporteringMetadataVirksomhetService,
