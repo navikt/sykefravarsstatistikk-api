@@ -173,10 +173,10 @@ class SykefraværsstatistikkImporteringService(
     }
 
     private fun importSykefraværsstatistikkVirksomhet(årstallOgKvartal: ÅrstallOgKvartal) {
-        val statistikk: List<SykefraværsstatistikkVirksomhet> = if (environment.activeProfiles.contains("prod")) {
-            datavarehusAggregertRepositoryV1.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal)
-        } else {
+        val statistikk: List<SykefraværsstatistikkVirksomhet> = if (environment.activeProfiles.contains("dev")) {
             SykefraværsstatistikkTestdatagenerator.genererSykefraværsstatistikkVirksomhet(årstallOgKvartal)
+        } else {
+            datavarehusAggregertRepositoryV1.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal)
         }
         val antallSlettet = sykefraværStatistikkVirksomhetRepository.slettForKvartal(årstallOgKvartal)
         val antallSattInn = sykefraværStatistikkVirksomhetRepository.settInn(statistikk)
@@ -188,12 +188,12 @@ class SykefraværsstatistikkImporteringService(
         årstallOgKvartal: ÅrstallOgKvartal
     ) {
         val statistikk: List<SykefraværsstatistikkVirksomhetMedGradering> =
-            if (environment.activeProfiles.contains("prod")) {
-                datavarehusAggregertRepositoryV2.hentSykefraværsstatistikkVirksomhetMedGradering(
+            if (environment.activeProfiles.contains("dev")) {
+                SykefraværsstatistikkTestdatagenerator.genererSykefraværsstatistikkVirksomhetMedGradering(
                     årstallOgKvartal
                 )
             } else {
-                SykefraværsstatistikkTestdatagenerator.genererSykefraværsstatistikkVirksomhetMedGradering(
+                datavarehusAggregertRepositoryV2.hentSykefraværsstatistikkVirksomhetMedGradering(
                     årstallOgKvartal
                 )
             }
