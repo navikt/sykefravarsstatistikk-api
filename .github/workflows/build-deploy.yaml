@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - siste-dvh-tabeller-til-exposed
+      - testdata
     paths-ignore:
       - '**.md'
       - '**/**.md'

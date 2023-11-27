@@ -172,11 +172,11 @@ class SykefraværsstatistikkImporteringService(
         return resultat
     }
 
-    private fun importSykefraværsstatistikkVirksomhet(årstallOgKvartal: ÅrstallOgKvartal) {
-        val statistikk: List<SykefraværsstatistikkVirksomhet> = if (environment.activeProfiles.contains("prod")) {
-            datavarehusAggregertRepositoryV1.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal)
+    fun importSykefraværsstatistikkVirksomhet(årstallOgKvartal: ÅrstallOgKvartal) {
+        val statistikk: List<SykefraværsstatistikkVirksomhet> = if (environment.activeProfiles.contains("dev")) {
+            SykefraværsstatistikkTestdatagenerator.genererSykefraværsstatistikkVirksomhet(årstallOgKvartal)
         } else {
-            SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhet(årstallOgKvartal)
+            datavarehusAggregertRepositoryV1.hentSykefraværsstatistikkVirksomhet(årstallOgKvartal)
         }
         val antallSlettet = sykefraværStatistikkVirksomhetRepository.slettForKvartal(årstallOgKvartal)
         val antallSattInn = sykefraværStatistikkVirksomhetRepository.settInn(statistikk)
@@ -184,16 +184,16 @@ class SykefraværsstatistikkImporteringService(
         loggResultat(årstallOgKvartal, SlettOgOpprettResultat(antallSlettet, antallSattInn), "virksomhet")
     }
 
-    private fun importSykefraværsstatistikkVirksomhetMedGradering(
+    fun importSykefraværsstatistikkVirksomhetMedGradering(
         årstallOgKvartal: ÅrstallOgKvartal
     ) {
         val statistikk: List<SykefraværsstatistikkVirksomhetMedGradering> =
-            if (environment.activeProfiles.contains("prod")) {
-                datavarehusAggregertRepositoryV2.hentSykefraværsstatistikkVirksomhetMedGradering(
+            if (environment.activeProfiles.contains("dev")) {
+                SykefraværsstatistikkTestdatagenerator.genererSykefraværsstatistikkVirksomhetMedGradering(
                     årstallOgKvartal
                 )
             } else {
-                SykefraværsstatistikkImporteringUtils.genererSykefraværsstatistikkVirksomhetMedGradering(
+                datavarehusAggregertRepositoryV2.hentSykefraværsstatistikkVirksomhetMedGradering(
                     årstallOgKvartal
                 )
             }

@@ -112,11 +112,10 @@ class VirksomhetMetadataService(
     }
 
     private fun overskrivVirksomhetMetadata(årstallOgKvartal: ÅrstallOgKvartal): Int {
-        val virksomheter = hentVirksomheterFraDvh(årstallOgKvartal)
+        val virksomheter = kildeTilVirksomhetsdata.hentVirksomheter(årstallOgKvartal).fjernDupliserteOrgnr()
         if (virksomheter.isEmpty()) {
             log.warn(
-                "Stopper import av metadata. Fant ingen virksomheter for {}",
-                årstallOgKvartal
+                "Stopper import av metadata. Fant ingen virksomheter for $årstallOgKvartal.",
             )
             return 0
         }
@@ -133,19 +132,6 @@ class VirksomhetMetadataService(
         )
         log.info("Antall rader VirksomhetMetadata opprettet: {}", antallOpprettet)
         return antallOpprettet
-    }
-
-    private fun hentVirksomheterFraDvh(årstallOgKvartal: ÅrstallOgKvartal): List<Orgenhet> {
-        val virksomheter = kildeTilVirksomhetsdata.hentVirksomheter(årstallOgKvartal)
-        if (virksomheter.isEmpty()) {
-            log.warn(
-                "Har ikke funnet noen virksomheter for årstall '{}' og kvartal '{}'. ",
-                årstallOgKvartal.årstall,
-                årstallOgKvartal.kvartal
-            )
-            return emptyList()
-        }
-        return fjernDupliserteOrgnr(virksomheter)
     }
 
     private fun importVirksomhetNæringskode(årstallOgKvartal: ÅrstallOgKvartal): Int {

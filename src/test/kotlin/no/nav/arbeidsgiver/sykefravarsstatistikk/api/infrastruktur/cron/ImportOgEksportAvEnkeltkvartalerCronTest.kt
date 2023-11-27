@@ -3,25 +3,26 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron
 import arrow.core.right
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringMetadataVirksomhetService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringPerStatistikkKategoriService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.VirksomhetMetadataService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringMetadataVirksomhetService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringPerStatistikkKategoriService
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
 
-class EksportAvEnkeltkvartalerCronTest {
+class ImportOgEksportAvEnkeltkvartalerCronTest {
     val eksporteringMetadataVirksomhetService = mock<EksporteringMetadataVirksomhetService>()
     val registry = mock<MeterRegistry>(defaultAnswer = { mock<Counter>()})
     val virksomhetMetadataService = mock<VirksomhetMetadataService>()
     val eksporteringPerStatistikkKategoriService = mock<EksporteringPerStatistikkKategoriService>()
-    val jobb = EksportAvEnkeltkvartalerCron(
+    val jobb = ImportOgEksportAvEnkeltkvartalerCron(
         registry,
         mock(),
         eksporteringMetadataVirksomhetService,
         eksporteringPerStatistikkKategoriService,
         virksomhetMetadataService,
+        mock(),
     )
 
     @Test

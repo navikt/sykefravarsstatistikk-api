@@ -10,6 +10,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.VirksomhetMetadataService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.SykefraværsstatistikkImporteringService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.time.Duration
@@ -17,12 +18,13 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit.MINUTES
 
 @Component
-class EksportAvEnkeltkvartalerCron(
+class ImportOgEksportAvEnkeltkvartalerCron(
     registry: MeterRegistry,
     private val taskExecutor: LockingTaskExecutor,
     private val eksporteringMetadataVirksomhetService: EksporteringMetadataVirksomhetService,
     private val eksporteringPerStatistikkKategoriService: EksporteringPerStatistikkKategoriService,
     private val virksomhetMetadataService: VirksomhetMetadataService,
+    private val sykefraværsstatistikkImporteringService: SykefraværsstatistikkImporteringService,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
     private val noeFeiletCounter: Counter
@@ -32,8 +34,8 @@ class EksportAvEnkeltkvartalerCron(
         noeFeiletCounter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
     }
 
-    //@Scheduled(cron = "0 40 13 15 11 ?")
-    fun scheduledEksportAvEnkeltkvartaler() {
+    //@Scheduled(cron = "0 30 14 27 11 ?")
+    fun scheduledImportOgEksportAvEnkeltkvartaler() {
         val kategorier = listOf(Statistikkategori.VIRKSOMHET, Statistikkategori.VIRKSOMHET_GRADERT)
         val sisteFireÅr = ÅrstallOgKvartal(2023, 2) inkludertTidligere 4 * 4 - 1
 
@@ -47,6 +49,8 @@ class EksportAvEnkeltkvartalerCron(
 
     fun gjennomførJobb(kvartaler: List<ÅrstallOgKvartal>, kategorier: List<Statistikkategori>) {
         for (kvartal in kvartaler) {
+            sykefraværsstatistikkImporteringService.importSykefraværsstatistikkVirksomhetMedGradering(kvartal)
+            sykefraværsstatistikkImporteringService.importSykefraværsstatistikkVirksomhet(kvartal)
 
             log.info("EksportAvEnkeltkvartaler har startet for $kvartal")
 

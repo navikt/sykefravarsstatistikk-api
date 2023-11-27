@@ -52,7 +52,7 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
             WebClientConfiguration::class,
             PrometheusMetrics::class,
             KafkaClient::class,
-            EksportAvEnkeltkvartalerCron::class,
+            ImportOgEksportAvEnkeltkvartalerCron::class,
             FjernStatistikkEldreEnnFemÅrCron::class,
             EksportAvGradertStatistikkCron::class]
     )]
