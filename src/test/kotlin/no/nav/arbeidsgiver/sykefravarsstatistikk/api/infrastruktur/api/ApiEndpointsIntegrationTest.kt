@@ -2,17 +2,24 @@
 
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api
 
+import arrow.core.right
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.net.HttpHeaders
 import config.SpringIntegrationTestbase
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnOrganisasjon
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.web.server.LocalServerPort
 import testUtils.TestTokenUtil.TOKENX_ISSUER_ID
 import testUtils.TestTokenUtil.createToken
@@ -55,6 +62,12 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
     @Autowired
     lateinit var importtidspunktRepository: ImporttidspunktRepository
 
+    @MockBean
+    lateinit var altinnService: AltinnService
+
+    @MockBean
+    lateinit var enhetsregisteretClient: EnhetsregisteretClient
+
     @LocalServerPort
     private val port: String? = null
     private val objectMapper = ObjectMapper()
@@ -80,6 +93,49 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
 
     @Test
     fun `kvartalsvis skal returnere riktig JSON`() {
+        whenever(altinnService.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(any(), any()))
+            .thenReturn(
+                listOf(
+                    AltinnOrganisasjon(
+                        name = "NAV ARBEID OG YTELSER AVD OSLO",
+                        type = "BEDR",
+                        parentOrganizationNumber = ORGNR_OVERORDNET_ENHET,
+                        organizationNumber = ORGNR_UNDERENHET,
+                        organizationForm = "BEDR",
+                        status = "Active"
+                    ),
+                    AltinnOrganisasjon(
+                        name = "NAV ARBEID OG YTELSER",
+                        type = "BEDR",
+                        parentOrganizationNumber = "",
+                        organizationNumber = ORGNR_OVERORDNET_ENHET,
+                        organizationForm = "BEDR",
+                        status = "Active"
+                    )
+                )
+            )
+
+        whenever(enhetsregisteretClient.hentUnderenhet(any()))
+            .thenReturn(
+                Underenhet.Næringsdrivende(
+                    orgnr = Orgnr(ORGNR_UNDERENHET),
+                    overordnetEnhetOrgnr = Orgnr(ORGNR_OVERORDNET_ENHET),
+                    navn = "NAV ARBEID OG YTELSER AVD OSLO",
+                    næringskode = Næringskode("10000"),
+                    antallAnsatte = 10
+                ).right()
+            )
+
+        whenever(enhetsregisteretClient.hentEnhet(any()))
+            .thenReturn(
+                OverordnetEnhet(
+                    orgnr = Orgnr(ORGNR_OVERORDNET_ENHET),
+                    navn = "NAV ARBEID OG YTELSER",
+                    næringskode = Næringskode("10000"),
+                    sektor = Sektor.STATLIG,
+                    antallAnsatte = 10
+                ).right()
+            )
         val jwtToken = createToken(
             oAuth2Server = mockOAuth2Server,
             pid = "15008462396",

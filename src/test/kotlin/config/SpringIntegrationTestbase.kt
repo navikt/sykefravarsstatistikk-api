@@ -17,7 +17,7 @@ import org.springframework.test.context.TestPropertySource
     classes = [SykefraværsstatistikkLocalTestApplication::class],
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
-@TestPropertySource(properties = ["wiremock.mock.port=8082", "spring.h2.console.enabled=false", "management.endpoints.web.exposure.include=prometheus", "management.endpoints.web.base-path=/internal/actuator"])
+@TestPropertySource(properties = ["spring.h2.console.enabled=false", "management.endpoints.web.exposure.include=prometheus", "management.endpoints.web.base-path=/internal/actuator"])
 @AutoConfigureMockMvc
 @AutoConfigureObservability
 open class SpringIntegrationTestbase

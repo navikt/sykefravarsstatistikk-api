@@ -1,19 +1,26 @@
 package infrastruktur
 
+import arrow.core.right
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.net.HttpHeaders
 import config.SpringIntegrationTestbase
 import io.kotest.matchers.shouldBe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnOrganisasjon
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.Rectype
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.web.server.LocalServerPort
 import testUtils.TestTokenUtil.createMockIdportenTokenXToken
 import testUtils.TestUtils.PRODUKSJON_NYTELSESMIDLER
@@ -55,6 +62,12 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     @Autowired
     lateinit var importtidspunktRepository: ImporttidspunktRepository
 
+    @MockBean
+    lateinit var altinnService: AltinnService
+
+    @MockBean
+    lateinit var enhetsregisteretClient: EnhetsregisteretClient
+
     @BeforeEach
     fun setUp() {
         slettAllStatistikkFraDatabase(
@@ -66,6 +79,29 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
         )
         importtidspunktRepository.slettAlleImporttidspunkt()
         importtidspunktRepository.settInnImporttidspunkt(SISTE_PUBLISERTE_KVARTAL, LocalDate.parse("2022-06-02"))
+        val altinnOrganisasjon = AltinnOrganisasjon(
+            name = "NAV ARBEID OG YTELSER AVD OSLO",
+            type = "BEDR",
+            parentOrganizationNumber = "910999919",
+            organizationNumber = ORGNR_UNDERENHET,
+            organizationForm = "BEDR",
+            status = "Active"
+        )
+        whenever(altinnService.hentVirksomheterDerBrukerHarTilknytning(any(), any())).thenReturn(
+            listOf(altinnOrganisasjon)
+        )
+        whenever(altinnService.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(any(), any())).thenReturn(
+            listOf(altinnOrganisasjon)
+        )
+        whenever(enhetsregisteretClient.hentUnderenhet(any())).thenReturn(
+            Underenhet.Næringsdrivende(
+                navn = "NAV ARBEID OG YTELSER AVD OSLO",
+                orgnr = Orgnr(ORGNR_UNDERENHET),
+                næringskode = Næringskode("10300"),
+                overordnetEnhetOrgnr = Orgnr("910825518"),
+                antallAnsatte = 10
+            ).right()
+        )
     }
 
     @AfterEach
@@ -284,47 +320,6 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun hentAgreggertStatistikk_returnererIkkeVirksomhetstatistikkTilBrukerSomManglerIaRettigheter() {
-        val (årstall, kvartal) = SISTE_PUBLISERTE_KVARTAL.minusEttÅr()
-        sykefraværStatistikkNæringskodeRepository.settInn(
-            listOf(
-                SykefraværsstatistikkForNæringskode(
-                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
-                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
-                    næringskode = BARNEHAGER.femsifferIdentifikator,
-                    antallPersoner = 10,
-                    tapteDagsverk = 5.toBigDecimal(),
-                    muligeDagsverk = 100.toBigDecimal()
-                ),
-                SykefraværsstatistikkForNæringskode(
-                    årstall = årstall,
-                    kvartal = kvartal,
-                    næringskode = BARNEHAGER.femsifferIdentifikator,
-                    antallPersoner = 10,
-                    tapteDagsverk = 1.toBigDecimal(),
-                    muligeDagsverk = 100.toBigDecimal(),
-                )
-            )
-        )
-        opprettStatistikkForLand(sykefraværStatistikkLandRepository)
-
-        val response = utførAutorisertKall(ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER)
-        val responseBody = objectMapper.readTree(response.body())
-        Assertions.assertThat(
-            responseBody["prosentSiste4KvartalerTotalt"].findValuesAsText("statistikkategori")
-        )
-            .containsExactlyInAnyOrderElementsOf(
-                listOf(
-                    Statistikkategori.BRANSJE.toString(),
-                    Statistikkategori.LAND.toString()
-                )
-            )
-        Assertions.assertThat(responseBody["trendTotalt"].findValuesAsText("statistikkategori"))
-            .containsExactly(Statistikkategori.BRANSJE.toString())
-    }
-
-    @Test
     fun `hentAgreggertStatistikk kræsjer ikke dersom mulige dagsverk er 0`() {
         sykefravarStatistikkVirksomhetRepository.settInn(
             listOf(
@@ -348,23 +343,68 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
 
     @Test
     @Throws(Exception::class)
-    fun hentAgreggertStatistikk_viserNavnetTilBransjenEllerNæringenSomLabel() {
+    fun `hent aggregert statistikk viser ikke virksomhetstall når bruker ikke har rettigheter`() {
+        whenever(enhetsregisteretClient.hentUnderenhet(any())).thenReturn(
+            Underenhet.Næringsdrivende(
+                navn = "NAV ARBEID OG YTELSER AVD OSLO",
+                orgnr = Orgnr(ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER),
+                næringskode = BARNEHAGER,
+                overordnetEnhetOrgnr = Orgnr("910999919"),
+                antallAnsatte = 10
+            ).right()
+        )
+        whenever(altinnService.hentVirksomheterDerBrukerHarTilknytning(any(), any())).thenReturn(
+            listOf(
+                AltinnOrganisasjon(
+                    name = "Barnehager",
+                    type = "BEDR",
+                    parentOrganizationNumber = "910999919",
+                    organizationNumber = ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER,
+                    organizationForm = "BEDR",
+                    status = "Active"
+                )
+            )
+        )
+        whenever(altinnService.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(any(), any())).thenReturn(
+            emptyList()
+        )
+        val (årstall, kvartal) = SISTE_PUBLISERTE_KVARTAL.minusEttÅr()
         sykefraværStatistikkNæringskodeRepository.settInn(
             listOf(
                 SykefraværsstatistikkForNæringskode(
-                    årstall = 2022,
-                    kvartal = 1,
+                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
                     næringskode = BARNEHAGER.femsifferIdentifikator,
                     antallPersoner = 10,
                     tapteDagsverk = 5.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal()
+                ),
+                SykefraværsstatistikkForNæringskode(
+                    årstall = årstall,
+                    kvartal = kvartal,
+                    næringskode = BARNEHAGER.femsifferIdentifikator,
+                    antallPersoner = 10,
+                    tapteDagsverk = 1.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal(),
                 )
             )
         )
+        opprettStatistikkForLand(sykefraværStatistikkLandRepository)
         val response = utførAutorisertKall(ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER)
         val responseBody = objectMapper.readTree(response.body())
         val barnehageJson = responseBody["prosentSiste4KvartalerTotalt"][0]
         Assertions.assertThat(barnehageJson["label"].toString()).isEqualTo("\"Barnehager\"")
+        Assertions.assertThat(
+            responseBody["prosentSiste4KvartalerTotalt"].findValuesAsText("statistikkategori")
+        )
+            .containsExactlyInAnyOrderElementsOf(
+                listOf(
+                    Statistikkategori.BRANSJE.toString(),
+                    Statistikkategori.LAND.toString()
+                )
+            )
+        Assertions.assertThat(responseBody["trendTotalt"].findValuesAsText("statistikkategori"))
+            .containsExactly(Statistikkategori.BRANSJE.toString())
     }
 
     private fun utførAutorisertKall(orgnr: String): HttpResponse<String> {
