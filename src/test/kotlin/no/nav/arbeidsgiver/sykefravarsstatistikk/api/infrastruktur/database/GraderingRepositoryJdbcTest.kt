@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 import config.AppConfigForJdbcTesterConfig
 import ia.felles.definisjoner.bransjer.Bransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.LocalOgUnitTestOidcConfiguration
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.Rectype
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterEach
@@ -23,7 +22,7 @@ import java.math.BigDecimal
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
-@DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class, LocalOgUnitTestOidcConfiguration::class])
+@DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 open class GraderingRepositoryJdbcTest {
 
     @Autowired

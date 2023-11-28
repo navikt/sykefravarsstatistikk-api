@@ -4,7 +4,6 @@ import config.AppConfigForJdbcTesterConfig
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetEksportPerKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.LocalOgUnitTestOidcConfiguration
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.LegacyEksporteringRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkRepository
 import org.junit.jupiter.api.Assertions
@@ -30,7 +29,7 @@ import java.time.LocalDateTime
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
-@DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class, LocalOgUnitTestOidcConfiguration::class])
+@DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 open class LegacyEksporteringRepositoryTest {
     @Autowired
     private lateinit var jdbcTemplate: NamedParameterJdbcTemplate

@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykef
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import com.google.common.collect.Lists
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
@@ -110,7 +109,7 @@ class EksporteringService(
             )
         )
         val virksomhetMetadataMap = LegacyEksporteringServiceUtils.getVirksomhetMetadataHashMap(virksomhetMetadataListe)
-        val subsets = Lists.partition(virksomheterTilEksport, LegacyEksporteringServiceUtils.EKSPORT_BATCH_STØRRELSE)
+        val subsets = virksomheterTilEksport.chunked(LegacyEksporteringServiceUtils.EKSPORT_BATCH_STØRRELSE)
         val antallEksportert = AtomicInteger()
         subsets.forEach { subset: List<VirksomhetEksportPerKvartal> ->
             val virksomheterMetadataIDenneSubset =
