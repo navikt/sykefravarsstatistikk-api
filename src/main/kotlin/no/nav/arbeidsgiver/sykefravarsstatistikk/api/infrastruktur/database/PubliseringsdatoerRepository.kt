@@ -33,7 +33,7 @@ class PubliseringsdatoerRepository(
         }
     }
 
-    fun oppdaterPubliseringsdatoer(data: List<Publiseringsdato>) {
+    fun overskrivPubliseringsdatoer(data: List<Publiseringsdato>) {
         val antallRaderSlettet = transaction { deleteAll() }
         log.info("Antall rader slettet fra 'publiseringsdatoer': $antallRaderSlettet")
 

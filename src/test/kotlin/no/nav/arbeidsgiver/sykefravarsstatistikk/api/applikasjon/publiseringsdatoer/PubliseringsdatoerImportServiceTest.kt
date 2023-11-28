@@ -47,6 +47,6 @@ internal class PubliseringsdatoerImportServiceTest {
             .thenReturn(publiseringsdatoListe)
         serviceUnderTest!!.importerDatoerFraDatavarehus()
         Mockito.verify(mockPubliseringsdatoerRepository, Mockito.times(1))
-            ?.oppdaterPubliseringsdatoer(publiseringsdatoListe)
+            ?.overskrivPubliseringsdatoer(publiseringsdatoListe)
     }
 }

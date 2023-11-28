@@ -11,6 +11,6 @@ class PubliseringsdatoerImportService(
 ) {
     fun importerDatoerFraDatavarehus() {
         val publiseringsdatoerFraDvh = datavarehusPubliseringsdatoerRepository.hentPubliseringsdatoerFraDvh()
-        publiseringsdatoerRepository.oppdaterPubliseringsdatoer(publiseringsdatoerFraDvh)
+        publiseringsdatoerRepository.overskrivPubliseringsdatoer(publiseringsdatoerFraDvh)
     }
 }

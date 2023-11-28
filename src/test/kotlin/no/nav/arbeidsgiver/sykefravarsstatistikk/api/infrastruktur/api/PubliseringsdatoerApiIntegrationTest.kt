@@ -1,7 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api
 
 import config.SpringIntegrationTestbase
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer.Publiseringsdato
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.PubliseringsdatoerRepository
 import org.assertj.core.api.AssertionsForClassTypes
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -24,6 +26,9 @@ class PubliseringsdatoerApiIntegrationTest : SpringIntegrationTestbase() {
     @Autowired
     private lateinit var importtidspunktRepository: ImporttidspunktRepository
 
+    @Autowired
+    private lateinit var publiseringsdatoerRepository: PubliseringsdatoerRepository
+
     @BeforeEach
     fun setUp() {
         importtidspunktRepository.slettAlleImporttidspunkt()
@@ -38,6 +43,17 @@ class PubliseringsdatoerApiIntegrationTest : SpringIntegrationTestbase() {
     @Throws(IOException::class, InterruptedException::class)
     fun hentPubliseringsdatoer_skalReturnereResponsMedKorrektFormat() {
         importtidspunktRepository.settInnImporttidspunkt(SISTE_PUBLISERTE_KVARTAL, LocalDate.parse("2022-06-02"))
+        publiseringsdatoerRepository.overskrivPubliseringsdatoer(
+            listOf(
+                Publiseringsdato(
+                    0,
+                    LocalDate.parse("2022-09-08"),
+                    LocalDate.parse("2022-01-01"),
+                    "stiv heks"
+                )
+            )
+        )
+
         val response = HttpClient.newBuilder()
             .build()
             .send(
