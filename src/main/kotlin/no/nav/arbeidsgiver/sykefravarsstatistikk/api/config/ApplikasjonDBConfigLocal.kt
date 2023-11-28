@@ -62,7 +62,9 @@ open class ApplikasjonDBConfigLocal(private val environment: Environment) {
     }
 
     @Bean
-    open fun flywayMigrationStrategy(): FlywayMigrationStrategy {
+    open fun flywayMigrationStrategy(
+        @Qualifier("sykefravarsstatistikkDataSource") dataSource: DataSource,
+    ): FlywayMigrationStrategy {
         val locations: MutableList<String> = ArrayList()
         locations.add("/db/migration")
         locations.add("/db/test-datavarehus")
@@ -74,7 +76,7 @@ open class ApplikasjonDBConfigLocal(private val environment: Environment) {
         }
         return FlywayMigrationStrategy {
             Flyway.configure()
-                .dataSource(sykefravarsstatistikkDataSource())
+                .dataSource(dataSource)
                 .locations(*locations.toTypedArray<String>())
                 .load()
                 .migrate()
