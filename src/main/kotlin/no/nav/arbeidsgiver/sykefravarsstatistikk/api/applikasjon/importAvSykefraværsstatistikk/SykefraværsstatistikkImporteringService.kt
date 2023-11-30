@@ -70,7 +70,8 @@ class SykefraværsstatistikkImporteringService(
         årstallOgKvartalForSfsDb: List<ÅrstallOgKvartal>,
         årstallOgKvartalForDvh: List<ÅrstallOgKvartal>
     ): Boolean {
-        val allStatistikkFraDvhHarSammeÅrstallOgKvartal = alleErLike(årstallOgKvartalForDvh)
+        val allStatistikkFraDvhHarSammeÅrstallOgKvartal =
+            årstallOgKvartalForDvh.all { it == årstallOgKvartalForDvh.firstOrNull() }
 
         if (!allStatistikkFraDvhHarSammeÅrstallOgKvartal) {
             log.warn(
@@ -84,7 +85,7 @@ class SykefraværsstatistikkImporteringService(
 
         val sisteÅrstallOgKvartalForDvh = årstallOgKvartalForDvh[0]
         val importertStatistikkLiggerEttKvartalBakDvh =
-                (sisteÅrstallOgKvartalForDvh.minusKvartaler(1) == årstallOgKvartalForSfsDb.min())
+            (sisteÅrstallOgKvartalForDvh.minusKvartaler(1) == årstallOgKvartalForSfsDb.min())
 
         return if (importertStatistikkLiggerEttKvartalBakDvh) {
             log.info(
@@ -223,28 +224,11 @@ class SykefraværsstatistikkImporteringService(
     private fun loggResultat(
         årstallOgKvartal: ÅrstallOgKvartal, resultat: SlettOgOpprettResultat, type: String
     ) {
-        val melding: String = if (resultat.antallRadOpprettet == 0 && resultat.antallRadSlettet == 0) {
+        val melding = if (resultat.antallRadOpprettet == 0 && resultat.antallRadSlettet == 0) {
             "Ingenting har blitt slettet eller importert."
         } else {
-            String.format(
-                "Antall rader opprettet: %d, antall slettet: %d",
-                resultat.antallRadOpprettet, resultat.antallRadSlettet
-            )
+            "Antall rader opprettet: ${resultat.antallRadOpprettet}, antall slettet: ${resultat.antallRadSlettet}"
         }
-        log.info(
-            "Import av sykefraværsstatistikk av type "
-                    + type
-                    + " for "
-                    + årstallOgKvartal
-                    + " i miljø "
-                    + environment
-                    + " er ferdig: "
-                    + melding
-        )
-    }
-
-    private fun alleErLike(årstallOgKvartal: List<ÅrstallOgKvartal>): Boolean {
-        val første = årstallOgKvartal.firstOrNull() ?: return true
-        return årstallOgKvartal.all { it == første }
+        log.info("Import av sykefraværsstatistikk av type $type for $årstallOgKvartal i miljø $environment er ferdig: $melding")
     }
 }
