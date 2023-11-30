@@ -13,7 +13,7 @@ class DatavarehusNæringskodeRepository(
 ) : UsingExposed, Table("dt_p.agg_ia_sykefravar_naring_kode") {
     val årstall = integer("arstall")
     val kvartal = integer("kvartal")
-    val næringskode = varchar("naring_kode", 5)
+    val næringskode = varchar("naering_kode", 5)
     val antallPersoner = integer("antpers")
     val tapteDagsverk = double("taptedv")
     val muligeDagsverk = double("muligedv")
