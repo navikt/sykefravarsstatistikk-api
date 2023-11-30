@@ -70,11 +70,9 @@ class SykefraværsstatistikkImporteringService(
         årstallOgKvartalForSfsDb: List<ÅrstallOgKvartal>,
         årstallOgKvartalForDvh: List<ÅrstallOgKvartal>
     ): Boolean {
-        val allImportertStatistikkHarSammeÅrstallOgKvartal = alleErLike(årstallOgKvartalForSfsDb)
         val allStatistikkFraDvhHarSammeÅrstallOgKvartal = alleErLike(årstallOgKvartalForDvh)
-        if (!allImportertStatistikkHarSammeÅrstallOgKvartal
-            || !allStatistikkFraDvhHarSammeÅrstallOgKvartal
-        ) {
+
+        if (!allStatistikkFraDvhHarSammeÅrstallOgKvartal) {
             log.warn(
                 "Kunne ikke importere ny statistikk, tabellene hadde forskjellige årstall og kvartal. "
                         + "Kvartaler Sykefraværsstatistikk-DB: {}. Kvartaler DVH: {}",
@@ -83,11 +81,11 @@ class SykefraværsstatistikkImporteringService(
             )
             return false
         }
+
         val sisteÅrstallOgKvartalForDvh = årstallOgKvartalForDvh[0]
-        val sisteÅrstallOgKvartalForSykefraværsstatistikk = årstallOgKvartalForSfsDb[0]
-        val importertStatistikkLiggerEttKvartalBakDvh = (sisteÅrstallOgKvartalForDvh
-            .minusKvartaler(1)
-                == sisteÅrstallOgKvartalForSykefraværsstatistikk)
+        val importertStatistikkLiggerEttKvartalBakDvh =
+                (sisteÅrstallOgKvartalForDvh.minusKvartaler(1) == årstallOgKvartalForSfsDb.min())
+
         return if (importertStatistikkLiggerEttKvartalBakDvh) {
             log.info(
                 "Skal importere statistikk fra Dvh for årstall {} og kvartal {}",
@@ -95,7 +93,7 @@ class SykefraværsstatistikkImporteringService(
                 sisteÅrstallOgKvartalForDvh.kvartal
             )
             true
-        } else if (sisteÅrstallOgKvartalForDvh == sisteÅrstallOgKvartalForSykefraværsstatistikk) {
+        } else if (sisteÅrstallOgKvartalForDvh == årstallOgKvartalForSfsDb.min()) {
             log.info(
                 "Skal ikke importere statistikk fra Dvh for årstall {} og kvartal {}. Ingen "
                         + "ny statistikk funnet.",
@@ -109,8 +107,8 @@ class SykefraværsstatistikkImporteringService(
                         + "nøyaktig ett kvartal foran vår statistikk som har årstall {} og kvartal {}.",
                 sisteÅrstallOgKvartalForDvh.årstall,
                 sisteÅrstallOgKvartalForDvh.kvartal,
-                sisteÅrstallOgKvartalForSykefraværsstatistikk.årstall,
-                sisteÅrstallOgKvartalForSykefraværsstatistikk.kvartal
+                årstallOgKvartalForSfsDb.min().årstall,
+                årstallOgKvartalForSfsDb.min().kvartal
             )
             false
         }

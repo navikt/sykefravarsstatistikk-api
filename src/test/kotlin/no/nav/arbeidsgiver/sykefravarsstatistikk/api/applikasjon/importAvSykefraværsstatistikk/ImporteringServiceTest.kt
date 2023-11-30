@@ -44,4 +44,34 @@ class ImporteringServiceTest {
             )
         )
     }
+
+    @Test
+    fun `import kan starte dersom vi mangler et kvartal i en av våre tabeller (dette kan skje når import tryner)`() {
+        Assertions.assertTrue(
+                importeringService.kanImportStartes(
+                        årstallOgKvartalForSfsDb = listOf(
+                                ÅrstallOgKvartal(2023, 3),
+                                ÅrstallOgKvartal(2023, 3),
+                                ÅrstallOgKvartal(2023, 2),
+                                ÅrstallOgKvartal(2023, 2),
+                        ),
+                        årstallOgKvartalForDvh = listOf(ÅrstallOgKvartal(2023, 3))
+                )
+        )
+    }
+
+    @Test
+    fun `import skal IKKE starte dersom vi mangler flere kvartal i våre tabeller (dette skal IKKE skje)`() {
+        Assertions.assertFalse(
+                importeringService.kanImportStartes(
+                        årstallOgKvartalForSfsDb = listOf(
+                                ÅrstallOgKvartal(2023, 3),
+                                ÅrstallOgKvartal(2023, 3),
+                                ÅrstallOgKvartal(2023, 1),
+                                ÅrstallOgKvartal(2023, 2),
+                        ),
+                        årstallOgKvartalForDvh = listOf(ÅrstallOgKvartal(2023, 3))
+                )
+        )
+    }
 }
