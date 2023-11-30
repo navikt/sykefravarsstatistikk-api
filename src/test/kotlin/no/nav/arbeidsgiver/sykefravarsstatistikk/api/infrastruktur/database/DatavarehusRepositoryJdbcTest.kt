@@ -116,6 +116,22 @@ open class DatavarehusRepositoryJdbcTest {
     }
 
     @Test
+    fun hentNæring5Siffer__returnerer_Næring5Siffer_for_årstall_og_kvartal() {
+        insertSykefraværsstatistikkNærin5SiffergInDvhTabell(
+                namedParameterJdbcTemplate, 2022, 3, 4, "01110", "K", 5, 100
+        )
+        insertSykefraværsstatistikkNærin5SiffergInDvhTabell(
+                namedParameterJdbcTemplate, 2022, 3, 4, "80830", "M", 25, 1300
+        )
+        insertSykefraværsstatistikkNærin5SiffergInDvhTabell(
+                namedParameterJdbcTemplate, 2020, 1, 2, "01110", "M", 12, 100
+        )
+        val results: List<SykefraværsstatistikkForNæringskode> = datavarehusNæringskodeRepository.hentFor(ÅrstallOgKvartal(2022, 3))
+        AssertionsForClassTypes.assertThat(results.size).isEqualTo(2)
+        AssertionsForClassTypes.assertThat(results.filter { it.næringskode == "80830" }.size).isEqualTo(1)
+    }
+
+    @Test
     fun hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Virksomhet() {
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
             namedParameterJdbcTemplate,
