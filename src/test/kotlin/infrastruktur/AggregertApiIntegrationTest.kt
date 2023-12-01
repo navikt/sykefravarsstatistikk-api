@@ -2,7 +2,6 @@ package infrastruktur
 
 import arrow.core.right
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.google.common.net.HttpHeaders
 import config.SpringIntegrationTestbase
 import io.kotest.matchers.shouldBe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
@@ -423,7 +422,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
                                     + "/v1/sykefravarshistorikk/aggregert"
                         )
                     )
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer $jwtToken")
+                    .header("AUTHORIZATION", "Bearer $jwtToken")
                     .build(),
                 BodyHandlers.ofString()
             )
