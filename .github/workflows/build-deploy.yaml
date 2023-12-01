@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - testdata
+      - upgrade-spring-boot
     paths-ignore:
       - '**.md'
       - '**/**.md'

@@ -4,17 +4,14 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.N�
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 
-class VirksomhetMetadataMedNæringskode(
-    private val orgnr: Orgnr,
+data class VirksomhetMetadataMedNæringskode(
+    private val orgnrObj: Orgnr,
     private val årstallOgKvartal: ÅrstallOgKvartal,
     private val næringskode: Næringskode
 ) {
-
-    fun getOrgnr(): String {
-        return orgnr.verdi
-    }
-
-    val Årstall: Int
+    val orgnr: String
+        get() = orgnrObj.verdi
+    val årstall: Int
         get() = årstallOgKvartal.årstall
     val kvartal: Int
         get() = årstallOgKvartal.kvartal

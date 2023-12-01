@@ -5,7 +5,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api
 import arrow.core.right
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.google.common.net.HttpHeaders
 import config.SpringIntegrationTestbase
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnOrganisasjon
@@ -316,7 +315,7 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
                             + "/sykefravarshistorikk/kvartalsvis"
                 )
             )
-            .header(HttpHeaders.AUTHORIZATION, jwtToken)
+            .header("AUTHORIZATION", jwtToken)
             .GET()
             .build()
         return HttpClient.newBuilder()
