@@ -9,5 +9,7 @@ import org.springframework.boot.runApplication
 open class SykefraværsstatistikkApplication
 
 fun main(args: Array<String>) {
-    runApplication<SykefraværsstatistikkApplication>(*args)
+    runApplication<SykefraværsstatistikkApplication>(*args) {
+        addInitializers(prodBeans)
+    }
 }
