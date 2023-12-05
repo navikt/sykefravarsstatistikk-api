@@ -31,7 +31,6 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
  * opprettet
  */
 @SpringBootConfiguration
-@EnableJdbcRepositories("no.nav.arbeidsgiver")
 @ComponentScan(
     basePackages = ["no.nav.arbeidsgiver"],
     excludeFilters = [ComponentScan.Filter(
@@ -59,4 +58,4 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
             EksportAvGradertStatistikkCron::class]
     )]
 )
-open class AppConfigForJdbcTesterConfig : JdbcRepositoryConfigExtension()
+open class AppConfigForJdbcTesterConfig
