@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-@EnableJwtTokenValidation(ignore = ["org.springdoc", "org.springframework"])
+@EnableJwtTokenValidation(ignore = ["org.springframework"])
 open class SykefraværsstatistikkApplication
 
 fun main(args: Array<String>) {
