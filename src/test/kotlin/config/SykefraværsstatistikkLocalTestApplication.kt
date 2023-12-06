@@ -1,12 +1,11 @@
 package config
 
-import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.context.annotation.Profile
+import org.springframework.context.ApplicationContextInitializer
+import org.springframework.context.support.GenericApplicationContext
+import testBeans
 
-@Profile("local", "mvc-test")
-@SpringBootApplication
-@EnableJwtTokenValidation(ignore = ["org.springframework"])
-@EnableConfigurationProperties
-open class SykefraværsstatistikkLocalTestApplication
+class SykefraværsstatistikkLocalTestApplication: ApplicationContextInitializer<GenericApplicationContext> {
+    override fun initialize(applicationContext: GenericApplicationContext) {
+       testBeans.initialize(applicationContext)
+    }
+}

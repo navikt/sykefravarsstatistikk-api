@@ -1,16 +1,23 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api
 
-import config.SpringIntegrationTestbase
+import config.SykefraværsstatistikkLocalTestApplication
 import io.prometheus.client.exporter.common.TextFormat.CONTENT_TYPE_004
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.PrometheusMetrics
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.PrometheusMetrics
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 
-internal class PrometheusMetricsControllerTest : SpringIntegrationTestbase() {
+@SpringBootTest(
+    classes = [SykefraværsstatistikkLocalTestApplication::class],
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
+@AutoConfigureMockMvc
+internal class PrometheusMetricsControllerTest {
     @Autowired
     lateinit var mockMvc: MockMvc
 
