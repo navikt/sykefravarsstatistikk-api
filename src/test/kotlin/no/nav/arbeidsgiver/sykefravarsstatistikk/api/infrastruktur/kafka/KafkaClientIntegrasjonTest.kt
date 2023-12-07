@@ -6,6 +6,7 @@ import net.javacrumbs.jsonunit.assertj.assertThatJson
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.PrometheusMetrics
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.MetadataVirksomhetKafkamelding
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.dto.SektorKafkaDto
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
@@ -18,11 +19,10 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Profile
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.listener.ContainerProperties
@@ -32,7 +32,6 @@ import org.springframework.kafka.test.EmbeddedKafkaBroker
 import org.springframework.kafka.test.EmbeddedKafkaZKBroker
 import org.springframework.kafka.test.utils.ContainerTestUtils
 import org.springframework.kafka.test.utils.KafkaTestUtils
-import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
@@ -43,15 +42,17 @@ import java.util.concurrent.TimeUnit
     classes = [SykefraværsstatistikkLocalTestApplication::class],
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
-@DirtiesContext
 @EnableMockOAuth2Server
-@AutoConfigureObservability
 class KafkaClientIntegrasjonTest {
     @Autowired
     private lateinit var kafkaClient: KafkaClient
 
     @Autowired
     private lateinit var embeddedKafkaBroker: EmbeddedKafkaBroker
+
+    // Blir brukt av KafkaClient for å slippe @AutoConfigureObservability på testklassen
+    @MockBean
+    private lateinit var prometheusMetrics: PrometheusMetrics
 
     @TestConfiguration
     open class EmbeddedKafkaBrokerConfig {
