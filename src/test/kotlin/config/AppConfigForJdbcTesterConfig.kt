@@ -22,8 +22,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaCl
 import org.springframework.boot.SpringBootConfiguration
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.FilterType
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories
-import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExtension
 
 /**
  * Med denne configfilen skal Spring kunne sette opp en applikasjon som bare inneholder de

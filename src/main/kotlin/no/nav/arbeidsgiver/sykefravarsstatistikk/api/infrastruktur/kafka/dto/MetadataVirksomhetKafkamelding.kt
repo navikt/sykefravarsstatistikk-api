@@ -8,6 +8,7 @@ data class MetadataVirksomhetKafkamelding(
     val orgnr: String,
     val årstallOgKvartal: ÅrstallOgKvartal,
     val næring: String,
+    val næringskode: String,
     val bransje: Bransje?,
     val sektor: SektorKafkaDto,
 ) : Kafkamelding {
@@ -26,6 +27,7 @@ data class MetadataVirksomhetKafkamelding(
                 "arstall" to årstallOgKvartal.årstall.toString(),
                 "kvartal" to årstallOgKvartal.kvartal.toString(),
                 "naring" to næring,
+                "naringskode" to næringskode,
                 "bransje" to bransje?.name,
                 "sektor" to sektor.name
             )
