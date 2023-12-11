@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -43,6 +44,7 @@ import java.util.concurrent.TimeUnit
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
 @EnableMockOAuth2Server
+@AutoConfigureObservability
 class KafkaClientIntegrasjonTest {
     @Autowired
     private lateinit var kafkaClient: KafkaClient
