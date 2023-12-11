@@ -103,14 +103,15 @@ class KafkaClientIntegrasjonTest {
     @Test
     fun `send kafkamelding med metadata sender på riktig topic`() {
         kafkaClient.sendMelding(
-            MetadataVirksomhetKafkamelding(
-                "999999999",
-                ÅrstallOgKvartal(2023, 2),
-                "86101",
-                Bransje.SYKEHUS,
-                SektorKafkaDto.STATLIG
+            melding = MetadataVirksomhetKafkamelding(
+                orgnr = "999999999",
+                årstallOgKvartal = ÅrstallOgKvartal(2023, 2),
+                næring = "86",
+                næringskode = "86101",
+                bransje = Bransje.SYKEHUS,
+                sektor = SektorKafkaDto.STATLIG
             ),
-            KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1,
+            topic = KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1,
         )
         val message = consumerRecords.poll(10, TimeUnit.SECONDS)
         assertThat(message?.topic()).isEqualTo(KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1.navn)
@@ -119,14 +120,15 @@ class KafkaClientIntegrasjonTest {
     @Test
     fun `send kafkamelding med metadata sender riktig data`() {
         kafkaClient.sendMelding(
-            MetadataVirksomhetKafkamelding(
-                "999999999",
-                ÅrstallOgKvartal(2023, 2),
-                "86",
-                Bransje.SYKEHUS,
-                SektorKafkaDto.STATLIG
+            melding = MetadataVirksomhetKafkamelding(
+                orgnr = "999999999",
+                årstallOgKvartal = ÅrstallOgKvartal(2023, 2),
+                næring = "86",
+                næringskode = "86101",
+                bransje = Bransje.SYKEHUS,
+                sektor = SektorKafkaDto.STATLIG
             ),
-            KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1,
+            topic = KafkaTopic.SYKEFRAVARSSTATISTIKK_METADATA_V1,
         )
         val message = consumerRecords.poll(10, TimeUnit.SECONDS)
         assertThatJson(message!!.value()) {
@@ -136,12 +138,13 @@ class KafkaClientIntegrasjonTest {
             node("kvartal").isString.isEqualTo("2")
             node("bransje").isString.isEqualTo("SYKEHUS")
             node("naring").isString.isEqualTo("86")
+            node("naringskode").isString.isEqualTo("86101")
             node("sektor").isString.isEqualTo("STATLIG")
         }
     }
 
     @Test
-    fun `send kafkamelding for alle kategorier sender melding til riktig topic`() {
+    fun `legacy kafka sender melding til riktig topic`() {
         kafkaClient.send(
             EksporteringServiceTestUtils.__2020_2,
             EksporteringServiceTestUtils.virksomhetSykefravær,
