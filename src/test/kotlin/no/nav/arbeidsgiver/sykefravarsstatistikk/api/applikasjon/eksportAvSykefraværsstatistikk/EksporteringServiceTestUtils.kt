@@ -208,7 +208,7 @@ object EksporteringServiceTestUtils {
             årstall = årstallOgKvartal.årstall,
             kvartal = årstallOgKvartal.kvartal,
             orgnr = orgnr,
-            antallPersoner = 40,
+            antallPersoner = 6,
             tapteDagsverk = BigDecimal(10),
             muligeDagsverk = BigDecimal(500)
         )
