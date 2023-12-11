@@ -188,7 +188,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
 
         assertThatJson(statistikkategoriKafkameldingCaptor.firstValue.innhold) {
             isObject
-            // Siste kvartal har bare fir personer, og skal være maskert
+            // Siste kvartal har bare fire personer, og skal være maskert
             node("kategori").isString.isEqualTo(Statistikkategori.VIRKSOMHET.name)
             node("sistePubliserteKvartal").isObject.node("årstall").isNumber.isEqualTo(BigDecimal("2020"))
             node("sistePubliserteKvartal").isObject.node("prosent").isNull()
