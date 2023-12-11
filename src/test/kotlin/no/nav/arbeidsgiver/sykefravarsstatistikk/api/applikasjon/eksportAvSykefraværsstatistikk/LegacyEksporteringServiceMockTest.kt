@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringService.LegacyEksportFeil
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.LegacyEksporteringService.LegacyEksportFeil
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.__2020_2
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.assertEqualsSykefraværMedKategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.assertEqualsVirksomhetSykefravær
@@ -9,7 +9,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.næring5SifferSykefraværTilhørerBransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.næringSykefravær
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.sektorSykefravær
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.sykefraværsstatistikkForNæringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.sykefraværsstatistikkLandSiste4Kvartaler
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.sykefraværsstatistikkNæring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.sykefraværsstatistikkNæring5SifferBransjeprogram
@@ -22,6 +21,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.SykefraværMedKategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetSykefravær
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkForNæringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
@@ -35,9 +35,10 @@ import org.mockito.kotlin.KArgumentCaptor
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.whenever
+import java.math.BigDecimal
 
 @ExtendWith(MockitoExtension::class)
-class EksporteringServiceMockTest {
+class LegacyEksporteringServiceMockTest {
     private val legacyEksporteringRepository: LegacyEksporteringRepository = mock()
 
     private val kafkaClient: KafkaClient = mock()
@@ -49,7 +50,7 @@ class EksporteringServiceMockTest {
     private val sykefraværStatistikkNæringskodeRepository = mock<SykefraværStatistikkNæringskodeRepository>()
     private val legacyVirksomhetMetadataRepository = mock<LegacyVirksomhetMetadataRepository>()
 
-    private val service = EksporteringService(
+    private val service = LegacyEksporteringService(
         legacyEksporteringRepository,
         sykefraværStatistikkLandRepository,
         sykefraværStatistikkSektorRepository,
@@ -118,7 +119,17 @@ class EksporteringServiceMockTest {
         )
         whenever(
             sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(any())
-        ).thenReturn(listOf(sykefraværsstatistikkForNæringskode))
+        ).thenReturn(
+            listOf(
+                SykefraværsstatistikkForNæringskode(
+                    årstall = __2020_2.årstall,
+                    kvartal = __2020_2.kvartal,
+                    næringskode = "11000",
+                    antallPersoner = 1250,
+                    tapteDagsverk = BigDecimal(40),
+                    muligeDagsverk = BigDecimal(4000)
+                )
+            ))
         whenever(
             sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(listOf(__2020_2))
         ).thenReturn(

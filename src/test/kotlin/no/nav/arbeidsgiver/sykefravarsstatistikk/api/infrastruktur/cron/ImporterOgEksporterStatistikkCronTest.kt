@@ -12,7 +12,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImportEk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringMetadataVirksomhetService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringPerStatistikkKategoriService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.LegacyEksporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.SykefraværsstatistikkImporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImportEksportStatusRepository
 import org.junit.jupiter.api.BeforeEach
@@ -22,7 +22,7 @@ class ImporterOgEksporterStatistikkCronTest {
     private val importeringService = mockk<SykefraværsstatistikkImporteringService>()
     private val importEksportStatusRepository = mockk<ImportEksportStatusRepository>(relaxed = true)
     private val virksomhetMetadataService = mockk<VirksomhetMetadataService>()
-    private val eksporteringsService = mockk<EksporteringService>()
+    private val eksporteringsService = mockk<LegacyEksporteringService>()
     private val eksporteringPerStatistikkKategoriService = mockk<EksporteringPerStatistikkKategoriService>()
     private val eksporteringMetadataVirksomhetService = mockk<EksporteringMetadataVirksomhetService>()
     private val importerOgEksporterStatistikkCron = ImporterOgEksporterStatistikkCron(

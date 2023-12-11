@@ -3,7 +3,7 @@ package config
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.AggregertStatistikkService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringMetadataVirksomhetService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringPerStatistikkKategoriService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.LegacyEksporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.VirksomhetMetadataService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.SykefraværsstatistikkImporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.TilgangskontrollService
@@ -22,8 +22,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaCl
 import org.springframework.boot.SpringBootConfiguration
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.FilterType
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories
-import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExtension
 
 /**
  * Med denne configfilen skal Spring kunne sette opp en applikasjon som bare inneholder de
@@ -37,7 +35,7 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
         type = FilterType.ASSIGNABLE_TYPE,
         value = [
             TokenService::class,
-            EksporteringService::class,
+            LegacyEksporteringService::class,
             EksporteringPerStatistikkKategoriService::class,
             ImporterOgEksporterStatistikkCron::class,
             SykefraværsstatistikkImporteringService::class,

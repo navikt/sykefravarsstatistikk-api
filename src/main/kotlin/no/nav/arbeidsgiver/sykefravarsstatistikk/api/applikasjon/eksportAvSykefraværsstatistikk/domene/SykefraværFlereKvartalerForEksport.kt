@@ -34,6 +34,6 @@ data class SykefraværFlereKvartalerForEksport(
             .toList()
         antallPersoner =
             if (umaskertSykefravær.isEmpty()) 0
-            else umaskertSykefravær.maxByOrNull { it.årstallOgKvartal }!!.antallPersoner
+            else umaskertSykefravær.maxOf { it.antallPersoner }
     }
 }
