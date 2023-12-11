@@ -6,8 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.__2020_1
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.__2020_2
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.sykefraværsstatistikkSektor
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkLand
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
@@ -141,7 +140,64 @@ class EksporteringPerStatistikkKategoriServiceTest {
             node("kategori").isString.isEqualTo(Statistikkategori.VIRKSOMHET.name)
             node("kode").isString.isEqualTo("987654321")
             node("sistePubliserteKvartal").isObject.node("årstall").isNumber.isEqualTo(BigDecimal("2020"))
+            node("sistePubliserteKvartal").isObject.node("erMaskert").isBoolean.isFalse()
             node("siste4Kvartal").isObject.node("prosent").isNumber.isEqualTo(BigDecimal("2.0"))
+            node("siste4Kvartal").isObject.node("erMaskert").isBoolean.isFalse()
+        }
+    }
+
+
+    @Test
+    fun `eksporterSykefraværsstatistikkVirksomhet tar hensyn til maskering`() {
+        val viskromhetMedMaskertKvartal = listOf(
+            SykefraværsstatistikkVirksomhetUtenVarighet(
+                årstall = __2020_2.årstall,
+                kvartal = __2020_2.kvartal,
+                orgnr = "999999999",
+                antallPersoner = 4,
+                tapteDagsverk = 20.toBigDecimal(),
+                muligeDagsverk = 1000.toBigDecimal()
+            ),
+            SykefraværsstatistikkVirksomhetUtenVarighet(
+                årstall = __2020_1.årstall,
+                kvartal = __2020_1.kvartal,
+                orgnr = "999999999",
+                antallPersoner = 5,
+                tapteDagsverk = 20.toBigDecimal(),
+                muligeDagsverk = 1000.toBigDecimal()
+            ),
+        )
+
+        whenever(sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(any()))
+            .thenReturn(viskromhetMedMaskertKvartal)
+
+
+        // 2- Kall tjenesten
+        service.eksporterPerStatistikkKategori(
+            __2020_2,
+            Statistikkategori.VIRKSOMHET
+        )
+
+
+        // 3- Sjekk hva Kafka har fått
+        verify(kafkaClient)
+            .sendMelding(
+                statistikkategoriKafkameldingCaptor.capture(),
+                eq(KafkaTopic.SYKEFRAVARSSTATISTIKK_VIRKSOMHET_V1)
+            )
+
+        assertThatJson(statistikkategoriKafkameldingCaptor.firstValue.innhold) {
+            isObject
+            // Siste kvartal har bare fir personer, og skal være maskert
+            node("kategori").isString.isEqualTo(Statistikkategori.VIRKSOMHET.name)
+            node("sistePubliserteKvartal").isObject.node("årstall").isNumber.isEqualTo(BigDecimal("2020"))
+            node("sistePubliserteKvartal").isObject.node("prosent").isNull()
+            node("sistePubliserteKvartal").isObject.node("antallPersoner").isIntegralNumber.isEqualTo(4)
+            node("sistePubliserteKvartal").isObject.node("erMaskert").isBoolean.isTrue()
+
+            // Gjennomsnittet har kvartaler med fem personer, og skal derfor ikke være maskert
+            node("siste4Kvartal").isObject.node("prosent").isNumber.isEqualTo(2.0.toBigDecimal())
+            node("siste4Kvartal").isObject.node("erMaskert").isBoolean.isFalse()
         }
     }
 
@@ -164,7 +220,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
             EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
                 __2019_3,
                 "987654321"
-            ),EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
+            ), EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
                 __2020_2,
                 "123412341"
             ),

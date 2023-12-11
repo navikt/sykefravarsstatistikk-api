@@ -10,7 +10,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImportEk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringMetadataVirksomhetService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringPerStatistikkKategoriService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.LegacyEksporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.SykefraværsstatistikkImporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImportEksportStatusRepository
 import org.slf4j.LoggerFactory
@@ -27,7 +27,7 @@ class ImporterOgEksporterStatistikkCron(
     private val importeringService: SykefraværsstatistikkImporteringService,
     private val importEksportStatusRepository: ImportEksportStatusRepository,
     private val virksomhetMetadataService: VirksomhetMetadataService,
-    private val eksporteringsService: EksporteringService,
+    private val eksporteringsService: LegacyEksporteringService,
     private val eksporteringPerStatistikkKategoriService: EksporteringPerStatistikkKategoriService,
     private val eksporteringMetadataVirksomhetService: EksporteringMetadataVirksomhetService,
 ) {

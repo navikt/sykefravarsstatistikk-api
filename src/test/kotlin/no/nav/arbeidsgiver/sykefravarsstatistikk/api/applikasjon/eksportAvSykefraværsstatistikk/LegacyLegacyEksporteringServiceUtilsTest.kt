@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import kotlin.collections.set
 
-class LegacyEksporteringServiceUtilsTest {
+class LegacyLegacyEksporteringServiceUtilsTest {
     @Test
     fun virksomhetMetadataHashMap__returnerer_en_map_med_orgnr_som_key() {
         val virksomhetMetadataHashMap = LegacyEksporteringServiceUtils.getVirksomhetMetadataHashMap(
