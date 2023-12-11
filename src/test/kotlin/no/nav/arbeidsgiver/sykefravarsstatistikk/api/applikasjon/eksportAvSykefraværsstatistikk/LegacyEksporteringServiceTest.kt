@@ -38,7 +38,7 @@ import org.mockito.kotlin.whenever
 import java.math.BigDecimal
 
 @ExtendWith(MockitoExtension::class)
-class LegacyEksporteringServiceMockTest {
+class LegacyEksporteringServiceTest {
     private val legacyEksporteringRepository: LegacyEksporteringRepository = mock()
 
     private val kafkaClient: KafkaClient = mock()
