@@ -3,7 +3,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka
 import config.SykefraværsstatistikkLocalTestApplication
 import ia.felles.definisjoner.bransjer.Bransje
 import net.javacrumbs.jsonunit.assertj.assertThatJson
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.LegacyEksporteringTestUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.PrometheusMetrics
@@ -146,12 +146,12 @@ class KafkaClientIntegrasjonTest {
     @Test
     fun `legacy kafka sender melding til riktig topic`() {
         kafkaClient.send(
-            EksporteringServiceTestUtils.__2020_2,
-            EksporteringServiceTestUtils.virksomhetSykefravær,
-            listOf(EksporteringServiceTestUtils.næring5SifferSykefravær),
-            EksporteringServiceTestUtils.næringSykefravær,
-            EksporteringServiceTestUtils.sektorSykefravær,
-            EksporteringServiceTestUtils.landSykefravær
+            LegacyEksporteringTestUtils.__2020_2,
+            LegacyEksporteringTestUtils.virksomhetSykefravær,
+            listOf(LegacyEksporteringTestUtils.næring5SifferSykefravær),
+            LegacyEksporteringTestUtils.næringSykefravær,
+            LegacyEksporteringTestUtils.sektorSykefravær,
+            LegacyEksporteringTestUtils.landSykefravær
         )
         val message = consumerRecords.poll(10, TimeUnit.SECONDS)
         Assertions.assertEquals(KafkaTopic.SYKEFRAVARSSTATISTIKK_V1.navn, message!!.topic())

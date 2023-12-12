@@ -1,11 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk
 
 import net.javacrumbs.jsonunit.assertj.assertThatJson
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.__2019_3
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.__2019_4
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.__2020_1
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.__2020_2
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringServiceTestUtils.sykefraværsstatistikkSektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
@@ -29,6 +24,11 @@ class EksporteringPerStatistikkKategoriServiceTest {
 
     private val kafkaClient = mock<KafkaClient>()
 
+    private val __2020_2 = ÅrstallOgKvartal(2020, 2)
+    private val __2020_1 = ÅrstallOgKvartal(2020, 1)
+    private val __2019_4 = ÅrstallOgKvartal(2019, 4)
+    private val __2019_3 = ÅrstallOgKvartal(2019, 3)
+
     private val service: EksporteringPerStatistikkKategoriService = EksporteringPerStatistikkKategoriService(
         sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
         sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository,
@@ -45,7 +45,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
     @Test
     fun eksporterSykefraværsstatistikkLand__sender_riktig_melding_til_kafka() {
         val umaskertSykefraværForEttKvartalListe =
-            EksporteringServiceTestUtils.sykefraværsstatistikkLandSiste4Kvartaler(__2020_2)
+            LegacyEksporteringTestUtils.sykefraværsstatistikkLandSiste4Kvartaler(__2020_2)
         whenever(sykefraværStatistikkLandRepository.hentSykefraværstatistikkLand(any()))
             .thenReturn(umaskertSykefraværForEttKvartalListe.map {
                 SykefraværsstatistikkLand(
@@ -73,10 +73,18 @@ class EksporteringPerStatistikkKategoriServiceTest {
         }
     }
 
+
     @Test
-    fun eksporterSykefraværsstatistikkSektor__sender_riktig_melding_til_kafka() {
-        val testData = sykefraværsstatistikkSektor
-        whenever(sykefraværStatistikkSektorRepository.hentForKvartaler(any())).thenReturn(listOf(testData))
+    fun `eksporterPerStatistikkKategori sender riktig melding til kafka`() {
+        val data = SykefraværsstatistikkSektor(
+            årstall = __2020_2.årstall,
+            kvartal = __2020_2.kvartal,
+            sektorkode = Sektor.STATLIG.sektorkode,
+            antallPersoner = 33000,
+            tapteDagsverk = BigDecimal(1340),
+            muligeDagsverk = BigDecimal(88000)
+        )
+        whenever(sykefraværStatistikkSektorRepository.hentForKvartaler(any())).thenReturn(listOf(data))
 
         service.eksporterPerStatistikkKategori(__2020_2, Statistikkategori.SEKTOR)
 
@@ -88,7 +96,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
 
         assertThatJson(statistikkategoriKafkameldingCaptor.firstValue.innhold) {
             isObject
-            node("kategori").isString.isEqualTo(Statistikkategori.SEKTOR.name)
+            node("kategori").isString.isEqualTo("SEKTOR")
             node("kode").isString.isEqualTo("1")
             node("sistePubliserteKvartal").isObject.node("årstall").isNumber.isEqualTo(BigDecimal("2020"))
             node("sistePubliserteKvartal").isObject.node("kvartal").isNumber.isEqualTo(BigDecimal("2"))
@@ -98,34 +106,23 @@ class EksporteringPerStatistikkKategoriServiceTest {
     @Test
     fun eksporterSykefraværsstatistikkVirksomhet__sender_riktig_melding_til_kafka() {
         // 1- Mock det database og repositories returnerer. Samme med KafkaService
-        val allData = listOf(
-            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
-                __2020_2,
-                "987654321"
-            ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
-                __2020_1,
-                "987654321"
-            ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
-                __2019_4,
-                "987654321"
-            ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
-                __2019_3,
-                "987654321"
+        val kvartaler = __2020_2 inkludertTidligere 3
+
+        val data = kvartaler.map {
+            SykefraværsstatistikkVirksomhetUtenVarighet(
+                årstall = it.årstall,
+                kvartal = it.kvartal,
+                orgnr = "987654321",
+                antallPersoner = 6,
+                tapteDagsverk = BigDecimal(10),
+                muligeDagsverk = BigDecimal(500)
             )
-        )
-        whenever(
-            sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(__2020_2 inkludertTidligere 3)
-        )
-            .thenReturn(allData)
+        }
+
+        whenever(sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(kvartaler)).thenReturn(data)
 
         // 2- Kall tjenesten
-        service.eksporterPerStatistikkKategori(
-            __2020_2,
-            Statistikkategori.VIRKSOMHET
-        )
+        service.eksporterPerStatistikkKategori(__2020_2, Statistikkategori.VIRKSOMHET)
 
 
         // 3- Sjekk hva Kafka har fått
@@ -201,38 +198,51 @@ class EksporteringPerStatistikkKategoriServiceTest {
         }
     }
 
+    fun sykefraværsstatistikkVirksomhet(
+        årstallOgKvartal: ÅrstallOgKvartal, orgnr: String
+    ): SykefraværsstatistikkVirksomhetUtenVarighet {
+        return SykefraværsstatistikkVirksomhetUtenVarighet(
+            årstall = årstallOgKvartal.årstall,
+            kvartal = årstallOgKvartal.kvartal,
+            orgnr = orgnr,
+            antallPersoner = 6,
+            tapteDagsverk = BigDecimal(10),
+            muligeDagsverk = BigDecimal(500)
+        )
+    }
+
     @Test
     fun eksporterSykefraværsstatistikkVirksomhet__sender_riktig_antall_meldinger_til_kafka() {
         // 1- Mock det database og repositories returnerer. Samme med KafkaService
         val allData = listOf(
-            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
+            sykefraværsstatistikkVirksomhet(
                 __2020_2,
                 "987654321"
             ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
+            sykefraværsstatistikkVirksomhet(
                 __2020_1,
                 "987654321"
             ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
+            sykefraværsstatistikkVirksomhet(
                 __2019_4,
                 "987654321"
             ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
+            sykefraværsstatistikkVirksomhet(
                 __2019_3,
                 "987654321"
-            ), EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
+            ), sykefraværsstatistikkVirksomhet(
                 __2020_2,
                 "123412341"
             ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
+            sykefraværsstatistikkVirksomhet(
                 __2020_1,
                 "123412341"
             ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
+            sykefraværsstatistikkVirksomhet(
                 __2019_4,
                 "123412341"
             ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhet(
+            sykefraværsstatistikkVirksomhet(
                 __2019_3,
                 "123412341"
             )
@@ -256,10 +266,10 @@ class EksporteringPerStatistikkKategoriServiceTest {
     @Test
     fun `eksporter statistikk for virksomhet gradert sender riktig melding til kafka`() {
         val allData = listOf(
-            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhetGradert(__2020_2, "11"),
-            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhetGradert(__2020_1, "11"),
-            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhetGradert(__2019_4, "11"),
-            EksporteringServiceTestUtils.sykefraværsstatistikkVirksomhetGradert(__2019_3, "11")
+            LegacyEksporteringTestUtils.sykefraværsstatistikkVirksomhetGradert(__2020_2, "11"),
+            LegacyEksporteringTestUtils.sykefraværsstatistikkVirksomhetGradert(__2020_1, "11"),
+            LegacyEksporteringTestUtils.sykefraværsstatistikkVirksomhetGradert(__2019_4, "11"),
+            LegacyEksporteringTestUtils.sykefraværsstatistikkVirksomhetGradert(__2019_3, "11")
         )
 
         whenever(
@@ -304,23 +314,24 @@ class EksporteringPerStatistikkKategoriServiceTest {
     @Test
     fun eksporterSykefraværsstatistikkNæring__sender_riktig_melding_til_kafka() {
         // 1- Mock det database og repositories returnerer. Samme med KafkaService
-        val allData = listOf(
-            EksporteringServiceTestUtils.sykefraværsstatistikkNæring(__2020_2, "11"),
-            EksporteringServiceTestUtils.sykefraværsstatistikkNæring(__2020_1, "11"),
-            EksporteringServiceTestUtils.sykefraværsstatistikkNæring(__2019_4, "11"),
-            EksporteringServiceTestUtils.sykefraværsstatistikkNæring(__2019_3, "11")
-        )
 
-        whenever(
-            sykefraværStatistikkNæringRepository.hentForAlleNæringer(__2020_2 inkludertTidligere 3)
-        )
-            .thenReturn(allData)
+        val kvartaler = __2020_2 inkludertTidligere 3
+
+        val data = kvartaler.map {
+            SykefraværsstatistikkForNæring(
+                årstall = it.årstall,
+                kvartal = it.kvartal,
+                næring = "11",
+                antallPersoner = 150,
+                tapteDagsverk = BigDecimal(100),
+                muligeDagsverk = BigDecimal(5000)
+            )
+        }
+
+        whenever(sykefraværStatistikkNæringRepository.hentForAlleNæringer(kvartaler)).thenReturn(data)
 
         // 2- Kall tjenesten
-        service.eksporterPerStatistikkKategori(
-            __2020_2,
-            Statistikkategori.NÆRING
-        )
+        service.eksporterPerStatistikkKategori(__2020_2, Statistikkategori.NÆRING)
 
         // 3- Sjekk hva Kafka har fått
         verify(kafkaClient)
@@ -350,31 +361,51 @@ class EksporteringPerStatistikkKategoriServiceTest {
     fun eksporterSykefraværsstatistikkNæringskode__sender_riktig_melding_til_kafka() {
         // 1- Mock det database og repositories returnerer. Samme med KafkaService
         val allData = listOf(
-            EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(
-                årstallOgKvartal = __2020_2,
-                næringskode = "11001"
+            SykefraværsstatistikkForNæringskode(
+                årstall = __2020_2.årstall,
+                kvartal = __2020_2.kvartal,
+                næringskode = "11001",
+                antallPersoner = 150,
+                tapteDagsverk = BigDecimal(100),
+                muligeDagsverk = BigDecimal(5000)
             ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(
-                årstallOgKvartal = __2020_1,
-                næringskode = "11001"
+            SykefraværsstatistikkForNæringskode(
+                årstall = __2020_1.årstall,
+                kvartal = __2020_1.kvartal,
+                næringskode = "11001",
+                antallPersoner = 150,
+                tapteDagsverk = BigDecimal(100),
+                muligeDagsverk = BigDecimal(5000)
             ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(
-                årstallOgKvartal = __2019_4,
-                næringskode = "11001"
+            SykefraværsstatistikkForNæringskode(
+                årstall = __2019_4.årstall,
+                kvartal = __2019_4.kvartal,
+                næringskode = "11001",
+                antallPersoner = 150,
+                tapteDagsverk = BigDecimal(100),
+                muligeDagsverk = BigDecimal(5000)
             ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(
-                årstallOgKvartal = __2019_3,
-                næringskode = "11001"
+            SykefraværsstatistikkForNæringskode(
+                årstall = __2019_3.årstall,
+                kvartal = __2019_3.kvartal,
+                næringskode = "11001",
+                antallPersoner = 150,
+                tapteDagsverk = BigDecimal(100),
+                muligeDagsverk = BigDecimal(5000)
             ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(
-                årstallOgKvartal = __2020_2,
+            SykefraværsstatistikkForNæringskode(
+                årstall = __2020_2.årstall,
+                kvartal = __2020_2.kvartal,
                 næringskode = "22002",
+                antallPersoner = 150,
                 tapteDagsverk = BigDecimal(10.0),
                 muligeDagsverk = BigDecimal(100)
             ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(
-                årstallOgKvartal = __2020_1,
+            SykefraværsstatistikkForNæringskode(
+                årstall = __2020_1.årstall,
+                kvartal = __2020_1.kvartal,
                 næringskode = "22002",
+                antallPersoner = 150,
                 tapteDagsverk = BigDecimal(15.0),
                 muligeDagsverk = BigDecimal(100)
             ),
@@ -441,33 +472,61 @@ class EksporteringPerStatistikkKategoriServiceTest {
     @Test
     fun `eksport sykefraværsstatistikk NÆRINGSKODE hopper over næringskoder som ikke har statistikk for forespurt kvartal`() {
         val allData = listOf(
-            EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(
-                årstallOgKvartal = __2020_2,
-                næringskode = "11001"
+            SykefraværsstatistikkForNæringskode(
+                årstall = __2020_2.årstall,
+                kvartal = __2020_2.kvartal,
+                næringskode = "11001",
+                antallPersoner = 150,
+                tapteDagsverk = BigDecimal(100),
+                muligeDagsverk = BigDecimal(5000)
             ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(
-                årstallOgKvartal = __2020_1,
-                næringskode = "11001"
+            SykefraværsstatistikkForNæringskode(
+                årstall = __2020_1.årstall,
+                kvartal = __2020_1.kvartal,
+                næringskode = "11001",
+                antallPersoner = 150,
+                tapteDagsverk = BigDecimal(100),
+                muligeDagsverk = BigDecimal(5000)
             ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(
-                årstallOgKvartal = __2019_4,
-                næringskode = "11001"
+            SykefraværsstatistikkForNæringskode(
+                årstall = __2019_4.årstall,
+                kvartal = __2019_4.kvartal,
+                næringskode = "11001",
+                antallPersoner = 150,
+                tapteDagsverk = BigDecimal(100),
+                muligeDagsverk = BigDecimal(5000)
             ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(
-                årstallOgKvartal = __2020_2,
-                næringskode = "22002"
+            SykefraværsstatistikkForNæringskode(
+                årstall = __2020_2.årstall,
+                kvartal = __2020_2.kvartal,
+                næringskode = "22002",
+                antallPersoner = 150,
+                tapteDagsverk = BigDecimal(100),
+                muligeDagsverk = BigDecimal(5000)
             ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(
-                årstallOgKvartal = __2020_1,
-                næringskode = "22002"
+            SykefraværsstatistikkForNæringskode(
+                årstall = __2020_1.årstall,
+                kvartal = __2020_1.kvartal,
+                næringskode = "22002",
+                antallPersoner = 150,
+                tapteDagsverk = BigDecimal(100),
+                muligeDagsverk = BigDecimal(5000)
             ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(
-                årstallOgKvartal = __2020_1,
-                næringskode = "33003"
+            SykefraværsstatistikkForNæringskode(
+                årstall = __2020_1.årstall,
+                kvartal = __2020_1.kvartal,
+                næringskode = "33003",
+                antallPersoner = 150,
+                tapteDagsverk = BigDecimal(100),
+                muligeDagsverk = BigDecimal(5000)
             ),
-            EksporteringServiceTestUtils.sykefraværsstatistikkNæringskode(
-                årstallOgKvartal = __2019_4,
-                næringskode = "33003"
+            SykefraværsstatistikkForNæringskode(
+                årstall = __2019_4.årstall,
+                kvartal = __2019_4.kvartal,
+                næringskode = "33003",
+                antallPersoner = 150,
+                tapteDagsverk = BigDecimal(100),
+                muligeDagsverk = BigDecimal(5000)
             ),
         )
 

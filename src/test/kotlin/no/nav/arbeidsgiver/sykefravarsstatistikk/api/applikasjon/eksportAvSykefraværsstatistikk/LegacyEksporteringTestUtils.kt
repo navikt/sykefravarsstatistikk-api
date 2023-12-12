@@ -7,15 +7,12 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.R
 import org.assertj.core.api.Assertions
 import java.math.BigDecimal
 
-object EksporteringServiceTestUtils {
+object LegacyEksporteringTestUtils {
     // Data for testing & Utilities
     val __2021_2 = ÅrstallOgKvartal(2021, 2)
     val __2021_1 = ÅrstallOgKvartal(2021, 1)
     val __2020_4 = ÅrstallOgKvartal(2020, 4)
     val __2020_2 = ÅrstallOgKvartal(2020, 2)
-    val __2020_1 = ÅrstallOgKvartal(2020, 1)
-    val __2019_4 = ÅrstallOgKvartal(2019, 4)
-    val __2019_3 = ÅrstallOgKvartal(2019, 3)
 
     var ORGNR_VIRKSOMHET_1 = Orgnr("987654321")
 
@@ -291,25 +288,6 @@ object EksporteringServiceTestUtils {
             150,
             BigDecimal(100),
             BigDecimal(5000)
-        )
-    }
-
-
-    fun sykefraværsstatistikkNæringskode(
-        årstallOgKvartal: ÅrstallOgKvartal,
-        næringskode: String = "11001",
-        antallPersoner: Int = 150,
-        tapteDagsverk: BigDecimal = BigDecimal(100),
-        muligeDagsverk: BigDecimal = BigDecimal(5000)
-
-    ): SykefraværsstatistikkForNæringskode {
-        return SykefraværsstatistikkForNæringskode(
-                årstallOgKvartal.årstall,
-                årstallOgKvartal.kvartal,
-                næringskode,
-                antallPersoner,
-                tapteDagsverk,
-                muligeDagsverk
         )
     }
 
