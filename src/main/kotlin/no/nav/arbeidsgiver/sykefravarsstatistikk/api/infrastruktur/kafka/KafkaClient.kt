@@ -22,8 +22,8 @@ import java.util.concurrent.CompletableFuture
 @Service
 class KafkaClient internal constructor(
     private val kafkaTemplate: KafkaTemplate<String?, String?>,
-    private val kafkaUtsendingRapport: KafkaUtsendingRapport,
-    private val kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository,
+    private val legacyKafkaUtsendingRapport: LegacyKafkaUtsendingRapport,
+    private val legacyKafkaUtsendingHistorikkRepository: LegacyKafkaUtsendingHistorikkRepository,
     private val prometheusMetrics: PrometheusMetrics,
 ) {
     private val log = LoggerFactory.getLogger(KafkaClient::class.java)
@@ -38,11 +38,11 @@ class KafkaClient internal constructor(
             KafkaTopicNavn.navn,
             totalMeldingerTilUtsending
         )
-        kafkaUtsendingRapport.reset(totalMeldingerTilUtsending)
+        legacyKafkaUtsendingRapport.reset(totalMeldingerTilUtsending)
     }
 
     val antallMeldingerMottattForUtsending: Int
-        get() = kafkaUtsendingRapport.antallMeldingerMottattForUtsending.toInt()
+        get() = legacyKafkaUtsendingRapport.antallMeldingerMottattForUtsending.toInt()
 
     fun sendMelding(melding: Kafkamelding, topic: KafkaTopic) {
         kafkaTemplate.send(topic.navn, melding.nøkkel, melding.innhold)
@@ -55,8 +55,8 @@ class KafkaClient internal constructor(
             }
     }
 
-
-    fun send(
+    @Deprecated("Bruk eksport per kategori. Slett denne etter at alle konsumenter har gått over.")
+    fun legacySend(
         årstallOgKvartal: ÅrstallOgKvartal,
         virksomhetSykefravær: VirksomhetSykefravær,
         næring5SifferSykefravær: List<SykefraværMedKategori>,
@@ -65,15 +65,15 @@ class KafkaClient internal constructor(
         landSykefravær: SykefraværMedKategori
     ) {
         // TODO bytt til Prometheus
-        kafkaUtsendingRapport.leggTilMeldingMottattForUtsending()
-        if (kafkaUtsendingRapport.antallMeldingerIError.toInt() > 5) {
+        legacyKafkaUtsendingRapport.leggTilMeldingMottattForUtsending()
+        if (legacyKafkaUtsendingRapport.antallMeldingerIError.toInt() > 5) {
             throw KafkaUtsendingException(
                 String.format(
                     "Antall error:'%d'. Avbryter eksportering. Totalt meldinger som var klar for sending er: '%d'."
                             + " Antall meldinger som har egentlig blitt sendt: '%d'",
-                    kafkaUtsendingRapport.antallMeldingerIError,
-                    kafkaUtsendingRapport.antallMeldingerSent,
-                    kafkaUtsendingRapport.antallMeldingerMottattForUtsending
+                    legacyKafkaUtsendingRapport.antallMeldingerIError,
+                    legacyKafkaUtsendingRapport.antallMeldingerSent,
+                    legacyKafkaUtsendingRapport.antallMeldingerMottattForUtsending
                 )
             )
         }
@@ -96,7 +96,7 @@ class KafkaClient internal constructor(
             keyAsJsonString = objectMapper.writeValueAsString(key)
             dataAsJsonString = objectMapper.writeValueAsString(value)
         } catch (e: JsonProcessingException) {
-            kafkaUtsendingRapport.leggTilError(
+            legacyKafkaUtsendingRapport.leggTilError(
                 String.format(
                     "Kunne ikke parse orgnr '%s' til Json. Statistikk ikke sent for virksomheten.",
                     virksomhetSykefravær.orgnr
@@ -110,7 +110,7 @@ class KafkaClient internal constructor(
         )
         futureResult
             .thenAcceptAsync { res: SendResult<String?, String?> ->
-                kafkaUtsendingRapport.leggTilUtsendingSuksess(
+                legacyKafkaUtsendingRapport.leggTilUtsendingSuksess(
                     Orgnr(virksomhetSykefravær.orgnr)
                 )
                 log.debug(
@@ -119,12 +119,12 @@ class KafkaClient internal constructor(
                     res.producerRecord.key(),
                     res.recordMetadata.offset()
                 )
-                kafkaUtsendingHistorikkRepository.opprettHistorikk(
+                legacyKafkaUtsendingHistorikkRepository.opprettHistorikk(
                     virksomhetSykefravær.orgnr, keyAsJsonString, dataAsJsonString
                 )
             }
             .exceptionally { throwable: Throwable ->
-                kafkaUtsendingRapport.leggTilError(
+                legacyKafkaUtsendingRapport.leggTilError(
                     String.format(
                         "Utsending feilet for orgnr '%s' med melding '%s'",
                         virksomhetSykefravær.orgnr, throwable.message
@@ -136,16 +136,16 @@ class KafkaClient internal constructor(
     }
 
     val snittTidUtsendingTilKafka: Long
-        get() = kafkaUtsendingRapport.snittTidUtsendingTilKafka
+        get() = legacyKafkaUtsendingRapport.snittTidUtsendingTilKafka
     val snittTidOppdateringIDB: Long
-        get() = kafkaUtsendingRapport.snittTidOppdateringIDB
+        get() = legacyKafkaUtsendingRapport.snittTidOppdateringIDB
     val råDataVedDetaljertMåling: String
-        get() = kafkaUtsendingRapport.råDataVedDetaljertMåling
+        get() = legacyKafkaUtsendingRapport.råDataVedDetaljertMåling
 
     fun addUtsendingTilKafkaProcessingTime(
         startUtsendingProcess: Long, stopUtsendingProcess: Long
     ) {
-        kafkaUtsendingRapport.addUtsendingTilKafkaProcessingTime(
+        legacyKafkaUtsendingRapport.addUtsendingTilKafkaProcessingTime(
             startUtsendingProcess, stopUtsendingProcess
         )
     }
@@ -153,7 +153,7 @@ class KafkaClient internal constructor(
     fun addDBOppdateringProcessingTime(
         startDBOppdateringProcess: Long, stopDBOppdateringProcess: Long
     ) {
-        kafkaUtsendingRapport.addDBOppdateringProcessingTime(
+        legacyKafkaUtsendingRapport.addDBOppdateringProcessingTime(
             startDBOppdateringProcess, stopDBOppdateringProcess
         )
     }

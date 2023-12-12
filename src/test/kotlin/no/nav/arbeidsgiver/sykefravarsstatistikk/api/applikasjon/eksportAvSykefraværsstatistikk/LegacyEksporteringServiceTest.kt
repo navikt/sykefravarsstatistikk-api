@@ -146,7 +146,7 @@ class LegacyEksporteringServiceTest {
             sykefraværStatistikkLandRepository.hentForKvartaler(any())
         ).thenReturn(sykefraværsstatistikkLandSiste4Kvartaler(__2020_2))
         val antallEksporterte = service.legacyEksporter(__2020_2).getOrNull()!!
-        verify(kafkaClient)?.send(
+        verify(kafkaClient)?.legacySend(
             årstallOgKvartalArgumentCaptor.capture(),
             virksomhetSykefraværArgumentCaptor.capture(),
             næring5SifferSykefraværArgumentCaptor.capture(),
@@ -247,7 +247,7 @@ class LegacyEksporteringServiceTest {
             sykefraværsstatistikkLandSiste4Kvartaler(årstallOgKvartal)
         )
         val antallEksporterte = service.legacyEksporter(årstallOgKvartal).getOrNull()
-        verify(kafkaClient)?.send(
+        verify(kafkaClient)?.legacySend(
             årstallOgKvartalArgumentCaptor.capture(),
             virksomhetSykefraværArgumentCaptor.capture(),
             næring5SifferSykefraværArgumentCaptor.capture(),

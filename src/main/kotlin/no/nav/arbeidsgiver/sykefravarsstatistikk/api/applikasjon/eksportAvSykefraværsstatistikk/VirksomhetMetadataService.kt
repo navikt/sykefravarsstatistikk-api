@@ -13,7 +13,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.Lega
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.LegacyVirksomhetMetadataRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.LegacyKafkaUtsendingHistorikkRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.util.stream.Collectors
@@ -23,7 +23,7 @@ class VirksomhetMetadataService(
     private val kildeTilVirksomhetsdata: KildeTilVirksomhetsdata,
     private val virksomhetMetadataRepository: VirksomhetMetadataRepository,
     private val legacyEksporteringRepository: LegacyEksporteringRepository,
-    private val kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository,
+    private val legacyKafkaUtsendingHistorikkRepository: LegacyKafkaUtsendingHistorikkRepository,
     private val sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
     private val legacyVirksomhetMetadataRepository: LegacyVirksomhetMetadataRepository,
 ) {
@@ -66,7 +66,7 @@ class VirksomhetMetadataService(
         log.info("Forberede neste eksport: prosessen starter.")
         if (slettHistorikk) {
             val slettUtsendingHistorikkStart = System.currentTimeMillis()
-            val antallRaderSlettetIUtsendingHistorikk = kafkaUtsendingHistorikkRepository.slettHistorikk()
+            val antallRaderSlettetIUtsendingHistorikk = legacyKafkaUtsendingHistorikkRepository.slettHistorikk()
             log.info(
                 "Forberede neste eksport: utsending historikk (working table) har blitt nullstilt. "
                         + "{} rader har blitt slettet. Tok {} millis. ",

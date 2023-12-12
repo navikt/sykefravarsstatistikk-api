@@ -171,7 +171,7 @@ class LegacyEksporteringService(
             Consumer { virksomhetMetadata: VirksomhetMetadata? ->
                 val startUtsendingProcess = System.nanoTime()
                 if (virksomhetMetadata != null) {
-                    kafkaClient.send(
+                    kafkaClient.legacySend(
                         årstallOgKvartal,
                         LegacyEksporteringServiceUtils.getVirksomhetSykefravær(
                             virksomhetMetadata,

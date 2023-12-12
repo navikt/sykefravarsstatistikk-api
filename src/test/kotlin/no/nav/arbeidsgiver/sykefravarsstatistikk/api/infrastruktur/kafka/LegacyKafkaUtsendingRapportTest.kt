@@ -3,10 +3,10 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-internal class KafkaUtsendingRapportTest {
+internal class LegacyKafkaUtsendingRapportTest {
     @Test
     fun addProcessingTime__gir_mulighet_til_å_beregne_snitt_prosesseringstid() {
-        val rapport = KafkaUtsendingRapport()
+        val rapport = LegacyKafkaUtsendingRapport()
         rapport.reset(2)
         rapport.addUtsendingTilKafkaProcessingTime(500, 550)
         rapport.addDBOppdateringProcessingTime(8000, 8800)

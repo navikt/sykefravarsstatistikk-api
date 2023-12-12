@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 
-class KafkaUtsendingRapport {
+class LegacyKafkaUtsendingRapport {
     private val log = LoggerFactory.getLogger(this::class.java)
 
     val antallMeldingerMottattForUtsending: AtomicInteger = AtomicInteger()

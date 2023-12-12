@@ -5,7 +5,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.LegacyEksporteringRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.LegacyKafkaUtsendingHistorikkRepository
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -38,11 +38,11 @@ open class LegacyEksporteringRepositoryTest {
     private lateinit var legacyEksporteringRepository: LegacyEksporteringRepository
 
     @Autowired
-    private lateinit var kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository
+    private lateinit var legacyKafkaUtsendingHistorikkRepository: LegacyKafkaUtsendingHistorikkRepository
 
     @BeforeEach
     fun setUp() {
-        slettAllEksportDataFraDatabase(jdbcTemplate, kafkaUtsendingHistorikkRepository)
+        slettAllEksportDataFraDatabase(jdbcTemplate, legacyKafkaUtsendingHistorikkRepository)
     }
 
     @Test

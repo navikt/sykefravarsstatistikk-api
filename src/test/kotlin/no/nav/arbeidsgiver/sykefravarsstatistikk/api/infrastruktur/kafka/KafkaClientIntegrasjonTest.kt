@@ -145,7 +145,7 @@ class KafkaClientIntegrasjonTest {
 
     @Test
     fun `legacy kafka sender melding til riktig topic`() {
-        kafkaClient.send(
+        kafkaClient.legacySend(
             LegacyEksporteringTestUtils.__2020_2,
             LegacyEksporteringTestUtils.virksomhetSykefravær,
             listOf(LegacyEksporteringTestUtils.næring5SifferSykefravær),

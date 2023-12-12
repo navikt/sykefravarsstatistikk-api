@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
 @Component
-open class KafkaUtsendingHistorikkRepository(
+open class LegacyKafkaUtsendingHistorikkRepository(
     @param:Qualifier("sykefravarsstatistikkDatabase") override val database: Database,
 ): UsingExposed, Table("kafka_utsending_historikk") {
     val orgnr = text("orgnr")

@@ -13,7 +13,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.Lega
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.LegacyVirksomhetMetadataRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.LegacyKafkaUtsendingHistorikkRepository
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers
@@ -30,7 +30,7 @@ internal class VirksomhetMetadataServiceTest {
 
     private val legacyEksporteringRepository: LegacyEksporteringRepository = mock()
 
-    private val kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository = mock()
+    private val legacyKafkaUtsendingHistorikkRepository: LegacyKafkaUtsendingHistorikkRepository = mock()
     private val sykefravarStatistikkVirksomhetGraderingRepository =
         mock<SykefravarStatistikkVirksomhetGraderingRepository>()
     val legacyVirksomhetMetadataRepository = mock<LegacyVirksomhetMetadataRepository>()
@@ -38,7 +38,7 @@ internal class VirksomhetMetadataServiceTest {
         datavarehusRepository,
         virksomhetMetadataRepository,
         legacyEksporteringRepository,
-        kafkaUtsendingHistorikkRepository,
+        legacyKafkaUtsendingHistorikkRepository,
         sykefravarStatistikkVirksomhetGraderingRepository,
         legacyVirksomhetMetadataRepository,
     )

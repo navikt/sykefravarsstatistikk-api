@@ -4,7 +4,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.N�
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkLand
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingHistorikkRepository
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.LegacyKafkaUtsendingHistorikkRepository
 import org.jetbrains.exposed.sql.deleteAll
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -69,10 +69,10 @@ object TestUtils {
 
     fun slettAllEksportDataFraDatabase(
         jdbcTemplate: NamedParameterJdbcTemplate? = null,
-        kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository
+        legacyKafkaUtsendingHistorikkRepository: LegacyKafkaUtsendingHistorikkRepository
     ) {
         jdbcTemplate?.update("delete from eksport_per_kvartal", MapSqlParameterSource())
-        kafkaUtsendingHistorikkRepository.slettHistorikk()
+        legacyKafkaUtsendingHistorikkRepository.slettHistorikk()
         jdbcTemplate?.update(
             "delete from virksomheter_bekreftet_eksportert", MapSqlParameterSource()
         )

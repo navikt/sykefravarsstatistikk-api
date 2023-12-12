@@ -1,6 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.config
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaUtsendingRapport
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.LegacyKafkaUtsendingRapport
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.config.SslConfigs
@@ -60,6 +60,6 @@ data class KafkaProperties(
 
     @get:Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     @get:Bean
-    val kafkaUtsendingReport: KafkaUtsendingRapport
-        get() = KafkaUtsendingRapport()
+    val kafkaUtsendingReport: LegacyKafkaUtsendingRapport
+        get() = LegacyKafkaUtsendingRapport()
 }

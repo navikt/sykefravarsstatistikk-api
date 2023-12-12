@@ -21,22 +21,22 @@ import java.time.LocalDateTime
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
-open class KafkaUtsendingHistorikkRepositoryTest {
+open class LegacyKafkaUtsendingHistorikkRepositoryTest {
     @Autowired
-    private lateinit var kafkaUtsendingHistorikkRepository: KafkaUtsendingHistorikkRepository
+    private lateinit var legacyKafkaUtsendingHistorikkRepository: LegacyKafkaUtsendingHistorikkRepository
 
     @BeforeEach
     fun setUp() {
-        slettAllEksportDataFraDatabase(kafkaUtsendingHistorikkRepository = kafkaUtsendingHistorikkRepository)
+        slettAllEksportDataFraDatabase(legacyKafkaUtsendingHistorikkRepository = legacyKafkaUtsendingHistorikkRepository)
     }
 
     @Test
     fun opprettHistorikk__oppretter_historikk() {
         val startTime = LocalDateTime.now()
-        kafkaUtsendingHistorikkRepository.opprettHistorikk(
+        legacyKafkaUtsendingHistorikkRepository.opprettHistorikk(
             "987654321", "{\"orgnr\": \"987654321\"}", "{\"statistikk\": \"....\"}"
         )
-        val results = kafkaUtsendingHistorikkRepository.hentAlt()
+        val results = legacyKafkaUtsendingHistorikkRepository.hentAlt()
         val kafkaUtsendingHistorikkData = results[0]
         kafkaUtsendingHistorikkData.orgnr shouldBe "987654321"
         kafkaUtsendingHistorikkData.key shouldBe "{\"orgnr\": \"987654321\"}"
@@ -46,24 +46,24 @@ open class KafkaUtsendingHistorikkRepositoryTest {
 
     @Test
     fun slettHistorikk__sletter_historikk() {
-        kafkaUtsendingHistorikkRepository.opprettHistorikk(
+        legacyKafkaUtsendingHistorikkRepository.opprettHistorikk(
             "987654321", "{\"orgnr\": \"987654321\"}", "{\"statistikk\": \"....\"}"
         )
-        kafkaUtsendingHistorikkRepository.opprettHistorikk(
+        legacyKafkaUtsendingHistorikkRepository.opprettHistorikk(
             "123456789", "{\"orgnr\": \"123456789\"}", "{\"statistikk\": \"....\"}"
         )
 
-        val førSletting = kafkaUtsendingHistorikkRepository.hentAlt()
+        val førSletting = legacyKafkaUtsendingHistorikkRepository.hentAlt()
         førSletting shouldHaveSize 2
 
-        val antallSlettet = kafkaUtsendingHistorikkRepository.slettHistorikk()
+        val antallSlettet = legacyKafkaUtsendingHistorikkRepository.slettHistorikk()
         antallSlettet shouldBe 2
 
-        val etterSletting = kafkaUtsendingHistorikkRepository.hentAlt()
+        val etterSletting = legacyKafkaUtsendingHistorikkRepository.hentAlt()
         etterSletting shouldHaveSize 0
     }
 
-    private fun KafkaUtsendingHistorikkRepository.hentAlt(): List<KafkaUtsendingHistorikkData> {
+    private fun LegacyKafkaUtsendingHistorikkRepository.hentAlt(): List<KafkaUtsendingHistorikkData> {
         return transaction {
             selectAll().map {
                 KafkaUtsendingHistorikkData(
