@@ -28,7 +28,7 @@ class SykefraværsstatistikkImporteringService(
     private val environment: Environment,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
-    fun importerHvisDetFinnesNyStatistikk(): ÅrstallOgKvartal {
+    fun importerHvisDetFinnesNyStatistikk() {
         log.info("Gjeldende miljø: " + environment.activeProfiles.contentToString())
         val årstallOgKvartalForSykefraværsstatistikk = listOf(
             sykefraværsstatistikkLandRepository.hentNyesteKvartal(),
@@ -44,7 +44,7 @@ class SykefraværsstatistikkImporteringService(
             datavarehusAggregertRepositoryV1.hentSisteKvartal(),
         )
         val gjeldendeÅrstallOgKvartal = årstallOgKvartalForDvh[0]
-        return if (kanImportStartes(årstallOgKvartalForSykefraværsstatistikk, årstallOgKvartalForDvh)) {
+        if (kanImportStartes(årstallOgKvartalForSykefraværsstatistikk, årstallOgKvartalForDvh)) {
             log.info("Importerer ny statistikk")
             importSykefraværsstatistikkLand(gjeldendeÅrstallOgKvartal)
             importSykefraværsstatistikkSektor(gjeldendeÅrstallOgKvartal)
@@ -54,10 +54,6 @@ class SykefraværsstatistikkImporteringService(
             importSykefraværsstatistikkVirksomhet(gjeldendeÅrstallOgKvartal)
             importSykefraværsstatistikkVirksomhetMedGradering(gjeldendeÅrstallOgKvartal)
             oppdaterPubliseringsstatus(gjeldendeÅrstallOgKvartal)
-            gjeldendeÅrstallOgKvartal
-        } else {
-            log.info("Importerer ikke statistikk")
-            gjeldendeÅrstallOgKvartal
         }
     }
 

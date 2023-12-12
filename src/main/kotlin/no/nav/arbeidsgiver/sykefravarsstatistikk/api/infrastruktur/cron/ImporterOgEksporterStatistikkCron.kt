@@ -5,19 +5,22 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import net.javacrumbs.shedlock.core.LockConfiguration
 import net.javacrumbs.shedlock.core.LockingTaskExecutor
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.VirksomhetMetadataService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImportEksportJobb.*
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringMetadataVirksomhetService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringPerStatistikkKategoriService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.LegacyEksporteringService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.VirksomhetMetadataService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.SykefraværsstatistikkImporteringService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer.PubliseringsdatoerService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImportEksportJobb.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImportEksportStatusRepository
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
+import java.time.Clock
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
 import java.time.temporal.ChronoUnit.MINUTES
 
 @Component
@@ -30,17 +33,13 @@ class ImporterOgEksporterStatistikkCron(
     private val eksporteringsService: LegacyEksporteringService,
     private val eksporteringPerStatistikkKategoriService: EksporteringPerStatistikkKategoriService,
     private val eksporteringMetadataVirksomhetService: EksporteringMetadataVirksomhetService,
+    private val publiseringsdatoerService: PubliseringsdatoerService,
+    private val clock: Clock,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
-    private val vellykketImportCounter: Counter
-    private val vellykketEksportCounter: Counter
-    private val noeFeilet: Counter
-
-    init {
-        vellykketImportCounter = registry.counter("sykefravarstatistikk_vellykket_import")
-        vellykketEksportCounter = registry.counter("sykefravarstatistikk_vellykket_eksport")
-        noeFeilet = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
-    }
+    private val vellykketImportCounter: Counter = registry.counter("sykefravarstatistikk_vellykket_import")
+    private val vellykketEksportCounter: Counter = registry.counter("sykefravarstatistikk_vellykket_eksport")
+    private val noeFeilet: Counter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
 
     @Scheduled(cron = "0 30 11 * * ?")
     fun scheduledImporteringOgEksportering() {
@@ -53,8 +52,21 @@ class ImporterOgEksporterStatistikkCron(
     }
 
     fun gjennomførImportOgEksport() {
+        val publiseringsdatoer = publiseringsdatoerService.hentPubliseringsdatoer()
+        val nestePubliseringsdato = publiseringsdatoer?.nestePubliseringsdato
+            ?: run {
+                log.error("Neste publiseringsdato er null, avbryter import og eksport. Er publiseringskalenderen i datavarehus oppdatert?")
+                noeFeilet.increment()
+                return
+            }
+        val gjeldendeKvartal = publiseringsdatoer.gjeldendePeriode
+        val iDag = LocalDate.now(clock)
+
         log.info("Jobb for å importere sykefraværsstatistikk er startet.")
-        val gjeldendeKvartal = importeringService.importerHvisDetFinnesNyStatistikk()
+        if (iDag >= nestePubliseringsdato) {
+            log.info("Neste publiseringsdato $nestePubliseringsdato er nådd i dag $iDag, importerer statistikk.")
+            importeringService.importerHvisDetFinnesNyStatistikk()
+        }
 
         val fullførteJobber = importEksportStatusRepository.hentFullførteJobber(gjeldendeKvartal)
         log.info("Listen over fullførte jobber dette kvartalet: ${fullførteJobber.joinToString()}")
