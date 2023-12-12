@@ -45,6 +45,7 @@ class EksporteringMetadataVirksomhetService(
                     virksomhet.orgnr,
                     virksomhet.årstallOgKvartal,
                     virksomhet.primærnæring,
+                    virksomhet.primærnæringskode,
                     Bransjeprogram.finnBransje(Næringskode(virksomhet.primærnæringskode)),
                     SektorKafkaDto.fraDomene(virksomhet.sektor)
                 )
