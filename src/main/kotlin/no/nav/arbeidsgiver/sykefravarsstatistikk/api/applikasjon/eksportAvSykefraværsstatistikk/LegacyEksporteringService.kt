@@ -17,7 +17,7 @@ import java.util.function.Consumer
 
 @Component
 @Deprecated("Brukes bare av legacy Kafka-strøm, som skal fases ut.")
-class EksporteringService(
+class LegacyEksporteringService(
     private val legacyEksporteringRepository: LegacyEksporteringRepository,
     private val sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository,
     private val sykefraværStatistikkSektorRepository: SykefraværStatistikkSektorRepository,
