@@ -8,7 +8,6 @@ open class SykefraværForEttKvartal(
     @field:JsonIgnore val årstallOgKvartal: ÅrstallOgKvartal?,
     tapteDagsverk: BigDecimal?,
     muligeDagsverk: BigDecimal?,
-    // TODO: trenger vi det?
     @field:JsonIgnore open val antallPersoner: Int
 ) : MaskerbartSykefravær(
     tapteDagsverk,

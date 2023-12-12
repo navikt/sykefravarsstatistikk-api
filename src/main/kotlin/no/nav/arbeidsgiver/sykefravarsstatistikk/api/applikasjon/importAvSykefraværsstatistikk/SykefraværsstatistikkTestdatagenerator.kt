@@ -8,6 +8,11 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Å
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.HardkodetKildeTilVirksomhetsdata.Testvirksomhet.VIRKSOMHETSSTØRRELSE
 import java.math.BigDecimal.ZERO
 
+
+/**
+ * Denne klassen er anvarlig for å generere opp testdata til bruk i dev-miljøene. Den genererte statistikken persisteres
+ * i en map, slik at kan oppnå en viss kontinuitet mellom totalsykefraværet og det graderte fraværet.
+ */
 object SykefraværsstatistikkTestdatagenerator {
     private val generertStatistikk = mutableMapOf<ÅrstallOgKvartal, List<SykefraværsstatistikkVirksomhet>>()
     private val generertStatistikkMedGradering =
@@ -49,12 +54,12 @@ object SykefraværsstatistikkTestdatagenerator {
         return HardkodetKildeTilVirksomhetsdata.hentTestvirksomheter(gjeldendeKvartal)
             .map { (virksomhet, størrelse) ->
                 val antallPersoner = when (størrelse) {
-                    VIRKSOMHETSSTØRRELSE.KNØTT -> (0..6).random()
-                    VIRKSOMHETSSTØRRELSE.LITEN -> (5..10).random()
-                    VIRKSOMHETSSTØRRELSE.MEDIUM -> (20 .. 30).random()
-                    VIRKSOMHETSSTØRRELSE.STOR -> (75..100).random()
-                    VIRKSOMHETSSTØRRELSE.ENORM -> (11_000..12_000).random()
-                }
+                    VIRKSOMHETSSTØRRELSE.KNØTT -> (0..6)
+                    VIRKSOMHETSSTØRRELSE.LITEN -> (5..10)
+                    VIRKSOMHETSSTØRRELSE.MEDIUM -> (20..30)
+                    VIRKSOMHETSSTØRRELSE.STOR -> (75..100)
+                    VIRKSOMHETSSTØRRELSE.ENORM -> (11_000..12_000)
+                }.random()
 
                 val antallDagsverkIEttKvartal = 230 / 4
                 val muligeDagsverk = antallPersoner * antallDagsverkIEttKvartal

@@ -9,41 +9,29 @@ import java.math.BigDecimal
 
 object EksporteringServiceTestUtils {
     // Data for testing & Utilities
-    @JvmField
     val __2021_2 = ÅrstallOgKvartal(2021, 2)
-    @JvmField
     val __2021_1 = ÅrstallOgKvartal(2021, 1)
-    @JvmField
     val __2020_4 = ÅrstallOgKvartal(2020, 4)
-    @JvmField
     val __2020_2 = ÅrstallOgKvartal(2020, 2)
-    @JvmField
     val __2020_1 = ÅrstallOgKvartal(2020, 1)
-    @JvmField
     val __2019_4 = ÅrstallOgKvartal(2019, 4)
-    @JvmField
     val __2019_3 = ÅrstallOgKvartal(2019, 3)
 
-    @JvmField
     var ORGNR_VIRKSOMHET_1 = Orgnr("987654321")
 
-    @JvmField
     var ORGNR_VIRKSOMHET_2 = Orgnr("912345678")
     var ORGNR_VIRKSOMHET_3 = Orgnr("999966633")
 
-    @JvmField
     var virksomhetSykefravær =
         VirksomhetSykefravær(
             "987654321", "Virksomhet 1", __2020_2, BigDecimal(10), BigDecimal(500), 6
         )
 
-    @JvmField
     var næringSykefravær =
         SykefraværMedKategori(
             Statistikkategori.NÆRING, "11", __2020_2, BigDecimal(100), BigDecimal(5000), 150
         )
 
-    @JvmField
     var næring5SifferSykefravær =
         SykefraværMedKategori(
             Statistikkategori.NÆRINGSKODE,
@@ -54,7 +42,6 @@ object EksporteringServiceTestUtils {
             1250
         )
 
-    @JvmField
     var næring5SifferSykefraværTilhørerBransje =
         SykefraværMedKategori(
             Statistikkategori.NÆRINGSKODE,
@@ -65,7 +52,6 @@ object EksporteringServiceTestUtils {
             1000
         )
 
-    @JvmField
     var sektorSykefravær =
         SykefraværMedKategori(
             Statistikkategori.SEKTOR,
@@ -87,27 +73,22 @@ object EksporteringServiceTestUtils {
             2500000
         )
 
-    @JvmField
     var virksomhet1Metadata_2020_4 = VirksomhetMetadata(
         ORGNR_VIRKSOMHET_1, "Virksomhet 1", Rectype.VIRKSOMHET.kode, Sektor.STATLIG, "11", "11111", __2020_4
     )
 
-    @JvmField
     val virksomhet2Metadata_2020_4 = VirksomhetMetadata(
         ORGNR_VIRKSOMHET_2, "Virksomhet 2", Rectype.VIRKSOMHET.kode, Sektor.KOMMUNAL, "22", "22222", __2020_4
     )
 
-    @JvmField
     val virksomhet3Metadata_2020_4 = VirksomhetMetadata(
         ORGNR_VIRKSOMHET_3, "Virksomhet 3", Rectype.VIRKSOMHET.kode, Sektor.PRIVAT, "33", "33333", __2020_4
     )
 
-    @JvmField
     val virksomhet1Metadata_2021_1 = VirksomhetMetadata(
         ORGNR_VIRKSOMHET_1, "Virksomhet 1", Rectype.VIRKSOMHET.kode, Sektor.STATLIG, "11", "11111", __2021_1
     )
 
-    @JvmField
     val virksomhet1Metadata_2021_2 = VirksomhetMetadata(
         ORGNR_VIRKSOMHET_1, "Virksomhet 1", Rectype.VIRKSOMHET.kode, Sektor.STATLIG, "11", "11111", __2021_2
     )
@@ -127,8 +108,6 @@ object EksporteringServiceTestUtils {
         )
     }
 
-
-    @JvmOverloads
     fun byggSykefraværsstatistikkVirksomhet(
         virksomhetMetadata: VirksomhetMetadata,
         antallPersoner: Int = 156,
@@ -254,7 +233,6 @@ object EksporteringServiceTestUtils {
         )
     }
 
-    @JvmField
     val virksomhetEksportPerKvartal =
         VirksomhetEksportPerKvartal(
             Orgnr("987654321"),
@@ -262,7 +240,6 @@ object EksporteringServiceTestUtils {
             false
         )
 
-    @JvmField
     val virksomhetMetadata = VirksomhetMetadata(Orgnr("987654321"), "Virksomhet 1", "2", Sektor.STATLIG, "11", "11111", __2020_2)
 
 
@@ -294,7 +271,6 @@ object EksporteringServiceTestUtils {
         )
     }
 
-    @JvmField
     val sykefraværsstatistikkSektor = SykefraværsstatistikkSektor(
         __2020_2.årstall,
         __2020_2.kvartal,
@@ -305,7 +281,6 @@ object EksporteringServiceTestUtils {
     )
 
 
-    @JvmOverloads
     fun sykefraværsstatistikkNæring(
         årstallOgKvartal: ÅrstallOgKvartal, næringskode: String? = "11"
     ): SykefraværsstatistikkForNæring {
@@ -320,7 +295,6 @@ object EksporteringServiceTestUtils {
     }
 
 
-    @JvmOverloads
     fun sykefraværsstatistikkNæringskode(
         årstallOgKvartal: ÅrstallOgKvartal,
         næringskode: String = "11001",
@@ -338,16 +312,6 @@ object EksporteringServiceTestUtils {
                 muligeDagsverk
         )
     }
-
-    @JvmField
-    val sykefraværsstatistikkForNæringskode = SykefraværsstatistikkForNæringskode(
-        __2020_2.årstall,
-        __2020_2.kvartal,
-        "11000",
-        1250,
-        BigDecimal(40),
-        BigDecimal(4000)
-    )
 
 
     fun sykefraværsstatistikkNæring5SifferBransjeprogram(
