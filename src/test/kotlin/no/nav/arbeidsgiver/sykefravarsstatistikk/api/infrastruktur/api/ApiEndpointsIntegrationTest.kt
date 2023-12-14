@@ -22,7 +22,6 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.web.server.LocalServerPort
 import testUtils.TestTokenUtil.TOKENX_ISSUER_ID
 import testUtils.TestTokenUtil.createToken
-import testUtils.TestUtils.PRODUKSJON_NYTELSESMIDLER
 import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import testUtils.TestUtils.opprettStatistikkForLand
 import testUtils.TestUtils.opprettStatistikkForLandExposed
@@ -70,6 +69,8 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
     @LocalServerPort
     private val port: String? = null
     private val objectMapper = ObjectMapper()
+
+    val PRODUKSJON_NYTELSESMIDLER = Næring("10")
 
     @BeforeEach
     fun setUp() {

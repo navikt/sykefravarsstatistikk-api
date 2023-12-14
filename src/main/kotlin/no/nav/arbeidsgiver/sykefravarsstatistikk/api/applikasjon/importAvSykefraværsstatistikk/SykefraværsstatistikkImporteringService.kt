@@ -43,22 +43,22 @@ class SykefraværsstatistikkImporteringService(
             datavarehusNæringskodeRepository.hentSisteKvartal(),
             datavarehusAggregertRepositoryV1.hentSisteKvartal(),
         )
-        val gjeldendeÅrstallOgKvartal = årstallOgKvartalForDvh[0]
+        val gjeldendeKvartal = årstallOgKvartalForDvh[0]
         if (kanImportStartes(årstallOgKvartalForSykefraværsstatistikk, årstallOgKvartalForDvh)) {
             log.info("Importerer ny statistikk")
-            importSykefraværsstatistikkLand(gjeldendeÅrstallOgKvartal)
-            importSykefraværsstatistikkSektor(gjeldendeÅrstallOgKvartal)
-            importSykefraværsstatistikkNæring(gjeldendeÅrstallOgKvartal)
-            importSykefraværsstatistikkNæring5siffer(gjeldendeÅrstallOgKvartal)
-            importSykefraværsstatistikkNæringMedVarighet(gjeldendeÅrstallOgKvartal)
-            importSykefraværsstatistikkVirksomhet(gjeldendeÅrstallOgKvartal)
-            importSykefraværsstatistikkVirksomhetMedGradering(gjeldendeÅrstallOgKvartal)
-            oppdaterPubliseringsstatus(gjeldendeÅrstallOgKvartal)
+            importerAlleKategorier(gjeldendeKvartal)
+            importtidspunktRepository.settInnImporttidspunkt(gjeldendeKvartal)
         }
     }
 
-    private fun oppdaterPubliseringsstatus(gjeldendeÅrstallOgKvartal: ÅrstallOgKvartal) {
-        importtidspunktRepository.settInnImporttidspunkt(gjeldendeÅrstallOgKvartal)
+    fun importerAlleKategorier(gjeldendekvartal: ÅrstallOgKvartal) {
+        importSykefraværsstatistikkLand(gjeldendekvartal)
+        importSykefraværsstatistikkSektor(gjeldendekvartal)
+        importSykefraværsstatistikkNæring(gjeldendekvartal)
+        importSykefraværsstatistikkNæring5siffer(gjeldendekvartal)
+        importSykefraværsstatistikkNæringMedVarighet(gjeldendekvartal)
+        importSykefraværsstatistikkVirksomhet(gjeldendekvartal)
+        importSykefraværsstatistikkVirksomhetMedGradering(gjeldendekvartal)
     }
 
 

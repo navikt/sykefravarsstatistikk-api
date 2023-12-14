@@ -12,6 +12,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.St
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.SykefraværsstatistikkImporteringService
 import org.slf4j.LoggerFactory
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.time.Duration
 import java.time.Instant
@@ -27,17 +28,12 @@ class ImportOgEksportAvEnkeltkvartalerCron(
     private val sykefraværsstatistikkImporteringService: SykefraværsstatistikkImporteringService,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
-    private val noeFeiletCounter: Counter
+    private val noeFeiletCounter: Counter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
 
-
-    init {
-        noeFeiletCounter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
-    }
-
-    //@Scheduled(cron = "0 30 14 27 11 ?")
+    @Scheduled(cron = "0 30 14 14 12 ?")
     fun scheduledImportOgEksportAvEnkeltkvartaler() {
         val kategorier = listOf(Statistikkategori.VIRKSOMHET, Statistikkategori.VIRKSOMHET_GRADERT)
-        val sisteFireÅr = ÅrstallOgKvartal(2023, 2) inkludertTidligere 4 * 4 - 1
+        val sisteFireÅr = ÅrstallOgKvartal(2023, 3) inkludertTidligere 4 * 4 - 1
 
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
@@ -48,12 +44,13 @@ class ImportOgEksportAvEnkeltkvartalerCron(
     }
 
     fun gjennomførJobb(kvartaler: List<ÅrstallOgKvartal>, kategorier: List<Statistikkategori>) {
+        log.info("Starter EksportAvEnkeltkvartaler for $kvartaler")
         for (kvartal in kvartaler) {
-            sykefraværsstatistikkImporteringService.importSykefraværsstatistikkVirksomhetMedGradering(kvartal)
-            sykefraværsstatistikkImporteringService.importSykefraværsstatistikkVirksomhet(kvartal)
+            log.info("Importerer statistikk fpor $kvartal...")
+            sykefraværsstatistikkImporteringService.importerAlleKategorier(kvartal)
+            log.info("import av $kvartal er fullført")
 
-            log.info("EksportAvEnkeltkvartaler har startet for $kvartal")
-
+            log.info("Overskriver metadata for $kvartal...")
             virksomhetMetadataService.overskrivMetadataForVirksomheter(kvartal)
                 .getOrElse {
                     noeFeiletCounter.increment()
@@ -65,14 +62,18 @@ class ImportOgEksportAvEnkeltkvartalerCron(
                     noeFeiletCounter.increment()
                     return
                 }
+            log.info("Overskriving av metadata for $kvartal er fullført")
 
+            log.info("Eksporterer metadata for $kvartal...")
             eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(kvartal)
                 .getOrElse {
                     noeFeiletCounter.increment()
                     return
                 }
+            log.info("Eksportering av metadata for $kvartal er fullført")
 
             kategorier.forEach { kategori ->
+                log.info("Eksporterer statistikk ($kategori) for $kvartal...")
                 runCatching {
                     eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(
                         kvartal,
@@ -83,9 +84,11 @@ class ImportOgEksportAvEnkeltkvartalerCron(
                     noeFeiletCounter.increment()
                     return
                 }
+                log.info("Eksportering av statistikk ($kategori) for $kvartal er ferdig")
             }
 
             log.info("EksportAvEnkeltkvartaler er ferdig for $kvartal")
         }
+        log.info("EksportAvEnkeltkvartaler er ferdig for $kvartaler")
     }
 }

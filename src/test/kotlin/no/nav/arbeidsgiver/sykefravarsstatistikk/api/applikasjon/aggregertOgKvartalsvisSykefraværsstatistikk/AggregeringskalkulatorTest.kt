@@ -9,6 +9,11 @@ import testUtils.TestUtils
 import java.math.BigDecimal
 
 internal class AggregeringskalkulatorTest {
+
+    fun sisteKvartalMinus(n: Int): ÅrstallOgKvartal {
+        return TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(n)
+    }
+
     @Test
     fun fraværsprosentLand_regnerUtRiktigFraværsprosent() {
         val virksomhet =
@@ -67,31 +72,31 @@ internal class AggregeringskalkulatorTest {
 
     private val synkendeSykefravær = listOf(
         UmaskertSykefraværForEttKvartal(
-            TestUtils.sisteKvartalMinus(0),
+            sisteKvartalMinus(0),
             BigDecimal.valueOf(2),
             BigDecimal.valueOf(100),
             10
         ),
         UmaskertSykefraværForEttKvartal(
-            TestUtils.sisteKvartalMinus(1),
+            sisteKvartalMinus(1),
             BigDecimal.valueOf(4),
             BigDecimal.valueOf(100),
             10
         ),
         UmaskertSykefraværForEttKvartal(
-            TestUtils.sisteKvartalMinus(2),
+            sisteKvartalMinus(2),
             BigDecimal.valueOf(6),
             BigDecimal.valueOf(100),
             10
         ),
         UmaskertSykefraværForEttKvartal(
-            TestUtils.sisteKvartalMinus(3),
+            sisteKvartalMinus(3),
             BigDecimal.valueOf(8),
             BigDecimal.valueOf(100),
             10
         ),
         UmaskertSykefraværForEttKvartal(
-            TestUtils.sisteKvartalMinus(4),
+            sisteKvartalMinus(4),
             BigDecimal.valueOf(10),
             BigDecimal.valueOf(100),
             10

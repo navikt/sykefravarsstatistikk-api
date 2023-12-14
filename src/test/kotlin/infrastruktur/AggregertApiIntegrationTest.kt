@@ -1,3 +1,5 @@
+@file:Suppress("SpringJavaInjectionPointsAutowiringInspection")
+
 package infrastruktur
 
 import arrow.core.right
@@ -22,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.web.server.LocalServerPort
 import testUtils.TestTokenUtil.createMockIdportenTokenXToken
-import testUtils.TestUtils.PRODUKSJON_NYTELSESMIDLER
 import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import testUtils.TestUtils.opprettStatistikkForLand
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
@@ -66,6 +67,8 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
 
     @MockBean
     lateinit var enhetsregisteretClient: EnhetsregisteretClient
+
+    val PRODUKSJON_NYTELSESMIDLER = Næring("10")
 
     @BeforeEach
     fun setUp() {

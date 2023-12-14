@@ -1,6 +1,5 @@
 package testUtils
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkLand
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
@@ -12,41 +11,8 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource
 import java.math.BigDecimal
 
 object TestUtils {
-    val PRODUKSJON_NYTELSESMIDLER = Næring("10")
 
     val SISTE_PUBLISERTE_KVARTAL = ÅrstallOgKvartal(2022, 1)
-    fun sisteKvartalMinus(n: Int): ÅrstallOgKvartal {
-        return SISTE_PUBLISERTE_KVARTAL.minusKvartaler(n)
-    }
-
-
-    private fun SykefravarStatistikkVirksomhetRepository.slettAlt() {
-        transaction { deleteAll() }
-    }
-
-    private fun SykefraværStatistikkLandRepository.slettAlt() {
-        transaction { deleteAll() }
-    }
-
-    private fun SykefraværStatistikkSektorRepository.slettAlt() {
-        transaction { deleteAll() }
-    }
-
-    private fun SykefraværStatistikkNæringRepository.slettAlt() {
-        transaction { deleteAll() }
-    }
-
-    private fun SykefraværStatistikkNæringskodeRepository.slettAlt() {
-        transaction {
-            deleteAll()
-        }
-    }
-
-    private fun SykefraværStatistikkNæringskodeMedVarighetRepository.slettAlt() {
-        transaction {
-            deleteAll()
-        }
-    }
 
     fun slettAllStatistikkFraDatabase(
         sykefravarStatistikkVirksomhetRepository: SykefravarStatistikkVirksomhetRepository? = null,
@@ -57,13 +23,32 @@ object TestUtils {
         sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository? = null,
         sykefraværStatistikkNæringskodeMedVarighetRepository: SykefraværStatistikkNæringskodeMedVarighetRepository? = null,
     ) {
-        sykefravarStatistikkVirksomhetRepository?.slettAlt()
-        sykefraværStatistikkNæringRepository?.slettAlt()
-        sykefraværStatistikkNæringskodeMedVarighetRepository?.slettAlt()
-        sykefravarStatistikkVirksomhetGraderingRepository?.slettAlt()
-        sykefraværStatistikkNæringskodeRepository?.slettAlt()
-        sykefraværStatistikkLandRepository?.slettAlt()
-        sykefraværStatistikkSektorRepository?.slettAlt()
+        with(sykefravarStatistikkVirksomhetRepository) {
+            this?.transaction { deleteAll() }
+        }
+        with(sykefraværStatistikkNæringRepository) {
+            this?.transaction { deleteAll() }
+        }
+
+        with(sykefraværStatistikkNæringskodeMedVarighetRepository) {
+            this?.transaction { deleteAll() }
+        }
+
+        with(sykefravarStatistikkVirksomhetGraderingRepository) {
+            this?.transaction { deleteAll() }
+        }
+
+        with(sykefraværStatistikkNæringskodeRepository) {
+            this?.transaction { deleteAll() }
+        }
+
+        with(sykefraværStatistikkLandRepository) {
+            this?.transaction { deleteAll() }
+        }
+
+        with(sykefraværStatistikkSektorRepository) {
+            this?.transaction { deleteAll() }
+        }
     }
 
 
@@ -168,7 +153,4 @@ object TestUtils {
     }
 
 
-    private fun SykefravarStatistikkVirksomhetGraderingRepository.slettAlt() {
-        transaction { deleteAll() }
-    }
 }
