@@ -25,8 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.web.server.LocalServerPort
 import testUtils.TestTokenUtil.createMockIdportenTokenXToken
-import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
-import testUtils.TestUtils.opprettStatistikkForLand
 import java.math.BigDecimal
 import java.net.URI
 import java.net.http.HttpClient
@@ -67,6 +65,8 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     lateinit var enhetsregisteretClient: EnhetsregisteretClient
 
     val PRODUKSJON_NYTELSESMIDLER = Næring("10")
+    val SISTE_PUBLISERTE_KVARTAL = ÅrstallOgKvartal(2022, 1)
+
 
     @BeforeEach
     fun setUp() {
@@ -343,7 +343,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
 
     @Test
     @Throws(Exception::class)
-    fun `hent aggregert statistikk viser ikke virksomhetstall når bruker ikke har rettigheter`() {
+    fun `hentAggregertStatistikk inneholder bare BRANSJE og TALL når bruker ikke har rettigheter`() {
         whenever(enhetsregisteretClient.hentUnderenhet(any())).thenReturn(
             Underenhet.Næringsdrivende(
                 navn = "NAV ARBEID OG YTELSER AVD OSLO",
@@ -389,7 +389,17 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
                 )
             )
         )
-        opprettStatistikkForLand(sykefraværStatistikkLandRepository)
+        sykefraværStatistikkLandRepository.settInn(
+            listOf(
+                SykefraværsstatistikkLand(
+                    årstall = this.SISTE_PUBLISERTE_KVARTAL.årstall,
+                    kvartal = this.SISTE_PUBLISERTE_KVARTAL.kvartal,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal("4.0"),
+                    muligeDagsverk = BigDecimal("100.0")
+                ),
+            )
+        )
         val response = utførAutorisertKall(ORGNR_UNDERENHET_UTEN_IA_RETTIGHETER)
         val responseBody = objectMapper.readTree(response.body())
         val barnehageJson = responseBody["prosentSiste4KvartalerTotalt"][0]

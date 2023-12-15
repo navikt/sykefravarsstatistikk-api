@@ -15,8 +15,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfigur
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
-import testUtils.TestUtils.opprettStatistikkForLand
 import java.math.BigDecimal
 import ia.felles.definisjoner.bransjer.Bransje
 import org.jetbrains.exposed.sql.deleteAll
@@ -42,6 +40,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
     @Autowired
     private lateinit var sykefraværStatistikkNæringskodeRepository: SykefraværStatistikkNæringskodeRepository
 
+    val SISTE_PUBLISERTE_KVARTAL = ÅrstallOgKvartal(2022, 1)
 
     @BeforeEach
     fun setUp() {
@@ -57,7 +56,31 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
 
     @Test
     fun hentSykefraværprosentLand__skal_returnere_riktig_sykefravær() {
-        opprettStatistikkForLand(sykefraværStatistikkLandRepository)
+        sykefraværStatistikkLandRepository.settInn(
+            listOf(
+                SykefraværsstatistikkLand(
+                    årstall = this.SISTE_PUBLISERTE_KVARTAL.årstall,
+                    kvartal = this.SISTE_PUBLISERTE_KVARTAL.kvartal,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal("4.0"),
+                    muligeDagsverk = BigDecimal("100.0")
+                ),
+                SykefraværsstatistikkLand(
+                    årstall = this.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).årstall,
+                    kvartal = this.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).kvartal,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal("5.0"),
+                    muligeDagsverk = BigDecimal("100.0")
+                ),
+                SykefraværsstatistikkLand(
+                    årstall = this.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).årstall,
+                    kvartal = this.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).kvartal,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal("6.0"),
+                    muligeDagsverk = BigDecimal("100.0")
+                ),
+            )
+        )
         val resultat = sykefraværStatistikkLandRepository.hentAlt()
         AssertionsForClassTypes.assertThat(resultat.size).isEqualTo(3)
         AssertionsForClassTypes.assertThat(resultat[0])

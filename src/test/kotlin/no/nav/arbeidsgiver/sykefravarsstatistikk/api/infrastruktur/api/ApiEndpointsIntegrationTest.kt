@@ -23,7 +23,6 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.web.server.LocalServerPort
 import testUtils.TestTokenUtil.TOKENX_ISSUER_ID
 import testUtils.TestTokenUtil.createToken
-import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import java.io.IOException
 import java.math.BigDecimal
 import java.net.URI
@@ -36,6 +35,8 @@ import java.util.*
 import java.util.stream.Collectors
 
 class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
+    private val SISTE_PUBLISERTE_KVARTAL = ÅrstallOgKvartal(2022, 1)
+
     private val SISTE_ÅRSTALL: Int = SISTE_PUBLISERTE_KVARTAL.årstall
     private val SISTE_KVARTAL: Int = SISTE_PUBLISERTE_KVARTAL.kvartal
 

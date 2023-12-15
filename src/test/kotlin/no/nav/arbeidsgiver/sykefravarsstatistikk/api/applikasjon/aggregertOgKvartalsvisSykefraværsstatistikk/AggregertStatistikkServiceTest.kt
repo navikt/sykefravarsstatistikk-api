@@ -12,7 +12,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregiste
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import testUtils.TestUtils
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -45,6 +44,8 @@ internal class AggregertStatistikkServiceTest {
         mockSykefraværStatistikkNæringskodeRepository,
     )
 
+    private val SISTE_PUBLISERTE_KVARTAL = ÅrstallOgKvartal(2022, 1)
+    
     private val etOrgnr = Orgnr("999999999")
 
     private val etAnnetOrgnr = Orgnr("1111111111")
@@ -65,7 +66,7 @@ internal class AggregertStatistikkServiceTest {
                 2022,
                 2,
                 2
-            ), TestUtils.SISTE_PUBLISERTE_KVARTAL
+            ), SISTE_PUBLISERTE_KVARTAL
         )
 
         every { mockSykefravarStatistikkVirksomhetRepository.hentUmaskertSykefravær(any(), any()) } returns listOf()
@@ -154,18 +155,18 @@ internal class AggregertStatistikkServiceTest {
         } returns
                 listOf(
                     UmaskertSykefraværForEttKvartal(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        SISTE_PUBLISERTE_KVARTAL,
                         BigDecimal(5),
                         BigDecimal(0),
                         0,
                     ),
                     UmaskertSykefraværForEttKvartal(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        SISTE_PUBLISERTE_KVARTAL,
                         BigDecimal(0),
                         BigDecimal(100),
                         200,
                     ), UmaskertSykefraværForEttKvartal(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
                         BigDecimal(0),
                         BigDecimal(100),
                         5,
@@ -177,32 +178,32 @@ internal class AggregertStatistikkServiceTest {
         } returns
                 listOf(
                     UmaskertSykefraværForEttKvartal(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        SISTE_PUBLISERTE_KVARTAL,
                         BigDecimal(10),
                         BigDecimal(0),
                         0,
                     ), UmaskertSykefraværForEttKvartal(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        SISTE_PUBLISERTE_KVARTAL,
                         BigDecimal(40),
                         BigDecimal(0),
                         0,
                     ), UmaskertSykefraværForEttKvartal(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        SISTE_PUBLISERTE_KVARTAL,
                         BigDecimal(20),
                         BigDecimal(0),
                         0,
                     ), UmaskertSykefraværForEttKvartal(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        SISTE_PUBLISERTE_KVARTAL,
                         BigDecimal(0),
                         BigDecimal(100),
                         200,
                     ), UmaskertSykefraværForEttKvartal(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
                         BigDecimal(10),
                         BigDecimal(0),
                         0,
                     ), UmaskertSykefraværForEttKvartal(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
                         BigDecimal(0),
                         BigDecimal(100),
                         5,
@@ -215,7 +216,7 @@ internal class AggregertStatistikkServiceTest {
             "En Barnehage",
             "40.0",
             200,
-            listOf(TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), TestUtils.SISTE_PUBLISERTE_KVARTAL)
+            listOf(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), SISTE_PUBLISERTE_KVARTAL)
         )
 
         serviceUnderTest.hentAggregertStatistikk(etOrgnr)
@@ -234,27 +235,27 @@ internal class AggregertStatistikkServiceTest {
         } returns
                 listOf(
                     UmaskertSykefraværForEttKvartal(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        SISTE_PUBLISERTE_KVARTAL,
                         BigDecimal(40),
                         BigDecimal(0),
                         0,
                     ), UmaskertSykefraværForEttKvartal(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        SISTE_PUBLISERTE_KVARTAL,
                         BigDecimal(5),
                         BigDecimal(0),
                         0,
                     ), UmaskertSykefraværForEttKvartal(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        SISTE_PUBLISERTE_KVARTAL,
                         BigDecimal(0),
                         BigDecimal(100),
                         100,
                     ), UmaskertSykefraværForEttKvartal(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
                         BigDecimal(10),
                         BigDecimal(0),
                         0,
                     ), UmaskertSykefraværForEttKvartal(
-                        TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                        SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
                         BigDecimal(0),
                         BigDecimal(100),
                         0,
@@ -269,7 +270,7 @@ internal class AggregertStatistikkServiceTest {
             "En Barnehage",
             "27.5",
             100,
-            listOf(TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), TestUtils.SISTE_PUBLISERTE_KVARTAL)
+            listOf(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), SISTE_PUBLISERTE_KVARTAL)
         )
 
         resultat shouldBeEqual forventet
@@ -294,31 +295,31 @@ internal class AggregertStatistikkServiceTest {
         every { mockSykefravarStatistikkVirksomhetRepository.hentLangtidsfravær(any()) } returns
                 listOf(
                     UmaskertSykefraværForEttKvartal(
-                        årstallOgKvartal = TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        årstallOgKvartal = SISTE_PUBLISERTE_KVARTAL,
                         dagsverkTeller = BigDecimal(10),
                         dagsverkNevner = BigDecimal(0),
                         antallPersoner = 0,
                     ),
                     UmaskertSykefraværForEttKvartal(
-                        årstallOgKvartal = TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        årstallOgKvartal = SISTE_PUBLISERTE_KVARTAL,
                         dagsverkTeller = BigDecimal(20),
                         dagsverkNevner = BigDecimal(0),
                         antallPersoner = 0,
                     ),
                     UmaskertSykefraværForEttKvartal(
-                        årstallOgKvartal = TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        årstallOgKvartal = SISTE_PUBLISERTE_KVARTAL,
                         dagsverkTeller = BigDecimal(0),
                         dagsverkNevner = BigDecimal(100),
                         antallPersoner = 3,
                     ),
                     UmaskertSykefraværForEttKvartal(
-                        årstallOgKvartal = TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                        årstallOgKvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
                         dagsverkTeller = BigDecimal(10),
                         dagsverkNevner = BigDecimal(0),
                         antallPersoner = 0,
                     ),
                     UmaskertSykefraværForEttKvartal(
-                        årstallOgKvartal = TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                        årstallOgKvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
                         dagsverkTeller = BigDecimal(0),
                         dagsverkNevner = BigDecimal(100),
                         antallPersoner = 4,
@@ -329,19 +330,19 @@ internal class AggregertStatistikkServiceTest {
         every { mockSykefravarStatistikkVirksomhetRepository.hentKorttidsfravær(any()) } returns
                 listOf(
                     UmaskertSykefraværForEttKvartal(
-                        årstallOgKvartal = TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        årstallOgKvartal = SISTE_PUBLISERTE_KVARTAL,
                         dagsverkTeller = BigDecimal(5),
                         dagsverkNevner = BigDecimal(0),
                         antallPersoner = 0,
                     ),
                     UmaskertSykefraværForEttKvartal(
-                        årstallOgKvartal = TestUtils.SISTE_PUBLISERTE_KVARTAL,
+                        årstallOgKvartal = SISTE_PUBLISERTE_KVARTAL,
                         dagsverkTeller = BigDecimal(0),
                         dagsverkNevner = BigDecimal(100),
                         antallPersoner = 3,
                     ),
                     UmaskertSykefraværForEttKvartal(
-                        årstallOgKvartal = TestUtils.SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
+                        årstallOgKvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
                         dagsverkTeller = BigDecimal(0),
                         dagsverkNevner = BigDecimal(100),
                         antallPersoner = 4,

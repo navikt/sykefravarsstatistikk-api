@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk
 
-import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.LegacyEksporteringTestUtils.ORGNR_VIRKSOMHET_1
@@ -26,6 +25,9 @@ import java.math.BigDecimal
 import kotlin.collections.set
 
 class LegacyEksporteringServiceUtilsTest {
+
+    private val SISTE_PUBLISERTE_KVARTAL = ÅrstallOgKvartal(2022, 1)
+
     @Test
     fun virksomhetMetadataHashMap__returnerer_en_map_med_orgnr_som_key() {
         val virksomhetMetadataHashMap = LegacyEksporteringServiceUtils.getVirksomhetMetadataHashMap(
