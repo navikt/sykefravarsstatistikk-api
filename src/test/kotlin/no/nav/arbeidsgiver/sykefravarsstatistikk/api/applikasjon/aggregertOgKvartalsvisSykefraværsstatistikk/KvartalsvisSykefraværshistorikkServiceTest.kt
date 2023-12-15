@@ -39,7 +39,13 @@ class KvartalsvisSykefraværshistorikkServiceTest {
 
     @Test
     fun hentSykefraværshistorikk__skal_returnere_en_næring_dersom_virksomhet_er_i_bransjeprogram_på_2_siffer_nivå() {
-        val underenhet = UnderenhetLegacy(etOrgnr(), etOrgnr(), "Underenhet AS", enNæringskode("10300"), 40)
+        val underenhet = Underenhet.Næringsdrivende(
+            orgnr = etOrgnr(),
+            overordnetEnhetOrgnr = etOrgnr(),
+            navn = "Underenhet AS",
+            næringskode = enNæringskode("10300"),
+            antallAnsatte = 40
+        )
         val kvartalsvisSykefraværshistorikk: List<KvartalsvisSykefraværshistorikkJson> =
             kvartalsvisSykefraværshistorikkService.hentSykefraværshistorikk(
                 underenhet, Sektor.PRIVAT

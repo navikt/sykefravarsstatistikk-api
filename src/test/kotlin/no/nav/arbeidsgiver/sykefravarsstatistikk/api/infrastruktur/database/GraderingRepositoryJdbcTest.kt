@@ -43,7 +43,8 @@ open class GraderingRepositoryJdbcTest {
     }
 
     @Test
-    fun hentSykefraværForEttKvartalMedGradering__skal_returnere_riktig_sykefravær() {
+    fun `hentSykefraværForEttKvartalMedGradering skal returnere riktig sykefravær`() {
+
         sykefravarStatistikkVirksomhetGraderingRepository.settInn(
             UNDERENHET_1_NÆRING_14.orgnr.verdi,
             PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
@@ -314,26 +315,26 @@ open class GraderingRepositoryJdbcTest {
             sektor = Sektor.PRIVAT,
         )
 
-        private val UNDERENHET_1_NÆRING_14 = UnderenhetLegacy(
-            Orgnr("999999999"),
-            null,
-            null.toString(),
-            Næringskode("14120"),
-            null
+        private val UNDERENHET_1_NÆRING_14 = Underenhet.Næringsdrivende(
+            orgnr = Orgnr("999999999"),
+            overordnetEnhetOrgnr = Orgnr("999999777"),
+            navn = "Klesprodusent",
+            næringskode = Næringskode("14120"),
+            antallAnsatte = 10
         )
-        private val UNDERENHET_2_NÆRING_15 = UnderenhetLegacy(
-            Orgnr("888888888"),
-            null,
-            null.toString(),
-            Næringskode("15100"),
-            null
+        private val UNDERENHET_2_NÆRING_15 = Underenhet.Næringsdrivende(
+            orgnr = Orgnr("888888888"),
+            overordnetEnhetOrgnr = Orgnr("999999777"),
+            navn = "Lakk og lær AS",
+            næringskode = Næringskode("15100"),
+            antallAnsatte = 2
         )
-        private val UNDERENHET_3_NÆRING_14 = UnderenhetLegacy(
-            Orgnr("777777777"),
-            null,
-            null.toString(),
-            Næringskode("14120"),
-            null
+        private val UNDERENHET_3_NÆRING_14 = Underenhet.Næringsdrivende(
+            orgnr = Orgnr("777777777"),
+            overordnetEnhetOrgnr = Orgnr("999999777"),
+            navn = "Svære Klær AS",
+            næringskode = Næringskode("14120"),
+            antallAnsatte = 1
         )
         private val _2020_1 = ÅrstallOgKvartal(2020, 1)
         private val _2019_4 = ÅrstallOgKvartal(2019, 4)
