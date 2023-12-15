@@ -22,7 +22,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import testUtils.TestData.ORGNR_VIRKSOMHET_1
 import testUtils.TestData.ORGNR_VIRKSOMHET_2
 import testUtils.TestData.ORGNR_VIRKSOMHET_3
-import testUtils.TestUtils.slettAllEksportDataFraDatabase
 import java.sql.ResultSet
 import java.time.LocalDateTime
 
@@ -42,7 +41,12 @@ open class LegacyEksporteringRepositoryTest {
 
     @BeforeEach
     fun setUp() {
-        slettAllEksportDataFraDatabase(jdbcTemplate, legacyKafkaUtsendingHistorikkRepository)
+        jdbcTemplate?.update("delete from eksport_per_kvartal", MapSqlParameterSource())
+        legacyKafkaUtsendingHistorikkRepository.slettHistorikk()
+        jdbcTemplate?.update(
+            "delete from virksomheter_bekreftet_eksportert", MapSqlParameterSource()
+        )
+
     }
 
     @Test

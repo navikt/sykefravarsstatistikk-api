@@ -6,7 +6,7 @@ import org.jetbrains.exposed.sql.insert
 import java.math.BigDecimal
 
 
-fun SykefravarStatistikkVirksomhetGraderingRepository.insertData(
+fun SykefravarStatistikkVirksomhetGraderingRepository.settInn(
     orgnr: String,
     næring: String,
     næringskode: String,

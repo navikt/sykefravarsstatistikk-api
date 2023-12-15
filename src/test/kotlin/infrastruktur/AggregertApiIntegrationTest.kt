@@ -28,7 +28,7 @@ import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import testUtils.TestUtils.opprettStatistikkForLand
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import testUtils.TestUtils.slettAlleImporttidspunkt
-import testUtils.insertData
+import testUtils.settInn
 import java.math.BigDecimal
 import java.net.URI
 import java.net.http.HttpClient
@@ -144,9 +144,20 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
 
     @Test
     @Throws(Exception::class)
-    fun hentAgreggertStatistikk_returnererForventedeTyperForBedriftSomHarAlleTyperData() {
+    fun `hentAgreggertStatistikk returnerer forventede typer for bedrift som har alle typer data`() {
         val (årstall, kvartal) = SISTE_PUBLISERTE_KVARTAL.minusEttÅr()
-        opprettStatistikkForLand(sykefraværStatistikkLandRepository)
+        sykefraværStatistikkLandRepository.settInn(
+            listOf(
+                SykefraværsstatistikkLand(
+                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal("4.0"),
+                    muligeDagsverk = BigDecimal("100.0")
+                ),
+            )
+        )
+
         sykefraværStatistikkNæringRepository.settInn(
             listOf(
                 SykefraværsstatistikkForNæring(
@@ -167,6 +178,7 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
                 )
             )
         )
+
         sykefravarStatistikkVirksomhetRepository.settInn(
             listOf(
                 SykefraværsstatistikkVirksomhet(
@@ -181,39 +193,26 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
                 )
             )
         )
-        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
-            ORGNR_UNDERENHET,
-            "10",
-            "10300",
-            Rectype.VIRKSOMHET.kode,
-            SISTE_PUBLISERTE_KVARTAL,
-            7,
-            BigDecimal(10),
-            BigDecimal(20),
-            BigDecimal(100)
+
+        sykefravarStatistikkVirksomhetGraderingRepository.settInn(
+            listOf(
+                SykefraværsstatistikkVirksomhetMedGradering(
+                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
+                    orgnr = ORGNR_UNDERENHET,
+                    næring = "10",
+                    næringkode = "10300",
+                    rectype = Rectype.VIRKSOMHET.kode,
+                    antallSykemeldinger = 0,
+                    tapteDagsverk = BigDecimal(20),
+                    muligeDagsverk = BigDecimal(100),
+                    antallGraderteSykemeldinger = 0,
+                    antallPersoner = 7,
+                    tapteDagsverkGradertSykemelding = BigDecimal(10)
+                )
+            )
         )
-        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
-            ORGNR_UNDERENHET,
-            "10",
-            "10300",
-            Rectype.VIRKSOMHET.kode,
-            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1),
-            7,
-            BigDecimal(12),
-            BigDecimal(20),
-            BigDecimal(100)
-        )
-        sykefravarStatistikkVirksomhetGraderingRepository.insertData(
-            ORGNR_UNDERENHET,
-            "10",
-            "10300",
-            Rectype.VIRKSOMHET.kode,
-            SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2),
-            15,
-            BigDecimal(25),
-            BigDecimal(50),
-            BigDecimal(300)
-        )
+
         val response = utførAutorisertKall(ORGNR_UNDERENHET)
         Assertions.assertThat(response.statusCode()).isEqualTo(200)
         val responseBody = objectMapper.readTree(response.body())

@@ -141,7 +141,18 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
             issuerId = TOKENX_ISSUER_ID,
             idp = "https://oidc.difi.no/idporten-oidc-provider/"
         )
-        opprettStatistikkForLand(sykefraværStatistikkLandRepository)
+
+        sykefraværStatistikkLandRepository.settInn(
+            listOf(
+                SykefraværsstatistikkLand(
+                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
+                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
+                    antallPersoner = 10,
+                    tapteDagsverk = BigDecimal("4.0"),
+                    muligeDagsverk = BigDecimal("100.0")
+                ),
+            )
+        )
 
         sykefraværStatistikkSektorRepository.settInn(
             listOf(
@@ -155,6 +166,7 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
                 )
             )
         )
+
         sykefraværStatistikkNæringRepository.settInn(
             listOf(
                 SykefraværsstatistikkForNæring(

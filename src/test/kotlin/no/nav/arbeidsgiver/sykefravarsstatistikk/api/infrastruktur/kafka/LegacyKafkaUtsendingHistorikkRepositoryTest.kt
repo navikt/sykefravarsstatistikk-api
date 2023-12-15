@@ -14,7 +14,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfigur
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import testUtils.TestUtils.slettAllEksportDataFraDatabase
 import java.time.LocalDateTime
 
 @ActiveProfiles("db-test")
@@ -27,7 +26,7 @@ open class LegacyKafkaUtsendingHistorikkRepositoryTest {
 
     @BeforeEach
     fun setUp() {
-        slettAllEksportDataFraDatabase(legacyKafkaUtsendingHistorikkRepository = legacyKafkaUtsendingHistorikkRepository)
+        legacyKafkaUtsendingHistorikkRepository.slettHistorikk()
     }
 
     @Test
