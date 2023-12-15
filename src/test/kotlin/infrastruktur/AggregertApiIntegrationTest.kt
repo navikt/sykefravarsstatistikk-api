@@ -28,7 +28,6 @@ import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import testUtils.TestUtils.opprettStatistikkForLand
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import testUtils.TestUtils.slettAlleImporttidspunkt
-import testUtils.settInn
 import java.math.BigDecimal
 import java.net.URI
 import java.net.http.HttpClient

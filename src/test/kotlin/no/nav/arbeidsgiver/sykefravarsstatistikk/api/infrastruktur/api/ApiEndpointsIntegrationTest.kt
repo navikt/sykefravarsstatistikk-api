@@ -23,7 +23,6 @@ import org.springframework.boot.test.web.server.LocalServerPort
 import testUtils.TestTokenUtil.TOKENX_ISSUER_ID
 import testUtils.TestTokenUtil.createToken
 import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
-import testUtils.TestUtils.opprettStatistikkForLand
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import testUtils.TestUtils.slettAlleImporttidspunkt
 import java.io.IOException

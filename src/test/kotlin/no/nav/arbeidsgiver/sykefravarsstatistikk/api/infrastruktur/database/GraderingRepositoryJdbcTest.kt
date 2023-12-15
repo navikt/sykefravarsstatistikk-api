@@ -4,7 +4,7 @@ import config.AppConfigForJdbcTesterConfig
 import ia.felles.definisjoner.bransjer.Bransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.Rectype
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -16,7 +16,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import testUtils.TestUtils
-import testUtils.settInn
 import java.math.BigDecimal
 
 @ActiveProfiles("db-test")
@@ -44,51 +43,63 @@ open class GraderingRepositoryJdbcTest {
 
     @Test
     fun `hentSykefraværForEttKvartalMedGradering skal returnere riktig sykefravær`() {
-
         sykefravarStatistikkVirksomhetGraderingRepository.settInn(
-            UNDERENHET_1_NÆRING_14.orgnr.verdi,
-            PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
-            "14100",
-            Rectype.VIRKSOMHET.kode,
-            _2019_4,
-            7,
-            BigDecimal(10),
-            BigDecimal(20),
-            BigDecimal(100)
-        )
-        sykefravarStatistikkVirksomhetGraderingRepository.settInn(
-            UNDERENHET_1_NÆRING_14.orgnr.verdi,
-            PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
-            "14222",
-            Rectype.VIRKSOMHET.kode,
-            _2019_4,
-            7,
-            BigDecimal(12),
-            BigDecimal(20),
-            BigDecimal(100)
-        )
-        sykefravarStatistikkVirksomhetGraderingRepository.settInn(
-            UNDERENHET_1_NÆRING_14.orgnr.verdi,
-            PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
-            "14222",
-            Rectype.VIRKSOMHET.kode,
-            _2020_1,
-            15,
-            BigDecimal(25),
-            BigDecimal(50),
-            BigDecimal(300)
+            listOf(
+                SykefraværsstatistikkVirksomhetMedGradering(
+                    årstall = _2019_4.årstall,
+                    kvartal = _2019_4.kvartal,
+                    orgnr = UNDERENHET_1_NÆRING_14.orgnr.verdi,
+                    næring = "14",
+                    næringkode = "14100",
+                    rectype = Rectype.VIRKSOMHET.kode,
+                    tapteDagsverk = 20.toBigDecimal(),
+                    muligeDagsverk = 100.toBigDecimal(),
+                    antallPersoner = 7,
+                    tapteDagsverkGradertSykemelding = 10.toBigDecimal(),
+                    antallGraderteSykemeldinger = 0,
+                    antallSykemeldinger = 0,
+                ),
+                SykefraværsstatistikkVirksomhetMedGradering(
+                    årstall = _2019_4.årstall,
+                    kvartal = _2019_4.kvartal,
+                    orgnr = UNDERENHET_1_NÆRING_14.orgnr.verdi,
+                    næring = PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
+                    rectype = Rectype.VIRKSOMHET.kode,
+                    næringkode = "14222",
+                    antallPersoner = 7,
+                    tapteDagsverkGradertSykemelding = BigDecimal(12),
+                    tapteDagsverk = BigDecimal(20),
+                    muligeDagsverk = BigDecimal(100),
+                    antallGraderteSykemeldinger = 0,
+                    antallSykemeldinger = 0,
+                ),
+                SykefraværsstatistikkVirksomhetMedGradering(
+                    årstall = _2020_1.årstall,
+                    kvartal = _2020_1.kvartal,
+                    orgnr = UNDERENHET_1_NÆRING_14.orgnr.verdi,
+                    næring = PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
+                    næringkode = "14222",
+                    rectype = Rectype.VIRKSOMHET.kode,
+                    antallPersoner = 15,
+                    tapteDagsverkGradertSykemelding = BigDecimal(25),
+                    tapteDagsverk = BigDecimal(50),
+                    muligeDagsverk = BigDecimal(300),
+                    antallGraderteSykemeldinger = 0,
+                    antallSykemeldinger = 0,
+                )
+            )
         )
         val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForOrgnr(
             UNDERENHET_1_NÆRING_14.orgnr
         )
-        Assertions.assertThat(resultat.size).isEqualTo(2)
-        Assertions.assertThat(resultat[0])
+        assertThat(resultat.size).isEqualTo(2)
+        assertThat(resultat[0])
             .isEqualTo(
                 UmaskertSykefraværForEttKvartal(
                     ÅrstallOgKvartal(2019, 4), BigDecimal(22), BigDecimal(40), 14
                 )
             )
-        Assertions.assertThat(resultat[1])
+        assertThat(resultat[1])
             .isEqualTo(
                 UmaskertSykefraværForEttKvartal(
                     ÅrstallOgKvartal(2020, 1), BigDecimal(25), BigDecimal(50), 15
@@ -97,51 +108,63 @@ open class GraderingRepositoryJdbcTest {
     }
 
     @Test
-    fun hentSykefraværForEttKvartalMedGradering__skal_returnere_riktig_underenhet_sykefravær() {
+    fun `hentSykefraværForEttKvartalMedGradering skal returnere riktig underenhet sykefravær`() {
         sykefravarStatistikkVirksomhetGraderingRepository.settInn(
-            UNDERENHET_1_NÆRING_14.orgnr.verdi,
-            PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
-            UNDERENHET_1_NÆRING_14.næringskode.femsifferIdentifikator,
-            Rectype.VIRKSOMHET.kode,
-            _2019_4,
-            7,
-            BigDecimal(10),
-            BigDecimal(20),
-            BigDecimal(100)
+            listOf(
+                SykefraværsstatistikkVirksomhetMedGradering(
+                    årstall = _2019_4.årstall,
+                    kvartal = _2019_4.kvartal,
+                    orgnr = UNDERENHET_1_NÆRING_14.orgnr.verdi,
+                    næring = PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
+                    næringkode = UNDERENHET_1_NÆRING_14.næringskode.femsifferIdentifikator,
+                    rectype = Rectype.VIRKSOMHET.kode,
+                    antallPersoner = 7,
+                    tapteDagsverkGradertSykemelding = BigDecimal(10),
+                    tapteDagsverk = BigDecimal(20),
+                    muligeDagsverk = BigDecimal(100),
+                    antallSykemeldinger = 0,
+                    antallGraderteSykemeldinger = 0
+                ), SykefraværsstatistikkVirksomhetMedGradering(
+                    årstall = _2020_1.årstall,
+                    kvartal = _2020_1.kvartal,
+                    orgnr = UNDERENHET_1_NÆRING_14.orgnr.verdi,
+                    næring = PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
+                    næringkode = "14222",
+                    rectype = Rectype.VIRKSOMHET.kode,
+                    antallPersoner = 7,
+                    tapteDagsverkGradertSykemelding = BigDecimal(12),
+                    tapteDagsverk = BigDecimal(20),
+                    muligeDagsverk = BigDecimal(100),
+                    antallSykemeldinger = 0,
+                    antallGraderteSykemeldinger = 0
+                ), SykefraværsstatistikkVirksomhetMedGradering(
+                    årstall = _2020_1.årstall,
+                    kvartal = _2020_1.kvartal,
+                    orgnr = UNDERENHET_3_NÆRING_14.orgnr.verdi,
+                    næring = PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
+                    næringkode = "14222",
+                    rectype = Rectype.VIRKSOMHET.kode,
+                    antallPersoner = 15,
+                    tapteDagsverkGradertSykemelding = BigDecimal(25),
+                    tapteDagsverk = BigDecimal(50),
+                    muligeDagsverk = BigDecimal(300),
+                    antallSykemeldinger = 0,
+                    antallGraderteSykemeldinger = 0
+                )
+            )
         )
-        sykefravarStatistikkVirksomhetGraderingRepository.settInn(
-            UNDERENHET_1_NÆRING_14.orgnr.verdi,
-            PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
-            "14222",
-            Rectype.VIRKSOMHET.kode,
-            _2020_1,
-            7,
-            BigDecimal(12),
-            BigDecimal(20),
-            BigDecimal(100)
-        )
-        sykefravarStatistikkVirksomhetGraderingRepository.settInn(
-            UNDERENHET_3_NÆRING_14.orgnr.verdi,
-            PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
-            "14222",
-            Rectype.VIRKSOMHET.kode,
-            _2020_1,
-            15,
-            BigDecimal(25),
-            BigDecimal(50),
-            BigDecimal(300)
-        )
+
         val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForOrgnr(
             UNDERENHET_1_NÆRING_14.orgnr
         )
-        Assertions.assertThat(resultat.size).isEqualTo(2)
-        Assertions.assertThat(resultat[0])
+        assertThat(resultat.size).isEqualTo(2)
+        assertThat(resultat[0])
             .isEqualTo(
                 UmaskertSykefraværForEttKvartal(
                     ÅrstallOgKvartal(2019, 4), BigDecimal(10), BigDecimal(20), 7
                 )
             )
-        Assertions.assertThat(resultat[1])
+        assertThat(resultat[1])
             .isEqualTo(
                 UmaskertSykefraværForEttKvartal(
                     ÅrstallOgKvartal(2020, 1), BigDecimal(12), BigDecimal(20), 7
@@ -150,50 +173,65 @@ open class GraderingRepositoryJdbcTest {
     }
 
     @Test
-    fun hentSykefraværForEttKvartalMedGradering__skal_returnere_riktig_sykefravær_for_næring() {
+    fun `hentSykefraværForEttKvartalMedGradering skal returnere riktig sykefravær for næring`() {
         sykefravarStatistikkVirksomhetGraderingRepository.settInn(
-            UNDERENHET_1_NÆRING_14.orgnr.verdi,
-            PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
-            UNDERENHET_1_NÆRING_14.næringskode.femsifferIdentifikator,
-            Rectype.VIRKSOMHET.kode,
-            _2019_4,
-            7,
-            BigDecimal(10),
-            BigDecimal(20),
-            BigDecimal(100)
+            listOf(
+                SykefraværsstatistikkVirksomhetMedGradering(
+                    årstall = _2019_4.årstall,
+                    kvartal = _2019_4.kvartal,
+                    orgnr = UNDERENHET_1_NÆRING_14.orgnr.verdi,
+                    næring = PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
+                    næringkode = UNDERENHET_1_NÆRING_14.næringskode.femsifferIdentifikator,
+                    rectype = Rectype.VIRKSOMHET.kode,
+                    antallPersoner = 7,
+                    tapteDagsverkGradertSykemelding = BigDecimal(10),
+                    tapteDagsverk = BigDecimal(20),
+                    muligeDagsverk = BigDecimal(100),
+                    antallSykemeldinger = 0,
+                    antallGraderteSykemeldinger = 0
+                ),
+                SykefraværsstatistikkVirksomhetMedGradering(
+                    årstall = _2020_1.årstall,
+                    kvartal = _2020_1.kvartal,
+                    orgnr = UNDERENHET_3_NÆRING_14.orgnr.verdi,
+                    næring = PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
+                    næringkode = "14222",
+                    rectype = Rectype.VIRKSOMHET.kode,
+                    antallPersoner = 7,
+                    tapteDagsverkGradertSykemelding = BigDecimal(12),
+                    tapteDagsverk = BigDecimal(20),
+                    muligeDagsverk = BigDecimal(100),
+                    antallSykemeldinger = 0,
+                    antallGraderteSykemeldinger = 0
+                ),
+                SykefraværsstatistikkVirksomhetMedGradering(
+                    årstall = _2020_1.årstall,
+                    kvartal = _2020_1.kvartal,
+                    orgnr = UNDERENHET_2_NÆRING_15.orgnr.verdi,
+                    næring = PRODUKSJON_AV_LÆR_OG_LÆRVARER.tosifferIdentifikator,
+                    næringkode = "15333",
+                    rectype = Rectype.VIRKSOMHET.kode,
+                    antallPersoner = 15,
+                    tapteDagsverkGradertSykemelding = BigDecimal(25),
+                    tapteDagsverk = BigDecimal(50),
+                    muligeDagsverk = BigDecimal(300),
+                    antallSykemeldinger = 0,
+                    antallGraderteSykemeldinger = 0
+                )
+
+            )
         )
-        sykefravarStatistikkVirksomhetGraderingRepository.settInn(
-            UNDERENHET_3_NÆRING_14.orgnr.verdi,
-            PRODUKSJON_AV_KLÆR.tosifferIdentifikator,
-            "14222",
-            Rectype.VIRKSOMHET.kode,
-            _2020_1,
-            7,
-            BigDecimal(12),
-            BigDecimal(20),
-            BigDecimal(100)
-        )
-        sykefravarStatistikkVirksomhetGraderingRepository.settInn(
-            UNDERENHET_2_NÆRING_15.orgnr.verdi,
-            PRODUKSJON_AV_LÆR_OG_LÆRVARER.tosifferIdentifikator,
-            "15333",
-            Rectype.VIRKSOMHET.kode,
-            _2020_1,
-            15,
-            BigDecimal(25),
-            BigDecimal(50),
-            BigDecimal(300)
-        )
+
         val resultat =
             sykefravarStatistikkVirksomhetGraderingRepository.hentForNæring(PRODUKSJON_AV_KLÆR)
-        Assertions.assertThat(resultat.size).isEqualTo(2)
-        Assertions.assertThat(resultat[0])
+        assertThat(resultat.size).isEqualTo(2)
+        assertThat(resultat[0])
             .isEqualTo(
                 UmaskertSykefraværForEttKvartal(
                     ÅrstallOgKvartal(2019, 4), BigDecimal(10), BigDecimal(20), 7
                 )
             )
-        Assertions.assertThat(resultat[1])
+        assertThat(resultat[1])
             .isEqualTo(
                 UmaskertSykefraværForEttKvartal(
                     ÅrstallOgKvartal(2020, 1), BigDecimal(12), BigDecimal(20), 7
@@ -207,60 +245,76 @@ open class GraderingRepositoryJdbcTest {
         val (kode1) = Næringskode("86107")
         val (kode2) = Næringskode("86902")
         sykefravarStatistikkVirksomhetGraderingRepository.settInn(
-            UNDERENHET_1_NÆRING_14.orgnr.verdi,
-            HELSETJENESTER.tosifferIdentifikator,
-            kode,
-            Rectype.VIRKSOMHET.kode,
-            _2019_4,
-            7,
-            BigDecimal(10),
-            BigDecimal(20),
-            BigDecimal(100)
-        )
-        sykefravarStatistikkVirksomhetGraderingRepository.settInn(
-            UNDERENHET_3_NÆRING_14.orgnr.verdi,
-            HELSETJENESTER.tosifferIdentifikator,
-            kode,
-            Rectype.VIRKSOMHET.kode,
-            _2020_1,
-            7,
-            BigDecimal(12),
-            BigDecimal(20),
-            BigDecimal(100)
-        )
-        sykefravarStatistikkVirksomhetGraderingRepository.settInn(
-            UNDERENHET_2_NÆRING_15.orgnr.verdi,
-            HELSETJENESTER.tosifferIdentifikator,
-            kode1,
-            Rectype.VIRKSOMHET.kode,
-            _2020_1,
-            15,
-            BigDecimal(25),
-            BigDecimal(50),
-            BigDecimal(300)
-        )
-        sykefravarStatistikkVirksomhetGraderingRepository.settInn(
-            UNDERENHET_2_NÆRING_15.orgnr.verdi,
-            HELSETJENESTER.tosifferIdentifikator,
-            kode2,
-            Rectype.VIRKSOMHET.kode,
-            _2020_1,
-            4,
-            BigDecimal(55),
-            BigDecimal(66),
-            BigDecimal(3000)
+            listOf(
+                SykefraværsstatistikkVirksomhetMedGradering(
+                    årstall = _2019_4.årstall,
+                    kvartal = _2019_4.kvartal,
+                    orgnr = UNDERENHET_1_NÆRING_14.orgnr.verdi,
+                    næring = HELSETJENESTER.tosifferIdentifikator,
+                    næringkode = kode,
+                    rectype = Rectype.VIRKSOMHET.kode,
+                    antallPersoner = 7,
+                    tapteDagsverkGradertSykemelding = BigDecimal(10),
+                    tapteDagsverk = BigDecimal(20),
+                    muligeDagsverk = BigDecimal(100),
+                    antallSykemeldinger = 0,
+                    antallGraderteSykemeldinger = 0
+                ),
+                SykefraværsstatistikkVirksomhetMedGradering(
+                    årstall = _2020_1.årstall,
+                    kvartal = _2020_1.kvartal,
+                    orgnr = UNDERENHET_3_NÆRING_14.orgnr.verdi,
+                    næring = HELSETJENESTER.tosifferIdentifikator,
+                    næringkode = kode,
+                    rectype = Rectype.VIRKSOMHET.kode,
+                    antallPersoner = 7,
+                    tapteDagsverkGradertSykemelding = BigDecimal(12),
+                    tapteDagsverk = BigDecimal(20),
+                    muligeDagsverk = BigDecimal(100),
+                    antallSykemeldinger = 0,
+                    antallGraderteSykemeldinger = 0
+                ),
+                SykefraværsstatistikkVirksomhetMedGradering(
+                    årstall = _2020_1.årstall,
+                    kvartal = _2020_1.kvartal,
+                    orgnr = UNDERENHET_2_NÆRING_15.orgnr.verdi,
+                    næring = HELSETJENESTER.tosifferIdentifikator,
+                    næringkode = kode1,
+                    rectype = Rectype.VIRKSOMHET.kode,
+                    antallPersoner = 15,
+                    tapteDagsverkGradertSykemelding = BigDecimal(25),
+                    tapteDagsverk = BigDecimal(50),
+                    muligeDagsverk = BigDecimal(300),
+                    antallSykemeldinger = 0,
+                    antallGraderteSykemeldinger = 0
+                ),
+                SykefraværsstatistikkVirksomhetMedGradering(
+                    årstall = _2020_1.årstall,
+                    kvartal = _2020_1.kvartal,
+                    orgnr = UNDERENHET_2_NÆRING_15.orgnr.verdi,
+                    næring = HELSETJENESTER.tosifferIdentifikator,
+                    næringkode = kode2,
+                    rectype = Rectype.VIRKSOMHET.kode,
+                    antallPersoner = 4,
+                    tapteDagsverkGradertSykemelding = BigDecimal(55),
+                    tapteDagsverk = BigDecimal(66),
+                    muligeDagsverk = BigDecimal(3000),
+                    antallSykemeldinger = 0,
+                    antallGraderteSykemeldinger = 0
+                )
+            )
         )
         val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(
             Bransje.SYKEHUS
         )
-        Assertions.assertThat(resultat.size).isEqualTo(2)
-        Assertions.assertThat(resultat[0])
+        assertThat(resultat.size).isEqualTo(2)
+        assertThat(resultat[0])
             .isEqualTo(
                 UmaskertSykefraværForEttKvartal(
                     ÅrstallOgKvartal(2019, 4), BigDecimal(10), BigDecimal(20), 7
                 )
             )
-        Assertions.assertThat(resultat[1])
+        assertThat(resultat[1])
             .isEqualTo(
                 UmaskertSykefraværForEttKvartal(
                     ÅrstallOgKvartal(2020, 1), BigDecimal(37), BigDecimal(70), 22
@@ -272,30 +326,40 @@ open class GraderingRepositoryJdbcTest {
     fun hentSykefraværForEttKvartalMedGradering__henterIkkeUtGradertSykefraværForOverordnetEnhet() {
         val (kode) = Næringskode("86101")
         sykefravarStatistikkVirksomhetGraderingRepository.settInn(
-            OVERORDNETENHET_1_NÆRING_86.orgnr.verdi,
-            HELSETJENESTER.tosifferIdentifikator,
-            kode,
-            Rectype.FORETAK.kode,
-            _2020_1,
-            7,
-            BigDecimal(10),
-            BigDecimal(20),
-            BigDecimal(100)
-        )
-        sykefravarStatistikkVirksomhetGraderingRepository.settInn(
-            UNDERENHET_3_NÆRING_14.orgnr.verdi,
-            HELSETJENESTER.tosifferIdentifikator,
-            kode,
-            Rectype.VIRKSOMHET.kode,
-            _2020_1,
-            7,
-            BigDecimal(12),
-            BigDecimal(20),
-            BigDecimal(100)
+            listOf(
+                SykefraværsstatistikkVirksomhetMedGradering(
+                    årstall = _2020_1.årstall,
+                    kvartal = _2020_1.kvartal,
+                    orgnr = OVERORDNETENHET_1_NÆRING_86.orgnr.verdi,
+                    næring = HELSETJENESTER.tosifferIdentifikator,
+                    næringkode = kode,
+                    rectype = Rectype.FORETAK.kode,
+                    antallPersoner = 7,
+                    tapteDagsverkGradertSykemelding = BigDecimal(10),
+                    tapteDagsverk = BigDecimal(20),
+                    muligeDagsverk = BigDecimal(100),
+                    antallSykemeldinger = 0,
+                    antallGraderteSykemeldinger = 0
+                ),
+                SykefraværsstatistikkVirksomhetMedGradering(
+                    årstall = _2020_1.årstall,
+                    kvartal = _2020_1.kvartal,
+                    orgnr = UNDERENHET_3_NÆRING_14.orgnr.verdi,
+                    næring = HELSETJENESTER.tosifferIdentifikator,
+                    næringkode = kode,
+                    rectype = Rectype.VIRKSOMHET.kode,
+                    antallPersoner = 7,
+                    tapteDagsverkGradertSykemelding = BigDecimal(12),
+                    tapteDagsverk = BigDecimal(20),
+                    muligeDagsverk = BigDecimal(100),
+                    antallSykemeldinger = 0,
+                    antallGraderteSykemeldinger = 0
+                )
+            )
         )
         val resultat = sykefravarStatistikkVirksomhetGraderingRepository.hentForBransje(Bransje.SYKEHUS)
-        Assertions.assertThat(resultat.size).isEqualTo(1)
-        Assertions.assertThat(resultat[0])
+        assertThat(resultat.size).isEqualTo(1)
+        assertThat(resultat[0])
             .isEqualTo(
                 UmaskertSykefraværForEttKvartal(
                     ÅrstallOgKvartal(2020, 1), BigDecimal(12), BigDecimal(20), 7

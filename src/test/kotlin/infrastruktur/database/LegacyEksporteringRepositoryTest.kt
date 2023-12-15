@@ -41,12 +41,11 @@ open class LegacyEksporteringRepositoryTest {
 
     @BeforeEach
     fun setUp() {
-        jdbcTemplate?.update("delete from eksport_per_kvartal", MapSqlParameterSource())
+        jdbcTemplate.update("delete from eksport_per_kvartal", MapSqlParameterSource())
         legacyKafkaUtsendingHistorikkRepository.slettHistorikk()
-        jdbcTemplate?.update(
+        jdbcTemplate.update(
             "delete from virksomheter_bekreftet_eksportert", MapSqlParameterSource()
         )
-
     }
 
     @Test
