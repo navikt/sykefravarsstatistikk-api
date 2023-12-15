@@ -13,6 +13,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.assertj.core.api.Assertions
+import org.jetbrains.exposed.sql.deleteAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
@@ -23,8 +24,6 @@ import org.springframework.boot.test.web.server.LocalServerPort
 import testUtils.TestTokenUtil.TOKENX_ISSUER_ID
 import testUtils.TestTokenUtil.createToken
 import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
-import testUtils.TestUtils.slettAllStatistikkFraDatabase
-import testUtils.TestUtils.slettAlleImporttidspunkt
 import java.io.IOException
 import java.math.BigDecimal
 import java.net.URI
@@ -72,12 +71,11 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
 
     @BeforeEach
     fun setUp() {
-        slettAllStatistikkFraDatabase(
-            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
-            sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository,
-            sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository,
-        )
-        importtidspunktRepository.slettAlleImporttidspunkt()
+        with(sykefravarStatistikkVirksomhetRepository) { transaction { deleteAll() } }
+        with(sykefraværStatistikkSektorRepository) { transaction { deleteAll() } }
+        with(sykefraværStatistikkNæringRepository) { transaction { deleteAll() } }
+        with(importtidspunktRepository) { transaction { deleteAll() } }
+
         importtidspunktRepository.settInnImporttidspunkt(SISTE_PUBLISERTE_KVARTAL, LocalDate.parse("2022-06-02"))
     }
 

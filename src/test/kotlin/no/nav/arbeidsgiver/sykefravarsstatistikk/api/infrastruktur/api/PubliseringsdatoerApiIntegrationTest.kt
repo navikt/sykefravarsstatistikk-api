@@ -5,13 +5,13 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdat
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.ImporttidspunktRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.PubliseringsdatoerRepository
 import org.assertj.core.api.AssertionsForClassTypes
+import org.jetbrains.exposed.sql.deleteAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.server.LocalServerPort
 import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
-import testUtils.TestUtils.slettAlleImporttidspunkt
 import java.io.IOException
 import java.net.URI
 import java.net.http.HttpClient
@@ -31,12 +31,12 @@ class PubliseringsdatoerApiIntegrationTest : SpringIntegrationTestbase() {
 
     @BeforeEach
     fun setUp() {
-        importtidspunktRepository.slettAlleImporttidspunkt()
+        with(importtidspunktRepository) { transaction { deleteAll() } }
     }
 
     @AfterEach
     fun tearDown() {
-        importtidspunktRepository.slettAlleImporttidspunkt()
+        with(importtidspunktRepository) { transaction { deleteAll() } }
     }
 
     @Test

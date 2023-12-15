@@ -5,6 +5,7 @@ import ia.felles.definisjoner.bransjer.Bransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.assertj.core.api.Assertions
+import org.jetbrains.exposed.sql.deleteAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -17,7 +18,6 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import testUtils.TestUtils.opprettStatistikkForLand
-import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import java.math.BigDecimal
 
 @ActiveProfiles("db-test")
@@ -41,19 +41,14 @@ open class SykefraværRepositoryJdbcTest {
 
     @BeforeEach
     fun setUp() {
-        slettAllStatistikkFraDatabase(
-            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
-            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository
-
-        )
+        with(sykefravarStatistikkVirksomhetRepository) { transaction { deleteAll() } }
+        with(sykefraværStatistikkLandRepository) { transaction { deleteAll() } }
     }
 
     @AfterEach
     fun tearDown() {
-        slettAllStatistikkFraDatabase(
-            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
-            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository
-        )
+        with(sykefravarStatistikkVirksomhetRepository) { transaction { deleteAll() } }
+        with(sykefraværStatistikkLandRepository) { transaction { deleteAll() } }
     }
 
     @Test

@@ -9,6 +9,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sy
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.Rectype
+import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.selectAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -19,7 +20,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfigur
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import testUtils.TestUtils
 import java.math.BigDecimal
 
 @ActiveProfiles("db-test")
@@ -33,9 +33,7 @@ open class SykefravarStatistikkVirksomhetRepositoryTest {
 
     @AfterEach
     fun setUp() {
-        TestUtils.slettAllStatistikkFraDatabase(
-            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
-        )
+        with(sykefravarStatistikkVirksomhetRepository) { transaction { deleteAll() } }
     }
 
     @Test

@@ -7,6 +7,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.Syke
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkNæringskodeRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.hentSykefraværsstatistikkForBransje
 import org.assertj.core.api.Assertions.assertThat
+import org.jetbrains.exposed.sql.deleteAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -16,7 +17,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfigur
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import testUtils.TestUtils
 import java.math.BigDecimal
 
 @ActiveProfiles("db-test")
@@ -33,10 +33,8 @@ open class HentSykefraværsstatistikkForBransjeTest {
 
     @BeforeEach
     fun beforeEach() {
-        TestUtils.slettAllStatistikkFraDatabase(
-            sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository,
-            sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository
-        )
+        with(sykefraværStatistikkNæringRepository) { transaction { deleteAll() } }
+        with(sykefraværStatistikkNæringskodeRepository) { transaction { deleteAll() } }
     }
 
     @Test

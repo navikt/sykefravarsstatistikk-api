@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkLand
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkLandRepository
+import org.jetbrains.exposed.sql.deleteAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -14,7 +15,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfigur
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import testUtils.TestUtils
 import java.math.BigDecimal
 
 @ActiveProfiles("db-test")
@@ -27,9 +27,7 @@ open class SykefraværStatistikkLandRepositoryTest {
 
     @AfterEach
     fun tearDown() {
-        TestUtils.slettAllStatistikkFraDatabase(
-            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository
-        )
+        with(sykefraværStatistikkLandRepository) { transaction { deleteAll() } }
     }
 
     @Test

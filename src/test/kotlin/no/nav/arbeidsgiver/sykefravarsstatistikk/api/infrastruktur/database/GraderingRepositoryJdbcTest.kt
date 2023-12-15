@@ -5,6 +5,7 @@ import ia.felles.definisjoner.bransjer.Bransje
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.Rectype
 import org.assertj.core.api.Assertions.*
+import org.jetbrains.exposed.sql.deleteAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -15,7 +16,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfigur
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import testUtils.TestUtils
 import java.math.BigDecimal
 
 @ActiveProfiles("db-test")
@@ -29,16 +29,12 @@ open class GraderingRepositoryJdbcTest {
 
     @BeforeEach
     fun setUp() {
-        TestUtils.slettAllStatistikkFraDatabase(
-            sykefravarStatistikkVirksomhetGraderingRepository = sykefravarStatistikkVirksomhetGraderingRepository
-        )
+        with(sykefravarStatistikkVirksomhetGraderingRepository) { transaction { deleteAll() } }
     }
 
     @AfterEach
     fun tearDown() {
-        TestUtils.slettAllStatistikkFraDatabase(
-            sykefravarStatistikkVirksomhetGraderingRepository = sykefravarStatistikkVirksomhetGraderingRepository
-        )
+        with(sykefravarStatistikkVirksomhetGraderingRepository) { transaction { deleteAll() } }
     }
 
     @Test

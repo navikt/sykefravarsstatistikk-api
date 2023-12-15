@@ -8,6 +8,7 @@ import io.kotest.matchers.shouldBe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.aggregertOgKvartalsvisSykefraværsstatistikk.domene.Varighetskategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import org.assertj.core.api.Assertions.assertThat
+import org.jetbrains.exposed.sql.deleteAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -17,7 +18,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfigur
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import testUtils.TestUtils
 import java.math.BigDecimal
 
 @ActiveProfiles("db-test")
@@ -34,10 +34,8 @@ open class SykefraværStatistikkNæringskodeMedVarighetRepositoryJdbcTest {
 
     @BeforeEach
     fun setUp() {
-        TestUtils.slettAllStatistikkFraDatabase(
-            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
-            sykefraværStatistikkNæringskodeMedVarighetRepository = sykefraværStatistikkNæringskodeMedVarighetRepository,
-        )
+        with(sykefravarStatistikkVirksomhetRepository) { transaction { deleteAll() } }
+        with(sykefraværStatistikkNæringskodeMedVarighetRepository) { transaction { deleteAll() } }
     }
 
     @Test

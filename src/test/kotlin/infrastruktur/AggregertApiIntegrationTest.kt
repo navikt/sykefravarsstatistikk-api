@@ -15,6 +15,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.R
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.assertj.core.api.Assertions
+import org.jetbrains.exposed.sql.deleteAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,8 +27,6 @@ import org.springframework.boot.test.web.server.LocalServerPort
 import testUtils.TestTokenUtil.createMockIdportenTokenXToken
 import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import testUtils.TestUtils.opprettStatistikkForLand
-import testUtils.TestUtils.slettAllStatistikkFraDatabase
-import testUtils.TestUtils.slettAlleImporttidspunkt
 import java.math.BigDecimal
 import java.net.URI
 import java.net.http.HttpClient
@@ -71,15 +70,15 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
 
     @BeforeEach
     fun setUp() {
-        slettAllStatistikkFraDatabase(
-            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
-            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
-            sykefravarStatistikkVirksomhetGraderingRepository = sykefravarStatistikkVirksomhetGraderingRepository,
-            sykefraværStatistikkNæringRepository = sykefraværStatistikkNæringRepository,
-            sykefraværStatistikkNæringskodeMedVarighetRepository = sykefraværStatistikkNæringskodeMedVarighetRepository,
-        )
-        importtidspunktRepository.slettAlleImporttidspunkt()
+        with(sykefravarStatistikkVirksomhetRepository) { transaction { deleteAll() } }
+        with(sykefraværStatistikkLandRepository) { transaction { deleteAll() } }
+        with(sykefravarStatistikkVirksomhetGraderingRepository) { transaction { deleteAll() } }
+        with(sykefraværStatistikkNæringRepository) { transaction { deleteAll() } }
+        with(sykefraværStatistikkNæringskodeMedVarighetRepository) { transaction { deleteAll() } }
+        with(importtidspunktRepository) { transaction { deleteAll() } }
+
         importtidspunktRepository.settInnImporttidspunkt(SISTE_PUBLISERTE_KVARTAL, LocalDate.parse("2022-06-02"))
+
         val altinnOrganisasjon = AltinnOrganisasjon(
             name = "NAV ARBEID OG YTELSER AVD OSLO",
             type = "BEDR",
@@ -88,12 +87,15 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
             organizationForm = "BEDR",
             status = "Active"
         )
+
         whenever(altinnService.hentVirksomheterDerBrukerHarTilknytning(any(), any())).thenReturn(
             listOf(altinnOrganisasjon)
         )
+
         whenever(altinnService.hentVirksomheterDerBrukerHarSykefraværsstatistikkrettighet(any(), any())).thenReturn(
             listOf(altinnOrganisasjon)
         )
+
         whenever(enhetsregisteretClient.hentUnderenhet(any())).thenReturn(
             Underenhet.Næringsdrivende(
                 navn = "NAV ARBEID OG YTELSER AVD OSLO",
@@ -107,12 +109,10 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
 
     @AfterEach
     fun tearDown() {
-        slettAllStatistikkFraDatabase(
-            sykefravarStatistikkVirksomhetRepository = sykefravarStatistikkVirksomhetRepository,
-            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
-            sykefravarStatistikkVirksomhetGraderingRepository = sykefravarStatistikkVirksomhetGraderingRepository
-        )
-        importtidspunktRepository.slettAlleImporttidspunkt()
+        with(sykefravarStatistikkVirksomhetRepository) { transaction { deleteAll() } }
+        with(sykefraværStatistikkLandRepository) { transaction { deleteAll() } }
+        with(sykefravarStatistikkVirksomhetGraderingRepository) { transaction { deleteAll() } }
+        with(importtidspunktRepository) { transaction { deleteAll() } }
     }
 
     @LocalServerPort

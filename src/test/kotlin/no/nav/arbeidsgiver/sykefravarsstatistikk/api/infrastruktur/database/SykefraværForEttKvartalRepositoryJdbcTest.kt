@@ -17,9 +17,10 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import testUtils.TestUtils.opprettStatistikkForLand
-import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import java.math.BigDecimal
 import ia.felles.definisjoner.bransjer.Bransje
+import org.jetbrains.exposed.sql.deleteAll
+
 @ActiveProfiles("db-test")
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [AppConfigForJdbcTesterConfig::class])
@@ -44,18 +45,14 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
 
     @BeforeEach
     fun setUp() {
-        slettAllStatistikkFraDatabase(
-            sykefravarStatistikkVirksomhetRepository = sykefraværStatistikkVirksomhetRepository,
-            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
-        )
+        with(sykefraværStatistikkVirksomhetRepository) { transaction { deleteAll() } }
+        with(sykefraværStatistikkLandRepository) { transaction { deleteAll() } }
     }
 
     @AfterEach
     fun tearDown() {
-        slettAllStatistikkFraDatabase(
-            sykefravarStatistikkVirksomhetRepository = sykefraværStatistikkVirksomhetRepository,
-            sykefraværStatistikkLandRepository = sykefraværStatistikkLandRepository,
-        )
+        with(sykefraværStatistikkVirksomhetRepository) { transaction { deleteAll() } }
+        with(sykefraværStatistikkLandRepository) { transaction { deleteAll() } }
     }
 
     @Test

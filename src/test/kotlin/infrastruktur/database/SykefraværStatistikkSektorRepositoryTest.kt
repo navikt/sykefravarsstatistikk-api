@@ -6,6 +6,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Se
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkSektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefraværStatistikkSektorRepository
+import org.jetbrains.exposed.sql.deleteAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -16,7 +17,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfigur
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import testUtils.TestUtils
 import java.math.BigDecimal
 
 @ActiveProfiles("db-test")
@@ -30,16 +30,12 @@ open class SykefraværStatistikkSektorRepositoryTest {
 
     @AfterEach
     fun tearDown() {
-        TestUtils.slettAllStatistikkFraDatabase(
-            sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository
-        )
+        with(sykefraværStatistikkSektorRepository) { transaction { deleteAll() } }
     }
 
     @BeforeEach
     fun setUp() {
-        TestUtils.slettAllStatistikkFraDatabase(
-            sykefraværStatistikkSektorRepository = sykefraværStatistikkSektorRepository
-        )
+        with(sykefraværStatistikkSektorRepository) { transaction { deleteAll() } }
     }
 
     @Test
