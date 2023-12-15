@@ -16,7 +16,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
-import testUtils.TestUtils.opprettStatistikkForLandExposed
+import testUtils.TestUtils.opprettStatistikkForLand
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import java.math.BigDecimal
 
@@ -59,7 +59,7 @@ open class SykefraværRepositoryJdbcTest {
     @Test
     fun hentUmaskertSykefraværForNorge_skal_hente_riktig_data() {
 
-        opprettStatistikkForLandExposed(sykefraværStatistikkLandRepository)
+        opprettStatistikkForLand(sykefraværStatistikkLandRepository)
         val kvartaler = ÅrstallOgKvartal.range(SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1), SISTE_PUBLISERTE_KVARTAL)
         val resultat = sykefraværStatistikkLandRepository.hentForKvartaler(kvartaler)
 

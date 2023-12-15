@@ -24,7 +24,6 @@ import testUtils.TestTokenUtil.TOKENX_ISSUER_ID
 import testUtils.TestTokenUtil.createToken
 import testUtils.TestUtils.SISTE_PUBLISERTE_KVARTAL
 import testUtils.TestUtils.opprettStatistikkForLand
-import testUtils.TestUtils.opprettStatistikkForLandExposed
 import testUtils.TestUtils.slettAllStatistikkFraDatabase
 import testUtils.TestUtils.slettAlleImporttidspunkt
 import java.io.IOException
@@ -143,7 +142,6 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
             idp = "https://oidc.difi.no/idporten-oidc-provider/"
         )
         opprettStatistikkForLand(sykefraværStatistikkLandRepository)
-        opprettStatistikkForLandExposed(sykefraværStatistikkLandRepository)
 
         sykefraværStatistikkSektorRepository.settInn(
             listOf(

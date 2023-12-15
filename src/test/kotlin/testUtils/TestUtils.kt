@@ -64,33 +64,7 @@ object TestUtils {
     }
 
 
-    fun opprettTestVirksomhetMetaData(
-        jdbcTemplate: NamedParameterJdbcTemplate, årstall: Int, kvartal: Int, orgnr: String?
-    ) {
-        opprettTestVirksomhetMetaData(jdbcTemplate, årstall, kvartal, orgnr, false)
-    }
 
-
-    fun opprettTestVirksomhetMetaData(
-        jdbcTemplate: NamedParameterJdbcTemplate,
-        årstall: Int,
-        kvartal: Int,
-        orgnr: String?,
-        eksportert: Boolean
-    ): Int {
-        val parametre: SqlParameterSource = MapSqlParameterSource()
-            .addValue("orgnr", orgnr)
-            .addValue("årstall", årstall)
-            .addValue("kvartal", kvartal)
-            .addValue("eksportert", eksportert)
-        return jdbcTemplate.update(
-            "insert into eksport_per_kvartal "
-                    + "(orgnr, arstall, kvartal, eksportert) "
-                    + "values "
-                    + "(:orgnr, :årstall, :kvartal, :eksportert)",
-            parametre
-        )
-    }
 
     fun opprettStatistikkForLand(sykefraværStatistikkLandRepository: SykefraværStatistikkLandRepository) {
         sykefraværStatistikkLandRepository.settInn(
@@ -115,34 +89,6 @@ object TestUtils {
                     10,
                     BigDecimal("6.0"),
                     BigDecimal("100.0")
-                ),
-            )
-        )
-    }
-
-    fun opprettStatistikkForLandExposed(repository: SykefraværStatistikkLandRepository) {
-        repository.settInn(
-            listOf(
-                SykefraværsstatistikkLand(
-                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
-                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
-                    antallPersoner = 10,
-                    tapteDagsverk = BigDecimal("4.0"),
-                    muligeDagsverk = BigDecimal("100.0")
-                ),
-                SykefraværsstatistikkLand(
-                    årstall = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).årstall,
-                    kvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(1).kvartal,
-                    antallPersoner = 10,
-                    tapteDagsverk = BigDecimal("5.0"),
-                    muligeDagsverk = BigDecimal("100.0")
-                ),
-                SykefraværsstatistikkLand(
-                    årstall = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).årstall,
-                    kvartal = SISTE_PUBLISERTE_KVARTAL.minusKvartaler(2).kvartal,
-                    antallPersoner = 10,
-                    tapteDagsverk = BigDecimal("6.0"),
-                    muligeDagsverk = BigDecimal("100.0")
                 ),
             )
         )

@@ -15,13 +15,13 @@ import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
 import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.jdbc.core.namedparam.SqlParameterSource
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import testUtils.TestData.ORGNR_VIRKSOMHET_1
 import testUtils.TestData.ORGNR_VIRKSOMHET_2
 import testUtils.TestData.ORGNR_VIRKSOMHET_3
-import testUtils.TestUtils.opprettTestVirksomhetMetaData
 import testUtils.TestUtils.slettAllEksportDataFraDatabase
 import java.sql.ResultSet
 import java.time.LocalDateTime
@@ -280,5 +280,34 @@ open class LegacyEksporteringRepositoryTest {
         val ORGNR_2 = Orgnr(ORGNR_VIRKSOMHET_2)
         val ORGNR_3 = Orgnr(ORGNR_VIRKSOMHET_3)
         val _2021_1 = ÅrstallOgKvartal(2021, 1)
+    }
+
+
+    fun opprettTestVirksomhetMetaData(
+        jdbcTemplate: NamedParameterJdbcTemplate, årstall: Int, kvartal: Int, orgnr: String?
+    ) {
+        opprettTestVirksomhetMetaData(jdbcTemplate, årstall, kvartal, orgnr, false)
+    }
+
+
+    fun opprettTestVirksomhetMetaData(
+        jdbcTemplate: NamedParameterJdbcTemplate,
+        årstall: Int,
+        kvartal: Int,
+        orgnr: String?,
+        eksportert: Boolean
+    ): Int {
+        val parametre: SqlParameterSource = MapSqlParameterSource()
+            .addValue("orgnr", orgnr)
+            .addValue("årstall", årstall)
+            .addValue("kvartal", kvartal)
+            .addValue("eksportert", eksportert)
+        return jdbcTemplate.update(
+            "insert into eksport_per_kvartal "
+                    + "(orgnr, arstall, kvartal, eksportert) "
+                    + "values "
+                    + "(:orgnr, :årstall, :kvartal, :eksportert)",
+            parametre
+        )
     }
 }
