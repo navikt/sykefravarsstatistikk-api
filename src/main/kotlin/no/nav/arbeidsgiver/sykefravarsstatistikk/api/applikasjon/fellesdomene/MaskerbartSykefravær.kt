@@ -14,11 +14,12 @@ open class MaskerbartSykefravær(
     var prosent: BigDecimal? = null
     var tapteDagsverk: BigDecimal? = null
     var muligeDagsverk: BigDecimal? = null
-    val erMaskert: Boolean
+    val erMaskert: Boolean = (
+            harSykefraværData &&
+                    antallPersoner < Konstanter.MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER
+            )
 
     init {
-        erMaskert = (harSykefraværData
-                && antallPersoner < Konstanter.MIN_ANTALL_PERS_FOR_AT_STATISTIKKEN_IKKE_ER_PERSONOPPLYSNINGER)
         if (!erMaskert && harSykefraværData) {
             prosent = StatistikkUtils.kalkulerSykefraværsprosent(tapteDagsverk!!, muligeDagsverk!!).getOrNull()
             this.tapteDagsverk = tapteDagsverk.setScale(1, RoundingMode.HALF_UP)
