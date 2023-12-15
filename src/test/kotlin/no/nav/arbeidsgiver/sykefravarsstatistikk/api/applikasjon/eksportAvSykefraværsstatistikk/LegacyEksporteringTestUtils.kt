@@ -1,11 +1,11 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk
 
-import testUtils.AssertUtils
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.Rectype
 import org.assertj.core.api.Assertions
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 object LegacyEksporteringTestUtils {
     // Data for testing & Utilities
@@ -237,7 +237,8 @@ object LegacyEksporteringTestUtils {
             false
         )
 
-    val virksomhetMetadata = VirksomhetMetadata(Orgnr("987654321"), "Virksomhet 1", "2", Sektor.STATLIG, "11", "11111", __2020_2)
+    val virksomhetMetadata =
+        VirksomhetMetadata(Orgnr("987654321"), "Virksomhet 1", "2", Sektor.STATLIG, "11", "11111", __2020_2)
 
 
     fun sykefraværsstatistikkLandSiste4Kvartaler(
@@ -312,8 +313,8 @@ object LegacyEksporteringTestUtils {
         Assertions.assertThat(actual.Årstall).isEqualTo(expected.Årstall)
         Assertions.assertThat(actual.kvartal).isEqualTo(expected.kvartal)
         Assertions.assertThat(actual.orgnr).isEqualTo(expected.orgnr)
-        AssertUtils.assertBigDecimalIsEqual(actual.muligeDagsverk, expected.muligeDagsverk)
-        AssertUtils.assertBigDecimalIsEqual(actual.tapteDagsverk, expected.tapteDagsverk)
+        assertBigDecimalIsEqual(actual.muligeDagsverk, expected.muligeDagsverk)
+        assertBigDecimalIsEqual(actual.tapteDagsverk, expected.tapteDagsverk)
     }
 
 
@@ -327,8 +328,8 @@ object LegacyEksporteringTestUtils {
         Assertions.assertThat(actual.kode).`as`("Sjekk kode").isEqualTo(expectedKode)
         Assertions.assertThat(actual.Årstall).`as`("Sjekk årstall").isEqualTo(expected.årstall)
         Assertions.assertThat(actual.kvartal).`as`("Sjekk kvartal").isEqualTo(expected.kvartal)
-        AssertUtils.assertBigDecimalIsEqual(actual.muligeDagsverk, expected.muligeDagsverk)
-        AssertUtils.assertBigDecimalIsEqual(actual.tapteDagsverk, expected.tapteDagsverk)
+        assertBigDecimalIsEqual(actual.muligeDagsverk, expected.muligeDagsverk)
+        assertBigDecimalIsEqual(actual.tapteDagsverk, expected.tapteDagsverk)
     }
 
 
@@ -341,7 +342,18 @@ object LegacyEksporteringTestUtils {
         Assertions.assertThat(actual.kode).`as`("Sjekk kode").isEqualTo(expected.kode)
         Assertions.assertThat(actual.Årstall).`as`("Sjekk årstall").isEqualTo(expected.Årstall)
         Assertions.assertThat(actual.kvartal).`as`("Sjekk kvartal").isEqualTo(expected.kvartal)
-        AssertUtils.assertBigDecimalIsEqual(actual.muligeDagsverk, expected.muligeDagsverk)
-        AssertUtils.assertBigDecimalIsEqual(actual.tapteDagsverk, expected.tapteDagsverk)
+        assertBigDecimalIsEqual(actual.muligeDagsverk, expected.muligeDagsverk)
+        assertBigDecimalIsEqual(actual.tapteDagsverk, expected.tapteDagsverk)
+    }
+
+
+    fun assertBigDecimalIsEqual(actual: BigDecimal?, expected: BigDecimal?) {
+        if (actual == null || expected == null) {
+            Assertions.assertThat(actual).isEqualTo(expected)
+            return
+        }
+        val SCALE = 6
+        Assertions.assertThat(actual.setScale(SCALE, RoundingMode.HALF_UP))
+            .isEqualTo(expected.setScale(SCALE, RoundingMode.HALF_UP))
     }
 }
