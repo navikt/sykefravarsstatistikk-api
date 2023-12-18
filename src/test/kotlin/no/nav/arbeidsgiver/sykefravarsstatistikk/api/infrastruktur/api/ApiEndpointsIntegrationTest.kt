@@ -21,8 +21,6 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.web.server.LocalServerPort
-import testUtils.TestTokenUtil.TOKENX_ISSUER_ID
-import testUtils.TestTokenUtil.createToken
 import java.io.IOException
 import java.math.BigDecimal
 import java.net.URI
@@ -31,7 +29,6 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.net.http.HttpResponse.BodyHandlers
 import java.time.LocalDate
-import java.util.*
 import java.util.stream.Collectors
 
 class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
@@ -39,6 +36,10 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
 
     private val SISTE_ÅRSTALL: Int = SISTE_PUBLISERTE_KVARTAL.årstall
     private val SISTE_KVARTAL: Int = SISTE_PUBLISERTE_KVARTAL.kvartal
+
+    private val ORGNR_UNDERENHET = "910969439"
+    private val ORGNR_OVERORDNET_ENHET = "999263550"
+    private val ORGNR_UNDERENHET_INGEN_TILGANG = "777777777"
 
     @Autowired
     lateinit var mockOAuth2Server: MockOAuth2Server
@@ -68,7 +69,6 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
     private val port: String? = null
     private val objectMapper = ObjectMapper()
 
-    val PRODUKSJON_NYTELSESMIDLER = Næring("10")
 
     @BeforeEach
     fun setUp() {
@@ -81,10 +81,11 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun sykefraværshistorikk__skal_ikke_tillate_selvbetjening_token() {
-        val jwtTokenIssuedByLoginservice = createToken(mockOAuth2Server, "15008462396", "selvbetjening", "")
+    fun `sykefraværshistorikk skal ikke tillate selvbetjening token`() {
+        val jwtTokenIssuedByLoginservice = lagJwtBearer(issuer = "selvbetjening")
+
         val respons = gjørKallMotKvartalsvis(ORGNR_UNDERENHET, jwtTokenIssuedByLoginservice)
+
         Assertions.assertThat(respons.statusCode()).isEqualTo(401)
     }
 
@@ -133,18 +134,12 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
                     antallAnsatte = 10
                 ).right()
             )
-        val jwtToken = createToken(
-            oAuth2Server = mockOAuth2Server,
-            pid = "15008462396",
-            issuerId = TOKENX_ISSUER_ID,
-            idp = "https://oidc.difi.no/idporten-oidc-provider/"
-        )
 
         sykefraværStatistikkLandRepository.settInn(
             listOf(
                 SykefraværsstatistikkLand(
-                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
-                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
+                    årstall = SISTE_ÅRSTALL,
+                    kvartal = SISTE_KVARTAL,
                     antallPersoner = 10,
                     tapteDagsverk = BigDecimal("4.0"),
                     muligeDagsverk = BigDecimal("100.0")
@@ -155,8 +150,8 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
         sykefraværStatistikkSektorRepository.settInn(
             listOf(
                 SykefraværsstatistikkSektor(
-                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
-                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
+                    årstall = SISTE_ÅRSTALL,
+                    kvartal = SISTE_KVARTAL,
                     sektorkode = Sektor.STATLIG.sektorkode,
                     antallPersoner = 10,
                     tapteDagsverk = BigDecimal("657853.346702"),
@@ -168,9 +163,9 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
         sykefraværStatistikkNæringRepository.settInn(
             listOf(
                 SykefraværsstatistikkForNæring(
-                    årstall = SISTE_PUBLISERTE_KVARTAL.årstall,
-                    kvartal = SISTE_PUBLISERTE_KVARTAL.kvartal,
-                    næring = PRODUKSJON_NYTELSESMIDLER.tosifferIdentifikator,
+                    årstall = SISTE_ÅRSTALL,
+                    kvartal = SISTE_KVARTAL,
+                    næring = Næring("10").tosifferIdentifikator,
                     antallPersoner = 10,
                     tapteDagsverk = 5.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal(),
@@ -206,7 +201,7 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
             )
         )
 
-        val response = gjørKallMotKvartalsvis(ORGNR_UNDERENHET, "Bearer $jwtToken")
+        val response = gjørKallMotKvartalsvis(ORGNR_UNDERENHET, lagJwtBearer())
 
         Assertions.assertThat(response.statusCode()).isEqualTo(200)
 
@@ -295,50 +290,57 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
 
     @Test
     @Throws(IOException::class, InterruptedException::class)
-    fun sykefraværshistorikk_sektor__skal_utføre_tilgangskontroll() {
-        val response = gjørKallMotKvartalsvis(ORGNR_UNDERENHET_INGEN_TILGANG, bearerMedJwt)
+    fun `sykefraværshistorikk skal utføre_tilgangskontroll`() {
+        val fnrUtenTilgang = "11122233344"
+        val response = gjørKallMotKvartalsvis(ORGNR_UNDERENHET_INGEN_TILGANG, lagJwtBearer(pid = fnrUtenTilgang))
         Assertions.assertThat(response.statusCode()).isEqualTo(403)
         Assertions.assertThat(response.body())
             .isEqualTo("{\"message\":\"You don't have access to this resource\"}")
     }
 
     @Test
-    @Throws(Exception::class)
-    fun sykefraværshistorikk__skal_IKKE_godkjenne_en_token_uten_sub_eller_pid() {
-        val jwtToken = createToken(mockOAuth2Server, "", "", TOKENX_ISSUER_ID, "")
-        val response = gjørKallMotKvartalsvis(ORGNR_UNDERENHET_INGEN_TILGANG, jwtToken)
-        Assertions.assertThat(response.statusCode()).isEqualTo(401)
+    fun `sykefraværshistorikk skal IKKE godkjenne en token uten pid og idp`() {
+
+        val invalidJwtToken = "Bearer " + mockOAuth2Server.issueToken(
+            issuerId = "tokenx",
+            audience = "someaudience",
+            claims = mapOf(
+                "idp" to "",
+                "pid" to "",
+            )
+        ).serialize()
+
+        val response = gjørKallMotKvartalsvis(orgnr = ORGNR_UNDERENHET_INGEN_TILGANG, jwtToken = invalidJwtToken)
+
+        Assertions.assertThat(response.statusCode()).isEqualTo(403)
         Assertions.assertThat(response.body())
-            .isEqualTo("{\"message\":\"You are not authorized to access this resource\"}")
+            .isEqualTo("{\"message\":\"You don't have access to this resource\"}")
     }
 
     @Throws(IOException::class, InterruptedException::class)
     private fun gjørKallMotKvartalsvis(orgnr: String, jwtToken: String): HttpResponse<String> {
-        val httpRequest = HttpRequest.newBuilder()
-            .uri(
-                URI.create(
-                    "http://127.0.0.1:"
-                            + port
-                            + "/sykefravarsstatistikk-api/"
-                            + orgnr
-                            + "/sykefravarshistorikk/kvartalsvis"
-                )
-            )
-            .header("AUTHORIZATION", jwtToken)
-            .GET()
-            .build()
         return HttpClient.newBuilder()
             .build()
-            .send(httpRequest, BodyHandlers.ofString())
+            .send(
+                HttpRequest.newBuilder()
+                    .uri(
+                        URI.create(
+                            "http://127.0.0.1:$port/sykefravarsstatistikk-api/$orgnr/sykefravarshistorikk/kvartalsvis"
+                        )
+                    )
+                    .header("AUTHORIZATION", jwtToken)
+                    .GET()
+                    .build(), BodyHandlers.ofString()
+            )
     }
 
-    private val bearerMedJwt: String
-        get() = ("Bearer "
-                + createToken(mockOAuth2Server, "15008462396", TOKENX_ISSUER_ID, ""))
-
-    companion object {
-        private const val ORGNR_UNDERENHET = "910969439"
-        private const val ORGNR_OVERORDNET_ENHET = "999263550"
-        private const val ORGNR_UNDERENHET_INGEN_TILGANG = "777777777"
-    }
+    fun lagJwtBearer(pid: String = "15008462396", issuer: String = "tokenx") =
+        "Bearer " + mockOAuth2Server.issueToken(
+            issuerId = issuer,
+            audience = "someaudience",
+            claims = mapOf(
+                "idp" to "https://oidc.difi.no/idporten-oidc-provider/",
+                "pid" to pid,
+            )
+        ).serialize()
 }

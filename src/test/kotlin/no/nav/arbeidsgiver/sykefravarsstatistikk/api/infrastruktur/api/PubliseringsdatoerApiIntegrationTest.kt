@@ -58,13 +58,7 @@ class PubliseringsdatoerApiIntegrationTest : SpringIntegrationTestbase() {
             .build()
             .send(
                 HttpRequest.newBuilder()
-                    .uri(
-                        URI.create(
-                            "http://127.0.0.1:"
-                                    + port
-                                    + "/sykefravarsstatistikk-api/publiseringsdato"
-                        )
-                    )
+                    .uri(URI.create("http://127.0.0.1:$port/sykefravarsstatistikk-api/publiseringsdato"))
                     .GET()
                     .build(),
                 BodyHandlers.ofString()

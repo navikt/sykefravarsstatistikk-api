@@ -23,3 +23,6 @@ spec:
     - team: pia
       application: lydia-api
       access: read
+    - team: team-dialog
+      application: sf-sykefravarsstatistikk-sektor
+      access: read

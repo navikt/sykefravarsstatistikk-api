@@ -24,7 +24,6 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.web.server.LocalServerPort
-import testUtils.TestTokenUtil.createMockIdportenTokenXToken
 import java.math.BigDecimal
 import java.net.URI
 import java.net.http.HttpClient
@@ -418,7 +417,14 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
     }
 
     private fun utførAutorisertKall(orgnr: String): HttpResponse<String> {
-        val jwtToken = createMockIdportenTokenXToken(mockOAuth2Server)
+        val validJwtToken = mockOAuth2Server.issueToken(
+            issuerId = "tokenx",
+            audience = "someaudience",
+            claims = mapOf(
+                "idp" to "https://oidc.difi.no/idporten-oidc-provider/",
+                "pid" to "15008462396",
+            )
+        ).serialize()
         return HttpClient.newBuilder()
             .build()
             .send(
@@ -426,18 +432,15 @@ class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
                     .GET()
                     .uri(
                         URI.create(
-                            "http://127.0.0.1:"
-                                    + port
-                                    + "/sykefravarsstatistikk-api/"
-                                    + orgnr
-                                    + "/v1/sykefravarshistorikk/aggregert"
+                            "http://127.0.0.1:$port/sykefravarsstatistikk-api/$orgnr/v1/sykefravarshistorikk/aggregert"
                         )
                     )
-                    .header("AUTHORIZATION", "Bearer $jwtToken")
+                    .header("AUTHORIZATION", "Bearer $validJwtToken")
                     .build(),
                 BodyHandlers.ofString()
             )
     }
+
 
     companion object {
         private const val ORGNR_UNDERENHET = "910969439"

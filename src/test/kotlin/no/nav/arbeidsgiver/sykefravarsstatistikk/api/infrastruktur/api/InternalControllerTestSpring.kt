@@ -19,13 +19,7 @@ class InternalControllerTestSpring : SpringIntegrationTestbase() {
             .build()
             .send(
                 HttpRequest.newBuilder()
-                    .uri(
-                        URI.create(
-                            "http://localhost:"
-                                    + port
-                                    + "/sykefravarsstatistikk-api/internal/liveness"
-                        )
-                    )
+                    .uri(URI.create("http://localhost:$port/sykefravarsstatistikk-api/internal/liveness"))
                     .GET()
                     .build(),
                 BodyHandlers.ofString()
