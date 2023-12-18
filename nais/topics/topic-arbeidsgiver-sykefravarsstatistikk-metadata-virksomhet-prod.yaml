@@ -26,3 +26,6 @@ spec:
     - team: fager
       application: min-side-arbeidsgiver-api
       access: read
+    - team: team-dialog
+      application: sf-sykefravaersstatistikk
+      access: read
