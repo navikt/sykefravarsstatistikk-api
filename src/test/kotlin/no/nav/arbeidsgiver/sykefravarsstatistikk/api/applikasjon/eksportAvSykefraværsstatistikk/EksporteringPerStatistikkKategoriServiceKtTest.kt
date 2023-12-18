@@ -19,7 +19,7 @@ class EksporteringPerStatistikkKategoriServiceKtTest {
             )
         )
 
-        val results = dataset.groupByNæringskode()
+        val results = dataset.groupBy({ it.næringskode }, { it })
         assertThat(results).isEqualTo(
             mapOf(
                 "12345" to listOf(
@@ -58,7 +58,7 @@ class EksporteringPerStatistikkKategoriServiceKtTest {
 
         val dataset: List<SykefraværsstatistikkForNæringskode> = statistikFor12345 + statistikFor67890
 
-        val results = dataset.groupByNæringskode()
+        val results = dataset.groupBy({ it.næringskode }, { it })
         assertThat(results).isEqualTo(
             mapOf(
                 "67890" to statistikFor67890,

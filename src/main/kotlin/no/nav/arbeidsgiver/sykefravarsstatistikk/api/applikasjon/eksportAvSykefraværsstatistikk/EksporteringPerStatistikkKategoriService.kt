@@ -55,7 +55,7 @@ class EksporteringPerStatistikkKategoriService(
     private fun eksporterSykefraværsstatistikkLand(årstallOgKvartal: ÅrstallOgKvartal) {
 
         sykefraværStatistikkLandRepository.hentSykefraværstatistikkLand(årstallOgKvartal inkludertTidligere 3)
-            .groupByLand().let {
+            .groupBy({ "NO" }, { it }).let {
                 eksporterSykefraværsstatistikkPerKategori(
                     eksportkvartal = årstallOgKvartal,
                     sykefraværGruppertEtterKode = it,
@@ -67,7 +67,7 @@ class EksporteringPerStatistikkKategoriService(
 
     private fun eksporterSykefraværsstatistikkSektor(årstallOgKvartal: ÅrstallOgKvartal) {
         sykefraværStatistikkSektorRepository.hentForKvartaler(årstallOgKvartal inkludertTidligere 3)
-            .groupBySektor()
+            .groupBy({ it.sektorkode }, { it })
             .let {
                 eksporterSykefraværsstatistikkPerKategori(
                     eksportkvartal = årstallOgKvartal,
@@ -81,7 +81,7 @@ class EksporteringPerStatistikkKategoriService(
     private fun eksporterSykefraværsstatistikkNæring(årstallOgKvartal: ÅrstallOgKvartal) {
         sykefraværStatistikkNæringRepository.hentForAlleNæringer(
             årstallOgKvartal inkludertTidligere 3
-        ).groupByNæring().let {
+        ).groupBy({ it.næring }, { it }).let {
             eksporterSykefraværsstatistikkPerKategori(
                 eksportkvartal = årstallOgKvartal,
                 sykefraværGruppertEtterKode = it,
@@ -93,7 +93,7 @@ class EksporteringPerStatistikkKategoriService(
 
     private fun eksporterSykefraværsstatistikkNæringskode(årstallOgKvartal: ÅrstallOgKvartal) {
         sykefraværStatistikkNæringskodeRepository.hentAltForKvartaler(årstallOgKvartal inkludertTidligere 3)
-            .groupByNæringskode().let {
+            .groupBy({ it.næringskode }, { it }).let {
                 eksporterSykefraværsstatistikkPerKategori(
                     eksportkvartal = årstallOgKvartal,
                     sykefraværGruppertEtterKode = it,
@@ -110,7 +110,7 @@ class EksporteringPerStatistikkKategoriService(
             sykefraværsstatistikkNæringRepository = sykefraværStatistikkNæringRepository,
             sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository
         )
-            .groupByBransje().let {
+            .groupBy({ it.bransje.name }, { it }).let {
                 eksporterSykefraværsstatistikkPerKategori(
                     eksportkvartal = kvartal,
                     sykefraværGruppertEtterKode = it,
@@ -123,7 +123,7 @@ class EksporteringPerStatistikkKategoriService(
     private fun eksporterSykefraværsstatistikkVirksomhet(årstallOgKvartal: ÅrstallOgKvartal) {
         val statistikk =
             sykefravarStatistikkVirksomhetRepository.hentSykefraværAlleVirksomheter(årstallOgKvartal inkludertTidligere 3)
-                .groupByOrgnr()
+                .groupBy({ it.orgnr }, { it })
 
         eksporterSykefraværsstatistikkPerKategori(
             eksportkvartal = årstallOgKvartal,
@@ -136,7 +136,7 @@ class EksporteringPerStatistikkKategoriService(
     private fun eksporterSykefraværsstatistikkVirksomhetGradert(årstallOgKvartal: ÅrstallOgKvartal) {
         sykefravarStatistikkVirksomhetGraderingRepository.hentSykefraværAlleVirksomheterGradert(
             årstallOgKvartal inkludertTidligere 3
-        ).groupByVirksomhet().let {
+        ).groupBy({ it.orgnr }, { it }).let {
             eksporterSykefraværsstatistikkPerKategori(
                 eksportkvartal = årstallOgKvartal,
                 sykefraværGruppertEtterKode = it,
@@ -215,33 +215,5 @@ class EksporteringPerStatistikkKategoriService(
             }
         }
 }
-
-fun List<SykefraværsstatistikkLand>.groupByLand():
-        Map<String, List<Sykefraværsstatistikk>> =
-    this.groupBy({ "NO" }, { it })
-
-fun List<SykefraværsstatistikkSektor>.groupBySektor():
-        Map<String, List<Sykefraværsstatistikk>> =
-    this.groupBy({ it.sektorkode }, { it })
-
-fun List<SykefraværsstatistikkForNæring>.groupByNæring():
-        Map<String, List<Sykefraværsstatistikk>> =
-    this.groupBy({ it.næring }, { it })
-
-fun List<SykefraværsstatistikkForNæringskode>.groupByNæringskode():
-        Map<String, List<Sykefraværsstatistikk>> =
-    this.groupBy({ it.næringskode }, { it })
-
-fun List<SykefraværsstatistikkBransje>.groupByBransje():
-        Map<String, List<Sykefraværsstatistikk>> =
-    this.groupBy({ it.bransje.name }, { it })
-
-fun List<SykefraværsstatistikkVirksomhetUtenVarighet>.groupByOrgnr():
-        Map<String, List<Sykefraværsstatistikk>> =
-    this.groupBy({ it.orgnr }, { it })
-
-fun List<SykefraværsstatistikkVirksomhetMedGradering>.groupByVirksomhet():
-        Map<String, List<Sykefraværsstatistikk>> =
-    this.groupBy({ it.orgnr }, { it })
 
 

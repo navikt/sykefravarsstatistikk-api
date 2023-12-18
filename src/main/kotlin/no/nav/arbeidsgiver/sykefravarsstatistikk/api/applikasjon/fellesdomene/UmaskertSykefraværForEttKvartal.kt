@@ -14,13 +14,8 @@ open class UmaskertSykefraværForEttKvartal(
     open val antallPersoner: Int
 ) : Comparable<UmaskertSykefraværForEttKvartal> {
 
-    val dagsverkTeller: BigDecimal
-    val dagsverkNevner: BigDecimal
-
-    init {
-        this.dagsverkTeller = dagsverkTeller.setScale(1, RoundingMode.HALF_UP)
-        this.dagsverkNevner = dagsverkNevner.setScale(1, RoundingMode.HALF_UP)
-    }
+    val dagsverkTeller: BigDecimal = dagsverkTeller.setScale(1, RoundingMode.HALF_UP)
+    val dagsverkNevner: BigDecimal = dagsverkNevner.setScale(1, RoundingMode.HALF_UP)
 
     constructor(statistikk: Sykefraværsstatistikk) : this(
         ÅrstallOgKvartal(statistikk.årstall, statistikk.kvartal),
