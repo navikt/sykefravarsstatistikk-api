@@ -23,6 +23,3 @@ spec:
     - team: pia
       application: lydia-api
       access: read
-    - team: arbeidsgiver
-      application: teamia-kcat
-      access: read
