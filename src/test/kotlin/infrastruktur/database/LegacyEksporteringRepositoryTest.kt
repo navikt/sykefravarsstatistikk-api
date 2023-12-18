@@ -19,9 +19,6 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import testUtils.TestData.ORGNR_VIRKSOMHET_1
-import testUtils.TestData.ORGNR_VIRKSOMHET_2
-import testUtils.TestData.ORGNR_VIRKSOMHET_3
 import java.sql.ResultSet
 import java.time.LocalDateTime
 
@@ -38,6 +35,12 @@ open class LegacyEksporteringRepositoryTest {
 
     @Autowired
     private lateinit var legacyKafkaUtsendingHistorikkRepository: LegacyKafkaUtsendingHistorikkRepository
+
+    private val ORGNR_VIRKSOMHET_1 = "987654321"
+    private val ORGNR_VIRKSOMHET_2 = "999999999"
+    private val ORGNR_VIRKSOMHET_3 = "999999777"
+
+    private val _2021_1 = ÅrstallOgKvartal(2021, 1)
 
     @BeforeEach
     fun setUp() {
@@ -122,29 +125,29 @@ open class LegacyEksporteringRepositoryTest {
     fun oppdaterVirksomheterIEksportTabell__oppdater_virksomheter_som_er_bekreftet_eksportert_og_returnerer_antall_oppdatert() {
         val testStartDato = LocalDateTime.now()
         createVirksomhetBekreftetEksportert(
-            VirksomhetBekreftetEksportert(ORGNR_1, _2021_1, testStartDato)
+            VirksomhetBekreftetEksportert(Orgnr(ORGNR_VIRKSOMHET_1), _2021_1, testStartDato)
         )
         createVirksomhetBekreftetEksportert(
-            VirksomhetBekreftetEksportert(ORGNR_2, _2021_1, testStartDato)
+            VirksomhetBekreftetEksportert(Orgnr(ORGNR_VIRKSOMHET_2), _2021_1, testStartDato)
         )
         createVirksomhetEksportPerKvartal(
             VirksomhetEksportPerKvartalMedDatoer(
-                ORGNR_1, _2021_1, true, testStartDato
+                Orgnr(ORGNR_VIRKSOMHET_1), _2021_1, true, testStartDato
             )
         )
         createVirksomhetEksportPerKvartal(
-            VirksomhetEksportPerKvartalMedDatoer(ORGNR_2, _2021_1, false, null)
+            VirksomhetEksportPerKvartalMedDatoer(Orgnr(ORGNR_VIRKSOMHET_2), _2021_1, false, null)
         )
         createVirksomhetEksportPerKvartal(
-            VirksomhetEksportPerKvartalMedDatoer(ORGNR_3, _2021_1, false, null)
+            VirksomhetEksportPerKvartalMedDatoer(Orgnr(ORGNR_VIRKSOMHET_3), _2021_1, false, null)
         )
         val antallOppdatert =
             legacyEksporteringRepository.oppdaterAlleVirksomheterIEksportTabellSomErBekrreftetEksportert()
         Assertions.assertEquals(1, antallOppdatert)
         val results = hentAlleVirksomhetEksportPerKvartal()
-        assertVirksomhetEksportPerKvartal(results, ORGNR_1.verdi, true, testStartDato)
-        assertVirksomhetEksportPerKvartal(results, ORGNR_2.verdi, true, testStartDato, true)
-        assertVirksomhetEksportPerKvartal(results, ORGNR_3.verdi, false, testStartDato)
+        assertVirksomhetEksportPerKvartal(results, ORGNR_VIRKSOMHET_1, true, testStartDato)
+        assertVirksomhetEksportPerKvartal(results, ORGNR_VIRKSOMHET_2, true, testStartDato, true)
+        assertVirksomhetEksportPerKvartal(results, ORGNR_VIRKSOMHET_3, false, testStartDato)
     }
 
     @Test
@@ -277,14 +280,6 @@ open class LegacyEksporteringRepositoryTest {
     internal inner class VirksomhetBekreftetEksportert(
         var orgnr: Orgnr, var årstallOgKvartal: ÅrstallOgKvartal, var opprettet: LocalDateTime
     )
-
-    companion object {
-        val ORGNR_1 = Orgnr(ORGNR_VIRKSOMHET_1)
-        val ORGNR_2 = Orgnr(ORGNR_VIRKSOMHET_2)
-        val ORGNR_3 = Orgnr(ORGNR_VIRKSOMHET_3)
-        val _2021_1 = ÅrstallOgKvartal(2021, 1)
-    }
-
 
     fun opprettTestVirksomhetMetaData(
         jdbcTemplate: NamedParameterJdbcTemplate, årstall: Int, kvartal: Int, orgnr: String?

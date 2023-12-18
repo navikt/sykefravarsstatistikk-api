@@ -7,8 +7,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.*
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import testUtils.TestData.enNæringskode
-import testUtils.TestData.etOrgnr
 import java.math.BigDecimal
 
 class KvartalsvisSykefraværshistorikkServiceTest {
@@ -27,6 +25,8 @@ class KvartalsvisSykefraværshistorikkServiceTest {
             sykefraværStatistikkNæringskodeRepository = sykefraværStatistikkNæringskodeRepository
         )
 
+    val ET_ORGNR = Orgnr("971800534")
+
 
     @BeforeEach
     fun setUp() {
@@ -40,10 +40,10 @@ class KvartalsvisSykefraværshistorikkServiceTest {
     @Test
     fun hentSykefraværshistorikk__skal_returnere_en_næring_dersom_virksomhet_er_i_bransjeprogram_på_2_siffer_nivå() {
         val underenhet = Underenhet.Næringsdrivende(
-            orgnr = etOrgnr(),
-            overordnetEnhetOrgnr = etOrgnr(),
+            orgnr = ET_ORGNR,
+            overordnetEnhetOrgnr = ET_ORGNR,
             navn = "Underenhet AS",
-            næringskode = enNæringskode("10300"),
+            næringskode = Næringskode("10300"),
             antallAnsatte = 40
         )
         val kvartalsvisSykefraværshistorikk: List<KvartalsvisSykefraværshistorikkJson> =

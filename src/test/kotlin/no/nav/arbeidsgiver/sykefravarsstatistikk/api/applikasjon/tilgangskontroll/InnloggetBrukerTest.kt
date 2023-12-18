@@ -1,9 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangskontroll
 
 import io.kotest.matchers.shouldBe
-import testUtils.TestData.getInnloggetBruker
-import testUtils.TestData.getOrganisasjon
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.Fnr
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.InnloggetBruker
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnOrganisasjon
 import org.junit.jupiter.api.Test
 
 class InnloggetBrukerTest {
@@ -42,5 +43,22 @@ class InnloggetBrukerTest {
         bruker.brukerensOrganisasjoner = organisasjoner
 
         bruker.harTilgang(Orgnr(DUMMY_ORGNR)) shouldBe true
+    }
+
+    fun getInnloggetBruker(fnr: String?): InnloggetBruker {
+        val bruker = InnloggetBruker(Fnr(fnr!!))
+        bruker.brukerensOrganisasjoner = listOf(getOrganisasjon("999999999"), getOrganisasjon("111111111"))
+        return bruker
+    }
+
+    fun getOrganisasjon(organizationNumber: String?): AltinnOrganisasjon {
+        return AltinnOrganisasjon(
+            name = null,
+            type = null,
+            parentOrganizationNumber = null,
+            organizationNumber = organizationNumber,
+            organizationForm = null,
+            status = null
+        )
     }
 }

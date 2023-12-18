@@ -5,9 +5,8 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Br
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import testUtils.TestData.enNæringskode
-import testUtils.TestData.etOrgnr
 import ia.felles.definisjoner.bransjer.Bransje
+
 class BransjeTest {
     private fun Bransje.inkludererVirksomhet(virksomhet: Virksomhet): Boolean {
         return bransjeId.let {
@@ -96,7 +95,7 @@ class BransjeTest {
 
     private fun underenhetMedNæringskode(næringskode: String): Underenhet.Næringsdrivende {
         return Underenhet.Næringsdrivende(
-            etOrgnr(), Orgnr("053497180"), "Underenhet AS", enNæringskode(næringskode), 40
+            Orgnr("971800534"), Orgnr("053497180"), "Underenhet AS", Næringskode(næringskode), 40
         )
     }
 }

@@ -22,11 +22,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import testUtils.TestData.NÆRINGSKODE_2SIFFER
-import testUtils.TestData.NÆRINGSKODE_5SIFFER
-import testUtils.TestData.ORGNR_VIRKSOMHET_1
-import testUtils.TestData.ORGNR_VIRKSOMHET_2
-import testUtils.TestData.ORGNR_VIRKSOMHET_3
 import java.sql.ResultSet
 
 @ActiveProfiles("db-test")
@@ -42,6 +37,12 @@ open class VirksomhetMetadataRepositoryJdbcTest {
 
     @Autowired
     private lateinit var legacyVirksomhetMetadataRepository: LegacyVirksomhetMetadataRepository
+
+    private val ORGNR_VIRKSOMHET_1 = "987654321"
+    private val ORGNR_VIRKSOMHET_2 = "999999999"
+    private val ORGNR_VIRKSOMHET_3 = "999999777"
+    private val NÆRINGSKODE_5SIFFER = "10062"
+    private val NÆRINGSKODE_2SIFFER = "10"
 
     @BeforeEach
     fun setUp() {

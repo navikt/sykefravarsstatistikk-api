@@ -6,8 +6,6 @@ import io.mockk.spyk
 import io.mockk.verify
 import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.error.ProxyError
 import no.nav.arbeidsgiver.altinnrettigheter.proxy.klient.error.exceptions.AltinnException
-import testUtils.TestData.getInnloggetBruker
-import testUtils.TestData.getOrganisasjon
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.TilgangskontrollException
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.TilgangskontrollService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.Fnr
@@ -15,6 +13,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.tilgangsstyring.TokenService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.CorrelationIdFilter
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnOrganisasjon
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.altinn.AltinnService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetslog.Loggevent
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetslog.Sporbarhetslogg
@@ -30,13 +29,17 @@ class TilgangskontrollServiceTest {
     private val tokenXClient: TokenXClient = mockk(relaxed = true)
     private val sporbarhetslogg: Sporbarhetslogg = spyk()
 
+    private val FNR = "01082248486"
+    private val SERVICE_CODE = "7834"
+    private val SERVICE_EDITION = "3"
+
     private val tilgangskontroll: TilgangskontrollService = TilgangskontrollService(
-        altinnService,
-        tokenService,
-        sporbarhetslogg,
-        IAWEB_SERVICE_CODE,
-        IAWEB_SERVICE_EDITION,
-        tokenXClient
+        altinnService = altinnService,
+        tokenService = tokenService,
+        sporbarhetslogg = sporbarhetslogg,
+        iawebServiceCode = SERVICE_CODE,
+        iawebServiceEdition = SERVICE_EDITION,
+        tokenXClient = tokenXClient
     )
 
     @BeforeEach
@@ -104,8 +107,8 @@ class TilgangskontrollServiceTest {
                         true,
                         httpMetode,
                         requestUrl,
-                        IAWEB_SERVICE_CODE,
-                        IAWEB_SERVICE_EDITION
+                        SERVICE_CODE,
+                        SERVICE_EDITION
                     )
                 )
         }
@@ -128,9 +131,13 @@ class TilgangskontrollServiceTest {
         } returns bruker.brukerensOrganisasjoner
     }
 
-    companion object {
-        private const val FNR = "01082248486"
-        private const val IAWEB_SERVICE_CODE = "7834"
-        private const val IAWEB_SERVICE_EDITION = "3"
+    fun getInnloggetBruker(fnr: String?): InnloggetBruker {
+        val bruker = InnloggetBruker(Fnr(fnr!!))
+        bruker.brukerensOrganisasjoner = listOf(getOrganisasjon("999999999"), getOrganisasjon("111111111"))
+        return bruker
+    }
+
+    fun getOrganisasjon(organizationNumber: String?): AltinnOrganisasjon {
+        return AltinnOrganisasjon(null, null, null, organizationNumber, null, null)
     }
 }

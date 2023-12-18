@@ -20,8 +20,6 @@ import org.mockito.ArgumentMatchers
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import testUtils.TestData.ORGNR_VIRKSOMHET_1
-import testUtils.TestData.ORGNR_VIRKSOMHET_2
 
 internal class VirksomhetMetadataServiceTest {
     private val datavarehusRepository: KildeTilVirksomhetsdata = mock()
@@ -42,7 +40,11 @@ internal class VirksomhetMetadataServiceTest {
         sykefravarStatistikkVirksomhetGraderingRepository,
         legacyVirksomhetMetadataRepository,
     )
+
     private val __2020_4 = ÅrstallOgKvartal(2020, 4)
+
+    private val ORGNR_VIRKSOMHET_1 = "987654321"
+    private val ORGNR_VIRKSOMHET_2 = "999999999"
 
     @Test
     fun fullførPostImporteringOgForberedNesteEksport__returnerer_antall_virksomheter_som_skal_til_neste_eksport() {
