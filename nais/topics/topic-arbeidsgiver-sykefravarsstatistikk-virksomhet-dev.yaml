@@ -27,5 +27,5 @@ spec:
       application: min-side-arbeidsgiver-api
       access: read
     - team: team-dialog
-      application: sf-sykefravaersstatistikk
+      application: sf-sykefravarsstatistikk-virksomhet
       access: read
