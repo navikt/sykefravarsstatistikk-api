@@ -1,6 +1,6 @@
 @file:Suppress("SpringJavaInjectionPointsAutowiringInspection")
 
-package infrastruktur
+package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api
 
 import arrow.core.right
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -32,7 +32,7 @@ import java.net.http.HttpResponse
 import java.net.http.HttpResponse.BodyHandlers
 import java.time.LocalDate
 
-class AggregertApiIntegrationTest : SpringIntegrationTestbase() {
+class AggregertEndpointIntegrationTest : SpringIntegrationTestbase() {
     @Autowired
     lateinit var mockOAuth2Server: MockOAuth2Server
 

@@ -21,7 +21,6 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.web.server.LocalServerPort
-import java.io.IOException
 import java.math.BigDecimal
 import java.net.URI
 import java.net.http.HttpClient
@@ -31,7 +30,7 @@ import java.net.http.HttpResponse.BodyHandlers
 import java.time.LocalDate
 import java.util.stream.Collectors
 
-class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
+class KvartalsvisEndpointIntegrationTest : SpringIntegrationTestbase() {
     private val SISTE_PUBLISERTE_KVARTAL = ÅrstallOgKvartal(2022, 1)
 
     private val SISTE_ÅRSTALL: Int = SISTE_PUBLISERTE_KVARTAL.årstall
@@ -289,7 +288,6 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
     }
 
     @Test
-    @Throws(IOException::class, InterruptedException::class)
     fun `sykefraværshistorikk skal utføre_tilgangskontroll`() {
         val fnrUtenTilgang = "11122233344"
         val response = gjørKallMotKvartalsvis(ORGNR_UNDERENHET_INGEN_TILGANG, lagJwtBearer(pid = fnrUtenTilgang))
@@ -300,7 +298,6 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
 
     @Test
     fun `sykefraværshistorikk skal IKKE godkjenne en token uten pid og idp`() {
-
         val invalidJwtToken = "Bearer " + mockOAuth2Server.issueToken(
             issuerId = "tokenx",
             audience = "someaudience",
@@ -317,7 +314,6 @@ class ApiEndpointsIntegrationTest : SpringIntegrationTestbase() {
             .isEqualTo("{\"message\":\"You don't have access to this resource\"}")
     }
 
-    @Throws(IOException::class, InterruptedException::class)
     private fun gjørKallMotKvartalsvis(orgnr: String, jwtToken: String): HttpResponse<String> {
         return HttpClient.newBuilder()
             .build()
