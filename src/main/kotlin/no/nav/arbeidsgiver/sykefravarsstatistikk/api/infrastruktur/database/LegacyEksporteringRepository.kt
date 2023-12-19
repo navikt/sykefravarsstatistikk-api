@@ -57,7 +57,7 @@ class LegacyEksporteringRepository(
     fun batchOpprettVirksomheterBekreftetEksportert(
         virksomheterSomErBekreftetEksportert: List<String?>, årstallOgKvartal: ÅrstallOgKvartal
     ): Int {
-        val virksomheter = virksomheterSomErBekreftetEksportert.stream()
+        val virksomheter = virksomheterSomErBekreftetEksportert
             .map { orgnr: String? ->
                 BatchUpdateVirksomhetTilEksport(
                     orgnr,
@@ -67,7 +67,6 @@ class LegacyEksporteringRepository(
                     LocalDateTime.now()
                 )
             }
-            .toList()
         val batch = SqlParameterSourceUtils.createBatch(*virksomheter.toTypedArray())
         val results = namedParameterJdbcTemplate.batchUpdate(
             "insert into virksomheter_bekreftet_eksportert "
