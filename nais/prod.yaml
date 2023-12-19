@@ -12,6 +12,8 @@ spec:
     - https://sykefravarsstatistikk-api.prod-fss-pub.nais.io/ # bro mellom fss og gcp
   tokenx:
     enabled: true
+  secureLogs:
+    enabled: true
   accessPolicy:
     inbound:
       rules:

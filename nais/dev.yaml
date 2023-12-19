@@ -13,6 +13,8 @@ spec:
     - https://sykefravarsstatistikk-api.dev-fss-pub.nais.io/
   tokenx:
     enabled: true
+  secureLogs:
+    enabled: true
   accessPolicy:
     inbound:
       rules:

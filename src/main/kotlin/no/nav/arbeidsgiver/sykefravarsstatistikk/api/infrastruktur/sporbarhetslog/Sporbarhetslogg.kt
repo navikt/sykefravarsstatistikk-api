@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component
 
 @Component
 class Sporbarhetslogg {
+
+    private val SPORBARHETSLOGGER = LoggerFactory.getLogger("sporbarhetslogger")
+
     fun loggHendelse(event: Loggevent, kommentar: String?) {
         val extensions = getExtensions(event)
         extensions.add("cs5=$kommentar")
@@ -73,9 +76,5 @@ class Sporbarhetslogg {
         }
         extensions.add("sproc=" + MDC.get(CorrelationIdFilter.CORRELATION_ID_MDC_NAME))
         return extensions
-    }
-
-    companion object {
-        private val SPORBARHETSLOGGER = LoggerFactory.getLogger("sporbarhetslogger")
     }
 }
