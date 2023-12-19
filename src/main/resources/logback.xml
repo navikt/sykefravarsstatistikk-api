@@ -7,18 +7,20 @@
                     <mask>$1***********</mask>
                 </valueMask>
             </jsonGeneratorDecorator>
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
         </encoder>
     </appender>
-    <appender name="sporbarhetsloggAppender" class="com.papertrailapp.logback.Syslog4jAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>%m%n%xEx</pattern>
-        </layout>
-        <syslogConfig class="org.productivity.java.syslog4j.impl.net.tcp.TCPNetSyslogConfig">
-            <host>audit.nais</host>
-            <port>6514</port>
-            <ident>sykefravarsstatistikk-api</ident>
-            <maxMessageLength>128000</maxMessageLength>
-        </syslogConfig>
+    <appender name="sporbarhetsloggAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/secure-logs/secure.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>/secure-logs/secure.log.%i</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>1</maxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>128MB</maxFileSize>
+        </triggeringPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
     <logger level="INFO" name="sporbarhetslogger" additivity="false">
         <appender-ref ref="sporbarhetsloggAppender"/>
@@ -29,5 +31,4 @@
     </root>
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
     <logger name="org.springframework.web" level="info"/>
-    <logger name="no.nav.security.token.support.spring.test" level="info"/>
 </configuration>
