@@ -44,7 +44,7 @@ class PubliseringsdatoerRepository(
                 this[oppdatertIDvh] = it.oppdatertDato
                 this[aktivitet] = it.aktivitet
             }
-        }
+        }.count()
         log.info("Antall rader satt inn i 'publiseringsdatoer': $antallRaderSattInn")
     }
 }
