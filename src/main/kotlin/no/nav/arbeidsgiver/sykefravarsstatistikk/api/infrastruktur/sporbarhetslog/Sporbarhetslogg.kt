@@ -3,12 +3,13 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.sporbarhetsl
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.CorrelationIdFilter
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
+import org.slf4j.MarkerFactory
 import org.springframework.stereotype.Component
 
 @Component
 class Sporbarhetslogg {
-
-    private val SPORBARHETSLOGGER = LoggerFactory.getLogger("sporbarhetslogger")
+    private val sporbarhetslogger = LoggerFactory.getLogger(this::class.java)
+    private val secureMarker = MarkerFactory.getMarker("SECURE_LOG")
 
     fun loggHendelse(event: Loggevent, kommentar: String?) {
         val extensions = getExtensions(event)
@@ -16,18 +17,18 @@ class Sporbarhetslogg {
         extensions.add("cs5Label=Kommentar")
         val loggmelding = lagLoggmelding(extensions, event.harTilgang)
         if (event.harTilgang) {
-            SPORBARHETSLOGGER.info(loggmelding)
+            sporbarhetslogger.info(secureMarker, loggmelding)
         } else {
-            SPORBARHETSLOGGER.warn(loggmelding)
+            sporbarhetslogger.warn(secureMarker, loggmelding)
         }
     }
 
     fun loggHendelse(event: Loggevent) {
         val loggmelding = lagLoggmelding(getExtensions(event), event.harTilgang)
         if (event.harTilgang) {
-            SPORBARHETSLOGGER.info(loggmelding)
+            sporbarhetslogger.info(secureMarker, loggmelding)
         } else {
-            SPORBARHETSLOGGER.warn(loggmelding)
+            sporbarhetslogger.warn(secureMarker, loggmelding)
         }
     }
 
