@@ -27,7 +27,7 @@
         <altinn-rettigheter-proxy-klient.version>3.1.0</altinn-rettigheter-proxy-klient.version>
         <micrometer.version>1.11.2</micrometer.version>
         <prometheus.version>0.16.0</prometheus.version>
-        <wiremock.version>3.0.1</wiremock.version>
+        <wiremock.version>3.3.1</wiremock.version>
         <shedlock.version>5.6.0</shedlock.version>
         <shedlock-provider-jdbc-template.version>4.33.0
         </shedlock-provider-jdbc-template.version>
@@ -268,7 +268,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.tomakehurst</groupId>
+            <groupId>org.wiremock</groupId>
             <artifactId>wiremock-standalone</artifactId>
             <version>${wiremock.version}</version>
             <scope>test</scope>
