@@ -16,7 +16,7 @@ class PubliseringdatoInfoImportCron(
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    @Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 0 9 * * ?")
     fun scheduledImport() {
         val lockAtMostFor = Duration.of(10, ChronoUnit.MINUTES)
         val lockAtLeastFor = Duration.of(1, ChronoUnit.MINUTES)
