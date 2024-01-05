@@ -59,6 +59,4 @@ open class VirksomhetMetadataRepository(
     open fun slettVirksomhetMetadata(): Int = transaction {
         deleteAll()
     }
-
-
 }

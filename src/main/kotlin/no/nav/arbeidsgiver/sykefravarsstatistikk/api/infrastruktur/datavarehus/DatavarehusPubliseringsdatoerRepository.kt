@@ -16,7 +16,6 @@ open class DatavarehusPubliseringsdatoerRepository(
     val rapportPeriode = integer("rapport_periode")
     val offentligDato = date("offentlig_dato")
     val oppdatertDato = date("oppdatert_dato")
-    val aktivitet = text("aktivitet")
     val tabellNavn = text("TABELL_NAVN")
     val periodeType = text("PERIODE_TYPE")
 
@@ -26,7 +25,6 @@ open class DatavarehusPubliseringsdatoerRepository(
                 rapportPeriode,
                 offentligDato,
                 oppdatertDato,
-                aktivitet
             ).select {
                 (tabellNavn eq "AGG_FAK_SYKEFRAVAR_DIA") and (periodeType eq "KVARTAL")
             }.orderBy(offentligDato to SortOrder.DESC)
@@ -35,7 +33,6 @@ open class DatavarehusPubliseringsdatoerRepository(
                         rapportPeriode = it[rapportPeriode],
                         offentligDato = it[offentligDato],
                         oppdatertDato = it[oppdatertDato],
-                        aktivitet = it[aktivitet]
                     )
                 }
 

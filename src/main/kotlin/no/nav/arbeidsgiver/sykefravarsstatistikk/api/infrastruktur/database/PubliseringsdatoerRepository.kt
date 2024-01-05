@@ -15,7 +15,6 @@ class PubliseringsdatoerRepository(
     val rapportPeriode = integer("rapport_periode")
     val offentligDato = date("offentlig_dato")
     val oppdatertIDvh = date("oppdatert_i_dvh")
-    val aktivitet = varchar("aktivitet", length = 255)
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -27,7 +26,6 @@ class PubliseringsdatoerRepository(
                         rapportPeriode = it[rapportPeriode],
                         offentligDato = it[offentligDato],
                         oppdatertDato = it[oppdatertIDvh],
-                        aktivitet = it[aktivitet],
                     )
                 }
         }
@@ -42,7 +40,6 @@ class PubliseringsdatoerRepository(
                 this[rapportPeriode] = it.rapportPeriode
                 this[offentligDato] = it.offentligDato
                 this[oppdatertIDvh] = it.oppdatertDato
-                this[aktivitet] = it.aktivitet
             }
         }.count()
         log.info("Antall rader satt inn i 'publiseringsdatoer': $antallRaderSattInn")

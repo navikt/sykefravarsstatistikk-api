@@ -49,7 +49,6 @@ class PubliseringsdatoerApiIntegrationTest : SpringIntegrationTestbase() {
                     0,
                     LocalDate.parse("2022-09-08"),
                     LocalDate.parse("2022-01-01"),
-                    "stiv heks"
                 )
             )
         )

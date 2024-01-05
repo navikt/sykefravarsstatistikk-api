@@ -17,7 +17,6 @@ class DatavarehusAggregertRepositoryV1(
     val orgnr = char("orgnr", 9)
     val næringskode = varchar("naering_kode", 5)
     val varighet = varchar("varighet", 1).nullable()
-    val sektor = varchar("sektor", 1)
     val tapteDagsverk = double("taptedv")
     val muligeDagsverk = double("muligedv")
     val antallPersoner = integer("antpers")

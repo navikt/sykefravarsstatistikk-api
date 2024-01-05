@@ -40,7 +40,6 @@ internal class PubliseringsdatoerImportServiceTest {
                 202202,
                 LocalDate.MIN,
                 LocalDate.MIN,
-                "sykefravær for en periode"
             )
         )
         Mockito.`when`(mockDatavarehusPubliseringsdatoerRepository!!.hentPubliseringsdatoerFraDvh())

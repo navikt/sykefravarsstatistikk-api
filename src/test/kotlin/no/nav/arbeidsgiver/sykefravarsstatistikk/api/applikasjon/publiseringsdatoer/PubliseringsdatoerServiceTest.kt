@@ -21,25 +21,21 @@ internal class PubliseringsdatoerServiceTest {
             202201,
             LocalDate.parse("2022-06-02"),
             LocalDate.parse("2021-11-01"),
-            "Sykefravær pr 1. kvartal 2022"
         ),
         Publiseringsdato(
             202104,
             LocalDate.parse("2022-03-03"),
             LocalDate.parse("2021-11-01"),
-            "Sykefravær pr 4. kvartal 2021"
         ),
         Publiseringsdato(
             202203,
             LocalDate.parse("2022-12-01"),
             LocalDate.parse("2021-11-01"),
-            "Sykefravær pr 3. kvartal 2022"
         ),
         Publiseringsdato(
             202202,
             LocalDate.parse("2022-09-08"),
             LocalDate.parse("2021-11-01"),
-            "Sykefravær pr 2. kvartal 2022"
         )
     )
     private var serviceUnderTest: PubliseringsdatoerService? = null
