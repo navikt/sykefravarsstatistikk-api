@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - eksport_dev
+      - eksporter-metadata-dev
     paths-ignore:
       - '**.md'
       - '**/**.md'
