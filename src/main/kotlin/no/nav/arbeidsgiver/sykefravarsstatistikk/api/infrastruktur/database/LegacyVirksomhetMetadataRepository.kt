@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component
 import java.sql.ResultSet
 
 @Component
-@Deprecated("Brukes kun av legacy Kafka-strøm, som skal fases ut.")
 open class LegacyVirksomhetMetadataRepository(
     @param:Qualifier("sykefravarsstatistikkJdbcTemplate") private val namedParameterJdbcTemplate: NamedParameterJdbcTemplate,
     private val virksomhetMetadataRepository: VirksomhetMetadataRepository,

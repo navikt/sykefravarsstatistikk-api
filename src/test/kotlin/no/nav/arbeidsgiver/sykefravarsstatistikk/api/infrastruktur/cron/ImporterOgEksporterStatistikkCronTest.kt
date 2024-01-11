@@ -12,7 +12,6 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImportEk
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringMetadataVirksomhetService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringPerStatistikkKategoriService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.LegacyEksporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.SykefraværsstatistikkImporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer.Publiseringsdatoer
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer.PubliseringsdatoerService
@@ -27,7 +26,6 @@ class ImporterOgEksporterStatistikkCronTest {
     private val importeringService = mockk<SykefraværsstatistikkImporteringService>()
     private val importEksportStatusRepository = mockk<ImportEksportStatusRepository>(relaxed = true)
     private val virksomhetMetadataService = mockk<VirksomhetMetadataService>()
-    private val eksporteringsService = mockk<LegacyEksporteringService>()
     private val eksporteringPerStatistikkKategoriService = mockk<EksporteringPerStatistikkKategoriService>()
     private val eksporteringMetadataVirksomhetService = mockk<EksporteringMetadataVirksomhetService>()
     private val publiseringsdatoerService = mockk<PubliseringsdatoerService>()
@@ -38,7 +36,6 @@ class ImporterOgEksporterStatistikkCronTest {
         registry = mockk(relaxed = true),
         importEksportStatusRepository = importEksportStatusRepository,
         virksomhetMetadataService = virksomhetMetadataService,
-        eksporteringsService = eksporteringsService,
         eksporteringPerStatistikkKategoriService = eksporteringPerStatistikkKategoriService,
         eksporteringMetadataVirksomhetService = eksporteringMetadataVirksomhetService,
         publiseringsdatoerService = publiseringsdatoerService,
@@ -52,9 +49,6 @@ class ImporterOgEksporterStatistikkCronTest {
         // Defaults to happy case
         every { importeringService.importerHvisDetFinnesNyStatistikk() } returns Unit
         every { virksomhetMetadataService.overskrivMetadataForVirksomheter(any()) } returns 1.right()
-        every { virksomhetMetadataService.overskrivNæringskoderForVirksomheter(any()) } returns 1.right()
-        every { virksomhetMetadataService.forberedNesteEksport(any(), any()) } returns 1.right()
-        every { eksporteringsService.legacyEksporter(any()) } returns 1.right()
         every { eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(any()) } returns Unit.right()
         every { eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(any(), any()) } returns Unit
         every { publiseringsdatoerService.hentPubliseringsdatoer() } returns
@@ -105,7 +99,6 @@ class ImporterOgEksporterStatistikkCronTest {
         importerOgEksporterStatistikkCron.gjennomførImportOgEksport()
 
         verify(exactly = 0) { virksomhetMetadataService.overskrivMetadataForVirksomheter(any()) }
-        verify(exactly = 1) { virksomhetMetadataService.overskrivNæringskoderForVirksomheter(any()) }
     }
 
     @Test

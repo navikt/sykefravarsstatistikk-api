@@ -56,11 +56,6 @@ class ImportOgEksportAvEnkeltkvartalerCron(
                     return
                 }
 
-            virksomhetMetadataService.overskrivNæringskoderForVirksomheter(kvartal)
-                .getOrElse {
-                    noeFeiletCounter.increment()
-                    return
-                }
             log.info("Overskriving av metadata for $kvartal er fullført")
 
             log.info("Eksporterer metadata for $kvartal...")

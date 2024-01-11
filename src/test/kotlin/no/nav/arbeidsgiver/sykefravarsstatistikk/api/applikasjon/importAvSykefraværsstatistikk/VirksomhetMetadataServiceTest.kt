@@ -1,155 +1,17 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.KildeTilVirksomhetsdata
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.VirksomhetMetadataService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetMetadata
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetMetadataMedNæringskode
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Næringskode
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Orgenhet
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.LegacyEksporteringRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.LegacyVirksomhetMetadataRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.LegacyKafkaUtsendingHistorikkRepository
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 internal class VirksomhetMetadataServiceTest {
     private val datavarehusRepository: KildeTilVirksomhetsdata = mock()
 
     private val virksomhetMetadataRepository: VirksomhetMetadataRepository = mock()
 
-    private val legacyEksporteringRepository: LegacyEksporteringRepository = mock()
-
-    private val legacyKafkaUtsendingHistorikkRepository: LegacyKafkaUtsendingHistorikkRepository = mock()
-    private val sykefravarStatistikkVirksomhetGraderingRepository =
-        mock<SykefravarStatistikkVirksomhetGraderingRepository>()
-    val legacyVirksomhetMetadataRepository = mock<LegacyVirksomhetMetadataRepository>()
-    private var service: VirksomhetMetadataService = VirksomhetMetadataService(
-        datavarehusRepository,
-        virksomhetMetadataRepository,
-        legacyEksporteringRepository,
-        legacyKafkaUtsendingHistorikkRepository,
-        sykefravarStatistikkVirksomhetGraderingRepository,
-        legacyVirksomhetMetadataRepository,
-    )
-
-    private val __2020_4 = ÅrstallOgKvartal(2020, 4)
-
-    private val ORGNR_VIRKSOMHET_1 = "987654321"
-    private val ORGNR_VIRKSOMHET_2 = "999999999"
-
     @Test
-    fun fullførPostImporteringOgForberedNesteEksport__returnerer_antall_virksomheter_som_skal_til_neste_eksport() {
-        mockImportVirksomhetMetadata(getOrgenhetListe(__2020_4))
-        mockImportVirksomhetNæringskode5sifferMapping(
-            getVirksomhetMetadataNæringskode5sifferListe(__2020_4)
-        )
-        mockForberedNesteEksport(__2020_4, getVirksomhetMetadataListe(__2020_4))
-        service.overskrivMetadataForVirksomheter(__2020_4)
-        service.overskrivNæringskoderForVirksomheter(__2020_4)
-        val antall = service.forberedNesteEksport(__2020_4, true).getOrNull()
-        Assertions.assertEquals(2, antall)
-    }
-
-    private fun mockForberedNesteEksport(
-        årstallOgKvartal: ÅrstallOgKvartal, virksomhetMetadataListe: List<VirksomhetMetadata>
-    ) {
-        whenever(
-            legacyVirksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(
-                årstallOgKvartal
-            )
-        )
-            .thenReturn(virksomhetMetadataListe)
-        whenever(legacyEksporteringRepository.opprettEksport(ArgumentMatchers.any()))
-            .thenReturn(virksomhetMetadataListe.size)
-    }
-
-    private fun mockImportVirksomhetMetadata(
-        orgenhetSomSkalTilVirksomhetMetadata: List<Orgenhet>
-    ) {
-        whenever(datavarehusRepository.hentVirksomheter(any<ÅrstallOgKvartal>()))
-            .thenReturn(orgenhetSomSkalTilVirksomhetMetadata)
-        whenever(virksomhetMetadataRepository.opprettVirksomhetMetadata(any()))
-            .thenReturn(orgenhetSomSkalTilVirksomhetMetadata.size)
-    }
-
-    private fun mockImportVirksomhetNæringskode5sifferMapping(
-        virksomhetMetadataMedNæringskodeListe: List<VirksomhetMetadataMedNæringskode>
-    ) {
-        whenever(
-            sykefravarStatistikkVirksomhetGraderingRepository.hentVirksomhetMetadataMedNæringskode(
-                any<ÅrstallOgKvartal>()
-            )
-        )
-            .thenReturn(virksomhetMetadataMedNæringskodeListe)
-
-        whenever(legacyVirksomhetMetadataRepository.opprettVirksomhetMetadataNæringskode5siffer(any()))
-            .thenReturn(virksomhetMetadataMedNæringskodeListe.size)
-    }
-
-    private fun getVirksomhetMetadataNæringskode5sifferListe(
-        årstallOgKvartal: ÅrstallOgKvartal
-    ): List<VirksomhetMetadataMedNæringskode> {
-        val virksomhetMetadataMedNæringskode: MutableList<VirksomhetMetadataMedNæringskode> = ArrayList()
-        virksomhetMetadataMedNæringskode.add(
-            VirksomhetMetadataMedNæringskode(
-                Orgnr(ORGNR_VIRKSOMHET_1),
-                årstallOgKvartal,
-                Næringskode("10101")
-            )
-        )
-        virksomhetMetadataMedNæringskode.add(
-            VirksomhetMetadataMedNæringskode(
-                Orgnr(ORGNR_VIRKSOMHET_1),
-                årstallOgKvartal,
-                Næringskode("10102")
-            )
-        )
-        virksomhetMetadataMedNæringskode.add(
-            VirksomhetMetadataMedNæringskode(
-                Orgnr(ORGNR_VIRKSOMHET_1),
-                årstallOgKvartal,
-                Næringskode("20101")
-            )
-        )
-        return virksomhetMetadataMedNæringskode
-    }
-
-    private fun getOrgenhetListe(årstallOgKvartal: ÅrstallOgKvartal): List<Orgenhet> {
-        val orgenhetSomSkalTilVirksomhetMetadata: MutableList<Orgenhet> = ArrayList()
-        orgenhetSomSkalTilVirksomhetMetadata.add(
-            Orgenhet(
-                Orgnr(ORGNR_VIRKSOMHET_1), "Virksomhet 1", "2", Sektor.PRIVAT, "10", "10000", årstallOgKvartal
-            )
-        )
-        orgenhetSomSkalTilVirksomhetMetadata.add(
-            Orgenhet(
-                Orgnr(ORGNR_VIRKSOMHET_2), "Virksomhet 2", "2", Sektor.PRIVAT, "20", "20000", årstallOgKvartal
-            )
-        )
-        return orgenhetSomSkalTilVirksomhetMetadata
-    }
-
-    private fun getVirksomhetMetadataListe(årstallOgKvartal: ÅrstallOgKvartal): List<VirksomhetMetadata> {
-        val virksomhetMetadataListe: MutableList<VirksomhetMetadata> = ArrayList()
-        virksomhetMetadataListe.add(
-            VirksomhetMetadata(
-                Orgnr(ORGNR_VIRKSOMHET_1), "Virksomhet 1", "2", Sektor.PRIVAT, "10", "10000", årstallOgKvartal
-            )
-        )
-        virksomhetMetadataListe.add(
-            VirksomhetMetadata(
-                Orgnr(ORGNR_VIRKSOMHET_2), "Virksomhet 2", "2", Sektor.PRIVAT, "20", "20000", årstallOgKvartal
-            )
-        )
-        return virksomhetMetadataListe
+    fun `Tester at import av metadata går som vi forventer`() {
+        TODO()
     }
 }

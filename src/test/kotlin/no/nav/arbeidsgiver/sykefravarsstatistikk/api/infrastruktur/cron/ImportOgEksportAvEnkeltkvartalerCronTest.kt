@@ -28,7 +28,6 @@ class ImportOgEksportAvEnkeltkvartalerCronTest {
     @Test
     fun `gjennomfør jobb burde importere og eksportere riktig antall kvartaler`() {
         whenever(virksomhetMetadataService.overskrivMetadataForVirksomheter(any())).thenReturn(1.right())
-        whenever(virksomhetMetadataService.overskrivNæringskoderForVirksomheter(any())).thenReturn(1.right())
         whenever(eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(any())).thenReturn(Unit.right())
 
         val kvartaler =  ÅrstallOgKvartal(2021, 4) inkludertTidligere 7

@@ -3,29 +3,17 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykef
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetEksportPerKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetMetadata
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Orgnr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.domene.Orgenhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.fjernDupliserteOrgnr
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.LegacyEksporteringRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.LegacyVirksomhetMetadataRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.SykefravarStatistikkVirksomhetGraderingRepository
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database.VirksomhetMetadataRepository
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.LegacyKafkaUtsendingHistorikkRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import java.util.stream.Collectors
 
 @Component
 class VirksomhetMetadataService(
     private val kildeTilVirksomhetsdata: KildeTilVirksomhetsdata,
     private val virksomhetMetadataRepository: VirksomhetMetadataRepository,
-    private val legacyEksporteringRepository: LegacyEksporteringRepository,
-    private val legacyKafkaUtsendingHistorikkRepository: LegacyKafkaUtsendingHistorikkRepository,
-    private val sykefravarStatistikkVirksomhetGraderingRepository: SykefravarStatistikkVirksomhetGraderingRepository,
-    private val legacyVirksomhetMetadataRepository: LegacyVirksomhetMetadataRepository,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -44,72 +32,6 @@ class VirksomhetMetadataService(
         }
     }
 
-    fun overskrivNæringskoderForVirksomheter(årstallOgKvartal: ÅrstallOgKvartal): Either<IngenRaderImportert, Int> {
-        val antallRaderOpprettet = importVirksomhetNæringskode(årstallOgKvartal)
-        log.info(
-            "Importering av $antallRaderOpprettet rader med næringskodemappinger ferdig."
-        )
-        return if (antallRaderOpprettet > 0) {
-            antallRaderOpprettet.right()
-        } else {
-            IngenRaderImportert.left()
-        }
-    }
-
-    object ForrigeEksportIkkeFerdig
-
-    @Deprecated("Brukes bare av legacy Kafka-strøm, som skal fases ut.")
-    fun forberedNesteEksport(
-        årstallOgKvartal: ÅrstallOgKvartal,
-        slettHistorikk: Boolean
-    ): Either<ForrigeEksportIkkeFerdig, Int> {
-        log.info("Forberede neste eksport: prosessen starter.")
-        if (slettHistorikk) {
-            val slettUtsendingHistorikkStart = System.currentTimeMillis()
-            val antallRaderSlettetIUtsendingHistorikk = legacyKafkaUtsendingHistorikkRepository.slettHistorikk()
-            log.info(
-                "Forberede neste eksport: utsending historikk (working table) har blitt nullstilt. "
-                        + "{} rader har blitt slettet. Tok {} millis. ",
-                antallRaderSlettetIUtsendingHistorikk,
-                System.currentTimeMillis() - slettUtsendingHistorikkStart
-            )
-        } else {
-            log.info("Forberede neste eksport: skal ikke slette historikk.")
-        }
-        val antallIkkeEksportertSykefaværsstatistikk = legacyEksporteringRepository.hentAntallIkkeFerdigEksportert()
-        if (antallIkkeEksportertSykefaværsstatistikk > 0) {
-            log.warn(
-                "Det finnes '{}' rader som IKKE er ferdig eksportert (eksportert=false). "
-                        + "Skal ikke importere en ny liste av virksomheter i 'eksport_per_kvartal' da det ligger "
-                        + "fortsatt noen rader markert som ikke eksportert. "
-                        + "Du kan enten kjøre ferdig siste eksport eller oppdatere manuelt gjenstående rader "
-                        + "med 'eksportert=true' i tabell 'eksport_per_kvartal'. "
-                        + "Etter det kan du kjøre denne prosessen (forbered neste eksport) på nytt. ",
-                antallIkkeEksportertSykefaværsstatistikk
-            )
-            // Vi er ikke ferdige med forrige eksport enda 💀
-            return ForrigeEksportIkkeFerdig.left()
-        }
-
-        // Starter å forberede neste eksport:
-        val antallSlettetEksportertPerKvartal = legacyEksporteringRepository.slettEksportertPerKvartal()
-        log.info(
-            "Slettet '{}' rader fra forrige eksportering.",
-            antallSlettetEksportertPerKvartal
-        )
-        val virksomhetMetadata =
-            legacyVirksomhetMetadataRepository.hentVirksomhetMetadataMedNæringskoder(
-                årstallOgKvartal
-            )
-        val virksomhetEksportPerKvartalListe = mapToVirksomhetEksportPerKvartal(virksomhetMetadata)
-        log.info(
-            "Skal gjøre klar '{}' virksomheter til neste eksportering. ",
-            virksomhetEksportPerKvartalListe.size
-        )
-        val antallOpprettet = legacyEksporteringRepository.opprettEksport(virksomhetEksportPerKvartalListe)
-        log.info("Antall rader opprettet til neste eksportering: {}", antallOpprettet)
-        return antallOpprettet.right()
-    }
 
     private fun overskrivVirksomhetMetadata(årstallOgKvartal: ÅrstallOgKvartal): Int {
         val virksomheter = kildeTilVirksomhetsdata.hentVirksomheter(årstallOgKvartal).fjernDupliserteOrgnr()
@@ -128,68 +50,19 @@ class VirksomhetMetadataService(
             årstallOgKvartal.kvartal
         )
         val antallOpprettet = virksomhetMetadataRepository.opprettVirksomhetMetadata(
-            mapToVirksomhetMetadata(virksomheter)
+            virksomheter.map {
+                VirksomhetMetadata(
+                    it.orgnr,
+                    it.navn!!,
+                    it.rectype!!,
+                    it.sektor!!,
+                    it.næring!!,
+                    it.næringskode!!,
+                    it.årstallOgKvartal
+                )
+            }
         )
         log.info("Antall rader VirksomhetMetadata opprettet: {}", antallOpprettet)
         return antallOpprettet
-    }
-
-    private fun importVirksomhetNæringskode(årstallOgKvartal: ÅrstallOgKvartal): Int {
-        val virksomhetMetadataNæringskode5siffer =
-            sykefravarStatistikkVirksomhetGraderingRepository.hentVirksomhetMetadataMedNæringskode(
-                årstallOgKvartal
-            )
-        if (virksomhetMetadataNæringskode5siffer.isEmpty()) {
-            log.warn(
-                "Ingen virksomhetMetadataNæringskode5siffer funnet i vår statistikktabell. Stopper import. "
-            )
-            return 0
-        }
-        val antallSlettetNæringskode5Siffer = legacyVirksomhetMetadataRepository.slettNæringOgNæringskode5siffer()
-        log.info(
-            "Slettet '{}' eksisterende NæringOgNæringskode5siffer. ", antallSlettetNæringskode5Siffer
-        )
-        val antallOpprettet = legacyVirksomhetMetadataRepository.opprettVirksomhetMetadataNæringskode5siffer(
-            virksomhetMetadataNæringskode5siffer
-        )
-        log.info(
-            "Antall rader VirksomhetMetadataNæringskode5siffer opprettet: {}",
-            antallOpprettet
-        )
-        return antallOpprettet
-    }
-
-    companion object {
-        private fun mapToVirksomhetMetadata(orgenhetList: List<Orgenhet>?): List<VirksomhetMetadata> {
-            return orgenhetList!!.stream()
-                .map { (orgnr, navn, rectype, sektor, næring, næringskode, årstallOgKvartal): Orgenhet ->
-                    VirksomhetMetadata(
-                        orgnr,
-                        navn!!,
-                        rectype!!,
-                        sektor!!,
-                        næring!!,
-                        næringskode!!,
-                        årstallOgKvartal
-                    )
-                }
-                .collect(Collectors.toList())
-        }
-
-        private fun mapToVirksomhetEksportPerKvartal(
-            virksomhetMetadataList: List<VirksomhetMetadata>
-        ): List<VirksomhetEksportPerKvartal> {
-            return virksomhetMetadataList.stream()
-                .map { virksomhetMetadata: VirksomhetMetadata ->
-                    VirksomhetEksportPerKvartal(
-                        Orgnr(virksomhetMetadata.orgnr),
-                        ÅrstallOgKvartal(
-                            virksomhetMetadata.årstall, virksomhetMetadata.kvartal
-                        ),
-                        false
-                    )
-                }
-                .collect(Collectors.toList())
-        }
     }
 }
