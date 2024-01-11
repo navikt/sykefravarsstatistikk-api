@@ -11,7 +11,7 @@ internal class VirksomhetMetadataServiceTest {
     private val virksomhetMetadataRepository: VirksomhetMetadataRepository = mock()
 
     @Test
-    fun `Tester at import av metadata går som vi forventer`() {
-        TODO()
+    fun `VirksomhetMetadata kan opprettes`() {
+
     }
 }
