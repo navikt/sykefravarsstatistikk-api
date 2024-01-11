@@ -15,10 +15,6 @@ enum class Varighetskategori(val kode: Char?) {
     }
 
     companion object {
-        fun fraKode(kode: Char?): Varighetskategori =
-            Varighetskategori.entries.find { it.kode == kode }
-                ?: throw IllegalArgumentException("Det finnes ingen sykefraværsvarighet med kode $kode")
-
         val kortidsvarigheter = listOf(
             TOTAL, _1_DAG_TIL_7_DAGER,
             _8_DAGER_TIL_16_DAGER

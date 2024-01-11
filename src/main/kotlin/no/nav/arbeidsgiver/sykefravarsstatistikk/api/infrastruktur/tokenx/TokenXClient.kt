@@ -66,8 +66,8 @@ open class TokenXClient(
             }
             throw httpClientErrorException
         }
-        val body: TokenExchangeResponse = responseEntity.body
-        return JwtToken(body.access_token)
+        val body: TokenExchangeResponse? = responseEntity.body
+        return JwtToken(body?.access_token)
     }
 
     @Throws(GeneralException::class, IOException::class)
@@ -118,9 +118,6 @@ open class TokenXClient(
 
     private class TokenExchangeResponse {
         var access_token: String? = null
-        var issued_token_type: String? = null
-        var token_type: String? = null
-        var expires_in: String? = null
     }
 
     companion object {

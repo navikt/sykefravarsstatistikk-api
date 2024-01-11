@@ -115,13 +115,12 @@ internal class EksporteringBransjeServiceTest {
 
         val melding = StatistikkategoriKafkamelding(
             SykefraværMedKategori(
-                Statistikkategori.BRANSJE,
-                Bransje.ANLEGG.name,
-                2023,
-                2,
-                BigDecimal.ONE,
-                BigDecimal.ONE,
-                5
+                statistikkategori = Statistikkategori.BRANSJE,
+                kode = Bransje.ANLEGG.name,
+                årstallOgKvartal = ÅrstallOgKvartal(2023, 2),
+                tapteDagsverk = "1.0".toBigDecimal(),
+                muligeDagsverk = "1.0".toBigDecimal(),
+                antallPersoner = 5
             ),
             SykefraværFlereKvartalerForEksport(
                 listOf(
