@@ -27,7 +27,7 @@ class ImportOgEksportAvEnkeltkvartalerCron(
     private val log = LoggerFactory.getLogger(this::class.java)
     private val noeFeiletCounter: Counter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
 
-    @Scheduled(cron = "0 50 14 11 01 ?")
+    @Scheduled(cron = "0 50 13 11 01 ?")
     fun scheduledManuellEksportCron() {
         val kategorier = Statistikkategori.entries.filter {it != Statistikkategori.VIRKSOMHET_GRADERT}
         val __2019_3 = listOf( ÅrstallOgKvartal(2019, 3))
