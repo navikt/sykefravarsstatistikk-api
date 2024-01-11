@@ -21,48 +21,37 @@ class VirksomhetMetadataService(
 
 
     fun overskrivMetadataForVirksomheter(årstallOgKvartal: ÅrstallOgKvartal): Either<IngenRaderImportert, Int> {
-        val antallRaderOpprettet = overskrivVirksomhetMetadata(årstallOgKvartal)
+        val virksomheter = kildeTilVirksomhetsdata.hentVirksomheter(årstallOgKvartal).fjernDupliserteOrgnr()
+
+        if (virksomheter.isEmpty()) {
+            log.warn(
+                "Stopper import av metadata. Fant ingen virksomheter for $årstallOgKvartal.",
+            )
+            return IngenRaderImportert.left()
+        }
+
+        log.info("Antall virksomheter til import: {}", virksomheter.size)
+
+        val antallSlettet = virksomhetMetadataRepository.slettVirksomhetMetadata()
+
         log.info(
-            "Importering av $antallRaderOpprettet rader VirksomhetMetadata ferdig."
+            "Slettet '{}' rader VirksomhetMetadata for {}'",
+            antallSlettet,
+            årstallOgKvartal,
         )
-        return if (antallRaderOpprettet > 0) {
-            antallRaderOpprettet.right()
+
+        val antallOpprettet = virksomhetMetadataRepository.opprettVirksomhetMetadata(
+            virksomheter.map { it.tilDomene() }
+        )
+
+        log.info("Antall rader VirksomhetMetadata opprettet: {}", antallOpprettet)
+        log.info("Importering av $antallOpprettet rader VirksomhetMetadata ferdig.")
+
+        return if (antallOpprettet > 0) {
+            antallOpprettet.right()
         } else {
             IngenRaderImportert.left()
         }
     }
 
-
-    private fun overskrivVirksomhetMetadata(årstallOgKvartal: ÅrstallOgKvartal): Int {
-        val virksomheter = kildeTilVirksomhetsdata.hentVirksomheter(årstallOgKvartal).fjernDupliserteOrgnr()
-        if (virksomheter.isEmpty()) {
-            log.warn(
-                "Stopper import av metadata. Fant ingen virksomheter for $årstallOgKvartal.",
-            )
-            return 0
-        }
-        log.info("Antall virksomheter fra DVH: {}", virksomheter.size)
-        val antallSlettet = virksomhetMetadataRepository.slettVirksomhetMetadata()
-        log.info(
-            "Slettet '{}' VirksomhetMetadata for årstall '{}' og kvartal '{}'",
-            antallSlettet,
-            årstallOgKvartal.årstall,
-            årstallOgKvartal.kvartal
-        )
-        val antallOpprettet = virksomhetMetadataRepository.opprettVirksomhetMetadata(
-            virksomheter.map {
-                VirksomhetMetadata(
-                    it.orgnr,
-                    it.navn!!,
-                    it.rectype!!,
-                    it.sektor!!,
-                    it.næring!!,
-                    it.næringskode!!,
-                    it.årstallOgKvartal
-                )
-            }
-        )
-        log.info("Antall rader VirksomhetMetadata opprettet: {}", antallOpprettet)
-        return antallOpprettet
-    }
 }
