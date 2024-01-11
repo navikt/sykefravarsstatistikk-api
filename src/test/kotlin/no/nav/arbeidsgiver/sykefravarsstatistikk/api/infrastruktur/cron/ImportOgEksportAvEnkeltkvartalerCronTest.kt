@@ -18,6 +18,8 @@ class ImportOgEksportAvEnkeltkvartalerCronTest {
         registry,
         mock(),
         mock(),
+        virksomhetMetadataService,
+        eksporteringMetadataVirksomhetService
     )
 
     @Test
@@ -29,6 +31,6 @@ class ImportOgEksportAvEnkeltkvartalerCronTest {
         val kvartaler =  ÅrstallOgKvartal(2021, 4) inkludertTidligere 7
         jobb.gjennomførJobb(kvartaler, listOf(Statistikkategori.BRANSJE))
 
-//        verify(eksporteringMetadataVirksomhetService, times(8)).eksporterMetadataVirksomhet(any())
+        verify(eksporteringMetadataVirksomhetService, times(8)).eksporterMetadataVirksomhet(any())
     }
 }
