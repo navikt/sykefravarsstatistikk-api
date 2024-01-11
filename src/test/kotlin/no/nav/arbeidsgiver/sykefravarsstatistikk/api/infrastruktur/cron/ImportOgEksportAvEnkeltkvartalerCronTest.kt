@@ -4,7 +4,6 @@ import arrow.core.right
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringMetadataVirksomhetService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringPerStatistikkKategoriService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.VirksomhetMetadataService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
@@ -15,14 +14,12 @@ class ImportOgEksportAvEnkeltkvartalerCronTest {
     val eksporteringMetadataVirksomhetService = mock<EksporteringMetadataVirksomhetService>()
     val registry = mock<MeterRegistry>(defaultAnswer = { mock<Counter>()})
     val virksomhetMetadataService = mock<VirksomhetMetadataService>()
-    val eksporteringPerStatistikkKategoriService = mock<EksporteringPerStatistikkKategoriService>()
     val jobb = ImportOgEksportAvEnkeltkvartalerCron(
         registry,
         mock(),
-        eksporteringMetadataVirksomhetService,
-        eksporteringPerStatistikkKategoriService,
-        virksomhetMetadataService,
         mock(),
+        virksomhetMetadataService,
+        eksporteringMetadataVirksomhetService
     )
 
     @Test
