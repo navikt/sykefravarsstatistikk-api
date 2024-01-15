@@ -101,4 +101,26 @@ class ÅrstallOgKvartalTest {
         val liste = range(ÅrstallOgKvartal(2004, 1), ÅrstallOgKvartal(2002, 1))
         Assertions.assertThat(liste).isEmpty()
     }
+
+    @Test
+    fun tilOgMed_skal_være_inklusiv() {
+        val liste = ÅrstallOgKvartal(2019, 3) tilOgMed ÅrstallOgKvartal(2019, 4)
+        Assertions.assertThat(liste).hasSize(2)
+        Assertions.assertThat(liste.last()).isEqualTo(ÅrstallOgKvartal(2019, 4))
+        Assertions.assertThat(liste.first()).isEqualTo(ÅrstallOgKvartal(2019, 3))
+    }
+
+    @Test
+    fun tilOgMed_skal_inkludere_alle_kvartaler_mellom_fra_og_til() {
+        val liste = ÅrstallOgKvartal(2019, 3) tilOgMed ÅrstallOgKvartal(2020, 2)
+        Assertions.assertThat(liste).hasSize(4)
+        Assertions.assertThat(liste).isEqualTo(
+            listOf(
+                ÅrstallOgKvartal(2019, 3),
+                ÅrstallOgKvartal(2019, 4),
+                ÅrstallOgKvartal(2020, 1),
+                ÅrstallOgKvartal(2020, 2),
+            )
+        )
+    }
 }
