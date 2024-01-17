@@ -14,7 +14,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.Organisas
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api.SykefraværshistorikkController
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.EksportAvGradertStatistikkCron
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.FjernStatistikkEldreEnnFemÅrCron
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImportOgEksportAvEnkeltkvartalerCron
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ManuellEksportCron
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImporterOgEksporterStatistikkCron
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.enhetsregisteret.EnhetsregisteretClient
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.KafkaClient
@@ -49,7 +49,7 @@ import org.springframework.context.annotation.FilterType
             WebClientConfiguration::class,
             PrometheusMetrics::class,
             KafkaClient::class,
-            ImportOgEksportAvEnkeltkvartalerCron::class,
+            ManuellEksportCron::class,
             FjernStatistikkEldreEnnFemÅrCron::class,
             EksportAvGradertStatistikkCron::class]
     )]

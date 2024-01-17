@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron
 
-import arrow.core.getOrElse
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import net.javacrumbs.shedlock.core.LockConfiguration
@@ -18,7 +17,7 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit.MINUTES
 
 @Component
-class ImportOgEksportAvEnkeltkvartalerCron(
+class ManuellEksportCron(
     registry: MeterRegistry,
     private val taskExecutor: LockingTaskExecutor,
     private val eksporteringPerStatistikkKategoriService: EksporteringPerStatistikkKategoriService,
@@ -28,54 +27,56 @@ class ImportOgEksportAvEnkeltkvartalerCron(
     private val log = LoggerFactory.getLogger(this::class.java)
     private val noeFeiletCounter: Counter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
 
-    @Scheduled(cron = "0 35 14 11 01 ?")
+    //@Scheduled(cron = "0 10 11 15 01 ?")
     fun scheduledManuellEksportCron() {
-        val kategorier = Statistikkategori.entries.filter {it != Statistikkategori.VIRKSOMHET_GRADERT}
-        val __2019_3 = listOf( ÅrstallOgKvartal(2019, 3))
-
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
         taskExecutor.executeWithLock(
-            Runnable { gjennomførJobb(__2019_3.sorted(), kategorier) },
+            Runnable { gjennomførJobb() },
             LockConfiguration(Instant.now(), "importering", lockAtMostFor, lockAtLeastFor)
         )
     }
 
-    fun gjennomførJobb(kvartaler: List<ÅrstallOgKvartal>, kategorier: List<Statistikkategori>) {
+    fun gjennomførJobb() {
+        val kategorier = Statistikkategori.entries.filter {
+            !(it == Statistikkategori.VIRKSOMHET || it == Statistikkategori.VIRKSOMHET_GRADERT)
+        }
+
+        val kvartaler = ÅrstallOgKvartal(2019, 3) tilOgMed ÅrstallOgKvartal(2023, 3)
         log.info("Starter EksportAvEnkeltkvartaler for $kvartaler")
 
         for (kvartal in kvartaler) {
-            log.info("Overskriver metadata for $kvartal...")
-
-            virksomhetMetadataService.overskrivMetadataForVirksomheter(kvartal)
-                .getOrElse {
-                    noeFeiletCounter.increment()
-                    return
-                }
-
-
-            log.info("Eksporterer metadata for $kvartal...")
-            eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(kvartal)
-                .getOrElse {
-                    noeFeiletCounter.increment()
-                    return
-                }
-            log.info("Eksportering av metadata for $kvartal er fullført")
-
-//            kategorier.forEach { kategori ->
-//                log.info("Eksporterer statistikk ($kategori) for $kvartal...")
-//                runCatching {
-//                    eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(
-//                        kvartal,
-//                        kategori
-//                    )
-//                }.getOrElse {
-//                    log.error("Eksport av kategori $kategori feilet", it)
+//            log.info("Overskriver metadata for $kvartal...")
+//
+//            virksomhetMetadataService.overskrivMetadataForVirksomheter(kvartal)
+//                .getOrElse {
 //                    noeFeiletCounter.increment()
 //                    return
 //                }
-//                log.info("Eksportering av statistikk ($kategori) for $kvartal er ferdig")
-//            }
+//
+//
+//            log.info("Eksporterer metadata for $kvartal...")
+//            eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(kvartal)
+//                .getOrElse {
+//                    noeFeiletCounter.increment()
+//                    return
+//                }
+//            log.info("Eksportering av metadata for $kvartal er fullført")
+
+            kategorier.forEach { kategori ->
+                log.info("Eksporterer statistikk ($kategori) for $kvartal...")
+                runCatching {
+                    eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(
+                        kvartal,
+                        kategori
+                    )
+                }.getOrElse {
+                    log.error("Eksport av kategori $kategori feilet", it)
+                    noeFeiletCounter.increment()
+                    return
+                }
+                log.info("Eksportering av statistikk ($kategori) for $kvartal er ferdig")
+            }
 
             log.info("Manuell eksport er ferdig for $kvartal")
         }

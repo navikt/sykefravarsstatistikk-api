@@ -63,6 +63,8 @@ data class ÅrstallOgKvartal(
 
     infix fun inkludertTidligere(n: Int) = (0..n).map { this.minusKvartaler(it) }
 
+    infix fun tilOgMed(til: ÅrstallOgKvartal) = range(fra = this, til = til)
+
     companion object {
         fun range(fra: ÅrstallOgKvartal, til: ÅrstallOgKvartal): List<ÅrstallOgKvartal> {
             val årstallOgKvartal: MutableList<ÅrstallOgKvartal> = ArrayList()
