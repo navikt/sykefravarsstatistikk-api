@@ -25,7 +25,7 @@ class SykefraværStatistikkSektorRepository(
             batchInsert(statistikk, shouldReturnGeneratedValues = false) {
                 this[årstall] = it.årstall
                 this[kvartal] = it.kvartal
-                this[sektorKode] = it.sektorkode
+                this[sektorKode] = it.sektor.sektorkode
                 this[antallPersoner] = it.antallPersoner
                 this[tapteDagsverk] = it.tapteDagsverk?.toDouble()!!
                 this[muligeDagsverk] = it.muligeDagsverk?.toDouble()!!
@@ -44,7 +44,7 @@ class SykefraværStatistikkSektorRepository(
                     SykefraværsstatistikkSektor(
                         årstall = it[årstall],
                         kvartal = it[kvartal],
-                        sektorkode = it[sektorKode],
+                        sektor = Sektor.fraSektorkode(it[sektorKode])!!,
                         antallPersoner = it[antallPersoner],
                         tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
                         muligeDagsverk = it[muligeDagsverk].toBigDecimal()

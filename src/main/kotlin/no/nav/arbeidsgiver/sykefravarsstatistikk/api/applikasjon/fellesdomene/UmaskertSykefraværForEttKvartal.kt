@@ -26,12 +26,12 @@ open class UmaskertSykefraværForEttKvartal(
 
     fun tilSykefraværMedKategori(kategori: Statistikkategori, kode: String): SykefraværMedKategori {
         return SykefraværMedKategori(
-            kategori,
-            kode,
-            årstallOgKvartal,
-            dagsverkTeller,
-            dagsverkNevner,
-            antallPersoner
+            statistikkategori = kategori,
+            kode = kode,
+            årstallOgKvartal = årstallOgKvartal,
+            tapteDagsverk = dagsverkTeller,
+            muligeDagsverk = dagsverkNevner,
+            antallPersoner = antallPersoner
         )
     }
 

@@ -1,5 +1,3 @@
-@file:Suppress("SpringJavaInjectionPointsAutowiringInspection")
-
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api
 
 import arrow.core.right
@@ -151,7 +149,7 @@ class KvartalsvisEndpointIntegrationTest : SpringIntegrationTestbase() {
                 SykefraværsstatistikkSektor(
                     årstall = SISTE_ÅRSTALL,
                     kvartal = SISTE_KVARTAL,
-                    sektor = Sektor.STATLIG.sektorkode,
+                    sektor = Sektor.STATLIG,
                     antallPersoner = 10,
                     tapteDagsverk = BigDecimal("657853.346702"),
                     muligeDagsverk = BigDecimal("13558710.866603")

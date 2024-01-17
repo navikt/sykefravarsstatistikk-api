@@ -7,7 +7,6 @@ import net.javacrumbs.shedlock.core.LockConfiguration
 import net.javacrumbs.shedlock.core.LockingTaskExecutor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringMetadataVirksomhetService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringPerStatistikkKategoriService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.LegacyEksporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.VirksomhetMetadataService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.SykefraværsstatistikkImporteringService
@@ -30,7 +29,6 @@ class ImporterOgEksporterStatistikkCron(
     private val importeringService: SykefraværsstatistikkImporteringService,
     private val importEksportStatusRepository: ImportEksportStatusRepository,
     private val virksomhetMetadataService: VirksomhetMetadataService,
-    private val eksporteringsService: LegacyEksporteringService,
     private val eksporteringPerStatistikkKategoriService: EksporteringPerStatistikkKategoriService,
     private val eksporteringMetadataVirksomhetService: EksporteringMetadataVirksomhetService,
     private val publiseringsdatoerService: PubliseringsdatoerService,
@@ -85,33 +83,6 @@ class ImporterOgEksporterStatistikkCron(
                     return
                 }
             importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_VIRKSOMHETDATA, gjeldendeKvartal)
-        }
-
-        if (fullførteJobber.manglerJobben(IMPORTERT_NÆRINGSKODEMAPPING)) {
-            virksomhetMetadataService.overskrivNæringskoderForVirksomheter(gjeldendeKvartal)
-                .getOrElse {
-                    noeFeilet.increment()
-                    return
-                }
-            importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_NÆRINGSKODEMAPPING, gjeldendeKvartal)
-        }
-
-        if (fullførteJobber.manglerJobben(FORBEREDT_NESTE_EKSPORT_LEGACY)) {
-            virksomhetMetadataService.forberedNesteEksport(gjeldendeKvartal, true)
-                .getOrElse {
-                    noeFeilet.increment()
-                    return
-                }
-            importEksportStatusRepository.leggTilFullførtJobb(FORBEREDT_NESTE_EKSPORT_LEGACY, gjeldendeKvartal)
-        }
-
-        if (fullførteJobber.manglerJobben(EKSPORTERT_LEGACY)) {
-            eksporteringsService.legacyEksporter(gjeldendeKvartal)
-                .getOrElse {
-                    noeFeilet.increment()
-                    return
-                }
-            importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_LEGACY, gjeldendeKvartal)
         }
 
         if (fullførteJobber.manglerJobben(EKSPORTERT_METADATA_VIRKSOMHET)) {

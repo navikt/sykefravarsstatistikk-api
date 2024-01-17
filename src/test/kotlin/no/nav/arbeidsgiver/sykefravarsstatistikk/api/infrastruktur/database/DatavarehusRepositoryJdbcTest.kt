@@ -165,32 +165,32 @@ open class DatavarehusRepositoryJdbcTest {
     @Test
     fun hentSykefraværsstatistikkSektor__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
         datavarehusLandRespository.settInn(
-            2018,
-            4,
-            1,
-            5,
-            100
+            inÅrstall = 2018,
+            inKvartal = 4,
+            inAntallPersoner = 1,
+            inTaptedagsverk = 5,
+            inMuligedagsverk = 100
         )
         datavarehusLandRespository.settInn(
-            2018,
-            4,
-            3,
-            10,
-            100
+            inÅrstall = 2018,
+            inKvartal = 4,
+            inAntallPersoner = 3,
+            inTaptedagsverk = 10,
+            inMuligedagsverk = 100
         )
         datavarehusLandRespository.settInn(
-            2019,
-            1,
-            1,
-            1,
-            10
+            inÅrstall = 2019,
+            inKvartal = 1,
+            inAntallPersoner = 1,
+            inTaptedagsverk = 1,
+            inMuligedagsverk = 10
         )
         val sykefraværsstatistikkSektor = datavarehusLandRespository.hentSykefraværsstatistikkSektor(
             ÅrstallOgKvartal(2018, 4),
         )
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkSektor.size).isEqualTo(1)
         val sykefraværsstatistikkSektorExpected =
-            SykefraværsstatistikkSektor(2018, 4, "1", 4, BigDecimal("15.0"), BigDecimal("200.0"))
+            SykefraværsstatistikkSektor(2018, 4, Sektor.STATLIG, 4, BigDecimal("15.0"), BigDecimal("200.0"))
         val sykefraværsstatistikkSektorActual = sykefraværsstatistikkSektor[0]
         Assertions.assertTrue(
             ReflectionEquals(sykefraværsstatistikkSektorExpected)

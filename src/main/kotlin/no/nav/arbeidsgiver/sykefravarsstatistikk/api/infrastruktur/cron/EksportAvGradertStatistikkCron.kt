@@ -21,11 +21,7 @@ class EksportAvGradertStatistikkCron(
     private val eksporteringPerStatistikkKategoriService: EksporteringPerStatistikkKategoriService,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
-    private val noeFeiletCounter: Counter
-
-    init {
-        noeFeiletCounter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
-    }
+    private val noeFeiletCounter: Counter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
 
     @Scheduled(cron = "-")
     fun scheduledEksportAvGradertStatistikk() {

@@ -2,7 +2,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import ia.felles.definisjoner.bransjer.Bransje
 import ia.felles.definisjoner.bransjer.BransjeId
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.VirksomhetMetadataMedNæringskode
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.*
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus.Rectype
 import org.jetbrains.exposed.sql.*
@@ -61,29 +60,6 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
                 this[muligeDagsverk] = it.muligeDagsverk.toFloat()
                 this[rectype] = it.rectype
             }.count()
-        }
-    }
-
-    fun hentVirksomhetMetadataMedNæringskode(
-        årstallOgKvartal: ÅrstallOgKvartal
-    ): List<VirksomhetMetadataMedNæringskode> {
-        return transaction {
-            slice(orgnr, årstall, kvartal, næringskode)
-                .select {
-                    (årstall eq årstallOgKvartal.årstall) and (kvartal eq årstallOgKvartal.kvartal)
-                }.groupBy(årstall, kvartal, orgnr, næringskode)
-                .orderBy(
-                    årstall to SortOrder.ASC,
-                    kvartal to SortOrder.ASC,
-                    orgnr to SortOrder.ASC,
-                    næringskode to SortOrder.ASC
-                ).map {
-                    VirksomhetMetadataMedNæringskode(
-                        Orgnr(it[orgnr]),
-                        ÅrstallOgKvartal(it[årstall], it[kvartal]),
-                        Næringskode(it[næringskode])
-                    )
-                }
         }
     }
 

@@ -9,22 +9,17 @@ import org.springframework.stereotype.Component
 class PrometheusMetrics(
     meterRegistry: CollectorRegistry,
 ) {
-    private val kafkaMessageSentCounter: Counter
-    private val kafkaMessageErrorCounter: Counter
+    private val kafkaMessageSentCounter: Counter = Counter.build()
+        .name("sykefravarsstatistikk_kafka_message_sent_counter")
+        .labelNames("topic_name")
+        .help("Hvor mange Kafka-meldinger som har blitt sendt ut fra sykefravarsstatistikk-api")
+        .register(meterRegistry)
 
-    init {
-        kafkaMessageSentCounter = Counter.build()
-            .name("sykefravarsstatistikk_kafka_message_sent_counter")
-            .labelNames("topic_name")
-            .help("Hvor mange Kafka-meldinger som har blitt sendt ut fra sykefravarsstatistikk-api")
-            .register(meterRegistry)
-
-        kafkaMessageErrorCounter = Counter.build()
-            .name("sykefravarsstatistikk_kafka_message_error_counter")
-            .labelNames("topic_name")
-            .help("Antall feilede forøk på å sende Kafka-meldinger fra sykefravarsstatistikk-api")
-            .register(meterRegistry)
-    }
+    private val kafkaMessageErrorCounter: Counter = Counter.build()
+        .name("sykefravarsstatistikk_kafka_message_error_counter")
+        .labelNames("topic_name")
+        .help("Antall feilede forøk på å sende Kafka-meldinger fra sykefravarsstatistikk-api")
+        .register(meterRegistry)
 
     fun incrementKafkaMessageSentCounter(kafkaTopic: KafkaTopic) {
         kafkaMessageSentCounter.labels(kafkaTopic.name).inc()

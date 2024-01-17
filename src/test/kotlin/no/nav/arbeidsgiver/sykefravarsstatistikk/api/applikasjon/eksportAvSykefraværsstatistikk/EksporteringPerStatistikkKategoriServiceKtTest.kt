@@ -87,7 +87,8 @@ class EksporteringPerStatistikkKategoriServiceKtTest {
 
 
         val result = dataset.map { UmaskertSykefraværForEttKvartal(it) }
-            .max().tilSykefraværMedKategori(Statistikkategori.NÆRINGSKODE, "12345")
+            .max()
+            .tilSykefraværMedKategori(Statistikkategori.NÆRINGSKODE, "12345")
 
         assertThat(result.årstallOgKvartal).isEqualTo(ÅrstallOgKvartal(2023, 1))
     }

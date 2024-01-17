@@ -102,7 +102,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
                 SykefraværsstatistikkSektor(
                     årstall = 2019,
                     kvartal = 2,
-                    sektor = Sektor.STATLIG.sektorkode,
+                    sektor = Sektor.STATLIG,
                     antallPersoner = 10,
                     tapteDagsverk = BigDecimal(2),
                     muligeDagsverk = BigDecimal(100)
@@ -110,7 +110,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
                 SykefraværsstatistikkSektor(
                     årstall = 2019,
                     kvartal = 1,
-                    sektor = Sektor.STATLIG.sektorkode,
+                    sektor = Sektor.STATLIG,
                     antallPersoner = 10,
                     tapteDagsverk = BigDecimal(2),
                     muligeDagsverk = BigDecimal(100)
@@ -118,7 +118,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
                 SykefraværsstatistikkSektor(
                     årstall = 2018,
                     kvartal = 4,
-                    sektor = Sektor.STATLIG.sektorkode,
+                    sektor = Sektor.STATLIG,
                     antallPersoner = 10,
                     tapteDagsverk = 4.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal()
@@ -126,7 +126,7 @@ open class SykefraværForEttKvartalRepositoryJdbcTest {
                 SykefraværsstatistikkSektor(
                     årstall = 2018,
                     kvartal = 4,
-                    sektor = Sektor.KOMMUNAL.sektorkode,
+                    sektor = Sektor.KOMMUNAL,
                     antallPersoner = 10,
                     tapteDagsverk = 5.toBigDecimal(),
                     muligeDagsverk = 100.toBigDecimal()

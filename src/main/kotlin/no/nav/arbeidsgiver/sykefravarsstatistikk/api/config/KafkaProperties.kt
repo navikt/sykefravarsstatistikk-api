@@ -1,14 +1,10 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.config
 
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.kafka.LegacyKafkaUtsendingRapport
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.StringSerializer
-import org.springframework.beans.factory.config.ConfigurableBeanFactory
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 
 @ConfigurationProperties(prefix = "kafka.outbound")
@@ -57,9 +53,4 @@ data class KafkaProperties(
         props[ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION] = 5 // default
         return props
     }
-
-    @get:Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-    @get:Bean
-    val kafkaUtsendingReport: LegacyKafkaUtsendingRapport
-        get() = LegacyKafkaUtsendingRapport()
 }
