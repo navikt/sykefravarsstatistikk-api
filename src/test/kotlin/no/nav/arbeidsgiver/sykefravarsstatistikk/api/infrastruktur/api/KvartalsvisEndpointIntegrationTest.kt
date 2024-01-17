@@ -1,5 +1,3 @@
-@file:Suppress("SpringJavaInjectionPointsAutowiringInspection")
-
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api
 
 import arrow.core.right

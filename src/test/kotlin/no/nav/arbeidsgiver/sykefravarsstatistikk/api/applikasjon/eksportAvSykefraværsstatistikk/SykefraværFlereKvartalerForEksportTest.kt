@@ -2,8 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykef
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.SykefraværFlereKvartalerForEksport
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.UmaskertSykefraværForEttKvartal
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.LegacyEksporteringTestUtils.__2021_1
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.LegacyEksporteringTestUtils.__2021_2
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import org.assertj.core.api.AssertionsForClassTypes
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -13,10 +12,10 @@ internal class SykefraværFlereKvartalerForEksportTest {
     fun sjekk_at_prosent_blir_riktig() {
         val sykefravær = listOf(
             UmaskertSykefraværForEttKvartal(
-                __2021_2, BigDecimal(10), BigDecimal(100), 8
+                ÅrstallOgKvartal(2021, 2), BigDecimal(10), BigDecimal(100), 8
             ),
             UmaskertSykefraværForEttKvartal(
-                __2021_1, BigDecimal(20), BigDecimal(100), 8
+                ÅrstallOgKvartal(2021, 1), BigDecimal(20), BigDecimal(100), 8
             )
         )
         val sykefraværFlereKvartalerForEksport = SykefraværFlereKvartalerForEksport(sykefravær)
@@ -29,10 +28,10 @@ internal class SykefraværFlereKvartalerForEksportTest {
     fun sjekk_at_sykefravær_ikke_blir_maskert() {
         val sykefravær = listOf(
             UmaskertSykefraværForEttKvartal(
-                __2021_2, BigDecimal(10), BigDecimal(100), 4
+                ÅrstallOgKvartal(2021, 2), BigDecimal(10), BigDecimal(100), 4
             ),
             UmaskertSykefraværForEttKvartal(
-                __2021_1, BigDecimal(20), BigDecimal(100), 8
+                ÅrstallOgKvartal(2021, 1), BigDecimal(20), BigDecimal(100), 8
             )
         )
         val sykefraværFlereKvartalerForEksport = SykefraværFlereKvartalerForEksport(sykefravær)
@@ -48,13 +47,21 @@ internal class SykefraværFlereKvartalerForEksportTest {
     fun sjekk_at_sykefravær_blir_maskert() {
         val sykefravær = listOf(
             UmaskertSykefraværForEttKvartal(
-                __2021_2, BigDecimal(10), BigDecimal(100), 4
+                årstallOgKvartal = ÅrstallOgKvartal(2021, 2),
+                dagsverkTeller = BigDecimal(10),
+                dagsverkNevner = BigDecimal(100),
+                antallPersoner = 4
             ),
             UmaskertSykefraværForEttKvartal(
-                __2021_1, BigDecimal(20), BigDecimal(100), 4
+                årstallOgKvartal = ÅrstallOgKvartal(2021, 1),
+                dagsverkTeller = BigDecimal(20),
+                dagsverkNevner = BigDecimal(100),
+                antallPersoner = 4
             )
         )
+
         val sykefraværFlereKvartalerForEksport = SykefraværFlereKvartalerForEksport(sykefravær)
+
         AssertionsForClassTypes.assertThat(sykefraværFlereKvartalerForEksport.tapteDagsverk).isNull()
         AssertionsForClassTypes.assertThat(sykefraværFlereKvartalerForEksport.muligeDagsverk).isNull()
         AssertionsForClassTypes.assertThat(sykefraværFlereKvartalerForEksport.prosent).isNull()
@@ -64,6 +71,7 @@ internal class SykefraværFlereKvartalerForEksportTest {
     fun kan_være_tom_for_statistikk() {
         val sykefravær = listOf<UmaskertSykefraværForEttKvartal>()
         val sykefraværFlereKvartalerForEksport = SykefraværFlereKvartalerForEksport(sykefravær)
+
         AssertionsForClassTypes.assertThat(sykefraværFlereKvartalerForEksport.tapteDagsverk).isNull()
         AssertionsForClassTypes.assertThat(sykefraværFlereKvartalerForEksport.muligeDagsverk).isNull()
         AssertionsForClassTypes.assertThat(sykefraværFlereKvartalerForEksport.prosent).isNull()

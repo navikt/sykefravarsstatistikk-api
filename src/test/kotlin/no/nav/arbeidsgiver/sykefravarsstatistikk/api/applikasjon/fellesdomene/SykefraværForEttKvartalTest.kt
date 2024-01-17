@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.SykefraværFlereKvartalerForEksport
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.SykefraværMedKategori
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.domene.SykefraværMedKategori.Companion.utenStatistikk
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -13,28 +12,52 @@ class SykefraværForEttKvartalTest {
     val PERIODE = ÅrstallOgKvartal(2019, 4)
 
     @Test
-    fun sykefraværprosent__uten_data_er_ikke_maskert() {
-        Assertions.assertThat(SykefraværForEttKvartal(PERIODE, null, null, 0).erMaskert)
-            .isFalse()
+    fun `sykefraværprosent uten data er ikke maskert`() {
+        Assertions.assertThat(
+            SykefraværForEttKvartal(
+                årstallOgKvartal = PERIODE,
+                tapteDagsverk = null,
+                muligeDagsverk = null,
+                antallPersoner = 0
+            ).erMaskert
+        ).isFalse()
     }
 
     @Test
     fun sykefraværprosent__equals_test() {
         val sykefravær = SykefraværForEttKvartal(
-            PERIODE, BigDecimal(5), BigDecimal(10), 20
+            årstallOgKvartal = PERIODE,
+            tapteDagsverk = BigDecimal(5),
+            muligeDagsverk = BigDecimal(10),
+            antallPersoner = 20
         )
+
         Assertions.assertThat(
             sykefravær == SykefraværForEttKvartal(
-                PERIODE, BigDecimal(5), BigDecimal(10), 20
+                årstallOgKvartal = PERIODE,
+                tapteDagsverk = BigDecimal(5),
+                muligeDagsverk = BigDecimal(10),
+                antallPersoner = 20
             )
-        )
-            .isEqualTo(true)
+        ).isEqualTo(true)
+
         Assertions.assertThat(
-            SykefraværForEttKvartal(PERIODE, null, null, 4) == sykefravær
-        )
-            .isEqualTo(false)
-        Assertions.assertThat(sykefravær == SykefraværForEttKvartal(PERIODE, null, null, 4))
-            .isFalse()
+            SykefraværForEttKvartal(
+                årstallOgKvartal = PERIODE,
+                tapteDagsverk = null,
+                muligeDagsverk = null,
+                antallPersoner = 4
+            ) == sykefravær
+        ).isEqualTo(false)
+
+        Assertions.assertThat(
+            sykefravær == SykefraværForEttKvartal(
+                årstallOgKvartal = PERIODE,
+                tapteDagsverk = null,
+                muligeDagsverk = null,
+                antallPersoner = 4
+            )
+        ).isFalse()
     }
 
     @Test
@@ -61,12 +84,12 @@ class SykefraværForEttKvartalTest {
     fun sykefraværMedKategori_equals_test() {
         Assertions.assertThat(
             SykefraværMedKategori(
-                Statistikkategori.VIRKSOMHET,
-                "987654321",
-                PERIODE,
-                BigDecimal(10),
-                BigDecimal(100),
-                6
+                statistikkategori = Statistikkategori.VIRKSOMHET,
+                kode = "987654321",
+                årstallOgKvartal = PERIODE,
+                tapteDagsverk = BigDecimal("10.0"),
+                muligeDagsverk = BigDecimal("100.0"),
+                antallPersoner = 6
             ) == utenStatistikk(
                 Statistikkategori.VIRKSOMHET, "987654321", PERIODE
             )
@@ -74,12 +97,12 @@ class SykefraværForEttKvartalTest {
             .isFalse()
         Assertions.assertThat(
             SykefraværMedKategori(
-                Statistikkategori.VIRKSOMHET,
-                "987654321",
-                PERIODE,
-                BigDecimal(2),
-                null,
-                0
+                statistikkategori = Statistikkategori.VIRKSOMHET,
+                kode = "987654321",
+                årstallOgKvartal = PERIODE,
+                tapteDagsverk = BigDecimal(2),
+                muligeDagsverk = null,
+                antallPersoner = 0
             ) == utenStatistikk(
                 Statistikkategori.VIRKSOMHET, "987654321", PERIODE
             )
@@ -98,7 +121,10 @@ class SykefraværForEttKvartalTest {
     @Test
     fun sykefraværprosent__skal_regne_ut_riktig_prosent_ut_i_fra_tapte_og_mulige_dagsverk() {
         val sykefravær = SykefraværForEttKvartal(
-            PERIODE, BigDecimal(5), BigDecimal(10), 20
+            årstallOgKvartal = PERIODE,
+            tapteDagsverk = BigDecimal(5),
+            muligeDagsverk = BigDecimal(10),
+            antallPersoner = 20
         )
         Assertions.assertThat(sykefravær.prosent).isEqualTo(BigDecimal("50.0"))
     }
@@ -106,7 +132,10 @@ class SykefraværForEttKvartalTest {
     @Test
     fun sykefraværprosent__skal_runde_prosenten_opp_ved_tvil() {
         val sykefravær = SykefraværForEttKvartal(
-            PERIODE, BigDecimal(455), BigDecimal(10000), 100
+            årstallOgKvartal = PERIODE,
+            tapteDagsverk = BigDecimal(455),
+            muligeDagsverk = BigDecimal(10000),
+            antallPersoner = 100
         )
         Assertions.assertThat(sykefravær.prosent).isEqualTo(BigDecimal("4.6"))
     }
@@ -147,5 +176,19 @@ class SykefraværForEttKvartalTest {
                     + "}"
         )
         Assertions.assertThat(json).isEqualTo(ønsketJson)
+    }
+
+
+    fun utenStatistikk(
+        kategori: Statistikkategori, kode: String, årstallOgKvartal: ÅrstallOgKvartal?
+    ): SykefraværMedKategori {
+        return SykefraværMedKategori(
+            statistikkategori = kategori,
+            kode = kode,
+            årstallOgKvartal = årstallOgKvartal,
+            tapteDagsverk = null,
+            muligeDagsverk = null,
+            antallPersoner = 0
+        )
     }
 }

@@ -45,7 +45,32 @@ class EksporteringPerStatistikkKategoriServiceTest {
     @Test
     fun eksporterSykefraværsstatistikkLand__sender_riktig_melding_til_kafka() {
         val umaskertSykefraværForEttKvartalListe =
-            LegacyEksporteringTestUtils.sykefraværsstatistikkLandSiste4Kvartaler(__2020_2)
+            listOf(
+                UmaskertSykefraværForEttKvartal(
+                    årstallOgKvartal = __2020_2,
+                    dagsverkTeller = BigDecimal(10000000),
+                    dagsverkNevner = BigDecimal(500000000),
+                    antallPersoner = 2500000
+                ),
+                UmaskertSykefraværForEttKvartal(
+                    årstallOgKvartal = __2020_2.minusKvartaler(1),
+                    dagsverkTeller = BigDecimal(9000000),
+                    dagsverkNevner = BigDecimal(500000000),
+                    antallPersoner = 2500000
+                ),
+                UmaskertSykefraværForEttKvartal(
+                    årstallOgKvartal = __2020_2.minusKvartaler(2),
+                    dagsverkTeller = BigDecimal(11000000),
+                    dagsverkNevner = BigDecimal(500000000),
+                    antallPersoner = 2500000
+                ),
+                UmaskertSykefraværForEttKvartal(
+                    årstallOgKvartal = __2020_2.minusKvartaler(3),
+                    dagsverkTeller = BigDecimal(8000000),
+                    dagsverkNevner = BigDecimal(500000000),
+                    antallPersoner = 2500000
+                )
+            )
         whenever(sykefraværStatistikkLandRepository.hentSykefraværstatistikkLand(any()))
             .thenReturn(umaskertSykefraværForEttKvartalListe.map {
                 SykefraværsstatistikkLand(
@@ -265,16 +290,27 @@ class EksporteringPerStatistikkKategoriServiceTest {
 
     @Test
     fun `eksporter statistikk for virksomhet gradert sender riktig melding til kafka`() {
-        val allData = listOf(
-            LegacyEksporteringTestUtils.sykefraværsstatistikkVirksomhetGradert(__2020_2, "11"),
-            LegacyEksporteringTestUtils.sykefraværsstatistikkVirksomhetGradert(__2020_1, "11"),
-            LegacyEksporteringTestUtils.sykefraværsstatistikkVirksomhetGradert(__2019_4, "11"),
-            LegacyEksporteringTestUtils.sykefraværsstatistikkVirksomhetGradert(__2019_3, "11")
-        )
+        val kvartaler = __2020_2 inkludertTidligere 3
 
         whenever(
-            sykefravarStatistikkVirksomhetGraderingRepository.hentSykefraværAlleVirksomheterGradert(__2020_2 inkludertTidligere 3)
-        ).thenReturn(allData)
+            sykefravarStatistikkVirksomhetGraderingRepository.hentSykefraværAlleVirksomheterGradert(any())
+        ).thenReturn(
+            kvartaler.map {
+                SykefraværsstatistikkVirksomhetMedGradering(
+                    årstall = it.årstall,
+                    kvartal = it.kvartal,
+                    orgnr = "191919191",
+                    næring = "10",
+                    næringkode = "10111",
+                    rectype = "3",
+                    antallGraderteSykemeldinger = 100,
+                    tapteDagsverkGradertSykemelding = BigDecimal(5),
+                    antallSykemeldinger = 200,
+                    antallPersoner = 6,
+                    tapteDagsverk = BigDecimal(10),
+                    muligeDagsverk = BigDecimal(100),
+                )
+            })
 
         service.eksporterPerStatistikkKategori(
             __2020_2,
@@ -290,7 +326,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
         assertThatJson(gradertStatistikkategoriKafkameldingCaptor.firstValue.innhold) {
             isObject
             node("kategori").isString.isEqualTo(Statistikkategori.VIRKSOMHET_GRADERT.name)
-            node("kode").isString.isEqualTo("11")
+            node("kode").isString.isEqualTo("191919191")
             node("sistePubliserteKvartal").isObject.node("årstall").isNumber.isEqualTo(BigDecimal("2020"))
             node("sistePubliserteKvartal").isObject.node("kvartal").isNumber.isEqualTo(BigDecimal("2"))
             node("sistePubliserteKvartal").isObject.node("prosent").isNumber.isEqualTo(BigDecimal("50.0"))
@@ -304,7 +340,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
         assertThatJson(gradertStatistikkategoriKafkameldingCaptor.firstValue.nøkkel) {
             isObject
             node("kategori").isString.isEqualTo(Statistikkategori.VIRKSOMHET_GRADERT.name)
-            node("kode").isString.isEqualTo("11")
+            node("kode").isString.isEqualTo("191919191")
             node("kvartal").isString.isEqualTo("2")
             node("årstall").isString.isEqualTo("2020")
         }
