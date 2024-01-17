@@ -79,7 +79,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
         val data = SykefraværsstatistikkSektor(
             årstall = __2020_2.årstall,
             kvartal = __2020_2.kvartal,
-            sektorkode = Sektor.STATLIG.sektorkode,
+            sektor = Sektor.STATLIG.sektorkode,
             antallPersoner = 33000,
             tapteDagsverk = BigDecimal(1340),
             muligeDagsverk = BigDecimal(88000)

@@ -151,7 +151,7 @@ class KvartalsvisEndpointIntegrationTest : SpringIntegrationTestbase() {
                 SykefraværsstatistikkSektor(
                     årstall = SISTE_ÅRSTALL,
                     kvartal = SISTE_KVARTAL,
-                    sektorkode = Sektor.STATLIG.sektorkode,
+                    sektor = Sektor.STATLIG.sektorkode,
                     antallPersoner = 10,
                     tapteDagsverk = BigDecimal("657853.346702"),
                     muligeDagsverk = BigDecimal("13558710.866603")
