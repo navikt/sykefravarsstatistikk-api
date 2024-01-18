@@ -36,8 +36,10 @@ class ManuellEksportCronTest {
         }
 
         val kvartaler = ÅrstallOgKvartal(2019, 3) tilOgMed ÅrstallOgKvartal(2023, 3)
-        verify(exactly = kvartaler.size * 6) {
-            eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(any(), any())
+
+        val antallEksporteringer = kvartaler.size * 1
+        verify(exactly = antallEksporteringer) {
+            eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(any(), Statistikkategori.SEKTOR)
         }
     }
 }
