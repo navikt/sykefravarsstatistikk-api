@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.datavarehus
 
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Sektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkLand
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkSektor
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
@@ -79,7 +80,7 @@ class DatavarehusLandRespository(
                     antallPersoner = it[antallPersoner.sum()]!!,
                     tapteDagsverk = it[tapteDagsverk.sum()]!!.toBigDecimal(),
                     muligeDagsverk = it[muligeDagsverk.sum()]!!.toBigDecimal(),
-                    sektorkode = it[sektor],
+                    sektor = Sektor.fraSektorkode(it[sektor])!!,
                 )
             }
         }

@@ -100,11 +100,11 @@ class EksporteringPerStatistikkKategoriServiceTest {
 
 
     @Test
-    fun `eksporterPerStatistikkKategori sender riktig melding til kafka`() {
+    fun `eksporterPerStatistikkKategori sender riktig melding til kafka for Sektor`() {
         val data = SykefraværsstatistikkSektor(
             årstall = __2020_2.årstall,
             kvartal = __2020_2.kvartal,
-            sektorkode = Sektor.STATLIG.sektorkode,
+            sektor = Sektor.STATLIG,
             antallPersoner = 33000,
             tapteDagsverk = BigDecimal(1340),
             muligeDagsverk = BigDecimal(88000)
@@ -122,7 +122,7 @@ class EksporteringPerStatistikkKategoriServiceTest {
         assertThatJson(statistikkategoriKafkameldingCaptor.firstValue.innhold) {
             isObject
             node("kategori").isString.isEqualTo("SEKTOR")
-            node("kode").isString.isEqualTo("1")
+            node("kode").isString.isEqualTo("STATLIG")
             node("sistePubliserteKvartal").isObject.node("årstall").isNumber.isEqualTo(BigDecimal("2020"))
             node("sistePubliserteKvartal").isObject.node("kvartal").isNumber.isEqualTo(BigDecimal("2"))
         }

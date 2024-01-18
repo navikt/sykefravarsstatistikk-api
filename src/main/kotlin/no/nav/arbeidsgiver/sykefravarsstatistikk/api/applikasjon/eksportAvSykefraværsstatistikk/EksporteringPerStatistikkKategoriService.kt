@@ -67,7 +67,7 @@ class EksporteringPerStatistikkKategoriService(
 
     private fun eksporterSykefraværsstatistikkSektor(årstallOgKvartal: ÅrstallOgKvartal) {
         sykefraværStatistikkSektorRepository.hentForKvartaler(årstallOgKvartal inkludertTidligere 3)
-            .groupBy({ it.sektorkode }, { it })
+            .groupBy({ it.sektor.name }, { it })
             .let {
                 eksporterSykefraværsstatistikkPerKategori(
                     eksportkvartal = årstallOgKvartal,

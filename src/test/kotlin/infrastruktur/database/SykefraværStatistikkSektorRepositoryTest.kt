@@ -43,7 +43,7 @@ open class SykefraværStatistikkSektorRepositoryTest {
         sykefraværStatistikkSektorRepository.settInn(
             listOf(
                 SykefraværsstatistikkSektor(
-                    sektorkode = Sektor.KOMMUNAL.sektorkode,
+                    sektor = Sektor.KOMMUNAL,
                     årstall = 2018,
                     kvartal = 4,
                     antallPersoner = 3,
@@ -51,7 +51,7 @@ open class SykefraværStatistikkSektorRepositoryTest {
                     muligeDagsverk = 60.toBigDecimal()
                 ),
                 SykefraværsstatistikkSektor(
-                    sektorkode = Sektor.KOMMUNAL.sektorkode,
+                    sektor = Sektor.KOMMUNAL,
                     årstall = 2019,
                     kvartal = 1,
                     antallPersoner = 40,
@@ -59,7 +59,7 @@ open class SykefraværStatistikkSektorRepositoryTest {
                     muligeDagsverk = 115.toBigDecimal()
                 ),
                 SykefraværsstatistikkSektor(
-                    sektorkode = Sektor.PRIVAT.sektorkode,
+                    sektor = Sektor.PRIVAT,
                     årstall = 2019,
                     kvartal = 2,
                     antallPersoner = 4,
@@ -67,7 +67,7 @@ open class SykefraværStatistikkSektorRepositoryTest {
                     muligeDagsverk = 100.toBigDecimal()
                 ),
                 SykefraværsstatistikkSektor(
-                    sektorkode = Sektor.PRIVAT.sektorkode,
+                    sektor = Sektor.PRIVAT,
                     årstall = 2019,
                     kvartal = 1,
                     antallPersoner = 7,
@@ -87,7 +87,7 @@ open class SykefraværStatistikkSektorRepositoryTest {
         resultat[0] shouldBe SykefraværsstatistikkSektor(
             årstall = 2019,
             kvartal = 1,
-            sektorkode = Sektor.KOMMUNAL.sektorkode,
+            sektor = Sektor.KOMMUNAL,
             antallPersoner = 40,
             tapteDagsverk = BigDecimal("20.0"),
             muligeDagsverk = BigDecimal("115.0")
@@ -95,7 +95,7 @@ open class SykefraværStatistikkSektorRepositoryTest {
         resultat[2] shouldBe SykefraværsstatistikkSektor(
             årstall = 2019,
             kvartal = 2,
-            sektorkode = Sektor.PRIVAT.sektorkode,
+            sektor = Sektor.PRIVAT,
             antallPersoner = 4,
             tapteDagsverk = BigDecimal("9.0"),
             muligeDagsverk = BigDecimal("100.0")
