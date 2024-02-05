@@ -27,6 +27,9 @@ spec:
         - application: min-ia
           namespace: teamia
           cluster: dev-gcp
+        - application: min-ia
+          namespace: pia
+          cluster: dev-gcp
         - application: forebyggingsplan-frontend
           namespace: teamia
           cluster: dev-gcp

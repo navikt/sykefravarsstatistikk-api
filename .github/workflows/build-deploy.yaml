@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - sektorkode_to_sektor
+      - flytte-min-ia-over-til-pia-namespace
     paths-ignore:
       - '**.md'
       - '**/**.md'
