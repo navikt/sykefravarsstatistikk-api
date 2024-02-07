@@ -9,6 +9,7 @@ import io.mockk.verify
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringMetadataVirksomhetService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringPerStatistikkKategoriService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.VirksomhetMetadataService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import org.junit.jupiter.api.Test
 
@@ -36,8 +37,10 @@ class ManuellEksportCronTest {
             eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(any(), any())
         }
 
-        val kvartaler = ÅrstallOgKvartal(2019, 3) tilOgMed ÅrstallOgKvartal(2023, 3)
-        val antallEksporteringer = kvartaler.size * 1
+        val antallKvartaler = 1
+        val antallKategorier = Statistikkategori.entries.size
+        val antallEksporteringer = antallKvartaler * antallKategorier
+
         verify(exactly = antallEksporteringer) {
             eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(any())
         }
