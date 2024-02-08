@@ -28,7 +28,7 @@ class ManuellEksportCron(
     private val log = LoggerFactory.getLogger(this::class.java)
     private val noeFeiletCounter: Counter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
 
-    @Scheduled(cron = "0 30 17 7 1 ?")
+    @Scheduled(cron = "0 50 10 8 02 ?")
     fun scheduledManuellEksportCron() {
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
