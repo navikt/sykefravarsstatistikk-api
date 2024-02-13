@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - postgres15
+      - auditlog
     paths-ignore:
       - '**.md'
       - '**/**.md'
