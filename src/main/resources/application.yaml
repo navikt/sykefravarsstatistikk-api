@@ -51,7 +51,7 @@ tokenxclient:
   altinn_rettigheter_proxy_audience: dev-gcp:arbeidsgiver:altinn-rettigheter-proxy
 
 
-database.navn: sykefravarsstatistikk
+database.navn: sykefravarsstatistikk-pg15
 vault.mount-path: postgresql/preprod-fss
 
 datavarehus.datasource:
@@ -88,7 +88,7 @@ tokenxclient:
   clientId: ${TOKEN_X_CLIENT_ID}
   altinn_rettigheter_proxy_audience: prod-gcp:arbeidsgiver:altinn-rettigheter-proxy
 
-database.navn: sykefravarsstatistikk
+database.navn: sykefravarsstatistikk-pg15
 vault.mount-path: postgresql/prod-fss
 
 datavarehus.datasource:

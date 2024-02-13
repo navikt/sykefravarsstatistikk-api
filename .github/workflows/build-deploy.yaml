@@ -1,10 +1,10 @@
 name: Build and deploy app
-run-name: Build and deploy app ~~ "${{ github.event.head_commit.message }}"
+run-name: Build and deploy app | "${{ github.event.head_commit.message }}"
 on:
   push:
     branches:
       - master
-      - flytte-min-ia-over-til-pia-namespace
+      - postgres15
     paths-ignore:
       - '**.md'
       - '**/**.md'
