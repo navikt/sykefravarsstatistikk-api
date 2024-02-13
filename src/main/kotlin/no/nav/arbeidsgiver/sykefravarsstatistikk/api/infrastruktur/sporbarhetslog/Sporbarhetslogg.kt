@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 @Component
 class Sporbarhetslogg {
     private val sporbarhetslogger = LoggerFactory.getLogger(this::class.java)
-    private val secureMarker = MarkerFactory.getMarker("SECURE_LOG")
+    private val secureMarker = MarkerFactory.getMarker("AUDIT_LOG")
 
     fun loggHendelse(event: Loggevent, kommentar: String?) {
         val extensions = getExtensions(event)

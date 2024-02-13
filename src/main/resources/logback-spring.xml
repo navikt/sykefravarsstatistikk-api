@@ -6,11 +6,11 @@
         <include resource="org/springframework/boot/logging/logback/base.xml"/>
     </springProfile>
 
-    <!--  Bruk Logstash appender og secure log når man kjører i dev og prod  -->
+    <!--  Bruk Logstash appender og audit-log når man kjører i dev og prod  -->
     <springProfile name="prod,dev">
         <root level="INFO">
             <appender-ref ref="LOGSTASH_CONSOLE"/>
-            <appender-ref ref="SECURE_FILE"/>
+            <appender-ref ref="AUDIT_LOG"/>
         </root>
     </springProfile>
 
