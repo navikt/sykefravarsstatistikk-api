@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron
 
-import arrow.core.left
 import arrow.core.right
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
@@ -9,7 +8,7 @@ import io.mockk.verify
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringMetadataVirksomhetService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringPerStatistikkKategoriService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.VirksomhetMetadataService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
 import org.junit.jupiter.api.Test
 
 class ManuellEksportCronTest {
@@ -32,14 +31,16 @@ class ManuellEksportCronTest {
 
         jobb.gjennomførJobb()
 
-        verify(exactly = 0) {
-            eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(any(), any())
+        val antallKvartaler = 1
+
+        verify(exactly = antallKvartaler) {
+            eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(any())
         }
 
-        val kvartaler = ÅrstallOgKvartal(2019, 3) tilOgMed ÅrstallOgKvartal(2023, 3)
-        val antallEksporteringer = kvartaler.size * 1
+        val antallKategorier = Statistikkategori.entries.size
+        val antallEksporteringer = antallKvartaler * antallKategorier
         verify(exactly = antallEksporteringer) {
-            eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(any())
+            eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(any(), any())
         }
     }
 }

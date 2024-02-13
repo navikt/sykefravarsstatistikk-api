@@ -1,5 +1,5 @@
 name: Build and deploy app
-run-name: Build and deploy app ~~ "${{ github.event.head_commit.message }}"
+run-name: Build and deploy app | "${{ github.event.head_commit.message }}"
 on:
   push:
     branches:
