@@ -21,16 +21,16 @@ open class ImportEksportStatusRepository(
 
     fun leggTilFullførtJobb(fullførtJobb: ImportEksportJobb, forKvartal: ÅrstallOgKvartal) {
         val alleredeFullførteJobber: List<FullførteJobber> =
-            hentImportEksportStatus(forKvartal).firstOrNull()?.fullførteJobber
-                ?: emptyList()
+            hentImportEksportStatus(forKvartal).firstOrNull()?.fullførteJobber ?: emptyList()
 
-        val oppdatertListeMedJobber = alleredeFullførteJobber + FullførteJobber.fraDomene(fullførtJobb)
+        val oppdatertListeMedJobber =
+            alleredeFullførteJobber + FullførteJobber.fraDomene(fullførtJobb)
 
         lagreImportEksportStatus(ImportEksportStatus(forKvartal, oppdatertListeMedJobber))
     }
 
     fun hentFullførteJobber(årstallOgKvartal: ÅrstallOgKvartal): List<ImportEksportJobb> {
-        return hentImportEksportStatus(årstallOgKvartal).firstOrNull()?.fullførteJobber?.map { it.tilDomene() }
+        return hentImportEksportStatus(årstallOgKvartal).firstOrNull()?.fullførteJobber?.mapNotNull { it.tilDomene() }
             ?: emptyList()
     }
 
@@ -69,14 +69,22 @@ private data class ImportEksportStatus(
 private enum class FullførteJobber {
     IMPORTERT_STATISTIKK,
     IMPORTERT_VIRKSOMHETDATA,
+    EKSPORTERT_LEGACY,
+    IMPORTERT_NÆRINGSKODEMAPPING,
+
+    // Ikke lenger i bruk i koden, men finnes i databasen.
+    FORBEREDT_NESTE_EKSPORT_LEGACY,
     EKSPORTERT_METADATA_VIRKSOMHET,
     EKSPORTERT_PER_STATISTIKKATEGORI;
 
-    fun tilDomene(): ImportEksportJobb = when (this) {
+    fun tilDomene(): ImportEksportJobb? = when (this) {
         IMPORTERT_STATISTIKK -> ImportEksportJobb.IMPORTERT_STATISTIKK
         IMPORTERT_VIRKSOMHETDATA -> ImportEksportJobb.IMPORTERT_VIRKSOMHETDATA
         EKSPORTERT_METADATA_VIRKSOMHET -> ImportEksportJobb.EKSPORTERT_METADATA_VIRKSOMHET
         EKSPORTERT_PER_STATISTIKKATEGORI -> ImportEksportJobb.EKSPORTERT_PER_STATISTIKKATEGORI
+
+        // Legacy
+        IMPORTERT_NÆRINGSKODEMAPPING, FORBEREDT_NESTE_EKSPORT_LEGACY, EKSPORTERT_LEGACY -> null
     }
 
     companion object {
