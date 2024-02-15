@@ -26,8 +26,8 @@ import java.time.temporal.ChronoUnit.MINUTES
 class ImporterOgEksporterStatistikkCron(
     registry: MeterRegistry,
     private val taskExecutor: LockingTaskExecutor,
-    private val importeringService: SykefraværsstatistikkImporteringService,
     private val importEksportStatusRepository: ImportEksportStatusRepository,
+    private val importeringService: SykefraværsstatistikkImporteringService,
     private val virksomhetMetadataService: VirksomhetMetadataService,
     private val eksporteringPerStatistikkKategoriService: EksporteringPerStatistikkKategoriService,
     private val eksporteringMetadataVirksomhetService: EksporteringMetadataVirksomhetService,
@@ -39,7 +39,7 @@ class ImporterOgEksporterStatistikkCron(
     private val vellykketEksportCounter: Counter = registry.counter("sykefravarstatistikk_vellykket_eksport")
     private val noeFeilet: Counter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
 
-    @Scheduled(cron = "0 15 13 * * ?") //  @Scheduled(cron = "0 5 8 * * ?")
+    @Scheduled(cron = "0 5 8 * * ?")
     fun scheduledImporteringOgEksportering() {
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
@@ -63,11 +63,8 @@ class ImporterOgEksporterStatistikkCron(
         log.info("Jobb for å importere sykefraværsstatistikk er startet.")
         if (iDag >= nestePubliseringsdato) {
             log.info("Neste publiseringsdato $nestePubliseringsdato er nådd i dag $iDag, importerer statistikk.")
-            // importeringService.importerHvisDetFinnesNyStatistikk()
+            importeringService.importerHvisDetFinnesNyStatistikk()
         }
-
-        // TODO: Fjern neste linje, den er bare for å logge litt rundt helsa til databasen
-        importeringService.importerHvisDetFinnesNyStatistikk()
 
         val fullførteJobber = importEksportStatusRepository.hentFullførteJobber(gjeldendeKvartal)
         log.info("Listen over fullførte jobber dette kvartalet: ${fullførteJobber.joinToString()}")
