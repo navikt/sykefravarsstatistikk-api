@@ -39,7 +39,7 @@ class ImporterOgEksporterStatistikkCron(
     private val vellykketEksportCounter: Counter = registry.counter("sykefravarstatistikk_vellykket_eksport")
     private val noeFeilet: Counter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
 
-    @Scheduled(cron = "0 10 11 * * ?") //  @Scheduled(cron = "0 5 8 * * ?")
+    @Scheduled(cron = "0 15 11 * * ?") //  @Scheduled(cron = "0 5 8 * * ?")
     fun scheduledImporteringOgEksportering() {
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
