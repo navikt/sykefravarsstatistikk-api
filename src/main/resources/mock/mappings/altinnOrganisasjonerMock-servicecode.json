@@ -1,0 +1,35 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/proxy/v2/organisasjoner",
+    "headers": {
+      "Accept": {
+        "contains": "application/json"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "Name": "BALLSTAD OG HORTEN",
+        "Type": "Enterprise",
+        "ParentOrganizationNumber": null,
+        "OrganizationNumber": "811076112",
+        "OrganizationForm": "AS",
+        "Status": "Active"
+      },
+      {
+        "Name": "BALLSTAD OG HORTEN",
+        "Type": "Enterprise",
+        "ParentOrganizationNumber": null,
+        "OrganizationNumber": "833445566",
+        "OrganizationForm": "AS",
+        "Status": "Active"
+      }
+    ]
+  }
+}

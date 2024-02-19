@@ -8,6 +8,38 @@ Hensikten er å gjøre arbeidsgivere mer engasjert i eget sykefravær.
 
 [![Build, push & deploy](https://github.com/navikt/sykefravarsstatistikk-api/actions/workflows/build-deploy.yaml/badge.svg?branch=master)](https://github.com/navikt/sykefravarsstatistikk-api/actions/workflows/build-deploy.yaml)
 
+
+# Kjøre lokalt i docker compose
+
+Pass på at docker-compose er satt opp og at docker kjører. Appen burde da svare på `http://localhost:8080/sykefravarsstatistikk-api/internal/readiness`
+
+Stå i rotmappa til prosjeketet og: 
+
+- Kjør opp avhengigheter med `docker-compose up -d`.
+- Kjør opp appen med `SPRING_PROFILES_ACTIVE=compose mvn clean spring-boot:run` (evt kjør i eclipse med aktiv profil = compose) 
+
+Hent ut token:
+
+```bash
+curl -H "Content-Type: application/x-www-form-urlencoded" --request POST  \
+  -d grant_type="client_credentials"                                      \
+  -d client_id="localhost:arbeidsgiver:ia-tjenester-metrikker"            \
+  -d client_secret="client_secret"                                        \
+  "http://localhost:6969/tokenx/token" | jq -r '.access_token' | pbcopy
+```
+
+Nå kan du kjøre request mot appen med tokenet i clipboardet.
+
+Noen eksempel requests:
+
+```bash
+curl -X GET \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $(pbpaste)" \
+  "http://localhost:8080/sykefravarsstatistikk-api/811076112/sykefravarshistorikk/kvartalsvis"
+```
+
+
 # Komme i gang
 
 Koden kan kjøres som en vanlig Spring Boot-applikasjon fra SykefraværsstatistikkApplication. Du må

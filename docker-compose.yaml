@@ -1,0 +1,41 @@
+services:
+  authserver:
+    image: ghcr.io/navikt/mock-oauth2-server:2.1.1
+    environment:
+      TZ: Europe/Oslo
+      SERVER_PORT: 6969
+      JSON_CONFIG: "{\"interactiveLogin\":true,\"tokenCallbacks\":[{\"issuerId\":\"tokenx\",\"tokenExpiry\":3600,\"requestMappings\":[{\"match\":\"*\",\"requestParam\":\"grant_type\",\"claims\":{\"aud\":[\"aud-localhost\"],\"pid\":\"01079812345\",\"sub\":\"01079812345\",\"idp\":\"https://fakedings.intern.dev.nav.no/fake/idporten\"}}]}]}"
+    ports:
+      - "6969:6969"
+
+  postgres_applikasjon:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: test
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data-applikasjon:/var/lib/postgresql/data
+
+  postgres_datavarehus:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: test
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data-datavarehus:/var/lib/postgresql/data
+
+  mock:
+    container_name: mock
+    image: wiremock/wiremock
+    ports:
+      - "8585:8080"
+    volumes:
+      - ./src/main/resources/mock:/home/wiremock
+
+volumes:
+  postgres-data-applikasjon:
+  postgres-data-datavarehus:

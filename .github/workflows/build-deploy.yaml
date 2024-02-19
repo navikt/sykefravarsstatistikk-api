@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - auditlog
+      - compose-oppsett
     paths-ignore:
       - '**.md'
       - '**/**.md'
