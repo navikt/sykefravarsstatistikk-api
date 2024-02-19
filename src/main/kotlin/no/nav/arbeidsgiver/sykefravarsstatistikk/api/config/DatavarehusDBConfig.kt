@@ -8,11 +8,13 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.util.*
 import javax.sql.DataSource
 
 @Configuration
+@Profile("!compose")
 open class DatavarehusDBConfig {
     @Value("\${datavarehus.datasource.url}")
     private val databaseUrl: String? = null

@@ -1,0 +1,42 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/enhetsregisteret/enheter/987654321",
+    "headers": {
+      "Accept": {
+        "contains": "*/*"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "organisasjonsnummer": "987654321",
+      "navn": "Overordnet enhet for test",
+      "naeringskode1": {
+        "beskrivelse": "Annen forskning og annet utviklingsarbeid innen naturvitenskap og teknikk",
+        "kode": "72.190"
+      },
+      "institusjonellSektorkode": {
+        "kode": "2100",
+        "beskrivelse": "Private aksjeselskaper mv."
+      },
+      "antallAnsatte": 6,
+      "overordnetEnhet": "987654321",
+      "forretningsadresse": {
+        "land": "Norge",
+        "landkode": "NO",
+        "postnummer": "0576",
+        "poststed": "OSLO",
+        "adresse": [
+          "Enannenveien 99"
+        ],
+        "kommune": "OSLO",
+        "kommunenummer": "0301"
+      }
+    }
+  }
+}

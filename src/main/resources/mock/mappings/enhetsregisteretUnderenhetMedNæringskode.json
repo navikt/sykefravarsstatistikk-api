@@ -1,0 +1,39 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/enhetsregisteret/underenheter/811076112",
+    "headers": {
+      "Accept": {
+        "contains": "*/*"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "organisasjonsnummer": "811076112",
+      "navn": "Bedrift uten næringskode",
+      "naeringskode1": {
+        "kode": "86.234",
+        "beskrivelse": "En random kode"
+      },
+      "antallAnsatte": 6,
+      "overordnetEnhet": "987654321",
+      "oppstartsdato": "2013-02-25",
+      "beliggenhetsadresse": {
+        "land": "Norge",
+        "landkode": "NO",
+        "postnummer": "3036",
+        "poststed": "DRAMMEN",
+        "adresse": [
+          "Testenekjørerveien 13"
+        ],
+        "kommune": "DRAMMEN",
+        "kommunenummer": "3005"
+      }
+    }
+  }
+}

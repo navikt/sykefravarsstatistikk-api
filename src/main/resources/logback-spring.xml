@@ -2,7 +2,7 @@
     <include resource="logback-appenders.xml"/>
 
     <!--  Bruk default Spring log config når man kjører lokalt  -->
-    <springProfile name="local">
+    <springProfile name="local,compose">
         <include resource="org/springframework/boot/logging/logback/base.xml"/>
     </springProfile>
 
