@@ -70,7 +70,7 @@ internal class PubliseringsdatoerServiceTest {
         Mockito.`when`(mockPubliseringsdatoerRepository?.hentPubliseringsdatoer()).thenReturn(publiseringsdatoer)
         val faktiskeDatoer = serviceUnderTest!!.hentPubliseringsdatoer()
 
-        val forventet = Publiseringsdatoer(
+        val forventet = PubliseringskalenderDto(
             LocalDate.parse("2022-09-08"),
             ÅrstallOgKvartal(2022, 2),
             LocalDate.parse("2022-12-01")
@@ -89,7 +89,7 @@ internal class PubliseringsdatoerServiceTest {
             .thenReturn(enDagEtterPlanlagtImport)
         Mockito.`when`(mockPubliseringsdatoerRepository?.hentPubliseringsdatoer()).thenReturn(publiseringsdatoer)
         val faktiskeDatoer = serviceUnderTest!!.hentPubliseringsdatoer()
-        val forventet = Publiseringsdatoer(
+        val forventet = PubliseringskalenderDto(
             LocalDate.parse("2022-06-03"),
             ÅrstallOgKvartal(2022, 1),
             LocalDate.parse("2022-09-08")

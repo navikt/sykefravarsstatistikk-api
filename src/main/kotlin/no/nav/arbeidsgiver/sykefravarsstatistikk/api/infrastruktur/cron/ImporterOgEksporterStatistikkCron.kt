@@ -9,6 +9,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringPerStatistikkKategoriService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.VirksomhetMetadataService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Statistikkategori
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.SykefraværsstatistikkImporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer.PubliseringsdatoerService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImportEksportJobb.*
@@ -64,11 +65,15 @@ class ImporterOgEksporterStatistikkCron(
                     return
                 }
 
-        var gjeldendeKvartal = publiseringskalender.gjeldendePeriode
+        val gjeldendeKvartal: ÅrstallOgKvartal?
 
         if (iDag() >= nestePubliseringsdato) {
             log.info("Neste publiseringsdato $nestePubliseringsdato er nådd i dag (${iDag()})")
             gjeldendeKvartal = publiseringskalender.gjeldendePeriode.plussKvartaler(1)
+            log.info("Neste publiseringsdato er nådd. Gjeldende kvartal blir nå $gjeldendeKvartal")
+        } else {
+            gjeldendeKvartal = publiseringskalender.gjeldendePeriode
+            log.info("Neste publiseringsdato er ikke nådd. Gjeldende kvartal er fortsatt $gjeldendeKvartal")
         }
 
         val fullførteJobber = importEksportStatusRepository.hentFullførteJobber(gjeldendeKvartal).also {
@@ -76,10 +81,14 @@ class ImporterOgEksporterStatistikkCron(
         }
 
         if (fullførteJobber.oppfyllerKraveneTilÅStarte(IMPORTERT_STATISTIKK)) {
-            importeringService.importerHvisDetFinnesNyStatistikk(gjeldendeKvartal).map {
-                importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_STATISTIKK, gjeldendeKvartal)
-                vellykketImportCounter.inkrementerOgLogg()
-            }
+            importeringService.importerHvisDetFinnesNyStatistikk(gjeldendeKvartal)
+                .map {
+                    log.info("Ny statistikk har blitt importert for $gjeldendeKvartal")
+                    importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_STATISTIKK, gjeldendeKvartal)
+                    vellykketImportCounter.inkrementerOgLogg()
+                }.mapLeft {
+                    log.info("Import ble ikke gjennomført for $gjeldendeKvartal, det ble ikke funnet noen ny statistikk i DVH")
+                }
         }
 
         if (fullførteJobber.oppfyllerKraveneTilÅStarte(IMPORTERT_VIRKSOMHETDATA)) {

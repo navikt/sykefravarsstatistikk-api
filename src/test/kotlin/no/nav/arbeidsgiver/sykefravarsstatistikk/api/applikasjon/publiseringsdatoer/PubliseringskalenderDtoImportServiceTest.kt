@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import java.time.LocalDate
 
 @ExtendWith(MockitoExtension::class)
-internal class PubliseringsdatoerImportServiceTest {
+internal class PubliseringskalenderDtoImportServiceTest {
     private var serviceUnderTest: PubliseringsdatoerImportService? = null
 
     @Mock
