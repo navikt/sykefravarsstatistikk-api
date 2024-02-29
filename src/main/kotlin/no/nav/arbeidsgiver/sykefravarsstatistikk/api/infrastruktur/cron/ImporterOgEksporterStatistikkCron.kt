@@ -39,7 +39,7 @@ class ImporterOgEksporterStatistikkCron(
     private val vellykketEksportCounter: Counter = registry.counter("sykefravarstatistikk_vellykket_eksport")
     private val noeFeilet: Counter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
 
-    @Scheduled(cron = "0 5 8 * * ?")
+    @Scheduled(cron = "0 40 10 * * ?")
     fun scheduledImporteringOgEksportering() {
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
@@ -51,19 +51,23 @@ class ImporterOgEksporterStatistikkCron(
 
     fun gjennomførImportOgEksport() {
         val publiseringsdatoer = publiseringsdatoerService.hentPubliseringsdatoer()
-        val nestePubliseringsdato = publiseringsdatoer?.nestePubliseringsdato
-            ?: run {
-                log.error("Neste publiseringsdato er null, avbryter import og eksport. Er publiseringskalenderen i datavarehus oppdatert?")
-                noeFeilet.increment()
-                return
-            }
+
+        val nestePubliseringsdato =
+            publiseringsdatoer?.nestePubliseringsdato?.also { log.info("Neste publiseringsdato er $it") }
+                ?: run {
+                    log.error("Neste publiseringsdato er null, avbryter import og eksport. Er publiseringskalenderen i datavarehus oppdatert?")
+                    noeFeilet.increment()
+                    return
+                }
         val gjeldendeKvartal = publiseringsdatoer.gjeldendePeriode
         val iDag = LocalDate.now(clock)
 
         log.info("Jobb for å importere sykefraværsstatistikk er startet.")
+        log.info("Gjeldende kvartal er $gjeldendeKvartal")
+
         if (iDag >= nestePubliseringsdato) {
             log.info("Neste publiseringsdato $nestePubliseringsdato er nådd i dag $iDag, importerer statistikk.")
-            importeringService.importerHvisDetFinnesNyStatistikk()
+            importeringService.importerHvisDetFinnesNyStatistikk(gjeldendeKvartal)
         }
 
         val fullførteJobber = importEksportStatusRepository.hentFullførteJobber(gjeldendeKvartal)

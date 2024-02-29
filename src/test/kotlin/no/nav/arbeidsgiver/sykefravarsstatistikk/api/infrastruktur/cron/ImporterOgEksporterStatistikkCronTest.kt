@@ -47,7 +47,7 @@ class ImporterOgEksporterStatistikkCronTest {
     @BeforeEach
     fun beforeEach() {
         // Defaults to happy case
-        every { importeringService.importerHvisDetFinnesNyStatistikk() } returns Unit
+        every { importeringService.importerHvisDetFinnesNyStatistikk(any()) } returns Unit
         every { virksomhetMetadataService.overskrivMetadataForVirksomheter(any()) } returns 1.right()
         every { eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(any()) } returns Unit.right()
         every { eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(any(), any()) } returns Unit
@@ -107,6 +107,6 @@ class ImporterOgEksporterStatistikkCronTest {
 
         importerOgEksporterStatistikkCron.gjennomførImportOgEksport()
 
-        verify(exactly = 0) { importeringService.importerHvisDetFinnesNyStatistikk() }
+        verify(exactly = 0) { importeringService.importerHvisDetFinnesNyStatistikk(any()) }
     }
 }
