@@ -19,7 +19,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse.BodyHandlers
 import java.time.LocalDate
 
-class PubliseringsdatoerApiIntegrationTest : SpringIntegrationTestbase() {
+class PubliseringskalenderDtoApiIntegrationTest : SpringIntegrationTestbase() {
     @LocalServerPort
     private val port: String? = null
 
