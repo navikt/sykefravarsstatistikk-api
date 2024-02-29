@@ -10,7 +10,7 @@ class PubliseringsdatoerService(
     private val importtidspunktRepository: ImporttidspunktRepository
 ) {
 
-    fun hentPubliseringsdatoer(): Publiseringsdatoer? {
+    fun hentPubliseringsdatoer(): PubliseringskalenderDto? {
         val publiseringsdatoer = publiseringsdatoerRepository.hentPubliseringsdatoer()
         val nyesteImport = importtidspunktRepository.hentNyesteImporterteKvartal()
             ?: return null
@@ -18,12 +18,12 @@ class PubliseringsdatoerService(
         val nestePubliseringsdato =
             publiseringsdatoer
                 .filter { it.offentligDato.isAfter(nyesteImport.sistImportertTidspunkt) }
-                .minOfOrNull { it.offentligDato }
+                .minOfOrNull { it.offentligDato } // Dette blir vel feil hvis importtidspunktet ikk er oppdatert?
 
-        return Publiseringsdatoer(
+        return PubliseringskalenderDto(
             sistePubliseringsdato = nyesteImport.sistImportertTidspunkt,
             gjeldendePeriode = nyesteImport.gjeldendePeriode,
-            nestePubliseringsdato = nestePubliseringsdato
+            nestePubliseringsdato = nestePubliseringsdato,
         )
     }
 }
