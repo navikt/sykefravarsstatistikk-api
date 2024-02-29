@@ -39,7 +39,8 @@ class ImporterOgEksporterStatistikkCron(
     private val vellykketEksportCounter: Counter = registry.counter("sykefravarstatistikk_vellykket_eksport")
     private val noeFeilet: Counter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
 
-    @Scheduled(cron = "0 40 10 * * ?")
+
+    @Scheduled(cron = FEM_OVER_ÅTTE_HVER_DAG)
     fun scheduledImporteringOgEksportering() {
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
@@ -50,55 +51,56 @@ class ImporterOgEksporterStatistikkCron(
     }
 
     fun gjennomførImportOgEksport() {
-        val publiseringsdatoer = publiseringsdatoerService.hentPubliseringsdatoer()
+
+        log.info("Jobb for å importere og eksportere sykefraværsstatistikk er startet")
+
+        val publiseringskalender = publiseringsdatoerService.hentPubliseringsdatoer()
 
         val nestePubliseringsdato =
-            publiseringsdatoer?.nestePubliseringsdato?.also { log.info("Neste publiseringsdato er $it") }
+            publiseringskalender?.nestePubliseringsdato?.also { log.info("Neste publiseringsdato er $it") }
                 ?: run {
                     log.error("Neste publiseringsdato er null, avbryter import og eksport. Er publiseringskalenderen i datavarehus oppdatert?")
-                    noeFeilet.increment()
+                    noeFeilet.inkrementerOgLogg()
                     return
                 }
-        val gjeldendeKvartal = publiseringsdatoer.gjeldendePeriode
-        val iDag = LocalDate.now(clock)
 
-        log.info("Jobb for å importere sykefraværsstatistikk er startet.")
-        log.info("Gjeldende kvartal er $gjeldendeKvartal")
+        var gjeldendeKvartal = publiseringskalender.gjeldendePeriode
 
-        if (iDag >= nestePubliseringsdato) {
-            log.info("Neste publiseringsdato $nestePubliseringsdato er nådd i dag $iDag, importerer statistikk.")
-            importeringService.importerHvisDetFinnesNyStatistikk(gjeldendeKvartal)
+        if (iDag() >= nestePubliseringsdato) {
+            log.info("Neste publiseringsdato $nestePubliseringsdato er nådd i dag (${iDag()})")
+            gjeldendeKvartal = publiseringskalender.gjeldendePeriode.plussKvartaler(1)
         }
 
-        val fullførteJobber = importEksportStatusRepository.hentFullførteJobber(gjeldendeKvartal)
-        log.info("Listen over fullførte jobber dette kvartalet: ${fullførteJobber.joinToString()}")
-
-        if (fullførteJobber.manglerJobben(IMPORTERT_STATISTIKK)) {
-            importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_STATISTIKK, gjeldendeKvartal)
-
-            log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_import'")
-            vellykketImportCounter.increment()
+        val fullførteJobber = importEksportStatusRepository.hentFullførteJobber(gjeldendeKvartal).also {
+            log.info("Listen over fullførte jobber dette kvartalet: ${it.joinToString()}")
         }
 
-        if (fullførteJobber.manglerJobben(IMPORTERT_VIRKSOMHETDATA)) {
+        if (fullførteJobber.oppfyllerKraveneTilÅStarte(IMPORTERT_STATISTIKK)) {
+            importeringService.importerHvisDetFinnesNyStatistikk(gjeldendeKvartal).map {
+                importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_STATISTIKK, gjeldendeKvartal)
+                vellykketImportCounter.inkrementerOgLogg()
+            }
+        }
+
+        if (fullførteJobber.oppfyllerKraveneTilÅStarte(IMPORTERT_VIRKSOMHETDATA)) {
             virksomhetMetadataService.overskrivMetadataForVirksomheter(gjeldendeKvartal)
                 .getOrElse {
-                    noeFeilet.increment()
+                    noeFeilet.inkrementerOgLogg()
                     return
                 }
             importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_VIRKSOMHETDATA, gjeldendeKvartal)
         }
 
-        if (fullførteJobber.manglerJobben(EKSPORTERT_METADATA_VIRKSOMHET)) {
+        if (fullførteJobber.oppfyllerKraveneTilÅStarte(EKSPORTERT_METADATA_VIRKSOMHET)) {
             eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(gjeldendeKvartal)
                 .getOrElse {
-                    noeFeilet.increment()
+                    noeFeilet.inkrementerOgLogg()
                     return
                 }
             importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_METADATA_VIRKSOMHET, gjeldendeKvartal)
         }
 
-        if (fullførteJobber.manglerJobben(EKSPORTERT_PER_STATISTIKKATEGORI)) {
+        if (fullførteJobber.oppfyllerKraveneTilÅStarte(EKSPORTERT_PER_STATISTIKKATEGORI)) {
             Statistikkategori.entries.forEach { kategori ->
                 runCatching {
                     eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(
@@ -107,19 +109,19 @@ class ImporterOgEksporterStatistikkCron(
                     )
                 }.getOrElse {
                     log.error("Eksport av kategori $kategori feilet", it)
-                    noeFeilet.increment()
+                    noeFeilet.inkrementerOgLogg()
                     return
                 }
             }
+
             importEksportStatusRepository.leggTilFullførtJobb(
                 EKSPORTERT_PER_STATISTIKKATEGORI,
                 gjeldendeKvartal
             )
 
-
-            log.info("Inkrementerer counter 'sykefravarstatistikk_vellykket_eksport'")
-            vellykketEksportCounter.increment()
+            vellykketEksportCounter.inkrementerOgLogg()
         }
+
         log.info(
             "Listen over fullførte jobber dette kvartalet: ${
                 importEksportStatusRepository.hentFullførteJobber(
@@ -128,6 +130,16 @@ class ImporterOgEksporterStatistikkCron(
             }"
         )
     }
+
+    fun iDag(): LocalDate = LocalDate.now(clock)
+
+    fun Counter.inkrementerOgLogg() {
+        log.info("Inkrementerer Prometheus-telleren ${this.id.name} til ${this.count()}")
+        this.increment()
+    }
+
+    companion object {
+        const val FEM_OVER_ÅTTE_HVER_DAG = "0 5 8 * * ?"
+    }
 }
 
-fun List<ImportEksportJobb>.manglerJobben(jobb: ImportEksportJobb) = this.none { it == jobb }
