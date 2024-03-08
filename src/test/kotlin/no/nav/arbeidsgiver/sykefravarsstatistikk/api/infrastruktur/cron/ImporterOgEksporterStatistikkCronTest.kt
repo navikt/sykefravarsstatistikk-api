@@ -1,9 +1,7 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron
 
-import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import io.kotest.matchers.ints.exactly
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
@@ -51,7 +49,6 @@ class ImporterOgEksporterStatistikkCronTest {
     val dummyForrigePubliseringsdato: LocalDate = LocalDate.parse("2024-02-29")
     val dummyGjeldendePeriode = ÅrstallOgKvartal(2023, 4)
     val dummyPlanlagtPubliseringsdato: LocalDate = LocalDate.parse("2024-05-30")
-
 
     @BeforeEach
     fun beforeEach() {
