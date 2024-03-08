@@ -1,7 +1,9 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron
 
+import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import io.kotest.matchers.ints.exactly
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
@@ -14,6 +16,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.Å
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringMetadataVirksomhetService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefraværsstatistikk.EksporteringPerStatistikkKategoriService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.SykefraværsstatistikkImporteringService
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.SykefraværsstatistikkImporteringService.ImportGjennomført
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer.PubliseringskalenderDto
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer.PubliseringsdatoerService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImporterOgEksporterStatistikkCronTest.Tidspunkt.*
@@ -48,6 +51,7 @@ class ImporterOgEksporterStatistikkCronTest {
     val dummyForrigePubliseringsdato: LocalDate = LocalDate.parse("2024-02-29")
     val dummyGjeldendePeriode = ÅrstallOgKvartal(2023, 4)
     val dummyPlanlagtPubliseringsdato: LocalDate = LocalDate.parse("2024-05-30")
+
 
     @BeforeEach
     fun beforeEach() {
@@ -90,17 +94,22 @@ class ImporterOgEksporterStatistikkCronTest {
 
 
     @Test
-    fun `importEksport burde markere IMPORTERT_STATUISTIKK-jobb som kjørt når det finnes ny statistikk men resten feiler`() {
-        every { virksomhetMetadataService.overskrivMetadataForVirksomheter(any()) } returns IngenRaderImportert.left()
+    fun `når vi er på publiseringsdatoen skal vi hente fullførte jobber for det kommende kvartalet`() {
+        stillKlokka(til = PåPlanlagtPubliseringsdato)
 
         importerOgEksporterStatistikkCron.gjennomførImportOgEksport()
 
-        verify(exactly = 1) { importEksportStatusRepository.leggTilFullførtJobb(any(), any()) }
-        verify(exactly = 1) { importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_STATISTIKK, any()) }
+        verify(exactly = 0) { importEksportStatusRepository.hentFullførteJobber(dummyGjeldendePeriode) }
+        verify(atLeast = 1) { importEksportStatusRepository.hentFullførteJobber(dummyGjeldendePeriode.plussKvartaler(1)) }
     }
 
     @Test
     fun `importEksport burde markere alle jobber som kjørt når det finnes ny statistikk og ingenting feiler`() {
+        stillKlokka(til = PåPlanlagtPubliseringsdato)
+        every { importEksportStatusRepository.hentFullførteJobber(dummyGjeldendePeriode.plussKvartaler(1)) } returns emptyList()
+
+
+
         importerOgEksporterStatistikkCron.gjennomførImportOgEksport()
 
         verify(exactly = ImportEksportJobb.entries.size) {
@@ -129,16 +138,13 @@ class ImporterOgEksporterStatistikkCronTest {
     }
 
     fun stillKlokka(til: Tidspunkt) {
-        val dagerFraPubliseringsdatoen = when (til) {
-            is DagenFørPlanlagtPubliseringsdato -> -1L
-            is PåPlanlagtPubliseringsdato -> 0L
-            is DagenEtterPlanlagtPubliseringsdato -> 1L
+        val nyDato = when (til) {
+            is DagenFørPlanlagtPubliseringsdato -> dummyPlanlagtPubliseringsdato.minusDays(1)
+            is PåPlanlagtPubliseringsdato -> dummyForrigePubliseringsdato
+            is DagenEtterPlanlagtPubliseringsdato -> dummyPlanlagtPubliseringsdato.plusDays(1)
         }
         every { clock.zone } returns UTC
-        every { clock.instant() } returns dummyPlanlagtPubliseringsdato
-            .plusDays(dagerFraPubliseringsdatoen)
-            .atStartOfDay()
-            .toInstant(UTC)
+        every { clock.instant() } returns nyDato.atStartOfDay().toInstant(UTC)
     }
 
 
