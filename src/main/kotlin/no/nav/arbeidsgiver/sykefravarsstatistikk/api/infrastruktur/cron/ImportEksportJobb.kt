@@ -13,4 +13,4 @@ fun List<ImportEksportJobb>.oppfyllerKraveneTilÅStarte(denneJobben: ImportEkspo
 private fun List<ImportEksportJobb>.manglerJobben(jobb: ImportEksportJobb) = this.none { it == jobb }
 
 private fun List<ImportEksportJobb>.påkrevdJobbErKjørtFor(denneJobben: ImportEksportJobb) =
-    this.contains(denneJobben.måKjøreEtter)
+    denneJobben.måKjøreEtter == null || this.contains(denneJobben.måKjøreEtter)
