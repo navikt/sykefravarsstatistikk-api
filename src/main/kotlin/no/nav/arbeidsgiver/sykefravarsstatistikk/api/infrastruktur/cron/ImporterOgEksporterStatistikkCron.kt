@@ -76,11 +76,7 @@ class ImporterOgEksporterStatistikkCron(
             log.info("Neste publiseringsdato er ikke nådd. Gjeldende kvartal er fortsatt $gjeldendeKvartal")
         }
 
-        val fullførteJobber = importEksportStatusRepository.hentFullførteJobber(gjeldendeKvartal).also {
-            log.info("Listen over fullførte jobber dette kvartalet: ${it.joinToString()}")
-        }
-
-        if (fullførteJobber.oppfyllerKraveneTilÅStarte(IMPORTERT_STATISTIKK)) {
+        if (kraveneErOppfyltForÅStarte(IMPORTERT_STATISTIKK, gjeldendeKvartal)) {
             importeringService.importerHvisDetFinnesNyStatistikk(gjeldendeKvartal)
                 .map {
                     log.info("Ny statistikk har blitt importert for $gjeldendeKvartal")
@@ -91,7 +87,7 @@ class ImporterOgEksporterStatistikkCron(
                 }
         }
 
-        if (fullførteJobber.oppfyllerKraveneTilÅStarte(IMPORTERT_VIRKSOMHETDATA)) {
+        if (kraveneErOppfyltForÅStarte(IMPORTERT_VIRKSOMHETDATA, gjeldendeKvartal)) {
             virksomhetMetadataService.overskrivMetadataForVirksomheter(gjeldendeKvartal)
                 .getOrElse {
                     noeFeilet.inkrementerOgLogg()
@@ -100,7 +96,7 @@ class ImporterOgEksporterStatistikkCron(
             importEksportStatusRepository.leggTilFullførtJobb(IMPORTERT_VIRKSOMHETDATA, gjeldendeKvartal)
         }
 
-        if (fullførteJobber.oppfyllerKraveneTilÅStarte(EKSPORTERT_METADATA_VIRKSOMHET)) {
+        if (kraveneErOppfyltForÅStarte(EKSPORTERT_METADATA_VIRKSOMHET, gjeldendeKvartal)) {
             eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(gjeldendeKvartal)
                 .getOrElse {
                     noeFeilet.inkrementerOgLogg()
@@ -109,7 +105,7 @@ class ImporterOgEksporterStatistikkCron(
             importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_METADATA_VIRKSOMHET, gjeldendeKvartal)
         }
 
-        if (fullførteJobber.oppfyllerKraveneTilÅStarte(EKSPORTERT_PER_STATISTIKKATEGORI)) {
+        if (kraveneErOppfyltForÅStarte(EKSPORTERT_PER_STATISTIKKATEGORI, gjeldendeKvartal)) {
             Statistikkategori.entries.forEach { kategori ->
                 runCatching {
                     eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(
@@ -145,6 +141,12 @@ class ImporterOgEksporterStatistikkCron(
     fun Counter.inkrementerOgLogg() {
         log.info("Inkrementerer Prometheus-telleren ${this.id.name} til ${this.count()}")
         this.increment()
+    }
+
+    fun kraveneErOppfyltForÅStarte(jobb: ImportEksportJobb, kvartal: ÅrstallOgKvartal): Boolean {
+        return importEksportStatusRepository.hentFullførteJobber(kvartal).also {
+            log.info("Listen over fullførte jobber er nå: ${it.joinToString()}")
+        }.oppfyllerKraveneTilÅStarte(jobb)
     }
 
     companion object {
