@@ -14,6 +14,7 @@ import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.eksportAvSykefr
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.SykefraværsstatistikkImporteringService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.SykefraværsstatistikkImporteringService.ImportGjennomført
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk.SykefraværsstatistikkImporteringService.IngenNyData
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer.PubliseringsdatoerService
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer.PubliseringskalenderDto
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImportEksportJobb.EKSPORTERT_METADATA_VIRKSOMHET
@@ -125,6 +126,18 @@ class ImporterOgEksporterStatistikkCronTest {
 
         verify(exactly = 0) { virksomhetMetadataService.overskrivMetadataForVirksomheter(any()) }
         verify(exactly = 1) { eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(any()) }
+    }
+
+    @Test
+    fun `ingen andre jobber skjal starte opp hvis ikke vi har importert statistikk først`() {
+        every { importEksportStatusRepository.hentFullførteJobber(any()) } returns emptyList()
+        every { importeringService.importerHvisDetFinnesNyStatistikk(any()) } returns IngenNyData.left()
+
+        importerOgEksporterStatistikkCron.gjennomførImportOgEksport()
+
+        verify(exactly = 0) { virksomhetMetadataService.overskrivMetadataForVirksomheter(any()) }
+        verify(exactly = 0) { eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(any()) }
+        verify(exactly = 0) { eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(any(), any()) }
     }
 
     @Test
