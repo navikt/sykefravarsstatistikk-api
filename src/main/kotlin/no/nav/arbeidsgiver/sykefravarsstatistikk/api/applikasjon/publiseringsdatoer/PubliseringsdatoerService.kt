@@ -18,7 +18,7 @@ class PubliseringsdatoerService(
         val nestePubliseringsdato =
             publiseringsdatoer
                 .filter { it.offentligDato.isAfter(nyesteImport.sistImportertTidspunkt) }
-                .minOfOrNull { it.offentligDato } // Dette blir vel feil hvis importtidspunktet ikk er oppdatert?
+                .minOfOrNull { it.offentligDato }
 
         return PubliseringskalenderDto(
             sistePubliseringsdato = nyesteImport.sistImportertTidspunkt,
