@@ -128,7 +128,7 @@ class ImporterOgEksporterStatistikkCron(
         }
 
         log.info(
-            "Listen over fullførte jobber dette kvartalet: ${
+            "Jobb for å importere og eksportere statistikk har fullført. Listen over fullførte jobber er nå: ${
                 importEksportStatusRepository.hentFullførteJobber(
                     gjeldendeKvartal
                 )
