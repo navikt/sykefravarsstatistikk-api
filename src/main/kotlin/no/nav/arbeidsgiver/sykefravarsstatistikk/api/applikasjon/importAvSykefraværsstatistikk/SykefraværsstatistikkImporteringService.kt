@@ -1,5 +1,8 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefraværsstatistikk
 
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhet
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.SykefraværsstatistikkVirksomhetMedGradering
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
@@ -28,8 +31,7 @@ class SykefraværsstatistikkImporteringService(
     private val environment: Environment,
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
-    fun importerHvisDetFinnesNyStatistikk(gjeldendeKvartal: ÅrstallOgKvartal) {
-        log.info("Gjeldende miljø: " + environment.activeProfiles.contentToString())
+    fun importerHvisDetFinnesNyStatistikk(gjeldendeKvartal: ÅrstallOgKvartal): Either<IngenNyData, ImportGjennomført> {
         val årstallOgKvartalForSykefraværsstatistikk = listOf(
             sykefraværsstatistikkLandRepository.hentNyesteKvartal(),
             sykefraværStatistikkSektorRepository.hentNyesteKvartal(),
@@ -45,12 +47,22 @@ class SykefraværsstatistikkImporteringService(
         )
         if (kanImportStartes(årstallOgKvartalForSykefraværsstatistikk, årstallOgKvartalForDvh)) {
             log.info("Importerer ny statistikk for $gjeldendeKvartal")
+
             importerAlleKategorier(gjeldendeKvartal)
+
             importtidspunktRepository.settInnImporttidspunkt(gjeldendeKvartal)
+
+            return ImportGjennomført.right()
         } else {
-            log.info("Det er ikke noen ny statistikk å importere for $gjeldendeKvartal. Avbryter.")
+            log.info("Det er ikke noen ny sykefraværsstatistikk å importere fra DVH.")
+            return IngenNyData.left()
         }
     }
+
+
+    object ImportGjennomført
+
+    object IngenNyData
 
     fun importerAlleKategorier(gjeldendekvartal: ÅrstallOgKvartal) {
         importSykefraværsstatistikkLand(gjeldendekvartal)
@@ -65,7 +77,7 @@ class SykefraværsstatistikkImporteringService(
 
     fun kanImportStartes(
         årstallOgKvartalForSfsDb: List<ÅrstallOgKvartal>,
-        årstallOgKvartalForDvh: List<ÅrstallOgKvartal>
+        årstallOgKvartalForDvh: List<ÅrstallOgKvartal>,
     ): Boolean {
         val allStatistikkFraDvhHarSammeÅrstallOgKvartal =
             årstallOgKvartalForDvh.all { it == årstallOgKvartalForDvh.firstOrNull() }
@@ -113,7 +125,7 @@ class SykefraværsstatistikkImporteringService(
     }
 
     private fun importSykefraværsstatistikkLand(
-        årstallOgKvartal: ÅrstallOgKvartal
+        årstallOgKvartal: ÅrstallOgKvartal,
     ): SlettOgOpprettResultat {
 
         val statistikk = datavarehusLandRespository.hentFor(årstallOgKvartal)
@@ -128,7 +140,7 @@ class SykefraværsstatistikkImporteringService(
     }
 
     private fun importSykefraværsstatistikkSektor(
-        årstallOgKvartal: ÅrstallOgKvartal
+        årstallOgKvartal: ÅrstallOgKvartal,
     ): SlettOgOpprettResultat {
         val sykefraværsstatistikkSektor =
             datavarehusLandRespository.hentSykefraværsstatistikkSektor(
@@ -143,7 +155,7 @@ class SykefraværsstatistikkImporteringService(
     }
 
     private fun importSykefraværsstatistikkNæring(
-        årstallOgKvartal: ÅrstallOgKvartal
+        årstallOgKvartal: ÅrstallOgKvartal,
     ): SlettOgOpprettResultat {
         val sykefraværsstatistikkNæring = datavarehusNæringRepository.hentFor(årstallOgKvartal)
         val slettet = sykefraværStatistikkNæringRepository.slettFor(årstallOgKvartal)
@@ -154,7 +166,7 @@ class SykefraværsstatistikkImporteringService(
     }
 
     private fun importSykefraværsstatistikkNæring5siffer(
-        årstallOgKvartal: ÅrstallOgKvartal
+        årstallOgKvartal: ÅrstallOgKvartal,
     ): SlettOgOpprettResultat {
         val sykefraværsstatistikkNæringskode =
             datavarehusNæringskodeRepository.hentFor(årstallOgKvartal)
@@ -181,7 +193,7 @@ class SykefraværsstatistikkImporteringService(
     }
 
     fun importSykefraværsstatistikkVirksomhetMedGradering(
-        årstallOgKvartal: ÅrstallOgKvartal
+        årstallOgKvartal: ÅrstallOgKvartal,
     ) {
         val statistikk: List<SykefraværsstatistikkVirksomhetMedGradering> =
             if (environment.activeProfiles.contains("dev")) {
@@ -203,7 +215,7 @@ class SykefraværsstatistikkImporteringService(
     }
 
     private fun importSykefraværsstatistikkNæringMedVarighet(
-        årstallOgKvartal: ÅrstallOgKvartal
+        årstallOgKvartal: ÅrstallOgKvartal,
     ): SlettOgOpprettResultat {
         val data = datavarehusAggregertRepositoryV1.hentSykefraværsstatistikkNæringMedVarighet(
             årstallOgKvartal
@@ -219,7 +231,7 @@ class SykefraværsstatistikkImporteringService(
     }
 
     private fun loggResultat(
-        årstallOgKvartal: ÅrstallOgKvartal, resultat: SlettOgOpprettResultat, type: String
+        årstallOgKvartal: ÅrstallOgKvartal, resultat: SlettOgOpprettResultat, type: String,
     ) {
         val melding = if (resultat.antallRadOpprettet == 0 && resultat.antallRadSlettet == 0) {
             "Ingenting har blitt slettet eller importert."

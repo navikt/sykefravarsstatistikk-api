@@ -2,7 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer.PubliseringsdatoerService
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer.Publiseringsdatoer
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.publiseringsdatoer.PubliseringskalenderDto
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -31,7 +31,7 @@ data class PubliseringdatoerJson(
     val gjeldendePeriode: ÅrstallOgKvartal
 ) {
     companion object {
-        fun fraDomene(domene: Publiseringsdatoer) =
+        fun fraDomene(domene: PubliseringskalenderDto) =
             PubliseringdatoerJson(
                 sistePubliseringsdato = domene.sistePubliseringsdato.toString(),
                 nestePubliseringsdato = domene.nestePubliseringsdato?.toString()

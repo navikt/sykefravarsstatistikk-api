@@ -25,13 +25,12 @@ class EksporteringPerStatistikkKategoriService(
 
     fun eksporterPerStatistikkKategori(
         årstallOgKvartal: ÅrstallOgKvartal,
-        statistikkategori: Statistikkategori
+        statistikkategori: Statistikkategori,
     ) {
         log.info(
-            "Starter eksportering av kategori '{}' for årstall '{}' og kvartal '{}' på topic '{}'.",
+            "Starter eksportering av kategori '{}' for {} på topic '{}'.",
             statistikkategori.name,
-            årstallOgKvartal.årstall,
-            årstallOgKvartal.kvartal,
+            årstallOgKvartal,
             from(statistikkategori)?.navn
         )
 
@@ -151,7 +150,7 @@ class EksporteringPerStatistikkKategoriService(
         eksportkvartal: ÅrstallOgKvartal,
         sykefraværGruppertEtterKode: Map<String, List<Sykefraværsstatistikk>>,
         statistikkategori: Statistikkategori,
-        kafkaTopic: KafkaTopic
+        kafkaTopic: KafkaTopic,
     ) {
         log.info("Starter utsending av alle meldinger til Kafka for statistikkategori ${statistikkategori.name}")
         var antallStatistikkEksportert = 0
@@ -174,7 +173,8 @@ class EksporteringPerStatistikkKategoriService(
                 Statistikkategori.BRANSJE,
                 Statistikkategori.OVERORDNET_ENHET,
                 Statistikkategori.VIRKSOMHET,
-                Statistikkategori.NÆRINGSKODE -> StatistikkategoriKafkamelding(
+                Statistikkategori.NÆRINGSKODE,
+                -> StatistikkategoriKafkamelding(
                     sykefraværMedKategoriSisteKvartal,
                     SykefraværFlereKvartalerForEksport(umaskertSykefraværsstatistikk)
                 )
@@ -204,7 +204,8 @@ class EksporteringPerStatistikkKategoriService(
                 is SykefraværsstatistikkNæringMedVarighet,
                 is SykefraværsstatistikkSektor,
                 is SykefraværsstatistikkVirksomhetUtenVarighet,
-                is SykefraværsstatistikkVirksomhet -> UmaskertSykefraværForEttKvartal(it)
+                is SykefraværsstatistikkVirksomhet,
+                -> UmaskertSykefraværForEttKvartal(it)
 
                 is SykefraværsstatistikkVirksomhetMedGradering -> UmaskertSykefraværForEttKvartal(
                     ÅrstallOgKvartal(it.årstall, it.kvartal),
