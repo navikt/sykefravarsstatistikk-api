@@ -38,7 +38,7 @@
         <token-support.version>3.2.0</token-support.version>
 
         <!-- Data manipulation -->
-        <json-smart.version>2.5.0</json-smart.version>
+        <json-smart.version>2.5.1</json-smart.version>
         <jackson-dataformat-csv.version>2.17.0</jackson-dataformat-csv.version>
 
         <!-- Database & Persistence -->
@@ -69,11 +69,11 @@
         <prometheus.version>0.16.0</prometheus.version>
 
         <!-- Syntaxic sugar -->
-        <arrow-core.version>1.1.5</arrow-core.version>
+        <arrow-core.version>1.2.4</arrow-core.version>
 
         <!-- Mocking & Testing -->
         <h2.version>2.2.224</h2.version>
-        <json-unit-assertj.version>2.36.1</json-unit-assertj.version>
+        <json-unit-assertj.version>3.2.7</json-unit-assertj.version>
         <kotest-assertions-core-jvm.version>5.8.1</kotest-assertions-core-jvm.version>
         <mockito-kotlin.version>5.3.1</mockito-kotlin.version>
         <mockk-jvm.version>1.13.10</mockk-jvm.version>
