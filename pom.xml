@@ -37,7 +37,7 @@
         <altinn-rettigheter-proxy-klient.version>3.1.0</altinn-rettigheter-proxy-klient.version>
         <micrometer.version>1.11.2</micrometer.version>
         <prometheus.version>0.16.0</prometheus.version>
-        <wiremock.version>3.3.1</wiremock.version>
+        <wiremock.version>3.5.2</wiremock.version>
         <shedlock.version>5.6.0</shedlock.version>
         <shedlock-provider-jdbc-template.version>4.33.0
         </shedlock-provider-jdbc-template.version>
@@ -51,12 +51,12 @@
         <h2.version>2.2.224</h2.version>
         <jetbrainsExposedVersion>0.42.0</jetbrainsExposedVersion>
         <spring-boot-starter-parent.version>3.1.2</spring-boot-starter-parent.version>
-        <mockk-jvm.version>1.13.8</mockk-jvm.version>
+        <mockk-jvm.version>1.13.10</mockk-jvm.version>
         <flyway-maven-plugin.version>10.1.0</flyway-maven-plugin.version>
         <ia-felles.version>1.0.0</ia-felles.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.1.0</springdoc-openapi-starter-webmvc-ui.version>
         <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
-        <mockito-kotlin.version>5.1.0</mockito-kotlin.version>
+        <mockito-kotlin.version>5.3.1</mockito-kotlin.version>
         <kotlinx-coroutines-core-jvm.version>1.6.4</kotlinx-coroutines-core-jvm.version>
         <kotest-assertions-core-jvm.version>5.6.2</kotest-assertions-core-jvm.version>
         <json-unit-assertj.version>2.36.1</json-unit-assertj.version>
