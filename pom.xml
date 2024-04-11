@@ -32,10 +32,11 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <!-- Authentification / Authorization -->
+        <!-- Authentification / Authorization / Crypto -->
         <altinn-rettigheter-proxy-klient.version>3.1.0</altinn-rettigheter-proxy-klient.version>
-        <nimbus-jose-jwt.version>9.37.2</nimbus-jose-jwt.version>
-        <token-support.version>3.2.0</token-support.version>
+        <bouncy-castle-provider-jdk.version>1.78</bouncy-castle-provider-jdk.version>
+        <nimbus-jose-jwt.version>9.37.3</nimbus-jose-jwt.version>
+        <token-support.version>4.1.4</token-support.version>
 
         <!-- Data manipulation -->
         <json-smart.version>2.5.1</json-smart.version>
@@ -50,8 +51,8 @@
         <vault-jdbc.version>1.3.10</vault-jdbc.version>
 
         <!-- Kotlin -->
-        <kotlin.version>2.0.0-RC1</kotlin.version>
-        <kotlinx-coroutines-core-jvm.version>1.8.1-Beta</kotlinx-coroutines-core-jvm.version>
+        <kotlin.version>1.9.20</kotlin.version>
+        <kotlinx-coroutines-core-jvm.version>1.8.0</kotlinx-coroutines-core-jvm.version>
 
         <!-- Framework -->
         <ia-felles.version>1.0.0</ia-felles.version>
@@ -332,7 +333,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
-            <version>1.77</version>
+            <version>${bouncy-castle-provider-jdk.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -366,7 +367,7 @@
                 <artifactId>kotlin-maven-plugin</artifactId>
                 <version>${kotlin.version}</version>
                 <configuration>
-                    <jvmTarget>17</jvmTarget>
+                    <jvmTarget>21</jvmTarget>
                 </configuration>
                 <executions>
                     <execution>
@@ -401,8 +402,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>17</source>
-                    <target>17</target>
+                    <source>21</source>
+                    <target>21</target>
                 </configuration>
             </plugin>
         </plugins>
