@@ -67,7 +67,7 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
         kvartaler: List<ÅrstallOgKvartal>
     ): List<SykefraværsstatistikkVirksomhetMedGradering> {
         return transaction {
-            slice(
+            select(
                 årstall,
                 kvartal,
                 orgnr,
@@ -81,7 +81,7 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
                 tapteDagsverk.sum(),
                 muligeDagsverk.sum(),
             )
-                .select {
+                .where {
                     (årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }
                 }
                 .groupBy(årstall, kvartal, orgnr, næring, næringskode, rectype)
@@ -130,15 +130,16 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
                 (rectype eq Rectype.VIRKSOMHET.kode)
     }
 
+
     private fun hent(where: SqlExpressionBuilder.() -> Op<Boolean>): List<UmaskertSykefraværForEttKvartal> {
         return transaction {
-            slice(
+            select(
                 årstall,
                 kvartal,
                 tapteDagsverkGradertSykemelding.sum(),
                 tapteDagsverk.sum(),
                 antallPersoner.sum(),
-            ).select(where)
+            ).where { where() }
                 .groupBy(årstall, kvartal)
                 .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
                 .map {

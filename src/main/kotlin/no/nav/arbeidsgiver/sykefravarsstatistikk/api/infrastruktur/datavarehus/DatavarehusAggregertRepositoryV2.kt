@@ -32,7 +32,7 @@ class DatavarehusAggregertRepositoryV2(
 
     fun hentSykefraværsstatistikkVirksomhetMedGradering(årstallOgKvartal: ÅrstallOgKvartal): List<SykefraværsstatistikkVirksomhetMedGradering> {
         return transaction {
-            slice(
+            select(
                 årstall,
                 kvartal,
                 orgnr,
@@ -45,7 +45,7 @@ class DatavarehusAggregertRepositoryV2(
                 antallPersoner.sum(),
                 tapteDagsverk.sum(),
                 muligeDagsverk.sum()
-            ).select {
+            ).where {
                 (årstall eq årstallOgKvartal.årstall) and (kvartal eq årstallOgKvartal.kvartal)
             }.groupBy(årstall, kvartal, orgnr, næring, næringskode, rectype).map {
                 SykefraværsstatistikkVirksomhetMedGradering(
@@ -70,9 +70,9 @@ class DatavarehusAggregertRepositoryV2(
 
     override fun hentVirksomheter(årstallOgKvartal: ÅrstallOgKvartal): List<Orgenhet> {
         return transaction {
-            slice(
+            select(
                 orgnr, rectype, sektor, primærnæringskode, årstall, kvartal
-            ).select {
+            ).where {
                 (årstall eq årstallOgKvartal.årstall) and
                         (kvartal eq årstallOgKvartal.kvartal) and
                         (orgnr.trim().charLength() eq 9) and

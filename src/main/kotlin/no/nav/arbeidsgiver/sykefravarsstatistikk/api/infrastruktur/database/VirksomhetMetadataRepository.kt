@@ -38,21 +38,22 @@ open class VirksomhetMetadataRepository(
 
     open fun hentVirksomhetMetadata(årstallOgKvartal: ÅrstallOgKvartal): List<VirksomhetMetadata> {
         return transaction {
-            select {
-                (arstall eq årstallOgKvartal.årstall) and (kvartal eq årstallOgKvartal.kvartal)
-            }.map {
-                VirksomhetMetadata(
-                    Orgnr(it[orgnr]),
-                    it[navn],
-                    it[rectype],
-                    Sektor.fraSektorkode(it[sektor])!!,
-                    it[primærnæring],
-                    it[primærnæringskode],
-                    ÅrstallOgKvartal(
-                        it[arstall], it[kvartal]
+            selectAll()
+                .where {
+                    (arstall eq årstallOgKvartal.årstall) and (kvartal eq årstallOgKvartal.kvartal)
+                }.map {
+                    VirksomhetMetadata(
+                        Orgnr(it[orgnr]),
+                        it[navn],
+                        it[rectype],
+                        Sektor.fraSektorkode(it[sektor])!!,
+                        it[primærnæring],
+                        it[primærnæringskode],
+                        ÅrstallOgKvartal(
+                            it[arstall], it[kvartal]
+                        )
                     )
-                )
-            }
+                }
         }
     }
 

@@ -20,9 +20,9 @@ class DatavarehusNæringskodeRepository(
 
     fun hentFor(årstallOgKvartal: ÅrstallOgKvartal): List<SykefraværsstatistikkForNæringskode> {
         return transaction {
-            slice(
+            select(
                 årstall, kvartal, næringskode, antallPersoner.sum(), tapteDagsverk.sum(), muligeDagsverk.sum()
-            ).select {
+            ).where {
                 (årstall eq årstallOgKvartal.årstall) and (kvartal eq årstallOgKvartal.kvartal)
             }.groupBy(
                 årstall, kvartal, næringskode
@@ -41,8 +41,7 @@ class DatavarehusNæringskodeRepository(
 
     fun hentSisteKvartal(): ÅrstallOgKvartal {
         return transaction {
-            slice(årstall, kvartal)
-                .selectAll()
+            select(årstall, kvartal)
                 .orderBy(årstall to SortOrder.DESC, kvartal to SortOrder.DESC)
                 .limit(1).map {
                     ÅrstallOgKvartal(

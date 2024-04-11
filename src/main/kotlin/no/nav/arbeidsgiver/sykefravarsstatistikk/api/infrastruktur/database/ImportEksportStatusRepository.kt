@@ -2,10 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImportEksportJobb
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.upsert
+import org.jetbrains.exposed.sql.*
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 
@@ -36,15 +33,16 @@ open class ImportEksportStatusRepository(
 
     private fun hentImportEksportStatus(årstallOgKvartal: ÅrstallOgKvartal): List<ImportEksportStatus> {
         return transaction {
-            select {
-                årstall eq årstallOgKvartal.årstall.toString()
-                kvartal eq årstallOgKvartal.kvartal.toString()
-            }.map {
-                ImportEksportStatus(
-                    årstallOgKvartal = ÅrstallOgKvartal(it[årstall].toInt(), it[kvartal].toInt()),
-                    fullførteJobber = it[fullførteJobber].splittTilListe()
-                )
-            }
+            selectAll()
+                .where {
+                    årstall eq årstallOgKvartal.årstall.toString()
+                    kvartal eq årstallOgKvartal.kvartal.toString()
+                }.map {
+                    ImportEksportStatus(
+                        årstallOgKvartal = ÅrstallOgKvartal(it[årstall].toInt(), it[kvartal].toInt()),
+                        fullførteJobber = it[fullførteJobber].splittTilListe()
+                    )
+                }
         }
     }
 

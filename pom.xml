@@ -50,12 +50,12 @@
         <vault-jdbc.version>1.3.10</vault-jdbc.version>
 
         <!-- Kotlin -->
-        <kotlin.version>1.9.0</kotlin.version>
-        <kotlinx-coroutines-core-jvm.version>1.6.4</kotlinx-coroutines-core-jvm.version>
+        <kotlin.version>2.0.0-RC1</kotlin.version>
+        <kotlinx-coroutines-core-jvm.version>1.8.1-Beta</kotlinx-coroutines-core-jvm.version>
 
         <!-- Framework -->
         <ia-felles.version>1.0.0</ia-felles.version>
-        <jetbrainsExposedVersion>0.42.0</jetbrainsExposedVersion>
+        <jetbrainsExposedVersion>0.49.0</jetbrainsExposedVersion>
         <okhttp3.version>5.0.0-alpha.12</okhttp3.version>
         <spring-boot-starter-parent.version>3.1.2</spring-boot-starter-parent.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.1.0</springdoc-openapi-starter-webmvc-ui.version>

@@ -29,8 +29,7 @@ class DatavarehusLandRespository(
 
     fun hentSisteKvartal(): ÅrstallOgKvartal {
         return transaction {
-            slice(årstall, kvartal)
-                .selectAll()
+            select(årstall, kvartal)
                 .orderBy(årstall to SortOrder.DESC, kvartal to SortOrder.DESC)
                 .limit(1).map {
                     ÅrstallOgKvartal(
@@ -43,9 +42,9 @@ class DatavarehusLandRespository(
 
     fun hentFor(årstallOgKvartal: ÅrstallOgKvartal): List<SykefraværsstatistikkLand> {
         return transaction {
-            slice(
+            select(
                 årstall, kvartal, antallPersoner.sum(), tapteDagsverk.sum(), muligeDagsverk.sum()
-            ).select {
+            ).where {
                 (kjønn neq "X") and (næring neq "X") and
                         (årstall eq årstallOgKvartal.årstall) and (kvartal eq årstallOgKvartal.kvartal)
             }.groupBy(
@@ -66,9 +65,9 @@ class DatavarehusLandRespository(
         årstallOgKvartal: ÅrstallOgKvartal,
     ): List<SykefraværsstatistikkSektor> {
         return transaction {
-            slice(
+            select(
                 årstall, kvartal, sektor, antallPersoner.sum(), tapteDagsverk.sum(), muligeDagsverk.sum()
-            ).select {
+            ).where {
                 (kjønn neq "X") and (næring neq "X") and
                         (årstall eq årstallOgKvartal.årstall) and (kvartal eq årstallOgKvartal.kvartal)
             }.groupBy(

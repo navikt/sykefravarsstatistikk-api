@@ -36,14 +36,14 @@ class SykefraværStatistikkNæringskodeRepository(
 
     fun hentKvartalsvisSykefraværprosent(næringskoder: List<Næringskode>): List<SykefraværForEttKvartal> {
         return transaction {
-            slice(
+            select(
                 årstall,
                 kvartal,
                 antallPersoner.sum(),
                 tapteDagsverk.sum(),
                 muligeDagsverk.sum()
             )
-                .select { næringskode inList næringskoder.map { it.femsifferIdentifikator } }
+                .where { næringskode inList næringskoder.map { it.femsifferIdentifikator } }
                 .groupBy(årstall, kvartal)
                 .orderBy(årstall to SortOrder.ASC)
                 .orderBy(kvartal to SortOrder.ASC)
@@ -61,9 +61,10 @@ class SykefraværStatistikkNæringskodeRepository(
 
     fun hentAltForKvartaler(kvartaler: List<ÅrstallOgKvartal>): List<SykefraværsstatistikkForNæringskode> {
         return transaction {
-            select {
-                (årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }
-            }
+            selectAll()
+                .where {
+                    (årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }
+                }
                 .orderBy(årstall to SortOrder.DESC)
                 .orderBy(kvartal to SortOrder.DESC)
                 .map {
@@ -84,14 +85,14 @@ class SykefraværStatistikkNæringskodeRepository(
         kvartaler: List<ÅrstallOgKvartal>
     ): List<UmaskertSykefraværForEttKvartal> {
         return transaction {
-            slice(
+            select(
                 årstall,
                 kvartal,
                 antallPersoner.sum(),
                 tapteDagsverk.sum(),
                 muligeDagsverk.sum(),
             )
-                .select {
+                .where {
                     (næringskode inList (bransje.bransjeId as BransjeId.Næringskoder).næringskoder) and
                             ((årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal })
                 }

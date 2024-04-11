@@ -35,9 +35,10 @@ class SykefraværStatistikkSektorRepository(
 
     fun hentForKvartaler(kvartaler: List<ÅrstallOgKvartal>): List<SykefraværsstatistikkSektor> {
         return transaction {
-            select {
-                (årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }
-            }
+            selectAll()
+                .where {
+                    (årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }
+                }
                 .orderBy(årstall to SortOrder.ASC)
                 .orderBy(kvartal to SortOrder.ASC)
                 .map {
@@ -63,9 +64,10 @@ class SykefraværStatistikkSektorRepository(
 
     fun hentKvartalsvisSykefraværprosent(sektor: Sektor): List<SykefraværForEttKvartal> {
         return transaction {
-            select {
-                sektorKode eq sektor.sektorkode
-            }
+            selectAll()
+                .where {
+                    sektorKode eq sektor.sektorkode
+                }
                 .orderBy(årstall to SortOrder.ASC)
                 .orderBy(kvartal to SortOrder.ASC)
                 .map {
