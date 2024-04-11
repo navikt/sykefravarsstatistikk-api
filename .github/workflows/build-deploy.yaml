@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - compose-oppsett
+      - dependency-update-apr-2024
     paths-ignore:
       - '**.md'
       - '**/**.md'
