@@ -53,13 +53,14 @@ class SykefraværStatistikkNæringRepository(
         kvartaler: List<ÅrstallOgKvartal>
     ): List<SykefraværsstatistikkForNæring> {
         return transaction {
-            select {
-                (årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }
-            }.orderBy(
-                årstall to SortOrder.DESC,
-                kvartal to SortOrder.DESC,
-                næring to SortOrder.ASC,
-            ).map {
+            selectAll()
+                .where {
+                    (årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }
+                }.orderBy(
+                    årstall to SortOrder.DESC,
+                    kvartal to SortOrder.DESC,
+                    næring to SortOrder.ASC,
+                ).map {
                     SykefraværsstatistikkForNæring(
                         årstall = it[årstall],
                         kvartal = it[kvartal],
@@ -74,16 +75,17 @@ class SykefraværStatistikkNæringRepository(
 
     fun hentKvartalsvisSykefraværprosent(næringa: Næring): List<SykefraværForEttKvartal> {
         return transaction {
-            select {
-                næring eq næringa.tosifferIdentifikator
-            }.orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC).map {
-                SykefraværForEttKvartal(
-                    årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
-                    tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
-                    muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
-                    antallPersoner = it[antallPersoner]
-                )
-            }
+            selectAll()
+                .where {
+                    næring eq næringa.tosifferIdentifikator
+                }.orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC).map {
+                    SykefraværForEttKvartal(
+                        årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                        tapteDagsverk = it[tapteDagsverk].toBigDecimal(),
+                        muligeDagsverk = it[muligeDagsverk].toBigDecimal(),
+                        antallPersoner = it[antallPersoner]
+                    )
+                }
         }
     }
 
@@ -92,17 +94,18 @@ class SykefraværStatistikkNæringRepository(
         kvartaler: List<ÅrstallOgKvartal>
     ): List<UmaskertSykefraværForEttKvartal> {
         return transaction {
-            select {
-                (næring eq næringa.tosifferIdentifikator) and
-                        ((årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal })
-            }.orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC).map {
-                UmaskertSykefraværForEttKvartal(
-                    årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
-                    dagsverkTeller = it[tapteDagsverk].toBigDecimal(),
-                    dagsverkNevner = it[muligeDagsverk].toBigDecimal(),
-                    antallPersoner = it[antallPersoner]
-                )
-            }
+            selectAll()
+                .where {
+                    (næring eq næringa.tosifferIdentifikator) and
+                            ((årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal })
+                }.orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC).map {
+                    UmaskertSykefraværForEttKvartal(
+                        årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                        dagsverkTeller = it[tapteDagsverk].toBigDecimal(),
+                        dagsverkNevner = it[muligeDagsverk].toBigDecimal(),
+                        antallPersoner = it[antallPersoner]
+                    )
+                }
         }
     }
 

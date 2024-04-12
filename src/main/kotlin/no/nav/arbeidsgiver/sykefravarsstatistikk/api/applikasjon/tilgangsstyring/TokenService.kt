@@ -21,12 +21,12 @@ open class TokenService(
     val ISSUER_TOKENX = "tokenx"
 
     fun hentInnloggetJwtToken(): JwtToken {
-        return contextHolder.tokenValidationContext.getJwtToken(ISSUER_TOKENX)
+        return contextHolder.getTokenValidationContext().getJwtToken(ISSUER_TOKENX)
             ?: throw (TilgangskontrollException(String.format("Finner ikke gyldig jwt token")))
     }
 
     fun hentInnloggetBruker(): InnloggetBruker {
-        val context = contextHolder.tokenValidationContext
+        val context = contextHolder.getTokenValidationContext()
         val claims = getClaimsFor(context)
         if (claims.isPresent) {
             log.debug("Claims kommer fra issuer TokenX")

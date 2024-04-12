@@ -24,7 +24,9 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(value = [EnhetsregisteretMappingException::class])
     @ResponseBody
     fun handleEnhetsregisteretMappingException(
-        e: RuntimeException, webRequest: WebRequest?
+        e: RuntimeException,
+        @Suppress("UNUSED_PARAMETER")
+        webRequest: WebRequest?
     ): ResponseEntity<Any> {
         return getResponseEntity(
             e, "Kunne ikke lese informasjon om enheten fra Enhetsregisteret", HttpStatus.BAD_REQUEST
@@ -34,7 +36,9 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(value = [OrgnrEksistererIkkeException::class])
     @ResponseBody
     fun handleOrgnrEksistererIkkeException(
-        e: RuntimeException, webRequest: WebRequest?
+        e: RuntimeException,
+        @Suppress("UNUSED_PARAMETER")
+        webRequest: WebRequest?
     ): ResponseEntity<Any> {
         Companion.logger.warn("Orgnr finnes ikke i Enhetsregisteret", e)
         return getResponseEntity(e, "Orgnr finnes ikke i Enhetsregisteret", HttpStatus.NOT_FOUND)
@@ -43,7 +47,9 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(value = [EnhetsregisteretIkkeTilgjengeligException::class])
     @ResponseBody
     fun handleEnhetsregisteretIkkeTilgjengeligException(
-        e: RuntimeException, webRequest: WebRequest?
+        e: RuntimeException,
+        @Suppress("UNUSED_PARAMETER")
+        webRequest: WebRequest?
     ): ResponseEntity<Any> {
         Companion.logger.warn(
             "Kunne ikke hente informasjon om enheten fra Enhetsregisteret fordi Enhetsregisteret ikke er tilgjengelig",
@@ -55,7 +61,9 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(value = [IngenNæringException::class])
     @ResponseBody
     fun handleIngenNæringException(
-        e: RuntimeException, webRequest: WebRequest?
+        e: RuntimeException,
+        @Suppress("UNUSED_PARAMETER")
+        webRequest: WebRequest?
     ): ResponseEntity<Any> {
         Companion.logger.info(
             "Kunne ikke lese informasjon om enheten fra Enhetsregisteret fordi enheten ikke har næring",
@@ -72,7 +80,9 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(value = [TilgangskontrollException::class])
     @ResponseBody
     fun handleTilgangskontrollException(
-        e: RuntimeException, webRequest: WebRequest?
+        e: RuntimeException,
+        @Suppress("UNUSED_PARAMETER")
+        webRequest: WebRequest?
     ): ResponseEntity<Any> {
         return getResponseEntity(e, "You don't have access to this resource", HttpStatus.FORBIDDEN)
     }
@@ -80,7 +90,9 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(value = [JwtTokenUnauthorizedException::class, AccessDeniedException::class])
     @ResponseBody
     fun handleUnauthorizedException(
-        e: RuntimeException, webRequest: WebRequest?
+        e: RuntimeException,
+        @Suppress("UNUSED_PARAMETER")
+        webRequest: WebRequest?
     ): ResponseEntity<Any> {
         return getResponseEntity(
             e, "You are not authorized to access this resource", HttpStatus.UNAUTHORIZED
@@ -90,7 +102,9 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(value = [AltinnException::class])
     @ResponseBody
     fun handleAltinnException(
-        e: RuntimeException, webRequest: WebRequest?
+        e: RuntimeException,
+        @Suppress("UNUSED_PARAMETER")
+        webRequest: WebRequest?
     ): ResponseEntity<Any> {
         Companion.logger.warn("Feil ved Altinn integrasjon", e)
         return getResponseEntity(e, "Internal error", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -99,7 +113,9 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(value = [Exception::class])
     @ResponseBody
     fun handleGenerellException(
-        e: RuntimeException, webRequest: WebRequest?
+        e: RuntimeException,
+        @Suppress("UNUSED_PARAMETER")
+        webRequest: WebRequest?
     ): ResponseEntity<Any> {
         Companion.logger.error("Uhåndtert feil", e)
         return getResponseEntity(e, "Internal error", HttpStatus.INTERNAL_SERVER_ERROR)

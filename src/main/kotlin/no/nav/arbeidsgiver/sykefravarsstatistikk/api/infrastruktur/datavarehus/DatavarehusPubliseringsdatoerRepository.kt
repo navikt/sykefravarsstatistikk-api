@@ -21,11 +21,11 @@ open class DatavarehusPubliseringsdatoerRepository(
 
     open fun hentPubliseringsdatoerFraDvh(): List<Publiseringsdato> {
         return transaction {
-            slice(
+            select(
                 rapportPeriode,
                 offentligDato,
                 oppdatertDato,
-            ).select {
+            ).where {
                 (tabellNavn eq "AGG_FAK_SYKEFRAVAR_DIA") and (periodeType eq "KVARTAL")
             }.orderBy(offentligDato to SortOrder.DESC)
                 .map {

@@ -26,7 +26,7 @@ class DatavarehusAggregertRepositoryV1(
         årstallOgKvartal: ÅrstallOgKvartal
     ): List<SykefraværsstatistikkVirksomhet> {
         return transaction {
-            slice(
+            select(
                 årstall,
                 kvartal,
                 orgnr,
@@ -35,7 +35,7 @@ class DatavarehusAggregertRepositoryV1(
                 antallPersoner.sum(),
                 tapteDagsverk.sum(),
                 muligeDagsverk.sum(),
-            ).select {
+            ).where {
                 (årstall eq årstallOgKvartal.årstall) and (kvartal eq årstallOgKvartal.kvartal)
             }.groupBy(årstall, kvartal, orgnr, varighet, rectype)
                 .map {
@@ -57,10 +57,10 @@ class DatavarehusAggregertRepositoryV1(
         årstallOgKvartal: ÅrstallOgKvartal
     ): List<SykefraværsstatistikkNæringMedVarighet> {
         return transaction {
-            slice(
+            select(
                 årstall, kvartal, næringskode, varighet,
                 antallPersoner.sum(), tapteDagsverk.sum(), muligeDagsverk.sum()
-            ).select {
+            ).where {
                 (årstall eq årstallOgKvartal.årstall) and
                         (kvartal eq årstallOgKvartal.kvartal) and
                         (varighet neq null) and
@@ -82,8 +82,7 @@ class DatavarehusAggregertRepositoryV1(
 
     fun hentSisteKvartal(): ÅrstallOgKvartal {
         return transaction {
-            slice(årstall, kvartal)
-                .selectAll()
+            select(årstall, kvartal)
                 .orderBy(årstall to SortOrder.DESC, kvartal to SortOrder.DESC)
                 .limit(1).map {
                     ÅrstallOgKvartal(

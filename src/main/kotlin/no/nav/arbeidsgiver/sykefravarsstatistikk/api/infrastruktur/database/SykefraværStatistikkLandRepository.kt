@@ -21,9 +21,10 @@ class SykefraværStatistikkLandRepository(@param:Qualifier("sykefravarsstatistik
 
     fun hentForKvartaler(kvartaler: List<ÅrstallOgKvartal>): List<UmaskertSykefraværForEttKvartal> {
         return transaction {
-            select {
-                årstall to kvartal inList kvartaler.map { it.årstall to it.kvartal }
-            }.orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
+            selectAll()
+                .where {
+                    årstall to kvartal inList kvartaler.map { it.årstall to it.kvartal }
+                }.orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
                 .map {
                     UmaskertSykefraværForEttKvartal(
                         årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),

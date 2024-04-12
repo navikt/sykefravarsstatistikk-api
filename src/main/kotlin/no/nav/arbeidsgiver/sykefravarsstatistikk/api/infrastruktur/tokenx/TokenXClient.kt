@@ -67,7 +67,13 @@ open class TokenXClient(
             throw httpClientErrorException
         }
         val body: TokenExchangeResponse? = responseEntity.body
-        return JwtToken(body?.access_token)
+        val accessToken: String? = body?.access_token
+
+        if (accessToken == null) {
+            logger.warn("Ingen access token i response fra TokenX")
+            throw TokenXException("Feil ved henting access token fra TokenX")
+        }
+        return JwtToken(accessToken)
     }
 
     @Throws(GeneralException::class, IOException::class)
@@ -110,7 +116,7 @@ open class TokenXClient(
         map.add("audience", altinnRettigheterProxyAudience)
         map.add("client_assertion", assertionToken)
         map.add("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer")
-        map.add("subject_token", token.tokenAsString)
+        map.add("subject_token", token.encodedToken)
         map.add("subject_token_type", "urn:ietf:params:oauth:token-type:jwt")
         map.add("grant_type", "urn:ietf:params:oauth:grant-type:token-exchange")
         return map

@@ -78,7 +78,7 @@ class SykefraværStatistikkNæringskodeMedVarighetRepository(
         varigheter: List<Varighetskategori>
     ): List<UmaskertSykefraværForEttKvartal> {
         return transaction {
-            slice(
+            select(
                 årstall,
                 kvartal,
                 næringskode,
@@ -87,7 +87,7 @@ class SykefraværStatistikkNæringskodeMedVarighetRepository(
                 muligeDagsverk.sum(),
                 antallPersoner.sum(),
             )
-                .select {
+                .where {
                     (næringskode like stringLiteral("${næringa.tosifferIdentifikator}%")) and
                             (varighet inList varigheter.map { it.kode!! })
                 }
@@ -109,7 +109,7 @@ class SykefraværStatistikkNæringskodeMedVarighetRepository(
         varigheter: List<Varighetskategori>
     ): List<UmaskertSykefraværForEttKvartal> {
         return transaction {
-            slice(
+            select(
                 årstall,
                 kvartal,
                 næringskode,
@@ -118,7 +118,7 @@ class SykefraværStatistikkNæringskodeMedVarighetRepository(
                 tapteDagsverk.sum(),
                 antallPersoner.sum()
             )
-                .select {
+                .where {
                     (næringskode inList næringskoder.næringskoder) and
                             (varighet inList varigheter.map { it.kode!! })
                 }

@@ -26,13 +26,13 @@ class SykefravarStatistikkVirksomhetRepository(
         virksomhet: Virksomhet, kvartaler: List<ÅrstallOgKvartal>
     ): List<UmaskertSykefraværForEttKvartal> {
         return transaction {
-            slice(
+            select(
                 tapteDagsverk.sum(),
                 muligeDagsverk.sum(),
                 antallPersoner.sum(),
                 årstall,
                 kvartal
-            ).select {
+            ).where {
                 orgnr eq virksomhet.orgnr.verdi and (årstall to kvartal inList kvartaler.map { it.årstall to it.kvartal })
             }
                 .groupBy(årstall, kvartal)
@@ -61,7 +61,7 @@ class SykefravarStatistikkVirksomhetRepository(
         varigheter: List<Varighetskategori>
     ): List<UmaskertSykefraværForEttKvartal> {
         return transaction {
-            select {
+            selectAll().where {
                 (orgnr eq organisasjonsnummer.verdi) and
                         (varighet inList varigheter.map { it.kode })
             }.orderBy(
@@ -87,14 +87,14 @@ class SykefravarStatistikkVirksomhetRepository(
         kvartaler: List<ÅrstallOgKvartal>
     ): List<SykefraværsstatistikkVirksomhetUtenVarighet> {
         return transaction {
-            slice(
+            select (
                 årstall,
                 kvartal,
                 orgnr,
                 tapteDagsverk.sum(),
                 muligeDagsverk.sum(),
                 antallPersoner.sum(),
-            ).select {
+            ).where {
                 (årstall to kvartal) inList kvartaler.map { it.årstall to it.kvartal }
             }.groupBy(årstall, kvartal, orgnr)
                 .map {
@@ -127,14 +127,14 @@ class SykefravarStatistikkVirksomhetRepository(
 
     fun hentAlt(organisasjonsnummer: Orgnr): List<SykefraværForEttKvartal> {
         return transaction {
-            slice(
+            select (
                 tapteDagsverk.sum(),
                 muligeDagsverk.sum(),
                 antallPersoner.sum(),
                 årstall,
                 kvartal,
             )
-                .select { orgnr eq organisasjonsnummer.verdi }
+                .where { orgnr eq organisasjonsnummer.verdi }
                 .groupBy(årstall, kvartal)
                 .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
                 .map {
