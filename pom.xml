@@ -33,7 +33,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- Authentification / Authorization / Crypto -->
-        <altinn-rettigheter-proxy-klient.version>3.1.0</altinn-rettigheter-proxy-klient.version>
+        <altinn-rettigheter-proxy-klient.version>4.0.0</altinn-rettigheter-proxy-klient.version>
         <bouncy-castle-provider-jdk.version>1.78</bouncy-castle-provider-jdk.version>
         <nimbus-jose-jwt.version>9.37.3</nimbus-jose-jwt.version>
         <token-support.version>4.1.4</token-support.version>
