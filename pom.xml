@@ -263,7 +263,6 @@
             <artifactId>jackson-dataformat-csv</artifactId>
             <version>${jackson-dataformat-csv.version}</version>
         </dependency>
-
         <!-- Test dependencies -->
         <dependency>
             <groupId>no.nav.security</groupId>
