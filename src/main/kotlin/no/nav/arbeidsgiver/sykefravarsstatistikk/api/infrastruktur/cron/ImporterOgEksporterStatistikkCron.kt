@@ -144,6 +144,8 @@ class ImporterOgEksporterStatistikkCron(
     }
 
     fun kraveneErOppfyltForÅStarte(jobb: ImportEksportJobb, kvartal: ÅrstallOgKvartal): Boolean {
+        log.info("Sjekker om kravene er oppfylt for å starte jobben '${jobb.name}' i kvartal '$kvartal'")
+
         return importEksportStatusRepository.hentFullførteJobber(kvartal).also {
             log.info("Listen over fullførte jobber er nå: ${it.joinToString()}")
         }.oppfyllerKraveneTilÅStarte(jobb)

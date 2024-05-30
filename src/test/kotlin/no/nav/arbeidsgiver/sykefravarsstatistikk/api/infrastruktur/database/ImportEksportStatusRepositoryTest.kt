@@ -1,10 +1,13 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.database
 
-import io.kotest.matchers.collections.shouldContainExactly
 import config.AppConfigForJdbcTesterConfig
+import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.shouldBe
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImportEksportJobb.EKSPORTERT_METADATA_VIRKSOMHET
+import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImportEksportJobb.EKSPORTERT_PER_STATISTIKKATEGORI
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImportEksportJobb.IMPORTERT_STATISTIKK
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.cron.ImportEksportJobb.IMPORTERT_VIRKSOMHETDATA
-import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import org.jetbrains.exposed.sql.deleteAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -28,6 +31,27 @@ open class ImportEksportStatusRepositoryTest {
     @AfterEach
     fun afterEach() {
         repo.slettAlt()
+    }
+
+    @Test
+    fun `returnerer en tom liste dersom ÅrstallOgKvartal ikke er i tabellen`() {
+        lagreAlleJobber(ÅrstallOgKvartal(2023, 1))
+        lagreAlleJobber(ÅrstallOgKvartal(2023, 2))
+        lagreAlleJobber(ÅrstallOgKvartal(2023, 3))
+        lagreAlleJobber(ÅrstallOgKvartal(2023, 4))
+
+        val resultat = repo.hentFullførteJobber(ÅrstallOgKvartal(2024, 1))
+
+        resultat shouldBe emptyList()
+    }
+
+    fun lagreAlleJobber(kvartal: ÅrstallOgKvartal) {
+        listOf(
+            IMPORTERT_STATISTIKK, IMPORTERT_VIRKSOMHETDATA, EKSPORTERT_METADATA_VIRKSOMHET,
+            EKSPORTERT_PER_STATISTIKKATEGORI
+        ).forEach {
+            repo.leggTilFullførtJobb(it, kvartal)
+        }
     }
 
     @Test

@@ -33,7 +33,7 @@ class SykefravarStatistikkVirksomhetRepository(
                 årstall,
                 kvartal
             ).where {
-                orgnr eq virksomhet.orgnr.verdi and (årstall to kvartal inList kvartaler.map { it.årstall to it.kvartal })
+                (orgnr eq virksomhet.orgnr.verdi) and (årstall to kvartal inList kvartaler.map { it.årstall to it.kvartal })
             }
                 .groupBy(årstall, kvartal)
                 .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
