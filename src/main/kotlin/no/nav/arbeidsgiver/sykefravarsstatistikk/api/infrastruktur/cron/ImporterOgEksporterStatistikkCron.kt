@@ -41,7 +41,7 @@ class ImporterOgEksporterStatistikkCron(
     private val noeFeilet: Counter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
 
 
-    @Scheduled(cron = FEM_OVER_ÅTTE_HVER_DAG)
+    @Scheduled(cron = MANUELT_START)
     fun scheduledImporteringOgEksportering() {
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
@@ -152,7 +152,8 @@ class ImporterOgEksporterStatistikkCron(
     }
 
     companion object {
-        const val FEM_OVER_ÅTTE_HVER_DAG = "0 5 8 * * ?"
+        //const val FEM_OVER_ÅTTE_HVER_DAG = "0 5 8 * * ?"
+        const val MANUELT_START = "0 55 10 * * ?"
     }
 }
 
