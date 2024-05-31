@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.4</version>
+        <version>3.3.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -34,16 +34,16 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- Authentification / Authorization / Crypto -->
         <altinn-rettigheter-proxy-klient.version>4.0.0</altinn-rettigheter-proxy-klient.version>
-        <bouncy-castle-provider-jdk.version>1.78</bouncy-castle-provider-jdk.version>
-        <nimbus-jose-jwt.version>9.37.3</nimbus-jose-jwt.version>
-        <token-support.version>4.1.4</token-support.version>
+        <bouncy-castle-provider-jdk.version>1.78.1</bouncy-castle-provider-jdk.version>
+        <nimbus-jose-jwt.version>9.39.1</nimbus-jose-jwt.version>
+        <token-support.version>4.1.7</token-support.version>
 
         <!-- Data manipulation -->
         <json-smart.version>2.5.1</json-smart.version>
-        <jackson-dataformat-csv.version>2.17.0</jackson-dataformat-csv.version>
+        <jackson-dataformat-csv.version>2.17.1</jackson-dataformat-csv.version>
 
         <!-- Database & Persistence -->
-        <flyway-maven-plugin.version>10.11.0</flyway-maven-plugin.version>
+        <flyway-database-postgresql.version>10.13.0</flyway-database-postgresql.version>
         <ojdbc8.version>19.3.0.0</ojdbc8.version>
         <shedlock.version>5.13.0</shedlock.version>
         <shedlock-provider-jdbc-template.version>4.33.0
@@ -51,19 +51,19 @@
         <vault-jdbc.version>1.3.10</vault-jdbc.version>
 
         <!-- Kotlin -->
-        <kotlin.version>1.9.20</kotlin.version>
-        <kotlinx-coroutines-core-jvm.version>1.8.0</kotlinx-coroutines-core-jvm.version>
+        <kotlin.version>1.9.23</kotlin.version>
+        <kotlinx-coroutines-core-jvm.version>1.8.1</kotlinx-coroutines-core-jvm.version>
 
         <!-- Framework -->
         <ia-felles.version>1.0.0</ia-felles.version>
-        <jetbrainsExposedVersion>0.49.0</jetbrainsExposedVersion>
-        <okhttp3.version>5.0.0-alpha.12</okhttp3.version>
+        <jetbrainsExposedVersion>0.50.1</jetbrainsExposedVersion>
+        <okhttp3.version>5.0.0-alpha.14</okhttp3.version>
         <spring-boot-starter-parent.version>3.1.2</spring-boot-starter-parent.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.1.0</springdoc-openapi-starter-webmvc-ui.version>
 
         <!-- Logging & Observability -->
         <common-log.version>2.2023.01.10_13.49-81ddc732df3a</common-log.version>
-        <ch.qos.logback.version>1.5.4</ch.qos.logback.version>
+        <ch.qos.logback.version>1.5.6</ch.qos.logback.version>
         <logback-syslog4j.version>1.0.0</logback-syslog4j.version>
         <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
         <micrometer.version>1.12.5</micrometer.version>
@@ -75,10 +75,10 @@
         <!-- Mocking & Testing -->
         <h2.version>2.2.224</h2.version>
         <json-unit-assertj.version>3.2.7</json-unit-assertj.version>
-        <kotest-assertions-core-jvm.version>5.8.1</kotest-assertions-core-jvm.version>
+        <kotest-assertions-core-jvm.version>5.9.0</kotest-assertions-core-jvm.version>
         <mockito-kotlin.version>5.3.1</mockito-kotlin.version>
-        <mockk-jvm.version>1.13.10</mockk-jvm.version>
-        <wiremock.version>3.5.2</wiremock.version>
+        <mockk-jvm.version>1.13.11</mockk-jvm.version>
+        <wiremock.version>3.6.0</wiremock.version>
     </properties>
 
     <repositories>
@@ -138,8 +138,8 @@
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-maven-plugin</artifactId>
-            <version>${flyway-maven-plugin.version}</version>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <version>${flyway-database-postgresql.version}</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
