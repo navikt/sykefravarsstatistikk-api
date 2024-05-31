@@ -41,7 +41,7 @@ class ImporterOgEksporterStatistikkCron(
     private val noeFeilet: Counter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
 
 
-    @Scheduled(cron = FEM_OVER_ÅTTE_HVER_DAG)
+    @Scheduled(cron = MANUELT_START)
     fun scheduledImporteringOgEksportering() {
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
@@ -144,13 +144,16 @@ class ImporterOgEksporterStatistikkCron(
     }
 
     fun kraveneErOppfyltForÅStarte(jobb: ImportEksportJobb, kvartal: ÅrstallOgKvartal): Boolean {
+        log.info("Sjekker om kravene er oppfylt for å starte jobben '${jobb.name}' i kvartal '$kvartal'")
+
         return importEksportStatusRepository.hentFullførteJobber(kvartal).also {
             log.info("Listen over fullførte jobber er nå: ${it.joinToString()}")
         }.oppfyllerKraveneTilÅStarte(jobb)
     }
 
     companion object {
-        const val FEM_OVER_ÅTTE_HVER_DAG = "0 5 8 * * ?"
+        //const val FEM_OVER_ÅTTE_HVER_DAG = "0 5 8 * * ?"
+        const val MANUELT_START = "0 55 10 * * ?"
     }
 }
 

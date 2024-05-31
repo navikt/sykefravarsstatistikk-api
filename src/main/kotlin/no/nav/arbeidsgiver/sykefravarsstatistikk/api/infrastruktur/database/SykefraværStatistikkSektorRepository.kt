@@ -66,7 +66,7 @@ class SykefraværStatistikkSektorRepository(
         return transaction {
             selectAll()
                 .where {
-                    sektorKode eq sektor.sektorkode
+                    (sektorKode eq sektor.sektorkode)
                 }
                 .orderBy(årstall to SortOrder.ASC)
                 .orderBy(kvartal to SortOrder.ASC)

@@ -35,9 +35,9 @@ open class ImportEksportStatusRepository(
         return transaction {
             selectAll()
                 .where {
-                    årstall eq årstallOgKvartal.årstall.toString()
-                    kvartal eq årstallOgKvartal.kvartal.toString()
-                }.map {
+                    (årstall eq årstallOgKvartal.årstall.toString()) and (kvartal eq årstallOgKvartal.kvartal.toString())
+                }
+                .map {
                     ImportEksportStatus(
                         årstallOgKvartal = ÅrstallOgKvartal(it[årstall].toInt(), it[kvartal].toInt()),
                         fullførteJobber = it[fullførteJobber].splittTilListe()
