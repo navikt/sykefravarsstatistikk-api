@@ -17,7 +17,7 @@ class GenererSykefraværsstatistikkVirksomhetMedGraderingTest {
             ÅrstallOgKvartal(2021, 1)
         )
 
-        statistikk.size shouldBe 330
+        statistikk.size shouldBe 379
     }
 
 
