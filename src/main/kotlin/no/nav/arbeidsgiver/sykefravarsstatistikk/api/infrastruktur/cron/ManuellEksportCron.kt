@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component
 import java.time.Duration
 import java.time.Instant
 import java.time.temporal.ChronoUnit.MINUTES
+import org.springframework.scheduling.annotation.Scheduled
 
 @Component
 class ManuellEksportCron(
@@ -27,7 +28,9 @@ class ManuellEksportCron(
     private val log = LoggerFactory.getLogger(this::class.java)
     private val noeFeiletCounter: Counter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
 
-    //@Scheduled(cron = "0 50 10 8 02 ?")
+    private val kvartalSomSkalEksporteres = ÅrstallOgKvartal(2024, 1)
+
+    @Scheduled(cron = "0 20 15 11 06 ?")
     fun scheduledManuellEksportCron() {
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
@@ -39,7 +42,7 @@ class ManuellEksportCron(
 
     fun gjennomførJobb() {
         val kategorier = Statistikkategori.entries
-        val kvartaler = listOf(ÅrstallOgKvartal(2023, 3))
+        val kvartaler = listOf(kvartalSomSkalEksporteres)
         log.info("Starter EksportAvEnkeltkvartaler for $kvartaler")
 
         for (kvartal in kvartaler) {

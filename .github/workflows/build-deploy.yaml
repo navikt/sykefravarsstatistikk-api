@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - oppdatere-avhengigheter
+      - nye-test-data-dev
     paths-ignore:
       - '**.md'
       - '**/**.md'
