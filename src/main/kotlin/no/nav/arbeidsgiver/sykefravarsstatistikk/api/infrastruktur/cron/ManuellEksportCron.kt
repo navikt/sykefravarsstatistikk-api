@@ -30,7 +30,7 @@ class ManuellEksportCron(
 
     private val kvartalSomSkalEksporteres = ÅrstallOgKvartal(2024, 1)
 
-    @Scheduled(cron = "0 20 15 11 06 ?")
+    @Scheduled(cron = "0 35 15 11 06 ?")
     fun scheduledManuellEksportCron() {
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
