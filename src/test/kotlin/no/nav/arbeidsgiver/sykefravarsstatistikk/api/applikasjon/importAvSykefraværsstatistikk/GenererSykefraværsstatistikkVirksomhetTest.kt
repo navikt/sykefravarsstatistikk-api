@@ -16,7 +16,7 @@ class GenererSykefraværsstatistikkVirksomhetTest {
             ÅrstallOgKvartal(2021, 1)
         )
 
-        statistikk.size shouldBe 2653
+        statistikk.size shouldBe 13139
     }
 
 

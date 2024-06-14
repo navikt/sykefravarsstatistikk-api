@@ -13,7 +13,7 @@ class HardkodetKildeTilVirksomhetsdataTest {
     fun `hardkodet kilde til virksomheter burde hente ut virksomheter fra fil`() {
         val virksomheter = HardkodetKildeTilVirksomhetsdata.hentVirksomheter(ÅrstallOgKvartal(2020, 1))
 
-        virksomheter.size shouldBe 379
+        virksomheter.size shouldBe 1877
     }
 
     @Test
@@ -31,12 +31,12 @@ class HardkodetKildeTilVirksomhetsdataTest {
         )
 
         virksomheter.last() shouldBe Orgenhet(
-            orgnr = Orgnr("314555287"),
-            navn = "Virksomhet 314555287",
+            orgnr = Orgnr("315419786"),
+            navn = "Virksomhet 315419786",
             rectype = "2",
-            sektor = Sektor.KOMMUNAL,
-            næring = "88",
-            næringskode = "88911",
+            sektor = Sektor.PRIVAT,
+            næring = "01",
+            næringskode = "01479",
             årstallOgKvartal = ÅrstallOgKvartal(2020, 1)
         )
     }
