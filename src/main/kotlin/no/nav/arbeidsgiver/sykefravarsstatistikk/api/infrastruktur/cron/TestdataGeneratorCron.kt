@@ -34,7 +34,7 @@ class TestdataGeneratorCron(
 
     private val kvartalSomSkalEksporteres = ÅrstallOgKvartal(2024, 1)
 
-    @Scheduled(cron = "0 10 15 13 06 ?")
+    @Scheduled(cron = "0 10 09 14 06 ?")
     fun scheduledManuellImportCron() {
         val lockAtMostFor = Duration.of(30, MINUTES)
         val lockAtLeastFor = Duration.of(1, MINUTES)
