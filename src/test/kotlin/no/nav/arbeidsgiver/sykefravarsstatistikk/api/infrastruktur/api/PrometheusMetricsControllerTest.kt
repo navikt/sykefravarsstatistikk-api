@@ -1,7 +1,6 @@
 package no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.api
 
 import config.SpringIntegrationTestbase
-import io.prometheus.client.exporter.common.TextFormat.CONTENT_TYPE_004
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.infrastruktur.PrometheusMetrics
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.config.KafkaTopic
 import org.hamcrest.CoreMatchers.containsString
@@ -24,10 +23,9 @@ internal class PrometheusMetricsControllerTest : SpringIntegrationTestbase() {
 
         mockMvc.get("/internal/actuator/prometheus").andExpect {
             content {
-                contentType(CONTENT_TYPE_004)
                 string(
                     containsString(
-                        "sykefravarsstatistikk_kafka_message_sent_counter_total{topic_name=\"${dummyTopic.name}\",} 1.0"
+                        "sykefravarsstatistikk_kafka_message_sent_counter_total{topic_name=\"${dummyTopic.name}\"} 1.0"
                     )
                 )
             }
