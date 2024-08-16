@@ -86,6 +86,6 @@ jobs:
       - uses: navikt/pia-actions/trivy-scan@v1 # https://github.com/navikt/pia-actions/tree/main/trivy-scan
         with:
           image: ${{ needs.docker-build-push.outputs.image }}
-          team: teamia
+          team: arbeidsgiver
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
