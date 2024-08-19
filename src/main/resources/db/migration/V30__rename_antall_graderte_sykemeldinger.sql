@@ -1,0 +1,2 @@
+ALTER TABLE sykefravar_statistikk_virksomhet_med_gradering RENAME COLUMN antall_graderte_sykemeldinger to x_antall_graderte_sykemeldinger;
+ALTER TABLE sykefravar_statistikk_virksomhet_med_gradering ALTER COLUMN x_antall_graderte_sykemeldinger DROP NOT NULL;

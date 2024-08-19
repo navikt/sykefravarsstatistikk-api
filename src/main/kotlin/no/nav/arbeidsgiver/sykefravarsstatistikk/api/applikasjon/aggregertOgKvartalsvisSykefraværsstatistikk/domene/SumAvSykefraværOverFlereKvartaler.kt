@@ -51,7 +51,10 @@ data class SumAvSykefraværOverFlereKvartaler(
             UtilstrekkeligData(
                 "Kan ikke regne ut sykefraværsprosent når antall mulige dagsverk er null."
             ).left()
-        } else StatistikkUtils.kalkulerSykefraværsprosent(tapteDagsverk, muligeDagsverk)
+        } else StatistikkUtils.kalkulerSykefraværsprosent(
+            dagsverkTeller = tapteDagsverk,
+            dagsverkNevner = muligeDagsverk
+        )
     }
 
     fun getTapteDagsverkOgMapTilDto(

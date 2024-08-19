@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.importAvSykefr
 import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.bigdecimal.shouldBeGreaterThan
 import io.kotest.matchers.bigdecimal.shouldBeGreaterThanOrEquals
-import io.kotest.matchers.ints.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.shouldBe
 import no.nav.arbeidsgiver.sykefravarsstatistikk.api.applikasjon.fellesdomene.ÅrstallOgKvartal
 import org.junit.jupiter.api.Test
@@ -29,10 +28,6 @@ class GenererSykefraværsstatistikkVirksomhetMedGraderingTest {
 
         statistikk.map { it.muligeDagsverk - it.tapteDagsverk }.shouldForAll {
             it shouldBeGreaterThanOrEquals ZERO
-        }
-
-        statistikk.map { it.antallSykemeldinger - it.antallGraderteSykemeldinger }.shouldForAll {
-            it shouldBeGreaterThanOrEqual 0
         }
 
         statistikk.filter { it.antallPersoner != 0 }

@@ -68,25 +68,25 @@ open class DatavarehusRepositoryJdbcTest {
     @Test
     fun hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Land_og_sektor() {
         datavarehusLandRespository.settInn(
-            2019,
-            4,
-            4,
-            5,
-            100
+            inÅrstall = 2019,
+            inKvartal = 4,
+            inAntallPersoner = 4,
+            inTaptedagsverk = 5,
+            inMuligedagsverk = 100
         )
         datavarehusLandRespository.settInn(
-            2019,
-            4,
-            6,
-            10,
-            100
+            inÅrstall = 2019,
+            inKvartal = 4,
+            inAntallPersoner = 6,
+            inTaptedagsverk = 10,
+            inMuligedagsverk = 100
         )
         datavarehusLandRespository.settInn(
-            2020,
-            1,
-            1,
-            1,
-            10
+            inÅrstall = 2020,
+            inKvartal = 1,
+            inAntallPersoner = 1,
+            inTaptedagsverk = 1,
+            inMuligedagsverk = 10
         )
         val sisteÅrstallOgKvartal = datavarehusLandRespository.hentSisteKvartal()
         AssertionsForClassTypes.assertThat(sisteÅrstallOgKvartal).isEqualTo(ÅrstallOgKvartal(2020, 1))
@@ -136,26 +136,26 @@ open class DatavarehusRepositoryJdbcTest {
     @Test
     fun hentSisteÅrstallOgKvartalFraSykefraværsstatistikk__returnerer_siste_ÅrstallOgKvartal_for_Virksomhet() {
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
-            namedParameterJdbcTemplate,
-            2018,
-            4,
-            4,
-            ORGNR_VIRKSOMHET_1,
-            "10062", Varighetskategori._8_DAGER_TIL_16_DAGER,
-            "K",
-            5,
-            100
+            jdbcTemplate = namedParameterJdbcTemplate,
+            årstall = 2018,
+            kvartal = 4,
+            antallPersoner = 4,
+            orgnr = ORGNR_VIRKSOMHET_1,
+            næringskode5siffer = "10062", varighet = Varighetskategori._8_DAGER_TIL_16_DAGER,
+            kjonn = "K",
+            taptedagsverk = 5,
+            muligedagsverk = 100
         )
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
-            namedParameterJdbcTemplate,
-            2019,
-            1,
-            5,
-            ORGNR_VIRKSOMHET_2,
-            "10062", Varighetskategori._8_DAGER_TIL_16_DAGER,
-            "M",
-            5,
-            101
+            jdbcTemplate = namedParameterJdbcTemplate,
+            årstall = 2019,
+            kvartal = 1,
+            antallPersoner = 5,
+            orgnr = ORGNR_VIRKSOMHET_2,
+            næringskode5siffer = "10062", varighet = Varighetskategori._8_DAGER_TIL_16_DAGER,
+            kjonn = "M",
+            taptedagsverk = 5,
+            muligedagsverk = 101
         )
         val sisteÅrstallOgKvartal =
             datavarehusAggregertRepositoryV1.hentSisteKvartal()
@@ -201,25 +201,25 @@ open class DatavarehusRepositoryJdbcTest {
     @Test
     fun hentSykefraværsstatistikkLand__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
         datavarehusLandRespository.settInn(
-            2018,
-            4,
-            4,
-            5,
-            100
+            inÅrstall = 2018,
+            inKvartal = 4,
+            inAntallPersoner = 4,
+            inTaptedagsverk = 5,
+            inMuligedagsverk = 100
         )
         datavarehusLandRespository.settInn(
-            2018,
-            4,
-            6,
-            10,
-            100
+            inÅrstall = 2018,
+            inKvartal = 4,
+            inAntallPersoner = 6,
+            inTaptedagsverk = 10,
+            inMuligedagsverk = 100
         )
         datavarehusLandRespository.settInn(
-            2019,
-            1,
-            1,
-            1,
-            10
+            inÅrstall = 2019,
+            inKvartal = 1,
+            inAntallPersoner = 1,
+            inTaptedagsverk = 1,
+            inMuligedagsverk = 10
         )
         val sykefraværsstatistikkLand = datavarehusLandRespository.hentFor(ÅrstallOgKvartal(2018, 4))
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkLand.size).isEqualTo(1)
@@ -232,59 +232,59 @@ open class DatavarehusRepositoryJdbcTest {
     @Test
     fun hentSykefraværsstatistikkVirksomhet__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk() {
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
-            namedParameterJdbcTemplate,
-            2018,
-            4,
-            4,
-            ORGNR_VIRKSOMHET_1,
-            "10062", Varighetskategori._1_DAG_TIL_7_DAGER,
-            "K",
-            5,
-            100
+            jdbcTemplate = namedParameterJdbcTemplate,
+            årstall = 2018,
+            kvartal = 4,
+            antallPersoner = 4,
+            orgnr = ORGNR_VIRKSOMHET_1,
+            næringskode5siffer = "10062", varighet = Varighetskategori._1_DAG_TIL_7_DAGER,
+            kjonn = "K",
+            taptedagsverk = 5,
+            muligedagsverk = 100
         )
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
-            namedParameterJdbcTemplate,
-            2018,
-            4,
-            3,
-            ORGNR_VIRKSOMHET_1,
-            "10062", Varighetskategori._1_DAG_TIL_7_DAGER,
-            "M",
-            8,
-            88
+            jdbcTemplate = namedParameterJdbcTemplate,
+            årstall = 2018,
+            kvartal = 4,
+            antallPersoner = 3,
+            orgnr = ORGNR_VIRKSOMHET_1,
+            næringskode5siffer = "10062", varighet = Varighetskategori._1_DAG_TIL_7_DAGER,
+            kjonn = "M",
+            taptedagsverk = 8,
+            muligedagsverk = 88
         )
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
-            namedParameterJdbcTemplate,
-            2018,
-            4,
-            6,
-            ORGNR_VIRKSOMHET_2,
-            "10062", Varighetskategori._1_DAG_TIL_7_DAGER,
-            "K",
-            3,
-            75
+            jdbcTemplate = namedParameterJdbcTemplate,
+            årstall = 2018,
+            kvartal = 4,
+            antallPersoner = 6,
+            orgnr = ORGNR_VIRKSOMHET_2,
+            næringskode5siffer = "10062", varighet = Varighetskategori._1_DAG_TIL_7_DAGER,
+            kjonn = "K",
+            taptedagsverk = 3,
+            muligedagsverk = 75
         )
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
-            namedParameterJdbcTemplate,
-            2019,
-            1,
-            5,
-            ORGNR_VIRKSOMHET_1,
-            "10062", Varighetskategori._1_DAG_TIL_7_DAGER,
-            "M",
-            5,
-            101
+            jdbcTemplate = namedParameterJdbcTemplate,
+            årstall = 2019,
+            kvartal = 1,
+            antallPersoner = 5,
+            orgnr = ORGNR_VIRKSOMHET_1,
+            næringskode5siffer = "10062", varighet = Varighetskategori._1_DAG_TIL_7_DAGER,
+            kjonn = "M",
+            taptedagsverk = 5,
+            muligedagsverk = 101
         )
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
-            namedParameterJdbcTemplate,
-            2019,
-            2,
-            9,
-            ORGNR_VIRKSOMHET_1,
-            "10062", Varighetskategori._8_DAGER_TIL_16_DAGER,
-            "M",
-            9,
-            99
+            jdbcTemplate = namedParameterJdbcTemplate,
+            årstall = 2019,
+            kvartal = 2,
+            antallPersoner = 9,
+            orgnr = ORGNR_VIRKSOMHET_1,
+            næringskode5siffer = "10062", varighet = Varighetskategori._8_DAGER_TIL_16_DAGER,
+            kjonn = "M",
+            taptedagsverk = 9,
+            muligedagsverk = 99
         )
         val sykefraværsstatistikkVirksomhet =
             datavarehusAggregertRepositoryV1.hentSykefraværsstatistikkVirksomhet(ÅrstallOgKvartal(2018, 4))
@@ -305,93 +305,93 @@ open class DatavarehusRepositoryJdbcTest {
     @Test
     fun hentSykefraværsstatistikkNæringMedVarighet__lager_sum_og_returnerer_antall_tapte_og_mulige_dagsverk_med_varighet() {
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
-            namedParameterJdbcTemplate,
-            2018,
-            4,
-            4,
-            ORGNR_VIRKSOMHET_1,
-            "10062", Varighetskategori._1_DAG_TIL_7_DAGER,
-            "K",
-            5,
-            100
+            jdbcTemplate = namedParameterJdbcTemplate,
+            årstall = 2018,
+            kvartal = 4,
+            antallPersoner = 4,
+            orgnr = ORGNR_VIRKSOMHET_1,
+            næringskode5siffer = "10062", varighet = Varighetskategori._1_DAG_TIL_7_DAGER,
+            kjonn = "K",
+            taptedagsverk = 5,
+            muligedagsverk = 100
         )
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
-            namedParameterJdbcTemplate,
-            2018,
-            4,
-            4,
-            ORGNR_VIRKSOMHET_1,
-            "10062", Varighetskategori._1_DAG_TIL_7_DAGER,
-            "K",
-            1,
-            10,
-            Rectype.FORETAK.kode
+            jdbcTemplate = namedParameterJdbcTemplate,
+            årstall = 2018,
+            kvartal = 4,
+            antallPersoner = 4,
+            orgnr = ORGNR_VIRKSOMHET_1,
+            næringskode = "10062", varighet = Varighetskategori._1_DAG_TIL_7_DAGER,
+            kjonn = "K",
+            taptedagsverk = 1,
+            muligedagsverk = 10,
+            rectype = Rectype.FORETAK.kode
         )
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
-            namedParameterJdbcTemplate,
-            2018,
-            4,
-            4,
-            ORGNR_VIRKSOMHET_1,
-            "10062", Varighetskategori._8_DAGER_TIL_16_DAGER,
-            "K",
-            5,
-            100
+            jdbcTemplate = namedParameterJdbcTemplate,
+            årstall = 2018,
+            kvartal = 4,
+            antallPersoner = 4,
+            orgnr = ORGNR_VIRKSOMHET_1,
+            næringskode5siffer = "10062", varighet = Varighetskategori._8_DAGER_TIL_16_DAGER,
+            kjonn = "K",
+            taptedagsverk = 5,
+            muligedagsverk = 100
         )
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
-            namedParameterJdbcTemplate,
-            2018,
-            4,
-            3,
-            ORGNR_VIRKSOMHET_1,
-            "10062", Varighetskategori._1_DAG_TIL_7_DAGER,
-            "M",
-            8,
-            88
+            jdbcTemplate = namedParameterJdbcTemplate,
+            årstall = 2018,
+            kvartal = 4,
+            antallPersoner = 3,
+            orgnr = ORGNR_VIRKSOMHET_1,
+            næringskode5siffer = "10062", varighet = Varighetskategori._1_DAG_TIL_7_DAGER,
+            kjonn = "M",
+            taptedagsverk = 8,
+            muligedagsverk = 88
         )
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
-            namedParameterJdbcTemplate,
-            2018,
-            4,
-            6,
-            ORGNR_VIRKSOMHET_2,
-            "10062", Varighetskategori._1_DAG_TIL_7_DAGER,
-            "K",
-            3,
-            75
+            jdbcTemplate = namedParameterJdbcTemplate,
+            årstall = 2018,
+            kvartal = 4,
+            antallPersoner = 6,
+            orgnr = ORGNR_VIRKSOMHET_2,
+            næringskode5siffer = "10062", varighet = Varighetskategori._1_DAG_TIL_7_DAGER,
+            kjonn = "K",
+            taptedagsverk = 3,
+            muligedagsverk = 75
         )
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
-            namedParameterJdbcTemplate,
-            2018,
-            4,
-            6,
-            ORGNR_VIRKSOMHET_3,
-            "85000", Varighetskategori._1_DAG_TIL_7_DAGER,
-            "K",
-            10,
-            80
+            jdbcTemplate = namedParameterJdbcTemplate,
+            årstall = 2018,
+            kvartal = 4,
+            antallPersoner = 6,
+            orgnr = ORGNR_VIRKSOMHET_3,
+            næringskode5siffer = "85000", varighet = Varighetskategori._1_DAG_TIL_7_DAGER,
+            kjonn = "K",
+            taptedagsverk = 10,
+            muligedagsverk = 80
         )
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
-            namedParameterJdbcTemplate,
-            2019,
-            1,
-            5,
-            ORGNR_VIRKSOMHET_1,
-            "10062", Varighetskategori._1_DAG_TIL_7_DAGER,
-            "M",
-            5,
-            101
+            jdbcTemplate = namedParameterJdbcTemplate,
+            årstall = 2019,
+            kvartal = 1,
+            antallPersoner = 5,
+            orgnr = ORGNR_VIRKSOMHET_1,
+            næringskode5siffer = "10062", varighet = Varighetskategori._1_DAG_TIL_7_DAGER,
+            kjonn = "M",
+            taptedagsverk = 5,
+            muligedagsverk = 101
         )
         insertSykefraværsstatistikkVirksomhetInDvhTabell(
-            namedParameterJdbcTemplate,
-            2019,
-            2,
-            9,
-            ORGNR_VIRKSOMHET_3,
-            "85000", Varighetskategori._8_DAGER_TIL_16_DAGER,
-            "M",
-            9,
-            99
+            jdbcTemplate = namedParameterJdbcTemplate,
+            årstall = 2019,
+            kvartal = 2,
+            antallPersoner = 9,
+            orgnr = ORGNR_VIRKSOMHET_3,
+            næringskode5siffer = "85000", varighet = Varighetskategori._8_DAGER_TIL_16_DAGER,
+            kjonn = "M",
+            taptedagsverk = 9,
+            muligedagsverk = 99
         )
         val sykefraværsstatistikkNæringMedVarighet =
             datavarehusAggregertRepositoryV1.hentSykefraværsstatistikkNæringMedVarighet(
@@ -418,44 +418,39 @@ open class DatavarehusRepositoryJdbcTest {
     @Test
     fun hentSykefraværsstatistikkVirksomhetMedGradering__lager_sum_og_returnerer_antall_tapte_dagsverk_i_gradert_sykemelding_og_mulige_dagsverk() {
         datavarehusAggregertRepositoryV2.settInn(
-            2018,
-            4,
-            13,
-            ORGNR_VIRKSOMHET_1,
-            NÆRINGSKODE_2SIFFER,
-            NÆRINGSKODE_5SIFFER,
-            3,
-            1,
-            3,
-            16,
-            100
+            årstall = 2018,
+            kvartal = 4,
+            antallPersoner = 13,
+            orgnrVirksomhet1 = ORGNR_VIRKSOMHET_1,
+            næringskode2siffer = NÆRINGSKODE_2SIFFER,
+            næringskode5siffer = NÆRINGSKODE_5SIFFER,
+            tapteDagsverkGradertSykemelding = 3,
+            tapteDagsverk = 16,
+            muligeDagsverk = 100
         )
         datavarehusAggregertRepositoryV2.settInn(
-            2018,
-            4,
-            26,
-            ORGNR_VIRKSOMHET_2,
-            NÆRINGSKODE_2SIFFER,
-            NÆRINGSKODE_5SIFFER,
-            6,
-            2,
-            2,
-            32,
-            200
+            årstall = 2018,
+            kvartal = 4,
+            antallPersoner = 26,
+            orgnrVirksomhet1 = ORGNR_VIRKSOMHET_2,
+            næringskode2siffer = NÆRINGSKODE_2SIFFER,
+            næringskode5siffer = NÆRINGSKODE_5SIFFER,
+            tapteDagsverkGradertSykemelding = 6,
+            tapteDagsverk = 32,
+            muligeDagsverk = 200
         )
         datavarehusAggregertRepositoryV2.settInn(
-            2019,
-            4,
-            13,
-            ORGNR_VIRKSOMHET_2,
-            NÆRINGSKODE_2SIFFER,
-            NÆRINGSKODE_5SIFFER,
-            10,
-            2,
-            4,
-            20,
-            100
+            årstall = 2019,
+            kvartal = 4,
+            antallPersoner = 13,
+            orgnrVirksomhet1 = ORGNR_VIRKSOMHET_2,
+            næringskode2siffer = NÆRINGSKODE_2SIFFER,
+            næringskode5siffer = NÆRINGSKODE_5SIFFER,
+            tapteDagsverkGradertSykemelding = 10,
+            tapteDagsverk = 20,
+            muligeDagsverk = 100
         )
+
         val sykefraværsstatistikkVirksomhetMedGradering =
             datavarehusAggregertRepositoryV2.hentSykefraværsstatistikkVirksomhetMedGradering(
                 ÅrstallOgKvartal(
@@ -463,34 +458,31 @@ open class DatavarehusRepositoryJdbcTest {
                     4
                 )
             )
+
         AssertionsForClassTypes.assertThat(sykefraværsstatistikkVirksomhetMedGradering.size).isEqualTo(2)
         val expected = SykefraværsstatistikkVirksomhetMedGradering(
-            2018,
-            4,
-            ORGNR_VIRKSOMHET_1,
-            NÆRINGSKODE_2SIFFER,
-            NÆRINGSKODE_5SIFFER,
-            Rectype.VIRKSOMHET.kode,
-            1,
-            BigDecimal("3.0"),
-            3,
-            13,
-            BigDecimal("16.0"),
-            BigDecimal("100.0")
+            årstall = 2018,
+            kvartal = 4,
+            orgnr = ORGNR_VIRKSOMHET_1,
+            næring = NÆRINGSKODE_2SIFFER,
+            næringkode = NÆRINGSKODE_5SIFFER,
+            rectype = Rectype.VIRKSOMHET.kode,
+            tapteDagsverkGradertSykemelding = BigDecimal("3.0"),
+            antallPersoner = 13,
+            tapteDagsverk = BigDecimal("16.0"),
+            muligeDagsverk = BigDecimal("100.0")
         )
         val expectedLinje2 = SykefraværsstatistikkVirksomhetMedGradering(
-            2018,
-            4,
-            ORGNR_VIRKSOMHET_2,
-            NÆRINGSKODE_2SIFFER,
-            NÆRINGSKODE_5SIFFER,
-            Rectype.VIRKSOMHET.kode,
-            2,
-            BigDecimal("6.0"),
-            2,
-            26,
-            BigDecimal("32.0"),
-            BigDecimal("200.0")
+            årstall = 2018,
+            kvartal = 4,
+            orgnr = ORGNR_VIRKSOMHET_2,
+            næring = NÆRINGSKODE_2SIFFER,
+            næringkode = NÆRINGSKODE_5SIFFER,
+            rectype = Rectype.VIRKSOMHET.kode,
+            tapteDagsverkGradertSykemelding = BigDecimal("6.0"),
+            antallPersoner = 26,
+            tapteDagsverk = BigDecimal("32.0"),
+            muligeDagsverk = BigDecimal("200.0")
         )
         AssertionsForClassTypes.assertThat(
             sykefraværsstatistikkVirksomhetMedGradering[0]
@@ -503,11 +495,11 @@ open class DatavarehusRepositoryJdbcTest {
     @Test
     fun hentSykefraværsstatistikkLand__returnerer_en_tom_liste_dersom_ingen_data_finnes_i_DVH() {
         datavarehusLandRespository.settInn(
-            2019,
-            1,
-            1,
-            1,
-            10
+            inÅrstall = 2019,
+            inKvartal = 1,
+            inAntallPersoner = 1,
+            inTaptedagsverk = 1,
+            inMuligedagsverk = 10
         )
         val sykefraværsstatistikkLand = datavarehusLandRespository.hentFor(ÅrstallOgKvartal(2018, 4))
         Assertions.assertTrue(sykefraværsstatistikkLand.isEmpty())
@@ -516,13 +508,13 @@ open class DatavarehusRepositoryJdbcTest {
     @Test
     fun hentVirksomhetMetadataEksportering__returnerer_virksomhetMetadataEksportering() {
         datavarehusAggregertRepositoryV2.settInn(
-            ORGNR_VIRKSOMHET_1,
-            Rectype.VIRKSOMHET.kode,
-            Sektor.PRIVAT.sektorkode,
-            NÆRINGSKODE_2SIFFER,
-            "10.111",
-            2020,
-            3
+            orgnr = ORGNR_VIRKSOMHET_1,
+            rectype = Rectype.VIRKSOMHET.kode,
+            sektor = Sektor.PRIVAT.sektorkode,
+            næring = NÆRINGSKODE_2SIFFER,
+            primærnæringskode = "10.111",
+            årstall = 2020,
+            kvartal = 3
         )
         val orgenhetList = datavarehusAggregertRepositoryV2.hentVirksomheter(ÅrstallOgKvartal(2020, 3))
         Assertions.assertTrue(
@@ -548,8 +540,6 @@ open class DatavarehusRepositoryJdbcTest {
         næringskode2siffer: String,
         næringskode5siffer: String,
         tapteDagsverkGradertSykemelding: Long,
-        antallGradertSykemeldinger: Int,
-        antallSykemeldinger: Int,
         tapteDagsverk: Long,
         muligeDagsverk: Long,
         rectype: String = Rectype.VIRKSOMHET.kode,
@@ -563,8 +553,6 @@ open class DatavarehusRepositoryJdbcTest {
                 it[this.næring] = næringskode2siffer
                 it[this.næringskode] = næringskode5siffer
                 it[this.tapteDagsverkGradert] = tapteDagsverkGradertSykemelding.toDouble()
-                it[this.antallGraderteSykemeldinger] = antallGradertSykemeldinger
-                it[this.antallSykemeldinger] = antallSykemeldinger
                 it[this.tapteDagsverk] = tapteDagsverk.toDouble()
                 it[this.muligeDagsverk] = muligeDagsverk.toDouble()
                 it[this.rectype] = rectype

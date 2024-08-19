@@ -199,10 +199,8 @@ class AggregertEndpointIntegrationTest : SpringIntegrationTestbase() {
                     næring = "10",
                     næringkode = "10300",
                     rectype = Rectype.VIRKSOMHET.kode,
-                    antallSykemeldinger = 0,
                     tapteDagsverk = BigDecimal(20),
                     muligeDagsverk = BigDecimal(100),
-                    antallGraderteSykemeldinger = 0,
                     antallPersoner = 7,
                     tapteDagsverkGradertSykemelding = BigDecimal(10)
                 )
