@@ -23,9 +23,7 @@ class DatavarehusAggregertRepositoryV2(
     val næringskode = varchar("naering_kode", 6)
     val primærnæringskode = varchar("primærnæringskode", 6).nullable()
     val rectype = varchar("rectype", 1)
-    val antallGraderteSykemeldinger = integer("antall_gs")
     val tapteDagsverkGradert = double("taptedv_gs")
-    val antallSykemeldinger = integer("antall")
     val antallPersoner = integer("antpers")
     val tapteDagsverk = double("taptedv")
     val muligeDagsverk = double("mulige_dv")
@@ -40,8 +38,6 @@ class DatavarehusAggregertRepositoryV2(
                 næringskode,
                 rectype,
                 tapteDagsverkGradert.sum(),
-                antallGraderteSykemeldinger.sum(),
-                antallSykemeldinger.sum(),
                 antallPersoner.sum(),
                 tapteDagsverk.sum(),
                 muligeDagsverk.sum()
@@ -55,9 +51,7 @@ class DatavarehusAggregertRepositoryV2(
                     næring = it[næring],
                     næringkode = it[næringskode],
                     rectype = it[rectype],
-                    antallGraderteSykemeldinger = it[antallGraderteSykemeldinger.sum()]!!,
                     tapteDagsverkGradertSykemelding = it[tapteDagsverkGradert.sum()]!!.toBigDecimal(),
-                    antallSykemeldinger = it[antallSykemeldinger.sum()]!!,
                     antallPersoner = it[antallPersoner.sum()]!!,
                     tapteDagsverk = it[tapteDagsverk.sum()]!!.toBigDecimal(),
                     muligeDagsverk = it[muligeDagsverk.sum()]!!.toBigDecimal()

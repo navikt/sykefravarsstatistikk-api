@@ -62,9 +62,7 @@ open class SykefravarStatistikkVirksomhetGraderingRepositoryTest {
         årstallOgKvartal: ÅrstallOgKvartal,
         orgnr: String = "999999999",
         næringskode: Næringskode = Næringskode("99999"),
-        antallGraderteSykemeldinger: Int = 10,
         tapteDagsverkGradertSykemelding: Float = 5f,
-        antallSykemeldinger: Int = 10,
         antallPersoner: Int = 10,
         tapteDagsverk: Float = 5f,
         muligeDagsverk: Float = 100f,
@@ -76,9 +74,7 @@ open class SykefravarStatistikkVirksomhetGraderingRepositoryTest {
                 it[this.næringskode] = næringskode.femsifferIdentifikator
                 it[this.årstall] = årstallOgKvartal.årstall
                 it[this.kvartal] = årstallOgKvartal.kvartal
-                it[this.antallGraderteSykemeldinger] = antallGraderteSykemeldinger
                 it[this.tapteDagsverkGradertSykemelding] = tapteDagsverkGradertSykemelding
-                it[this.antallSykemeldinger] = antallSykemeldinger
                 it[this.antallPersoner] = antallPersoner
                 it[this.tapteDagsverk] = tapteDagsverk
                 it[this.muligeDagsverk] = muligeDagsverk

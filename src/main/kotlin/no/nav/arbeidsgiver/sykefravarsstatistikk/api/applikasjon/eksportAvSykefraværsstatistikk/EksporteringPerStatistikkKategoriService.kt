@@ -194,6 +194,10 @@ class EksporteringPerStatistikkKategoriService(
     }
 
 
+    // TODO: rename 'UmaskertSykefraværForEttKvartal' da graderingsprosent og sykefraværsprosent er to forskjellige ting
+    //  og kalkuleres på to forskjellige måter
+    //  -> sykefraværsprosent = (antall tapte dagsverk / antall mulige dagsverk) * 100 -- lav prosent er bra
+    //  -> graderingsprosent = (antall tapte graderte dagsverk / antall tapte dagsverk) * 100 -- høy prosent er bra
     fun List<Sykefraværsstatistikk>.tilUmaskertSykefraværForEttKvartal() =
         this.map {
             when (it) {
@@ -205,13 +209,18 @@ class EksporteringPerStatistikkKategoriService(
                 is SykefraværsstatistikkSektor,
                 is SykefraværsstatistikkVirksomhetUtenVarighet,
                 is SykefraværsstatistikkVirksomhet,
-                -> UmaskertSykefraværForEttKvartal(it)
+                -> UmaskertSykefraværForEttKvartal(
+                    årstallOgKvartal = ÅrstallOgKvartal(it.årstall, it.kvartal),
+                    dagsverkTeller = it.tapteDagsverk!!,
+                    dagsverkNevner = it.muligeDagsverk!!,
+                    antallPersoner = it.antallPersoner
+                )
 
                 is SykefraværsstatistikkVirksomhetMedGradering -> UmaskertSykefraværForEttKvartal(
-                    ÅrstallOgKvartal(it.årstall, it.kvartal),
-                    it.tapteDagsverkGradertSykemelding,
-                    it.tapteDagsverk,
-                    it.antallPersoner
+                    årstallOgKvartal = ÅrstallOgKvartal(it.årstall, it.kvartal),
+                    dagsverkTeller = it.tapteDagsverkGradertSykemelding,
+                    dagsverkNevner = it.tapteDagsverk,
+                    antallPersoner = it.antallPersoner
                 )
             }
         }

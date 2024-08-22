@@ -52,8 +52,6 @@ open class GraderingRepositoryJdbcTest {
                     muligeDagsverk = 100.toBigDecimal(),
                     antallPersoner = 7,
                     tapteDagsverkGradertSykemelding = 10.toBigDecimal(),
-                    antallGraderteSykemeldinger = 0,
-                    antallSykemeldinger = 0,
                 ),
                 SykefraværsstatistikkVirksomhetMedGradering(
                     årstall = _2019_4.årstall,
@@ -66,8 +64,6 @@ open class GraderingRepositoryJdbcTest {
                     tapteDagsverkGradertSykemelding = BigDecimal(12),
                     tapteDagsverk = BigDecimal(20),
                     muligeDagsverk = BigDecimal(100),
-                    antallGraderteSykemeldinger = 0,
-                    antallSykemeldinger = 0,
                 ),
                 SykefraværsstatistikkVirksomhetMedGradering(
                     årstall = _2020_1.årstall,
@@ -80,8 +76,6 @@ open class GraderingRepositoryJdbcTest {
                     tapteDagsverkGradertSykemelding = BigDecimal(25),
                     tapteDagsverk = BigDecimal(50),
                     muligeDagsverk = BigDecimal(300),
-                    antallGraderteSykemeldinger = 0,
-                    antallSykemeldinger = 0,
                 )
             )
         )
@@ -118,8 +112,6 @@ open class GraderingRepositoryJdbcTest {
                     tapteDagsverkGradertSykemelding = BigDecimal(10),
                     tapteDagsverk = BigDecimal(20),
                     muligeDagsverk = BigDecimal(100),
-                    antallSykemeldinger = 0,
-                    antallGraderteSykemeldinger = 0
                 ), SykefraværsstatistikkVirksomhetMedGradering(
                     årstall = _2020_1.årstall,
                     kvartal = _2020_1.kvartal,
@@ -131,8 +123,6 @@ open class GraderingRepositoryJdbcTest {
                     tapteDagsverkGradertSykemelding = BigDecimal(12),
                     tapteDagsverk = BigDecimal(20),
                     muligeDagsverk = BigDecimal(100),
-                    antallSykemeldinger = 0,
-                    antallGraderteSykemeldinger = 0
                 ), SykefraværsstatistikkVirksomhetMedGradering(
                     årstall = _2020_1.årstall,
                     kvartal = _2020_1.kvartal,
@@ -144,8 +134,6 @@ open class GraderingRepositoryJdbcTest {
                     tapteDagsverkGradertSykemelding = BigDecimal(25),
                     tapteDagsverk = BigDecimal(50),
                     muligeDagsverk = BigDecimal(300),
-                    antallSykemeldinger = 0,
-                    antallGraderteSykemeldinger = 0
                 )
             )
         )
@@ -183,8 +171,6 @@ open class GraderingRepositoryJdbcTest {
                     tapteDagsverkGradertSykemelding = BigDecimal(10),
                     tapteDagsverk = BigDecimal(20),
                     muligeDagsverk = BigDecimal(100),
-                    antallSykemeldinger = 0,
-                    antallGraderteSykemeldinger = 0
                 ),
                 SykefraværsstatistikkVirksomhetMedGradering(
                     årstall = _2020_1.årstall,
@@ -197,8 +183,6 @@ open class GraderingRepositoryJdbcTest {
                     tapteDagsverkGradertSykemelding = BigDecimal(12),
                     tapteDagsverk = BigDecimal(20),
                     muligeDagsverk = BigDecimal(100),
-                    antallSykemeldinger = 0,
-                    antallGraderteSykemeldinger = 0
                 ),
                 SykefraværsstatistikkVirksomhetMedGradering(
                     årstall = _2020_1.årstall,
@@ -211,8 +195,6 @@ open class GraderingRepositoryJdbcTest {
                     tapteDagsverkGradertSykemelding = BigDecimal(25),
                     tapteDagsverk = BigDecimal(50),
                     muligeDagsverk = BigDecimal(300),
-                    antallSykemeldinger = 0,
-                    antallGraderteSykemeldinger = 0
                 )
 
             )
@@ -253,8 +235,6 @@ open class GraderingRepositoryJdbcTest {
                     tapteDagsverkGradertSykemelding = BigDecimal(10),
                     tapteDagsverk = BigDecimal(20),
                     muligeDagsverk = BigDecimal(100),
-                    antallSykemeldinger = 0,
-                    antallGraderteSykemeldinger = 0
                 ),
                 SykefraværsstatistikkVirksomhetMedGradering(
                     årstall = _2020_1.årstall,
@@ -267,8 +247,6 @@ open class GraderingRepositoryJdbcTest {
                     tapteDagsverkGradertSykemelding = BigDecimal(12),
                     tapteDagsverk = BigDecimal(20),
                     muligeDagsverk = BigDecimal(100),
-                    antallSykemeldinger = 0,
-                    antallGraderteSykemeldinger = 0
                 ),
                 SykefraværsstatistikkVirksomhetMedGradering(
                     årstall = _2020_1.årstall,
@@ -281,8 +259,6 @@ open class GraderingRepositoryJdbcTest {
                     tapteDagsverkGradertSykemelding = BigDecimal(25),
                     tapteDagsverk = BigDecimal(50),
                     muligeDagsverk = BigDecimal(300),
-                    antallSykemeldinger = 0,
-                    antallGraderteSykemeldinger = 0
                 ),
                 SykefraværsstatistikkVirksomhetMedGradering(
                     årstall = _2020_1.årstall,
@@ -295,8 +271,6 @@ open class GraderingRepositoryJdbcTest {
                     tapteDagsverkGradertSykemelding = BigDecimal(55),
                     tapteDagsverk = BigDecimal(66),
                     muligeDagsverk = BigDecimal(3000),
-                    antallSykemeldinger = 0,
-                    antallGraderteSykemeldinger = 0
                 )
             )
         )
@@ -334,8 +308,6 @@ open class GraderingRepositoryJdbcTest {
                     tapteDagsverkGradertSykemelding = BigDecimal(10),
                     tapteDagsverk = BigDecimal(20),
                     muligeDagsverk = BigDecimal(100),
-                    antallSykemeldinger = 0,
-                    antallGraderteSykemeldinger = 0
                 ),
                 SykefraværsstatistikkVirksomhetMedGradering(
                     årstall = _2020_1.årstall,
@@ -348,8 +320,6 @@ open class GraderingRepositoryJdbcTest {
                     tapteDagsverkGradertSykemelding = BigDecimal(12),
                     tapteDagsverk = BigDecimal(20),
                     muligeDagsverk = BigDecimal(100),
-                    antallSykemeldinger = 0,
-                    antallGraderteSykemeldinger = 0
                 )
             )
         )

@@ -20,9 +20,7 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
     val næringskode = text("naring_kode")
     val årstall = integer("arstall")
     val kvartal = integer("kvartal")
-    val antallGraderteSykemeldinger = integer("antall_graderte_sykemeldinger")
     val tapteDagsverkGradertSykemelding = float("tapte_dagsverk_gradert_sykemelding")
-    val antallSykemeldinger = integer("antall_sykemeldinger")
     val antallPersoner = integer("antall_personer")
     val tapteDagsverk = float("tapte_dagsverk")
     val muligeDagsverk = float("mulige_dagsverk")
@@ -52,12 +50,10 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
                 this[næringskode] = it.næringkode
                 this[årstall] = it.årstall
                 this[kvartal] = it.kvartal
-                this[antallGraderteSykemeldinger] = it.antallGraderteSykemeldinger
-                this[tapteDagsverkGradertSykemelding] = it.tapteDagsverkGradertSykemelding.toFloat()
-                this[antallSykemeldinger] = it.antallSykemeldinger
                 this[antallPersoner] = it.antallPersoner
                 this[tapteDagsverk] = it.tapteDagsverk.toFloat()
                 this[muligeDagsverk] = it.muligeDagsverk.toFloat()
+                this[tapteDagsverkGradertSykemelding] = it.tapteDagsverkGradertSykemelding.toFloat()
                 this[rectype] = it.rectype
             }.count()
         }
@@ -74,10 +70,8 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
                 næring,
                 næringskode,
                 rectype,
-                antallGraderteSykemeldinger.sum(),
                 tapteDagsverkGradertSykemelding.sum(),
                 antallPersoner.sum(),
-                antallSykemeldinger.sum(),
                 tapteDagsverk.sum(),
                 muligeDagsverk.sum(),
             )
@@ -93,9 +87,7 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
                         næring = it[næring],
                         næringkode = it[næringskode],
                         rectype = it[rectype],
-                        antallGraderteSykemeldinger = it[antallGraderteSykemeldinger.sum()]!!,
                         tapteDagsverkGradertSykemelding = it[tapteDagsverkGradertSykemelding.sum()]!!.toBigDecimal(),
-                        antallSykemeldinger = it[antallSykemeldinger.sum()]!!,
                         antallPersoner = it[antallPersoner.sum()]!!,
                         tapteDagsverk = it[tapteDagsverk.sum()]!!.toBigDecimal(),
                         muligeDagsverk = it[muligeDagsverk.sum()]!!.toBigDecimal(),
@@ -144,10 +136,10 @@ class SykefravarStatistikkVirksomhetGraderingRepository(
                 .orderBy(årstall to SortOrder.ASC, kvartal to SortOrder.ASC)
                 .map {
                     UmaskertSykefraværForEttKvartal(
-                        ÅrstallOgKvartal(it[årstall], it[kvartal]),
-                        it[tapteDagsverkGradertSykemelding.sum()]!!.toBigDecimal(),
-                        it[tapteDagsverk.sum()]!!.toBigDecimal(),
-                        it[antallPersoner.sum()]!!
+                        årstallOgKvartal = ÅrstallOgKvartal(it[årstall], it[kvartal]),
+                        dagsverkTeller = it[tapteDagsverkGradertSykemelding.sum()]!!.toBigDecimal(),
+                        dagsverkNevner = it[tapteDagsverk.sum()]!!.toBigDecimal(),
+                        antallPersoner = it[antallPersoner.sum()]!!
                     )
                 }
         }

@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - nye-test-data-dev
+      - slett-antall-sykemeldinger-og-antall-graderte-sm
     paths-ignore:
       - '**.md'
       - '**/**.md'
