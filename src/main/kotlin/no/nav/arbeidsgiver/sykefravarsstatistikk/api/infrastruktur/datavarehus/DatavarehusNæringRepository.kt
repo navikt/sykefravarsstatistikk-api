@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 @Component
 class DatavarehusNæringRepository(
     @param:Qualifier("datavarehusDatabase") override val database: Database
-) : UsingExposed, Table("dt_p.v_agg_ia_sykefravar_naring") {
+) : UsingExposed, Table("dvh_syfra.v_agg_ia_sykefravar_naring") {
     val årstall = integer("arstall")
     val kvartal = integer("kvartal")
     val næring = varchar("naring", 2)

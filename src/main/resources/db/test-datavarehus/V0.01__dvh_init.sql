@@ -1,8 +1,8 @@
 -- Tabeller fra datavarehus
-create schema dt_p;
+create schema dvh_syfra;
 create schema dk_p;
 
-create table dt_p.agg_ia_sykefravar_land_v
+create table dvh_syfra.agg_ia_sykefravar_land_v
 (
     arstall      char(4) not null,
     kvartal      char(1) not null,
@@ -29,7 +29,7 @@ create table dt_p.agg_ia_sykefravar_land_v
     ia3_antpers  decimal(7, 0)
 );
 
-create table dt_p.v_agg_ia_sykefravar_naring
+create table dvh_syfra.v_agg_ia_sykefravar_naring
 (
     arstall  char(4) not null,
     kvartal  char(1) not null,
@@ -41,7 +41,7 @@ create table dt_p.v_agg_ia_sykefravar_naring
     antpers  decimal(7, 0)
 );
 
-create table dt_p.agg_ia_sykefravar_v
+create table dvh_syfra.agg_ia_sykefravar_v
 (
     arstall      char(4)    not null,
     kvartal      char(1)    not null,
@@ -61,7 +61,7 @@ create table dt_p.agg_ia_sykefravar_v
     rectype      char(1)    not null
 );
 
-create table dt_p.agg_ia_sykefravar_naring_kode
+create table dvh_syfra.agg_ia_sykefravar_naring_kode
 (
     arstall      char(4) not null,
     kvartal      char(1) not null,
@@ -73,7 +73,7 @@ create table dt_p.agg_ia_sykefravar_naring_kode
     antpers      decimal(7, 0)
 );
 
-create table dt_p.agg_ia_sykefravar_v_2
+create table dvh_syfra.agg_ia_sykefravar_v_2
 (
     arstall           char(4),
     kvartal           char(1),

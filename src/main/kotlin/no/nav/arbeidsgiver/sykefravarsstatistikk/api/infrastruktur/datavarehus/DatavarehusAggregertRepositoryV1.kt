@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 @Component
 class DatavarehusAggregertRepositoryV1(
     @param:Qualifier("datavarehusDatabase") override val database: Database
-) : UsingExposed, Table("dt_p.agg_ia_sykefravar_v") {
+) : UsingExposed, Table("dvh_syfra.agg_ia_sykefravar_v") {
     val årstall = integer("arstall")
     val kvartal = integer("kvartal")
     val orgnr = char("orgnr", 9)

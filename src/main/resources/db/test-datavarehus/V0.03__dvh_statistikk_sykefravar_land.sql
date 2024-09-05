@@ -1,7 +1,7 @@
 -- Aggregates statistikk tabeller fra datavarehus
 
 -- Land
-insert into dt_p.agg_ia_sykefravar_land_v
+insert into dvh_syfra.agg_ia_sykefravar_land_v
 (arstall, kvartal,
  naring, naringnavn,
  alder, kjonn,
@@ -20,7 +20,7 @@ values ('2019', '1',
         0, 0, 0,
         0, 0, 0,
         0, 0, 0);
-insert into dt_p.agg_ia_sykefravar_land_v
+insert into dvh_syfra.agg_ia_sykefravar_land_v
 (arstall, kvartal,
  naring, naringnavn,
  alder, kjonn,
@@ -39,7 +39,7 @@ values ('2019', '1',
         0, 0, 0,
         0, 0, 0,
         0, 0, 0);
-insert into dt_p.agg_ia_sykefravar_land_v
+insert into dvh_syfra.agg_ia_sykefravar_land_v
 (arstall, kvartal,
  naring, naringnavn,
  alder, kjonn,
@@ -58,7 +58,7 @@ values ('2019', '1',
         0, 0, 0,
         0, 0, 0,
         0, 0, 0);
-insert into dt_p.agg_ia_sykefravar_land_v
+insert into dvh_syfra.agg_ia_sykefravar_land_v
 (arstall, kvartal,
  naring, naringnavn,
  alder, kjonn,
@@ -78,7 +78,7 @@ values ('2019', '1',
         0, 0, 0,
         0, 0, 0);
 
-insert into dt_p.agg_ia_sykefravar_land_v
+insert into dvh_syfra.agg_ia_sykefravar_land_v
 (arstall, kvartal,
  naring, naringnavn,
  alder, kjonn,

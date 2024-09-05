@@ -95,7 +95,7 @@ object DatavarehusRepositoryJdbcTestUtils {
             .addValue("muligedv", muligedagsverk)
             .addValue("rectype", rectype)
         jdbcTemplate.update(
-            "insert into dt_p.agg_ia_sykefravar_v ("
+            "insert into dvh_syfra.agg_ia_sykefravar_v ("
                     + "arstall, kvartal, "
                     + "orgnr, naering_kode, sektor, storrelse, fylkarb, "
                     + "alder, kjonn,  fylkbo, "
@@ -130,7 +130,7 @@ object DatavarehusRepositoryJdbcTestUtils {
             .addValue("taptedv", taptedagsverk)
             .addValue("muligedv", muligedagsverk)
         jdbcTemplate.update(
-            "insert into dt_p.v_agg_ia_sykefravar_naring ("
+            "insert into dvh_syfra.v_agg_ia_sykefravar_naring ("
                     + "arstall, kvartal, "
                     + "naring, "
                     + "alder, kjonn, "
@@ -164,7 +164,7 @@ object DatavarehusRepositoryJdbcTestUtils {
             .addValue("taptedv", taptedagsverk)
             .addValue("muligedv", muligedagsverk)
         jdbcTemplate.update(
-            "insert into dt_p.agg_ia_sykefravar_naring_kode ("
+            "insert into dvh_syfra.agg_ia_sykefravar_naring_kode ("
                     + "arstall, kvartal, "
                     + "naering_kode, "
                     + "alder, kjonn, "

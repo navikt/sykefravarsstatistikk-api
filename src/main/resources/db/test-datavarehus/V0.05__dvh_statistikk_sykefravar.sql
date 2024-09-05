@@ -5,7 +5,7 @@
 --  rad #1 har taptedv, mens muligedev og antpers er null
 --  rad #2 har muligedev og antpers, mens taptedv er null (sftype er 'X' og varighet er 'X')
 
-insert into dt_p.agg_ia_sykefravar_v
+insert into dvh_syfra.agg_ia_sykefravar_v
 (
     arstall, kvartal,
     orgnr, naering_kode, sektor, storrelse, fylkarb,
@@ -22,7 +22,7 @@ values
     103.123, 546.121, 88, '1'
 );
 
-insert into dt_p.agg_ia_sykefravar_v
+insert into dvh_syfra.agg_ia_sykefravar_v
 (
     arstall, kvartal,
     orgnr, naering_kode, sektor, storrelse, fylkarb,
@@ -39,7 +39,7 @@ values
     13.345, 44.111, 3, '2'
 );
 
-insert into dt_p.agg_ia_sykefravar_v
+insert into dvh_syfra.agg_ia_sykefravar_v
 (
     arstall, kvartal,
     orgnr, naering_kode, sektor, storrelse, fylkarb,
@@ -55,7 +55,7 @@ values
     'X', 'X',
     34.876, 386.123, 6, '2'
 );
-insert into dt_p.agg_ia_sykefravar_v
+insert into dvh_syfra.agg_ia_sykefravar_v
 (
     arstall, kvartal,
     orgnr, naering_kode, sektor, storrelse, fylkarb,
@@ -71,7 +71,7 @@ values
     'X', 'X',
     34.876, 386.123, 6, '2'
 );
-insert into dt_p.agg_ia_sykefravar_v
+insert into dvh_syfra.agg_ia_sykefravar_v
 (
     arstall, kvartal,
     orgnr, naering_kode, sektor, storrelse, fylkarb,

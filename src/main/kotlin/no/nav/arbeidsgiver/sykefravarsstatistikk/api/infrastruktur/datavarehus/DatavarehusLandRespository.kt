@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component
 class DatavarehusLandRespository(
     @param:Qualifier("datavarehusDatabase")
     override val database: Database
-) : UsingExposed, Table("dt_p.agg_ia_sykefravar_land_v") {
+) : UsingExposed, Table("dvh_syfra.agg_ia_sykefravar_land_v") {
     val årstall = integer("arstall")
     val kvartal = integer("kvartal")
     val antallPersoner = integer("antpers")

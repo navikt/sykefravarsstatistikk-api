@@ -1,5 +1,5 @@
 -- Gradering
-insert into dt_p.agg_ia_sykefravar_v_2
+insert into dvh_syfra.agg_ia_sykefravar_v_2
  (
   arstall, kvartal,
   orgnr, naring, naering_kode,
@@ -20,7 +20,7 @@ insert into dt_p.agg_ia_sykefravar_v_2
   78.048722, 1269.433466, 42
  );
 
-insert into dt_p.agg_ia_sykefravar_v_2
+insert into dvh_syfra.agg_ia_sykefravar_v_2
  (
   arstall, kvartal,
   orgnr, naring, naering_kode,
@@ -40,7 +40,7 @@ insert into dt_p.agg_ia_sykefravar_v_2
   7,
   109.77722, 2345.488866, 170
  );
-insert into dt_p.agg_ia_sykefravar_v_2
+insert into dvh_syfra.agg_ia_sykefravar_v_2
 (
     arstall, kvartal,
     orgnr, naring, naering_kode,
