@@ -40,7 +40,7 @@
 
         <!-- Data manipulation -->
         <json-smart.version>2.5.1</json-smart.version>
-        <jackson-dataformat-csv.version>2.18.0</jackson-dataformat-csv.version>
+        <jackson-dataformat-csv.version>2.17.2</jackson-dataformat-csv.version>
 
         <!-- Database & Persistence -->
         <flyway-database-postgresql.version>10.19.0</flyway-database-postgresql.version>
