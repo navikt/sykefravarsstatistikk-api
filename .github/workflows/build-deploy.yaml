@@ -36,6 +36,8 @@ jobs:
         uses: advanced-security/maven-dependency-submission-action@v4.0.0
       - uses: nais/docker-build-push@v0
         id: docker-push
+        env:
+          TRIVY_JAVA_DB_REPOSITORY: "public.ecr.aws/aquasecurity/trivy-java-db:1"
         with:
           team: arbeidsgiver
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
