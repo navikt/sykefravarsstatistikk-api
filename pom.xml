@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.3</version>
+        <version>3.3.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -24,7 +24,7 @@
             <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
-                <version>42.7.3</version>
+                <version>${postgresql.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -45,6 +45,7 @@
         <!-- Database & Persistence -->
         <flyway-database-postgresql.version>10.17.1</flyway-database-postgresql.version>
         <ojdbc8.version>19.3.0.0</ojdbc8.version>
+        <postgresql.version>42.7.4</postgresql.version>
         <shedlock.version>5.13.0</shedlock.version>
         <shedlock-provider-jdbc-template.version>4.33.0
         </shedlock-provider-jdbc-template.version>
@@ -62,7 +63,7 @@
 
         <!-- Logging & Observability -->
         <common-log.version>2.2023.01.10_13.49-81ddc732df3a</common-log.version>
-        <ch.qos.logback.version>1.5.7</ch.qos.logback.version>
+        <ch.qos.logback.version>1.5.8</ch.qos.logback.version>
         <logback-syslog4j.version>1.0.0</logback-syslog4j.version>
         <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
 
@@ -70,11 +71,12 @@
         <arrow-core.version>1.2.4</arrow-core.version>
 
         <!-- Mocking & Testing -->
-        <h2.version>2.2.224</h2.version>
+        <h2.version>2.3.232</h2.version>
         <json-unit-assertj.version>3.2.7</json-unit-assertj.version>
         <kotest-assertions-core-jvm.version>5.9.1</kotest-assertions-core-jvm.version>
         <mockito-kotlin.version>5.3.1</mockito-kotlin.version>
-        <mockk-jvm.version>1.13.11</mockk-jvm.version>
+        <mockk-jvm.version>1.13.12</mockk-jvm.version>
+        <snappy-java.version>1.1.10.7</snappy-java.version>
         <wiremock.version>3.6.0</wiremock.version>
     </properties>
 
@@ -311,7 +313,7 @@
         <dependency>
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>
-            <version>1.1.10.5</version>
+            <version>${snappy-java.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
