@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - slett-antall-sykemeldinger-og-antall-graderte-sm
+      - verif-v5-token-validation-support
     paths-ignore:
       - '**.md'
       - '**/**.md'
