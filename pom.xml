@@ -36,7 +36,7 @@
         <altinn-rettigheter-proxy-klient.version>4.0.0</altinn-rettigheter-proxy-klient.version>
         <bouncy-castle-provider-jdk.version>1.78.1</bouncy-castle-provider-jdk.version>
         <nimbus-jose-jwt.version>9.41.2</nimbus-jose-jwt.version>
-        <token-support.version>4.1.8</token-support.version>
+        <token-support.version>5.0.5</token-support.version>
 
         <!-- Data manipulation -->
         <json-smart.version>2.5.1</json-smart.version>
