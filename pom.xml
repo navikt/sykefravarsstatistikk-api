@@ -33,7 +33,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- Authentification / Authorization / Crypto -->
-        <altinn-rettigheter-proxy-klient.version>4.0.0</altinn-rettigheter-proxy-klient.version>
+        <altinn-rettigheter-proxy-klient.version>altinn-rettigheter-proxy-klient-5.0.0</altinn-rettigheter-proxy-klient.version>
         <bouncy-castle-provider-jdk.version>1.79</bouncy-castle-provider-jdk.version>
         <nimbus-jose-jwt.version>9.46</nimbus-jose-jwt.version>
         <token-support.version>5.0.11</token-support.version>
@@ -210,7 +210,7 @@
             <version>${json-smart.version}</version>
         </dependency>
         <dependency>
-            <groupId>no.nav.arbeidsgiver</groupId>
+            <groupId>com.github.navikt</groupId>
             <artifactId>altinn-rettigheter-proxy-klient</artifactId>
             <version>${altinn-rettigheter-proxy-klient.version}</version>
         </dependency>
