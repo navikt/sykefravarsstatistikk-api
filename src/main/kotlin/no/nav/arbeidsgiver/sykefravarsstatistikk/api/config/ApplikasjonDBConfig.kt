@@ -75,7 +75,7 @@ open class ApplikasjonDBConfig {
     open fun flywayMigrationStrategy(): FlywayMigrationStrategy {
         return FlywayMigrationStrategy {
             Flyway.configure()
-                .encoding(Charset.forName("UTF-8"))
+                .validateMigrationNaming(true)
                 .dataSource(dataSource("admin"))
                 .initSql(String.format("SET ROLE \"%s\"", dbRole("admin")))
                 .load()
