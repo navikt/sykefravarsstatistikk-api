@@ -53,6 +53,10 @@ spec:
     enabled: true
     path: /sykefravarsstatistikk-api/internal/actuator/prometheus
   webproxy: true
+
+  envFrom:
+    - secret: sykefravarsstatistikk-api
+
   vault:
     enabled: true
     paths:
