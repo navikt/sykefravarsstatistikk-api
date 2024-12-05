@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - distroless
+      - distroless-utf-8-scripts
     paths-ignore:
       - '**.md'
       - '**/**.md'
