@@ -1,4 +1,4 @@
-FROM ghcr.io/navikt/baseimages/temurin:21
+FROM eclipse-temurin:21.0.2_13-jdk
 
 ENV APP_NAME="sykefravarsstatistikk-api"
 ENV LANG="nb_NO.UTF-8"
