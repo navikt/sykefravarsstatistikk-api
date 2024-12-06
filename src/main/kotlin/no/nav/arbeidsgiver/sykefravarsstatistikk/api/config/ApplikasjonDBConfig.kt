@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.sykefravarsstatistikk.api.config
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import java.nio.charset.Charset
 import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil
 import no.nav.vault.jdbc.hikaricp.VaultError
 import org.flywaydb.core.Flyway
@@ -74,6 +75,7 @@ open class ApplikasjonDBConfig {
     open fun flywayMigrationStrategy(): FlywayMigrationStrategy {
         return FlywayMigrationStrategy {
             Flyway.configure()
+                .validateMigrationNaming(true)
                 .dataSource(dataSource("admin"))
                 .initSql(String.format("SET ROLE \"%s\"", dbRole("admin")))
                 .load()

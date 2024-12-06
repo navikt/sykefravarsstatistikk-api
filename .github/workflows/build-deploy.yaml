@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - verif-v5-token-validation-support
+      - distroless
     paths-ignore:
       - '**.md'
       - '**/**.md'
