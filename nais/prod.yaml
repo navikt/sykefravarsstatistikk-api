@@ -52,13 +52,13 @@ spec:
     enabled: true
     path: /sykefravarsstatistikk-api/internal/actuator/prometheus
   webproxy: true
+
+  envFrom:
+    - secret: sykefravarsstatistikk-api
+
   vault:
     enabled: true
-    paths:
-      - kvPath: /kv/prod/fss/sykefravarsstatistikk-api/arbeidsgiver
-        mountPath: /var/run/secrets/nais.io/vault
-      - kvPath: /apikey/apigw/prod/eksternapp.altinn.serviceowner/sykefravarsstatistikk-api
-        mountPath: /var/run/secrets/nais.io/altinn
+
   kafka:
     pool: nav-prod
   resources:
