@@ -49,17 +49,18 @@ spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: dev
+
   prometheus:
     enabled: true
     path: /sykefravarsstatistikk-api/internal/actuator/prometheus
   webproxy: true
+
+  envFrom:
+    - secret: sykefravarsstatistikk-api
+
   vault:
     enabled: true
-    paths:
-      - kvPath: /kv/preprod/fss/sykefravarsstatistikk-api/arbeidsgiver
-        mountPath: /var/run/secrets/nais.io/vault
-      - kvPath: /apikey/apigw/dev/eksternapp.altinn.serviceowner/sykefravarsstatistikk-api_q1
-        mountPath: /var/run/secrets/nais.io/altinn
+
   kafka:
     pool: nav-dev
   resources:
