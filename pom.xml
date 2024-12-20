@@ -64,7 +64,7 @@
 
         <!-- Logging & Observability -->
         <common-log.version>2.2023.01.10_13.49-81ddc732df3a</common-log.version>
-        <ch.qos.logback.version>1.5.12</ch.qos.logback.version>
+        <ch.qos.logback.version>1.5.13</ch.qos.logback.version>
         <logback-syslog4j.version>1.0.0</logback-syslog4j.version>
         <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
 
