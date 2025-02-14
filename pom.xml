@@ -38,6 +38,9 @@
         <nimbus-jose-jwt.version>10.0.1</nimbus-jose-jwt.version>
         <token-support.version>5.0.16</token-support.version>
 
+        <!-- spring 3.4.2 har sårbar versjon 4.1.117.Final -->
+        <netty.version>4.1.118.Final</netty.version>
+
         <!-- Data manipulation -->
         <commons-io.version>2.18.0</commons-io.version>
         <json-smart.version>2.5.2</json-smart.version>
