@@ -38,8 +38,6 @@ jobs:
         id: docker-push
         with:
           team: arbeidsgiver
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
     outputs:
       image: ${{ steps.docker-push.outputs.image }}
 
@@ -86,5 +84,3 @@ jobs:
         with:
           image: ${{ needs.docker-build-push.outputs.image }}
           team: arbeidsgiver
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
