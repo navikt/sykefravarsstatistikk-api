@@ -44,7 +44,7 @@
         <jackson-dataformat-csv.version>2.19.0</jackson-dataformat-csv.version>
 
         <!-- Database & Persistence -->
-        <flyway-database-postgresql.version>11.8.0</flyway-database-postgresql.version>
+        <flywaydb-flyway.version>11.8.1</flywaydb-flyway.version>
         <ojdbc8.version>19.3.0.0</ojdbc8.version>
         <postgresql.version>42.7.5</postgresql.version>
         <shedlock.version>6.5.0</shedlock.version>
@@ -142,7 +142,12 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
-            <version>${flyway-database-postgresql.version}</version>
+            <version>${flywaydb-flyway.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>${flywaydb-flyway.version}</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
