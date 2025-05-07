@@ -7,6 +7,8 @@ on:
       - '.github/workflows/deploy-alerts.yaml'
 jobs:
   apply-alerts:
+    permissions:
+      id-token: write
     name: Deploy alerts
     runs-on: ubuntu-latest
     timeout-minutes: 2

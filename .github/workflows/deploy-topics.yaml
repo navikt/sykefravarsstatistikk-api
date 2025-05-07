@@ -7,6 +7,8 @@ on:
       - '.github/workflows/deploy-topics.yaml'
 jobs:
   deployTopics:
+    permissions:
+      id-token: write
     name: Deploy topics
     runs-on: ubuntu-latest
     timeout-minutes: 2
