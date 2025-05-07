@@ -52,7 +52,6 @@ jobs:
         env:
           CLUSTER: dev-fss
           IMAGE: ${{ needs.docker-build-push.outputs.image }}
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           RESOURCE: nais/dev.yaml
 
   deploy-to-prod:
@@ -67,7 +66,6 @@ jobs:
         env:
           CLUSTER: prod-fss
           IMAGE: ${{ needs.docker-build-push.outputs.image }}
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           RESOURCE: nais/prod.yaml
 
   trivy-scan:
