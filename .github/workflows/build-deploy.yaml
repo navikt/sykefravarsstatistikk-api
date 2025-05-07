@@ -48,7 +48,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - uses: nais/deploy/actions/deploy@v1
+      - uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: dev-fss
           IMAGE: ${{ needs.docker-build-push.outputs.image }}
@@ -63,7 +63,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - uses: nais/deploy/actions/deploy@v1
+      - uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: prod-fss
           IMAGE: ${{ needs.docker-build-push.outputs.image }}
