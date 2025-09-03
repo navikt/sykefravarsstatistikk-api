@@ -40,6 +40,7 @@ class ImporterOgEksporterStatistikkCron(
     private val vellykketEksportCounter: Counter = registry.counter("sykefravarstatistikk_vellykket_eksport")
     private val noeFeilet: Counter = registry.counter("sykefravarstatistikk_import_eller_eksport_feilet")
 
+    private val skipEksport = true // Vi eksporterer ikke lenger metadata og statistikk (overgang til GCP og Pia namespace)
 
     @Scheduled(cron = FEM_OVER_ÅTTE_HVER_DAG)
     fun scheduledImporteringOgEksportering() {
@@ -97,28 +98,35 @@ class ImporterOgEksporterStatistikkCron(
         }
 
         if (kraveneErOppfyltForÅStarte(EKSPORTERT_METADATA_VIRKSOMHET, gjeldendeKvartal)) {
-            eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(gjeldendeKvartal)
-                .getOrElse {
-                    noeFeilet.inkrementerOgLogg()
-                    return
-                }
+            if (!skipEksport) {
+                eksporteringMetadataVirksomhetService.eksporterMetadataVirksomhet(gjeldendeKvartal)
+                    .getOrElse {
+                        noeFeilet.inkrementerOgLogg()
+                        return
+                    }
+            } else {
+                log.info("Eksport av metadata er skrudd av. Vil ikke eksportere metadata for $gjeldendeKvartal")
+            }
             importEksportStatusRepository.leggTilFullførtJobb(EKSPORTERT_METADATA_VIRKSOMHET, gjeldendeKvartal)
         }
 
         if (kraveneErOppfyltForÅStarte(EKSPORTERT_PER_STATISTIKKATEGORI, gjeldendeKvartal)) {
-            Statistikkategori.entries.forEach { kategori ->
-                runCatching {
-                    eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(
-                        gjeldendeKvartal,
-                        kategori
-                    )
-                }.getOrElse {
-                    log.error("Eksport av kategori $kategori feilet", it)
-                    noeFeilet.inkrementerOgLogg()
-                    return
+            if (!skipEksport) {
+                Statistikkategori.entries.forEach { kategori ->
+                    runCatching {
+                        eksporteringPerStatistikkKategoriService.eksporterPerStatistikkKategori(
+                            gjeldendeKvartal,
+                            kategori
+                        )
+                    }.getOrElse {
+                        log.error("Eksport av kategori $kategori feilet", it)
+                        noeFeilet.inkrementerOgLogg()
+                        return
+                    }
                 }
+            } else {
+                log.info("Eksport av statistikk er skrudd av. Vil ikke eksportere statistikk for $gjeldendeKvartal")
             }
-
             importEksportStatusRepository.leggTilFullførtJobb(
                 EKSPORTERT_PER_STATISTIKKATEGORI,
                 gjeldendeKvartal
