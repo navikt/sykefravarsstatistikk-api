@@ -12,10 +12,13 @@ import org.springframework.context.annotation.Profile
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.util.*
 import javax.sql.DataSource
+import org.slf4j.LoggerFactory
 
 @Configuration
 @Profile("!compose")
 open class DatavarehusDBConfig {
+    private val log = LoggerFactory.getLogger(this::class.java)
+
     @Value("\${datavarehus.datasource.url}")
     private val databaseUrl: String? = null
 
@@ -29,6 +32,7 @@ open class DatavarehusDBConfig {
     private val driverClassName: String? = null
     @Bean(name = ["datavarehusDS"])
     open fun datavarehusDataSource(): DataSource {
+        log.info("Creating datavarehusDataSource på url: '$databaseUrl'")
         val properties = Properties()
         properties["dataSource.oracle.jdbc.fanEnabled"] = false
         val config = HikariConfig(properties)
