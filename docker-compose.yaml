@@ -1,6 +1,6 @@
 services:
   authserver:
-    image: ghcr.io/navikt/mock-oauth2-server:2.1.1
+    image: ghcr.io/navikt/mock-oauth2-server:3.0.0
     environment:
       TZ: Europe/Oslo
       SERVER_PORT: 6969
