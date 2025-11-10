@@ -36,7 +36,7 @@
         <altinn-rettigheter-proxy-klient.version>altinn-rettigheter-proxy-klient-5.0.0</altinn-rettigheter-proxy-klient.version>
         <bouncy-castle-provider-jdk.version>1.82</bouncy-castle-provider-jdk.version>
         <nimbus-jose-jwt.version>10.5</nimbus-jose-jwt.version>
-        <token-support.version>5.0.30</token-support.version>
+        <token-support.version>5.0.39</token-support.version>
         <!-- Data manipulation -->
         <commons-io.version>2.20.0</commons-io.version>
         <json-smart.version>2.6.0</json-smart.version>
@@ -92,6 +92,10 @@
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>github</id>
+            <url>https://github-package-registry-mirror.gc.nav.no/cached/maven-release</url>
         </repository>
     </repositories>
 
@@ -321,6 +325,11 @@
         </dependency>
 
         <!--    Transitive dependencies    -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.19.0</version>
+        </dependency>
         <dependency>
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>
