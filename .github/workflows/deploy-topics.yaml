@@ -13,20 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      - uses: actions/checkout@v4
-      - name: Deploy topics to dev-gcp
-        uses: nais/deploy/actions/deploy@v2
-        env:
-          CLUSTER: dev-gcp
-          RESOURCE: "\
-              nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-land-dev.yaml,\
-              nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-virksomhet-dev.yaml,\
-              nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-naring-dev.yaml,\
-              nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-sektor-dev.yaml,\
-              nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-bransje-dev.yaml,\
-              nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-metadata-virksomhet-dev.yaml,\
-              nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-naringskode-dev.yaml,\
-              nais/topics/topic-arbeidsgiver-sykefravarsstatistikk-virksomhet-gradert-dev.yaml"
       - name: Deploy topics to prod-gcp
         if: github.ref == 'refs/heads/master'
         uses: nais/deploy/actions/deploy@v2
