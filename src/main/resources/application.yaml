@@ -23,46 +23,6 @@ spring:
 ---
 
 spring:
-  config.activate.on-profile: dev
-
-
-enhetsregisteret:
-  url: "https://arbeidsgiver-mock-enhetsregisteret.intern.dev.nav.no/enhetsregisteret/api"
-
-altinn:
-  url: "https://api-gw-q1.adeo.no/"
-  apikey: ${ALTINN_APIKEY}
-  apigw.apikey: ${ALTINN_APIGW_APIKEY}
-  proxy:
-    url: https://altinn-rettigheter-proxy.intern.dev.nav.no/altinn-rettigheter-proxy
-
-  iaweb.service:
-    code: 3403
-    edition: 1
-
-no.nav.security.jwt.issuer:
-  tokenx:
-    discoveryurl: ${TOKEN_X_WELL_KNOWN_URL}
-    accepted_audience: ${TOKEN_X_CLIENT_ID}
-
-tokenxclient:
-  jwk: ${TOKEN_X_PRIVATE_JWK}
-  clientId: ${TOKEN_X_CLIENT_ID}
-  altinn_rettigheter_proxy_audience: dev-gcp:arbeidsgiver:altinn-rettigheter-proxy
-
-
-database.navn: sykefravarsstatistikk-pg15
-vault.mount-path: postgresql/preprod-fss
-
-datavarehus.datasource:
-  url: ${DVH_DATASOURCE_URL}
-  username: ${DVH_BRUKERNAVN}
-  password: ${DVH_PASSORD}
-  driver-class-name: oracle.jdbc.OracleDriver
-
----
-
-spring:
   config.activate.on-profile: prod
 
 enhetsregisteret:

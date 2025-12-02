@@ -41,21 +41,6 @@ jobs:
     outputs:
       image: ${{ steps.docker-push.outputs.image }}
 
-  deploy-to-dev:
-    permissions:
-      id-token: write
-    name: Deploy to dev-fss
-    needs: docker-build-push
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-      - uses: nais/deploy/actions/deploy@v2
-        env:
-          CLUSTER: dev-fss
-          IMAGE: ${{ needs.docker-build-push.outputs.image }}
-          RESOURCE: nais/dev.yaml
-
   deploy-to-prod:
     permissions:
       id-token: write
