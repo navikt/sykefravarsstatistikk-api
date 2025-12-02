@@ -15,11 +15,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Deploy alerts to dev-fss
-        uses: nais/deploy/actions/deploy@v2
-        env:
-          CLUSTER: dev-fss
-          RESOURCE: nais/alerts.yaml
       - name: Deploy alerts to prod-fss
         if: github.ref == 'refs/heads/master'
         uses: nais/deploy/actions/deploy@v2
