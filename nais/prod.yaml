@@ -8,37 +8,10 @@ metadata:
 spec:
   image: {{ image }}
   port: 8080
-  ingresses:
-    - https://sykefravarsstatistikk-api.prod-fss-pub.nais.io/ # bro mellom fss og gcp
   tokenx:
     enabled: true
   secureLogs:
     enabled: true
-  accessPolicy:
-    inbound:
-      rules:
-        - application: sykefravarsstatistikk
-          namespace: arbeidsgiver
-          cluster: prod-gcp
-        - application: min-side-arbeidsgiver
-          namespace: fager
-          cluster: prod-gcp
-        - application: min-ia
-          namespace: teamia
-          cluster: prod-gcp
-        - application: min-ia
-          namespace: pia
-          cluster: prod-gcp
-        - application: forebyggingsplan-frontend
-          namespace: teamia
-          cluster: prod-gcp
-    outbound:
-      rules:
-        - application: altinn-rettigheter-proxy
-          namespace: arbeidsgiver
-          cluster: prod-gcp
-      external:
-        - host: data.brreg.no
   liveness:
     path: /sykefravarsstatistikk-api/internal/liveness
     initialDelay: 30
