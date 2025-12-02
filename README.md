@@ -1,6 +1,13 @@
 Sykefraværsstatistikk api
 ================
 
+
+# Repository arkiveres
+
+Denne appen er migrert over til https://github.com/navikt/pia-sykefravarsstatistikk. 
+
+
+
 Denne appen eksponerer statistikk om sykefravær.
 Arbeidsgivere skal kunne se sitt eget sykefravær sammenlignet med sykefraværet i egen bransje,
 sektor og i hele landet.
